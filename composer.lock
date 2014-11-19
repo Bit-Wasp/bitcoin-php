@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "763e5851765fe9afc24e4554eafdae2e",
+    "hash": "d011118429864032723ca0f1770f4f29",
     "packages": [
         {
             "name": "mdanter/ecc",
