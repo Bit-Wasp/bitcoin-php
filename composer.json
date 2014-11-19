@@ -1,0 +1,26 @@
+{
+  "autoload": {
+    "psr-4": {
+      "Bitcoin\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=5.3.3",
+    "ext-gmp": "*",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-openssl": "*",
+    "ext-mcrypt": "*",
+    "symfony/config": "~2.3",
+    "symfony/dependency-injection": "~2.3",
+    "mdanter/ecc": "~0.1"
+  },
+  "require-dev": {
+    "phpmd/phpmd": "~2.1.3",
+    "phpunit/phpunit": "~4.3.1",
+    "fzaninotto/faker": "~1.4.0",
+    "mikey179/vfsStream": "~1.4.0",
+    "squizlabs/php_codesniffer": "~1.5.5",
+    "satooshi/php-coveralls": "~0.6.1"
+  }
+}
