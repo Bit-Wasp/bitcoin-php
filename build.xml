@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="bitcoin/package" default="build">
+    <target name="build" depends="lint,phpunit" />
+
+    <target name="lint"
+        description="Check the syntax of PHP files">
+        <mkdir dir="${project.basedir}/build/cache" />
+        <phplint cachefile="${project.basedir}/build/cache/phplint.cache">
+            <fileset dir="${project.basedir}/src">
+                <include name="**/*.php"/>
+            </fileset>
+        </phplint>
+    </target>
+
+    <target name="phpunit">
+        <delete dir="${project.basedir}/build/docs/code-coverage" />
+        <mkdir dir="${project.basedir}/build/docs/code-coverage" />
+        <exec executable="${project.basedir}/bin/phpunit" passthru="true">
+            <arg value="-c" />
+            <arg path="${project.basedir}/build/phpunit.dist.xml" />
+        </exec>
+    </target>
+
+    <target name="build:docs" description="Build user documentation">
+        <exec executable="make" passthru="true" dir="${project.basedir}/docs">
+            <arg value="html" />
+        </exec>
+    </target>
+</project>

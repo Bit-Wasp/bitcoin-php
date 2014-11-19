@@ -2,3 +2,6 @@ vendor
 .idea
 *~
 composer.lock
+build/docs/*
+build/logs/*
+build/cache/*
