@@ -11,7 +11,6 @@ namespace Bitcoin;
 
 class Hash
 {
-
     /**
      * Calculate Sha256(RipeMd160()) on the given data
      *
@@ -21,7 +20,8 @@ class Hash
      */
     public static function sha256ripe160($data, $binary_output = false)
     {
-        $hash = self::sha256($data, true);
+        $bs = pack("H*", $data);
+        $hash = self::sha256($bs, true);
         $hash = self::ripe160($hash, $binary_output);
         return $hash;
     }
@@ -73,7 +73,8 @@ class Hash
      * @param bool $binary_output
      * @return string
      */
-    public static function ripe160d($data, $binary_output = false) {
+    public static function ripe160d($data, $binary_output = false)
+    {
         $hash = self::ripe160($data, true);
         $hash = self::ripe160($hash, $binary_output);
         return $hash;
