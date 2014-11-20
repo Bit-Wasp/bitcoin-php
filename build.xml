@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="bitpay/package" default="build">
+<project name="bitcoin/package" default="build">
     <target name="build" depends="lint,phpunit" />
 
     <target name="lint"
