@@ -8,7 +8,6 @@
 
 namespace Bitcoin;
 
-
 class Math {
 
     private static $adapter = null;
@@ -25,5 +24,12 @@ class Math {
         }
 
         return call_user_func_array(array(static::$adapter, $name), $arguments);
+    }
+
+    public static function div_qr($dividend, $divisor)
+    {
+        $div = Math::div($dividend, $divisor);
+        $remainder = Math::sub($dividend, Math::mul($div, $divisor));
+        return array($div, $remainder);
     }
 }
