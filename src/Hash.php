@@ -81,7 +81,7 @@ class Hash
 
     /**
      * PBKDF2
-     * 
+     *
      * @param $algo
      * @param $data
      * @param $salt
