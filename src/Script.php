@@ -177,6 +177,9 @@ class Script implements ScriptInterface {
         return $this;
     }
 
+    /**
+     * Set up registered Op Codes
+     */
     public function setRegisteredOpCodes()
     {
         foreach (self::$opCodes as $key => $codeNum) {
@@ -184,6 +187,11 @@ class Script implements ScriptInterface {
         }
     }
 
+    /**
+     * Get Registered opcode (indexed by decimal opcode)
+     *
+     * @return array
+     */
     public function getRegisteredOpCodes()
     {
         return $this->rOpCodes;
@@ -207,6 +215,7 @@ class Script implements ScriptInterface {
     }
 
     /**
+     * Get human readable version of the script
      * @return string
      */
     public function getAsm() {
@@ -217,7 +226,7 @@ class Script implements ScriptInterface {
         $script = $this->getHex(true);
         $scriptLen = strlen($script);
 
-        while($pos < $scriptLen) {
+        while ($pos < $scriptLen) {
             // Load decimal opcode
             $hexOp = bin2hex(substr($script, $pos, 1));
             $opCode = Math::hexDec($hexOp);
@@ -256,6 +265,7 @@ class Script implements ScriptInterface {
 
             $data[] = $push;
         }
+
         return implode(" ", $data);
 
     }
@@ -362,11 +372,17 @@ class Script implements ScriptInterface {
         }
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return bin2hex($this->script);
     }
 
+    /**
+     *
+     */
     public function serialize()
     {
 

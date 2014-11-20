@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="bitcoin/package" default="build">
+<project name="bitpay/package" default="build">
     <target name="build" depends="lint,phpunit" />
 
     <target name="lint"
@@ -18,7 +18,7 @@
         <mkdir dir="${project.basedir}/build/docs/code-coverage" />
         <exec executable="${project.basedir}/bin/phpunit" passthru="true">
             <arg value="-c" />
-            <arg path="${project.basedir}/build/phpunit.dist.xml" />
+            <arg path="${project.basedir}/build" />
         </exec>
     </target>
 

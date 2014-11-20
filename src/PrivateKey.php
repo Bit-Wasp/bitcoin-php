@@ -12,12 +12,31 @@ use \Mdanter\Ecc\EccFactory;
 
 class PrivateKey implements KeyInterface, PrivateKeyInterface
 {
-
+    /**
+     * @var
+     */
     protected $decimal;
+
+    /**
+     * @var
+     */
     protected $hex;
+
+    /**
+     * @var \Mdanter\Ecc\CurveFp
+     */
     protected $curve;
+
+    /**
+     * @var
+     */
     protected $publicKey;
 
+    /**
+     * @param \Mdanter\Ecc\CurveFp $curve
+     * @param $hex
+     * @param bool $compressed
+     */
     public function __construct(\Mdanter\Ecc\CurveFp $curve, $hex, $compressed = false)
     {
         $this->hex = $hex;
@@ -31,32 +50,60 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface
         $this->curve = $curve;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function isCompressed()
     {
         return $this->compressed;
     }
 
+    /**
+     * Set whether compressed keys should be returned
+     *
+     * @param $setting
+     */
+    public function setCompressed($setting)
+    {
+        $this->compressed = $setting;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getCurve()
     {
         return $this->curve;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getHex()
     {
         return $this->hex;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDec()
     {
         return $this->dec;
     }
 
-    public function getWif(NetworkInterface $network, $compressed = false)
+    /**
+     * When given a network,
+     * @param NetworkInterface $network
+     * @param bool $compressed
+     * @return string
+     */
+    public function getWif(NetworkInterface $network)
     {
         $byte = $network->getPrivByte();
         $hex = sprintf("%s%s", $byte, $this->hex);
 
-        if ($compressed) {
+        if ($this->isCompressed()) {
             $hex .= '01';
         }
 

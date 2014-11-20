@@ -15,9 +15,6 @@ use \Mdanter\Ecc\GeneratorPoint;
 class PublicKey implements KeyInterface, PublicKeyInterface
 {
 
-    const PARITYBYTE_EVEN = '02';
-    const PARITYBYTE_ODD = '03';
-
     /**
      * @var PointInterface
      */
@@ -84,7 +81,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public function getHex($binary_output = FALSE)
     {
-        $hex = '';
+
         if ($this->compressed) {
             $byte = (Math::mod($this->getY(), 2) == '0') ? '02' : '03';
             $x    = str_pad(Math::decHex($this->getX()), '0', 64, STR_PAD_LEFT);

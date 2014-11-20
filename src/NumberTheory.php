@@ -2,19 +2,35 @@
 
 namespace Bitcoin;
 
-class Math {
+class NumberTheory
+{
 
+    /**
+     * @var \Mdanter\Ecc\NumberTheory
+     */
     private static $adapter = null;
 
-    public static function setAdapter(\Mdanter\Ecc\MathAdapter $math)
+    /**
+     * Set the adapter to use
+     *
+     * @param \Mdanter\Ecc\NumberTheory $theory
+     */
+    public static function setAdapter(\Mdanter\Ecc\NumberTheory $theory)
     {
-        self::$adapter = $math;
+        self::$adapter = $theory;
     }
 
+    /**
+     * Statically call the adapter (or catch the default) for number theory functions
+     *
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public static function __callStatic($name, $arguments)
     {
         if (is_null(static::$adapter)) {
-            static::$adapter = Bitcoin::getMath();
+            static::$adapter = Bitcoin::getNumberTheory();
         }
 
         return call_user_func_array(array(static::$adapter, $name), $arguments);

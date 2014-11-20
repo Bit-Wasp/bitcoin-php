@@ -9,7 +9,8 @@
 namespace Bitcoin;
 
 
-class ScriptInterpreter implements ScriptInterpreterInterface {
+class ScriptInterpreter implements ScriptInterpreterInterface
+{
 
     /**
      * @var Script
@@ -41,6 +42,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface {
      */
     protected $maxOpCodes;
 
+    /**
+     * @param Script $script
+     */
     public function __construct(Script $script)
     {
         $this->script = $script;

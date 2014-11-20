@@ -10,16 +10,35 @@ namespace Bitcoin;
 
 class TransactionInput implements TransactionInputInterface {
 
+    /**
+     * @var
+     */
     protected $txid;
+    /**
+     * @var
+     */
     protected $vout;
+    /**
+     * @var
+     */
     protected $sequence;
+    /**
+     * @var
+     */
     protected $script;
 
+    /**
+     * @return mixed
+     */
     public function getTransactionId()
     {
         return $this->txid;
     }
 
+    /**
+     * @param $txid
+     * @return $this
+     */
     public function setTransactionId($txid)
     {
         if (ctype_xdigit($txid) == true and strlen($txid) == 64) {
@@ -29,11 +48,18 @@ class TransactionInput implements TransactionInputInterface {
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getVout()
     {
         return $this->vout;
     }
 
+    /**
+     * @param $vout
+     * @return $this
+     */
     public function setVout($vout)
     {
         if (is_numeric($vout) == true) {
@@ -43,6 +69,9 @@ class TransactionInput implements TransactionInputInterface {
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getSequence()
     {
         if ($this->sequence == null) {
@@ -52,6 +81,10 @@ class TransactionInput implements TransactionInputInterface {
         return $this->sequence;
     }
 
+    /**
+     * @param $sequence
+     * @return $this
+     */
     public function setSequence($sequence)
     {
         if (is_numeric($sequence) == true) {
@@ -61,20 +94,33 @@ class TransactionInput implements TransactionInputInterface {
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getScript()
     {
         return $this->script;
     }
 
+    /**
+     *
+     */
     public function setScript()
     {
         // TODO
     }
 
+    /**
+     *
+     */
     public function isCoinbase()
     {
 
     }
+
+    /**
+     *
+     */
     public function serialize()
     {
 

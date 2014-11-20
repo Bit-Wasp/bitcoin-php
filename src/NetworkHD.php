@@ -8,8 +8,15 @@
 
 namespace Bitcoin;
 
-class NetworkHD extends Network {
+class NetworkHD extends Network
+{
 
+    /**
+     * Get version bytes for XPUB key
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function getHDPubByte()
     {
         if ($this->xpub_byte == null){
@@ -18,6 +25,12 @@ class NetworkHD extends Network {
         return $this->xpub_byte;
     }
 
+    /**
+     * Set version bytes for XPUB key
+     *
+     * @param $byte
+     * @return $this
+     */
     public function setHDPubByte($byte)
     {
         if (!empty($byte) and ctype_xdigit($byte) == true) {
@@ -26,6 +39,12 @@ class NetworkHD extends Network {
         return $this;
     }
 
+    /**
+     * Get version bytes for XPRIV key
+     *
+     * @return null
+     * @throws \Exception
+     */
     public function getHDPrivByte()
     {
         if ($this->xpriv_byte == null){
@@ -34,6 +53,12 @@ class NetworkHD extends Network {
         return $this->xpriv_byte;
     }
 
+    /**
+     * Set version bytes for XPRIV key
+     *
+     * @param $bytes
+     * @return $this
+     */
     public function setHDPrivByte($bytes)
     {
         if (!empty($bytes) and ctype_xdigit($bytes) == true) {
@@ -41,4 +66,4 @@ class NetworkHD extends Network {
         }
         return $this;
     }
-} 
+};
