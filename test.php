@@ -2,6 +2,7 @@
 
 use Bitcoin\Base58;
 use Bitcoin\Math;
+use Bitcoin\ScriptInterpreter;
 use Bitcoin\Buffer;
 use Bitcoin\Network;
 use Bitcoin\Transaction;
@@ -52,8 +53,13 @@ $rs
     ->op('CHECKMULTISIG');
 
 $hex = $rs->getHex();
-echo $hex."\n";
-echo "----------------------------------------\n";
+//echo $hex."\n";
+//echo "----------------------------------------\n";
 $p1 = Script::payToScriptHash($rs);
-echo $p1."\n";
-print_r($p1->getAsm());
+
+$i = new ScriptInterpreter($p1);
+//echo $p1."\n";
+print_r($p1->getAsm());echo "\n";
+echo "\n";
+
+$i->run();

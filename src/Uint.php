@@ -8,7 +8,7 @@
 
 namespace Bitcoin;
 
-
+// TODO: Use for templating things?
 class Uint {
 
     protected $math;

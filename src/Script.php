@@ -11,7 +11,10 @@ namespace Bitcoin;
 
 class Script implements ScriptInterface {
 
-    protected $opCodes = array(
+    /**
+     * @var array
+     */
+    public static $opCodes = array(
         // Constants
         'OP_0'    => 0,
         'OP_PUSHDATA1' => 76,
@@ -145,45 +148,205 @@ class Script implements ScriptInterface {
 
     private $rOpCodes;
 
-    protected $script;
-    protected $stack;
-
-    const PUSHDATA1_LIMIT = 65535;      // uint16_t (2^16)
-
+    /**
+     *
+     */
     public function __construct()
     {
         $this->script = '';
+        $this->setRegisteredOpCodes();
 
-        foreach ($this->opCodes as $key => $codeNum) {
-            $this->rOpCodes[$codeNum] = $key;
-        }
     }
 
+    /**
+     * Add an opcode to the script
+     *
+     * @param $opCode
+     * @return $this
+     */
     public function op($opCode)
     {
         $code = 'OP_' . $opCode;
 
-        if (!$this->opCodes[$code]) {
+        if (!self::$opCodes[$code]) {
             throw new \RuntimeException('Invalid script opcode encountered: '.$opCode);
         }
 
-        $op = $this->opCodes[$code];
+        $op = self::$opCodes[$code];
         $this->script .= hex2bin((Math::decHex($op)));
         return $this;
     }
 
+    public function setRegisteredOpCodes()
+    {
+        foreach (self::$opCodes as $key => $codeNum) {
+            $this->rOpCodes[$codeNum] = $key;
+        }
+    }
+
+    public function getRegisteredOpCodes()
+    {
+        return $this->rOpCodes;
+    }
+
+    /**
+     * Push data into the stack
+     *
+     * @param $data
+     * @return $this
+     * @throws \Exception
+     */
+    public function push($data)
+    {
+        $bin    = hex2bin($data);
+        $varInt = self::numToVarInt(strlen($bin));
+        $string = $varInt . $bin;
+
+        $this->script .=  $string;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsm() {
+        $pos = 0;
+        $data = array();
+
+        // Load script as a byte string
+        $script = $this->getHex(true);
+        $scriptLen = strlen($script);
+
+        while($pos < $scriptLen) {
+            // Load decimal opcode
+            $hexOp = bin2hex(substr($script, $pos, 1));
+            $opCode = Math::hexDec($hexOp);
+            $pos += 1;
+
+            if ($opCode < 1) {
+                // False, or OP_0
+                $push = '0';
+
+            } else if ($opCode < 75) {
+                // When < 75, this opCode is the length of the following string
+                $push = bin2hex(substr($script, $pos, $opCode));
+                $pos += $opCode;
+
+            } else if($opCode <= 78) {
+                // Get length of following string
+                $lenLen = 2 ^ ($opCode - 76);
+                $len = Math::hexDec(substr($script, $pos, $lenLen));
+                $pos += $len;
+
+                $push = bin2hex(substr($script, $pos, ($pos + $len)));
+                $pos += $len;
+
+            } else if ($opCode <= 96) {
+                // In the OP_1 - OP_16 region. 80 - 96. So Subtract $opCode - 80.
+                $push = ($opCode - 80);
+
+            } else {
+                // None of these pushdatas, so just an opcode
+                if(isset($this->rOpCodes[$opCode])){
+                    $push = $this->rOpCodes[$opCode];
+                } else {
+                    $push = "[unknown:$opCode]";
+                }
+            }
+
+            $data[] = $push;
+        }
+        return implode(" ", $data);
+
+    }
+
+    /**
+     * Get the hex or binary string of this script
+     *
+     * @param bool $binary_output
+     * @return string
+     */
+    public function getHex($binary_output = false)
+    {
+        if ($binary_output) {
+            return $this->script;
+        } else {
+            return bin2hex($this->script);
+        }
+    }
+
+
+    /**
+     * Create a Pay to pubkey output
+     *
+     * @param PublicKeyInterface $public_key
+     * @return Script
+     */
+    public static function payToPubKey(PublicKeyInterface $public_key)
+    {
+        $script = new self();
+        $script->push($public_key->getHex())->op('CHECKSIG');
+
+        return $script;
+    }
+
+    /**
+     * Create a P2PKH output script
+     *
+     * @param PublicKeyInterface $public_key
+     * @return Script
+     */
+    public static function payToPubKeyHash(PublicKeyInterface $public_key)
+    {
+        $hash = Hash::sha256ripe160($public_key->getHex());
+
+        $script = new self();
+        $script->op('DUP')->op('HASH160')->push($hash)->op('EQUALVERIFY');
+
+        return $script;
+    }
+
+    /**
+     * Create a P2SH output script
+     *
+     * @param Script $script
+     * @return Script
+     */
+    public static function payToScriptHash(Script $script)
+    {
+        $script_hex = $script->getHex();
+        $hash = Hash::sha256ripe160($script_hex);
+
+        $new_script = new self();
+        $new_script->op('HASH160')->push($hash)->op('EQUAL');
+        return $new_script;
+    }
+
+    /**
+     * Flip byte order of this string
+     *
+     * @param $hex
+     * @return string
+     */
     public static function flipBytes($hex)
     {
         return implode('', array_reverse(str_split($hex, 2)));
     }
 
+    /**
+     * Convert a decimal number into a VarInt
+     *
+     * @param $decimal
+     * @return string
+     * @throws \Exception
+     */
     public static function numToVarInt($decimal)
     {
         if ($decimal < 0xfd) {
             return chr($decimal);
 
         } elseif ($decimal > 0xffffffffffffffff) {
-            throw new Exception('numToVarInt(): Integer too large');
+            throw new \Exception('numToVarInt(): Integer too large');
 
         } else {
 
@@ -197,99 +360,6 @@ class Script implements ScriptInterface {
                 }
             }
         }
-    }
-
-    public function getAsm() {
-        $pos = 0;
-        $data = array();
-
-        $script = $this->getHex(true);
-        $scriptLen = strlen($script);
-
-        while($pos < $scriptLen) {
-            $codeHex = bin2hex(substr($script, $pos, 1));
-            $opCode = Math::hexDec($codeHex);
-            $pos += 1;
-
-            if ($opCode < 1) {
-                $push = '0';
-            } else if ($opCode < 75) {
-                // When < 75, this opCode is the length of the following string
-                $push = bin2hex(substr($script, $pos, $opCode));
-                $pos += $opCode;
-            } else if($opCode <= 78) {
-                // Get length of following string
-                $lenLen = 2 ^ ($opCode - 76);
-                $len = Math::hexDec(substr($script, $pos, $lenLen));
-                $pos += $len;
-
-                $push = bin2hex(substr($script, $pos, ($pos + $len)));
-                $pos += $len;
-            } else if ($opCode <= 96) {
-                $push = ($opCode - 80);
-            } else {
-                if(isset($this->rOpCodes[$opCode])){
-                    $push = $this->rOpCodes[$opCode];
-                } else {
-                    $push = '??';
-                }
-            }
-            $data[] = $push;
-        }
-        return implode(" ", $data);
-
-    }
-
-    public function getHex($binary_output = false)
-    {
-        if ($binary_output) {
-            return $this->script;
-        } else {
-            return bin2hex($this->script);
-        }
-    }
-
-    public function push($data)
-    {
-        $bin    = hex2bin($data);
-        $varInt = self::numToVarInt(strlen($bin));
-        $string = $varInt . $bin;
-
-        $this->script .=  $string;
-        return $this;
-    }
-
-    public function getChunks()
-    {
-
-    }
-
-    public static function payToPubKey(PublicKeyInterface $public_key)
-    {
-        $script = new self();
-        $script->push($public_key->getHex())->op('CHECKSIG');
-
-        return $script;
-    }
-
-    public static function payToPubKeyHash(PublicKeyInterface $public_key)
-    {
-        $hash = Hash::sha256ripe160($public_key->getHex());
-
-        $script = new self();
-        $script->op('DUP')->op('HASH160')->push($hash)->op('EQUALVERIFY');
-
-        return $script;
-    }
-
-    public static function payToScriptHash(Script $script)
-    {
-        $script_hex = $script->getHex();
-        $hash = Hash::sha256ripe160($script_hex);
-
-        $new_script = new self();
-        $new_script->op('HASH160')->push($hash)->op('EQUAL');
-        return $new_script;
     }
 
     public function __toString()

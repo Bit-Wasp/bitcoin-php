@@ -15,6 +15,5 @@ interface PublicKeyInterface {
     public function getY();
     public function getCurve();
     public function getPoint();
-    public function getGenerator();
 
 } 

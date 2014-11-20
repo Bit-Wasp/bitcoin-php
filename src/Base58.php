@@ -13,6 +13,12 @@ class Base58 {
 
     private static $base58chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
+    /**
+     * Calculate a checksum for the given data
+     *
+     * @param $data
+     * @return string
+     */
     public static function checksum($data)
     {
         $hash = Hash::sha256d($data);
@@ -21,10 +27,17 @@ class Base58 {
         return $checksum;
     }
 
+    /**
+     * Encode a given hex string in base58
+     *
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
     public static function encode($data)
     {
         if (Math::mod(strlen($data), 2) != 0 || strlen($data) == 0) {
-            throw new Exception('Invalid length, must be a valid hex string');
+            throw new \Exception('Invalid length, must be a valid hex string');
         }
 
         $decimal = Math::hexDec($data);
@@ -44,6 +57,13 @@ class Base58 {
         return $output;
     }
 
+    /**
+     * Encode the given data in base58, with a checksum to check integrity.
+     *
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
     public static function encode_check($data)
     {
         $checksum = self::checksum($data);
@@ -51,6 +71,12 @@ class Base58 {
         return self::encode($hex);
     }
 
+    /**
+     * Decode a base58 string
+     *
+     * @param $base58
+     * @return string
+     */
     public static function decode($base58)
     {
         $original = $base58;
@@ -73,6 +99,13 @@ class Base58 {
         return $hex;
     }
 
+    /**
+     * Decode a base58 checksum string and validate checksum
+     *
+     * @param $base58
+     * @return string
+     * @throws Base58ChecksumFailure
+     */
     public static function decode_check($base58)
     {
 

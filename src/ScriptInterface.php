@@ -10,7 +10,9 @@ namespace Bitcoin;
 
 
 interface ScriptInterface {
-    public function getChunks();
+
+
+    public function getHex();
     public function serialize();
 
 } 
