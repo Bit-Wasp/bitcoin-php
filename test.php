@@ -52,14 +52,24 @@ $rs
     ->op('3')
     ->op('CHECKMULTISIG');
 
-$hex = $rs->getHex();
-//echo $hex."\n";
-//echo "----------------------------------------\n";
-$p1 = Script::payToScriptHash($rs);
 
-$i = new ScriptInterpreter($p1);
+
+$hex = $rs->serialize('hex');
+echo $hex."\n";
+
+
+print_r($rs->getAsm());
+
+//echo "----------------------------------------\n";
+
+//print_r($p1);
+$i = new ScriptInterpreter($rs);
 //echo $p1."\n";
-print_r($p1->getAsm());echo "\n";
+//print_r($p1->getAsm());echo "\n";
 echo "\n";
 
 $i->run();
+
+$j = new ScriptInterpreter(Script::payToScriptHash($rs));
+$j ->run();
+print_r($j);

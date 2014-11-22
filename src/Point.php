@@ -12,6 +12,10 @@ use \Mdanter\Ecc\EccFactory;
 use \Mdanter\Ecc\PointInterface;
 use \Mdanter\Ecc\GeneratorPoint;
 
+/**
+ * Class Point
+ * @package Bitcoin
+ */
 class Point implements PointInterface
 {
 
@@ -50,10 +54,10 @@ class Point implements PointInterface
     public function __construct($x, $y, GeneratorPoint $generator = null)
     {
         if ($generator == null) {
-            $generator = \Mdanter\Ecc\EccFactory::getSecgCurves()->generator256k1();
+            $generator = EccFactory::getSecgCurves()->generator256k1();
         }
 
-        $math = \Mdanter\Ecc\EccFactory::getAdapter();
+        $math = EccFactory::getAdapter();
 
         $this->point = new \Mdanter\Ecc\Point($generator->getCurve(), $x, $y, $generator->getOrder(), $math);
     }

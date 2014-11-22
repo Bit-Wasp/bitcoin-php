@@ -1,30 +1,39 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 18:13
- */
 
 namespace Bitcoin;
 
-class Buffer {
-
-    protected $math;
+/**
+ * Class Buffer
+ * @package Bitcoin
+ */
+class Buffer
+{
+    /**
+     * @var int|null
+     */
     protected $size;
+
+    /**
+     * @var string
+     */
     protected $buffer;
 
+    /**
+     * @param $byte_string
+     * @param null $bitsize
+     * @throws \Exception
+     */
     public function __construct($byte_string, $bitsize = null)
     {
         if ( ! is_string($byte_string)) {
-            throw new \Exception('Number must be a string');
+            throw new \Exception('Data for buffer must be a string');
         }
 
         if (is_numeric($bitsize)) {
             $max_int = Math::pow(2, $bitsize);
 
             if (Math::cmp($byte_string, $max_int) > 0) {
-                throw new \Exception('Decimal is out of range of bitsize');
+                throw new \Exception('Byte string exceeds maximum size');
             }
         }
 
@@ -32,17 +41,20 @@ class Buffer {
         $this->buffer = $byte_string;
     }
 
-    public function serialize()
+    /**
+     * @return int|null|string
+     */
+    public function getMaxSize()
     {
-
+        return $this->size;
     }
 
-    public function __toString()
-    {
-        $unpack = unpack("H*", $this->buffer);
-        return $unpack[1];
-    }
-
+    /**
+     * @param $hex
+     * @param null $uint
+     * @return Buffer
+     * @throws \Exception
+     */
     public static function hex($hex, $uint = null)
     {
         if (ctype_print($hex) AND ctype_xdigit($hex) == false) {
@@ -52,4 +64,38 @@ class Buffer {
         $buffer = pack("H*", $hex);
         return new self($buffer, $uint);
     }
+
+    /**
+     * @param string|null $type
+     * @return int
+     */
+    public function getSize($type = null)
+    {
+        $string = $this->serialize($type);
+        $size   = strlen($string);
+        return $size;
+    }
+
+    /**
+     * @param string|null $type
+     * @return string
+     */
+    public function serialize($type = null)
+    {
+        if ($type == 'hex') {
+            return $this->__toString();
+        } else {
+            return $this->buffer;
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function __toString()
+    {
+        $unpack = unpack("H*", $this->buffer);
+        return $unpack[1];
+    }
+
 } 

@@ -1,16 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 05:19
- */
 
 namespace Bitcoin;
 
+/**
+ * Class Base58
+ * @package Bitcoin
+ */
+class Base58
+{
 
-class Base58 {
-
+    /**
+     * @var string
+     */
     private static $base58chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     /**
@@ -36,8 +37,12 @@ class Base58 {
      */
     public static function encode($data)
     {
-        if (Math::mod(strlen($data), 2) != 0 || strlen($data) == 0) {
-            throw new \Exception('Invalid length, must be a valid hex string');
+        if (strlen($data) == 0) {
+            return '';
+        }
+
+        if (Math::mod(strlen($data), 2) != 0) {
+            throw new \Exception('Data must be of even length');
         }
 
         $decimal = Math::hexDec($data);
@@ -79,6 +84,9 @@ class Base58 {
      */
     public static function decode($base58)
     {
+        if(strlen($base58) == 0)
+            return '';
+
         $original = $base58;
         $return = 0;
 
@@ -91,6 +99,7 @@ class Base58 {
         for ($i = 0; $i < strlen($original) && $original[$i] == "1"; $i++) {
             $hex = "00" . $hex;
         }
+
 
         if (Math::mod(strlen($return),2) != 0 ) {
             $hex = "0" . $return;

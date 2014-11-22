@@ -1,14 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 05:44
- */
 
 namespace Bitcoin;
 
-
+/**
+ * Class Hash
+ * @package Bitcoin
+ */
 class Hash
 {
     /**
@@ -22,7 +19,7 @@ class Hash
     {
         $bs = pack("H*", $data);
         $hash = self::sha256($bs, true);
-        $hash = self::ripe160($hash, $binary_output);
+        $hash = self::ripemd160($hash, $binary_output);
         return $hash;
     }
 
@@ -60,7 +57,7 @@ class Hash
      * @param bool $binary_output
      * @return string
      */
-    public static function ripe160($data, $binary_output = false)
+    public static function ripemd160($data, $binary_output = false)
     {
         $hash = hash('ripemd160', $data, $binary_output);
         return $hash;
@@ -73,10 +70,21 @@ class Hash
      * @param bool $binary_output
      * @return string
      */
-    public static function ripe160d($data, $binary_output = false)
+    public static function ripemd160d($data, $binary_output = false)
     {
-        $hash = self::ripe160($data, true);
-        $hash = self::ripe160($hash, $binary_output);
+        $hash = self::ripemd160($data, true);
+        $hash = self::ripemd160($hash, $binary_output);
+        return $hash;
+    }
+
+    /**
+     * @param $data
+     * @param bool $binary_output
+     * @return string
+     */
+    public static function sha1($data, $binary_output = false)
+    {
+        $hash = hash('sha1', $data, $binary_output);
         return $hash;
     }
 

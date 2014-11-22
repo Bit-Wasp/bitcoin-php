@@ -1,13 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 06:31
- */
 
 namespace Bitcoin;
 
+/**
+ * Interface PrivateKeyInterface
+ * @package Bitcoin
+ */
 interface PrivateKeyInterface
 {
 

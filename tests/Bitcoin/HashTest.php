@@ -46,7 +46,7 @@ class HashTest extends \PHPUnit_Framework_TestCase {
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $hash = $this->hash->ripe160($test->data);
+            $hash = $this->hash->ripemd160($test->data);
             $this->assertSame($hash, $test->result);
         }
     }
@@ -57,7 +57,7 @@ class HashTest extends \PHPUnit_Framework_TestCase {
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $hash = $this->hash->ripe160d($test->data);
+            $hash = $this->hash->ripemd160d($test->data);
             $this->assertSame($hash, $test->result);
         }
     }

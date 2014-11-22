@@ -1,16 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 13:37
- */
+
 
 namespace Bitcoin;
 
 
 interface ScriptInterpreterInterface
 {
+
+    const SCRIPT_ERR_BAD_OPCODE = "";
+    const SCRIPT_ERR_PUSH_SIZE = "";
+    const SCRIPT_ERR_OP_COUNT = "";
+    const SCRIPT_ERR_MINIMALDATA = "";
 
     const SIGHASH_ALL          = 0x1;
     const SIGHASH_NONE         = 0x2;
@@ -48,5 +48,5 @@ interface ScriptInterpreterInterface
      * @param $sighash_type
      * @return mixed
      */
-    public function run(TransactionInterface $transaction, $index, $sighash_type);
+  //  public function run(TransactionInterface $transaction, $index, $sighash_type);
 } 

@@ -1,15 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 05:18
- */
 
 namespace Bitcoin;
 
 use \Mdanter\Ecc\EccFactory;
 
+/**
+ * Class PrivateKey
+ * @package Bitcoin
+ */
 class PrivateKey implements KeyInterface, PrivateKeyInterface
 {
     /**
@@ -93,7 +91,8 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface
     }
 
     /**
-     * When given a network,
+     * When given a network, return a WIF
+     *
      * @param NetworkInterface $network
      * @param bool $compressed
      * @return string

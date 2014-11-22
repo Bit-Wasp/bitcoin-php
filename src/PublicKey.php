@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 05:18
- */
 
 namespace Bitcoin;
 
@@ -12,6 +6,10 @@ use \Mdanter\Ecc\EccFactory;
 use \Mdanter\Ecc\PointInterface;
 use \Mdanter\Ecc\GeneratorPoint;
 
+/**
+ * Class PublicKey
+ * @package Bitcoin
+ */
 class PublicKey implements KeyInterface, PublicKeyInterface
 {
 

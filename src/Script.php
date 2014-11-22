@@ -1,20 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 05:12
- */
 
 namespace Bitcoin;
 
-
-class Script implements ScriptInterface {
+/**
+ * Class Script
+ * @package Bitcoin
+ */
+class Script implements ScriptInterface
+{
 
     /**
      * @var array
      */
-    public static $opCodes = array(
+    public $opCodes = array(
         // Constants
         'OP_0'    => 0,
         'OP_PUSHDATA1' => 76,
@@ -149,7 +147,7 @@ class Script implements ScriptInterface {
     private $rOpCodes;
 
     /**
-     *
+     * Initialize container
      */
     public function __construct()
     {
@@ -159,32 +157,39 @@ class Script implements ScriptInterface {
     }
 
     /**
-     * Add an opcode to the script
-     *
-     * @param $opCode
-     * @return $this
-     */
-    public function op($opCode)
-    {
-        $code = 'OP_' . $opCode;
-
-        if (!self::$opCodes[$code]) {
-            throw new \RuntimeException('Invalid script opcode encountered: '.$opCode);
-        }
-
-        $op = self::$opCodes[$code];
-        $this->script .= hex2bin((Math::decHex($op)));
-        return $this;
-    }
-
-    /**
      * Set up registered Op Codes
      */
     public function setRegisteredOpCodes()
     {
-        foreach (self::$opCodes as $key => $codeNum) {
+        foreach ($this->opCodes as $key => $codeNum) {
             $this->rOpCodes[$codeNum] = $key;
         }
+    }
+
+    /**
+     * Get a list of op codes: opCode => OP_X
+     *
+     * @return array
+     */
+    public function getRegisteredOpCodes()
+    {
+        return $this->rOpCodes;
+    }
+
+    /**
+     * When given an $opCode, returns OP_X
+     *
+     * @param $opCode
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getRegisteredOpCode($opCode)
+    {
+        if (!isset($this->rOpCodes[$opCode])) {
+            throw new \Exception('Script op byte '. $opCode . ' not found');
+        }
+
+        return $this->rOpCodes[$opCode];
     }
 
     /**
@@ -192,9 +197,45 @@ class Script implements ScriptInterface {
      *
      * @return array
      */
-    public function getRegisteredOpCodes()
+    public function getOpCodes()
     {
-        return $this->rOpCodes;
+        return $this->opCodes;
+    }
+
+    /**
+     * When given a text 'OP_X' will return the op code.
+     * @param $code
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getOpCode($code)
+    {
+        if (!isset($this->opCodes[$code])) {
+            throw new \Exception('Script opcode '. $code . ' not found');
+        }
+
+        return $this->opCodes[$code];
+    }
+
+
+    /**
+     * Add an opcode to the script
+     *
+     * @param $opCode
+     * @throws ScriptRuntimeException
+     * @return $this
+     */
+    public function op($opCode)
+    {
+        $code = 'OP_' . $opCode;
+
+        if (!$this->opCodes[$code]) {
+            throw new ScriptRuntimeException('Invalid script opcode encountered: '.$opCode);
+        }
+
+        $op = $this->opCodes[$code];
+        $this->script .= hex2bin((Math::decHex($op)));
+        return $this;
     }
 
     /**
@@ -215,15 +256,15 @@ class Script implements ScriptInterface {
     }
 
     /**
-     * Get human readable version of the script
-     * @return string
+     * Parse a script into opcodes and Buffers of data
+     * @return array
      */
-    public function getAsm() {
+    public function parse() {
         $pos = 0;
         $data = array();
 
         // Load script as a byte string
-        $script = $this->getHex(true);
+        $script = $this->serialize();
         $scriptLen = strlen($script);
 
         while ($pos < $scriptLen) {
@@ -234,29 +275,25 @@ class Script implements ScriptInterface {
 
             if ($opCode < 1) {
                 // False, or OP_0
-                $push = '0';
+                $push = Buffer::hex('');
 
             } else if ($opCode < 75) {
                 // When < 75, this opCode is the length of the following string
-                $push = bin2hex(substr($script, $pos, $opCode));
+                $push = new Buffer(substr($script, $pos, $opCode));
                 $pos += $opCode;
 
-            } else if($opCode <= 78) {
+            } else if ($opCode <= 78) {
                 // Get length of following string
                 $lenLen = 2 ^ ($opCode - 76);
                 $len = Math::hexDec(substr($script, $pos, $lenLen));
                 $pos += $len;
 
-                $push = bin2hex(substr($script, $pos, ($pos + $len)));
+                $push = new Buffer(substr($script, $pos, ($pos + $len)));
                 $pos += $len;
-
-            } else if ($opCode <= 96) {
-                // In the OP_1 - OP_16 region. 80 - 96. So Subtract $opCode - 80.
-                $push = ($opCode - 80);
 
             } else {
                 // None of these pushdatas, so just an opcode
-                if(isset($this->rOpCodes[$opCode])){
+                if (isset($this->rOpCodes[$opCode])) {
                     $push = $this->rOpCodes[$opCode];
                 } else {
                     $push = "[unknown:$opCode]";
@@ -265,26 +302,30 @@ class Script implements ScriptInterface {
 
             $data[] = $push;
         }
-
-        return implode(" ", $data);
+        return $data;
 
     }
 
     /**
-     * Get the hex or binary string of this script
-     *
-     * @param bool $binary_output
      * @return string
      */
-    public function getHex($binary_output = false)
+    public function getAsm()
     {
-        if ($binary_output) {
-            return $this->script;
-        } else {
-            return bin2hex($this->script);
-        }
-    }
+        $result = array();
+        $parse  = $this->parse();
 
+        foreach ($parse as $item) {
+            if ($item instanceof Buffer) {
+                $result[] = $item->serialize('hex');
+                // Buffer
+            } else {
+                $result[] = $item;
+                // Opcode
+            }
+        }
+
+        return implode(" ", $result);
+    }
 
     /**
      * Create a Pay to pubkey output
@@ -324,7 +365,7 @@ class Script implements ScriptInterface {
      */
     public static function payToScriptHash(Script $script)
     {
-        $script_hex = $script->getHex();
+        $script_hex = $script->serialize('hex');
         $hash = Hash::sha256ripe160($script_hex);
 
         $new_script = new self();
@@ -360,7 +401,7 @@ class Script implements ScriptInterface {
 
         } else {
 
-            //
+            // Loop through
             foreach (array(2, 4, 8) as $j => $numBytes) {
                 $uint_max = Math::pow(16, $numBytes);
 
@@ -381,10 +422,26 @@ class Script implements ScriptInterface {
     }
 
     /**
-     *
+     * @param null $type
+     * @return mixed|string
      */
-    public function serialize()
+    public function serialize($type = null)
     {
+        if ($type == 'hex') {
+            return $this->__toString();
+        } else {
+            return $this->script;
+        }
+    }
 
+    /**
+     * @param null $type
+     * @return int
+     */
+    public function getSize($type = null)
+    {
+        $data = $this->serialize($type);
+        $size = strlen($data);
+        return $size;
     }
 } 

@@ -1,14 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 15:57
- */
 
 namespace Bitcoin;
 
-interface TransactionInputInterface {
+/**
+ * Interface TransactionInputInterface
+ * @package Bitcoin
+ */
+interface TransactionInputInterface
+{
 
     const DEFAULT_SEQUENCE = 0xffffffff;
     

@@ -1,14 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 05:09
- */
 
 namespace Bitcoin;
 
-
+/**
+ * Class Transaction
+ * @package Bitcoin
+ */
 class Transaction implements TransactionInterface
 {
     /**

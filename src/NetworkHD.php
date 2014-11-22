@@ -1,13 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 17:16
- */
 
 namespace Bitcoin;
 
+/**
+ * Class NetworkHD
+ * @package Bitcoin
+ */
 class NetworkHD extends Network
 {
 

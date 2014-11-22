@@ -1,14 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 05:20
- */
 
 namespace Bitcoin;
 
-
+/**
+ * Interface TransactionInterface
+ * @package Bitcoin
+ */
 interface TransactionInterface {
     const MAX_VERSION  = 4294967296;
     const MAX_LOCKTIME = 4294967296;

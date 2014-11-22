@@ -1,27 +1,42 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 05:09
- */
 
 namespace Bitcoin;
 
+/**
+ * Class TransactionOutput
+ * @package Bitcoin
+ */
+class TransactionOutput implements TransactionOutputInterface
+{
 
-class TransactionOutput implements TransactionOutputInterface {
-
+    /**
+     * @var
+     */
     protected $value;
+    /**
+     * @var
+     */
     protected $script;
 
+    /**
+     *
+     */
     public function getValue()
     {
 
     }
+
+    /**
+     *
+     */
     public function getScript()
     {
 
     }
+
+    /**
+     *
+     */
     public function serialize()
     {
 

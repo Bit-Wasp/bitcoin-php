@@ -1,6 +1,11 @@
 <?php
+
 namespace Bitcoin;
 
+/**
+ * Class Bitcoin
+ * @package Bitcoin
+ */
 class Bitcoin
 {
     /**

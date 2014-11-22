@@ -2,9 +2,12 @@
 
 namespace Bitcoin;
 
+/**
+ * Class NumberTheory
+ * @package Bitcoin
+ */
 class NumberTheory
 {
-
     /**
      * @var \Mdanter\Ecc\NumberTheory
      */

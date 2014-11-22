@@ -1,17 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 18:31
- */
 
 namespace Bitcoin;
 
-class Math {
+/**
+ * Class Math
+ * @package Bitcoin
+ */
+class Math
+{
 
     /**
-     * @var \Mdanter\Ecc\MathAdater
+     * @var \Mdanter\Ecc\MathAdapter
      */
     private static $adapter;
 

@@ -1,14 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 16:09
- */
 
 namespace Bitcoin;
 
-
+/**
+ * Interface NetworkInterface
+ * @package Bitcoin
+ */
 interface NetworkInterface
 {
     /**

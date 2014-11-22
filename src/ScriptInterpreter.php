@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 12:50
- */
 
 namespace Bitcoin;
 
@@ -15,12 +9,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @var Script
      */
-    protected $script;
+    private $script;
 
     /**
-     * @var
+     * @var array
      */
-    protected $stack;
+    protected $mainStack = array();
+
+    /**
+     *
+     */
+    protected $execStack;
+    protected $altStack;
+    protected $hashStart;
+    protected $opCount;
 
     /**
      * @var
@@ -41,18 +43,22 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @var
      */
     protected $maxOpCodes;
+    protected $requireLowestPushdata;
 
     /**
      * @param Script $script
      */
     public function __construct(Script $script)
     {
-        $this->script = $script;
-        $this->rOpCodes = $this->script->getRegisteredOpCodes();
+        $this->script    = $script;
+        $this->mainStack = new ScriptStack;
+        $this->altStack  = new ScriptStack;
+
         $this->setCheckDisabledOpcodes(true);
         $this->setMaxBytes(10000);
         $this->setMaxPushBytes(520);
         $this->setMaxOpCodes(200);
+        $this->requireLowestPushdata(true);
     }
 
     /**
@@ -72,6 +78,34 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function setCheckDisabledOpcodes($setting)
     {
         $this->checkDisabledOpcodes = $setting;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDisabledOpcodes()
+    {
+        return array('OP_CAT', 'OP_SUBSTR', 'OP_LEFT', 'OP_RIGHT',
+        'OP_INVERT', 'OP_AND', 'OP_OR', 'OP_XOR', 'OP_2MUL', 'OP_2DIV',
+        'OP_MUL', 'OP_DIV', 'OP_MOD', 'OP_LSHIFT');
+
+    }
+    /**
+     * @return mixed
+     */
+    public function requireLowestPushdata()
+    {
+        return $this->requireLowestPushdata;
+    }
+
+    /**
+     * @param $bool
+     * @return $this
+     */
+    public function setRequestLowestPushdata($bool)
+    {
+        $this->requireLowestPushdata = $bool;
         return $this;
     }
 
@@ -132,8 +166,32 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function setMaxOpCodes($limit)
     {
-        $this->maxOpCodes($limit);
+        $this->maxOpCodes = $limit;
         return $this;
+    }
+
+    // todo checkMinimalPush
+
+    /**
+     * @param $op
+     * @return bool
+     */
+    public function isPushOp($op)
+    {
+        if (is_numeric($op)) {
+            return ($op > 0 && $op <= 96);
+        } else {
+            return FALSE;
+        }
+    }
+
+    public function castToBool($value)
+    {
+        if ($value) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -143,58 +201,113 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param $index
      * @param $sighash_type
      */
-    public function run(TransactionInterface $transaction, $index, $sighash_type)
+    //public function run(TransactionInterface $transaction, $index, $sighash_type)
+    public function run()
     {
 
         $position = 0;
-        $script = $this->script->getHex(true);
-        $scriptLen = strlen($script);
 
-        while ($position < $scriptLen) {
 
-            $opCode = $this->rOpCodes[ord(substr($this->script, $position, 1))];
+        try {
+            foreach ($this->script->parse() as $op) {
+                if ($op instanceof Buffer) {
+                    $this->mainStack->push($op);
+                } else {
 
-            switch ($opCode)
-            {
-                // Check for disabled opcodes
-                case 'OP_CAT':
-                case 'OP_SUBSTR':
-                case 'OP_LEFT':
-                case 'OP_RIGHT':
-                case 'OP_INVERT':
-                case 'OP_AND':
-                case 'OP_OR':
-                case 'OP_XOR':
-                case 'OP_2MUL':
-                case 'OP_2DIV':
-                case 'OP_MUL':
-                case 'OP_DIV':
-                case 'OP_MOD':
-                case 'OP_LSHIFT':
-                case 'OP_RSHIFT':
-                    return false;
+                    if ($this->checkDisabledOpcodes() and in_array($op, $this->getDisabledOpcodes())) {
+                        throw new ScriptRuntimeException('Used disabled opcode: ' . $op);
+                    }
 
-                // Proven unspendable
-                case 'OP_RETURN':
-                    return false;
-                    break;
+                    switch ($op) {
 
-                // No operation
-                case 'OP_NOP':
-                case 'OP_NOP1': case 'OP_NOP2': case 'OP_NOP3': case 'OP_NOP4': case 'OP_NOP5':
-                case 'OP_NOP6': case 'OP_NOP7': case 'OP_NOP8': case 'OP_NOP9': case 'OP_NOP10':
-                break;
+                        case 'OP_1NEGATE': // 79
+                        case 'OP_1':
+                        case 'OP_2':
+                        case 'OP_3':
+                        case 'OP_4':
+                        case 'OP_5':
+                        case 'OP_6':
+                        case 'OP_7':
+                        case 'OP_8':
+                        case 'OP_9':
+                        case 'OP_10':
+                        case 'OP_11':
+                        case 'OP_12':
+                        case 'OP_13':
+                        case 'OP_14':
+                        case 'OP_15':
+                        case 'OP_16':       // 96
+                            $num = $this->script->getOpCode($op) - $this->script->getOpCode('OP_1') + 1;
+                            $this->mainStack->push($num);
+                            break;
 
-                // Verify first element in stack is not false
-                case 'OP_VERIFY':
-                    if (empty($this->mainStack))
-                        return false;
-                    if(false == $this->castToBool($this->popFromMainStack()))
-                        return false;
-                    $nextPosition = $position + 1;
-                    break;
+                        // No operation
+                        case 'OP_NOP':
+                        case 'OP_NOP1':
+                        case 'OP_NOP2':
+                        case 'OP_NOP3':
+                        case 'OP_NOP4':
+                        case 'OP_NOP5':
+                        case 'OP_NOP6':
+                        case 'OP_NOP7':
+                        case 'OP_NOP8':
+                        case 'OP_NOP9':
+                        case 'OP_NOP10':
+                            break;
+
+                        // Proven unspendable
+                        case 'OP_RETURN':
+                            return false;
+                            break;
+
+                        case 'OP_RIPEMD160':
+                        case 'OP_SHA1':
+                        case 'OP_SHA256':
+                        case 'OP_HASH160':
+                        case 'OP_HASH256':
+                            $value = $this->mainStack->pop();
+                            if ($op == 'OP_RIPEMD160') {
+                                $hash = Hash::ripemd160($value);
+                            } elseif ($op == 'OP_SHA1') {
+                                $hash = Hash::sha1($value);
+                            } elseif ($op == 'OP_SHA256') {
+                                $hash = Hash::sha256($value);
+                            } elseif ($op == 'OP_HASH160') {
+                                $hash = Hash::sha256ripe160($value);
+                            } else {
+                                $hash = Hash::sha256d($value);
+                            }
+                            $buffer = new Buffer($hash);
+                            $this->mainStack->push($buffer);
+                            break;
+
+                        // Verify first element in stack is not false
+                        case 'OP_VERIFY':
+                            if (empty($this->mainStack)) {
+                                return false;
+                            }
+                            if (false == $this->castToBool($this->popFromMainStack())) {
+                                return false;
+                            }
+                            $nextPosition = $position + 1;
+                            break;
+
+                        case 'OP_CHECKSIG':
+                            break;
+
+                        case 'OP_CHECKMULTISIG':
+                            break;
+                    }
+                }
             }
+        } catch (ScriptRuntimeException $e) {
+
+        } catch (ScriptStackException $e) {
+
         }
     }
 
 };
+
+class ScriptRuntimeException extends \Exception {};
+class ScriptStackException extends \Exception {};
