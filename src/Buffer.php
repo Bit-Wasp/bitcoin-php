@@ -20,24 +20,27 @@ class Buffer
 
     /**
      * @param $byte_string
-     * @param null $bitsize
+     * @param null $bit_size
      * @throws \Exception
      */
-    public function __construct($byte_string, $bitsize = null)
+    public function __construct($byte_string = '', $bit_size = null)
     {
-        if ( ! is_string($byte_string)) {
-            throw new \Exception('Data for buffer must be a string');
-        }
 
-        if (is_numeric($bitsize)) {
-            $max_int = Math::pow(2, $bitsize);
+        if (is_numeric($bit_size)) {
+            // 8 bits, 2 bytes -> 8^2
+            $max_int = Math::pow(2, $bit_size);
 
-            if (Math::cmp($byte_string, $max_int) > 0) {
+            // From byte string, we get an integer.
+            $int = bin2hex($byte_string);
+            $int = Math::hexDec($int);
+
+            // Check the integer doesn't overflow its supposed site
+            if (Math::cmp($int, $max_int) > 0) {
                 throw new \Exception('Byte string exceeds maximum size');
             }
         }
 
-        $this->size = $bitsize;
+        $this->size = $bit_size;
         $this->buffer = $byte_string;
     }
 
@@ -51,18 +54,14 @@ class Buffer
 
     /**
      * @param $hex
-     * @param null $uint
+     * @param null $bit_size
      * @return Buffer
      * @throws \Exception
      */
-    public static function hex($hex, $uint = null)
+    public static function hex($hex = '', $bit_size = null)
     {
-        if (ctype_print($hex) AND ctype_xdigit($hex) == false) {
-            throw new \Exception('Hex buffer must contain hexadecimal chars');
-        }
-
         $buffer = pack("H*", $hex);
-        return new self($buffer, $uint);
+        return new self($buffer, $bit_size);
     }
 
     /**
@@ -84,6 +83,9 @@ class Buffer
     {
         if ($type == 'hex') {
             return $this->__toString();
+        } else if($type == 'int') {
+            $hex = $this->__toString();
+            return Math::hexDec($hex);
         } else {
             return $this->buffer;
         }

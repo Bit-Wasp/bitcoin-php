@@ -39,7 +39,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         $hash = $this->base58->encode('41414141a');
     }
 
-    public function testEncodeDecode()
+    /*public function testEncodeDecode()
     {
         $f = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
 
@@ -51,6 +51,6 @@ class Base58Test extends \PHPUnit_Framework_TestCase
             $back = $this->base58->decode($encoded);
             $this->assertSame($back, $test[0]);
         }
-    }
+    }*/
 }
  

@@ -85,5 +85,16 @@ class HashTest extends \PHPUnit_Framework_TestCase {
         }
 
     }
+    public function testSha1()
+    {
+        $f = file_get_contents(__DIR__.'/../Data/hash.sha1.json');
+
+        $json = json_decode($f);
+        foreach ($json->test as $test) {
+            $hash = $this->hash->sha1($test->data);
+            $this->assertSame($hash, $test->result);
+        }
+
+    }
 }
  

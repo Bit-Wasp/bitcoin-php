@@ -193,7 +193,7 @@ class Script implements ScriptInterface
     }
 
     /**
-     * Get Registered opcode (indexed by decimal opcode)
+     * Get all opcodes (OP_X => opcode)
      *
      * @return array
      */
@@ -203,7 +203,7 @@ class Script implements ScriptInterface
     }
 
     /**
-     * When given a text 'OP_X' will return the op code.
+     * When given a text 'OP_X' will return the opcode.
      * @param $code
      * @return mixed
      * @throws \Exception
@@ -222,22 +222,29 @@ class Script implements ScriptInterface
      * Add an opcode to the script
      *
      * @param $opCode
-     * @throws ScriptRuntimeException
+     * @throws \RuntimeException
      * @return $this
      */
-    public function op($opCode)
+    public function op($code)
     {
-        $code = 'OP_' . $opCode;
-
-        if (!$this->opCodes[$code]) {
-            throw new ScriptRuntimeException('Invalid script opcode encountered: '.$opCode);
+        if (!isset($this->opCodes[$code])) {
+            throw new \RuntimeException('Invalid script opcode encountered: '.$code);
         }
 
         $op = $this->opCodes[$code];
-        $this->script .= hex2bin((Math::decHex($op)));
+        $this->script .= pack("H*", (Math::decHex($op)));
         return $this;
     }
 
+    public function rOp($code)
+    {
+        if (!isset($this->rOpCodes[$code])) {
+            throw new \RuntimeException('Invalid script opcode encountered: '.$code);
+        }
+
+        $this->script .= chr($code);
+        return $this;
+    }
     /**
      * Push data into the stack
      *
@@ -247,14 +254,33 @@ class Script implements ScriptInterface
      */
     public function push($data)
     {
-        $bin    = hex2bin($data);
-        $varInt = self::numToVarInt(strlen($bin));
-        $string = $varInt . $bin;
+        if ($data instanceof Buffer) {
+            $bin = $data->serialize();
+        } else {
+            $bin = pack("H*", $data);
+        }
 
-        $this->script .=  $string;
+        $length = strlen($bin);
+
+        if ($length < $this->getOpCode('OP_PUSHDATA1')) {
+            $data = chr($length) . $bin;
+        } else if ($length <= 0xff) {
+            $data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*",(Math::decHex($length))) . $bin;
+        } else if ($length <= 0xffff) {
+            $data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*",(Math::decHex($length))) . $bin;
+        } else {
+            $data = chr($this->getOpCode('OP_PUSHDATA4')) . pack("H*",(Math::decHex($length))) . $bin;
+        }
+        //$varInt = self::numToVarInt($length);
+
+        //$string = $varInt . $bin;
+        $this->script .=  $data;
         return $this;
     }
 
+    public function pushdata($length, $string) {
+
+    }
     /**
      * Parse a script into opcodes and Buffers of data
      * @return array
@@ -268,39 +294,55 @@ class Script implements ScriptInterface
         $scriptLen = strlen($script);
 
         while ($pos < $scriptLen) {
-            // Load decimal opcode
-            $hexOp = bin2hex(substr($script, $pos, 1));
-            $opCode = Math::hexDec($hexOp);
-            $pos += 1;
+
+            $opCode = ord(substr($script, $pos, 1));
+            $pos   += 1;
 
             if ($opCode < 1) {
+
                 // False, or OP_0
-                $push = Buffer::hex('');
+                $push = Buffer::hex('00');
 
             } else if ($opCode < 75) {
+
                 // When < 75, this opCode is the length of the following string
                 $push = new Buffer(substr($script, $pos, $opCode));
                 $pos += $opCode;
 
             } else if ($opCode <= 78) {
-                // Get length of following string
-                $lenLen = 2 ^ ($opCode - 76);
-                $len = Math::hexDec(substr($script, $pos, $lenLen));
-                $pos += $len;
 
-                $push = new Buffer(substr($script, $pos, ($pos + $len)));
-                $pos += $len;
+                // Each pushdata opcode is followed by the length of the string.
+                // The number of bytes which encode the length change with the opcode.
+
+                if ($opCode == $this->getOpCode('OP_PUSHDATA1')) {
+                    $lengthOfLen = 1;
+                } else if ($opCode == $this->getOpCode('OP_PUSHDATA2')) {
+                    $lengthOfLen = 2;
+                } else if ($opCode == $this->getOpCode('OP_PUSHDATA4')) {
+                    $lengthOfLen = 4;
+                }
+
+                // Length is serialized in little-endian - Flip bytes and convert to decimal for true length
+                $lengthNetwork = bin2hex(substr($script, $pos, $lengthOfLen));
+                $length   = Math::hexDec(Parser::flipBytes($lengthNetwork));
+                $pos     += $lengthOfLen;
+
+                // Get the data
+                $push   = new Buffer(substr($script, $pos, $pos+$length));
+                $pos   += $length;
 
             } else {
+
                 // None of these pushdatas, so just an opcode
                 if (isset($this->rOpCodes[$opCode])) {
                     $push = $this->rOpCodes[$opCode];
                 } else {
-                    $push = "[unknown:$opCode]";
+                    throw new \RuntimeException('Unknown opcode: '. $opCode);
                 }
             }
 
             $data[] = $push;
+
         }
         return $data;
 
@@ -336,7 +378,7 @@ class Script implements ScriptInterface
     public static function payToPubKey(PublicKeyInterface $public_key)
     {
         $script = new self();
-        $script->push($public_key->getHex())->op('CHECKSIG');
+        $script->push($public_key->getHex())->op('OP_CHECKSIG');
 
         return $script;
     }
@@ -352,7 +394,7 @@ class Script implements ScriptInterface
         $hash = Hash::sha256ripe160($public_key->getHex());
 
         $script = new self();
-        $script->op('DUP')->op('HASH160')->push($hash)->op('EQUALVERIFY');
+        $script->op('OP_DUP')->op('OP_HASH160')->push($hash)->op('OP_EQUALVERIFY');
 
         return $script;
     }
@@ -369,20 +411,11 @@ class Script implements ScriptInterface
         $hash = Hash::sha256ripe160($script_hex);
 
         $new_script = new self();
-        $new_script->op('HASH160')->push($hash)->op('EQUAL');
+        $new_script->op('OP_HASH160')->push($hash)->op('OP_EQUAL');
         return $new_script;
     }
 
-    /**
-     * Flip byte order of this string
-     *
-     * @param $hex
-     * @return string
-     */
-    public static function flipBytes($hex)
-    {
-        return implode('', array_reverse(str_split($hex, 2)));
-    }
+
 
     /**
      * Convert a decimal number into a VarInt
@@ -395,21 +428,14 @@ class Script implements ScriptInterface
     {
         if ($decimal < 0xfd) {
             return chr($decimal);
-
-        } elseif ($decimal > 0xffffffffffffffff) {
-            throw new \Exception('numToVarInt(): Integer too large');
-
+        } else if($decimal <= 0xffff) {                     // Uint16
+            return pack("Cv", 0xfd, $decimal);
+        } else if($decimal <= 0xffffffff) {                 // Uint32
+            return pack("CV", 0xfe, $decimal);
+        //} else if ($decimal < 0xffffffffffffffff) {        // Uint 64
+           // return pack("CP", 0xff, $decimal);
         } else {
-
-            // Loop through
-            foreach (array(2, 4, 8) as $j => $numBytes) {
-                $uint_max = Math::pow(16, $numBytes);
-
-                if ($decimal <= $uint_max) {
-                    $prefix = 0xfe + $j;
-                    return hex2bin($prefix) . decbin($decimal);
-                }
-            }
+            throw new \Exception('numToVarInt(): Integer too large');
         }
     }
 
@@ -428,10 +454,12 @@ class Script implements ScriptInterface
     public function serialize($type = null)
     {
         if ($type == 'hex') {
-            return $this->__toString();
+            $data = $this->__toString();
         } else {
-            return $this->script;
+            $data = $this->script;
         }
+
+        return $data;
     }
 
     /**
@@ -440,8 +468,12 @@ class Script implements ScriptInterface
      */
     public function getSize($type = null)
     {
-        $data = $this->serialize($type);
-        $size = strlen($data);
+        if ($type == 'hex') {
+            $size = strlen($this->__toString());
+        } else {
+            $size = strlen($this->script);
+        }
+
         return $size;
     }
 } 
