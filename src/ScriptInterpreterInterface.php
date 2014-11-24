@@ -49,4 +49,4 @@ interface ScriptInterpreterInterface
      * @return mixed
      */
   //  public function run(TransactionInterface $transaction, $index, $sighash_type);
-} 
+}

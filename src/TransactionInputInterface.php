@@ -17,4 +17,4 @@ interface TransactionInputInterface
     public function getScript();
     public function isCoinBase();
     public function serialize();
-} 
+}

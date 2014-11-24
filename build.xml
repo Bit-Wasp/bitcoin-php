@@ -19,6 +19,7 @@
         <exec executable="${project.basedir}/bin/phpunit" passthru="true">
             <arg value="-c" />
             <arg path="${project.basedir}/build" />
+            <arg value="--debug" />
         </exec>
     </target>
 

@@ -12,18 +12,22 @@ class Transaction implements TransactionInterface
      * @var NetworkInterface
      */
     protected $network;
+
     /**
      * @var
      */
     protected $version;
+
     /**
      * @var array
      */
     protected $inputs = array();
+
     /**
      * @var array
      */
     protected $outputs = array();
+
     /**
      * @var
      */
@@ -32,7 +36,8 @@ class Transaction implements TransactionInterface
     /**
      * @param NetworkInterface $network
      */
-    public function __construct(NetworkInterface $network) {
+    public function __construct(NetworkInterface $network)
+    {
         $this->network = $network;
     }
 
@@ -69,7 +74,7 @@ class Transaction implements TransactionInterface
      */
     public function setVersion($version)
     {
-        if (empty($version) OR !is_numeric($version)) {
+        if (empty($version) or !is_numeric($version)) {
             throw new \Exception('Version must be a decimal');
         }
 
@@ -183,7 +188,7 @@ class Transaction implements TransactionInterface
      */
     public function setLockTime($locktime = 0)
     {
-        if (empty($locktime) OR !is_numeric($locktime)) {
+        if (empty($locktime) or !is_numeric($locktime)) {
             throw new \Exception('Locktime must be a decimal');
         }
 
@@ -195,7 +200,8 @@ class Transaction implements TransactionInterface
         return $this;
     }
 
-    public function serialize() {
+    public function serialize()
+    {
         // TODO
     }
 }

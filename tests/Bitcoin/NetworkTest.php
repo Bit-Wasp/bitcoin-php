@@ -86,4 +86,64 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         return new Network('00','05','80',false);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No HD xpriv byte was set
+     */
+    public function testGetHDPrivByteException()
+    {
+        $this->network = new \Bitcoin\Network('00','05','80',true);
+        $this->network->getHDPrivByte();
+    }
+
+    /**
+     * @depends testGetHDPrivByteException
+     */
+    public function testGetHDPrivByte()
+    {
+        $this->network = new \Bitcoin\Network('00','05','80',true);
+        $this->network->setHDPrivByte('0488B21E');
+        $this->assertSame('0488B21E', $this->network->getHDPrivByte());
+    }
+
+    /**
+     * @depends testGetHDPrivByteException
+     */
+    public function testSetHDPrivByte()
+    {
+        $this->network = new \Bitcoin\Network('00','05','80',true);
+        $this->network->setHDPrivByte('0488B21E');
+        $this->assertSame('0488B21E', $this->network->getHDPrivByte());
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No HD xpub byte was set
+     */
+    public function testGetHDPubByteException()
+    {
+        $this->network = new \Bitcoin\Network('00','05','80',true);
+        $this->network->getHDPubByte();
+    }
+    /**
+     * @depends testGetHDPubByteException
+     */
+    public function testGetHDPubByte()
+    {
+        $this->network = new \Bitcoin\Network('00','05','80',true);
+        $this->network->setHDPubByte('0488B21E');
+        $this->assertSame('0488B21E', $this->network->getHDPubByte());
+    }
+
+    /**
+     * @depends testGetHDPubByteException
+     */
+    public function testSetHDPubByte()
+    {
+        $this->network = new \Bitcoin\Network('00','05','80',true);
+        $this->network->setHDPubByte('0488B21E');
+        $this->assertSame('0488B21E', $this->network->getHDPubByte());
+    }
+
+
 }

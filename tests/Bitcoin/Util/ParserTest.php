@@ -6,8 +6,8 @@
  * Time: 17:18
  */
 
-namespace Bitcoin;
 
+namespace Bitcoin\Util;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {

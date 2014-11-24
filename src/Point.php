@@ -16,33 +16,13 @@ use \Mdanter\Ecc\GeneratorPoint;
  * Class Point
  * @package Bitcoin
  */
-class Point implements PointInterface
+class Point implements \Mdanter\Ecc\PointInterface
 {
 
     /**
      * @var
      */
-    protected $curve;
-
-    /**
-     * @var
-     */
-    protected $x;
-
-    /**
-     * @var
-     */
-    protected $y;
-
-    /**
-     * @var
-     */
-    protected $order;
-
-    /**
-     * @var
-     */
-    protected $math;
+    protected $point;
 
     /**
      * Take X, Y, and a generator point, and we can get what we need!
@@ -91,7 +71,7 @@ class Point implements PointInterface
      */
     public function getX()
     {
-        return $this->x;
+        return $this->point->getX();
     }
 
     /**
@@ -99,7 +79,7 @@ class Point implements PointInterface
      */
     public function getY()
     {
-        return $this->y;
+        return $this->point->getY();
     }
 
     /**
@@ -141,5 +121,4 @@ class Point implements PointInterface
     {
         return $this->point->getDouble();
     }
-
-};
+}

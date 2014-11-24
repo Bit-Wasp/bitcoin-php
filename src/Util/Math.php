@@ -1,6 +1,8 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Util;
+
+use Bitcoin\Bitcoin;
 
 /**
  * Class Math
@@ -44,7 +46,7 @@ class Math
      * @param $divisor
      * @return array
      */
-    public static function div_qr($dividend, $divisor)
+    public static function divQr($dividend, $divisor)
     {
         // $div = n / q
         $div = Math::div($dividend, $divisor);

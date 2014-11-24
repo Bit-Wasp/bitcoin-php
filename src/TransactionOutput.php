@@ -41,4 +41,4 @@ class TransactionOutput implements TransactionOutputInterface
     {
 
     }
-} 
+}

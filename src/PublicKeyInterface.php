@@ -10,16 +10,30 @@ interface PublicKeyInterface
 {
 
     /**
+     * Length of an uncompressed key
+     */
+    const LENGTH_UNCOMPRESSED = 130;
+
+    /**
+     * When key is uncompressed, this is the prefix.
+     */
+    const KEY_UNCOMPRESSED = '04';
+
+    /**
+     * Length of a compressed key
+     */
+    const LENGTH_COMPRESSED = 66;
+    /**
      * When y coordinate is even, prepend x coordinate with this if
      * generating a public key
      */
-    const PARITYBYTE_EVEN = '02';
+    const KEY_COMPRESSED_EVEN = '02';
 
     /**
      * When y coordinate is odd, prepend x coordinate with this if
      * generating a public key
      */
-    const PARITYBYTE_ODD = '03';
+    const KEY_COMPRESSED_ODD = '03';
 
     /**
      * Get the X coordinate in decimal
@@ -48,5 +62,4 @@ interface PublicKeyInterface
      * @return mixed
      */
     public function getPoint();
-
-} 
+}

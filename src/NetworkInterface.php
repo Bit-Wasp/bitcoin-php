@@ -34,4 +34,14 @@ interface NetworkInterface
      * @return mixed
      */
     public function isTestnet();
-} 
+
+    /**
+     * @return mixed
+     */
+    public function getHDPubByte();
+
+    /**
+     * @return mixed
+     */
+    public function getHDPrivByte();
+}

@@ -2,13 +2,16 @@
 
 namespace Bitcoin;
 
+use Bitcoin\Util\Math;
+use Bitcoin\Util\Hash;
+use Bitcoin\Util\Buffer;
+
 /**
  * Class Script
  * @package Bitcoin
  */
 class Script implements ScriptInterface
 {
-
     /**
      * @var array
      */
@@ -265,11 +268,11 @@ class Script implements ScriptInterface
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
             $data = chr($length) . $bin;
         } else if ($length <= 0xff) {
-            $data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*",(Math::decHex($length))) . $bin;
+            $data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*", (Math::decHex($length))) . $bin;
         } else if ($length <= 0xffff) {
-            $data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*",(Math::decHex($length))) . $bin;
+            $data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*", (Math::decHex($length))) . $bin;
         } else {
-            $data = chr($this->getOpCode('OP_PUSHDATA4')) . pack("H*",(Math::decHex($length))) . $bin;
+            $data = chr($this->getOpCode('OP_PUSHDATA4')) . pack("H*", (Math::decHex($length))) . $bin;
         }
         //$varInt = self::numToVarInt($length);
 
@@ -278,14 +281,12 @@ class Script implements ScriptInterface
         return $this;
     }
 
-    public function pushdata($length, $string) {
-
-    }
     /**
      * Parse a script into opcodes and Buffers of data
      * @return array
      */
-    public function parse() {
+    public function parse()
+    {
         $pos = 0;
         $data = array();
 
@@ -346,6 +347,16 @@ class Script implements ScriptInterface
         }
         return $data;
 
+    }
+
+    public function set($scriptData)
+    {
+        if ($scriptData instanceof Buffer) {
+            $this->script = $scriptData->serialize();
+        } else {
+            $this->script = pack("H*", $scriptData);
+        }
+        return $this;
     }
 
     /**
@@ -428,15 +439,27 @@ class Script implements ScriptInterface
     {
         if ($decimal < 0xfd) {
             return chr($decimal);
-        } else if($decimal <= 0xffff) {                     // Uint16
+        } else if ($decimal <= 0xffff) {                     // Uint16
             return pack("Cv", 0xfd, $decimal);
-        } else if($decimal <= 0xffffffff) {                 // Uint32
+        } else if ($decimal <= 0xffffffff) {                 // Uint32
             return pack("CV", 0xfe, $decimal);
-        //} else if ($decimal < 0xffffffffffffffff) {        // Uint 64
+        //} else if ($decimal < 0xffffffffffffffff) {        // Uint64
            // return pack("CP", 0xff, $decimal);
         } else {
             throw new \Exception('numToVarInt(): Integer too large');
         }
+    }
+
+    /**
+     * Return a varInt, based on the size of the script.
+     * @return string
+     * @throws \Exception
+     */
+    public function getVarInt()
+    {
+        $size   = $this->getSize();
+        $varInt = self::numToVarInt($size);
+        return $varInt;
     }
 
     /**
@@ -476,4 +499,4 @@ class Script implements ScriptInterface
 
         return $size;
     }
-} 
+}

@@ -23,5 +23,4 @@ class Bitcoin
     {
         return \Mdanter\Ecc\EccFactory::getNumberTheory();
     }
-
 }

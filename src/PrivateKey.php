@@ -2,21 +2,26 @@
 
 namespace Bitcoin;
 
+use \Bitcoin\Util\Buffer;
+use \Bitcoin\Util\Random;
+use \Bitcoin\Util\Hash;
+use \Bitcoin\Util\Base58;
+use \Bitcoin\Util\Math;
 use \Mdanter\Ecc\EccFactory;
 
 /**
  * Class PrivateKey
  * @package Bitcoin
  */
-class PrivateKey implements KeyInterface, PrivateKeyInterface
+class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInterface
 {
     /**
-     * @var
+     * @var int
      */
     protected $decimal;
 
     /**
-     * @var
+     * @var string
      */
     protected $hex;
 
@@ -26,7 +31,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface
     protected $curve;
 
     /**
-     * @var
+     * @var PublicKey
      */
     protected $publicKey;
 
@@ -35,25 +40,90 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface
      * @param $hex
      * @param bool $compressed
      */
-    public function __construct(\Mdanter\Ecc\CurveFp $curve, $hex, $compressed = false)
+    public function __construct($hex, $compressed = false, \Mdanter\Ecc\GeneratorPoint $generator = null)
     {
-        $this->hex = $hex;
-        $this->decimal = Math::hexDec($hex);
-        $this->compressed = $compressed;
-
-        if ($curve == null) {
-            $curve = EccFactory::getSecgCurves()->secp256k1_curve();
+        if (! self::isValidKey($hex)) {
+            throw new \Exception('Invalid private key - must be less than curve order.');
         }
 
-        $this->curve = $curve;
+        $this->decimal    = Math::hexDec($hex);
+        $this->compressed = $compressed;
+
+        if ($generator == null) {
+            $generator = EccFactory::getSecgCurves()->generator256k1();
+        }
+
+        $point = $generator->mul($this->decimal);
+        $this->generator  = $generator;
+        $this->publicKey  = new PublicKey($point, $this->compressed);
     }
 
+    /**
+     * Generate a new private key from entropy
+     *
+     * @param bool $compressed
+     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @return PrivateKey
+     * @throws \Exception
+     */
+    public static function generateNew($compressed = false, \Mdanter\Ecc\GeneratorPoint $generator = null)
+    {
+        if ($generator == null) {
+            $generator = EccFactory::getSecgCurves()->generator256k1();
+        }
+
+        $buffer = new Buffer(Random::bytes(32));
+        while (! self::isValidKey($buffer->serialize('hex'), $generator)) {
+            $buffer = new Buffer(Random::bytes(32));
+        }
+
+        $private = new PrivateKey($buffer->serialize('hex'), $compressed);
+
+        return $private;
+    }
+
+    /**
+     * Check if the $hex string is a valid key, ie, less than the order of the curve.
+     *
+     * @param $hex
+     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @return bool
+     */
+    public static function isValidKey($hex, \Mdanter\Ecc\GeneratorPoint $generator = null)
+    {
+        if ($generator == null) {
+            $generator = EccFactory::getSecgCurves()->generator256k1();
+        }
+
+        $withinRange = Math::cmp(Math::hexDec($hex), $generator->getOrder()) < 0;
+
+        return $withinRange;
+    }
     /**
      * @inheritdoc
      */
     public function isCompressed()
     {
         return $this->compressed;
+    }
+
+    /**
+     * Return the public key
+     *
+     * @return PublicKey
+     */
+    public function getPublicKey()
+    {
+        return $this->publicKey;
+    }
+
+    /**
+     * Return the hash of the associated public key
+     * @return mixed
+     */
+    public function getPubKeyHash()
+    {
+        return $this->publicKey->getPubKeyHash();
     }
 
     /**
@@ -64,6 +134,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface
     public function setCompressed($setting)
     {
         $this->compressed = $setting;
+        $this->publicKey->setCompressed($setting);
     }
 
     /**
@@ -75,11 +146,52 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface
     }
 
     /**
-     * @inheritdoc
+     * Return the hex representation of the key
+     * @return string
      */
-    public function getHex()
+    private function getHex()
     {
-        return $this->hex;
+        return str_pad(Math::decHex($this->decimal), 64, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Serialize to desired type: hex, decimal, or binary
+     *
+     * @param null $type
+     * @return int|mixed|string
+     */
+    public function serialize($type = null)
+    {
+        if ($type == 'hex') {
+            return $this->getHex();
+        } elseif ($type == 'int') {
+            return $this->decimal;
+        } else {
+            return pack("H*", $this->getHex());
+        }
+    }
+
+    /**
+     * Return the length of the private key. 32 for binary, 64 for hex.
+     * @param null $type
+     * @return int
+     */
+    public function getSize($type = null)
+    {
+        if ($type == 'hex') {
+            return strlen($this->getHex());
+        } else {
+            return 32;
+        }
+    }
+
+    /**
+     * Return hex string representation of private key
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getHex();
     }
 
     /**
@@ -99,14 +211,14 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface
      */
     public function getWif(NetworkInterface $network)
     {
-        $byte = $network->getPrivByte();
-        $hex = sprintf("%s%s", $byte, $this->hex);
 
-        if ($this->isCompressed()) {
-            $hex .= '01';
-        }
+        $hex = sprintf(
+            "%s%s%s",
+            $network->getPrivByte(),
+            $this->getHex(),
+            ($this->isCompressed() ? '01' : '')
+        );
 
-        return Base58::encode_check($hex);
+        return Base58::encodeCheck($hex);
     }
-
-} 
+}

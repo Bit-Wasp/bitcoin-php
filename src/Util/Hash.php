@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Util;
 
 /**
  * Class Hash
@@ -103,4 +103,15 @@ class Hash
     {
         return hash_pbkdf2($algo, $data, $salt, $iterations, $length, $binary_output);
     }
-} 
+
+    /**
+     * @param $algo
+     * @param $data
+     * @param $salt
+     * @return string
+     */
+    public static function hmac($algo, $data, $salt)
+    {
+        return hash_hmac($algo, $data, $salt);
+    }
+}

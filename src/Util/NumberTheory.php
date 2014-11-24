@@ -1,6 +1,8 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Util;
+
+use Bitcoin\Bitcoin;
 
 /**
  * Class NumberTheory
@@ -38,4 +40,4 @@ class NumberTheory
 
         return call_user_func_array(array(static::$adapter, $name), $arguments);
     }
-} 
+}

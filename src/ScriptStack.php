@@ -16,15 +16,6 @@ class ScriptStack
     protected $stack = array();
 
     /**
-     * @param $pos
-     * @return int
-     */
-    private function getIndexFor($pos)
-    {
-        return count($this->stack) + $pos;
-    }
-
-    /**
      * @return mixed
      * @throws ScriptStackException
      */
@@ -35,6 +26,26 @@ class ScriptStack
         }
 
         return array_pop($this->stack);
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function push($value)
+    {
+        array_push($this->stack, $value);
+        return $this;
+    }
+
+    /**
+     * @param $pos
+     * @return int
+     */
+    private function getIndexFor($pos)
+    {
+        $index = (count($this->stack) + $pos);
+        return $index;
     }
 
     /**
@@ -66,16 +77,6 @@ class ScriptStack
     }
 
     /**
-     * @param $value
-     * @return $this
-     */
-    public function push($value)
-    {
-        array_push($this->stack, $value);
-        return $this;
-    }
-
-    /**
      * @param $pos
      * @return mixed
      */
@@ -84,4 +85,13 @@ class ScriptStack
         $index = $this->getIndexFor($pos);
         return $this->stack[$index];
     }
-} 
+
+    public function dump()
+    {
+        return $this->stack;
+    }
+}
+
+class ScriptStackException extends \Exception
+{
+}

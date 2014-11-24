@@ -1,6 +1,7 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Util;
+
 
 /**
  * Class Base58
@@ -8,7 +9,6 @@ namespace Bitcoin;
  */
 class Base58
 {
-
     /**
      * @var string
      */
@@ -48,8 +48,8 @@ class Base58
         $decimal = Math::hexDec($data);
         $output = '';
 
-        while(Math::cmp($decimal, 0) > 0) {
-            list($decimal, $remain) = Math::div_qr($decimal, 58);
+        while (Math::cmp($decimal, 0) > 0) {
+            list($decimal, $remain) = Math::divQr($decimal, 58);
             $output .= substr(self::$base58chars, $remain, 1);
         }
 
@@ -69,7 +69,7 @@ class Base58
      * @return string
      * @throws \Exception
      */
-    public static function encode_check($data)
+    public static function encodeCheck($data)
     {
         $checksum = self::checksum($data);
         $hex = $data . $checksum;
@@ -84,11 +84,12 @@ class Base58
      */
     public static function decode($base58)
     {
-        if(strlen($base58) == 0)
+        if (strlen($base58) == 0) {
             return '';
+        }
 
         $original = $base58;
-        $return = 0;
+        $return = '0';
 
         for ($i = 0; $i < strlen($base58); $i++) {
             $return = Math::add(Math::mul($return, 58), strpos(self::$base58chars, $base58[$i]));
@@ -100,9 +101,8 @@ class Base58
             $hex = "00" . $hex;
         }
 
-
-        if (Math::mod(strlen($return),2) != 0 ) {
-            $hex = "0" . $return;
+        if (Math::mod(strlen($hex), 2) !== 0) {
+            $hex = "0" . $hex;
         }
 
         return $hex;
@@ -115,9 +115,8 @@ class Base58
      * @return string
      * @throws Base58ChecksumFailure
      */
-    public static function decode_check($base58)
+    public static function decodeCheck($base58)
     {
-
         $hex = self::decode($base58);
         $data = substr($hex, 0, -8);
         $cs_verify = substr($hex, -8);
@@ -132,4 +131,6 @@ class Base58
     }
 }
 
-class Base58ChecksumFailure extends \Exception {};
+class Base58ChecksumFailure extends \Exception
+{
+}

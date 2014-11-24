@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Util;
 
 /**
  * Class Buffer
@@ -83,7 +83,7 @@ class Buffer
     {
         if ($type == 'hex') {
             return $this->__toString();
-        } else if($type == 'int') {
+        } else if ($type == 'int') {
             $hex = $this->__toString();
             return Math::hexDec($hex);
         } else {
@@ -99,5 +99,4 @@ class Buffer
         $unpack = unpack("H*", $this->buffer);
         return $unpack[1];
     }
-
-} 
+}

@@ -8,6 +8,10 @@ use Bitcoin\Buffer;
 use Bitcoin\Parser;
 use Bitcoin\Network;
 use Bitcoin\Transaction;
+
+use Bitcoin\HeirarchicalKey;
+
+use Bitcoin\PrivateKey;
 use Bitcoin\Script;
 
 require_once "vendor/autoload.php";
@@ -58,7 +62,7 @@ $rs
     ->op('OP_CHECKMULTISIG');
 */
 
-
+/*
 $s1 = new Script();
 $s1->op('OP_0')
     ->push('3045022057e65d83fb50768f310953300cdf09e8c551a716de81eb9e9bea2b055cffce53022100830c1636104d5ba704ef92849db0415182c364278b7f2a53097b65beb1c755c001')
@@ -70,7 +74,7 @@ $s1->op('OP_0')
     ->push('5621025d951ab5a9c3656aa25b4facf7b9824ca3cca7f9eaf3b84551d3aef8b0803a5721027b7eb1910184738f54b00ee7c5f695598d0f21b8ea87bface1e9d901fa5193802102e8537cc8081358b9bbcbd221da7f10ec167fbadcb03b8ff2980c8a78aca076712102f2d0f1996cf932b766032ea1da0051d8e7688516eb005b9ffd6acfbf032627c321030bd27f6a978bc03748b301e20531dd76f27ddcc25e51c09e65a6e4dafa8abbaf21037bd4c27021916bd09f7af32433a0eb542087cf0ae51cd4289c1c6d35ebfab79856ae');
 
 
-
+echo $s->getVarInt()."\n";
 
 $hex = $s1->serialize('hex');
 
@@ -78,3 +82,15 @@ $i = new ScriptInterpreter($s1);
 echo "\n";
 
 print_r($i->run());
+*/
+
+$priv = PrivateKey::generateNew(true);
+
+$b = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
+$network = new Network('00','05','08',true);
+$network->setHDPrivByte('0488ade4');
+$network->setHDPubByte('0488b21e');
+$k = new HeirarchicalKey($b, $network);
+
+
+print_r($k);

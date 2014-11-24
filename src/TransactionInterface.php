@@ -6,7 +6,8 @@ namespace Bitcoin;
  * Interface TransactionInterface
  * @package Bitcoin
  */
-interface TransactionInterface {
+interface TransactionInterface
+{
     const MAX_VERSION  = 4294967296;
     const MAX_LOCKTIME = 4294967296;
 
@@ -19,9 +20,4 @@ interface TransactionInterface {
     public function getLockTime();
     public function serialize();
     public function getNetwork();
-
-//    public static function fromHex() {
-
-    //}
-
-} 
+}

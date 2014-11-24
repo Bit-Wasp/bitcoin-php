@@ -6,7 +6,7 @@
  * Time: 18:14
  */
 
-namespace Bitcoin;
+namespace Bitcoin\Util;
 
 
 class BufferTest extends \PHPUnit_Framework_TestCase
@@ -21,14 +21,14 @@ class BufferTest extends \PHPUnit_Framework_TestCase
     public function testCreateEmptyBuffer()
     {
         $this->buffer = new Buffer();
-        $this->assertInstanceOf('\Bitcoin\Buffer', $this->buffer);
+        $this->assertInstanceOf('\Bitcoin\Util\Buffer', $this->buffer);
         $this->assertEmpty($this->buffer->serialize());
     }
 
     public function testCreateEmptyHexBuffer()
     {
         $this->buffer = Buffer::hex();
-        $this->assertInstanceOf('\Bitcoin\Buffer', $this->buffer);
+        $this->assertInstanceOf('\Bitcoin\Util\Buffer', $this->buffer);
         $this->assertEmpty($this->buffer->serialize());
     }
 
@@ -36,7 +36,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
     {
         $hex = '80000000';
         $this->buffer = Buffer::hex($hex);
-        $this->assertInstanceOf('\Bitcoin\Buffer', $this->buffer);
+        $this->assertInstanceOf('\Bitcoin\Util\Buffer', $this->buffer);
         $this->assertNotEmpty($this->buffer->serialize());
     }
 
@@ -64,7 +64,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
     {
         $hex = '41414141';
         $this->buffer = Buffer::hex($hex);
-        $this->assertInstanceOf('\Bitcoin\Buffer', $this->buffer);
+        $this->assertInstanceOf('\Bitcoin\Util\Buffer', $this->buffer);
         $this->assertNotEmpty($this->buffer->serialize());
     }
 

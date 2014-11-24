@@ -6,8 +6,8 @@ namespace Bitcoin;
  * Class TransactionInput
  * @package Bitcoin
  */
-class TransactionInput implements TransactionInputInterface {
-
+class TransactionInput implements TransactionInputInterface
+{
     /**
      * @var
      */
@@ -123,4 +123,4 @@ class TransactionInput implements TransactionInputInterface {
     {
 
     }
-} 
+}

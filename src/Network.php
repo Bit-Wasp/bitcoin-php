@@ -8,7 +8,6 @@ namespace Bitcoin;
  */
 class Network implements NetworkInterface
 {
-
     /**
      * @var
      */
@@ -46,7 +45,7 @@ class Network implements NetworkInterface
      * @param $priv_byte
      * @throws \Exception
      */
-    public function __construct($address_byte, $p2sh_byte, $priv_byte, $testnet = FALSE)
+    public function __construct($address_byte, $p2sh_byte, $priv_byte, $testnet = false)
     {
         foreach (array('address_byte', 'p2sh_byte', 'priv_byte') as $required_byte) {
             if (ctype_xdigit($$required_byte) and strlen($$required_byte) == 2) {
@@ -56,7 +55,7 @@ class Network implements NetworkInterface
             }
         }
 
-        if ( ! is_bool($testnet)) {
+        if (! is_bool($testnet)) {
             throw new \Exception("Testnet parameter must be a boolean");
         }
 
@@ -95,4 +94,59 @@ class Network implements NetworkInterface
         return $this->p2sh_byte;
     }
 
-} 
+    /**
+     * Get version bytes for XPUB key
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function getHDPubByte()
+    {
+        if ($this->xpub_byte == null) {
+            throw new \Exception('No HD xpub byte was set');
+        }
+        return $this->xpub_byte;
+    }
+
+    /**
+     * Set version bytes for XPUB key
+     *
+     * @param $byte
+     * @return $this
+     */
+    public function setHDPubByte($byte)
+    {
+        if (!empty($byte) and ctype_xdigit($byte) == true) {
+            $this->xpub_byte = $byte;
+        }
+        return $this;
+    }
+
+    /**
+     * Get version bytes for XPRIV key
+     *
+     * @return null
+     * @throws \Exception
+     */
+    public function getHDPrivByte()
+    {
+        if ($this->xpriv_byte == null) {
+            throw new \Exception('No HD xpriv byte was set');
+        }
+        return $this->xpriv_byte;
+    }
+
+    /**
+     * Set version bytes for XPRIV key
+     *
+     * @param $bytes
+     * @return $this
+     */
+    public function setHDPrivByte($bytes)
+    {
+        if (!empty($bytes) and ctype_xdigit($bytes) == true) {
+            $this->xpriv_byte = $bytes;
+        }
+        return $this;
+    }
+}

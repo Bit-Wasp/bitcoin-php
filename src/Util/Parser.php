@@ -1,9 +1,10 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Util;
 
 /**
- * Class Parser
+ * Class Parser - mainly for decoding transactions..
+ *
  * @package Bitcoin
  */
 class Parser
@@ -18,11 +19,13 @@ class Parser
      */
     protected $position;
 
+    protected $parsed = array();
+
     /**
      * @param null $in
      * @throws \Exception
      */
-    public function __construct(Buffer $in = null)
+    public function __construct($in = null)
     {
         // Make sure we're dealing only with binary data
         if ($in instanceof Buffer) {
@@ -36,18 +39,22 @@ class Parser
     }
 
     // Functions for serializing data in object to string
-    public function writeUint($bit, Buffer $buffer, $flip_bytes = false)
+    /**
+     * @param $bitsize
+     * @param Buffer $buffer
+     * @param bool $flip_bytes
+     */
+    public function writeBytes($bytes, $decimal, $flip_bytes = false)
     {
-        $bytes = $bit / 2;
-        $data = $buffer->serialize();
+        $hex = Math::decHex($decimal);
         if ($flip_bytes) {
-            $data = $this->flipBytes($data);
+            $hex = $this->flipBytes($hex);
         }
 
         // Do this to ensure size constraint is met.
-        $newBuffer = new Buffer($data, $bytes);
+        $newBuffer = Buffer::hex($hex, $bytes);
         $this->string .= $newBuffer->serialize();
-
+        return $this;
     }
 
     /**
@@ -61,6 +68,9 @@ class Parser
         return implode('', array_reverse(str_split($hex, 1)));
     }
 
+    /**
+     * @return Buffer
+     */
     public function getBuffer()
     {
         $buffer = new Buffer($this->string);
@@ -71,10 +81,10 @@ class Parser
      * @param bool $flip_bytes
      * @return string
      */
-    public function getBinaryString($bit, $flip_bytes = false)
+    public function getBinaryString($bytes, $flip_bytes = false)
     {
-        $bytes = $bit / 2;
         $string = substr($this->string, $this->position, $bytes);
+        $this->position += $bytes;
 
         if ($flip_bytes) {
             $string = $this->flipBytes($string);
@@ -85,11 +95,17 @@ class Parser
     }
 
     // Functions for pulling data from string
-    public function getUint($bit, $flip_bytes = false)
+    public function readBytes($bit, $flip_bytes = false)
     {
         $string = $this->getBinaryString($bit, $flip_bytes);
-
         return $string;
+    }
+
+    public function readBytesHex($bit, $flip_bytes = false)
+    {
+        $string = $this->readBytes($bit, $flip_bytes);
+        $hex    = $string->serialize('hex');
+        return $hex;
 
     }
 
@@ -102,5 +118,4 @@ class Parser
     {
 
     }
-
 }

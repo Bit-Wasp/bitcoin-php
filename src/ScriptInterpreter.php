@@ -12,37 +12,55 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     private $script;
 
     /**
-     * @var array
-     */
-    protected $mainStack = array();
-
-    /**
      *
      */
     protected $execStack;
+
+    /**
+     * @var ScriptStack
+     */
+    protected $mainStack;
+
+    /**
+     * Alt Stack
+     * @var ScriptStack
+     */
     protected $altStack;
+
+    /**
+     * Position of codeseparator, for calcualting sighash
+     * @var
+     */
     protected $hashStart;
+
+    /**
+     * @var int
+     */
     protected $opCount;
 
     /**
-     * @var
+     * @var bool
      */
     protected $checkDisabledOpcodes;
 
     /**
-     * @var
+     * @var int
      */
     protected $maxBytes;
 
     /**
-     * @var
+     * @var int
      */
     protected $maxPushBytes;
 
     /**
-     * @var
+     * @var int
      */
     protected $maxOpCodes;
+
+    /**
+     * @var bool
+     */
     protected $requireLowestPushdata;
 
     /**
@@ -54,6 +72,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $this->mainStack = new ScriptStack;
         $this->altStack  = new ScriptStack;
 
+        // Set up current limits
         $this->setCheckDisabledOpcodes(true);
         $this->setMaxBytes(10000);
         $this->setMaxPushBytes(520);
@@ -92,7 +111,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     }
     /**
-     * @return mixed
+     * @return bool
      */
     public function requireLowestPushdata()
     {
@@ -181,7 +200,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         if (is_numeric($op)) {
             return ($op > 0 && $op <= 96);
         } else {
-            return FALSE;
+            return false;
         }
     }
 
@@ -204,9 +223,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     //public function run(TransactionInterface $transaction, $index, $sighash_type)
     public function run()
     {
-
         $position = 0;
-
 
         try {
             foreach ($this->script->parse() as $op) {
@@ -306,8 +323,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         }
     }
+}
+;
 
-};
+class ScriptRuntimeException extends \Exception
+{
+}
 
-class ScriptRuntimeException extends \Exception {};
-class ScriptStackException extends \Exception {};
+class ScriptStackException extends \Exception
+{
+}

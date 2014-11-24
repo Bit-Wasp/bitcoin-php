@@ -15,8 +15,8 @@ interface KeyInterface
     public function isCompressed();
 
     /**
-     * Return the hex / buffer of this key.
+     * Return the hash of the public key.
      * @return mixed
      */
-    public function getHex();
-} 
+    public function getPubKeyHash();
+}
