@@ -131,6 +131,14 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         return $hex;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function isPrivate()
+    {
+        return false;
+    }
+
     public static function getCompressedPrefix(\Mdanter\Ecc\PointInterface $point)
     {
         return (Math::mod($point->getY(), 2) == '0')

@@ -367,7 +367,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script1[0]->getSize(), 65);
         $this->assertSame($script1[1], 'OP_CHECKSIG');
         $this->assertSame($s1->getAsm(), $json->test[1]->asm);
-        
+
         // pay to script hash output
         $s2 = (new Script())
             ->set($json->test[2]->script);

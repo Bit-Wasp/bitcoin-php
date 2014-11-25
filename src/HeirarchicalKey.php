@@ -274,6 +274,12 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
         return $this->privateKey instanceOf PrivateKey;
     }
 
+    /**
+     * Return a base58 encoded extended private key
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function getExtendedPrivateKey()
     {
         if (!$this->isPrivate()) {
@@ -295,6 +301,10 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
         return $base58;
     }
 
+    /**
+     * Return a base58 encoded extended public key
+     * @return string
+     */
     public function getExtendedPublicKey()
     {
         $bytes = (new Parser)
@@ -312,6 +322,11 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
         return $base58;
     }
 
+    /**
+     * @param NetworkInterface $network
+     * @return mixed|string
+     * @throws \Exception
+     */
     public function getWif(NetworkInterface $network)
     {
         if (!$this->isPrivate()) {
@@ -321,16 +336,29 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
         return $this->privateKey->getWif($network);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getPubKeyHash()
     {
         return $this->publicKey->getPubKeyHash();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function isCompressed()
     {
         return true;
     }
 
+    /**
+     * Create a buffer containing data to be hashed hashed to yield the child offset
+     *
+     * @param Buffer $sequence
+     * @return Buffer
+     * @throws \Exception
+     */
     public function getOffsetBuffer(Buffer $sequence)
     {
 
@@ -356,6 +384,13 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
         return $data;
     }
 
+    /**
+     * Derive a child key
+     *
+     * @param $sequence
+     * @return HeirarchicalKey
+     * @throws \Exception
+     */
     public function deriveChild($sequence)
     {
         // Generate offset
