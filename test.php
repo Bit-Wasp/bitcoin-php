@@ -1,11 +1,11 @@
 <?php
 
-use Bitcoin\Base58;
-use Bitcoin\Math;
+use Bitcoin\Util\Base58;
+use Bitcoin\Util\Math;
 use Bitcoin\ScriptInterpreter;
 
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Parser;
 use Bitcoin\Network;
 use Bitcoin\Transaction;
 
@@ -90,7 +90,8 @@ $b = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosa
 $network = new Network('00','05','08',true);
 $network->setHDPrivByte('0488ade4');
 $network->setHDPubByte('0488b21e');
+$b = Base58::decodeCheck($b);
 $k = new HeirarchicalKey($b, $network);
-
-
+print_r($k);
+$k = $k->deriveChild(1);
 print_r($k);

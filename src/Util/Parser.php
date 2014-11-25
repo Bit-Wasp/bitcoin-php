@@ -19,8 +19,6 @@ class Parser
      */
     protected $position;
 
-    protected $parsed = array();
-
     /**
      * @param null $in
      * @throws \Exception
@@ -36,24 +34,54 @@ class Parser
         }
 
         $this->postion = 0;
+        return $this;
     }
 
     // Functions for serializing data in object to string
+
     /**
-     * @param $bitsize
-     * @param Buffer $buffer
+     * Write $data as $bytes bytes. Can be flipped if needed.
+     *
+     * @param $bytes
+     * @param $data
      * @param bool $flip_bytes
+     * @return $this
      */
-    public function writeBytes($bytes, $decimal, $flip_bytes = false)
+    public function writeBytes($bytes, $data, $flip_bytes = false)
     {
-        $hex = Math::decHex($decimal);
-        if ($flip_bytes) {
-            $hex = $this->flipBytes($hex);
+        // Create a new buffer, ensuring that were within the limit set by $bytes
+        if ($data instanceof Buffer) {
+            $newBuffer = new Buffer($data->serialize(), $bytes);
+        } else {
+            $newBuffer = Buffer::hex($data, $bytes);
         }
 
-        // Do this to ensure size constraint is met.
-        $newBuffer = Buffer::hex($hex, $bytes);
+        $data = $newBuffer->serialize();
+
+        if ($flip_bytes) {
+            $data = $this->flipBytes($data);
+        }
+
         $this->string .= $newBuffer->serialize();
+        return $this;
+    }
+
+    /**
+     * @param $bytes
+     * @param $int
+     * @param bool $flip_bytes
+     */
+    public function writeInt($bytes, $int, $flip_bytes = false)
+    {
+        $hex  = Math::decHex($int);
+        $hex  = str_pad($hex, $bytes*2, '0', STR_PAD_LEFT);
+        $data = pack("H*", $hex);
+
+        if ($flip_bytes) {
+            $data = $this->flipBytes($data);
+        }
+
+        $this->string .= $data;
         return $this;
     }
 
@@ -69,6 +97,8 @@ class Parser
     }
 
     /**
+     * Return the string as a buffer
+     *
      * @return Buffer
      */
     public function getBuffer()
@@ -76,12 +106,17 @@ class Parser
         $buffer = new Buffer($this->string);
         return $buffer;
     }
+
+    // Functions for pulling data from string
+
     /**
-     * @param $bit
+     * Parse $bytes bytes from the string, and return the obtained buffer
+     *
+     * @param $bytes
      * @param bool $flip_bytes
      * @return string
      */
-    public function getBinaryString($bytes, $flip_bytes = false)
+    public function readBytes($bytes, $flip_bytes = false)
     {
         $string = substr($this->string, $this->position, $bytes);
         $this->position += $bytes;
@@ -91,22 +126,8 @@ class Parser
         }
 
         $buffer = new Buffer($string);
+
         return $buffer;
-    }
-
-    // Functions for pulling data from string
-    public function readBytes($bit, $flip_bytes = false)
-    {
-        $string = $this->getBinaryString($bit, $flip_bytes);
-        return $string;
-    }
-
-    public function readBytesHex($bit, $flip_bytes = false)
-    {
-        $string = $this->readBytes($bit, $flip_bytes);
-        $hex    = $string->serialize('hex');
-        return $hex;
-
     }
 
     public function getVarInt()

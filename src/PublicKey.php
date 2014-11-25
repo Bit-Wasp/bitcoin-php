@@ -3,6 +3,7 @@
 namespace Bitcoin;
 
 use Bitcoin\Util\Math;
+use Bitcoin\Util\Hash;
 use Bitcoin\Util\NumberTheory;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
@@ -33,6 +34,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     {
         $this->point = $point;
         $this->compressed = $compressed;
+        return $this;
     }
 
     /**
@@ -75,9 +77,12 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         return $this->compressed;
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getPubKeyHash()
     {
-        $public_key = $this->serialize();
+        $public_key = $this->serialize('hex');
         $hash = Hash::sha256ripe160($public_key);
         return $hash;
     }

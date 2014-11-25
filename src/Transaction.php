@@ -39,6 +39,7 @@ class Transaction implements TransactionInterface
     public function __construct(NetworkInterface $network)
     {
         $this->network = $network;
+        return $this;
     }
 
     /**

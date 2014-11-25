@@ -31,8 +31,9 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase {
         $key3 = '8000000000000000000000000000000000000000000000000000000000000000';
         $this->assertTrue(PrivateKey::isValidKey($key3));
 
-        $key4 = '0000000000000000000000000000000000000000000000000000000000000000';
-        $this->assertTrue(PrivateKey::isValidKey($key4));
+        $key4 = '8000000000000000000000000000000000000000000000000000000000000001';
+        $this->assertTrue(PrivateKey::isValidKey($key3));
+
     }
 
     /**
@@ -43,6 +44,9 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase {
         // Order of secp256k1
         $order = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
         $this->assertFalse(PrivateKey::isValidKey($order));
+
+        $key1 = '0000000000000000000000000000000000000000000000000000000000000000';
+        $this->assertFalse(PrivateKey::isValidKey($key1));
     }
 
     public function testCreatePrivateKey()

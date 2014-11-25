@@ -60,6 +60,7 @@ class Network implements NetworkInterface
         }
 
         $this->testnet = $testnet;
+        return $this;
     }
 
     /**

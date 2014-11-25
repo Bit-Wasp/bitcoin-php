@@ -54,10 +54,8 @@ class BufferTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateMaxBufferExceeded()
     {
-        $deci = 4294967296;
-        $hex = Math::decHex($deci);
-        $lim = 32;
-        $this->buffer = Buffer::hex($hex, $lim);
+        $lim = 4;
+        $this->buffer = Buffer::hex('414141411', $lim);
     }
 
     public function testCreateHexBuffer()
@@ -109,7 +107,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMaxSize()
     {
-        $maxSize = 33;
+        $maxSize = 4;
         $this->buffer = Buffer::hex('41414141', $maxSize);
         $this->assertNotNull($this->buffer->getMaxSize());
         $this->assertSame($this->buffer->getMaxSize(), $maxSize);

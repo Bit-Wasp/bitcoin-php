@@ -20,7 +20,7 @@ class Point implements \Mdanter\Ecc\PointInterface
 {
 
     /**
-     * @var
+     * @var \Mdanter\Ecc\PointInterface
      */
     protected $point;
 
@@ -40,6 +40,7 @@ class Point implements \Mdanter\Ecc\PointInterface
         $math = EccFactory::getAdapter();
 
         $this->point = new \Mdanter\Ecc\Point($generator->getCurve(), $x, $y, $generator->getOrder(), $math);
+        return $this;
     }
 
     /**
@@ -55,7 +56,7 @@ class Point implements \Mdanter\Ecc\PointInterface
      */
     public function getCurve()
     {
-        return $this->curve;
+        return $this->point->getCurve();
     }
 
     /**
@@ -63,7 +64,7 @@ class Point implements \Mdanter\Ecc\PointInterface
      */
     public function getOrder()
     {
-        return $this->order;
+        return $this->point->getOrder();
     }
 
     /**

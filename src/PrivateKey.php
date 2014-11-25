@@ -21,11 +21,6 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     protected $decimal;
 
     /**
-     * @var string
-     */
-    protected $hex;
-
-    /**
      * @var \Mdanter\Ecc\CurveFp
      */
     protected $curve;
@@ -42,6 +37,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public function __construct($hex, $compressed = false, \Mdanter\Ecc\GeneratorPoint $generator = null)
     {
+
         if (! self::isValidKey($hex)) {
             throw new \Exception('Invalid private key - must be less than curve order.');
         }
@@ -56,6 +52,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $point = $generator->mul($this->decimal);
         $this->generator  = $generator;
         $this->publicKey  = new PublicKey($point, $this->compressed);
+        return $this;
     }
 
     /**
@@ -72,14 +69,25 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
             $generator = EccFactory::getSecgCurves()->generator256k1();
         }
 
+        $keyBuffer = self::generateKey($generator);
+        $private   = new PrivateKey($keyBuffer->serialize('hex'), $compressed);
+        return $private;
+    }
+
+    /**
+     * Generate a buffer containing a valid key
+     *
+     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @return Buffer
+     * @throws \Exception
+     */
+    public static function generateKey(\Mdanter\Ecc\GeneratorPoint $generator = null)
+    {
         $buffer = new Buffer(Random::bytes(32));
         while (! self::isValidKey($buffer->serialize('hex'), $generator)) {
             $buffer = new Buffer(Random::bytes(32));
         }
-
-        $private = new PrivateKey($buffer->serialize('hex'), $compressed);
-
-        return $private;
+        return $buffer;
     }
 
     /**
@@ -95,9 +103,12 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
             $generator = EccFactory::getSecgCurves()->generator256k1();
         }
 
+        // Less than the order of the curve
         $withinRange = Math::cmp(Math::hexDec($hex), $generator->getOrder()) < 0;
 
-        return $withinRange;
+        // Not zero
+        $notZero     = ! Math::cmp(Math::hexDec($hex), 0) == 0;
+        return $withinRange and $notZero;
     }
     /**
      * @inheritdoc
@@ -135,6 +146,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     {
         $this->compressed = $setting;
         $this->publicKey->setCompressed($setting);
+        return $this;
     }
 
     /**
@@ -192,14 +204,6 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public function __toString()
     {
         return $this->getHex();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getDec()
-    {
-        return $this->dec;
     }
 
     /**

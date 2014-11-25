@@ -5,6 +5,7 @@ namespace Bitcoin;
 use Bitcoin\Util\Math;
 use Bitcoin\Util\Hash;
 use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Parser;
 
 /**
  * Class Script
@@ -156,7 +157,7 @@ class Script implements ScriptInterface
     {
         $this->script = '';
         $this->setRegisteredOpCodes();
-
+        return $this;
     }
 
     /**
@@ -333,7 +334,6 @@ class Script implements ScriptInterface
                 $pos   += $length;
 
             } else {
-
                 // None of these pushdatas, so just an opcode
                 if (isset($this->rOpCodes[$opCode])) {
                     $push = $this->rOpCodes[$opCode];

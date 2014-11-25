@@ -40,7 +40,6 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase {
     public function testSet()
     {
         $this->stack->set(0, '41');
-        print_r($this->stack);
 
         $this->assertInternalType('array', $this->stack->dump());
         $this->assertNotEmpty($this->stack->dump());

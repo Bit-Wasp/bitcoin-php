@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Bitcoin;
 
 /**
@@ -9,11 +8,18 @@ namespace Bitcoin;
  */
 class ScriptStack
 {
-
     /**
      * @var array
      */
     protected $stack = array();
+
+    /**
+     * @returns self
+     */
+    public function __construct()
+    {
+        return $this;
+    }
 
     /**
      * @return mixed

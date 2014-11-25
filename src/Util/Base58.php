@@ -22,6 +22,7 @@ class Base58
      */
     public static function checksum($data)
     {
+        $data = pack("H*", $data);
         $hash = Hash::sha256d($data);
         $checksum = substr($hash, 0, 8);
 
@@ -117,11 +118,11 @@ class Base58
      */
     public static function decodeCheck($base58)
     {
-        $hex = self::decode($base58);
-        $data = substr($hex, 0, -8);
+        $hex       = self::decode($base58);
         $cs_verify = substr($hex, -8);
 
-        $checksum = self::checksum($data);
+        $data      = substr($hex, 0, -8);
+        $checksum  = self::checksum($data);
 
         if ($checksum != $cs_verify) {
             throw new Base58ChecksumFailure('Failed to verify checksum');

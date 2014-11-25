@@ -78,6 +78,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $this->setMaxPushBytes(520);
         $this->setMaxOpCodes(200);
         $this->requireLowestPushdata(true);
+        return $this;
     }
 
     /**
@@ -106,10 +107,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function getDisabledOpcodes()
     {
         return array('OP_CAT', 'OP_SUBSTR', 'OP_LEFT', 'OP_RIGHT',
-        'OP_INVERT', 'OP_AND', 'OP_OR', 'OP_XOR', 'OP_2MUL', 'OP_2DIV',
-        'OP_MUL', 'OP_DIV', 'OP_MOD', 'OP_LSHIFT');
-
+            'OP_INVERT', 'OP_AND', 'OP_OR', 'OP_XOR', 'OP_2MUL',
+            'OP_2DIV', 'OP_MUL', 'OP_DIV', 'OP_MOD', 'OP_LSHIFT'
+        );
     }
+
     /**
      * @return bool
      */
@@ -204,6 +206,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
     }
 
+    /**
+     * @param $value
+     * @return bool
+     */
     public function castToBool($value)
     {
         if ($value) {
