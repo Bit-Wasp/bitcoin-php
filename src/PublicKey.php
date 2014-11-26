@@ -216,7 +216,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public static function recoverYfromX($x, $byte, GeneratorPoint $generator = null)
     {
-        if (! in_array($byte, [PublicKey::KEY_COMPRESSED_ODD, PUBLICKEY::KEY_COMPRESSED_EVEN])) {
+        if (! in_array($byte, array(PublicKey::KEY_COMPRESSED_ODD, PUBLICKEY::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
         }
 

@@ -300,30 +300,24 @@ class Script implements ScriptInterface
         $data = array();
 
         // Load script as a byte string
-        $script = $this->serialize();
-        $scriptLen = strlen($script);
+        $script = $this->serialize('hex');
+        $parser = new Parser($script);
 
-        while ($pos < $scriptLen) {
-
-            $opCode = ord(substr($script, $pos, 1));
-            $pos   += 1;
+        while ($op = $parser->readBytes(1)) {
+            $opCode = $op->serialize('int');
 
             if ($opCode < 1) {
-
                 // False, or OP_0
                 $push = Buffer::hex('00');
 
             } else if ($opCode < 75) {
-
                 // When < 75, this opCode is the length of the following string
-                $push = new Buffer(substr($script, $pos, $opCode));
-                $pos += $opCode;
+                $push = $parser->readBytes($opCode);
 
             } else if ($opCode <= 78) {
 
                 // Each pushdata opcode is followed by the length of the string.
                 // The number of bytes which encode the length change with the opcode.
-
                 if ($opCode == $this->getOpCode('OP_PUSHDATA1')) {
                     $lengthOfLen = 1;
                 } else if ($opCode == $this->getOpCode('OP_PUSHDATA2')) {
@@ -332,14 +326,8 @@ class Script implements ScriptInterface
                     $lengthOfLen = 4;
                 }
 
-                // Length is serialized in little-endian - Flip bytes and convert to decimal for true length
-                $lengthNetwork = bin2hex(substr($script, $pos, $lengthOfLen));
-                $length   = Math::hexDec(Parser::flipBytes($lengthNetwork));
-                $pos     += $lengthOfLen;
-
-                // Get the data
-                $push   = new Buffer(substr($script, $pos, $pos+$length));
-                $pos   += $length;
+                $length = $parser->readBytes($lengthOfLen)->serialize('int');
+                $push = $parser->readBytes($length);
 
             } else {
                 // None of these pushdatas, so just an opcode

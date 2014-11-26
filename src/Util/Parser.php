@@ -119,6 +119,13 @@ class Parser
     public function readBytes($bytes, $flip_bytes = false)
     {
         $string = substr($this->string, $this->position, $bytes);
+        $length = strlen($string);
+        if ($length == 0) {
+            return false;
+        } else if ($length !== $bytes) {
+            throw new Exception('Could not parse string of required length');
+        }
+
         $this->position += $bytes;
 
         if ($flip_bytes) {
