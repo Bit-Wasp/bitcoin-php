@@ -285,7 +285,7 @@ class Script implements ScriptInterface
                 ->getBuffer()->serialize();
             //$data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*", (Math::decHex($length))) . $bin;
         } else if ($length <= 0xffff) {
-            
+
             $parsed = new Parser();
             $parsed = $parsed
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
@@ -472,11 +472,11 @@ class Script implements ScriptInterface
         } else if ($decimal <= 0xffffffff) {                 // Uint32
             return pack("CV", 0xfe, $decimal);
         } else if ($decimal < 0xffffffffffffffff) {        // Uint64
-            if (version_compare(phpversion(), '5.6.0') >= 0) {
-                return pack("CP", 0xff, $decimal);
-            } else {
+          //  if (version_compare(phpversion(), '5.6.0') >= 0) {
+          //      return pack("CP", 0xff, $decimal);
+          //  } else {
                 throw new \Exception('numToVarInt(): Integer too large');
-            }
+          //  }
         }
     }
 
