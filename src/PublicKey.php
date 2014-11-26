@@ -83,6 +83,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     public function getPubKeyHash()
     {
         $public_key = $this->serialize('hex');
+
         $hash = Hash::sha256ripe160($public_key);
         return $hash;
     }

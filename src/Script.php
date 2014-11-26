@@ -280,11 +280,12 @@ class Script implements ScriptInterface
         } else if ($length <= 0xffff) {
             $data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*", (Math::decHex($length))) . $bin;
         } else {
+            //if (version_compare(phpversion(), '5.6.0') >= 0) {
             $data = chr($this->getOpCode('OP_PUSHDATA4')) . pack("H*", (Math::decHex($length))) . $bin;
+            //} else {
+             //   throw Exception('Must have php version 5.6.0 or greater to use PUSHDATA4. ')
+            //}
         }
-        //$varInt = self::numToVarInt($length);
-
-        //$string = $varInt . $bin;
         $this->script .=  $data;
         return $this;
     }
@@ -387,6 +388,15 @@ class Script implements ScriptInterface
         return implode(" ", $result);
     }
 
+    public function getScriptHash()
+    {
+        $hex  = $this->serialize('hex');
+        $hash = Hash::sha256ripe160($hex, true);
+
+        $buffer = new Buffer($hash);
+        return $buffer;
+    }
+
     /**
      * Create a Pay to pubkey output
      *
@@ -396,7 +406,7 @@ class Script implements ScriptInterface
     public static function payToPubKey(PublicKeyInterface $public_key)
     {
         $script = new self();
-        $script->push($public_key->getHex())->op('OP_CHECKSIG');
+        $script->push($public_key->serialize('hex'))->op('OP_CHECKSIG');
 
         return $script;
     }
@@ -409,7 +419,7 @@ class Script implements ScriptInterface
      */
     public static function payToPubKeyHash(PublicKeyInterface $public_key)
     {
-        $hash = Hash::sha256ripe160($public_key->getHex());
+        $hash = $public_key->getPubKeyHash();
 
         $script = new self();
         $script->op('OP_DUP')->op('OP_HASH160')->push($hash)->op('OP_EQUALVERIFY');
@@ -450,10 +460,12 @@ class Script implements ScriptInterface
             return pack("Cv", 0xfd, $decimal);
         } else if ($decimal <= 0xffffffff) {                 // Uint32
             return pack("CV", 0xfe, $decimal);
-        //} else if ($decimal < 0xffffffffffffffff) {        // Uint64
-           // return pack("CP", 0xff, $decimal);
-        } else {
-            throw new \Exception('numToVarInt(): Integer too large');
+        } else if ($decimal < 0xffffffffffffffff) {        // Uint64
+            if (version_compare(phpversion(), '5.6.0') >= 0) {
+                return pack("CP", 0xff, $decimal);
+            } else {
+                throw new \Exception('numToVarInt(): Integer too large');
+            }
         }
     }
 
@@ -462,10 +474,16 @@ class Script implements ScriptInterface
      * @return string
      * @throws \Exception
      */
-    public function getVarInt()
+    public function getVarInt($type = null)
     {
         $size   = $this->getSize();
         $varInt = self::numToVarInt($size);
+
+        if ($type == 'hex') {
+            $hex = unpack("H*", $varInt);
+            return $hex[1];
+        }
+
         return $varInt;
     }
 

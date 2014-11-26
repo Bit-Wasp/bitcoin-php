@@ -459,5 +459,80 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->script->parse();
     }
 
+    public function testPayToPubKey()
+    {
+        $pubkey = PublicKey::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
+        $script = Script::payToPubKey($pubkey);
+        $parsed = $script->parse();
+        $this->assertSame($parsed[0]->serialize('hex'), '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
+        $this->assertSame($parsed[1], 'OP_CHECKSIG');
+    }
+
+    public function testPayToPubKeyHash()
+    {
+        $pubkey = PublicKey::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
+        $script = Script::payToPubKeyHash($pubkey);
+        $parsed = $script->parse();
+        $this->assertSame($parsed[0], 'OP_DUP');
+        $this->assertSame($parsed[1], 'OP_HASH160');
+        $this->assertSame($parsed[2]->serialize('hex'), 'f0cd7fab8e8f4b335931a77f114a46039068da59');
+        $this->assertSame($parsed[3], 'OP_EQUALVERIFY');
+    }
+
+    public function testGetScriptHash()
+    {
+        $script = new Script();
+        $script
+            ->op('OP_2')
+            ->push('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb')
+            ->push('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb')
+            ->push('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb')
+            ->op('OP_3')
+            ->op('OP_CHECKMULTISIG');
+
+        $rs = new Script();
+        $rs->set('522102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb53ae');
+
+        // Ensure scripthash is being reproduced
+        $this->assertSame($script->serialize('hex'), '522102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb53ae');
+        $this->assertSame($script->getScriptHash()->serialize('hex'), $rs->getScriptHash()->serialize('hex'));
+
+        // Validate it's correct
+        $this->assertSame($script->getScriptHash()->serialize('hex'), 'f7c29c0c6d319e33c9250fca0cb61a500621d93e');
+
+    }
+
+    public function testPayToScriptHash()
+    {
+        // Script::payToScriptHash should produce a ScriptHash type script, from a different script
+        $script = new Script();
+        $script
+            ->op('OP_2')
+            ->push('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb')
+            ->push('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb')
+            ->push('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb')
+            ->op('OP_3')
+            ->op('OP_CHECKMULTISIG');
+
+        $scriptHash = Script::payToScriptHash($script);
+        $parsed     = $scriptHash->parse();
+        $this->assertSame($parsed[0], 'OP_HASH160');
+        $this->assertSame($parsed[1]->serialize('hex'), 'f7c29c0c6d319e33c9250fca0cb61a500621d93e');
+        $this->assertSame($parsed[2], 'OP_EQUAL');
+    }
+
+    public function testGetVarInt()
+    {
+        $f = file_get_contents(__DIR__ . '/../Data/script.varint.json');
+        $json = json_decode($f);
+        foreach ($json->test as $test) {
+            $script = new Script();
+            $script->set($test->script);
+            $this->assertSame($script->getVarInt(), pack("H*", $test->varint));
+            $this->assertSame($script->getVarInt('hex'), $test->varint);
+
+        }
+
+    }
 
 }

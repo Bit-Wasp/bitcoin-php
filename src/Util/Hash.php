@@ -9,6 +9,20 @@ namespace Bitcoin\Util;
 class Hash
 {
     /**
+     * Normalize data so it is always a
+     * @param $input
+     * @return string
+     */
+    private static function normalize($input)
+    {
+        if ($input instanceof Buffer) {
+            $input = $input->serialize('hex');
+        }
+
+        return $input;
+    }
+
+    /**
      * Calculate Sha256(RipeMd160()) on the given data
      *
      * @param $data
@@ -17,8 +31,9 @@ class Hash
      */
     public static function sha256ripe160($data, $binary_output = false)
     {
-        $bs = pack("H*", $data);
-        $hash = self::sha256($bs, true);
+        $data = self::normalize($data);
+        $data = pack("H*", $data);
+        $hash = self::sha256($data, true);
         $hash = self::ripemd160($hash, $binary_output);
         return $hash;
     }
@@ -45,6 +60,7 @@ class Hash
      */
     public static function sha256d($data, $binary_output = false)
     {
+        $data = self::normalize($data);
         $hash = self::sha256($data, true);
         $hash = self::sha256($hash, $binary_output);
         return $hash;
@@ -72,6 +88,8 @@ class Hash
      */
     public static function ripemd160d($data, $binary_output = false)
     {
+        $data = self::normalize($data);
+        $bs = pack("H*", $data);
         $hash = self::ripemd160($data, true);
         $hash = self::ripemd160($hash, $binary_output);
         return $hash;
@@ -84,6 +102,7 @@ class Hash
      */
     public static function sha1($data, $binary_output = false)
     {
+        $data = self::normalize($data);
         $hash = hash('sha1', $data, $binary_output);
         return $hash;
     }
@@ -101,6 +120,7 @@ class Hash
      */
     public static function pbkdf2($algo, $data, $salt, $iterations, $length, $binary_output = false)
     {
+        $data = self::normalize($data);
         return hash_pbkdf2($algo, $data, $salt, $iterations, $length, $binary_output);
     }
 
@@ -112,6 +132,7 @@ class Hash
      */
     public static function hmac($algo, $data, $salt)
     {
+        $data = self::normalize($data);
         return hash_hmac($algo, $data, $salt);
     }
 }
