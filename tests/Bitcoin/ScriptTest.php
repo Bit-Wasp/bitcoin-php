@@ -411,8 +411,8 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script6[4], 'OP_CHECKSIG');
 
         // OP_RETURN <38 bytes>
-        $s7 = (new Script())
-            ->set($json->test[7]->script);
+        $s7 = new Script();
+        $s7->set($json->test[7]->script);
         $script7 = $s7->parse();
         $this->assertSame($script7[0], 'OP_RETURN');
         $this->assertSame($script7[1]->getSize(), 40);
