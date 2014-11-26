@@ -148,6 +148,9 @@ class Script implements ScriptInterface
         'OP_NOP10' => 185,
     );
 
+    /**
+     * @var array
+     */
     private $rOpCodes;
 
     /**
@@ -240,6 +243,10 @@ class Script implements ScriptInterface
         return $this;
     }
 
+    /**
+     * @param $code
+     * @return $this
+     */
     public function rOp($code)
     {
         if (!isset($this->rOpCodes[$code])) {

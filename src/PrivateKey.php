@@ -113,7 +113,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
 
     /**
      * Always returns true when private key.
-     * 
+     *
      * @return bool
      */
     public function isPrivate()

@@ -350,8 +350,8 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
 
         // Pay to pubkey hash
-        $s0 = (new Script())
-            ->set($json->test[0]->script);
+        $s0 = new Script();
+        $s0->set($json->test[0]->script);
         $script0 = $s0->parse();
         $this->assertSame($script0[0], 'OP_DUP');
         $this->assertSame($script0[1], 'OP_HASH160');
@@ -361,31 +361,31 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($s0->getAsm(), $json->test[0]->asm);
 
         // <65 bytes> OP_CHECKSIG - uncompressed paytopubkey
-        $s1 = (new Script())
-            ->set($json->test[1]->script);
+        $s1 = new Script();
+        $s1->set($json->test[1]->script);
         $script1 = $s1->parse();
         $this->assertSame($script1[0]->getSize(), 65);
         $this->assertSame($script1[1], 'OP_CHECKSIG');
         $this->assertSame($s1->getAsm(), $json->test[1]->asm);
 
         // pay to script hash output
-        $s2 = (new Script())
-            ->set($json->test[2]->script);
+        $s2 = new Script();
+        $s2->set($json->test[2]->script);
         $script2 = $s2->parse();
         $this->assertSame($script2[0], 'OP_HASH160');
         $this->assertSame($script2[1]->getSize(), 20);
         $this->assertSame($script2[2], 'OP_EQUAL');
 
         // <33 bytes> OP_CHECKSIG - compressed paytopubkey
-        $s3 = (new Script())
-            ->set($json->test[3]->script);
+        $s3 = new Script();
+        $s3->set($json->test[3]->script);
         $script3 = $s3->parse();
         $this->assertSame($script3[0]->getSize(), 33);
         $this->assertSame($script3[1], 'OP_CHECKSIG');
 
         // 1 <pubkey> <pubkey> OP_CHECKMULTISIG
-        $s4 = (new Script())
-            ->set($json->test[4]->script);
+        $s4 = new Script();
+        $s4->set($json->test[4]->script);
         $script4 = $s4->parse();
         $this->assertSame($script4[0], 'OP_1');
         $this->assertSame($script4[1]->getSize(), 33);
@@ -394,15 +394,15 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script4[4], 'OP_CHECKMULTISIG');
 
         // OP_RETURN <40 bytes>
-        $s5 = (new Script())
-            ->set($json->test[5]->script);
+        $s5 = new Script();
+        $s5->set($json->test[5]->script);
         $script5 = $s5->parse();
         $this->assertSame($script5[0], 'OP_RETURN');
         $this->assertSame($script5[1]->getSize(), 38);
 
         // MtGox fuckup.
-        $s6 = (new Script())
-            ->set($json->test[6]->script);
+        $s6 = new Script();
+        $s6->set($json->test[6]->script);
         $script6 = $s6->parse();
         $this->assertSame($script6[0], 'OP_DUP');
         $this->assertSame($script6[1], 'OP_HASH160');
@@ -418,8 +418,8 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script7[1]->getSize(), 40);
 
         //
-        $s8 = (new Script())
-            ->set($json->test[8]->script);
+        $s8 = new Script();
+        $s8->set($json->test[8]->script);
         $script8 = $s8->parse();
         $this->assertSame($script8[0], 'OP_IFDUP');
         $this->assertSame($script8[1], 'OP_IF');
