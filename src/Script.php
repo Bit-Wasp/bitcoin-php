@@ -276,15 +276,26 @@ class Script implements ScriptInterface
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
             $data = chr($length) . $bin;
         } else if ($length <= 0xff) {
-            $data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*", (Math::decHex($length))) . $bin;
+            $data = (new Parser)
+                ->writeInt(1, $this->getOpCode('OP_PUSHDATA1'))
+                ->writeInt(1, $length, false)
+                ->writeBytes($length, $data)
+                ->getBuffer()->serialize();
+            //$data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*", (Math::decHex($length))) . $bin;
         } else if ($length <= 0xffff) {
-            $data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*", (Math::decHex($length))) . $bin;
+            $data = (new Parser)
+                ->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
+                ->writeInt(2, $length, false)
+                ->writeBytes($length, $data)
+                ->getBuffer()->serialize();
+
+            //$data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*", (Math::decHex($length))) . $bin;
         } else {
-            //if (version_compare(phpversion(), '5.6.0') >= 0) {
-            $data = chr($this->getOpCode('OP_PUSHDATA4')) . pack("H*", (Math::decHex($length))) . $bin;
-            //} else {
-             //   throw Exception('Must have php version 5.6.0 or greater to use PUSHDATA4. ')
-            //}
+            $data = (new Parser)
+                ->writeInt(1, $this->getOpCode('OP_PUSHDATA4'))
+                ->writeInt(4, $length, false)
+                ->writeBytes($length, $data)
+                ->getBuffer()->serialize();
         }
         $this->script .=  $data;
         return $this;
@@ -313,21 +324,22 @@ class Script implements ScriptInterface
             } else if ($opCode < 75) {
                 // When < 75, this opCode is the length of the following string
                 $push = $parser->readBytes($opCode);
-
             } else if ($opCode <= 78) {
 
                 // Each pushdata opcode is followed by the length of the string.
                 // The number of bytes which encode the length change with the opcode.
+                $flipBytes = true;
                 if ($opCode == $this->getOpCode('OP_PUSHDATA1')) {
                     $lengthOfLen = 1;
+                    $flipBytes = false;
                 } else if ($opCode == $this->getOpCode('OP_PUSHDATA2')) {
                     $lengthOfLen = 2;
                 } else if ($opCode == $this->getOpCode('OP_PUSHDATA4')) {
                     $lengthOfLen = 4;
                 }
 
-                $length = $parser->readBytes($lengthOfLen)->serialize('int');
-                $push = $parser->readBytes($length);
+                $length = $parser->readBytes($lengthOfLen, false)->serialize('int');
+                $push   = $parser->readBytes($length);
 
             } else {
                 // None of these pushdatas, so just an opcode
@@ -376,6 +388,11 @@ class Script implements ScriptInterface
         return implode(" ", $result);
     }
 
+    /**
+     * Return a buffer containing the hash of this script.
+     *
+     * @return Buffer
+     */
     public function getScriptHash()
     {
         $hex  = $this->serialize('hex');

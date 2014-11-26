@@ -69,7 +69,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $hex = '41414141';
-        $dec = Math::hexDec($hex);
+        $dec = (int)Math::hexDec($hex);
         $bin = pack("H*", $hex);
         $this->buffer = Buffer::hex($hex);
 

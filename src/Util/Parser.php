@@ -17,7 +17,7 @@ class Parser
     /**
      * @var int
      */
-    protected $position;
+    protected $position = 0;
 
     /**
      * @param null $in
@@ -74,7 +74,7 @@ class Parser
     public function writeInt($bytes, $int, $flip_bytes = false)
     {
         $hex  = Math::decHex($int);
-        $hex  = str_pad($hex, $bytes*2, '0', STR_PAD_LEFT);
+        $hex  = str_pad($hex, (int)$bytes*2, '0', STR_PAD_LEFT);
         $data = pack("H*", $hex);
 
         if ($flip_bytes) {
@@ -120,10 +120,11 @@ class Parser
     {
         $string = substr($this->string, $this->position, $bytes);
         $length = strlen($string);
+
         if ($length == 0) {
             return false;
         } else if ($length !== $bytes) {
-            throw new Exception('Could not parse string of required length');
+            throw new \Exception('Could not parse string of required length');
         }
 
         $this->position += $bytes;
@@ -133,7 +134,6 @@ class Parser
         }
 
         $buffer = new Buffer($string);
-
         return $buffer;
     }
 

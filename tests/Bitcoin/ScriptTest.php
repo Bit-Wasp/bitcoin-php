@@ -9,6 +9,10 @@
 namespace Bitcoin;
 
 use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Random;
+use Bitcoin\Util\Math;
+
+
 
 class ScriptTest extends \PHPUnit_Framework_TestCase
 {
@@ -457,6 +461,12 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $firstOpCode = ord($script[0]);
         $this->assertSame($firstOpCode, $this->script->getOpCode('OP_PUSHDATA2'));
         $this->script->parse();
+    }
+
+    public function testPushdata3()
+    {
+      
+
     }
 
     public function testPayToPubKey()
