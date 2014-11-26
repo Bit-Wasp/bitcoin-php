@@ -274,16 +274,20 @@ class Script implements ScriptInterface
         $length = strlen($bin);
 
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
-            $data = chr($length) . $bin;
+            $parsed = chr($length) . $bin;
         } else if ($length <= 0xff) {
-            $data = (new Parser)
+            echo 'a';
+            $parsed = new Parser();
+            $parsed = $parsed
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA1'))
                 ->writeInt(1, $length, false)
                 ->writeBytes($length, $data)
                 ->getBuffer()->serialize();
             //$data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*", (Math::decHex($length))) . $bin;
         } else if ($length <= 0xffff) {
-            $data = (new Parser)
+            
+            $parsed = new Parser();
+            $parsed = $parsed
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
                 ->writeInt(2, $length, false)
                 ->writeBytes($length, $data)
@@ -291,13 +295,15 @@ class Script implements ScriptInterface
 
             //$data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*", (Math::decHex($length))) . $bin;
         } else {
-            $data = (new Parser)
+            $parsed = new Parser();
+            $parsed = $parsed
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA4'))
                 ->writeInt(4, $length, false)
                 ->writeBytes($length, $data)
                 ->getBuffer()->serialize();
         }
-        $this->script .=  $data;
+
+        $this->script .=  $parsed;
         return $this;
     }
 

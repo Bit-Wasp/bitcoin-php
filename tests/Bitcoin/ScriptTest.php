@@ -465,7 +465,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function testPushdata3()
     {
-      
+
 
     }
 
