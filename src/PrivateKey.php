@@ -110,6 +110,17 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $notZero     = ! Math::cmp(Math::hexDec($hex), 0) == 0;
         return $withinRange and $notZero;
     }
+
+    /**
+     * Always returns true when private key.
+     * 
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return true;
+    }
+
     /**
      * @inheritdoc
      */
