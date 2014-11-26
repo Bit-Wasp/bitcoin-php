@@ -271,7 +271,7 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function isPrivate()
     {
-        return $this->privateKey instanceOf PrivateKey;
+        return $this->privateKey instanceof PrivateKey;
     }
 
     /**
@@ -426,7 +426,10 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
                             $this->getGenerator()->getOrder()
                         )
                     ),
-                    64, '0', STR_PAD_LEFT)
+                    64,
+                    '0',
+                    STR_PAD_LEFT
+                )
             );
             $public = $private->getPublicKey();
         } else {

@@ -2,6 +2,8 @@
 
 namespace Bitcoin;
 
+use Bitcoin\Exceptions\ScriptStackException;
+
 /**
  * Class ScriptStack
  * @package Bitcoin
@@ -96,8 +98,4 @@ class ScriptStack
     {
         return $this->stack;
     }
-}
-
-class ScriptStackException extends \Exception
-{
 }

@@ -20,7 +20,7 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException \Bitcoin\ScriptStackException
+     * @expectedException \Bitcoin\Exceptions\ScriptStackException
      */
     public function testPopException()
     {
@@ -83,7 +83,7 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException \Bitcoin\ScriptStackException
+     * @expectedException \Bitcoin\Exceptions\ScriptStackException
      */
     public function testEraseException()
     {

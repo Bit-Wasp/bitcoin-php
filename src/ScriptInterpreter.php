@@ -2,7 +2,15 @@
 
 namespace Bitcoin;
 
+use Bitcoin\Util\Hash;
+use Bitcoin\Util\Buffer;
+use Bitcoin\Exceptions\ScriptStackException;
+use Bitcoin\Exceptions\ScriptRuntimeException;
 
+/**
+ * Class ScriptInterpreter
+ * @package Bitcoin
+ */
 class ScriptInterpreter implements ScriptInterpreterInterface
 {
 
@@ -331,11 +339,3 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 }
 ;
-
-class ScriptRuntimeException extends \Exception
-{
-}
-
-class ScriptStackException extends \Exception
-{
-}

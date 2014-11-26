@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Util;
 
+use Bitcoin\Exceptions\Base58ChecksumFailure;
 
 /**
  * Class Base58
@@ -130,8 +131,4 @@ class Base58
 
         return $data;
     }
-}
-
-class Base58ChecksumFailure extends \Exception
-{
 }
