@@ -402,11 +402,11 @@ class HeirarchicalKey implements PrivateKeyInterface, KeyInterface
         $hash   = Hash::hmac('sha512', $data->serialize(), $this->getChainCode()->serialize());
         $parser = new Parser($hash);
         list($offset, $chainCode) =
-            [
+            array(
                 $parser->readBytes(32),
                 $parser->readBytes(32)
-            ];
-
+            );
+              
         // todo remove?
         if (PrivateKey::isValidKey($offset->serialize('hex')) == false) {
             // Do again, increasing the number by 1.
