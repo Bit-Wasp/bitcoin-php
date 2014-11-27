@@ -276,7 +276,6 @@ class Script implements ScriptInterface
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
             $parsed = chr($length) . $bin;
         } else if ($length <= 0xff) {
-            echo 'a';
             $parsed = new Parser();
             $parsed = $parsed
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA1'))

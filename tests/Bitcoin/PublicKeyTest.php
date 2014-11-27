@@ -150,6 +150,18 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testSetUnCompressed()
+    {
+        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
+        $json = json_decode($f);
+        foreach ($json->test as $test) {
+            $pub = PublicKey::fromHex($test->compressed);
+            $this->assertTrue($pub->isCompressed());
+            $pub->setCompressed(false);
+            $this->assertFalse($pub->isCompressed());
+        }
+    }
+
     public function testSerializeHex()
     {
         $f = file_get_contents(__DIR__ . '/../Data/publickey.compressed.json');

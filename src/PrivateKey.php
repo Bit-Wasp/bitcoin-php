@@ -83,10 +83,10 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public static function generateKey(\Mdanter\Ecc\GeneratorPoint $generator = null)
     {
-        $buffer = new Buffer(Random::bytes(32));
-        while (! self::isValidKey($buffer->serialize('hex'), $generator)) {
+        do {
             $buffer = new Buffer(Random::bytes(32));
-        }
+        } while (! self::isValidKey($buffer->serialize('hex'), $generator));
+
         return $buffer;
     }
 
@@ -161,11 +161,19 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     }
 
     /**
+     * @return \Mdanter\Ecc\GeneratorPoint
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getCurve()
     {
-        return $this->curve;
+        return $this->getGenerator()->getCurve();
     }
 
     /**
