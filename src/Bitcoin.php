@@ -10,10 +10,9 @@ use Mdanter\Ecc\EccFactory;
  */
 class Bitcoin
 {
-
     private static $math = null;
-    private static $numberTheory = null;
     private static $generator = null;
+    private static $curve = null;
 
     /**
      * @return \Mdanter\Ecc\MathAdapter
