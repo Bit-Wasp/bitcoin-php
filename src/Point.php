@@ -8,7 +8,6 @@
 
 namespace Bitcoin;
 
-use Bitcoin\Util\Math;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;

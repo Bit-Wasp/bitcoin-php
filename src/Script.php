@@ -275,27 +275,23 @@ class Script implements ScriptInterface
 
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
             $parsed = chr($length) . $bin;
+
         } else if ($length <= 0xff) {
-            $parsed = new Parser();
-            $parsed = $parsed
+            $parsed = (new Parser())
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA1'))
                 ->writeInt(1, $length, false)
                 ->writeBytes($length, $data)
                 ->getBuffer()->serialize();
-            //$data = chr($this->getOpCode('OP_PUSHDATA1')) . pack("H*", (Math::decHex($length))) . $bin;
-        } else if ($length <= 0xffff) {
 
-            $parsed = new Parser();
-            $parsed = $parsed
+        } else if ($length <= 0xffff) {
+            $parsed = (new Parser())
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
                 ->writeInt(2, $length, false)
                 ->writeBytes($length, $data)
                 ->getBuffer()->serialize();
 
-            //$data = chr($this->getOpCode('OP_PUSHDATA2')) . pack("H*", (Math::decHex($length))) . $bin;
         } else {
-            $parsed = new Parser();
-            $parsed = $parsed
+            $parsed = (new Parser())
                 ->writeInt(1, $this->getOpCode('OP_PUSHDATA4'))
                 ->writeInt(4, $length, false)
                 ->writeBytes($length, $data)
@@ -308,11 +304,11 @@ class Script implements ScriptInterface
 
     /**
      * Parse a script into opcodes and Buffers of data
+     *
      * @return array
      */
     public function parse()
     {
-        $pos = 0;
         $data = array();
 
         // Load script as a byte string
@@ -329,21 +325,20 @@ class Script implements ScriptInterface
             } else if ($opCode < 75) {
                 // When < 75, this opCode is the length of the following string
                 $push = $parser->readBytes($opCode);
+
             } else if ($opCode <= 78) {
 
                 // Each pushdata opcode is followed by the length of the string.
                 // The number of bytes which encode the length change with the opcode.
-                $flipBytes = true;
                 if ($opCode == $this->getOpCode('OP_PUSHDATA1')) {
                     $lengthOfLen = 1;
-                    $flipBytes = false;
                 } else if ($opCode == $this->getOpCode('OP_PUSHDATA2')) {
                     $lengthOfLen = 2;
                 } else if ($opCode == $this->getOpCode('OP_PUSHDATA4')) {
                     $lengthOfLen = 4;
                 }
 
-                $length = $parser->readBytes($lengthOfLen, false)->serialize('int');
+                $length = $parser->readBytes($lengthOfLen)->serialize('int');
                 $push   = $parser->readBytes($length);
 
             } else {

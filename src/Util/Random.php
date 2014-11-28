@@ -2,6 +2,8 @@
 
 namespace Bitcoin\Util;
 
+use \Bitcoin\Exceptions\InsufficientEntropy;
+
 /**
  * Class Random
  * @package Bitcoin\Random
@@ -14,6 +16,8 @@ class Random
     protected static $hasOpenssl;
 
     /**
+     * Check if OpenSSL is loaded
+     *
      * @return bool
      */
     private static function hasOpenssl()
@@ -27,6 +31,7 @@ class Random
     }
 
     /**
+     * Return $length bytes. Throws an exception if
      * @param int $length
      * @return string
      * @throws \Exception
@@ -34,7 +39,7 @@ class Random
     public static function bytes($length = 32)
     {
         if (!self::hasOpenssl()) {
-            throw new \Exception('Openssl not found');
+            throw new InsufficientEntropy('Openssl not found');
         }
 
         $strong = true;

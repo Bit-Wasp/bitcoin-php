@@ -2,12 +2,12 @@
 
 namespace Bitcoin;
 
-use \Bitcoin\Util\Buffer;
-use \Bitcoin\Util\Random;
-use \Bitcoin\Util\Hash;
-use \Bitcoin\Util\Base58;
-use \Bitcoin\Util\Math;
-use \Mdanter\Ecc\EccFactory;
+use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Random;
+use Bitcoin\Util\Base58;
+use Bitcoin\Util\Math;
+use Bitcoin\Exceptions\InvalidPrivateKey;
+use Mdanter\Ecc\EccFactory;
 
 /**
  * Class PrivateKey
@@ -28,18 +28,18 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     /**
      * @var PublicKey
      */
-    protected $publicKey;
+    protected $publicKey = null;
 
     /**
-     * @param \Mdanter\Ecc\CurveFp $curve
      * @param $hex
      * @param bool $compressed
+     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @throws \Exception
      */
     public function __construct($hex, $compressed = false, \Mdanter\Ecc\GeneratorPoint $generator = null)
     {
-
         if (! self::isValidKey($hex)) {
-            throw new \Exception('Invalid private key - must be less than curve order.');
+            throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
         $this->decimal    = Math::hexDec($hex);
@@ -49,9 +49,8 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
             $generator = EccFactory::getSecgCurves()->generator256k1();
         }
 
-        $point = $generator->mul($this->decimal);
         $this->generator  = $generator;
-        $this->publicKey  = new PublicKey($point, $this->compressed);
+
         return $this;
     }
 
@@ -107,7 +106,8 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $withinRange = Math::cmp(Math::hexDec($hex), $generator->getOrder()) < 0;
 
         // Not zero
-        $notZero     = ! Math::cmp(Math::hexDec($hex), 0) == 0;
+        $notZero     = ! (Math::cmp(Math::hexDec($hex), 0) == 0);
+
         return $withinRange and $notZero;
     }
 
@@ -136,26 +136,37 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public function getPublicKey()
     {
+        if ($this->publicKey == null) {
+            $point = $this
+                ->getGenerator()
+                ->mul($this->serialize('int'));
+            $this->publicKey  = new PublicKey($point, $this->compressed);
+        }
+
         return $this->publicKey;
     }
 
     /**
      * Return the hash of the associated public key
+     *
      * @return mixed
      */
     public function getPubKeyHash()
     {
-        return $this->publicKey->getPubKeyHash();
+        return $this->getPublicKey()->getPubKeyHash();
     }
 
     /**
-     * Set whether compressed keys should be returned
+     * Set that this key should be compressed
      *
      * @param $setting
+     * @return $this
+     * @throws \Exception
      */
     public function setCompressed($setting)
     {
         $this->compressed = $setting;
+        $this->getPublicKey();
         $this->publicKey->setCompressed($setting);
         return $this;
     }
@@ -204,6 +215,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
 
     /**
      * Return the length of the private key. 32 for binary, 64 for hex.
+     *
      * @param null $type
      * @return int
      */
@@ -229,12 +241,10 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * When given a network, return a WIF
      *
      * @param NetworkInterface $network
-     * @param bool $compressed
      * @return string
      */
     public function getWif(NetworkInterface $network)
     {
-
         $hex = sprintf(
             "%s%s%s",
             $network->getPrivByte(),

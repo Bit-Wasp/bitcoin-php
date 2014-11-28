@@ -66,7 +66,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public function getCurve()
     {
-        return $this->point->getCurve();
+        return $this->getPoint()->getCurve();
     }
 
     /**

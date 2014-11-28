@@ -33,11 +33,20 @@ class Parser
             $this->string = $buffer->serialize();
         }
 
-        $this->postion = 0;
+        $this->position = 0;
         return $this;
     }
 
-    // Functions for serializing data in object to string
+    /**
+     * Flip byte order of this binary string
+     *
+     * @param $hex
+     * @return string
+     */
+    public static function flipBytes($hex)
+    {
+        return implode('', array_reverse(str_split($hex, 1)));
+    }
 
     /**
      * Write $data as $bytes bytes. Can be flipped if needed.
@@ -62,14 +71,17 @@ class Parser
             $data = $this->flipBytes($data);
         }
 
-        $this->string .= $newBuffer->serialize();
+        $this->string .= $data;
         return $this;
     }
 
     /**
+     * Write an integer to the buffer
+     *
      * @param $bytes
      * @param $int
      * @param bool $flip_bytes
+     * @return $this
      */
     public function writeInt($bytes, $int, $flip_bytes = false)
     {
@@ -82,18 +94,8 @@ class Parser
         }
 
         $this->string .= $data;
-        return $this;
-    }
 
-    /**
-     * Flip byte order of this binary string
-     *
-     * @param $hex
-     * @return string
-     */
-    public static function flipBytes($hex)
-    {
-        return implode('', array_reverse(str_split($hex, 1)));
+        return $this;
     }
 
     /**
@@ -114,7 +116,8 @@ class Parser
      *
      * @param $bytes
      * @param bool $flip_bytes
-     * @return string
+     * @return Buffer
+     * @throws \Exception
      */
     public function readBytes($bytes, $flip_bytes = false)
     {
@@ -134,12 +137,29 @@ class Parser
         }
 
         $buffer = new Buffer($string);
+
         return $buffer;
     }
 
+    /**
+     * Parse a variable length integer
+     *
+     * @return string
+     * @throws \Exception
+     */
     public function getVarInt()
     {
-
+        // Return the length encoded in this var int
+        $byte = (int)$this->readBytes(1)->serialize('int');
+        if (Math::cmp($byte, 0xfd) < 0) {
+            return $byte;
+        } else if (Math::cmp($byte, 0xfd) == 0) {
+            return $this->readBytes(2)->serialize('int');
+        } else if (Math::cmp($byte, 0xfe) == 0) {
+            return $this->readBytes(4)->serialize('int');
+        } else if (Math::cmp($byte, 0xff) == 0) {
+            return $this->readBytes(8)->serialize('int');
+        }
     }
 
     public function getArray($numIndexes)

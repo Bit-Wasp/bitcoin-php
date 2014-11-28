@@ -40,6 +40,7 @@ class Network implements NetworkInterface
 
     /**
      * Load basic data, throw exception if it's not provided
+     *
      * @param $address_byte
      * @param $p2sh_byte
      * @param $priv_byte

@@ -24,6 +24,8 @@ class ScriptStack
     }
 
     /**
+     * Pop a value from the stack
+     *
      * @return mixed
      * @throws ScriptStackException
      */
@@ -37,6 +39,8 @@ class ScriptStack
     }
 
     /**
+     * Push a value onto the stack
+     *
      * @param $value
      * @return $this
      */
@@ -47,6 +51,8 @@ class ScriptStack
     }
 
     /**
+     * Get index of $pos relative to the top of the stack
+     *
      * @param $pos
      * @return int
      */
@@ -57,6 +63,8 @@ class ScriptStack
     }
 
     /**
+     * Erase the item at $pos (relative to the top of the stack)
+     *
      * @param $pos
      * @return $this
      * @throws ScriptStackException
@@ -73,6 +81,8 @@ class ScriptStack
     }
 
     /**
+     * Set $value to the $pos position in the stack (Relative to the top)
+     *
      * @param $pos
      * @param $value
      * @return $this
@@ -85,6 +95,8 @@ class ScriptStack
     }
 
     /**
+     * Get the $pos value from the stack
+     *
      * @param $pos
      * @return mixed
      */
@@ -94,6 +106,11 @@ class ScriptStack
         return $this->stack[$index];
     }
 
+    /**
+     * Dump the current stack
+     *
+     * @return array
+     */
     public function dump()
     {
         return $this->stack;

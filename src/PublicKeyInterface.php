@@ -8,7 +8,6 @@ namespace Bitcoin;
  */
 interface PublicKeyInterface
 {
-
     /**
      * Length of an uncompressed key
      */

@@ -121,6 +121,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
+     * Check if settings require that pushdatas are the lowest possible
+     * opcode, otherwise validation should fail.
+     *
      * @return bool
      */
     public function requireLowestPushdata()
@@ -129,6 +132,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
+     * Set whether PUSHDATA opcodes must be the lowest possible value
+     *
      * @param $bool
      * @return $this
      */
@@ -160,6 +165,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     /**
      * Get max number of bytes in pushdata
+     *
      * @return mixed
      */
     public function getMaxPushBytes()
@@ -215,6 +221,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
+     * Cast the value to a boolean
+     *
      * @param $value
      * @return bool
      */
@@ -234,7 +242,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param $index
      * @param $sighash_type
      */
-    //public function run(TransactionInterface $transaction, $index, $sighash_type)
+    /**
+     * @throws \Exception
+     */
     public function run()
     {
         $position = 0;
@@ -338,4 +348,3 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
     }
 }
-;

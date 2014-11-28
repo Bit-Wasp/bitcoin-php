@@ -16,66 +16,32 @@ class Base58
     private static $base58chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     /**
-     * Calculate a checksum for the given data
-     *
-     * @param $data
-     * @return string
-     */
-    public static function checksum($data)
-    {
-        $data = pack("H*", $data);
-        $hash = Hash::sha256d($data);
-        $checksum = substr($hash, 0, 8);
-
-        return $checksum;
-    }
-
-    /**
      * Encode a given hex string in base58
      *
-     * @param $data
+     * @param $hex
      * @return string
      * @throws \Exception
      */
-    public static function encode($data)
+    public static function encode($hex)
     {
-        if (strlen($data) == 0) {
-            return '';
-        }
-
-        if (Math::mod(strlen($data), 2) != 0) {
+        if (Math::mod(strlen($hex), 2) !== '0') {
             throw new \Exception('Data must be of even length');
         }
+        $orighex = $hex;
 
-        $decimal = Math::hexDec($data);
-        $output = '';
-
+        $decimal = Math::hexDec($hex);
+        $return = "";
         while (Math::cmp($decimal, 0) > 0) {
-            list($decimal, $remain) = Math::divQr($decimal, 58);
-            $output .= substr(self::$base58chars, $remain, 1);
+            list($decimal, $rem) = Math::divQr($decimal, 58);
+            $return = $return . self::$base58chars[$rem];
         }
+        $return = strrev($return);
 
-        for ($i = 0; $i < strlen($data) && substr($data, $i, 2) == '00'; $i += 2) {
-            $output .= substr(self::$base58chars, 0, 1);
+        //leading zeros
+        for ($i = 0; $i < strlen($orighex) && substr($orighex, $i, 2) == "00"; $i += 2) {
+            $return = "1" . $return;
         }
-
-        $output = strrev($output);
-
-        return $output;
-    }
-
-    /**
-     * Encode the given data in base58, with a checksum to check integrity.
-     *
-     * @param $data
-     * @return string
-     * @throws \Exception
-     */
-    public static function encodeCheck($data)
-    {
-        $checksum = self::checksum($data);
-        $hex = $data . $checksum;
-        return self::encode($hex);
+        return $return;
     }
 
     /**
@@ -97,17 +63,32 @@ class Base58
             $return = Math::add(Math::mul($return, 58), strpos(self::$base58chars, $base58[$i]));
         }
 
-        $hex = Math::decHex($return);
+        $hex = ($return == '0') ? '' : Math::decHex($return);
 
         for ($i = 0; $i < strlen($original) && $original[$i] == "1"; $i++) {
             $hex = "00" . $hex;
         }
 
-        if (Math::mod(strlen($hex), 2) !== 0) {
+        if (Math::mod(strlen($hex), 2) !== '0') {
             $hex = "0" . $hex;
         }
 
         return $hex;
+    }
+
+    /**
+     * Calculate a checksum for the given data
+     *
+     * @param $data
+     * @return string
+     */
+    public static function checksum($data)
+    {
+        $data = pack("H*", $data);
+        $hash = Hash::sha256d($data);
+        $checksum = substr($hash, 0, 8);
+
+        return $checksum;
     }
 
     /**
@@ -130,5 +111,19 @@ class Base58
         }
 
         return $data;
+    }
+
+    /**
+     * Encode the given data in base58, with a checksum to check integrity.
+     *
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    public static function encodeCheck($data)
+    {
+        $checksum = self::checksum($data);
+        $hex = $data . $checksum;
+        return self::encode($hex);
     }
 }

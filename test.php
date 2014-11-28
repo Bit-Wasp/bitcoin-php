@@ -9,7 +9,7 @@ use Bitcoin\Util\Parser;
 use Bitcoin\Network;
 use Bitcoin\Transaction;
 
-use Bitcoin\HeirarchicalKey;
+use Bitcoin\HierarchicalKey;
 
 use Bitcoin\PrivateKey;
 use Bitcoin\Script;
@@ -86,12 +86,38 @@ print_r($i->run());
 
 $priv = PrivateKey::generateNew(true);
 
-$b = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
+$b = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
 $network = new Network('00','05','08',true);
 $network->setHDPrivByte('0488ade4');
 $network->setHDPubByte('0488b21e');
+
 $b = Base58::decodeCheck($b);
-$k = new HeirarchicalKey($b, $network);
-print_r($k);
-$k = $k->deriveChild(1);
-print_r($k);
+$k = new HierarchicalKey($b, $network);
+var_dump(
+    array(
+        "magic_bytes" => $k->getBytes(),
+        "depth" => $k->getDepth(),
+        "fingerprint" => $k->getFingerprint(),
+        "i" => $k->getSequence(),
+        "chaincode" => $k->getChainCode()->serialize('hex'),
+        "key" => $k->getKeyData()->serialize('hex'),
+        "extended" => $k->getExtendedPrivateKey()
+    )
+);
+
+$k = $k->deriveChild("2147483648");
+var_dump(
+    array(
+        "magic_bytes" => $k->getBytes(),
+        "depth" => $k->getDepth(),
+        "fingerprint" => $k->getFingerprint(),
+        "i" => $k->getSequence(),
+        "chaincode" => $k->getChainCode()->serialize('hex'),
+        "key" => $k->getKeyData()->serialize('hex'),
+        "extended" => $k->getExtendedPrivateKey()
+    )
+);
+
+//$a = $k->decodePath("m/0/1h/2/3h");
+//print_r($a);
+//print_r($k);

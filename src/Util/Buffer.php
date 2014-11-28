@@ -25,10 +25,8 @@ class Buffer
      */
     public function __construct($byte_string = '', $byte_size = null)
     {
-
         if (is_numeric($byte_size)) {
-
-            // Check the integer doesn't overflow its supposed site
+            // Check the integer doesn't overflow its supposed size
             if (Math::cmp(strlen($byte_string), $byte_size) > 0) {
                 throw new \Exception('Byte string exceeds maximum size');
             }
@@ -39,7 +37,9 @@ class Buffer
     }
 
     /**
-     * @return int|null|string
+     * Return the max size of this buffer
+     *
+     * @return int|null
      */
     public function getMaxSize()
     {
@@ -47,6 +47,7 @@ class Buffer
     }
 
     /**
+     * Create a new buffer from a hex string
      * @param $hex
      * @param null $bit_size
      * @return Buffer
@@ -59,6 +60,8 @@ class Buffer
     }
 
     /**
+     * Get the size of the buffer to be returned, depending on the $type
+     *
      * @param string|null $type
      * @return int
      */
@@ -70,6 +73,8 @@ class Buffer
     }
 
     /**
+     * Serialize a the buffer to hex, an integer, or a byte string
+     *
      * @param string|null $type
      * @return string
      */
@@ -86,6 +91,8 @@ class Buffer
     }
 
     /**
+     * Print the contents of the buffer as a string
+     *
      * @return mixed
      */
     public function __toString()

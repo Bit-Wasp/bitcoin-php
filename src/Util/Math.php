@@ -10,7 +10,6 @@ use Bitcoin\Bitcoin;
  */
 class Math
 {
-
     /**
      * @var \Mdanter\Ecc\MathAdapter
      */

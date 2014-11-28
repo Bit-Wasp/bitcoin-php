@@ -31,16 +31,21 @@ interface NetworkInterface
 
     /**
      * Check if the network is testnet
+     *
      * @return mixed
      */
     public function isTestnet();
 
     /**
+     * Return the HD public bytes for this network
+     *
      * @return mixed
      */
     public function getHDPubByte();
 
     /**
+     * Return the HD private bytes for this network
+     *
      * @return mixed
      */
     public function getHDPrivByte();
