@@ -20,5 +20,4 @@ interface TransactionOutputInterface
      * @return mixed
      */
     public function getValue();
-
 }

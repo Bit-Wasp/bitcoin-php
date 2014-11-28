@@ -44,5 +44,4 @@ interface TransactionInputInterface
      * @return mixed
      */
     public function isCoinBase();
-
 }
