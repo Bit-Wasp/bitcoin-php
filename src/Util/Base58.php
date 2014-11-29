@@ -24,6 +24,10 @@ class Base58
      */
     public static function encode($hex)
     {
+        if ($hex == '') {
+            return '';
+        }
+
         if (Math::mod(strlen($hex), 2) !== '0') {
             throw new \Exception('Data must be of even length');
         }
