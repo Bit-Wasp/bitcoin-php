@@ -57,11 +57,13 @@ class TransactionOutput implements TransactionOutputInterface
      */
     public function serialize($type = null)
     {
-        return (new Parser)
-            ->writeInt(8, $this->getValue()->serialize('int'), true)
+        $parser = new Parser;
+        $parser->writeInt(8, $this->getValue()->serialize('int'), true)
             ->writeWithLength(
                 new Buffer($this->getScript())
-            )
+            );
+        
+        return $parser
             ->getBuffer()
             ->serialize($type);
     }

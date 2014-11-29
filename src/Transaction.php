@@ -79,11 +79,13 @@ class Transaction implements TransactionInterface
      */
     public function serialize($type)
     {
-        return (new Parser())
-            ->writeInt(4, $this->getVersion()->serialize('int'), true)
+        $parser = new Parser();
+        $parser->writeInt(4, $this->getVersion()->serialize('int'), true)
             ->writeArray($this->getInputs())
-            //->writeArray($this->getOutputs())
-            //->writeBytes(4, $this->getLockTime()->serialize('int'))
+            ->writeArray($this->getOutputs())
+            ->writeBytes(4, $this->getLockTime()->serialize('int'));
+
+        return $parser
             ->getBuffer()
             ->serialize($type);
     }

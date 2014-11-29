@@ -71,12 +71,14 @@ class TransactionInput implements TransactionInputInterface
      */
     public function serialize($type = null)
     {
-        return (new Parser)
-            ->writeBytes(32, $this->getTransactionId())
+        $parser = new Parser;
+        $parser->writeBytes(32, $this->getTransactionId())
             ->writeInt(4, $this->getVout()->serialize('int'), true)
             ->writeWithLength(
                 new Buffer($this->getScript()->serialize())
-            )
+            );
+
+        return $parser
             ->getBuffer()
             ->serialize($type);
     }

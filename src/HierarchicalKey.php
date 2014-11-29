@@ -172,8 +172,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             throw new InvalidPrivateKey("Entropy produced an invalid key.. Odds of this happening are very low.");
         }
 
-        $bytes = (new Parser)
-            ->writeBytes(4, $network->getHDPrivByte())
+        $bytes = new Parser();
+        $bytes = $bytes->writeBytes(4, $network->getHDPrivByte())
             ->writeInt(1, '0')
             ->writeBytes(4, Buffer::hex('00000000'))
             ->writeBytes(4, '00000000')
@@ -386,7 +386,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             throw new \Exception('This is not a private key');
         }
 
-        $bytes = (new Parser)
+        $bytes = new Parser();
+        $bytes = $bytes
             ->writeBytes(4, $this->getNetwork()->getHDPrivByte())
             ->writeInt(1, $this->getDepth())
             ->writeBytes(4, $this->getFingerprint())
@@ -409,7 +410,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function getExtendedPublicKey()
     {
-        $bytes = (new Parser)
+        $bytes = new Parser();
+        $bytes = $bytes
             ->writeBytes(4, Buffer::hex($this->getNetwork()->getHDPubByte()))
             ->writeInt(1, $this->getDepth())
             ->writeBytes(4, $this->getFingerprint())
@@ -432,7 +434,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function serialize($type = null)
     {
-        $bytes = (new Parser)
+        $bytes = new Parser();
+        $bytes = $bytes
             ->writeBytes(4, $this->getBytes())
             ->writeInt(1, $this->getDepth())
             ->writeBytes(4, $this->getFingerprint())
@@ -460,13 +463,15 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         try {
             // can be easily wrapped in a loop that recurses until
             // the desired key is created, without the other stuff.
-            $sequence = (new Parser())
+            $parser = new Parser();
+            $sequence = $parser
                 ->writeInt(4, $sequence)
                 ->getBuffer();
 
             $data      = $this->getOffsetBuffer($sequence);
             $hash      = Hash::hmac('sha512', $data->serialize(), $chainCode->serialize());
-            $parser    = (new Parser)->writeBytes(64, $hash);
+            $parser    = new Parser();
+            $parser    = $parser->writeBytes(64, $hash);
             $offsetBuf = $parser->readBytes(32);
             $chainCode = $parser->readBytes(32);
             $key       = $this->getKeyFromOffset($offsetBuf);
@@ -479,7 +484,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             throw $e;
         }
 
-        $bytes = (new Parser)
+        $bytes = new Parser();
+        $bytes = $bytes
             ->writeBytes(4, Buffer::hex($this->getNetwork()->getHDPrivByte()))
             ->writeInt(1, ((int)$this->getDepth() + 1))
             ->writeBytes(4, $this->getChildFingerprint())
@@ -506,19 +512,20 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function getOffsetBuffer(Buffer $sequence)
     {
+        $parser = new Parser();
         $hardened = Math::cmp($sequence->serialize('int'), Math::hexDec('80000000')) >= 0;
 
         if ($hardened) {
             if ($this->isPrivate() == false) {
                 throw new \Exception("Can't derive a hardened key without the private key");
             }
-            $parser = (new Parser)
+
+            $parser
                 ->writeBytes(1, '00')
                 ->writeBytes(32, $this->getPrivateKey()->serialize('hex'));
 
         } else {
-            $parser = (new Parser)
-                ->writeBytes(33, $this->getPublicKey()->serialize('hex'));
+            $parser->writeBytes(33, $this->getPublicKey()->serialize('hex'));
         }
 
         return $parser

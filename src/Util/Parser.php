@@ -120,8 +120,8 @@ class Parser
 
     public function writeArray($serializable)
     {
-        $parser = (new Parser)
-           ->writeInt(1, count($serializable));
+        $parser = new Parser;
+        $parser->writeInt(1, count($serializable));
 
         foreach ($serializable as $object) {
             $buffer = new Buffer($object->serialize());

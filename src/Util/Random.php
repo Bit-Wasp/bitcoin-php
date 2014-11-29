@@ -27,7 +27,6 @@ class Random
         }
 
         return self::$hasOpenssl;
-
     }
 
     /**

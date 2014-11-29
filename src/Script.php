@@ -265,40 +265,33 @@ class Script implements ScriptInterface
      */
     public function push($data)
     {
-        if ($data instanceof Buffer) {
-            $bin = $data->serialize();
-        } else {
-            $bin = pack("H*", $data);
+        if (!$data instanceof Buffer) {
+            $data = Buffer::hex($data);
         }
 
-        $length = strlen($bin);
+        $length = $data->getSize();
+        $parsed = new Parser();
 
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
-            $parsed = chr($length) . $bin;
+            $parsed = $parsed->writeWithLength($data);
 
         } else if ($length <= 0xff) {
-            $parsed = (new Parser())
-                ->writeInt(1, $this->getOpCode('OP_PUSHDATA1'))
+            $parsed->writeInt(1, $this->getOpCode('OP_PUSHDATA1'))
                 ->writeInt(1, $length, false)
-                ->writeBytes($length, $data)
-                ->getBuffer()->serialize();
+                ->writeBytes($length, $data);
 
         } else if ($length <= 0xffff) {
-            $parsed = (new Parser())
-                ->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
+            $parsed->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
                 ->writeInt(2, $length, false)
-                ->writeBytes($length, $data)
-                ->getBuffer()->serialize();
+                ->writeBytes($length, $data);
 
         } else {
-            $parsed = (new Parser())
-                ->writeInt(1, $this->getOpCode('OP_PUSHDATA4'))
+            $parsed->writeInt(1, $this->getOpCode('OP_PUSHDATA4'))
                 ->writeInt(4, $length, false)
-                ->writeBytes($length, $data)
-                ->getBuffer()->serialize();
+                ->writeBytes($length, $data);
         }
 
-        $this->script .=  $parsed;
+        $this->script .=  $parsed->getBuffer()->serialize();
         return $this;
     }
 
@@ -357,6 +350,10 @@ class Script implements ScriptInterface
 
     }
 
+    /**
+     * @param $scriptData
+     * @return $this
+     */
     public function set($scriptData)
     {
         if ($scriptData instanceof Buffer) {
