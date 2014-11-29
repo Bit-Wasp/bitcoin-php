@@ -2,6 +2,10 @@
 
 namespace Bitcoin;
 
+use Bitcoin\Util\Parser;
+use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Math;
+
 /**
  * Class Transaction
  * @package Bitcoin
@@ -36,10 +40,64 @@ class Transaction implements TransactionInterface
     /**
      * @param NetworkInterface $network
      */
-    public function __construct(NetworkInterface $network)
+    public function __construct(NetworkInterface $network = null)
     {
         $this->network = $network;
         return $this;
+    }
+
+    /**
+     * @param $parser
+     * @throws \Exception
+     */
+    public function fromParser(Parser &$parser)
+    {
+        $this->setVersion($parser->readBytes(4, true));
+
+        $inputC = $parser->getVarInt()->serialize('int');
+        for ($i = 0; $i < $inputC; $i++) {
+            $input = new TransactionInput();
+            $this->addInput(
+                $input->fromParser($parser)
+            );
+        }
+
+        $outputC = $parser->getVarInt()->serialize('int');
+        for ($i = 0; $i < $outputC; $i++) {
+            $output = new TransactionOutput();
+            $this->addOutput(
+                $output->fromParser($parser)
+            );
+        }
+
+        $this->setLockTime($parser->readBytes(4, true));
+    }
+
+    /**
+     * @param $type
+     * @return string
+     */
+    public function serialize($type)
+    {
+        return (new Parser())
+            ->writeInt(4, $this->getVersion()->serialize('int'), true)
+            ->writeArray($this->getInputs())
+            //->writeArray($this->getOutputs())
+            //->writeBytes(4, $this->getLockTime()->serialize('int'))
+            ->getBuffer()
+            ->serialize($type);
+    }
+
+    /**
+     * @param $hex
+     * @return Transaction
+     */
+    public static function fromHex($hex)
+    {
+        $parser = new Parser($hex);
+        $transaction = new self();
+        $transaction->fromParser($parser);
+        return $transaction;
     }
 
     /**
@@ -55,7 +113,7 @@ class Transaction implements TransactionInterface
      */
     public function getTransactionId()
     {
-        // TODO
+
     }
 
     /**
@@ -73,18 +131,13 @@ class Transaction implements TransactionInterface
      * @return $this
      * @throws \Exception
      */
-    public function setVersion($version)
+    public function setVersion(Buffer $version)
     {
-        if (empty($version) or !is_numeric($version)) {
-            throw new \Exception('Version must be a decimal');
-        }
-
-        if ($version > TransactionInterface::MAX_VERSION) {
+        if (Math::cmp($version->serialize('int'), TransactionInterface::MAX_VERSION) > 0) {
             throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
 
         $this->version = $version;
-
         return $this;
     }
 
@@ -136,10 +189,10 @@ class Transaction implements TransactionInterface
      * @param TransactionOutput $output
      * @return $this`
      */
-    public function addOutput($index, TransactionOutput $output)
+    public function addOutput(TransactionOutput $output)
     {
         if (!empty($output)) {
-            $this->outputs[$index] = $output;
+            $this->outputs[] = $output;
         }
 
         return $this;
@@ -187,22 +240,13 @@ class Transaction implements TransactionInterface
      * @return $this
      * @throws \Exception
      */
-    public function setLockTime($locktime = 0)
+    public function setLockTime(Buffer $locktime)
     {
-        if (empty($locktime) or !is_numeric($locktime)) {
-            throw new \Exception('Locktime must be a decimal');
-        }
-
-        if ($locktime > TransactionInterface::MAX_LOCKTIME) {
+        if (Math::cmp($locktime->serialize('int'), TransactionInterface::MAX_LOCKTIME) > 0) {
             throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 
         $this->locktime = $locktime;
         return $this;
-    }
-
-    public function serialize()
-    {
-        // TODO
     }
 }

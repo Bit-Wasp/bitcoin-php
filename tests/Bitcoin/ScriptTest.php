@@ -166,98 +166,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($parse);
     }
 
-    public function testNumToVarInt()
-    {
-        // Should not prefix with anything. Just return chr($decimal);
-        for ($i = 0; $i < 253; $i++) {
-            $decimal = $i;
-            $expected = chr($decimal);
-            $val = $this->script->numToVarInt($decimal);
 
-            $this->assertSame($expected, $val);
-       }
-    }
-
-    public function testNumToVarInt1LowerFailure()
-    {
-        // Decimal of this size does not take a prefix
-        $decimal  = 0xfc; // 252;
-        $prefixOp = 0xfd;
-        $expected = pack("Cv", $prefixOp, $decimal);
-        $val = $this->script->numToVarInt($decimal);
-        $this->assertNotSame($expected, $val);
-    }
-    public function testNumToVarInt1Lowest()
-    {
-        // Decimal > 253 requires a prefix
-        $prefixOp = 0xfd;
-        $decimal  = 0xfd;
-        $expected = pack("Cv", $prefixOp, $decimal);
-        $val = $this->script->numToVarInt($decimal);
-        $this->assertSame($expected, $val);
-    }
-    public function testNumToVarInt1Upper()
-    {
-        // This prefix is used up to 0xffff, because if we go higher,
-        // the prefixes are no longer in agreement
-
-        $prefixOp = 0xfd;
-        $decimal  = 0xffff;
-        $expected = pack("Cv", $prefixOp, $decimal);
-        $val = $this->script->numToVarInt($decimal);
-        $this->assertSame($expected, $val);
-    }
-    public function testNumToVarInt1UpperFailure()
-    {
-        // here the inconsistency occurs - look!
-        $decimal  = 0xffff + 1;
-        $prefixOp = 0xfd;
-        $expected = pack("Cv", $prefixOp, $decimal);
-
-        $val = $this->script->numToVarInt($decimal);
-        $this->assertNotSame($expected, $val);
-    }
-
-    public function testNumToVarInt2LowerFailure()
-    {
-        // We can check that numbers this low don't yield a 0xfe prefix
-        $prefixOp = 0xfe;
-        $decimal  = 0xffff;
-        $expected = pack("CV", $prefixOp, $decimal);
-        $val = $this->script->numToVarInt($decimal);
-        $this->assertNotSame($expected, $val);
-    }
-
-    public function testNumToVarInt2Lowest()
-    {
-        // With this prefix, check that the lowest for this field IS prefictable.
-        $prefixOp = 0xfe;
-        $decimal  = 0xffff + 1;
-        $expected = pack("CV", $prefixOp, $decimal);
-        $val = $this->script->numToVarInt($decimal);
-        $this->assertSame($expected, $val);
-    }
-
-    public function testNumToVarInt2Upper()
-    {
-        // Last number that will share 0xfe prefix: 2^32
-        $prefixOp = 0xfe;
-        $decimal  = 0xffffffff;
-        $expected = pack("CV", $prefixOp, $decimal);
-        $val = $this->script->numToVarInt($decimal);
-        $this->assertSame($expected, $val);
-    }
-
-    /**
-     * @expectedException \Exception
-     */
-    public function testNumToVarIntOutOfRange()
-    {
-        // Check that this is out of range (PHP's fault)
-        $prefixOp = 0xfe;
-        $decimal  = 0xffffffff + 1;                             // 2^32 - 1
-        $this->script->numToVarInt($decimal);
-    }
 
     public function testPushHex()
     {
@@ -538,8 +447,8 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         foreach ($json->test as $test) {
             $script = new Script();
             $script->set($test->script);
-            $this->assertSame($script->getVarInt(), pack("H*", $test->varint));
-            $this->assertSame($script->getVarInt('hex'), $test->varint);
+            $this->assertSame($script->getVarInt()->serialize(), pack("H*", $test->varint));
+            $this->assertSame($script->getVarInt()->serialize('hex'), $test->varint);
 
         }
 

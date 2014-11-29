@@ -2,6 +2,10 @@
 
 namespace Bitcoin;
 
+use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Parser;
+use Bitcoin\Script;
+
 /**
  * Class TransactionInput
  * @package Bitcoin
@@ -16,16 +20,72 @@ class TransactionInput implements TransactionInputInterface
      * @var
      */
     protected $vout;
+
     /**
      * @var
      */
     protected $sequence;
+
     /**
-     * @var
+     * @var Script
      */
     protected $script;
 
     /**
+     * @var Buffer
+     */
+    protected $scriptBuf;
+
+
+    public function __construct()
+    {
+        return $this;
+    }
+
+    public function fromParser(Parser &$parser)
+    {
+        $this->setTransactionId(
+                $parser->readBytes(32, true)
+            )
+            ->setVout(
+                $parser->readBytes(4)
+            );
+        $scriptLen = $parser->getVarInt()->serialize('int');
+        echo "varint: $scriptLen\n";
+        //echo $parser->readBytes($scriptLen)."\n";
+        $this->setScriptBuf(
+                $parser->readBytes($scriptLen)
+            );
+
+        $p = $parser->readBytes(4);
+        echo $p."\n";
+            $this->setSequence(
+             $p
+            );
+        return $this;
+    }
+
+    /**
+     * Serialize the transaction input.
+     *
+     * @param $type
+     * @return string
+     */
+    public function serialize($type = null)
+    {
+        return (new Parser)
+            ->writeBytes(32, $this->getTransactionId())
+            ->writeInt(4, $this->getVout()->serialize('int'), true)
+            ->writeWithLength(
+                new Buffer($this->getScript()->serialize())
+            )
+            ->getBuffer()
+            ->serialize($type);
+    }
+
+    /**
+     * Return the transaction ID buffer
+     *
      * @return mixed
      */
     public function getTransactionId()
@@ -37,12 +97,9 @@ class TransactionInput implements TransactionInputInterface
      * @param $txid
      * @return $this
      */
-    public function setTransactionId($txid)
+    public function setTransactionId(Buffer $txid)
     {
-        if (ctype_xdigit($txid) == true and strlen($txid) == 64) {
-            $this->txid = $txid;
-        }
-
+        $this->txid = $txid;
         return $this;
     }
 
@@ -58,12 +115,9 @@ class TransactionInput implements TransactionInputInterface
      * @param $vout
      * @return $this
      */
-    public function setVout($vout)
+    public function setVout(Buffer $vout)
     {
-        if (is_numeric($vout) == true) {
-            $this->vout = $vout;
-        }
-
+        $this->vout = $vout;
         return $this;
     }
 
@@ -83,29 +137,47 @@ class TransactionInput implements TransactionInputInterface
      * @param $sequence
      * @return $this
      */
-    public function setSequence($sequence)
+    public function setSequence(Buffer $sequence)
     {
-        if (is_numeric($sequence) == true) {
-            $this->sequence = $sequence;
-        }
+        $this->sequence = $sequence;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * Return an initialized script. Checks if already has a script
+     * object. If not, returns script from scriptBuf (which can simply
+     * be null).
+     *
+     * @return Script
      */
     public function getScript()
     {
+        if ($this->script == null) {
+            $this->script = new Script();
+            $this->script->set($this->getScriptBuf());
+        }
         return $this->script;
     }
 
     /**
-     *
+     * Get Script Buffer - just return the buffer, not the script
+     * @return Buffer
      */
-    public function setScript()
+    public function getScriptBuf()
     {
-        // TODO
+        return $this->scriptBuf;
+    }
+
+    /**
+     * Set Script Buffer
+     * @param Buffer $script
+     * @return $this
+     */
+    public function setScriptBuf(Buffer $script)
+    {
+        $this->scriptBuf = $script;
+        return $this;
     }
 
     /**
@@ -113,14 +185,7 @@ class TransactionInput implements TransactionInputInterface
      */
     public function isCoinbase()
     {
-
+        return $this->getTransactionId()->serialize('hex') == '0000000000000000000000000000000000000000000000000000000000000000';
     }
 
-    /**
-     *
-     */
-    public function serialize()
-    {
-
-    }
 }

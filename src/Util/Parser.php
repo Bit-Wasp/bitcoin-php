@@ -2,6 +2,8 @@
 
 namespace Bitcoin\Util;
 
+use Bitcoin\Util\Buffer;
+
 /**
  * Class Parser - mainly for decoding transactions..
  *
@@ -37,6 +39,39 @@ class Parser
         return $this;
     }
 
+    /**
+     * Convert a decimal number into a VarInt
+     *
+     * @param $decimal
+     * @return string
+     * @throws \Exception
+     */
+    public static function numToVarInt($decimal)
+    {
+
+        if ($decimal < 0xfd) {
+            $bin = chr($decimal);
+        } else  if ($decimal <= 0xff) {                     // Uint16
+            $bin = pack("Cv", 0xfd, $decimal);
+        } else if ($decimal <= 0xffff) {                 // Uint32
+            $bin = pack("CV", 0xfe, $decimal);
+        } else { //if ($decimal < 0xfffffffff) {        // Uint64
+            //  if (version_compare(phpversion(), '5.6.0') >= 0) {
+            //      return pack("CP", 0xff, $decimal);
+            //  } else {
+            throw new \Exception('numToVarInt(): Integer too large');
+            //  }
+        }
+
+        return new Buffer($bin);
+    }
+
+
+
+    public function getPosition()
+    {
+        return $this->position;
+    }
     /**
      * Flip byte order of this binary string
      *
@@ -75,6 +110,28 @@ class Parser
         return $this;
     }
 
+    public function writeWithLength(Buffer $buffer)
+    {
+        $varInt = self::numToVarInt($buffer->getSize());
+        $buffer = new Buffer($varInt->serialize() .  $buffer->serialize());
+        $this->writeBytes($buffer->getSize(), $buffer);
+        return $this;
+    }
+
+    public function writeArray($serializable)
+    {
+        $parser = (new Parser)
+           ->writeInt(1, count($serializable));
+
+        foreach ($serializable as $object) {
+            $buffer = new Buffer($object->serialize());
+            $parser->writeWithLength($buffer);
+        }
+
+        $this->string .= $parser->getBuffer()->serialize();
+        return $this;
+    }
+
     /**
      * Write an integer to the buffer
      *
@@ -85,8 +142,7 @@ class Parser
      */
     public function writeInt($bytes, $int, $flip_bytes = false)
     {
-        $hex  = Math::decHex($int);
-        $hex  = str_pad($hex, (int)$bytes*2, '0', STR_PAD_LEFT);
+        $hex  = str_pad(Math::decHex($int), (int)$bytes*2, '0', STR_PAD_LEFT);
         $data = pack("H*", $hex);
 
         if ($flip_bytes) {
@@ -131,39 +187,42 @@ class Parser
         }
 
         $this->position += $bytes;
-
         if ($flip_bytes) {
             $string = $this->flipBytes($string);
         }
 
         $buffer = new Buffer($string);
-
+        echo "R: $buffer\n";
         return $buffer;
+    }
+
+    public function parseBytes($bytes, $flip_bytes = false)
+    {
+        $buffer = $this->readBytes($bytes, $flip_bytes);
+        $parser = new Parser($buffer);
+        return $parser;
     }
 
     /**
      * Parse a variable length integer
      *
-     * @return string
+     * @return Buffer
      * @throws \Exception
      */
     public function getVarInt()
     {
         // Return the length encoded in this var int
-        $byte = (int)$this->readBytes(1)->serialize('int');
+        $b    = $this->readBytes(1);
+        $byte = $b->serialize('int');
+
         if (Math::cmp($byte, 0xfd) < 0) {
-            return $byte;
+            return $b;
         } else if (Math::cmp($byte, 0xfd) == 0) {
-            return $this->readBytes(2)->serialize('int');
+            return $this->readBytes(1, true);
         } else if (Math::cmp($byte, 0xfe) == 0) {
-            return $this->readBytes(4)->serialize('int');
+            return $this->readBytes(2, true);
         } else if (Math::cmp($byte, 0xff) == 0) {
-            return $this->readBytes(8)->serialize('int');
+            return $this->readBytes(4, true);
         }
-    }
-
-    public function getArray($numIndexes)
-    {
-
     }
 }

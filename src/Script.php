@@ -156,9 +156,9 @@ class Script implements ScriptInterface
     /**
      * Initialize container
      */
-    public function __construct()
+    public function __construct(Buffer $script = null)
     {
-        $this->script = '';
+        $this->set($script);
         $this->setRegisteredOpCodes();
         return $this;
     }
@@ -448,32 +448,6 @@ class Script implements ScriptInterface
         return $new_script;
     }
 
-
-
-    /**
-     * Convert a decimal number into a VarInt
-     *
-     * @param $decimal
-     * @return string
-     * @throws \Exception
-     */
-    public static function numToVarInt($decimal)
-    {
-        if ($decimal < 0xfd) {
-            return chr($decimal);
-        } else if ($decimal <= 0xffff) {                     // Uint16
-            return pack("Cv", 0xfd, $decimal);
-        } else if ($decimal <= 0xffffffff) {                 // Uint32
-            return pack("CV", 0xfe, $decimal);
-        } else if ($decimal < 0xffffffffffffffff) {        // Uint64
-          //  if (version_compare(phpversion(), '5.6.0') >= 0) {
-          //      return pack("CP", 0xff, $decimal);
-          //  } else {
-                throw new \Exception('numToVarInt(): Integer too large');
-          //  }
-        }
-    }
-
     /**
      * Return a varInt, based on the size of the script.
      * @return string
@@ -482,13 +456,7 @@ class Script implements ScriptInterface
     public function getVarInt($type = null)
     {
         $size   = $this->getSize();
-        $varInt = self::numToVarInt($size);
-
-        if ($type == 'hex') {
-            $hex = unpack("H*", $varInt);
-            return $hex[1];
-        }
-
+        $varInt = Parser::numToVarInt($size);
         return $varInt;
     }
 
