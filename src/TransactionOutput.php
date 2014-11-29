@@ -117,5 +117,4 @@ class TransactionOutput implements TransactionOutputInterface
         $this->scriptBuf = $buffer;
         return $this;
     }
-
 }

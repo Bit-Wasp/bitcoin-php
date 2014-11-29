@@ -51,7 +51,7 @@ class Parser
 
         if ($decimal < 0xfd) {
             $bin = chr($decimal);
-        } else  if ($decimal <= 0xff) {                     // Uint16
+        } else if ($decimal <= 0xff) {                     // Uint16
             $bin = pack("Cv", 0xfd, $decimal);
         } else if ($decimal <= 0xffff) {                 // Uint32
             $bin = pack("CV", 0xfe, $decimal);
@@ -192,7 +192,6 @@ class Parser
         }
 
         $buffer = new Buffer($string);
-        echo "R: $buffer\n";
         return $buffer;
     }
 

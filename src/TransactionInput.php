@@ -45,23 +45,21 @@ class TransactionInput implements TransactionInputInterface
     public function fromParser(Parser &$parser)
     {
         $this->setTransactionId(
-                $parser->readBytes(32, true)
-            )
-            ->setVout(
-                $parser->readBytes(4)
-            );
-        $scriptLen = $parser->getVarInt()->serialize('int');
-        echo "varint: $scriptLen\n";
-        //echo $parser->readBytes($scriptLen)."\n";
-        $this->setScriptBuf(
-                $parser->readBytes($scriptLen)
-            );
+            $parser->readBytes(32, true)
+        )
+        ->setVout(
+            $parser->readBytes(4)
+        );
 
-        $p = $parser->readBytes(4);
-        echo $p."\n";
-            $this->setSequence(
-             $p
-            );
+        $this->setScriptBuf(
+            $parser->readBytes(
+                $parser
+                    ->getVarInt()
+                    ->serialize('int')
+            )
+        );
+        $this->setSequence($parser->readBytes(4));
+
         return $this;
     }
 
@@ -187,5 +185,4 @@ class TransactionInput implements TransactionInputInterface
     {
         return $this->getTransactionId()->serialize('hex') == '0000000000000000000000000000000000000000000000000000000000000000';
     }
-
 }
