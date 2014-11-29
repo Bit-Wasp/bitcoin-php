@@ -9,8 +9,8 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->key = null;
-        $this->network = (new Network('00','05','80', false))
-            ->setHDPubByte('0488b21e')
+        $this->network = new Network('00','05','80', false);
+        $this->network->setHDPubByte('0488b21e')
             ->setHDPrivByte('0488ade4');
     }
 
