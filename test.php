@@ -125,4 +125,5 @@ $t = Transaction::fromHex('010000000462442ea8de9ee6cc2dd7d76dfc4523910eb2e3bd4b2
 print_r($t);
 $o = $t->getOutputs();
 echo $o[1]->getValue()->serialize('int');
+echo $t->getTransactionId()."\n";
 //echo $t->serialize('hex');

@@ -5,6 +5,7 @@ namespace Bitcoin;
 use Bitcoin\Util\Parser;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Math;
+use Bitcoin\Util\Hash;
 
 /**
  * Class Transaction
@@ -77,7 +78,7 @@ class Transaction implements TransactionInterface
      * @param $type
      * @return string
      */
-    public function serialize($type)
+    public function serialize($type = null)
     {
         $parser = new Parser();
         $parser->writeInt(4, $this->getVersion()->serialize('int'), true)
@@ -115,7 +116,9 @@ class Transaction implements TransactionInterface
      */
     public function getTransactionId()
     {
-
+        $hex  = $this->serialize();
+        $hash = Hash::sha256d($hex);
+        return $hash;
     }
 
     /**
