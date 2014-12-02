@@ -42,47 +42,6 @@ class TransactionInput implements TransactionInputInterface
         return $this;
     }
 
-    public function fromParser(Parser &$parser)
-    {
-        $this->setTransactionId(
-            $parser->readBytes(32, true)
-        )
-        ->setVout(
-            $parser->readBytes(4)
-        );
-
-        $this->setScriptBuf(
-            $parser->readBytes(
-                $parser
-                    ->getVarInt()
-                    ->serialize('int')
-            )
-        );
-        $this->setSequence($parser->readBytes(4));
-
-        return $this;
-    }
-
-    /**
-     * Serialize the transaction input.
-     *
-     * @param $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $parser = new Parser;
-        $parser->writeBytes(32, $this->getTransactionId())
-            ->writeInt(4, $this->getVout()->serialize('int'), true)
-            ->writeWithLength(
-                new Buffer($this->getScript()->serialize())
-            );
-
-        return $parser
-            ->getBuffer()
-            ->serialize($type);
-    }
-
     /**
      * Return the transaction ID buffer
      *
@@ -115,7 +74,7 @@ class TransactionInput implements TransactionInputInterface
      * @param $vout
      * @return $this
      */
-    public function setVout(Buffer $vout)
+    public function setVout($vout)
     {
         $this->vout = $vout;
         return $this;
@@ -137,10 +96,9 @@ class TransactionInput implements TransactionInputInterface
      * @param $sequence
      * @return $this
      */
-    public function setSequence(Buffer $sequence)
+    public function setSequence($sequence)
     {
         $this->sequence = $sequence;
-
         return $this;
     }
 
@@ -187,4 +145,72 @@ class TransactionInput implements TransactionInputInterface
     {
         return $this->getTransactionId()->serialize('hex') == '0000000000000000000000000000000000000000000000000000000000000000';
     }
+
+    /**
+     * Set all parameters when given a parser at the start of the input
+     * @param Parser $parser
+     * @return $this
+     * @throws \Exception
+     */
+    public function fromParser(Parser &$parser)
+    {
+        $this
+            ->setTransactionId(
+                $parser->readBytes(32, true)
+            )
+            ->setVout(
+                $parser
+                    ->readBytes(4)
+                    ->serialize('int')
+            )
+            ->setScriptBuf(
+                $parser->getVarString()
+            )
+            ->setSequence(
+                $parser
+                    ->readBytes(4)
+                    ->serialize('int')
+            );
+
+        return $this;
+    }
+
+    /**
+     * Serialize the transaction input.
+     *
+     * @param $type
+     * @return string
+     */
+    public function serialize($type = null)
+    {
+        $parser = new Parser;
+        $parser
+            ->writeBytes(32, $this->getTransactionId(), true)
+            ->writeInt(4, $this->getVout(), true)
+            ->writeWithLength(
+                new Buffer($this->getScript()->serialize())
+            )
+            ->writeInt(4, $this->getSequence(), true);
+
+        return $parser
+            ->getBuffer()
+            ->serialize($type);
+    }
+
+    /**
+     * Return the input in an array style as bitcoind would
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'txid' => $this->getTransactionId(),
+            'vout' => $this->getVout(),
+            'scriptSig' => array(
+                'hex' => $this->getScript()->serialize('hex'),
+                'asm' => $this->getScript()->getAsm()
+            )
+        );
+    }
+
 }

@@ -29,48 +29,17 @@ class TransactionOutput implements TransactionOutputInterface
     protected $scriptBuf;
 
     /**
-     *
+     * Initialize class
      */
     public function __construct()
     {
         return $this;
     }
 
-    public function fromParser(&$parser)
-    {
-        $this
-            ->setValue(
-                $parser->readBytes(8, true)
-            )
-            ->setScriptBuf(
-                $parser->readBytes(
-                    $parser->getVarInt()->serialize('int')
-                )
-            );
-        return $this;
-    }
-
     /**
-     * Serialize a
-     * @param $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $parser = new Parser;
-        $parser->writeInt(8, $this->getValue()->serialize('int'), true)
-            ->writeWithLength(
-                new Buffer($this->getScript())
-            );
-        
-        return $parser
-            ->getBuffer()
-            ->serialize($type);
-    }
-
-
-    /**
-     * @return Buffer|mixed
+     * Return the value of this output
+     *
+     * @return int|null
      */
     public function getValue()
     {
@@ -78,10 +47,12 @@ class TransactionOutput implements TransactionOutputInterface
     }
 
     /**
-     * @param Buffer $value
+     * Set the value of this output, in satoshis
+     *
+     * @param int|null $value
      * @return $this
      */
-    public function setValue(Buffer $value)
+    public function setValue($value)
     {
         $this->value = $value;
         return $this;
@@ -99,10 +70,13 @@ class TransactionOutput implements TransactionOutputInterface
         if ($this->script == null) {
             $this->script = new Script($this->getScriptBuf());
         }
+
         return $this->script;
     }
 
     /**
+     * Return the current script buffer
+     *
      * @return Buffer
      */
     public function getScriptBuf()
@@ -111,6 +85,8 @@ class TransactionOutput implements TransactionOutputInterface
     }
 
     /**
+     * Set Script Buffer
+     *
      * @param Buffer $buffer
      * @return $this
      */
@@ -118,5 +94,59 @@ class TransactionOutput implements TransactionOutputInterface
     {
         $this->scriptBuf = $buffer;
         return $this;
+    }
+
+    /**
+     * From a Parser instance, load what should be the script data.
+     *
+     * @param $parser
+     * @return $this
+     */
+    public function fromParser(&$parser)
+    {
+        $this
+            ->setValue(
+                $parser
+                    ->readBytes(8, true)
+                    ->serialize('int')
+            )
+            ->setScriptBuf(
+                $parser->getVarString()
+            );
+        return $this;
+    }
+
+    /**
+     * Serialize the output into either hex ($type = hex),
+     * or a byte string (default; $type = null)
+     *
+     * @param $type
+     * @return string
+     */
+    public function serialize($type = null)
+    {
+        $parser = new Parser;
+        $parser
+            ->writeInt(8, $this->getValue(), true)
+            ->writeWithLength(
+                new Buffer($this->getScript()->serialize())
+            );
+
+        return $parser
+            ->getBuffer()
+            ->serialize($type);
+    }
+
+    /**
+     * Return this object in the form of an array, compatible with bitcoind
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'value' => $this->getValue() / 1e8,
+            'scriptPubKey' => $this->getScript()->toArray()
+        );
     }
 }

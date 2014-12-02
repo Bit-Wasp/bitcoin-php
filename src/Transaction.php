@@ -48,62 +48,6 @@ class Transaction implements TransactionInterface
     }
 
     /**
-     * @param $parser
-     * @throws \Exception
-     */
-    public function fromParser(Parser &$parser)
-    {
-        $this->setVersion($parser->readBytes(4, true));
-
-        $inputC = $parser->getVarInt()->serialize('int');
-        for ($i = 0; $i < $inputC; $i++) {
-            $input = new TransactionInput();
-            $this->addInput(
-                $input->fromParser($parser)
-            );
-        }
-
-        $outputC = $parser->getVarInt()->serialize('int');
-        for ($i = 0; $i < $outputC; $i++) {
-            $output = new TransactionOutput();
-            $this->addOutput(
-                $output->fromParser($parser)
-            );
-        }
-
-        $this->setLockTime($parser->readBytes(4, true));
-    }
-
-    /**
-     * @param $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $parser = new Parser();
-        $parser->writeInt(4, $this->getVersion()->serialize('int'), true)
-            ->writeArray($this->getInputs())
-            ->writeArray($this->getOutputs())
-            ->writeBytes(4, $this->getLockTime()->serialize('int'));
-
-        return $parser
-            ->getBuffer()
-            ->serialize($type);
-    }
-
-    /**
-     * @param $hex
-     * @return Transaction
-     */
-    public static function fromHex($hex)
-    {
-        $parser = new Parser($hex);
-        $transaction = new self();
-        $transaction->fromParser($parser);
-        return $transaction;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getNetwork()
@@ -245,13 +189,101 @@ class Transaction implements TransactionInterface
      * @return $this
      * @throws \Exception
      */
-    public function setLockTime(Buffer $locktime)
+    public function setLockTime($locktime)
     {
-        if (Math::cmp($locktime->serialize('int'), TransactionInterface::MAX_LOCKTIME) > 0) {
+        if (Math::cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
             throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 
         $this->locktime = $locktime;
         return $this;
+    }
+
+    /**
+     * @param $parser
+     * @throws \Exception
+     */
+    public function fromParser(Parser &$parser)
+    {
+        $this->setVersion($parser->readBytes(4, true));
+
+        $inputC = $parser->getVarInt()->serialize('int');
+        for ($i = 0; $i < $inputC; $i++) {
+            $input = new TransactionInput();
+            $this->addInput(
+                $input->fromParser($parser)
+            );
+        }
+
+        $outputC = $parser->getVarInt()->serialize('int');
+        for ($i = 0; $i < $outputC; $i++) {
+            $output = new TransactionOutput();
+            $this->addOutput(
+                $output->fromParser($parser)
+            );
+        }
+
+        $this->setLockTime($parser->readBytes(4, true)->serialize('int'));
+    }
+
+    /**
+     * Take a $hex string, and return an instance of a Transaction
+     *
+     * @param $hex
+     * @return Transaction
+     */
+    public static function fromHex($hex, NetworkInterface $network = null)
+    {
+        $parser = new Parser($hex);
+        $transaction = new self();
+        $transaction->fromParser($parser);
+        return $transaction;
+    }
+
+    /**
+     * Serialize this object to a binary string ($type = null), hex string ($type = 'hex'),
+     * int (although this isn't meaningful), or a bitcoind style array.
+     *
+     * @param $type
+     * @return string
+     */
+    public function serialize($type = null)
+    {
+        if ($type == 'array') {
+            return $this->toArray();
+        }
+
+        $parser = new Parser();
+        $parser->writeInt(4, $this->getVersion()->serialize('int'), true)
+            ->writeArray($this->getInputs())
+            ->writeArray($this->getOutputs())
+            ->writeInt(4, $this->getLockTime(), true);
+
+        return $parser
+            ->getBuffer()
+            ->serialize($type);
+    }
+
+    /**
+     * Return the transaction in the format of an array compatible with bitcoind.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        $inputs = array_map(function($input) {
+            return $input->toArray();
+        }, $this->getInputs());
+
+        $outputs = array_map(function($output) {
+            return $output->toArray();
+        }, $this->getOutputs());
+
+        return array(
+            'version' => $this->getVersion(),
+            'locktime' => $this->getLockTime(),
+            'vin' => $inputs,
+            'vout' => $outputs
+        );
     }
 }

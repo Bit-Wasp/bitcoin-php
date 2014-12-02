@@ -450,7 +450,7 @@ class Script implements ScriptInterface
      * @return string
      * @throws \Exception
      */
-    public function getVarInt($type = null)
+    public function getVarInt()
     {
         $size   = $this->getSize();
         $varInt = Parser::numToVarInt($size);
@@ -458,6 +458,8 @@ class Script implements ScriptInterface
     }
 
     /**
+     * Return the script as a printable string
+     *
      * @return string
      */
     public function __toString()
@@ -466,6 +468,8 @@ class Script implements ScriptInterface
     }
 
     /**
+     * Serialize the script into a hex string or a byte string
+     *
      * @param null $type
      * @return mixed|string
      */
@@ -481,6 +485,9 @@ class Script implements ScriptInterface
     }
 
     /**
+     * Return the size of the script - for either a binary string (number of bytes - default)
+     * or a hex string (twice the byte length)
+     *
      * @param null $type
      * @return int
      */
@@ -493,5 +500,18 @@ class Script implements ScriptInterface
         }
 
         return $size;
+    }
+
+    /**
+     * Return the object as an array
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'hex' => $this->serialize('hex'),
+            'asm' => $this->getAsm()
+        );
     }
 }

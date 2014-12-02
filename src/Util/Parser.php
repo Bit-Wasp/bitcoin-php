@@ -123,13 +123,26 @@ class Parser
         $parser = new Parser;
         $parser->writeInt(1, count($serializable));
 
+        $a = array();
         foreach ($serializable as $object) {
+            $a[] = $object->serialize('hex');
             $buffer = new Buffer($object->serialize());
-            $parser->writeWithLength($buffer);
+            $parser->writeBytes($buffer->getSize(), $buffer);
         }
 
         $this->string .= $parser->getBuffer()->serialize();
+        //echo $parser->getBuffer()->serialize('hex')."\n";
         return $this;
+    }
+
+    public function getArray($array, callable $callback)
+    {
+        $results = array();
+        array_walk($array, function($value, $key) use ($callback, &$results) {
+            var_dump($value);
+            //$results[] = $callback($value);
+        });
+        return $results;
     }
 
     /**
@@ -165,8 +178,6 @@ class Parser
         return $buffer;
     }
 
-    // Functions for pulling data from string
-
     /**
      * Parse $bytes bytes from the string, and return the obtained buffer
      *
@@ -177,7 +188,8 @@ class Parser
      */
     public function readBytes($bytes, $flip_bytes = false)
     {
-        $string = substr($this->string, $this->position, $bytes);
+        $string = substr($this->string, $this->getPosition(), $bytes);
+
         $length = strlen($string);
 
         if ($length == 0) {
@@ -193,6 +205,20 @@ class Parser
 
         $buffer = new Buffer($string);
         return $buffer;
+    }
+
+    /**
+     * Return a variable length string. This is a variable length string,
+     * prefixed with it's length encoded as a VarInt.
+     *
+     * @return Buffer
+     * @throws \Exception
+     */
+    public function getVarString()
+    {
+        return $this->readBytes(
+            $this->getVarInt()->serialize('int')
+        );
     }
 
     public function parseBytes($bytes, $flip_bytes = false)
