@@ -87,9 +87,9 @@ class Transaction implements TransactionInterface
      * @return $this
      * @throws \Exception
      */
-    public function setVersion(Buffer $version)
+    public function setVersion($version)
     {
-        if (Math::cmp($version->serialize('int'), TransactionInterface::MAX_VERSION) > 0) {
+        if (Math::cmp($version, TransactionInterface::MAX_VERSION) > 0) {
             throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
 
@@ -212,7 +212,7 @@ class Transaction implements TransactionInterface
      */
     public function fromParser(Parser &$parser)
     {
-        $this->setVersion($parser->readBytes(4, true));
+        $this->setVersion($parser->readBytes(4, true)->serialize('int'));
 
         $inputC = $parser->getVarInt()->serialize('int');
         for ($i = 0; $i < $inputC; $i++) {
@@ -261,7 +261,7 @@ class Transaction implements TransactionInterface
         }
 
         $parser = new Parser();
-        $parser->writeInt(4, $this->getVersion()->serialize('int'), true)
+        $parser->writeInt(4, $this->getVersion(), true)
             ->writeArray($this->getInputs())
             ->writeArray($this->getOutputs())
             ->writeInt(4, $this->getLockTime(), true);

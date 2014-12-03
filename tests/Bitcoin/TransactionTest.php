@@ -26,6 +26,20 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetNetwork()
     {
+        $this->assertSame($this->transaction->getNetwork(), $this->network);
+    }
 
+    public function testGetVersionEmpty()
+    {
+        $this->assertNull($this->transaction->getVersion());
+    }
+
+    /**
+     * @depends testGetVersionEmpty
+     */
+    public function testSetVersion()
+    {
+        $this->transaction->setVersion('1');
+        $this->assertSame($this->transaction->getVersion(), '1');
     }
 } 
