@@ -351,6 +351,8 @@ class Script implements ScriptInterface
     }
 
     /**
+     * When given a Buffer or hex string, set the script to be this.
+     *
      * @param $scriptData
      * @return $this
      */
@@ -365,6 +367,9 @@ class Script implements ScriptInterface
     }
 
     /**
+     * Return a human readable representation of the Script Opcodes, and data being
+     * pushed to the stack
+     *
      * @return string
      */
     public function getAsm()
@@ -374,11 +379,12 @@ class Script implements ScriptInterface
 
         foreach ($parse as $item) {
             if ($item instanceof Buffer) {
-                $result[] = $item->serialize('hex');
                 // Buffer
+                $result[] = $item->serialize('hex');
             } else {
-                $result[] = $item;
                 // Opcode
+                $result[] = $item;
+
             }
         }
 
@@ -447,6 +453,7 @@ class Script implements ScriptInterface
 
     /**
      * Return a varInt, based on the size of the script.
+     *
      * @return string
      * @throws \Exception
      */

@@ -22,12 +22,13 @@ class Parser
     protected $position = 0;
 
     /**
+     * Instantiate class, optionally taking a given hex string or Buffer.
+     *
      * @param null $in
      * @throws \Exception
      */
     public function __construct($in = null)
     {
-        // Make sure we're dealing only with binary data
         if ($in instanceof Buffer) {
             $this->string = $in->serialize();
         } else {
@@ -40,7 +41,7 @@ class Parser
     }
 
     /**
-     * Convert a decimal number into a VarInt
+     * Convert a decimal number into a VarInt Buffer
      *
      * @param $decimal
      * @return string
@@ -194,7 +195,7 @@ class Parser
 
         if ($length == 0) {
             return false;
-        } else if ($length !== $bytes) {
+        } else if ($length == 0 OR $length !== $bytes) {
             throw new \Exception('Could not parse string of required length');
         }
 
@@ -221,6 +222,14 @@ class Parser
         );
     }
 
+    /**
+     * Extract $bytes from the parser, and return them as a new Parser instance.
+     *
+     * @param $bytes
+     * @param bool $flip_bytes
+     * @return Parser
+     * @throws \Exception
+     */
     public function parseBytes($bytes, $flip_bytes = false)
     {
         $buffer = $this->readBytes($bytes, $flip_bytes);

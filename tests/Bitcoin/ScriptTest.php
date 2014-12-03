@@ -166,8 +166,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($parse);
     }
 
-
-
     public function testPushHex()
     {
         $hex = '41';

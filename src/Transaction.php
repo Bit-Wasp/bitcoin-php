@@ -62,7 +62,14 @@ class Transaction implements TransactionInterface
     {
         $hex  = $this->serialize();
         $hash = Hash::sha256d($hex);
-        return $hash;
+
+        $txid = new Parser();
+        $txid = $txid
+            ->writeBytes(32, $hash, true)
+            ->getBuffer()
+            ->serialize('hex');
+
+        return $txid;
     }
 
     /**

@@ -186,7 +186,7 @@ class TransactionInput implements TransactionInputInterface
         $parser = new Parser;
         $parser
             ->writeBytes(32, $this->getTransactionId(), true)
-            ->writeInt(4, $this->getVout(), true)
+            ->writeInt(4, $this->getVout())
             ->writeWithLength(
                 new Buffer($this->getScript()->serialize())
             )
@@ -212,5 +212,4 @@ class TransactionInput implements TransactionInputInterface
             )
         );
     }
-
 }
