@@ -82,14 +82,15 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public function getPubKeyHash()
     {
-        $public_key = $this->serialize('hex');
+        $publicKey = $this->serialize('hex');
 
-        $hash = Hash::sha256ripe160($public_key);
+        $hash = Hash::sha256ripe160($publicKey);
         return $hash;
     }
 
     /**
      * Serialize this according to requested type
+     *
      * @return string
      */
     public function serialize($type = null)
@@ -105,27 +106,28 @@ class PublicKey implements KeyInterface, PublicKeyInterface
 
     /**
      * Return the hex string for this public key
+     *
      * @return string
      */
     public function getPubKeyHex()
     {
         if ($this->isCompressed()) {
             $byte = self::getCompressedPrefix($this->getPoint());
-            $x    = Math::decHex($this->getX());
+            $xHex = Math::decHex($this->getX());
             $hex  = sprintf(
                 "%s%s",
                 $byte,
-                str_pad($x, 64, '0', STR_PAD_LEFT)
+                str_pad($xHex, 64, '0', STR_PAD_LEFT)
             );
 
         } else {
-            $x    = Math::decHex($this->getX());
-            $y    = Math::decHex($this->getY());
+            $xHex = Math::decHex($this->getX());
+            $yHex = Math::decHex($this->getY());
             $hex  = sprintf(
                 "%s%s%s",
                 PublicKey::KEY_UNCOMPRESSED,
-                str_pad($x, 64, '0', STR_PAD_LEFT),
-                str_pad($y, 64, '0', STR_PAD_LEFT)
+                str_pad($xHex, 64, '0', STR_PAD_LEFT),
+                str_pad($yHex, 64, '0', STR_PAD_LEFT)
             );
         }
 
@@ -140,6 +142,12 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         return false;
     }
 
+    /**
+     * Return the prefix for an address, based on the point.
+     *
+     * @param PointInterface $point
+     * @return string
+     */
     public static function getCompressedPrefix(\Mdanter\Ecc\PointInterface $point)
     {
         return (Math::mod($point->getY(), 2) == '0')
@@ -147,11 +155,23 @@ class PublicKey implements KeyInterface, PublicKeyInterface
             : PublicKey::KEY_COMPRESSED_ODD;
     }
 
+    /**
+     * Return the hex representation of the public key
+     *
+     * @return string
+     */
     public function __toString()
     {
         return $this->getPubKeyHex();
     }
 
+    /**
+     * Return the size of the serialized public key. Can choose hex type, or
+     * binary (default)
+     *
+     * @param null $type
+     * @return float|int
+     */
     public function getSize($type = null)
     {
         $hex = $this->getPubKeyHex();
@@ -198,23 +218,23 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         }
 
         $byte = self::getCompressedPrefix($point);
-        $x    = Math::decHex($point->getX());
+        $xHex    = Math::decHex($point->getX());
 
         return sprintf(
             "%s%s",
             $byte,
-            str_pad($x, 64, '0', STR_PAD_LEFT)
+            str_pad($xHex, 64, '0', STR_PAD_LEFT)
         );
     }
 
     /**
      * Recover Y from X and a parity byte
-     * @param $x
+     * @param $xCoord
      * @param $byte
      * @param GeneratorPoint $generator
      * @throws \Exception
      */
-    public static function recoverYfromX($x, $byte, GeneratorPoint $generator = null)
+    public static function recoverYfromX($xCoord, $byte, GeneratorPoint $generator = null)
     {
         if (! in_array($byte, array(PublicKey::KEY_COMPRESSED_ODD, PUBLICKEY::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
@@ -228,32 +248,32 @@ class PublicKey implements KeyInterface, PublicKeyInterface
 
         try {
             // x ^ 3
-            $x3 = Math::powMod($x, 3, $curve->getPrime());
-            $y2 = Math::add($x3, $curve->getB());
+            $x_cubed = Math::powMod($xCoord, 3, $curve->getPrime());
+            $y_squared = Math::add($x_cubed, $curve->getB());
 
             // Calculate first root
-            $y0 = NumberTheory::squareRootModP($y2, $curve->getPrime());
+            $root0 = NumberTheory::squareRootModP($y_squared, $curve->getPrime());
 
-            if ($y0 == null) {
+            if ($root0 == null) {
                 throw new \RuntimeException('Unable to calculate sqrt mod p');
             }
 
             // Depending on the byte, we expect the Y value to be even or odd.
             // We only calculate the second y root if it's needed.
             if ($byte == PublicKey::KEY_COMPRESSED_EVEN) {
-                $y = (Math::mod($y0, 2) == '0')
-                    ? $y0
-                    : Math::sub($curve->getPrime(), $y0);
-            } else if ($byte == PublicKey::KEY_COMPRESSED_ODD) {
-                $y = (Math::mod($y0, 2) !== '0')
-                    ? $y0
-                    : Math::sub($curve->getPrime(), $y0);
+                $yCoord = (Math::mod($root0, 2) == '0')
+                    ? $root0
+                    : Math::sub($curve->getPrime(), $root0);
+            } else {
+                $yCoord = (Math::mod($root0, 2) !== '0')
+                    ? $root0
+                    : Math::sub($curve->getPrime(), $root0);
             }
         } catch (\Exception $e) {
             throw $e;
         }
 
-        return $y;
+        return $yCoord;
     }
 
     /**
@@ -274,19 +294,19 @@ class PublicKey implements KeyInterface, PublicKeyInterface
 
         if (strlen($hex) == PublicKey::LENGTH_COMPRESSED) {
             $compressed = true;
-            $x = Math::hexDec(substr($hex, 2, 64));
-            $y = self::recoverYfromX($x, $byte, $generator);
+            $xCoord = Math::hexDec(substr($hex, 2, 64));
+            $yCoord = self::recoverYfromX($xCoord, $byte, $generator);
 
         } elseif (strlen($hex) == PublicKey::LENGTH_UNCOMPRESSED) {
             $compressed = false;
-            $x = Math::hexDec(substr($hex, 2, 64));
-            $y = Math::hexDec(substr($hex, 66, 64));
+            $xCoord = Math::hexDec(substr($hex, 2, 64));
+            $yCoord = Math::hexDec(substr($hex, 66, 64));
 
         } else {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
-        $point = new Point($x, $y, $generator);
+        $point = new Point($xCoord, $yCoord, $generator);
 
         return new self($point, $compressed);
     }
