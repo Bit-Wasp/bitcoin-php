@@ -130,5 +130,29 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($curve->getB(), 7);
         $this->assertSame($curve->getPrime(), '115792089237316195423570985008687907853269984665640564039457584007908834671663');
     }
+
+    public function testSerialize()
+    {
+        $buf                = \Bitcoin\Util\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey   = new PrivateKey($buf);
+        $this->assertSame($buf->serialize(), $this->privateKey->serialize());
+    }
+
+    public function test__toString()
+    {
+        $hex                = '4141414141414141414141414141414141414141414141414141414141414141';
+        $buf                = \Bitcoin\Util\Buffer::hex($hex);
+        $this->privateKey   = new PrivateKey($buf);
+        $this->assertEquals($hex, $this->privateKey->__toString());
+    }
+
+    public function testGetSize()
+    {
+        $hex                = '4141414141414141414141414141414141414141414141414141414141414141';
+        $buf                = \Bitcoin\Util\Buffer::hex($hex);
+        $this->privateKey   = new PrivateKey($buf);
+        $this->assertEquals(32, $this->privateKey->getSize());
+        $this->assertEquals(64, $this->privateKey->getSize('hex'));
+    }
 }
  
