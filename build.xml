@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="bitcoin/package" default="build">
-    <target name="build" depends="lint,phpunit,phpcs" />
+    <target name="build" depends="lint,phpunit,phpcs,phpmd" />
 
     <target name="lint"
         description="Check the syntax of PHP files">
@@ -25,6 +25,11 @@
 
     <target name="phpcs">
         <exec command="${project.basedir}/bin/phpcs ./src --standard=PSR1,PSR2 -n" passthru="true">
+        </exec>
+    </target>
+
+    <target name="phpmd">
+        <exec command="${project.basedir}/bin/phpmd src/ text build/phpmd.xml" passthru="true">
         </exec>
     </target>
 
