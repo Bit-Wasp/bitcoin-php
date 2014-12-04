@@ -98,6 +98,15 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testRecoverYfromXException()
+    {
+        $x = 0;
+        PublicKey::recoverYfromX($x, '02');
+    }
+
     public function testCompressKeys()
     {
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
