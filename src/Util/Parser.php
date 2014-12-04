@@ -24,18 +24,16 @@ class Parser
     /**
      * Instantiate class, optionally taking a given hex string or Buffer.
      *
-     * @param null $in
+     * @param null $input
      * @throws \Exception
      */
-    public function __construct($in = null)
+    public function __construct($input = null)
     {
-        if ($in instanceof Buffer) {
-            $this->string = $in->serialize();
-        } else {
-            $buffer = Buffer::hex($in);
-            $this->string = $buffer->serialize();
+        if (!$input instanceof Buffer) {
+            $input = Buffer::hex($input);
         }
 
+        $this->string   = $input->serialize();
         $this->position = 0;
         return $this;
     }
@@ -124,11 +122,11 @@ class Parser
      * Parse $bytes bytes from the string, and return the obtained buffer
      *
      * @param $bytes
-     * @param bool $flip_bytes
+     * @param bool $flipBytes
      * @return Buffer
      * @throws \Exception
      */
-    public function readBytes($bytes, $flip_bytes = false)
+    public function readBytes($bytes, $flipBytes = false)
     {
         $string = substr($this->string, $this->getPosition(), $bytes);
         $length = strlen($string);
@@ -141,7 +139,7 @@ class Parser
 
         $this->position += $bytes;
 
-        if ($flip_bytes) {
+        if ($flipBytes) {
             $string = $this->flipBytes($string);
         }
 
@@ -154,10 +152,10 @@ class Parser
      *
      * @param $bytes
      * @param $data
-     * @param bool $flip_bytes
+     * @param bool $flipBytes
      * @return $this
      */
-    public function writeBytes($bytes, $data, $flip_bytes = false)
+    public function writeBytes($bytes, $data, $flipBytes = false)
     {
         // Create a new buffer, ensuring that were within the limit set by $bytes
         if ($data instanceof Buffer) {
@@ -168,7 +166,7 @@ class Parser
 
         $data = $newBuffer->serialize();
 
-        if ($flip_bytes) {
+        if ($flipBytes) {
             $data = $this->flipBytes($data);
         }
 
@@ -202,7 +200,7 @@ class Parser
     public function getArray($array, callable $callback)
     {
         $results = array();
-        array_walk($array, function ($value, $key) use ($callback, &$results) {
+        array_walk($array, function ($value) use ($callback, &$results) {
             var_dump($value);
             //$results[] = $callback($value);
         });
@@ -221,12 +219,10 @@ class Parser
         $parser = new Parser($varInt);
         //$parser->writeInt(1, count($serializable));
 
-        $a = array();
         foreach ($serializable as $object) {
             if (!in_array('Bitcoin\SerializableInterface', class_implements($object))) {
                 throw new \RuntimeException('Objects being serialized to an array must implement the SerializableInterface');
             }
-            $a[] = $object->serialize('hex');
             $buffer = new Buffer($object->serialize());
             $parser->writeBytes($buffer->getSize(), $buffer);
         }
@@ -241,15 +237,15 @@ class Parser
      *
      * @param $bytes
      * @param $int
-     * @param bool $flip_bytes
+     * @param bool $flipBytes
      * @return $this
      */
-    public function writeInt($bytes, $int, $flip_bytes = false)
+    public function writeInt($bytes, $int, $flipBytes = false)
     {
         $hex  = str_pad(Math::decHex($int), $bytes*2, '0', STR_PAD_LEFT);
         $data = pack("H*", $hex);
 
-        if ($flip_bytes) {
+        if ($flipBytes) {
             $data = $this->flipBytes($data);
         }
 
@@ -269,19 +265,17 @@ class Parser
         return $buffer;
     }
 
-
-
     /**
      * Extract $bytes from the parser, and return them as a new Parser instance.
      *
      * @param $bytes
-     * @param bool $flip_bytes
+     * @param bool $flipBytes
      * @return Parser
      * @throws \Exception
      */
-    public function parseBytes($bytes, $flip_bytes = false)
+    public function parseBytes($bytes, $flipBytes = false)
     {
-        $buffer = $this->readBytes($bytes, $flip_bytes);
+        $buffer = $this->readBytes($bytes, $flipBytes);
         $parser = new Parser($buffer);
         return $parser;
     }
@@ -295,8 +289,8 @@ class Parser
     public function getVarInt()
     {
         // Return the length encoded in this var int
-        $byte    = $this->readBytes(1);
-        $int = $byte->serialize('int');
+        $byte   = $this->readBytes(1);
+        $int    = $byte->serialize('int');
 
         if (Math::cmp($int, 0xfd) < 0) {
             return $byte;
@@ -318,8 +312,8 @@ class Parser
      */
     public function getVarString()
     {
-        $vi     = $this->getVarInt()->serialize('int');
-        $string = $this->readBytes($vi);
+        $varInt = $this->getVarInt()->serialize('int');
+        $string = $this->readBytes($varInt);
         return $string;
     }
 }

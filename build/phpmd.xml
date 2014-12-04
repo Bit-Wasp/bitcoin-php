@@ -5,13 +5,11 @@
  * see https://github.com/bitpay/php-bitpay-client/blob/master/LICENSE
  */
  -->
- <ruleset name="BitPay PHP Client PHPMD Ruleset">
-     <!--
+ <ruleset name="BPHPMD Ruleset">
      <rule ref="rulesets/cleancode.xml" />
      <rule ref="rulesets/codesize.xml" />
      <rule ref="rulesets/controversial.xml" />
      <rule ref="rulesets/design.xml" />
      <rule ref="rulesets/naming.xml" />
      <rule ref="rulesets/unusedcode.xml" />
-     -->
  </ruleset>

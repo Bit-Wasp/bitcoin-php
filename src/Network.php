@@ -41,25 +41,32 @@ class Network implements NetworkInterface
     /**
      * Load basic data, throw exception if it's not provided
      *
-     * @param $address_byte
-     * @param $p2sh_byte
-     * @param $priv_byte
+     * @param $addressByte
+     * @param $p2shByte
+     * @param $privByte
      * @throws \Exception
      */
-    public function __construct($address_byte, $p2sh_byte, $priv_byte, $testnet = false)
+    public function __construct($addressByte, $p2shByte, $privByte, $testnet = false)
     {
-        foreach (array('address_byte', 'p2sh_byte', 'priv_byte') as $required_byte) {
-            if (ctype_xdigit($$required_byte) and strlen($$required_byte) == 2) {
-                $this->$required_byte = $$required_byte;
-            } else {
-                throw new \Exception("$required_byte must be 1 hexadecimal byte");
-            }
+        if (! (ctype_xdigit($addressByte) and strlen($addressByte) == 2)) {
+            throw new \Exception("address byte must be 1 hexadecimal byte");
+        }
+
+        if (! (ctype_xdigit($p2shByte) and strlen($p2shByte) == 2)) {
+            throw new \Exception("p2sh byte must be 1 hexadecimal byte");
+        }
+
+        if (! (ctype_xdigit($privByte) and strlen($privByte) == 2)) {
+            throw new \Exception("priv byte must be 1 hexadecimal byte");
         }
 
         if (! is_bool($testnet)) {
             throw new \Exception("Testnet parameter must be a boolean");
         }
 
+        $this->address_byte = $addressByte;
+        $this->p2sh_byte = $p2shByte;
+        $this->priv_byte = $privByte;
         $this->testnet = $testnet;
         return $this;
     }
@@ -107,6 +114,7 @@ class Network implements NetworkInterface
         if ($this->xpub_byte == null) {
             throw new \Exception('No HD xpub byte was set');
         }
+
         return $this->xpub_byte;
     }
 
@@ -121,6 +129,7 @@ class Network implements NetworkInterface
         if (!empty($byte) and ctype_xdigit($byte) == true) {
             $this->xpub_byte = $byte;
         }
+
         return $this;
     }
 
@@ -135,6 +144,7 @@ class Network implements NetworkInterface
         if ($this->xpriv_byte == null) {
             throw new \Exception('No HD xpriv byte was set');
         }
+
         return $this->xpriv_byte;
     }
 
@@ -149,6 +159,7 @@ class Network implements NetworkInterface
         if (!empty($bytes) and ctype_xdigit($bytes) == true) {
             $this->xpriv_byte = $bytes;
         }
+
         return $this;
     }
 }

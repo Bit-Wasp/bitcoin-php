@@ -26,15 +26,15 @@ class Hash
      * Calculate Sha256(RipeMd160()) on the given data
      *
      * @param $data
-     * @param bool $binary_output
+     * @param bool $binaryOutput
      * @return string
      */
-    public static function sha256ripe160($data, $binary_output = false)
+    public static function sha256ripe160($data, $binaryOutput = false)
     {
         $data = self::normalize($data);
         $data = pack("H*", $data);
         $hash = self::sha256($data, true);
-        $hash = self::ripemd160($hash, $binary_output);
+        $hash = self::ripemd160($hash, $binaryOutput);
         return $hash;
     }
 
@@ -42,12 +42,12 @@ class Hash
      * Perform SHA256
      *
      * @param $data
-     * @param bool $binary_output
+     * @param bool $binaryOutput
      * @return string
      */
-    public static function sha256($data, $binary_output = false)
+    public static function sha256($data, $binaryOutput = false)
     {
-        $hash = hash('sha256', $data, $binary_output);
+        $hash = hash('sha256', $data, $binaryOutput);
         return $hash;
     }
 
@@ -55,14 +55,14 @@ class Hash
      * Perform SHA256 twice
      *
      * @param $data
-     * @param bool $binary_output
+     * @param bool $binaryOutput
      * @return string
      */
-    public static function sha256d($data, $binary_output = false)
+    public static function sha256d($data, $binaryOutput = false)
     {
         $data = self::normalize($data);
         $hash = self::sha256($data, true);
-        $hash = self::sha256($hash, $binary_output);
+        $hash = self::sha256($hash, $binaryOutput);
         return $hash;
     }
 
@@ -70,12 +70,12 @@ class Hash
      * RIPEMD160
      *
      * @param $data
-     * @param bool $binary_output
+     * @param bool $binaryOutput
      * @return string
      */
-    public static function ripemd160($data, $binary_output = false)
+    public static function ripemd160($data, $binaryOutput = false)
     {
-        $hash = hash('ripemd160', $data, $binary_output);
+        $hash = hash('ripemd160', $data, $binaryOutput);
         return $hash;
     }
 
@@ -83,14 +83,14 @@ class Hash
      * RIPEMD160 twice
      *
      * @param $data
-     * @param bool $binary_output
+     * @param bool $binaryOutput
      * @return string
      */
-    public static function ripemd160d($data, $binary_output = false)
+    public static function ripemd160d($data, $binaryOutput = false)
     {
         $data = self::normalize($data);
         $hash = self::ripemd160($data, true);
-        $hash = self::ripemd160($hash, $binary_output);
+        $hash = self::ripemd160($hash, $binaryOutput);
         return $hash;
     }
 
@@ -98,13 +98,13 @@ class Hash
      * Calculate a SHA1 hash
      *
      * @param $data
-     * @param bool $binary_output
+     * @param bool $binaryOutput
      * @return string
      */
-    public static function sha1($data, $binary_output = false)
+    public static function sha1($data, $binaryOutput = false)
     {
         $data = self::normalize($data);
-        $hash = hash('sha1', $data, $binary_output);
+        $hash = hash('sha1', $data, $binaryOutput);
         return $hash;
     }
 
@@ -116,10 +116,10 @@ class Hash
      * @param $salt
      * @param $count
      * @param $key_length
-     * @param bool $raw_output
+     * @param bool $rawOutput
      * @return string
      */
-    public static function pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output = false)
+    public static function pbkdf2($algorithm, $password, $salt, $count, $key_length, $rawOutput = false)
     {
         $password   = self::normalize($password);
         $key_length = $key_length / 2;
@@ -134,10 +134,10 @@ class Hash
 
         if (function_exists("hash_pbkdf2")) {
             // The output length is in NIBBLES (4-bits) if $raw_output is false!
-            if (!$raw_output) {
+            if (!$rawOutput) {
                 $key_length = $key_length * 2;
             }
-            return hash_pbkdf2($algorithm, $password, $salt, $count, $key_length, $raw_output);
+            return hash_pbkdf2($algorithm, $password, $salt, $count, $key_length, $rawOutput);
         }
 
         $hash_length = strlen(hash($algorithm, "", true));
@@ -156,7 +156,7 @@ class Hash
             $output .= $xorsum;
         }
 
-        if ($raw_output) {
+        if ($rawOutput) {
             return substr($output, 0, $key_length);
         } else {
             return bin2hex(substr($output, 0, $key_length));

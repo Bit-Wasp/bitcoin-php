@@ -19,11 +19,29 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage address_byte must be 1 hexadecimal byte
+     * @expectedExceptionMessage address byte must be 1 hexadecimal byte
      */
     public function testCreateInstanceFailsNotHex()
     {
         $this->network = new \Bitcoin\Network('hi','00','00', true);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage p2sh byte must be 1 hexadecimal byte
+     */
+    public function testCreateInstanceFailsP2shNotHex()
+    {
+        $this->network = new \Bitcoin\Network('00','hi','00', true);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage priv byte must be 1 hexadecimal byte
+     */
+    public function testCreateInstanceFailsPrivNotHex()
+    {
+        $this->network = new \Bitcoin\Network('00','00','hi', true);
     }
 
     /**
