@@ -38,6 +38,10 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public function __construct($hex, $compressed = false, \Mdanter\Ecc\GeneratorPoint $generator = null)
     {
+        if ($hex instanceof Buffer) {
+            $hex = $hex->serialize('hex');
+        }
+
         if (! self::isValidKey($hex)) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
