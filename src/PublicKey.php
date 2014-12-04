@@ -248,11 +248,11 @@ class PublicKey implements KeyInterface, PublicKeyInterface
 
         try {
             // x ^ 3
-            $x_cubed = Math::powMod($xCoord, 3, $curve->getPrime());
-            $y_squared = Math::add($x_cubed, $curve->getB());
+            $xCubed = Math::powMod($xCoord, 3, $curve->getPrime());
+            $ySquared = Math::add($xCubed, $curve->getB());
 
             // Calculate first root
-            $root0 = NumberTheory::squareRootModP($y_squared, $curve->getPrime());
+            $root0 = NumberTheory::squareRootModP($ySquared, $curve->getPrime());
 
             if ($root0 == null) {
                 throw new \RuntimeException('Unable to calculate sqrt mod p');
