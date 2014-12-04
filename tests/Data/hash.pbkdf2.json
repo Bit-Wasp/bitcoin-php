@@ -5,7 +5,7 @@
       "algo": "sha512",
       "salt": "abcd",
       "iterations": "25432",
-      "length": "128",
+      "length": 128,
       "result": "894576533fd8a2a3dec4f2f62b347cb461a43e22b25f6a121f93b69365764241aa397fcdddb48ad80b967ffad3884fc900d3c9d7ffc3193e9a0d9751ee0929cd"
     }
   ]
