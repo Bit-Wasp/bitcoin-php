@@ -154,6 +154,11 @@ class Script implements ScriptInterface
     private $rOpCodes;
 
     /**
+     * @var null|string
+     */
+    protected $script = null;
+
+    /**
      * Initialize container
      */
     public function __construct(Buffer $script = null)
@@ -257,7 +262,7 @@ class Script implements ScriptInterface
         return $this;
     }
     /**
-     * Push data into the stack
+     * Push data into the stack.
      *
      * @param $data
      * @return $this
@@ -271,6 +276,8 @@ class Script implements ScriptInterface
 
         $length = $data->getSize();
         $parsed = new Parser();
+
+        /** Note that larger integers are serialized without flipping bits - Big endian */
 
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
             $parsed = $parsed->writeWithLength($data);

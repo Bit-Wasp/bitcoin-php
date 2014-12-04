@@ -18,12 +18,21 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $this->parser = new Parser();
     }
 
+    public function testParserEmpty()
+    {
+        $parser = new Parser();
+        $this->assertInstanceOf('Bitcoin\Util\Parser', $parser);
+
+        $this->assertSame(0, $this->parser->getPosition());
+        $this->assertInstanceOf('Bitcoin\Util\Buffer', $this->parser->getBuffer());
+        $this->assertEmpty($this->parser->getBuffer()->serialize('hex'));
+    }
+
     public function testCreatesInstance()
     {
         $buffer = Buffer::hex('41414141');
         $this->parser = new Parser($buffer);
     }
-
 
     public function testNumToVarInt()
     {
@@ -39,47 +48,37 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testNumToVarInt1LowerFailure()
     {
-        // Decimal of this size does not take a prefix
+        // This decimal should NOT return a prefix
         $decimal  = 0xfc; // 252;
-        $prefixOp = 0xfd;
-        $expected = pack("Cv", $prefixOp, $decimal);
         $val = $this->parser->numToVarInt($decimal)->serialize();
-
-        $this->assertNotSame($expected, $val);
+        $this->assertSame($val[0], chr(0xfc));
     }
+
     public function testNumToVarInt1Lowest()
     {
-
         // Decimal > 253 requires a prefix
-        $prefixOp = 0xfd;
         $decimal  = 0xfd;
-        $expected = pack("Cv", $prefixOp, $decimal);
+        $expected = chr(0xfd).chr(0xfd).chr(0x00);
         $val = $this->parser->numToVarInt($decimal);//->serialize();
-
-
         $this->assertSame($expected, $val->serialize());
     }
+
     public function testNumToVarInt1Upper()
     {
         // This prefix is used up to 0xffff, because if we go higher,
         // the prefixes are no longer in agreement
-
-        $prefixOp = 0xfd;
-        $decimal  = 0xff;
-        $expected = pack("Cv", $prefixOp, $decimal);
+        $decimal  = 0xffff;
+        $expected = chr(0xfd) . chr(0xff) . chr(0xff);
         $val = $this->parser->numToVarInt($decimal)->serialize();
         $this->assertSame($expected, $val);
     }
 
-
     public function testNumToVarInt2LowerFailure()
     {
-
         // We can check that numbers this low don't yield a 0xfe prefix
-        $prefixOp = 0xfe;
-        $decimal  = 0xfffe;
-        $expected = pack("CV", $prefixOp, $decimal);
-        $val = $this->parser->numToVarInt($decimal);//->serialize();
+        $decimal    = 0xfffe;
+        $expected   = chr(0xfe) . chr(0xfe) . chr(0xff);
+        $val        = $this->parser->numToVarInt($decimal);
 
         $this->assertNotSame($expected, $val);
     }
@@ -87,24 +86,24 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testNumToVarInt2Lowest()
     {
         // With this prefix, check that the lowest for this field IS prefictable.
-        $prefixOp = 0xfe;
-        $decimal  = 256;
-        $expected = pack("CV", $prefixOp, $decimal);
-        $val = $this->parser->numToVarInt($decimal);//->serialize();
+        $decimal    = 0xffff0001;
+        $expected   = chr(0xfe) . chr(0x01) . chr(0x00) . chr(0xff) . chr(0xff) ;
+        $val        = $this->parser->numToVarInt($decimal);
+
         $this->assertSame($expected, $val->serialize());
     }
 
     public function testNumToVarInt2Upper()
     {
-
         // Last number that will share 0xfe prefix: 2^32
-        $prefixOp = 0xfe;
-        $decimal  = 0xffff;
-        $expected = pack("CV", $prefixOp, $decimal);
-        $val = $this->parser->numToVarInt($decimal);//->serialize();
+        $decimal    = 0xffffffff;
+        $expected   = chr(0xfe) . chr(0xff) . chr(0xff) . chr(0xff) . chr(0xff);
+        $val        = $this->parser->numToVarInt($decimal);//->serialize();
 
         $this->assertSame($expected, $val->serialize());
     }
+
+    // Varint for uint32_t
 
     /**
      * @expectedException \Exception
@@ -112,9 +111,9 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testNumToVarIntOutOfRange()
     {
         // Check that this is out of range (PHP's fault)
-        $prefixOp = 0xfe;
-        $decimal  = 0xffffffff + 1;                             // 2^32 - 1
+        $decimal  = \Bitcoin\Util\Math::pow(2, 32) + 1;
         $this->parser->numToVarInt($decimal);
+
     }
 
     /**
@@ -125,21 +124,178 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $buffer = Buffer::hex('41414141');
 
         $this->parser = new Parser($buffer);
-        $parserData = $this->parser->getBuffer()->serialize();
-        $bufferData = $buffer->serialize();
+        $this->assertSame($this->parser->getBuffer()->serialize(), $buffer->serialize());
     }
 
-
     /**
-     * @depends testCreatesInstance
-  /*   public function testGetBufferNull()
+     *
+     */
+    public function testGetBufferEmptyNull()
     {
         $buffer = new Buffer();
         $this->parser = new Parser($buffer);
         $parserData = $this->parser->getBuffer()->serialize();
         $bufferData = $buffer->serialize();
         $this->assertSame($parserData, $bufferData);
-    }*/
+    }
 
+    public function testFlipBytes()
+    {
+        $buffer = Buffer::hex('41');
+        $string = $buffer->serialize();
+        $flip   = Parser::flipBytes($string);
+        $this->assertSame($flip, $string);
 
+        $buffer = Buffer::hex('4141');
+        $string = $buffer->serialize();
+        $flip   = Parser::flipBytes($string);
+        $this->assertSame($flip, $string);
+
+        $buffer = Buffer::hex('4142');
+        $string = $buffer->serialize();
+        $flip   = Parser::flipBytes($string);
+        $this->assertSame($flip, chr(0x42) . chr(0x41));
+
+        $buffer = Buffer::hex('0102030405060708');
+        $string = $buffer->serialize();
+        $flip   = Parser::flipBytes($string);
+        $this->assertSame($flip, chr(0x08) . chr(0x07) . chr(0x06) . chr(0x05) . chr(0x04) . chr(0x03) . chr(0x02) . chr(0x01));
+    }
+
+    public function testWriteBytes()
+    {
+        $bytes = '41424344';
+        $parser = new Parser();
+        $parser->writeBytes(4, Buffer::hex($bytes));
+        $returned = $parser->getBuffer()->serialize('hex');
+        $this->assertSame($returned, '41424344');
+    }
+
+    public function testWriteBytesFlip()
+    {
+        $bytes = '41424344';
+        $parser = new Parser();
+        $parser->writeBytes(4, Buffer::hex($bytes), true);
+        $returned = $parser->getBuffer()->serialize('hex');
+        $this->assertSame($returned, '44434241');
+    }
+
+    public function testReadBytes()
+    {
+        $bytes  = '41424344';
+        $parser = new Parser($bytes);
+        $read   = $parser->readBytes(4);
+        $this->assertInstanceOf('Bitcoin\Util\Buffer', $read);
+        $hex    = $read->serialize('hex');
+        $this->assertSame($bytes, $hex);
+    }
+
+    public function testReadBytesFlip()
+    {
+        $bytes  = '41424344';
+        $parser = new Parser($bytes);
+        $read   = $parser->readBytes(4, true);
+        $this->assertInstanceOf('Bitcoin\Util\Buffer', $read);
+        $hex    = $read->serialize('hex');
+        $this->assertSame('44434241', $hex);
+    }
+
+    public function testReadBytesEmpty()
+    {
+        // Should return false because position is zero,
+        // and length is zero.
+
+        $parser = new Parser();
+        $data = $parser->readBytes(0);
+        $this->assertFalse($data);
+    }
+
+    public function testReadBytesEndOfString()
+    {
+        $parser = new Parser('4041414142414141');
+        $bytes1 = $parser->readBytes(4);
+        $bytes2 = $parser->readBytes(4);
+        $this->assertSame($bytes1->serialize('hex'), '40414141');
+        $this->assertSame($bytes2->serialize('hex'), '42414141');
+        $this->assertFalse($parser->readBytes(1));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testReadBytesBeyondLength()
+    {
+        $bytes = '41424344';
+        $parser = new Parser($bytes);
+        $read   = $parser->readBytes(5);
+    }
+
+    public function testParseBytes()
+    {
+        $bytes  = '4142434445464748';
+        $parser = new Parser($bytes);
+        $bs1    = $parser->parseBytes(1);
+        $bs2    = $parser->parseBytes(2);
+        $bs3    = $parser->parseBytes(4);
+        $bs4    = $parser->parseBytes(1);
+        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs1);
+        $this->assertSame('41', $bs1->getBuffer()->serialize('hex'));
+        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs2);
+        $this->assertSame('4243', $bs2->getBuffer()->serialize('hex'));
+        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs3);
+        $this->assertSame('44454647', $bs3->getBuffer()->serialize('hex'));
+        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs4);
+        $this->assertSame('48', $bs4->getBuffer()->serialize('hex'));
+    }
+
+    public function testWriteWithLength()
+    {
+        $str1 = Buffer::hex('01020304050607080909');
+        $parser1 = new Parser();
+        $parser1->writeWithLength($str1);
+        $this->assertSame('0a', $parser1->readBytes(1)->serialize('hex'));
+        $this->assertSame('01020304050607080909', $parser1->readBytes(10)->serialize('hex'));
+
+        $str2 = Buffer::hex('00010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102');
+        $parser2 = new Parser();
+        $parser2->writeWithLength($str2);
+        $this->assertSame('fdfd00', $parser2->readBytes(3)->serialize('hex'));
+        $this->assertSame('00010203040506070809', $parser2->readBytes(10)->serialize('hex'));
+
+    }
+
+    public function testGetVarInt()
+    {
+        $p1 = new Parser('0141');
+        $this->assertSame('01', $p1->getVarInt()->serialize('hex'));
+        $this->assertSame('41', $p1->readBytes(1)->serialize('hex'));
+        $this->assertSame(false, $p1->readBytes(1));
+
+        $p2 = new Parser('022345');
+        $this->assertSame('02', $p2->getVarInt()->serialize('hex'));
+        $this->assertSame('2345', $p2->readBytes(2)->serialize('hex'));
+        $this->assertSame(false, $p2->readBytes(1));
+
+        $s3 = Buffer::hex('00010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102');
+        $p3 = new Parser();
+        $p3->writeWithLength($s3);
+        $p3 = new Parser($p3->getBuffer());
+        $this->assertSame(253, $p3->getVarInt()->serialize('int'));
+    }
+
+    public function testGetVarString()
+    {
+        $strings = array(
+            '00',
+            '00010203040506070809',
+            '00010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102'
+        );
+
+        foreach ($strings as $string) {
+            $p = new Parser();
+            $p->writeWithLength(Buffer::hex($string));
+            $np = new Parser($p->getBuffer());
+            $this->assertSame($string, $np->getVarString()->serialize('hex'));
+        }
+    }
 } 

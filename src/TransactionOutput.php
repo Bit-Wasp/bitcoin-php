@@ -3,6 +3,7 @@
 namespace Bitcoin;
 
 use Bitcoin\Script;
+use Bitcoin\Util\Math;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 
@@ -10,7 +11,7 @@ use Bitcoin\Util\Parser;
  * Class TransactionOutput
  * @package Bitcoin
  */
-class TransactionOutput implements TransactionOutputInterface
+class TransactionOutput implements TransactionOutputInterface, SerializableInterface
 {
 
     /**
@@ -43,6 +44,10 @@ class TransactionOutput implements TransactionOutputInterface
      */
     public function getValue()
     {
+        if ($this->value == null) {
+            return '0';
+        }
+
         return $this->value;
     }
 
@@ -117,11 +122,7 @@ class TransactionOutput implements TransactionOutputInterface
     }
 
     /**
-     * Serialize the output into either hex ($type = hex),
-     * or a byte string (default; $type = null)
-     *
-     * @param $type
-     * @return string
+     * @inheritdoc
      */
     public function serialize($type = null)
     {
@@ -138,6 +139,22 @@ class TransactionOutput implements TransactionOutputInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getSize($type = null)
+    {
+        return strlen($this->serialize($type));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __toString()
+    {
+        return $this->serialize('hex');
+    }
+
+    /**
      * Return this object in the form of an array, compatible with bitcoind
      *
      * @return array
@@ -145,7 +162,7 @@ class TransactionOutput implements TransactionOutputInterface
     public function toArray()
     {
         return array(
-            'value' => $this->getValue() / 1e8,
+            'value' => number_format($this->getValue() / 1e8, 8, ".", ""),
             'scriptPubKey' => $this->getScript()->toArray()
         );
     }

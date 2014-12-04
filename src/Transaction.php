@@ -43,7 +43,7 @@ class Transaction implements TransactionInterface
      */
     public function __construct(NetworkInterface $network = null)
     {
-        $this->network = $network;
+        $this->setNetwork($network);
         return $this;
     }
 
@@ -53,6 +53,11 @@ class Transaction implements TransactionInterface
     public function getNetwork()
     {
         return $this->network;
+    }
+
+    public function setNetwork(NetworkInterface $network = null)
+    {
+        $this->network = $network;
     }
 
     /**
@@ -187,6 +192,10 @@ class Transaction implements TransactionInterface
      */
     public function getLockTime()
     {
+        if ($this->locktime === null) {
+            return TransactionInterface::MAX_LOCKTIME;
+        }
+
         return $this->locktime;
     }
 
@@ -278,11 +287,11 @@ class Transaction implements TransactionInterface
      */
     public function toArray()
     {
-        $inputs = array_map(function($input) {
+        $inputs = array_map(function ($input) {
             return $input->toArray();
         }, $this->getInputs());
 
-        $outputs = array_map(function($output) {
+        $outputs = array_map(function ($output) {
             return $output->toArray();
         }, $this->getOutputs());
 

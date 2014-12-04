@@ -49,30 +49,66 @@ class Parser
      */
     public static function numToVarInt($decimal)
     {
+       /* $parsed = new Parser();
+
+        if (Math::cmp($decimal, 0xfd) < 0) {
+            $parsed->writeInt(1, $decimal);
+
+        } else if (Math::cmp($decimal, Math::pow(2, 16)) < 1) {
+            $parsed->writeInt(1, 0xfd)
+                ->writeInt(2, $decimal, true);
+
+        } else if (Math::cmp($decimal, Math::sub(Math::pow(2, 32),1)) < 1) {
+            $parsed->writeInt(1, 0xfe)
+                ->writeInt(4, $decimal, true);
+
+        } else if (Math::cmp($decimal, Math::sub(Math::pow(2, 64),1)) < 1) {
+            echo "$decimal\n";
+            $parsed->writeInt(1, 0xff)
+                ->writeInt(8, $decimal, true);
+        } else {
+            throw new \Exception('Number too big');
+        }
+
+        return $parsed->getBuffer();*/
 
         if ($decimal < 0xfd) {
             $bin = chr($decimal);
-        } else if ($decimal <= 0xff) {                     // Uint16
+        } else if ($decimal <= 0xffff) {                     // Uint16
             $bin = pack("Cv", 0xfd, $decimal);
-        } else if ($decimal <= 0xffff) {                 // Uint32
+        } else if ($decimal <= 0xffffffff) {                 // Uint32
             $bin = pack("CV", 0xfe, $decimal);
-        } else { //if ($decimal < 0xfffffffff) {        // Uint64
-            //  if (version_compare(phpversion(), '5.6.0') >= 0) {
-            //      return pack("CP", 0xff, $decimal);
-            //  } else {
-            throw new \Exception('numToVarInt(): Integer too large');
-            //  }
+        } else { //if (Math::cmp($decimal, Math::pow(2, 64)) < 1) {        // Uint64
+            /*$highMap = 0xffffffff00000000;
+            $lowMap  = 0x00000000ffffffff;
+            $higher  = ($decimal & $highMap) >>32;
+            $lower   = $decimal & $lowMap;
+            $bin     = pack('CNN', 0xff, $higher, $lower);*/
+
+            /* if (version_compare(phpversion(), '5.6.3') >= 0) {
+                 $bin = pack("CP", 0xff, $decimal);
+             } else { */
+
+            // Todo, support for 64bit integers
+             throw new \Exception('numToVarInt(): Integer too large');
+             /*}*/
+            //}
         }
 
         return new Buffer($bin);
     }
 
 
-
+    /**
+     * Get the position pointer of the parser - ie, how many bytes from 0
+     *
+     * @return int
+     */
     public function getPosition()
     {
         return $this->position;
     }
+
     /**
      * Flip byte order of this binary string
      *
@@ -82,6 +118,35 @@ class Parser
     public static function flipBytes($hex)
     {
         return implode('', array_reverse(str_split($hex, 1)));
+    }
+
+    /**
+     * Parse $bytes bytes from the string, and return the obtained buffer
+     *
+     * @param $bytes
+     * @param bool $flip_bytes
+     * @return Buffer
+     * @throws \Exception
+     */
+    public function readBytes($bytes, $flip_bytes = false)
+    {
+        $string = substr($this->string, $this->getPosition(), $bytes);
+        $length = strlen($string);
+
+        if ($length == 0) {
+            return false;
+        } else if ($length !== $bytes) {
+            throw new \Exception('Could not parse string of required length');
+        }
+
+        $this->position += $bytes;
+
+        if ($flip_bytes) {
+            $string = $this->flipBytes($string);
+        }
+
+        $buffer = new Buffer($string);
+        return $buffer;
     }
 
     /**
@@ -111,6 +176,14 @@ class Parser
         return $this;
     }
 
+    /**
+     * Write with length - Writes a buffer and prefixes it with it's length,
+     * as a VarInt
+     *
+     * @param Buffer $buffer
+     * @return $this
+     * @throws \Exception
+     */
     public function writeWithLength(Buffer $buffer)
     {
         $varInt = self::numToVarInt($buffer->getSize());
@@ -119,31 +192,48 @@ class Parser
         return $this;
     }
 
+    /**
+     * Get array. TODO. Should parse a varint and apply a closure
+     *
+     * @param $array
+     * @param callable $callback
+     * @return array
+     */
+    public function getArray($array, callable $callback)
+    {
+        $results = array();
+        array_walk($array, function ($value, $key) use ($callback, &$results) {
+            var_dump($value);
+            //$results[] = $callback($value);
+        });
+        return $results;
+    }
+
+    /**
+     * Take an array containing serializable objects.
+     * @param $serializable
+     * @return $this
+     */
     public function writeArray($serializable)
     {
-        $parser = new Parser;
-        $parser->writeInt(1, count($serializable));
+        $varInt = self::numToVarInt(count($serializable));
+
+        $parser = new Parser($varInt);
+        //$parser->writeInt(1, count($serializable));
 
         $a = array();
         foreach ($serializable as $object) {
+            if (!in_array('Bitcoin\SerializableInterface', class_implements($object))) {
+                throw new \RuntimeException('Objects being serialized to an array must implement the SerializableInterface');
+            }
             $a[] = $object->serialize('hex');
             $buffer = new Buffer($object->serialize());
             $parser->writeBytes($buffer->getSize(), $buffer);
         }
 
         $this->string .= $parser->getBuffer()->serialize();
-        //echo $parser->getBuffer()->serialize('hex')."\n";
-        return $this;
-    }
 
-    public function getArray($array, callable $callback)
-    {
-        $results = array();
-        array_walk($array, function($value, $key) use ($callback, &$results) {
-            var_dump($value);
-            //$results[] = $callback($value);
-        });
-        return $results;
+        return $this;
     }
 
     /**
@@ -156,7 +246,7 @@ class Parser
      */
     public function writeInt($bytes, $int, $flip_bytes = false)
     {
-        $hex  = str_pad(Math::decHex($int), (int)$bytes*2, '0', STR_PAD_LEFT);
+        $hex  = str_pad(Math::decHex($int), $bytes*2, '0', STR_PAD_LEFT);
         $data = pack("H*", $hex);
 
         if ($flip_bytes) {
@@ -179,48 +269,7 @@ class Parser
         return $buffer;
     }
 
-    /**
-     * Parse $bytes bytes from the string, and return the obtained buffer
-     *
-     * @param $bytes
-     * @param bool $flip_bytes
-     * @return Buffer
-     * @throws \Exception
-     */
-    public function readBytes($bytes, $flip_bytes = false)
-    {
-        $string = substr($this->string, $this->getPosition(), $bytes);
 
-        $length = strlen($string);
-
-        if ($length == 0) {
-            return false;
-        } else if ($length == 0 OR $length !== $bytes) {
-            throw new \Exception('Could not parse string of required length');
-        }
-
-        $this->position += $bytes;
-        if ($flip_bytes) {
-            $string = $this->flipBytes($string);
-        }
-
-        $buffer = new Buffer($string);
-        return $buffer;
-    }
-
-    /**
-     * Return a variable length string. This is a variable length string,
-     * prefixed with it's length encoded as a VarInt.
-     *
-     * @return Buffer
-     * @throws \Exception
-     */
-    public function getVarString()
-    {
-        return $this->readBytes(
-            $this->getVarInt()->serialize('int')
-        );
-    }
 
     /**
      * Extract $bytes from the parser, and return them as a new Parser instance.
@@ -246,17 +295,31 @@ class Parser
     public function getVarInt()
     {
         // Return the length encoded in this var int
-        $b    = $this->readBytes(1);
-        $byte = $b->serialize('int');
+        $byte    = $this->readBytes(1);
+        $int = $byte->serialize('int');
 
-        if (Math::cmp($byte, 0xfd) < 0) {
-            return $b;
-        } else if (Math::cmp($byte, 0xfd) == 0) {
-            return $this->readBytes(1, true);
-        } else if (Math::cmp($byte, 0xfe) == 0) {
+        if (Math::cmp($int, 0xfd) < 0) {
+            return $byte;
+        } else if (Math::cmp($int, 0xfd) == 0) {
             return $this->readBytes(2, true);
-        } else if (Math::cmp($byte, 0xff) == 0) {
+        } else if (Math::cmp($int, 0xfe) == 0) {
             return $this->readBytes(4, true);
+        } else if (Math::cmp($int, 0xff) == 0) {
+            return $this->readBytes(8, true);
         }
+    }
+
+    /**
+     * Return a variable length string. This is a variable length string,
+     * prefixed with it's length encoded as a VarInt.
+     *
+     * @return Buffer
+     * @throws \Exception
+     */
+    public function getVarString()
+    {
+        $vi     = $this->getVarInt()->serialize('int');
+        $string = $this->readBytes($vi);
+        return $string;
     }
 }

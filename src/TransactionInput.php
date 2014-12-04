@@ -10,7 +10,7 @@ use Bitcoin\Script;
  * Class TransactionInput
  * @package Bitcoin
  */
-class TransactionInput implements TransactionInputInterface
+class TransactionInput implements TransactionInputInterface, SerializableInterface
 {
     /**
      * @var
@@ -56,7 +56,7 @@ class TransactionInput implements TransactionInputInterface
      * @param $txid
      * @return $this
      */
-    public function setTransactionId(Buffer $txid)
+    public function setTransactionId($txid)
     {
         $this->txid = $txid;
         return $this;
@@ -103,22 +103,6 @@ class TransactionInput implements TransactionInputInterface
     }
 
     /**
-     * Return an initialized script. Checks if already has a script
-     * object. If not, returns script from scriptBuf (which can simply
-     * be null).
-     *
-     * @return Script
-     */
-    public function getScript()
-    {
-        if ($this->script == null) {
-            $this->script = new Script();
-            $this->script->set($this->getScriptBuf());
-        }
-        return $this->script;
-    }
-
-    /**
      * Get Script Buffer - just return the buffer, not the script
      * @return Buffer
      */
@@ -139,15 +123,34 @@ class TransactionInput implements TransactionInputInterface
     }
 
     /**
+     * Return an initialized script. Checks if already has a script
+     * object. If not, returns script from scriptBuf (which can simply
+     * be null).
      *
+     * @return Script
+     */
+    public function getScript()
+    {
+        if ($this->script == null) {
+            $this->script = new Script();
+            $this->script->set($this->getScriptBuf());
+        }
+        return $this->script;
+    }
+
+    /**
+     * Check whether this transaction is a coinbase transaction
+     *
+     * @return boolean
      */
     public function isCoinbase()
     {
-        return $this->getTransactionId()->serialize('hex') == '0000000000000000000000000000000000000000000000000000000000000000';
+        return $this->getTransactionId() == '0000000000000000000000000000000000000000000000000000000000000000';
     }
 
     /**
      * Set all parameters when given a parser at the start of the input
+     *
      * @param Parser $parser
      * @return $this
      * @throws \Exception
@@ -156,7 +159,9 @@ class TransactionInput implements TransactionInputInterface
     {
         $this
             ->setTransactionId(
-                $parser->readBytes(32, true)
+                $parser
+                    ->readBytes(32, true)
+                    ->serialize('hex')
             )
             ->setVout(
                 $parser
@@ -195,6 +200,22 @@ class TransactionInput implements TransactionInputInterface
         return $parser
             ->getBuffer()
             ->serialize($type);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSize($type = null)
+    {
+        return strlen($this->serialize($type));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __toString()
+    {
+        return $this->serialize('hex');
     }
 
     /**
