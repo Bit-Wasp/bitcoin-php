@@ -18,7 +18,7 @@ class Deterministic implements SignatureKInterface
 
     public function __construct(PrivateKeyInterface $privateKey, Transaction $transaction)
     {
-        $this->privateKey = $privateKey;
+        $this->privateKey  = $privateKey;
         $this->transaction = $transaction;
     }
 
