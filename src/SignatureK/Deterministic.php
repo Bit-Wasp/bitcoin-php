@@ -24,4 +24,4 @@ class Deterministic implements SignatureKInterface
     {
 
     }
-} 
+}

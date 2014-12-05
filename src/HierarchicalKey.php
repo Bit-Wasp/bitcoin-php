@@ -359,6 +359,14 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     }
 
     /**
+     * @inheritdoc
+     */
+    public function sign(Buffer $hash, SignatureKInterface $kProvider = null)
+    {
+        return $this->getPrivateKey()->sign($hash, $kProvider);
+    }
+
+    /**
      * Get the public key the private key or public key.
      *
      * @return PublicKey
