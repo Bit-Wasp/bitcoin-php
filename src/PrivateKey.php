@@ -18,7 +18,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     /**
      * @var int
      */
-    protected $decimal;
+    protected $secretMultiplier;
 
     /**
      * @var \Mdanter\Ecc\CurveFp
@@ -46,7 +46,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
-        $this->decimal    = Math::hexDec($hex);
+        $this->secretMultiplier    = Math::hexDec($hex);
         $this->compressed = $compressed;
 
         if ($generator == null) {
@@ -113,6 +113,52 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $notZero     = ! (Math::cmp(Math::hexDec($hex), 0) == 0);
 
         return $withinRange and $notZero;
+    }
+
+    public function sign(Buffer $hash)
+    {
+
+        $randomK = new Buffer(Random::bytes(32));
+
+      //  try {
+            $G  = $this->getGenerator();
+            $n  = $G->getOrder();
+            $k  = $randomK->serialize('int');
+            $p1 = $G->mul($k);
+            $r  = $p1->getX();
+
+            if (Math::cmp($r, 0) == 0) {
+                throw new \RuntimeException('Random number r = 0');
+            }
+
+            $s  = Math::mod(
+                Math::mul(
+                    Math::inverseMod(
+                        $k,
+                        $n
+                    ),
+                    Math::mod(
+                        Math::add(
+                            $hash->serialize('int'),
+                            Math::mul(
+                                $this->serialize('int'),
+                                $r
+                            )
+                        ),
+                        $n
+                    )
+                ),
+                $n
+            );
+
+            if (Math::cmp($s, 0) == 0) {
+                throw new \RuntimeException('Signature s = 0');
+            }
+
+            return new Signature($r, $s);
+      //  } catch (\RuntimeException $e) {
+      //      return $this->sign($hash);
+        //}
     }
 
     /**
@@ -197,7 +243,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     private function getHex()
     {
-        return str_pad(Math::decHex($this->decimal), 64, '0', STR_PAD_LEFT);
+        return str_pad(Math::decHex($this->secretMultiplier), 64, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -211,7 +257,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         if ($type == 'hex') {
             return $this->getHex();
         } elseif ($type == 'int') {
-            return $this->decimal;
+            return $this->secretMultiplier;
         } else {
             return pack("H*", $this->getHex());
         }
