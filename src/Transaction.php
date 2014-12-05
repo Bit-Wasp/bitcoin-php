@@ -144,6 +144,15 @@ class Transaction implements TransactionInterface
     }
 
     /**
+     * Return a reference to the array containing the inputs
+     *
+     * @return array
+     */
+    public function &getInputsReference()
+    {
+        return $this->inputs;
+    }
+    /**
      * Add an output at a specific index
      *
      * @param $index
@@ -181,6 +190,16 @@ class Transaction implements TransactionInterface
      * @return array
      */
     public function getOutputs()
+    {
+        return $this->outputs;
+    }
+
+    /**
+     * Return a reference to the internal outputs
+     *
+     * @return array
+     */
+    public function &getOutputsReference()
     {
         return $this->outputs;
     }
