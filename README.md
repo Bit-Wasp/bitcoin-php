@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.com/afk11/bitcoin.svg?branch=master)](https://travis-ci.com/afk11/bitcoin)
+[![Build Status](https://magnum.travis-ci.com/afk11/bitcoin.svg?branch=master)](https://magnum.travis-ci.com/afk11/bitcoin)
 
 Bitcoin
 =======
