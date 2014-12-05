@@ -115,12 +115,14 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         return $withinRange and $notZero;
     }
 
-    public function sign(Buffer $hash)
+    public function sign(Buffer $hash, SignatureKInterface $kProvider = null)
     {
+        if ($kProvider == null) {
+            $kProvider = new \Bitcoin\SignatureK\Random();
+        }
 
-        $randomK = new Buffer(Random::bytes(32));
+        $randomK = $kProvider->getK();
 
-        //  try {
         $G  = $this->getGenerator();
         $n  = $G->getOrder();
         $k  = $randomK->serialize('int');
@@ -133,17 +135,11 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
 
         $s  = Math::mod(
             Math::mul(
-                Math::inverseMod(
-                    $k,
-                    $n
-                ),
+                Math::inverseMod($k, $n),
                 Math::mod(
                     Math::add(
                         $hash->serialize('int'),
-                        Math::mul(
-                            $this->serialize('int'),
-                            $r
-                        )
+                        Math::mul($this->serialize('int'), $r)
                     ),
                     $n
                 )
@@ -156,9 +152,6 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         }
 
         return new Signature($r, $s);
-      //  } catch (\RuntimeException $e) {
-      //      return $this->sign($hash);
-        //}
     }
 
     /**
