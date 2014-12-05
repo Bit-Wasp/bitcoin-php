@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="bitcoin/package" default="build">
-    <target name="build" depends="lint,phpunit,phpcs,phpmd" />
+    <target name="build" depends="lint,phpunit,phpcs" />
 
     <target name="lint"
         description="Check the syntax of PHP files">
