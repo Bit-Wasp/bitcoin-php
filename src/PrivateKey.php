@@ -120,42 +120,42 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
 
         $randomK = new Buffer(Random::bytes(32));
 
-      //  try {
-            $G  = $this->getGenerator();
-            $n  = $G->getOrder();
-            $k  = $randomK->serialize('int');
-            $p1 = $G->mul($k);
-            $r  = $p1->getX();
+        //  try {
+        $G  = $this->getGenerator();
+        $n  = $G->getOrder();
+        $k  = $randomK->serialize('int');
+        $p1 = $G->mul($k);
+        $r  = $p1->getX();
 
-            if (Math::cmp($r, 0) == 0) {
-                throw new \RuntimeException('Random number r = 0');
-            }
+        if (Math::cmp($r, 0) == 0) {
+            throw new \RuntimeException('Random number r = 0');
+        }
 
-            $s  = Math::mod(
-                Math::mul(
-                    Math::inverseMod(
-                        $k,
-                        $n
-                    ),
-                    Math::mod(
-                        Math::add(
-                            $hash->serialize('int'),
-                            Math::mul(
-                                $this->serialize('int'),
-                                $r
-                            )
-                        ),
-                        $n
-                    )
+        $s  = Math::mod(
+            Math::mul(
+                Math::inverseMod(
+                    $k,
+                    $n
                 ),
-                $n
-            );
+                Math::mod(
+                    Math::add(
+                        $hash->serialize('int'),
+                        Math::mul(
+                            $this->serialize('int'),
+                            $r
+                        )
+                    ),
+                    $n
+                )
+            ),
+            $n
+        );
 
-            if (Math::cmp($s, 0) == 0) {
-                throw new \RuntimeException('Signature s = 0');
-            }
+        if (Math::cmp($s, 0) == 0) {
+            throw new \RuntimeException('Signature s = 0');
+        }
 
-            return new Signature($r, $s);
+        return new Signature($r, $s);
       //  } catch (\RuntimeException $e) {
       //      return $this->sign($hash);
         //}

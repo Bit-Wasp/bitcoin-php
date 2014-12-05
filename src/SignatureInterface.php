@@ -12,4 +12,4 @@ interface SignatureInterface
     public function getR();
 
     public function getS();
-} 
+}
