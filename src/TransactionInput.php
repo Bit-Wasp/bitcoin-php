@@ -139,6 +139,18 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
     }
 
     /**
+     * Set a Script
+     *
+     * @param Script $script
+     * @return $this
+     */
+    public function setScript(Script $script)
+    {
+        $this->script = $script;
+        return $this;
+    }
+
+    /**
      * Check whether this transaction is a coinbase transaction
      *
      * @return boolean

@@ -80,6 +80,18 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     }
 
     /**
+     * Set a Script
+     *
+     * @param Script $script
+     * @return $this
+     */
+    public function setScript(Script $script)
+    {
+        $this->script = $script;
+        return $this;
+    }
+
+    /**
      * Return the current script buffer
      *
      * @return Buffer
