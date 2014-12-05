@@ -4,7 +4,7 @@ use Bitcoin\Util\Base58;
 use Bitcoin\Util\Math;
 use Bitcoin\ScriptInterpreter;
 
-use Bitcoin\SigHashBuilder;
+use Bitcoin\SignatureKInterface;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 use Bitcoin\Network;

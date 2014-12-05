@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\SignatureK;
+namespace Bitcoin;
 
 /**
  * Interface SignatureKInterface

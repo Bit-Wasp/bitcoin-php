@@ -2,6 +2,7 @@
 
 namespace Bitcoin\SignatureK;
 
+use Bitcoin\Util\Buffer;
 use Bitcoin\SignatureKInterface;
 
 /**
@@ -21,6 +22,8 @@ class Random implements SignatureKInterface
      */
     public function getK()
     {
-        return \Bitcoin\Util\Random::bytes(32);
+        $byteString = \Bitcoin\Util\Random::bytes(32);
+        $buffer     = Buffer::hex($byteString);
+        return $buffer;
     }
 }
