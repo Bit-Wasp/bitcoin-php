@@ -1,14 +1,33 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 05/12/14
- * Time: 07:37
- */
 
 namespace Bitcoin;
 
+use Bitcoin\SignatureInterface;
 
-class Signature {
+/**
+ * Class Signature
+ * @package Bitcoin
+ * @author  Thomas Kerin
+ */
+class Signature implements SignatureInterface
+{
+    protected $r;
 
+    protected $s;
+
+    public function __construct($r, $s)
+    {
+        $this->r = $r;
+        $this->s = $s;
+    }
+
+    public function getR()
+    {
+        return $this->r;
+    }
+
+    public function getS()
+    {
+        return $this->s;
+    }
 } 

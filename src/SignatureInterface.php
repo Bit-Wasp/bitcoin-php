@@ -1,14 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 05/12/14
- * Time: 07:38
- */
 
 namespace Bitcoin;
 
+/**
+ * Interface SignatureInterface
+ * @package Bitcoin
+ * @author  Thomas Kerin
+ */
+interface SignatureInterface
+{
+    public function getR();
 
-class SignatureInterface {
-
+    public function getS();
 } 
