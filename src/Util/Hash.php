@@ -115,36 +115,36 @@ class Hash
      * @param $password
      * @param $salt
      * @param $count
-     * @param $key_length
+     * @param $keyLength
      * @param bool $rawOutput
      * @return string
      */
-    public static function pbkdf2($algorithm, $password, $salt, $count, $key_length, $rawOutput = false)
+    public static function pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
     {
         $password   = self::normalize($password);
-        $key_length = $key_length / 2;
+        $keyLength = $keyLength / 2;
         $algorithm  = strtolower($algorithm);
 
         if (!in_array($algorithm, hash_algos(), true)) {
             trigger_error('PBKDF2 ERROR: Invalid hash algorithm.', E_USER_ERROR);
         }
-        if ($count <= 0 || $key_length <= 0) {
+        if ($count <= 0 || $keyLength <= 0) {
             trigger_error('PBKDF2 ERROR: Invalid parameters.', E_USER_ERROR);
         }
 
         if (function_exists("hash_pbkdf2")) {
             // The output length is in NIBBLES (4-bits) if $raw_output is false!
             if (!$rawOutput) {
-                $key_length = $key_length * 2;
+                $keyLength = $keyLength * 2;
             }
-            return hash_pbkdf2($algorithm, $password, $salt, $count, $key_length, $rawOutput);
+            return hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
         }
 
-        $hash_length = strlen(hash($algorithm, "", true));
-        $block_count = ceil($key_length / $hash_length);
+        $hashLength = strlen(hash($algorithm, "", true));
+        $blockCount = ceil($keyLength / $hashLength);
 
         $output = "";
-        for ($i = 1; $i <= $block_count; $i++) {
+        for ($i = 1; $i <= $blockCount; $i++) {
             // $i encoded as 4 bytes, big endian.
             $last = $salt . pack("N", $i);
             // first iteration
@@ -157,9 +157,9 @@ class Hash
         }
 
         if ($rawOutput) {
-            return substr($output, 0, $key_length);
+            return substr($output, 0, $keyLength);
         } else {
-            return bin2hex(substr($output, 0, $key_length));
+            return bin2hex(substr($output, 0, $keyLength));
         }
     }
 
