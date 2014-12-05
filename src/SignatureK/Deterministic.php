@@ -12,13 +12,19 @@ use Bitcoin\PrivateKeyInterface;
  */
 class Deterministic implements SignatureKInterface
 {
-    public function __construct(PrivateKeyInterface $privateKey)
+    protected $privateKey;
+
+    protected $transaction;
+
+    public function __construct(PrivateKeyInterface $privateKey, Transaction $transaction)
     {
-        // Todo
+        $this->privateKey = $privateKey;
+        $this->transaction = $transaction;
     }
 
     /**
      * Return a K value deterministically derived from the private key
+     *  - TODO
      */
     public function getK()
     {

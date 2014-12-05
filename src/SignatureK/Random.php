@@ -2,6 +2,8 @@
 
 namespace Bitcoin\SignatureK;
 
+use Bitcoin\SignatureKInterface;
+
 /**
  * Class Random
  * @package Bitcoin\SignatureK
