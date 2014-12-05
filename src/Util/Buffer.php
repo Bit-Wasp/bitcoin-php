@@ -19,21 +19,21 @@ class Buffer
     protected $buffer;
 
     /**
-     * @param $byte_string
-     * @param null $byte_size
+     * @param $byteString
+     * @param null $byteSize
      * @throws \Exception
      */
-    public function __construct($byte_string = '', $byte_size = null)
+    public function __construct($byteString = '', $byteSize = null)
     {
-        if (is_numeric($byte_size)) {
+        if (is_numeric($byteSize)) {
             // Check the integer doesn't overflow its supposed size
-            if (Math::cmp(strlen($byte_string), $byte_size) > 0) {
+            if (Math::cmp(strlen($byteString), $byteSize) > 0) {
                 throw new \Exception('Byte string exceeds maximum size');
             }
         }
 
-        $this->size = $byte_size;
-        $this->buffer = $byte_string;
+        $this->size = $byteSize;
+        $this->buffer = $byteString;
     }
 
     /**
@@ -49,14 +49,14 @@ class Buffer
     /**
      * Create a new buffer from a hex string
      * @param $hex
-     * @param null $bit_size
+     * @param null $bitSize
      * @return Buffer
      * @throws \Exception
      */
-    public static function hex($hex = '', $bit_size = null)
+    public static function hex($hex = '', $bitSize = null)
     {
         $buffer = pack("H*", $hex);
-        return new self($buffer, $bit_size);
+        return new self($buffer, $bitSize);
     }
 
     /**

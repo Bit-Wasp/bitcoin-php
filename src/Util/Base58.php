@@ -31,7 +31,7 @@ class Base58
         if (Math::mod(strlen($hex), 2) !== '0') {
             throw new \Exception('Data must be of even length');
         }
-        $orighex = $hex;
+        $origHex = $hex;
 
         $decimal = Math::hexDec($hex);
         $return = "";
@@ -42,7 +42,7 @@ class Base58
         $return = strrev($return);
 
         //leading zeros
-        for ($i = 0; $i < strlen($orighex) && substr($orighex, $i, 2) == "00"; $i += 2) {
+        for ($i = 0; $i < strlen($origHex) && substr($origHex, $i, 2) == "00"; $i += 2) {
             $return = "1" . $return;
         }
         return $return;
@@ -105,12 +105,12 @@ class Base58
     public static function decodeCheck($base58)
     {
         $hex       = self::decode($base58);
-        $cs_verify = substr($hex, -8);
-
+        $csVerify  = substr($hex, -8);
         $data      = substr($hex, 0, -8);
+
         $checksum  = self::checksum($data);
 
-        if ($checksum != $cs_verify) {
+        if ($checksum != $csVerify) {
             throw new Base58ChecksumFailure('Failed to verify checksum');
         }
 
