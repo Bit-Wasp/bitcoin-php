@@ -156,7 +156,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         return false;
     }
 
-    public function verifies(Buffer $messageHash, SignatureInterface $signature)
+    public function verify(Buffer $messageHash, SignatureInterface $signature)
     {
 
     }
