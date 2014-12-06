@@ -1,13 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/11/14
- * Time: 05:15
- */
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
 
+use Bitcoin\TransactionOutput;
+use Bitcoin\Script;
 
 class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 {

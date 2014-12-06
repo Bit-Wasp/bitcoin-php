@@ -1,18 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 24/11/14
- * Time: 00:47
- */
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
 
 use Bitcoin\PublicKey;
 use Bitcoin\Util\Math;
 
 class PublicKeyTest extends \PHPUnit_Framework_TestCase
 {
+
+    protected $publicKey;
+
     public function setUp()
     {
         $this->publicKey = null;
@@ -20,7 +17,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testFromHex()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
+        $f    = file_get_contents(__DIR__.'/Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $this->publicKey = PublicKey::fromHex($test->compressed);
@@ -38,7 +35,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testFromHexUncompressed()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
+        $f    = file_get_contents(__DIR__.'/Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $this->publicKey = PublicKey::fromHex($test->uncompressed);
@@ -85,7 +82,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testRecoverYfromX()
     {
-        $f = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
+        $f = file_get_contents(__DIR__.'/Data/publickey.compressed.json');
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
@@ -109,7 +106,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testCompressKeys()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
+        $f    = file_get_contents(__DIR__.'/Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $key        = PublicKey::fromHex($test->uncompressed);
@@ -138,7 +135,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testPubKeyHash()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.pubkeyhash.json');
+        $f    = file_get_contents(__DIR__.'/Data/publickey.pubkeyhash.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $pubkey = PublicKey::fromHex($test->key);
@@ -149,7 +146,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testSetCompressed()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
+        $f    = file_get_contents(__DIR__.'/Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $pub = PublicKey::fromHex($test->uncompressed);
@@ -161,7 +158,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testSetUnCompressed()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
+        $f    = file_get_contents(__DIR__.'/Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $pub = PublicKey::fromHex($test->compressed);
@@ -173,7 +170,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testSerializeHex()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/publickey.compressed.json');
+        $f = file_get_contents(__DIR__ . '/Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $pubkey = PublicKey::fromHex($test->compressed);

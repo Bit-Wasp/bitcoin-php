@@ -1,6 +1,8 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
+
+use Bitcoin\Signature;
 
 /**
  * Class SignatureTest

@@ -1,15 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 24/11/14
- * Time: 00:00
- */
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
 
+use Bitcoin\PrivateKey;
+use Bitcoin\Network;
 
-class PrivateKeyTest extends \PHPUnit_Framework_TestCase {
+class PrivateKeyTest extends \PHPUnit_Framework_TestCase
+{
     protected $privateKey;
 
     public function setUp()

@@ -6,9 +6,10 @@
  * Time: 22:50
  */
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
 
-use Bitcoin\ScriptStackException;
+use Bitcoin\ScriptStack;
+use Bitcoin\Exceptions\ScriptStackException;
 
 class ScriptStackTest extends \PHPUnit_Framework_TestCase {
 

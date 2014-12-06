@@ -1,17 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 22/11/14
- * Time: 19:35
- */
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
 
+use Bitcoin\Script;
+use Bitcoin\PublicKey;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Random;
 use Bitcoin\Util\Math;
-
 
 
 class ScriptTest extends \PHPUnit_Framework_TestCase
@@ -257,7 +252,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function testParseScripts()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/script.asm.json');
+        $f = file_get_contents(__DIR__ . '/Data/script.asm.json');
         $json = json_decode($f);
 
         // Pay to pubkey hash
@@ -440,7 +435,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVarInt()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/script.varint.json');
+        $f = file_get_contents(__DIR__ . '/Data/script.varint.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $script = new Script();

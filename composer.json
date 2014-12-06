@@ -1,7 +1,8 @@
 {
   "autoload": {
     "psr-4": {
-      "Bitcoin\\": "src/"
+      "Bitcoin\\": "src/",
+      "Bitcoin\\Tests\\": "tests/"
     }
   },
   "require": {

@@ -6,8 +6,10 @@
  * Time: 18:14
  */
 
-namespace Bitcoin\Util;
+namespace Bitcoin\Tests;
 
+use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Math;
 
 class BufferTest extends \PHPUnit_Framework_TestCase
 {

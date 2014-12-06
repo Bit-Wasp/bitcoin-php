@@ -1,9 +1,14 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
+
+use Bitcoin\TransactionInput;
+use Bitcoin\Script;
 
 class TransactionInputTest extends \PHPUnit_Framework_TestCase
 {
+
+    protected $in;
 
     public function __construct()
     {

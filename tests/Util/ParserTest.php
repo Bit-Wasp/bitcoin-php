@@ -1,13 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 22/11/14
- * Time: 17:18
- */
 
+namespace Bitcoin\Tests;
 
-namespace Bitcoin\Util;
+use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Parser;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,10 +1,14 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Tests;
+
+use Bitcoin\Network;
+use Bitcoin\HierarchicalKey;
 
 class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 {
     protected $key;
+    protected $network;
 
     public function setUp()
     {

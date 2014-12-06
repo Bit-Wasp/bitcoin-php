@@ -6,7 +6,9 @@
  * Time: 15:00
  */
 
-namespace Bitcoin\Util;
+namespace Bitcoin\Tests;
+
+use Bitcoin\Util\Base58;
 
 class Base58Test extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +23,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
     public function testEncode()
     {
 
-        $f    = file_get_contents(__DIR__.'/../../Data/base58.encodedecode.json');
+        $f    = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
@@ -45,7 +47,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
     }
     public function testEncodeDecode()
     {
-        $f = file_get_contents(__DIR__.'/../../Data/base58.encodedecode.json');
+        $f = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
 
         $json = json_decode($f);
 
@@ -69,7 +71,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
     }
     public function testEncodeDecodeCheck()
     {
-        $f = file_get_contents(__DIR__.'/../../Data/base58.encodedecode.json');
+        $f = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
 
         $json = json_decode($f);
 
