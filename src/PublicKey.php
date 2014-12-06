@@ -317,5 +317,4 @@ class PublicKey implements KeyInterface, PublicKeyInterface
             return strlen($hex) / 2;
         }
     }
-
 }
