@@ -23,7 +23,7 @@ class Random implements SignatureKInterface
     public function getK()
     {
         $byteString = \Bitcoin\Util\Random::bytes(32);
-        $buffer     = Buffer::hex($byteString);
+        $buffer     = new Buffer($byteString);
         return $buffer;
     }
 }

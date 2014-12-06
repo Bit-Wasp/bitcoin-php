@@ -70,14 +70,6 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     }
 
     /**
-     * @return bool
-     */
-    public function isCompressed()
-    {
-        return $this->compressed;
-    }
-
-    /**
      * @return mixed|string
      */
     public function getPubKeyHash()
@@ -86,22 +78,6 @@ class PublicKey implements KeyInterface, PublicKeyInterface
 
         $hash = Hash::sha256ripe160($publicKey);
         return $hash;
-    }
-
-    /**
-     * Serialize this according to requested type
-     *
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $hex = $this->getPubKeyHex();
-
-        if ($type == 'hex') {
-            return $hex;
-        }
-
-        return pack("H*", $hex);
     }
 
     /**
@@ -135,14 +111,6 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     }
 
     /**
-     * @inheritdoc
-     */
-    public function isPrivate()
-    {
-        return false;
-    }
-
-    /**
      * Return the prefix for an address, based on the point.
      *
      * @param PointInterface $point
@@ -153,34 +121,6 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         return (Math::mod($point->getY(), 2) == '0')
             ? PublicKey::KEY_COMPRESSED_EVEN
             : PublicKey::KEY_COMPRESSED_ODD;
-    }
-
-    /**
-     * Return the hex representation of the public key
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getPubKeyHex();
-    }
-
-    /**
-     * Return the size of the serialized public key. Can choose hex type, or
-     * binary (default)
-     *
-     * @param null $type
-     * @return float|int
-     */
-    public function getSize($type = null)
-    {
-        $hex = $this->getPubKeyHex();
-
-        if ($type == 'hex') {
-            return strlen($hex);
-        } else {
-            return strlen($hex) / 2;
-        }
     }
 
     /**
@@ -198,6 +138,27 @@ class PublicKey implements KeyInterface, PublicKeyInterface
 
         $this->compressed = $compressed;
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCompressed()
+    {
+        return $this->compressed;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isPrivate()
+    {
+        return false;
+    }
+
+    public function verifies(Buffer $messageHash, SignatureInterface $signature)
+    {
+
     }
 
     /**
@@ -310,4 +271,51 @@ class PublicKey implements KeyInterface, PublicKeyInterface
 
         return new self($point, $compressed);
     }
+
+
+    /**
+     * Serialize this according to requested type
+     *
+     * @return string
+     */
+    public function serialize($type = null)
+    {
+        $hex = $this->getPubKeyHex();
+
+        if ($type == 'hex') {
+            return $hex;
+        }
+
+        return pack("H*", $hex);
+    }
+
+
+    /**
+     * Return the hex representation of the public key
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->getPubKeyHex();
+    }
+
+    /**
+     * Return the size of the serialized public key. Can choose hex type, or
+     * binary (default)
+     *
+     * @param null $type
+     * @return float|int
+     */
+    public function getSize($type = null)
+    {
+        $hex = $this->getPubKeyHex();
+
+        if ($type == 'hex') {
+            return strlen($hex);
+        } else {
+            return strlen($hex) / 2;
+        }
+    }
+
 }
