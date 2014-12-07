@@ -3,7 +3,7 @@
 namespace Bitcoin\Key;
 
 use Bitcoin\NetworkInterface;
-use Bitcoin\SignatureKInterface;
+use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Util\Base58;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Hash;
@@ -363,7 +363,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     /**
      * @inheritdoc
      */
-    public function sign(Buffer $hash, SignatureKInterface $kProvider = null)
+    public function sign(Buffer $hash, KInterface $kProvider = null)
     {
         return $this->getPrivateKey()->sign($hash, $kProvider);
     }

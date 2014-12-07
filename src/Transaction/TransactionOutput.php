@@ -111,7 +111,6 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      */
     public function setScriptBuf(Buffer $buffer)
     {
-        echo "Setting script buf : $buffer\n";
         $this->scriptBuf = $buffer;
         return $this;
     }
@@ -141,8 +140,6 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      */
     public function serialize($type = null)
     {
-$s = new Buffer($this->getScript()->serialize());
-        echo "seiralizing script : $s\n";
         $parser = new Parser;
         $parser
             ->writeInt(8, $this->getValue(), true)

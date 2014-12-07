@@ -3,7 +3,6 @@
 namespace Bitcoin\Key;
 
 use Bitcoin\Exceptions\InvalidPrivateKey;
-use Mdanter\Ecc\EccFactory;
 use Bitcoin\NetworkInterface;
 use Bitcoin\SerializableInterface;
 use Bitcoin\Signature\Signature;
@@ -12,7 +11,7 @@ use Bitcoin\Util\Math;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Random;
 use Bitcoin\Util\Base58;
-
+use Mdanter\Ecc\EccFactory;
 
 /**
  * Class PrivateKey
