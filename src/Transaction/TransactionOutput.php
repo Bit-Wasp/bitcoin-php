@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Transaction;
 
-use Bitcoin\Script;
+use Bitcoin\Script\Script;
 use Bitcoin\Util\Math;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
@@ -11,6 +11,7 @@ use Bitcoin\SerializableInterface;
 /**
  * Class TransactionOutput
  * @package Bitcoin
+ * @author Thomas Kerin
  */
 class TransactionOutput implements TransactionOutputInterface, SerializableInterface
 {
@@ -110,6 +111,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      */
     public function setScriptBuf(Buffer $buffer)
     {
+        echo "Setting script buf : $buffer\n";
         $this->scriptBuf = $buffer;
         return $this;
     }
@@ -120,7 +122,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      * @param $parser
      * @return $this
      */
-    public function fromParser(&$parser)
+    public function fromParser(Parser &$parser)
     {
         $this
             ->setValue(
@@ -139,6 +141,8 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      */
     public function serialize($type = null)
     {
+$s = new Buffer($this->getScript()->serialize());
+        echo "seiralizing script : $s\n";
         $parser = new Parser;
         $parser
             ->writeInt(8, $this->getValue(), true)

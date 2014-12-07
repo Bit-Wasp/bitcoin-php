@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Bitcoin\Tests\Transaction;
 
 use Bitcoin\Transaction\TransactionOutput;
-use Bitcoin\Script;
+use Bitcoin\Script\Script;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 
@@ -13,10 +13,15 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
      * @var TransactionOutput
      */
     protected $out;
+    protected $txOutType;
+    protected $scriptType;
+    protected $bufferType;
 
     public function __construct()
     {
-
+        $this->txOutType = 'Bitcoin\Transaction\TransactionOutput';
+        $this->scriptType = 'Bitcoin\Script\Script';
+        $this->bufferType = 'Bitcoin\Util\Buffer';
     }
 
     public function setUp()
@@ -43,7 +48,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     public function testGetScript()
     {
         $script = $this->out->getScript();
-        $this->assertInstanceOf('Bitcoin\Script', $script);
+        $this->assertInstanceOf($this->scriptType, $script);
         $this->assertEmpty($script->serialize());
     }
 
@@ -54,8 +59,8 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $buffer = new Buffer($script);
         $this->out->setScriptBuf($buffer);
 
-        $this->assertInstanceOf('Bitcoin\Util\Buffer', $this->out->getScriptBuf());
-        $this->assertInstanceOf('Bitcoin\Script', $this->out->getScript());
+        $this->assertInstanceOf($this->bufferType, $this->out->getScriptBuf());
+        $this->assertInstanceOf($this->scriptType, $this->out->getScript());
         $this->assertSame('5253', $this->out->getScriptBuf()->serialize('hex'));
     }
 
@@ -64,7 +69,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
         $parser = new Parser($buffer);
         $out = $this->out->fromParser($parser);
-        $this->assertInstanceOf('Bitcoin\Transaction\TransactionOutput', $out);
+        $this->assertInstanceOf($this->txOutType, $out);
     }
 
     public function testSerialize()

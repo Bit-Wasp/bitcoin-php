@@ -8,7 +8,14 @@ namespace Bitcoin\Transaction;
  */
 interface TransactionInterface
 {
+    /**
+     * The version parameter is encoded as a uint32
+     */
     const MAX_VERSION  = 4294967296;
+
+    /**
+     * The locktime parameter is encoded as a uint32
+     */
     const MAX_LOCKTIME = 4294967296;
 
     /**
@@ -41,6 +48,13 @@ interface TransactionInterface
     public function getInputs();
 
     /**
+     * Return a reference to the internal array containing the inputs
+     *
+     * @return array
+     */
+    public function &getInputsReference();
+
+    /**
      * Get a particular output by it's $index
      *
      * @param $index
@@ -54,6 +68,13 @@ interface TransactionInterface
      * @return mixed
      */
     public function getOutputs();
+
+    /**
+     * Return a reference to the internal array containing the outputs
+     *
+     * @return mixed
+     */
+    public function &getOutputsReference();
 
     /**
      * Return the locktime for this transaction

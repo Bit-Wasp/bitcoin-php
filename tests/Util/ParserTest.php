@@ -1,13 +1,25 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Bitcoin\Tests\Util;
 
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Parser
+     */
     protected $parser;
+
+    protected $parserType;
+    protected $bufferType;
+
+    public function __construct()
+    {
+        $this->parserType = 'Bitcoin\Util\Parser';
+        $this->bufferType = 'Bitcoin\Util\Buffer';
+    }
 
     public function setUp()
     {
@@ -17,10 +29,10 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testParserEmpty()
     {
         $parser = new Parser();
-        $this->assertInstanceOf('Bitcoin\Util\Parser', $parser);
+        $this->assertInstanceOf($this->parserType, $parser);
 
         $this->assertSame(0, $this->parser->getPosition());
-        $this->assertInstanceOf('Bitcoin\Util\Buffer', $this->parser->getBuffer());
+        $this->assertInstanceOf($this->bufferType, $this->parser->getBuffer());
         $this->assertEmpty($this->parser->getBuffer()->serialize('hex'));
     }
 
@@ -181,7 +193,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $bytes  = '41424344';
         $parser = new Parser($bytes);
         $read   = $parser->readBytes(4);
-        $this->assertInstanceOf('Bitcoin\Util\Buffer', $read);
+        $this->assertInstanceOf($this->bufferType, $read);
         $hex    = $read->serialize('hex');
         $this->assertSame($bytes, $hex);
     }
@@ -191,7 +203,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $bytes  = '41424344';
         $parser = new Parser($bytes);
         $read   = $parser->readBytes(4, true);
-        $this->assertInstanceOf('Bitcoin\Util\Buffer', $read);
+        $this->assertInstanceOf($this->bufferType, $read);
         $hex    = $read->serialize('hex');
         $this->assertSame('44434241', $hex);
     }
@@ -234,13 +246,13 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $bs2    = $parser->parseBytes(2);
         $bs3    = $parser->parseBytes(4);
         $bs4    = $parser->parseBytes(1);
-        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs1);
+        $this->assertInstanceOf($this->parserType, $bs1);
         $this->assertSame('41', $bs1->getBuffer()->serialize('hex'));
-        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs2);
+        $this->assertInstanceOf($this->parserType, $bs2);
         $this->assertSame('4243', $bs2->getBuffer()->serialize('hex'));
-        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs3);
+        $this->assertInstanceOf($this->parserType, $bs3);
         $this->assertSame('44454647', $bs3->getBuffer()->serialize('hex'));
-        $this->assertInstanceOf('Bitcoin\Util\Parser', $bs4);
+        $this->assertInstanceOf($this->parserType, $bs4);
         $this->assertSame('48', $bs4->getBuffer()->serialize('hex'));
     }
 

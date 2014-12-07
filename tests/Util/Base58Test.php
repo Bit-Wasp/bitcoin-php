@@ -1,18 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 15:00
- */
 
-namespace Bitcoin\Tests;
+namespace Bitcoin\Tests\Util;
 
 use Bitcoin\Util\Base58;
 
 class Base58Test extends \PHPUnit_Framework_TestCase
 {
-
+    /**
+     * @var Base58
+     */
     protected $base58;
 
     public function setUp()
@@ -20,9 +16,11 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         $this->base58 = new Base58();
     }
 
+    /**
+     * Test results of encoding a hex string against test vectors
+     */
     public function testEncode()
     {
-
         $f    = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
         $json = json_decode($f);
 
@@ -30,10 +28,10 @@ class Base58Test extends \PHPUnit_Framework_TestCase
             $hash = $this->base58->encode($test[0]);
             $this->assertSame($test[1], $hash);
         }
-
     }
 
     /**
+     * Test that uneven length strings will throw an exception
      * @expectedException \Exception
      */
     public function testEncodeWithException()
@@ -41,27 +39,30 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         $hash = $this->base58->encode('41414141a');
     }
 
-    public function testEncodeDecode2()
-    {
-
-    }
+    /**
+     * Test that encoding and decoding a string results in the original data
+     */
     public function testEncodeDecode()
     {
-        $f = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
-
+        $f    = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
             $encoded = $this->base58->encode($test[0]);
-
             $this->assertSame($test[1],$encoded);
-            $back = $this->base58->decode($encoded);
+
+            $back    = $this->base58->decode($encoded);
             $this->assertSame($test[0], $back);
         }
     }
+
+    /**
+     * Test the application of padding 1's when 00 bytes are found.
+     * Satoshism.
+     */
     public function testWeird()
     {
-        $str = '00000000000000000000';
+        $str    = '00000000000000000000';
         $encode = $this->base58->encode($str);
         $decode = $this->base58->decode($encode);
 
@@ -69,18 +70,21 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         $this->assertSame($decode, $str);
 
     }
+
+    /**
+     * Check that when data is encoded with a checksum, that we can decode
+     * correctly and
+     */
     public function testEncodeDecodeCheck()
     {
-        $f = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
-
-        $json = json_decode($f);
+        $f     = file_get_contents(__DIR__ . '/../Data/base58.encodedecode.json');
+        $json  = json_decode($f);
 
         foreach ($json->test as $test) {
             $encoded = $this->base58->encodeCheck($test[0]);
-            $back = $this->base58->decodeCheck($encoded);
+            $back    = $this->base58->decodeCheck($encoded);
 
             $this->assertSame($test[0], $back);
         }
     }
 }
- 

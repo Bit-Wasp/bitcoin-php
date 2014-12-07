@@ -1,16 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 20/11/14
- * Time: 14:32
- */
 
-namespace Bitcoin\Util;
+namespace Bitcoin\Tests\Util;
 
+use Bitcoin\Util\Hash;
 
-class HashTest extends \PHPUnit_Framework_TestCase {
-
+class HashTest extends \PHPUnit_Framework_TestCase
+{
     protected $hash;
 
     public function setUp()

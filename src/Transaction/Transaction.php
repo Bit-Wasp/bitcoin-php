@@ -56,6 +56,11 @@ class Transaction implements TransactionInterface
         return $this->network;
     }
 
+    /**
+     * Set a network to a transaction
+     *
+     * @param NetworkInterface $network
+     */
     public function setNetwork(NetworkInterface $network = null)
     {
         $this->network = $network;

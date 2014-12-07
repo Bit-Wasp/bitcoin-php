@@ -4,7 +4,7 @@ namespace Bitcoin\Transaction;
 
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
-use Bitcoin\Script;
+use Bitcoin\Script\Script;
 use Bitcoin\SerializableInterface;
 
 /**

@@ -5,10 +5,13 @@ namespace Bitcoin\Transaction;
 /**
  * Interface TransactionInputInterface
  * @package Bitcoin
+ * @author Thomas Kerin
  */
 interface TransactionInputInterface
 {
-
+    /**
+     * The default sequence.
+     */
     const DEFAULT_SEQUENCE = 0xffffffff;
 
     /**

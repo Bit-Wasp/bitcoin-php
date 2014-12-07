@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Bitcoin\Tests\Transaction;
 
 use Bitcoin\Network;
 use Bitcoin\Transaction\Transaction;
