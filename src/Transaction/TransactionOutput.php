@@ -1,11 +1,12 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Transaction;
 
 use Bitcoin\Script;
 use Bitcoin\Util\Math;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
+use Bitcoin\SerializableInterface;
 
 /**
  * Class TransactionOutput

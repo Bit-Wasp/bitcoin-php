@@ -2,11 +2,16 @@
 
 namespace Bitcoin\Tests;
 
-use Bitcoin\TransactionOutput;
+use Bitcoin\Transaction\TransactionOutput;
 use Bitcoin\Script;
+use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Parser;
 
 class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var TransactionOutput
+     */
     protected $out;
 
     public function __construct()
@@ -46,7 +51,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     {
         $script = new Script();
         $script = $script->op('OP_2')->op('OP_3')->serialize();
-        $buffer = new \Bitcoin\Util\Buffer($script);
+        $buffer = new Buffer($script);
         $this->out->setScriptBuf($buffer);
 
         $this->assertInstanceOf('Bitcoin\Util\Buffer', $this->out->getScriptBuf());
@@ -56,17 +61,17 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function testFromParser()
     {
-        $buffer = \Bitcoin\Util\Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
-        $parser = new \Bitcoin\Util\Parser($buffer);
+        $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
+        $parser = new Parser($buffer);
         $out = $this->out->fromParser($parser);
-        $this->assertInstanceOf('Bitcoin\TransactionOutput', $out);
+        $this->assertInstanceOf('Bitcoin\Transaction\TransactionOutput', $out);
     }
 
     public function testSerialize()
     {
         $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = \Bitcoin\Util\Buffer::hex($hex);
-        $parser = new \Bitcoin\Util\Parser($buffer);
+        $buffer = Buffer::hex($hex);
+        $parser = new Parser($buffer);
         $out    = $this->out->fromParser($parser);
         $this->assertSame($hex, $out->serialize('hex'));
     }
@@ -74,8 +79,8 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     public function testGetSize()
     {
         $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = \Bitcoin\Util\Buffer::hex($hex);
-        $parser = new \Bitcoin\Util\Parser($buffer);
+        $buffer = Buffer::hex($hex);
+        $parser = new Parser($buffer);
         $out    = $this->out->fromParser($parser);
         $this->assertSame(34, $out->getSize());
         $this->assertSame(68, $out->getSize('hex'));
@@ -85,8 +90,8 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     public function test__toString()
     {
         $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = \Bitcoin\Util\Buffer::hex($hex);
-        $parser = new \Bitcoin\Util\Parser($buffer);
+        $buffer = Buffer::hex($hex);
+        $parser = new Parser($buffer);
         $out    = $this->out->fromParser($parser);
         $this->assertSame($hex, $out->__toString());
 
@@ -95,8 +100,8 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     public function testToArray()
     {
         $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = \Bitcoin\Util\Buffer::hex($hex);
-        $parser = new \Bitcoin\Util\Parser($buffer);
+        $buffer = Buffer::hex($hex);
+        $parser = new Parser($buffer);
         $out    = $this->out->fromParser($parser);
         $array  = $out->toArray();
 

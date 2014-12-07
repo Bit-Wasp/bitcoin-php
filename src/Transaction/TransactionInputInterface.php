@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin;
+namespace Bitcoin\Transaction;
 
 /**
  * Interface TransactionInputInterface
