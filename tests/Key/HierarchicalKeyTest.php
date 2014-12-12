@@ -87,14 +87,14 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     {
         $key       = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
         $this->key = HierarchicalKey::fromBase58($key, $this->network);
-        $this->assertSame($this->key->getDepth(), 0);
+        $this->assertSame($this->key->getDepth(), '0');
     }
 
     public function testGetDepth()
     {
         $key       = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $this->key = HierarchicalKey::fromBase58($key, $this->network);
-        $this->assertSame($this->key->getDepth(), 2);
+        $this->assertSame($this->key->getDepth(), '2');
     }
 
     public function testGetBytes()

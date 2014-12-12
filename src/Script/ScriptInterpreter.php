@@ -249,7 +249,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 if ($op instanceof Buffer) {
                     $this->mainStack->push($op);
                 } else {
-
                     if ($this->checkDisabledOpcodes() and in_array($op, $this->getDisabledOpcodes())) {
                         throw new ScriptRuntimeException('Used disabled opcode: ' . $op);
                     }
@@ -337,9 +336,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 }
             }
         } catch (ScriptRuntimeException $e) {
-
         } catch (ScriptStackException $e) {
-
         }
     }
 }

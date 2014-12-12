@@ -68,12 +68,14 @@ class Deterministic implements KInterface
         // Step A: Process message data through the hash function.
         $this->h1       = Hash::$algo($data, true);
         $this->hlen     = strlen($this->h1);
+        echo "HLEN: ".$this->hlen."\n";
         $this->vlen     = 8 * ceil($this->hlen / 8);
-
+        echo "VLEN: ".$this->vlen."\n";
         $q              = Buffer::hex(Math::decHex($generator->getOrder()));
         $this->qlen     = $q->getSize();
+        echo "QLEN: ".$this->qlen."\n";
         $this->rlen     = (8 * ceil($this->hlen / 8));
-
+        echo "RLEN: ".$this->rlen."\n";
         // Step B: Set initial V
         $this->V    = str_pad('', $this->vlen, chr(0x0), STR_PAD_LEFT);
 
@@ -106,10 +108,11 @@ class Deterministic implements KInterface
                 $this->h1
             )
         );
+        echo "K: " . $this->K."\n";
 
         // Step E: V = HMAC with Key(V)
         $this->V = $this->hash($this->V);
-
+        echo "V: " . $this->V."\n";
         // Step F:
         $this->K = $this->hash(
             sprintf(
@@ -120,33 +123,33 @@ class Deterministic implements KInterface
                 $this->h1
             )
         );
-
+        echo "K: " . $this->K."\n";
         // Step G: Set V: HMAC with Key (V)
         $this->V = $this->hash($this->V);
 
         // Step H: Apply algorithm until a value for K is found
         while (true) {
+            echo "try now\n";
             // Step H1
-            $t = '';
-
             // Step H2
 
-            while (strlen($t) < $this->rlen) {
-                $this->V = $this->hash($this->V);
-                $t      .= $this->V;
+            $this->V = $this->hash($this->V);
+            echo $this->V."\n";
 
-            }
 
-            $secret = new Buffer($t);
-            $k      = $secret->serialize('int');
+            $secret  = Buffer::hex($this->V);
+            $k       = $secret->serialize('int');
 
-            if (Math::cmp(1, $this->generator->getOrder()) >= 0
+            if (Math::cmp(1, $k) <= 0
                 and Math::cmp($k, $this->generator->getOrder()) < 0
             ) {
+                var_dump($k);
                 return $secret;
             }
 
+            echo "DOOVER\n";
             $this->K = $this->hash($this->V . chr(0x00));
+            echo "K: " . $this->K."\n";
             $this->V = $this->hash($this->V);
         }
     }

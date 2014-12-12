@@ -39,6 +39,17 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf($this->txType, $this->sighash->getTransaction());
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Input does not exist
+     */
+    public function testFailsWithInvalidInputToSign()
+    {
+        $this->sighash = new SignatureHash($this->tx);
+        $o = new TransactionOutput();
+        $h = $this->sighash->calculateHash($o, 99);
+    }
+
     public function testCalculateHash()
     {
         $f    = file_get_contents(__DIR__ . '/../Data/signaturehash.hash.json');

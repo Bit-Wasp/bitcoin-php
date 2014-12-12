@@ -13,7 +13,7 @@ class Hash
      * @param $input
      * @return string
      */
-    private static function normalize($input)
+    public static function normalize($input)
     {
         if ($input instanceof Buffer) {
             $input = $input->serialize('hex');
@@ -126,19 +126,31 @@ class Hash
         $algorithm  = strtolower($algorithm);
 
         if (!in_array($algorithm, hash_algos(), true)) {
-            trigger_error('PBKDF2 ERROR: Invalid hash algorithm.', E_USER_ERROR);
+            throw new \Exception('PBKDF2 ERROR: Invalid hash algorithm');
         }
         if ($count <= 0 || $keyLength <= 0) {
-            trigger_error('PBKDF2 ERROR: Invalid parameters.', E_USER_ERROR);
+            throw new \Exception('PBKDF2 ERROR: Invalid parameters.');
         }
 
         if (function_exists("hash_pbkdf2")) {
             // The output length is in NIBBLES (4-bits) if $raw_output is false!
-            if (!$rawOutput) {
-                $keyLength = $keyLength * 2;
-            }
-            return hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
+            return self::pbkdf2Extension($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
         }
+
+        return self::pbkdf2Pure($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
+    }
+
+    public static function pbkdf2Extension($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
+    {
+        // The output length is in NIBBLES (4-bits) if $raw_output is false!
+        if (!$rawOutput) {
+            $keyLength = $keyLength * 2;
+        }
+        return hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
+    }
+
+    public static function pbkdf2Pure($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
+    {
 
         $hashLength = strlen(hash($algorithm, "", true));
         $blockCount = ceil($keyLength / $hashLength);

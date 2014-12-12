@@ -84,7 +84,7 @@ class Buffer
             return $this->__toString();
         } else if ($type == 'int') {
             $hex = $this->__toString();
-            return (int)Math::hexDec($hex);
+            return Math::hexDec($hex);
         } else {
             return $this->buffer;
         }

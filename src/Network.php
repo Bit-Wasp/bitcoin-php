@@ -2,26 +2,29 @@
 
 namespace Bitcoin;
 
+use Bitcoin\Util\Hash;
+
 /**
  * Class Network
  * @package Bitcoin
+ * @author Thomas Kerin
  */
 class Network implements NetworkInterface
 {
     /**
-     * @var
+     * @var string
      */
-    protected $address_byte;
+    protected $addressByte;
 
     /**
-     * @var
+     * @var string
      */
-    protected $priv_byte;
+    protected $privByte;
 
     /**
-     * @var
+     * @var string
      */
-    protected $p2sh_byte;
+    protected $p2shByte;
 
     /**
      * @var bool
@@ -29,14 +32,14 @@ class Network implements NetworkInterface
     protected $testnet;
 
     /**
-     * @var null
+     * @var null|string
      */
-    protected $xpub_byte = null;
+    protected $xpubByte = null;
 
     /**
-     * @var null
+     * @var null|string
      */
-    protected $xpriv_byte = null;
+    protected $xprivByte = null;
 
     /**
      * Load basic data, throw exception if it's not provided
@@ -64,10 +67,10 @@ class Network implements NetworkInterface
             throw new \Exception("Testnet parameter must be a boolean");
         }
 
-        $this->address_byte = $addressByte;
-        $this->p2sh_byte = $p2shByte;
-        $this->priv_byte = $privByte;
-        $this->testnet = $testnet;
+        $this->addressByte = $addressByte;
+        $this->p2shByte    = $p2shByte;
+        $this->privByte    = $privByte;
+        $this->testnet     = $testnet;
         return $this;
     }
 
@@ -84,7 +87,7 @@ class Network implements NetworkInterface
      */
     public function getAddressByte()
     {
-        return $this->address_byte;
+        return $this->addressByte;
     }
 
     /**
@@ -92,7 +95,7 @@ class Network implements NetworkInterface
      */
     public function getPrivByte()
     {
-        return $this->priv_byte;
+        return $this->privByte;
     }
 
     /**
@@ -100,7 +103,7 @@ class Network implements NetworkInterface
      */
     public function getP2shByte()
     {
-        return $this->p2sh_byte;
+        return $this->p2shByte;
     }
 
     /**
@@ -111,11 +114,11 @@ class Network implements NetworkInterface
      */
     public function getHDPubByte()
     {
-        if ($this->xpub_byte == null) {
+        if ($this->xpubByte == null) {
             throw new \Exception('No HD xpub byte was set');
         }
 
-        return $this->xpub_byte;
+        return $this->xpubByte;
     }
 
     /**
@@ -127,7 +130,7 @@ class Network implements NetworkInterface
     public function setHDPubByte($byte)
     {
         if (!empty($byte) and ctype_xdigit($byte) == true) {
-            $this->xpub_byte = $byte;
+            $this->xpubByte = $byte;
         }
 
         return $this;
@@ -141,11 +144,11 @@ class Network implements NetworkInterface
      */
     public function getHDPrivByte()
     {
-        if ($this->xpriv_byte == null) {
+        if ($this->xprivByte == null) {
             throw new \Exception('No HD xpriv byte was set');
         }
 
-        return $this->xpriv_byte;
+        return $this->xprivByte;
     }
 
     /**
@@ -157,9 +160,19 @@ class Network implements NetworkInterface
     public function setHDPrivByte($bytes)
     {
         if (!empty($bytes) and ctype_xdigit($bytes) == true) {
-            $this->xpriv_byte = $bytes;
+            $this->xprivByte = $bytes;
         }
 
         return $this;
+    }
+
+    /**
+     * @return callable
+     */
+    public static function getHashFunction()
+    {
+        return function($value) {
+            return Hash::sha256d($value);
+        };
     }
 }

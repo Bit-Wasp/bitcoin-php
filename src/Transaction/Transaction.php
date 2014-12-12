@@ -2,10 +2,9 @@
 
 namespace Bitcoin\Transaction;
 
-use Bitcoin\Util\Parser;
-use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Math;
 use Bitcoin\Util\Hash;
+use Bitcoin\Util\Parser;
 use Bitcoin\NetworkInterface;
 
 /**

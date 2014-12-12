@@ -24,7 +24,7 @@
     </target>
 
     <target name="phpcs">
-        <exec command="${project.basedir}/bin/phpcs ./src --standard=PSR1,PSR2 -n" passthru="true">
+        <exec command="${project.basedir}/bin/phpcbf ./src --standard=PSR1,PSR2 -n" passthru="true">
         </exec>
     </target>
 

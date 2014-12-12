@@ -72,11 +72,14 @@ class Parser
 
         if ($decimal < 0xfd) {
             $bin = chr($decimal);
-        } else if ($decimal <= 0xffff) {                     // Uint16
+        } else if ($decimal <= 0xffff) {
+// Uint16
             $bin = pack("Cv", 0xfd, $decimal);
-        } else if ($decimal <= 0xffffffff) {                 // Uint32
+        } else if ($decimal <= 0xffffffff) {
+// Uint32
             $bin = pack("CV", 0xfe, $decimal);
-        } else { //if (Math::cmp($decimal, Math::pow(2, 64)) < 1) {        // Uint64
+        } else {
+//if (Math::cmp($decimal, Math::pow(2, 64)) < 1) {        // Uint64
             /*$highMap = 0xffffffff00000000;
             $lowMap  = 0x00000000ffffffff;
             $higher  = ($decimal & $highMap) >>32;
@@ -133,7 +136,7 @@ class Parser
 
         if ($length == 0) {
             return false;
-        } else if ($length !== $bytes) {
+        } else if (Math::cmp($length, $bytes) !== 0) {
             throw new \Exception('Could not parse string of required length');
         }
 
@@ -190,6 +193,10 @@ class Parser
         return $this;
     }
 
+    public function parseArray()
+    {
+
+    }
     /**
      * Get array. TODO. Should parse a varint and apply a closure
      *
@@ -197,13 +204,16 @@ class Parser
      * @param callable $callback
      * @return array
      */
-    public function getArray($array, callable $callback)
+    public function getArray(callable $callback)
     {
         $results = array();
-        array_walk($array, function ($value) use ($callback, &$results) {
-            var_dump($value);
-            //$results[] = $callback($value);
-        });
+        $varInt  = $this->getVarInt();
+        $txCount = $varInt->serialize('int');
+        echo $txCount."\n";
+        for ($i = 0; $i < $txCount; $i++) {
+            $results[] = $callback($this);
+        }
+
         return $results;
     }
 

@@ -329,7 +329,6 @@ class Script implements ScriptInterface
                 $push = $parser->readBytes($opCode);
 
             } else if ($opCode <= 78) {
-
                 // Each pushdata opcode is followed by the length of the string.
                 // The number of bytes which encode the length change with the opcode.
                 if ($opCode == $this->getOpCode('OP_PUSHDATA1')) {

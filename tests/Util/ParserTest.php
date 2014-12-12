@@ -288,7 +288,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $p3 = new Parser();
         $p3->writeWithLength($s3);
         $p3 = new Parser($p3->getBuffer());
-        $this->assertSame(253, $p3->getVarInt()->serialize('int'));
+        $this->assertSame('253', $p3->getVarInt()->serialize('int'));
     }
 
     public function testGetVarString()
