@@ -183,9 +183,9 @@ class Hash
      * @param $salt
      * @return string
      */
-    public static function hmac($algo, $data, $salt)
+    public static function hmac($algo, $data, $salt, $rawOutput = false)
     {
         $data = self::normalize($data);
-        return hash_hmac($algo, $data, $salt);
+        return hash_hmac($algo, $data, $salt, $rawOutput);
     }
 }
