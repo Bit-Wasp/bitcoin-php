@@ -9,5 +9,8 @@ namespace Bitcoin\Signature\K;
  */
 interface KInterface
 {
+    /**
+     * @return \Bitcoin\Util\Buffer
+     */
     public function getK();
 }
