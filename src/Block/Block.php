@@ -24,19 +24,22 @@ class Block implements BlockInterface
      */
     protected $transactions = array();
 
+    /**
+     * @param Parser $parser
+     * @return Block
+     */
     public function fromParser(Parser &$parser)
     {
         $block = new self();
-        $block->setMagicBytes($parser->readBytes(4));
 
         $header = new BlockHeader();
         $header->fromParser($parser);
         $block->setHeader($header);
         $block->setTransactions(
             $parser->getArray(
-                function (Parser $parser) {
+                function () use (&$parser) {
                     $transaction = new \Bitcoin\Transaction\Transaction();
-
+                    $transaction->fromParser($parser);
                     return $transaction;
                 }
             )
@@ -82,6 +85,10 @@ class Block implements BlockInterface
         return $this;
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getMerkleRoot()
     {
         $root = new MerkleRoot($this);

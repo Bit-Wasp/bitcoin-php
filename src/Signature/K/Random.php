@@ -13,7 +13,7 @@ class Random implements KInterface
 {
 
     /**
-     * Return a random K value
+     * Return a buffer containing a random K value
      *
      * @return string
      * @throws \Bitcoin\Exceptions\InsufficientEntropy

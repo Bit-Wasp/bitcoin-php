@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Block;
 
+use Bitcoin\Util\Hash;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 
@@ -59,11 +60,6 @@ class BlockHeader implements BlockHeaderInterface
         return $block;
     }
 
-    public function __construct()
-    {
-        return $this;
-    }
-
     /**
      * @param Parser $parser
      * @return $this
@@ -98,11 +94,29 @@ class BlockHeader implements BlockHeaderInterface
     }
 
     /**
+     *
+     */
+    public function __construct()
+    {
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getBits()
     {
         return $this->bits;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBlockHash()
+    {
+        $header = $this->serialize();
+        $hash   = Hash::sha256d($header);
+        return $hash;
     }
 
     /**

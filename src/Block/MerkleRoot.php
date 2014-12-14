@@ -93,28 +93,28 @@ class MerkleRoot
         $transactions = $this->block->getTransactions();
         $txCount      = count($transactions);
 
-        echo "is count 0?\n";
         if ($txCount == 0) {
             throw new \Exception('Cannot calculate the hash of a block with no transactions');
         }
 
         // Create a fixed size Merkle Tree
-        $tree = new FixedSizeTree($txCount + (count($txCount) % 2), $this->getHashFxn(), array($this, 'setLastHash'));
+        $tree = new FixedSizeTree($txCount + (count($txCount) % 2), $this->getHashFxn());
+
         $lastHash = null;
         // Compute hash of each transaction
         foreach ($transactions as $i => $transaction) {
-            $lastHash = $transaction->getTransactionId();
+            $lastHash = $transaction->serialize();
             // Set value of a leaf of the merkle tree
+
             $tree->set($i, $lastHash);
         }
-print_r($tree);
-        echo "last was $i\n";
         // Check if we need to repeat the last hash (odd number of transactions)
         if (Math::mod($txCount, 2) !== 0) {
             $tree->set($txCount, $lastHash);
         }
 
         $this->setLastHash($tree->hash());
+
         return $this->getLastHash();
     }
 }

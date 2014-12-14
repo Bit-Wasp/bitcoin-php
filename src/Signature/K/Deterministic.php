@@ -77,10 +77,13 @@ class Deterministic implements KInterface
         $this->rlen     = (8 * ceil($this->hlen / 8));
         echo "RLEN: ".$this->rlen."\n";
         // Step B: Set initial V
-        $this->V    = str_pad('', $this->vlen, chr(0x0), STR_PAD_LEFT);
+        $this->V    = str_pad('', $this->vlen, chr(0x01), STR_PAD_LEFT);
 
         // Step C: Set initial K
-        $this->K    = str_pad('', $this->vlen, chr(0x0), STR_PAD_LEFT);
+        $this->K    = str_pad('', $this->vlen, chr(0x00), STR_PAD_LEFT);
+
+        echo "K now ".bin2hex($this->K)."\n";
+        echo "V now ".bin2hex($this->V)."\n";
     }
 
     /**
@@ -89,6 +92,8 @@ class Deterministic implements KInterface
      */
     public function hash($data)
     {
+        echo "hashing data: $data\n";
+        echo "with key: ".$this->K."\n";
         return Hash::hmac($this->algorithm, $this->K, $data, true);
     }
 

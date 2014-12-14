@@ -5,6 +5,7 @@ namespace Bitcoin\Signature;
 use Bitcoin\Util\Hash;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
+use Bitcoin\Script\Script;
 use Bitcoin\Transaction\TransactionInterface;
 use Bitcoin\Transaction\TransactionOutputInterface;
 
