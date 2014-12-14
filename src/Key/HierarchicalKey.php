@@ -184,9 +184,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             ->getBuffer()
             ->serialize('hex');
 
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
+        $generator = $generator ?: EccFactory::getSecgCurves()->generator256k1();
 
         return new HierarchicalKey($bytes, $network, $generator);
     }

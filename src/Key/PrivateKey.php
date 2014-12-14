@@ -50,14 +50,9 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
-        $this->secretMultiplier    = Math::hexDec($hex);
-        $this->compressed = $compressed;
-
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
-
-        $this->generator  = $generator;
+        $this->generator        = $generator ?: EccFactory::getSecgCurves()->generator256k1();
+        $this->compressed       = $compressed;
+        $this->secretMultiplier = Math::hexDec($hex);
 
         return $this;
     }
@@ -91,7 +86,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public static function generateKey(\Mdanter\Ecc\GeneratorPoint $generator = null)
     {
         do {
-            $buffer = new Buffer(Random::bytes(32));
+            $buffer = Random::bytes(32);
         } while (! self::isValidKey($buffer->serialize('hex'), $generator));
 
         return $buffer;

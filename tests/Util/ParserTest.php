@@ -306,4 +306,23 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($string, $np->getVarString()->serialize('hex'));
         }
     }
+
+    public function testGetArray()
+    {
+        $expected = array(
+            Buffer::hex('09020304'),
+            Buffer::hex('08020304'),
+            Buffer::hex('07020304')
+        );
+
+        $parser   = new Parser(Buffer::hex('03090203040802030407020304'));
+        $callback = function() use (&$parser) {
+            return $parser->readBytes(4);
+        };
+
+        $actual   = $parser->getArray($callback);
+        for($i = 0; $i < count($expected); $i++) {
+            $this->assertEquals($expected[$i]->serialize(), $actual[$i]->serialize());
+        }
+    }
 } 

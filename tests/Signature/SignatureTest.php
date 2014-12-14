@@ -143,8 +143,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
          */
         $pk = new \Bitcoin\Key\PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
         for ($i = 0; $i < 100; $i++) {
-            $data = \Bitcoin\Util\Random::bytes(32);
-            $buf  = new \Bitcoin\Util\Buffer($data);
+            $buf = \Bitcoin\Util\Random::bytes(32);
             $sig  = $pk->sign($buf);
             $this->assertInstanceOf('Bitcoin\Signature\Signature', $sig);
             $this->assertTrue(Signature::isCanonical(new Buffer($sig->serialize())));

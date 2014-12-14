@@ -1,44 +1,29 @@
 <?php
 
-namespace {
-    // This allow us to configure the behavior of the "global mock"
-    $mockOpensslPseudoRandomBytes = false;
-}
-
-namespace Bitcoin\Util\Random {
-    function openssl_pseudo_random_bytes() {
-        global $mockOpensslPseudoRandomBytes;
-        if (isset($mockOpensslPseudoRandomBytes) && $mockOpensslPseudoRandomBytes == true) {
-            return false;
-        } else {
-            return call_user_func_array('\openssl_pseudo_random_bytes', func_get_args());
-        }
-    }
-}
-
 namespace Bitcoin\Tests\Util;
 
-use Bitcoin\Util\Random;
-
-class Random extends \PHPUnit_Framework_TestCase
+class RandomTest extends \PHPUnit_Framework_TestCase
 {
 
     public function setUp()
     {
-        global $mockOpensslPseudoRandomBytes;
-        $mockOpensslPseudoRandomBytes = false;
+    }
+
+    public function testBytes()
+    {
+        $random = new \Bitcoin\Util\Random;
+        $bytes  = $random->bytes(32);
+        $this->assertInstanceOf('Bitcoin\Util\Buffer', $bytes);
+        $this->assertEquals(32, $bytes->getSize());
     }
 
     /**
-     *
+     * @expectedException \Exception
      */
-    public function __construct()
+    public function testFailureOrWeak()
     {
-        $this->sigType = 'Bitcoin\Signature\Signature';
+        $random = new \Bitcoin\Util\Random;
+        $bytes  = $random->bytes(-1);
     }
 
-    public function setUp()
-    {
-        $this->sig = null;
-    }
 }

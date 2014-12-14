@@ -21,8 +21,8 @@ class Random implements KInterface
      */
     public function getK()
     {
-        $byteString = \Bitcoin\Util\Random::bytes(32);
-        $buffer     = new Buffer($byteString);
+        $buffer = \Bitcoin\Util\Random::bytes(32);
+
         return $buffer;
     }
 }

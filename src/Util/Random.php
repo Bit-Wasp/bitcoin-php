@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Util;
 
+use \Bitcoin\Util\Buffer;
 use \Bitcoin\Exceptions\InsufficientEntropy;
 
 /**
@@ -14,7 +15,7 @@ class Random
     /**
      * Return $length bytes. Throws an exception if
      * @param int $length
-     * @return string
+     * @return Buffer
      * @throws \Exception
      */
     public static function bytes($length = 32)
@@ -22,10 +23,10 @@ class Random
         $strong = true;
         $random = openssl_random_pseudo_bytes($length, $strong);
 
-        if (!$strong) {
+        if (!$strong || !$random) {
             throw new \Exception('Insufficient entropy for cryptographic operations');
         }
 
-        return $random;
+        return new Buffer($random);
     }
 }

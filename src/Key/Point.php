@@ -27,11 +27,8 @@ class Point implements PointInterface
      */
     public function __construct($x, $y, GeneratorPoint $generator = null)
     {
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
-
-        $math = EccFactory::getAdapter();
+        $math      = EccFactory::getAdapter();
+        $generator = $generator ?: EccFactory::getSecgCurves()->generator256k1();
 
         $this->point = new \Mdanter\Ecc\Point($generator->getCurve(), $x, $y, $generator->getOrder(), $math);
         return $this;
