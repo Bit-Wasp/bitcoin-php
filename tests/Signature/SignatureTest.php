@@ -17,8 +17,14 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
      */
     protected $sig;
 
+    /**
+     * @var string
+     */
     protected $sigType;
 
+    /**
+     * 
+     */
     public function __construct()
     {
         $this->sigType = 'Bitcoin\Signature\Signature';
@@ -77,7 +83,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
     public function testSetSighashType()
     {
         $this->sig = new Signature('15148391597642804072346119047125209977057190235171731969261106466169304622925', '29241524176690745465970782157695275252863180202254265092780741319779241938696', 0x81);
-        $this->AssertEquals(0x81, $this->sig->getSighashType());
+        $this->assertEquals(0x81, $this->sig->getSighashType());
     }
 
     public function testGetR()
@@ -139,7 +145,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
          * thing while writing this test was cases where r / s were 31.5 bytes.
          */
         $pk = new \Bitcoin\Key\PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $data = \Bitcoin\Util\Random::bytes(32);
             $buf  = new \Bitcoin\Util\Buffer($data);
             $sig  = $pk->sign($buf);

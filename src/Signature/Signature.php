@@ -86,18 +86,15 @@ class Signature implements SignatureInterface
      */
     public function fromParser(Parser &$parser)
     {
-
         $parser->readBytes(1);
-        $outer    = new Parser($parser->getVarString());
-        $prefix   = $outer->readBytes(1);
-        $r        = $outer->getVarString();
-        $prefix   = $outer->readBytes(1);
-        $s        = $outer->getVarString();
-
-        echo "\nB: ".$parser->getBuffer()."\n";
-        echo "R: ".$r->serialize('hex')."\n";
-        echo "S: ".$s->serialize('hex')."\n";
+        $outer    = $parser->getVarString();
         $hashtype = $parser->readBytes(1)->serialize('int');
+
+        $parse    = new Parser($outer);
+        $prefix   = $parse->readBytes(1);
+        $r        = $parse->getVarString();
+        $prefix   = $parse->readBytes(1);
+        $s        = $parse->getVarString();
 
         return new Signature($r->serialize('int'), $s->serialize('int'), $hashtype);
     }
@@ -174,7 +171,7 @@ class Signature implements SignatureInterface
         }
 
         if (ord($bin[1]) !== $sig->getSize() - 3) {
-            throw new SignatureNotCanonical('Signature has wrong length marker: '.$bin[1].']['.bin2hex($bin[1]));
+            throw new SignatureNotCanonical('Signature has wrong length marker');
         }
 
         $lenR   = ord($bin[3]);
@@ -204,7 +201,7 @@ class Signature implements SignatureInterface
         }
 
         if ($lenR > 1 && ord($r[0]) == 0x00 && !ord(($r[1] & pack('H*', '80')))) {
-            throw new SignatureNotCanonical('Signature R value excessively padded' . "\n".$sig);
+            throw new SignatureNotCanonical('Signature R value excessively padded');
         }
 
         if (ord(substr($bin, $startS - 2, 1)) !== 0x02) {
@@ -221,13 +218,7 @@ class Signature implements SignatureInterface
         }
 
         if ($lenS > 1 && ord($s[0]) == 0x00 && !ord(($s[1] & pack("H*", '80'))) == 0x80) {
-            echo "\n++++\n";
-            echo "+DEBUG: s0h  ".bin2hex($s[0])."\n";
-            echo "+DEBUG: s0d ". ord($s[0]) ."\n";
-            echo "+DEBUG: s &  ". ord(($s[1] & pack("H*", '80'))) ."\n";
-
-            echo "\n";
-            throw new SignatureNotCanonical('Signature S value excessively padded'. "\n".$sig);
+            throw new SignatureNotCanonical('Signature S value excessively padded');
         }
 
         return true;
