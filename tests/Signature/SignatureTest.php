@@ -23,7 +23,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
     protected $sigType;
 
     /**
-     * 
+     *
      */
     public function __construct()
     {
@@ -107,9 +107,6 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $sd       = $sig->serialize('hex');
         Signature::isCanonical(Buffer::hex($sd));
 
-        //echo "\n Orig:". $test."\n";
-        //echo "Ihave:". $sd;
-        // echo "\n\n Next Test!\n";
         $this->assertSame($s, $sd);
     }
 

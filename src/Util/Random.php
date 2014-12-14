@@ -10,24 +10,6 @@ use \Bitcoin\Exceptions\InsufficientEntropy;
  */
 class Random
 {
-    /**
-     * @var bool
-     */
-    protected static $hasOpenssl;
-
-    /**
-     * Check if OpenSSL is loaded
-     *
-     * @return bool
-     */
-    private static function hasOpenssl()
-    {
-        if (self::$hasOpenssl == null) {
-            self::$hasOpenssl = extension_loaded('openssl');
-        }
-
-        return self::$hasOpenssl;
-    }
 
     /**
      * Return $length bytes. Throws an exception if
@@ -37,10 +19,6 @@ class Random
      */
     public static function bytes($length = 32)
     {
-        if (!self::hasOpenssl()) {
-            throw new InsufficientEntropy('Openssl not found');
-        }
-
         $strong = true;
         $random = openssl_random_pseudo_bytes($length, $strong);
 
