@@ -11,7 +11,7 @@ namespace Bitcoin\Util;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\Util\Buffer;
 
-class HMAC_DRBG
+class HMACDRBG
 {
     private $algorithm;
     private $privKey;
