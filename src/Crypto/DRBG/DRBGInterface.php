@@ -17,5 +17,5 @@ interface DRBGInterface
      * @param int $numNumBytes
      * @return Buffer
      */
-    public function bytes ($numNumBytes);
+    public function bytes($numNumBytes);
 }
