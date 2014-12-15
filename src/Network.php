@@ -2,7 +2,7 @@
 
 namespace Bitcoin;
 
-use Bitcoin\Util\Hash;
+use Bitcoin\Crypto\Hash;
 
 /**
  * Class Network

@@ -3,8 +3,8 @@
 namespace Bitcoin\Transaction;
 
 use Bitcoin\Util\Math;
-use Bitcoin\Util\Hash;
 use Bitcoin\Util\Parser;
+use Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
 
 /**

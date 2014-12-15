@@ -2,8 +2,8 @@
 
 namespace Bitcoin\Script;
 
-use Bitcoin\Util\Hash;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Crypto\Hash;
+use Bitcoin\Crypto\Buffer;
 use Bitcoin\Exceptions\ScriptStackException;
 use Bitcoin\Exceptions\ScriptRuntimeException;
 

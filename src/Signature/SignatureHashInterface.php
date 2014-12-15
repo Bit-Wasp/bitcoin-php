@@ -40,7 +40,7 @@ interface SignatureHashInterface
      *
      * @param $transaction
      * @param $inputToSign
-     * @return \Bitcoin\Util\Buffer
+     * @return \Bitcoin\Crypto\Buffer
      */
     public function calculateHash(TransactionOutputInterface $txOut, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL);
 }

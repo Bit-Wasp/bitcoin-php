@@ -2,14 +2,14 @@
 
 namespace Bitcoin\Signature\K;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Crypto\Random;
 
 /**
  * Class Random
  * @package Bitcoin\SignatureK
  * @author Thomas Kerin
  */
-class Random implements KInterface
+class RandomK implements KInterface
 {
 
     /**
@@ -21,7 +21,7 @@ class Random implements KInterface
      */
     public function getK()
     {
-        $buffer = \Bitcoin\Util\Random::bytes(32);
+        $buffer = Random::bytes(32);
 
         return $buffer;
     }

@@ -14,6 +14,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     protected $privateKey;
 
     protected $baseType = 'Bitcoin\Key\PrivateKey';
+
     protected $publicType = 'Bitcoin\Key\PublicKey';
 
     public function setUp()

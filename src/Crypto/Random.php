@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Util;
+namespace Bitcoin\Crypto;
 
 use \Bitcoin\Util\Buffer;
-use \Bitcoin\Exceptions\InsufficientEntropy;
+use \Bitcoin\Exceptions\RandomBytesFailure;
 
 /**
  * Class Random
@@ -24,7 +24,7 @@ class Random
         $random = openssl_random_pseudo_bytes($length, $strong);
 
         if (!$strong || !$random) {
-            throw new \Exception('Insufficient entropy for cryptographic operations');
+            throw new RandomBytesFailure('Insufficient entropy for cryptographic operations');
         }
 
         return new Buffer($random);

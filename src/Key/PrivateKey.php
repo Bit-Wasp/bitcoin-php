@@ -9,8 +9,8 @@ use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Util\Math;
 use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Random;
 use Bitcoin\Util\Base58;
+use Bitcoin\Crypto\Random;
 use Mdanter\Ecc\EccFactory;
 
 /**
@@ -117,7 +117,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public function sign(Buffer $hash, KInterface $kProvider = null)
     {
         if ($kProvider == null) {
-            $kProvider = new \Bitcoin\Signature\K\Random();
+            $kProvider = new \Bitcoin\Signature\K\RandomK();
         }
 
         $randomK = $kProvider->getK();

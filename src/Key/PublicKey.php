@@ -3,8 +3,8 @@
 namespace Bitcoin\Key;
 
 use Bitcoin\Util\Math;
-use Bitcoin\Util\Hash;
 use Bitcoin\Util\NumberTheory;
+use Bitcoin\Crypto\Hash;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;

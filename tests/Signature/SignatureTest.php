@@ -140,12 +140,13 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
          * - Padding also must be applied to prevent r and s from being negative.
          * Signature lengths vary with a certain probability, but the most annoying
          * thing while writing this test was cases where r / s were 31.5 bytes.
+         * Should be at least 100 to catch these, but it can take a while
          */
         $pk = new \Bitcoin\Key\PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
-        for ($i = 0; $i < 100; $i++) {
-            $buf = \Bitcoin\Util\Random::bytes(32);
+        for ($i = 0; $i < 1; $i++) {
+            $buf = \Bitcoin\Crypto\Random::bytes(32);
             $sig  = $pk->sign($buf);
-            $this->assertInstanceOf('Bitcoin\Signature\Signature', $sig);
+            $this->assertInstanceOf($this->sigType, $sig);
             $this->assertTrue(Signature::isCanonical(new Buffer($sig->serialize())));
         }
     }

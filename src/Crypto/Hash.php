@@ -1,6 +1,8 @@
 <?php
 
-namespace Bitcoin\Util;
+namespace Bitcoin\Crypto;
+
+use Bitcoin\Util\Buffer;
 
 /**
  * Class Hash

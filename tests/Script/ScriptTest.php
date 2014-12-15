@@ -5,8 +5,8 @@ namespace Bitcoin\Tests\Script;
 use Bitcoin\Script\Script;
 use Bitcoin\Key\PublicKey;
 use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Random;
 use Bitcoin\Util\Math;
+use Bitcoin\Crypto\Random;
 
 
 class ScriptTest extends \PHPUnit_Framework_TestCase

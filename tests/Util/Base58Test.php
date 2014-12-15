@@ -87,4 +87,19 @@ class Base58Test extends \PHPUnit_Framework_TestCase
             $this->assertSame($test[0], $back);
         }
     }
+
+    /**
+     * @expectedException \Bitcoin\Exceptions\Base58ChecksumFailure
+     */
+    public function testDecodeCheckChecksumFailure()
+    {
+        // Base58Check encoded data has a checksum at the end.
+
+        // 12D2adLM3UKy4bH891ZFDkWmXmotrMoF <-- valid
+        // 12D2adLM3UKy4cH891ZFDkWmXmotrMoF <-- has typo, b replaced with c.
+        //              ^
+
+        Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
+
+    }
 }

@@ -12,6 +12,9 @@ class BufferTest extends \PHPUnit_Framework_TestCase
      */
     protected $buffer;
 
+    /**
+     * @var string
+     */
     protected $bufferType;
 
     public function __construct()

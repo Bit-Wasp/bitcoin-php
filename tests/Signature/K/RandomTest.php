@@ -2,12 +2,12 @@
 
 namespace Bitcoin\Tests\Signature\K;
 
-use Bitcoin\Signature\K\Random;
+use Bitcoin\Signature\K\RandomK;
 
 class RandomTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Random
+     * @var RandomK
      */
     protected $random;
 
@@ -20,7 +20,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->random = new Random();
+        $this->random = new RandomK();
     }
 
     public function testGetK()

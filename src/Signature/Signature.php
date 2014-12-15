@@ -36,9 +36,10 @@ class Signature implements SignatureInterface
      */
     public function __construct($r, $s, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
-        $this->r            = $r;
-        $this->s            = $s;
-        $this->sighashType  = $sighashType;
+        return $this
+            ->setR($r)
+            ->setS($s)
+            ->setSighashType($sighashType);
     }
 
     /**
@@ -50,11 +51,31 @@ class Signature implements SignatureInterface
     }
 
     /**
+     * @param $r
+     * @return $this
+     */
+    private function setR($r)
+    {
+        $this->r = $r;
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getS()
     {
         return $this->s;
+    }
+
+    /**
+     * @param $s
+     * @return $this
+     */
+    private function setS($s)
+    {
+        $this->s = $s;
+        return $this;
     }
 
     /**
@@ -65,6 +86,16 @@ class Signature implements SignatureInterface
     public function getSighashType()
     {
         return $this->sighashType;
+    }
+
+    /**
+     * @param $hashtype
+     * @return $this
+     */
+    private function setSighashType($hashtype)
+    {
+        $this->sighashType = $hashtype;
+        return $this;
     }
 
     /**
@@ -86,17 +117,22 @@ class Signature implements SignatureInterface
      */
     public function fromParser(Parser &$parser)
     {
-        $parser->readBytes(1);
-        $outer    = $parser->getVarString();
-        $hashtype = $parser->readBytes(1)->serialize('int');
+        try {
+            $parser->readBytes(1);
+            $outer    = $parser->getVarString();
+            $this->setSighashType($parser->readBytes(1)->serialize('int'));
 
-        $parse    = new Parser($outer);
-        $prefix   = $parse->readBytes(1);
-        $r        = $parse->getVarString();
-        $prefix   = $parse->readBytes(1);
-        $s        = $parse->getVarString();
+            $parse    = new Parser($outer);
+            $prefix   = $parse->readBytes(1);
+            $this->setR($parse->getVarString()->serialize('int'));
 
-        return new Signature($r->serialize('int'), $s->serialize('int'), $hashtype);
+            $prefix   = $parse->readBytes(1);
+            $this->setS($parse->getVarString()->serialize('int'));
+        } catch (ParserOutOfRange $e) {
+            throw new ParserOutOfRange('Failed to extract full signature from parser');
+        }
+
+        return $this;
     }
 
     /**

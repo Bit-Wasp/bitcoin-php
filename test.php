@@ -1,12 +1,14 @@
 <?php
 
-use Bitcoin\Util\Base58;
-use Bitcoin\Util\Math;
+use Bitcoin\Crypto\Base58;
+use Bitcoin\Crypto\Math;
 use Bitcoin\Script\ScriptInterpreter;
 
 use Bitcoin\Signature\K\KInterface;
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Crypto\Buffer;
+use Bitcoin\Crypto\HMAC;
+
+use Bitcoin\Crypto\Parser;
 use Bitcoin\Network;
 use Bitcoin\Transaction\Transaction;
 use Bitcoin\Transaction\TransactionOutput;
@@ -14,7 +16,7 @@ use Bitcoin\Key\HierarchicalKey;
 
 use Bitcoin\Key\PrivateKey;
 use Bitcoin\Script\Script;
-use Bitcoin\Util\Hash;
+use Bitcoin\Crypto\Hash;
 
 require_once "vendor/autoload.php";
 
@@ -152,24 +154,7 @@ while(true) {
 
 
 }
-*/
 
-
-
-$pk = new \Bitcoin\Key\PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
-for ($i = 0; $i < 1000; $i++) {
-    echo "---- Do $i\n";
-    $data = \Bitcoin\Util\Random::bytes(32);
-    $buf  = new \Bitcoin\Util\Buffer($data);
-    $sig  = $pk->sign($buf);
-    $sigs = new Buffer($sig->serialize());
-    echo "data: ".$sigs."\n";
-    Bitcoin\Signature\Signature::isCanonical($sigs);
-
-    echo "-----\n\n";
-  //  $this->assertInstanceOf('Bitcoin\Signature\Signature', $sig);
-  //  $this->assertTrue(Signature::isCanonical(new Buffer($sig->serialize())));
-}
 
 //$h = Bitcoin\Signature\Signature::fromHex('304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01');
 
@@ -321,28 +306,32 @@ echo "$m\n --ed ndormalized\n";
 $hmac = new Bitcoin\Util\HMAC_DRBG('sha256', $pk);
 $hmac->update($pk->serialize() . $m);
 
-$h = $hmac->compute(32);
+$h = $hmac->bytes(32);
 echo $h;
 //print_r($hmac);
 */
-/*
+
 
 
 $m = "Satoshi Nakamoto";
-$m = \Normalizer::normalize($m, \Normalizer::FORM_KD);
+$m = utf8_encode($m);
 echo "m $m\n";
+echo "h ".Bitcoin\Crypto\Hash::sha256($m)."\n";
 echo "------------------------\n";
-$pk = new PrivateKey('8F8A276C19F4149656B280621E358CCE24F5F52542772691EE69063B74F15D15');
+//$pk = new PrivateKey('8F8A276C19F4149656B280621E358CCE24F5F52542772691EE69063B74F15D15');
+$pk = new PrivateKey('0000000000000000000000000000000000000000000000000000000000000001');
 
 
-$k = new Bitcoin\Signature\K\Deterministic()
+$b = Buffer::hex(Bitcoin\Crypto\Hash::sha256($m));
+
+$k = new Bitcoin\Crypto\HMACDRBG('sha256', new Buffer($pk->serialize() . $b->serialize()));
+
+
+$K = $k->bytes(32);
+echo $K."\n";
 
 
 
-
-
-
-*/
 
 
 
@@ -360,5 +349,5 @@ if($tx == $t->serialize('hex'))
 //$o = $t->getOutputs();
 //echo $t->serialize('hex');
 //print_r($t->toArray());
-echo "\n\nID: ".$t->getTransactionId()."\n";*/
-echo "\n";
+echo "\n\nID: ".$t->getTransactionId()."\n";
+*/

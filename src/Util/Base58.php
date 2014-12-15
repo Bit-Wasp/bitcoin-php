@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Util;
 
+use Bitcoin\Crypto\Hash;
 use Bitcoin\Exceptions\Base58ChecksumFailure;
 
 /**

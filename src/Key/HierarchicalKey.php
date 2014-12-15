@@ -2,13 +2,13 @@
 
 namespace Bitcoin\Key;
 
-use Bitcoin\NetworkInterface;
-use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Util\Base58;
 use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Hash;
 use Bitcoin\Util\Math;
 use Bitcoin\Util\Parser;
+use Bitcoin\Crypto\Hash;
+use Bitcoin\NetworkInterface;
+use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;

@@ -3,9 +3,10 @@
 namespace Bitcoin\Script;
 
 use Bitcoin\Util\Math;
-use Bitcoin\Util\Hash;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
+
+use Bitcoin\Crypto\Hash;
 use Bitcoin\Key\PublicKeyInterface;
 
 /**
