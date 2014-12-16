@@ -32,11 +32,11 @@ class RFC6979 implements DRBGInterface
      * @param PrivateKeyInterface $privateKey
      * @param Buffer $message
      */
-    public function __construct($algo, PrivateKeyInterface $privateKey, Buffer $message)
+    public function __construct(PrivateKeyInterface $privateKey, Buffer $message, $algo = 'sha256')
     {
         $entropy         = new Buffer($privateKey->serialize() . Hash::sha256($message, true));
         $this->generator = $privateKey->getGenerator();
-        $this->drbg      = new HMACDRBG($algo, $entropy, null);
+        $this->drbg      = new HMACDRBG($algo, $entropy);
     }
 
     /**

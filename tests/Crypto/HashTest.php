@@ -20,7 +20,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
     public function testNormalize()
     {
         $data = Buffer::hex('414141');
-        $this->assertSame('414141', $this->hash->normalize($data));
+        $this->assertSame(hex2bin('414141'), $this->hash->normalize($data));
     }
 
     public function testSha256()

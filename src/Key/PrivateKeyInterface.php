@@ -25,9 +25,9 @@ interface PrivateKeyInterface
      * Sign a buffer (hash of a message, and optionally accept a source
      * for the K value (which can be random or deterministic)
      *
-     * @param Buffer $hash
+     * @param Buffer $messageHash
      * @param KInterface $kProvider
      * @return mixed
      */
-    public function sign(Buffer $hash, KInterface $kProvider = null);
+    public function sign(Buffer $messageHash, KInterface $kProvider = null);
 }

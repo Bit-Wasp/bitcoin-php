@@ -3,7 +3,9 @@
 namespace Bitcoin\Signature\K;
 
 use Bitcoin\Util\Buffer;
+use Bitcoin\Crypto\Hash;
 use Bitcoin\Crypto\DRBG\HMACDRBG;
+use Bitcoin\Crypto\DRBG\RFC6979;
 use Bitcoin\Key\PrivateKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
 
@@ -26,10 +28,11 @@ class DeterministicK implements KInterface
      * @param string $algo
      * @param GeneratorPoint $generator
      */
-    public function __construct(PrivateKeyInterface $privateKey, Buffer $data, $algo = 'sha256', GeneratorPoint $generator = null)
+    public function __construct(PrivateKeyInterface $privateKey, Buffer $data, $algo = 'sha256')
     {
-        $entropy    = $privateKey->serialize() . $data->serialize();
-        $this->drbg = new HMACDRBG($algo, $entropy, null, 256, $generator);
+        $entropy         = new Buffer($privateKey->serialize() . $data->serialize());
+        $this->generator = $privateKey->getGenerator();
+        $this->drbg      = new HMACDRBG($algo, $entropy);
     }
 
     /**

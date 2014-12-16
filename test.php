@@ -1,14 +1,13 @@
 <?php
 
-use Bitcoin\Crypto\Base58;
-use Bitcoin\Crypto\Math;
+use Bitcoin\Util\Base58;
+use Bitcoin\Util\Math;
 use Bitcoin\Script\ScriptInterpreter;
 
 use Bitcoin\Signature\K\KInterface;
-use Bitcoin\Crypto\Buffer;
-use Bitcoin\Crypto\HMAC;
+use Bitcoin\Util\Buffer;
 
-use Bitcoin\Crypto\Parser;
+use Bitcoin\Util\Parser;
 use Bitcoin\Network;
 use Bitcoin\Transaction\Transaction;
 use Bitcoin\Transaction\TransactionOutput;
@@ -20,6 +19,13 @@ use Bitcoin\Crypto\Hash;
 
 require_once "vendor/autoload.php";
 
+
+$privateKey = new PrivateKey('0000000000000000000000000000000000000000000000000000000000000001');
+$message = new Buffer('Satoshi Nakamoto');
+$messageHash = new Buffer(Hash::sha256($message->serialize(), true));
+$k = new Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
+$sig = $privateKey->sign($messageHash, $k);
+echo $sig->serialize('hex');
 /*
 echo Math::add(1,2);
 echo "\n";
@@ -312,7 +318,7 @@ echo $h;
 */
 
 
-
+/*
 $m = "Satoshi Nakamoto";
 $m = utf8_encode($m);
 echo "m $m\n";
@@ -334,7 +340,7 @@ echo $K."\n";
 
 
 
-
+*/
 
 
 

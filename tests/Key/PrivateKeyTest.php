@@ -5,6 +5,13 @@ namespace Bitcoin\Tests\Key;
 use Bitcoin\Key\PrivateKey;
 use Bitcoin\Network;
 use Bitcoin\Util\Buffer;
+use Bitcoin\Util\Math;
+
+
+use Bitcoin\Crypto\Hash;
+use Bitcoin\Crypto\DRBG\HMACDRBG;
+use Bitcoin\Signature\K\DeterministicK;
+
 
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -158,6 +165,28 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         $this->privateKey   = new PrivateKey($buf);
         $this->assertEquals(32, $this->privateKey->getSize());
         $this->assertEquals(64, $this->privateKey->getSize('hex'));
+    }
+
+    public function testSign()
+    {
+
+        $f = file_get_contents(__DIR__.'/../Data/hmacdrbg.json');
+
+        $json = json_decode($f);
+        foreach ($json->test as $test) {
+
+            $privateKey = new PrivateKey($test->privKey);
+            $message = new Buffer($test->message);
+            $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
+            $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
+            $sig = $privateKey->sign($messageHash, $k);
+
+            $rHex = Math::dechex($sig->getR())."\n";
+            $sHex = Math::dechex($sig->getS())."\n";
+
+            var_dump($rHex, $sHex);
+            echo "\n";
+        }
     }
 }
  
