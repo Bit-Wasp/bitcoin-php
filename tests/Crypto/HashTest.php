@@ -74,7 +74,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $hash = $this->hash->pbkdf2($test->algo, $test->data, $test->salt, $test->iterations, $test->length);
-            $this->assertSame($hash, $test->result);
+            $this->assertSame($test->result, $hash);
         }
     }
     /**

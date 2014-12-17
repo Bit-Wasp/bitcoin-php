@@ -125,12 +125,12 @@ class Hash
     public static function pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
     {
         $password   = self::normalize($password);
-        $keyLength  = $keyLength / 2;
         $algorithm  = strtolower($algorithm);
 
         if (!in_array($algorithm, hash_algos(), true)) {
             throw new \Exception('PBKDF2 ERROR: Invalid hash algorithm');
         }
+
         if ($count <= 0 || $keyLength <= 0) {
             throw new \Exception('PBKDF2 ERROR: Invalid parameters.');
         }
@@ -150,7 +150,9 @@ class Hash
             $keyLength = $keyLength * 2;
         }
 
-        return \hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
+        $hash = \hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
+
+        return $hash;
     }
 
     public static function pbkdf2Pure($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
@@ -171,11 +173,15 @@ class Hash
             }
             $output .= $xorsum;
         }
+
         if ($rawOutput) {
-            return substr($output, 0, $keyLength);
+            echo "do pure raw\n";
+            $hash = substr($output, 0, $keyLength);
         } else {
-            return bin2hex(substr($output, 0, $keyLength));
+            echo "do pure hex\n";
+            $hash = bin2hex(substr($output, 0, $keyLength));
         }
+        return $hash;
     }
 
 
