@@ -31,7 +31,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function testGetValueDefault()
     {
-        $this->assertSame('0',$this->out->getValue());
+        $this->assertSame('0', $this->out->getValue());
     }
 
     public function testSetValue()
@@ -55,11 +55,12 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     public function testSetScript()
     {
         $script = new Script();
-        $script = $script->op('OP_2')->op('OP_3')->serialize();
+        $script = $script->op('OP_2')->op('OP_3');
 
         $this->out->setScript($script);
         $this->assertSame($script, $this->out->getScript());
     }
+
     public function testSetScriptBuf()
     {
         $script = new Script();

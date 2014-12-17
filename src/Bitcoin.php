@@ -23,6 +23,8 @@ class Bitcoin
 
     private static $generator = null;
 
+    private static $network = null;
+
     private static $curve = null;
 
     /**
@@ -91,5 +93,15 @@ class Bitcoin
     public static function setCurve(\Mdanter\Ecc\CurveFpInterface $curve)
     {
         self::$curve = $curve;
+    }
+
+    public static function getNetwork()
+    {
+        if (is_null(self::$network)) {
+            $network = new Network('00','05','80');
+            $network->setHDPubByte('0488B21E');
+            $network->setHDPubByte('0488ADE4');
+            self::$network = $network;
+        }
     }
 }
