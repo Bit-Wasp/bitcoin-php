@@ -135,7 +135,7 @@ class Hash
             throw new \Exception('PBKDF2 ERROR: Invalid parameters.');
         }
 
-        return hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
+        return \hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
     }
 
 
