@@ -125,7 +125,7 @@ class Hash
     public static function pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
     {
         $password   = self::normalize($password);
-        $keyLength  = ($rawOutput ? ($keyLength * 2) : $keyLength);
+        $keyLength  = $keyLength / 2;
         $algorithm  = strtolower($algorithm);
 
         if (!in_array($algorithm, hash_algos(), true)) {

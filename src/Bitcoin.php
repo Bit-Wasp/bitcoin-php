@@ -98,7 +98,7 @@ class Bitcoin
     public static function getNetwork()
     {
         if (is_null(self::$network)) {
-            $network = new Network('00','05','80');
+            $network = new Network('00', '05', '80');
             $network->setHDPubByte('0488B21E');
             $network->setHDPubByte('0488ADE4');
             self::$network = $network;

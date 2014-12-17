@@ -11,7 +11,7 @@ interface MathAdapter
      * @param int|string $other
      * @return int less than 0 if first is less than second, 0 if equal, greater than 0 if greater than.
      */
-    function cmp($first, $other);
+    public function cmp($first, $other);
 
     /**
      * Returns the remainder of a division
@@ -20,7 +20,7 @@ interface MathAdapter
      * @param int|string $modulus
      * @return int|string
      */
-    function mod($number, $modulus);
+    public function mod($number, $modulus);
 
     /**
      * Adds two numbers
@@ -29,7 +29,7 @@ interface MathAdapter
      * @param int|string $addend
      * @return int|string
      */
-    function add($augend, $addend);
+    public function add($augend, $addend);
 
     /**
      * Substract one number from another
@@ -38,7 +38,7 @@ interface MathAdapter
      * @param int|string $subtrahend
      * @return int|string
      */
-    function sub($minuend, $subtrahend);
+    public function sub($minuend, $subtrahend);
 
     /**
      * Multiplies a number by another.
@@ -47,7 +47,7 @@ interface MathAdapter
      * @param int|string $multiplicand
      * @return int|string
      */
-    function mul($multiplier, $multiplicand);
+    public function mul($multiplier, $multiplicand);
 
     /**
      * Divides a number by another.
@@ -56,7 +56,7 @@ interface MathAdapter
      * @param int|string $divisor
      * @return int|string
      */
-    function div($dividend, $divisor);
+    public function div($dividend, $divisor);
 
     /**
      * Raises a number to a power.
@@ -65,7 +65,7 @@ interface MathAdapter
      * @param int|string $exponent The power to raise the number to.
      * @return int|string
      */
-    function pow($base, $exponent);
+    public function pow($base, $exponent);
 
     /**
      * Generates a random integer between 0 (inclusive) and $n (inclusive).
@@ -73,7 +73,7 @@ interface MathAdapter
      * @param int|string $n Maximum value to return.
      * @return int|string
      */
-    function rand($n);
+    public function rand($n);
 
     /**
      * Performs a logical AND between two values.
@@ -82,14 +82,14 @@ interface MathAdapter
      * @param int|string $other
      * @return int|string
      */
-    function bitwiseAnd($first, $other);
+    public function bitwiseAnd($first, $other);
 
     /**
      * Returns the string representation of a returned value.
      *
      * @param int|string $value
      */
-    function toString($value);
+    public function toString($value);
 
     /**
      * Converts an hexadecimal string to decimal.
@@ -97,7 +97,7 @@ interface MathAdapter
      * @param string $hexString
      * @return int|string
      */
-    function hexDec($hexString);
+    public function hexDec($hexString);
 
     /**
      * Converts a decimal string to hexadecimal.
@@ -105,7 +105,7 @@ interface MathAdapter
      * @param int|string $decString
      * @return int|string
      */
-    function decHex($decString);
+    public function decHex($decString);
 
     /**
      * Calculates the modular exponent of a number.
@@ -114,7 +114,7 @@ interface MathAdapter
      * @param int|string $exponent
      * @param int|string $modulus
      */
-    function powmod($base, $exponent, $modulus);
+    public function powmod($base, $exponent, $modulus);
 
     /**
      * Checks whether a number is a prime.
@@ -122,7 +122,7 @@ interface MathAdapter
      * @param int|string $n
      * @return boolean
      */
-    function isPrime($n);
+    public function isPrime($n);
 
     /**
      * Gets the next known prime that is greater than a given prime.
@@ -130,41 +130,41 @@ interface MathAdapter
      * @param int|string $currentPrime
      * @return int|string
      */
-    function nextPrime($currentPrime);
+    public function nextPrime($currentPrime);
 
     /**
      *
      * @param int|string $a
      * @param int|string $m
      */
-    function inverseMod($a, $m);
+    public function inverseMod($a, $m);
 
     /**
      *
      * @param int|string $a
      * @param int|string $p
      */
-    function jacobi($a, $p);
+    public function jacobi($a, $p);
 
     /**
      * @param int|string $x
      * @return string|null
      */
-    function intToString($x);
+    public function intToString($x);
 
     /**
      *
      * @param int|string $s
      * @return int|string
      */
-    function stringToInt($s);
+    public function stringToInt($s);
 
     /**
      *
      * @param int|string $m
      * @return int|string
      */
-    function digestInteger($m);
+    public function digestInteger($m);
 
     /**
      *
@@ -172,7 +172,7 @@ interface MathAdapter
      * @param int|string $m
      * @return int|string
      */
-    function gcd2($a, $m);
+    public function gcd2($a, $m);
 
-    function divQr($dividend, $divisor);
+    public function divQr($dividend, $divisor);
 }
