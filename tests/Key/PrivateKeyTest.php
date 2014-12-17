@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Tests\Key;
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Key\PrivateKey;
 use Bitcoin\Network;
 use Bitcoin\Util\Buffer;
@@ -181,11 +182,9 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
             $sig = $privateKey->sign($messageHash, $k);
 
-            $rHex = Math::dechex($sig->getR())."\n";
-            $sHex = Math::dechex($sig->getS())."\n";
+            $rHex = Bitcoin::getMath()->dechex($sig->getR())."\n";
+            $sHex = Bitcoin::getMath()->decHex($sig->getS())."\n";
 
-            var_dump($rHex, $sHex);
-            echo "\n";
         }
     }
 }

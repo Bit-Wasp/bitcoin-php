@@ -16,15 +16,14 @@ class Random
      * Return $length bytes. Throws an exception if
      * @param int $length
      * @return Buffer
-     * @throws \Exception
+     * @throws RandomBytesFailure
      */
     public static function bytes($length = 32)
     {
-        $strong = true;
-        $random = openssl_random_pseudo_bytes($length, $strong);
+        $random = mcrypt_create_iv(32, \MCRYPT_DEV_URANDOM);
 
-        if (!$strong || !$random) {
-            throw new RandomBytesFailure('Insufficient entropy for cryptographic operations');
+        if (!$random) {
+            throw new RandomBytesFailure('Failed to generate random bytes');
         }
 
         return new Buffer($random);

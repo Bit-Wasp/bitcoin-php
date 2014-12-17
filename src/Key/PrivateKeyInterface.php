@@ -29,5 +29,5 @@ interface PrivateKeyInterface
      * @param KInterface $kProvider
      * @return mixed
      */
-    public function sign(Buffer $messageHash, KInterface $kProvider = null);
+    public function sign(Buffer $messageHash, KInterface $kProvider);
 }

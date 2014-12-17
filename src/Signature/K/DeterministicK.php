@@ -31,7 +31,6 @@ class DeterministicK implements KInterface
     public function __construct(PrivateKeyInterface $privateKey, Buffer $data, $algo = 'sha256')
     {
         $entropy         = new Buffer($privateKey->serialize() . $data->serialize());
-        $this->generator = $privateKey->getGenerator();
         $this->drbg      = new HMACDRBG($algo, $entropy);
     }
 

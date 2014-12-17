@@ -77,29 +77,6 @@ class HashTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($hash, $test->result);
         }
     }
-
-    public function testPBKDF2InternalConsistent()
-    {
-        $f = file_get_contents(__DIR__.'/../Data/hash.pbkdf2.json');
-
-        $json = json_decode($f);
-        foreach ($json->test as $test) {
-
-            $hash1 = $this->hash->pbkdf2Pure($test->algo, $test->data, $test->salt, $test->iterations, $test->length / 2);
-            $this->assertSame($hash1, $test->result);
-
-            $hash1 = $this->hash->pbkdf2Pure($test->algo, $test->data, $test->salt, $test->iterations, $test->length / 2, true);
-            $this->assertSame($hash1, hex2bin($test->result));
-
-            if (function_exists('hash_pbkdf2')) {
-                $hash = $this->hash->pbkdf2Extension($test->algo, $test->data, $test->salt, $test->iterations, $test->length / 2);
-                $this->assertSame($hash, $test->result);
-            }
-
-
-        }
-    }
-
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage PBKDF2 ERROR: Invalid hash algorithm

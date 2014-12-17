@@ -4,6 +4,7 @@ namespace Bitcoin\Block;
 
 use Pleo\Merkle\FixedSizeTree;
 use Bitcoin\Util\Math;
+use Bitcoin\Bitcoin;
 
 /**
  * Class MerkleRoot
@@ -135,7 +136,7 @@ class MerkleRoot
         }
 
         // Check if we need to repeat the last hash (odd number of transactions)
-        if (Math::mod($txCount, 2) !== 0) {
+        if (Bitcoin::getMath()->mod($txCount, 2) !== 0) {
             $tree->set($txCount, $lastHash);
         }
 

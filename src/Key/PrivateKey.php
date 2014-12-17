@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Key;
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Exceptions\InvalidPrivateKey;
 use Bitcoin\NetworkInterface;
 use Bitcoin\SerializableInterface;
@@ -52,7 +53,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
 
         $this->generator        = $generator ?: EccFactory::getSecgCurves()->generator256k1();
         $this->compressed       = $compressed;
-        $this->secretMultiplier = Math::hexDec($hex);
+        $this->secretMultiplier = Bitcoin::getMath()->hexDec($hex);
 
         return $this;
     }
@@ -67,9 +68,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public static function generateNew($compressed = false, \Mdanter\Ecc\GeneratorPoint $generator = null)
     {
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
+        $generator ?: EccFactory::getSecgCurves()->generator256k1();
 
         $keyBuffer = self::generateKey($generator);
         $private   = new PrivateKey($keyBuffer->serialize('hex'), $compressed);
@@ -99,47 +98,42 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @return bool
      */
-    public static function isValidKey($hex, \Mdanter\Ecc\GeneratorPoint $generator = null)
+    public static function isValidKey($hex)
     {
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
+        $math        = Bitcoin::getMath();
+        $generator   = Bitcoin::getGenerator();
 
         // Less than the order of the curve
-        $withinRange = Math::cmp(Math::hexDec($hex), $generator->getOrder()) < 0;
+        $withinRange = $math->cmp($math->hexDec($hex), $generator->getOrder()) < 0;
 
         // Not zero
-        $notZero     = ! (Math::cmp(Math::hexDec($hex), 0) == 0);
+        $notZero     = ! ($math->cmp($math->hexDec($hex), 0) == 0);
 
         return $withinRange and $notZero;
     }
 
-    public function sign(Buffer $messageHash, KInterface $kProvider = null)
+    public function sign(Buffer $messageHash, KInterface $kProvider)
     {
-        if ($kProvider == null) {
-            $kProvider = new \Bitcoin\Signature\K\RandomK();
-        }
-
         $randomK = $kProvider->getK();
-        echo "Using K: ".$randomK."\n";
 
-        $G  = $this->getGenerator();
+        $math = Bitcoin::getMath();
+        $G  = Bitcoin::getGenerator();
         $n  = $G->getOrder();
         $k  = $randomK->serialize('int');
         $p1 = $G->mul($k);
         $r  = $p1->getX();
 
-        if (Math::cmp($r, 0) == 0) {
+        if ($math->cmp($r, 0) == 0) {
             throw new \RuntimeException('Random number r = 0');
         }
 
-        $s  = Math::mod(
-            Math::mul(
-                Math::inverseMod($k, $n),
-                Math::mod(
-                    Math::add(
+        $s  = $math->mod(
+            $math->mul(
+                $math->inverseMod($k, $n),
+                $math->mod(
+                    $math->add(
                         $messageHash->serialize('int'),
-                        Math::mul($this->serialize('int'), $r)
+                        $math->mul($this->serialize('int'), $r)
                     ),
                     $n
                 )
@@ -147,7 +141,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
             $n
         );
 
-        if (Math::cmp($s, 0) == 0) {
+        if ($math->cmp($s, 0) == 0) {
             throw new \RuntimeException('Signature s = 0');
         }
 
@@ -180,9 +174,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public function getPublicKey()
     {
         if ($this->publicKey == null) {
-            $point = $this
-                ->getGenerator()
-                ->mul($this->serialize('int'));
+            $point = Bitcoin::getGenerator()->mul($this->serialize('int'));
             $this->publicKey  = new PublicKey($point, $this->compressed);
         }
 
@@ -215,19 +207,11 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     }
 
     /**
-     * @return \Mdanter\Ecc\GeneratorPoint
-     */
-    public function getGenerator()
-    {
-        return $this->generator;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getCurve()
     {
-        return $this->getGenerator()->getCurve();
+        return Bitcoin::getGenerator()->getCurve();
     }
 
     /**
@@ -236,7 +220,8 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     private function getHex()
     {
-        return str_pad(Math::decHex($this->secretMultiplier), 64, '0', STR_PAD_LEFT);
+        $hex = Bitcoin::getMath()->decHex($this->secretMultiplier);
+        return str_pad($hex, 64, '0', STR_PAD_LEFT);
     }
 
     /**

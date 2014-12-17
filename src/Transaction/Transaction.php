@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Transaction;
 
-use Bitcoin\Util\Math;
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Parser;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
@@ -99,7 +99,7 @@ class Transaction implements TransactionInterface
      */
     public function setVersion($version)
     {
-        if (Math::cmp($version, TransactionInterface::MAX_VERSION) > 0) {
+        if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
             throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
 
@@ -231,7 +231,7 @@ class Transaction implements TransactionInterface
      */
     public function setLockTime($locktime)
     {
-        if (Math::cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
+        if (Bitcoin::getMath()->cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
             throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 

@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Key;
 
+use Bitcoin\Bitcoin;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -25,10 +26,10 @@ class Point implements PointInterface
      * @param $y
      * @param GeneratorPoint $generator
      */
-    public function __construct($x, $y, GeneratorPoint $generator = null)
+    public function __construct($x, $y)
     {
         $math      = EccFactory::getAdapter();
-        $generator = $generator ?: EccFactory::getSecgCurves()->generator256k1();
+        $generator = Bitcoin::getGenerator();
 
         $this->point = new \Mdanter\Ecc\Point($generator->getCurve(), $x, $y, $generator->getOrder(), $math);
         return $this;

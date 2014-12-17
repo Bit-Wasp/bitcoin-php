@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Tests\Util;
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Math;
 
@@ -52,7 +53,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
     public function testCreateMaxBuffer()
     {
         $deci = 4294967295;
-        $hex = Math::decHex($deci);
+        $hex = Bitcoin::getMath()->decHex($deci);
         $lim = 32;
         $this->buffer = Buffer::hex($hex, $lim);
     }
@@ -78,7 +79,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $hex = '41414141';
-        $dec = Math::hexDec($hex);
+        $dec = Bitcoin::getMath()->hexDec($hex);
         $bin = pack("H*", $hex);
         $this->buffer = Buffer::hex($hex);
 

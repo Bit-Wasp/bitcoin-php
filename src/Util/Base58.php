@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Util;
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Exceptions\Base58ChecksumFailure;
 
@@ -29,15 +30,17 @@ class Base58
             return '';
         }
 
-        if (Math::mod(strlen($hex), 2) !== '0') {
+        $math = Bitcoin::getMath();
+
+        if ($math->mod(strlen($hex), 2) !== '0') {
             throw new \Exception('Data must be of even length');
         }
         $origHex = $hex;
 
-        $decimal = Math::hexDec($hex);
+        $decimal = $math->hexDec($hex);
         $return = "";
-        while (Math::cmp($decimal, 0) > 0) {
-            list($decimal, $rem) = Math::divQr($decimal, 58);
+        while ($math->cmp($decimal, 0) > 0) {
+            list($decimal, $rem) = $math->divQr($decimal, 58);
             $return = $return . self::$base58chars[$rem];
         }
         $return = strrev($return);
@@ -63,18 +66,20 @@ class Base58
 
         $original = $base58;
         $return = '0';
+        $math = Bitcoin::getMath();
+
 
         for ($i = 0; $i < strlen($base58); $i++) {
-            $return = Math::add(Math::mul($return, 58), strpos(self::$base58chars, $base58[$i]));
+            $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
         }
 
-        $hex = ($return == '0') ? '' : Math::decHex($return);
+        $hex = ($return == '0') ? '' : $math->decHex($return);
 
         for ($i = 0; $i < strlen($original) && $original[$i] == "1"; $i++) {
             $hex = "00" . $hex;
         }
 
-        if (Math::mod(strlen($hex), 2) !== '0') {
+        if ($math->mod(strlen($hex), 2) !== '0') {
             $hex = "0" . $hex;
         }
 

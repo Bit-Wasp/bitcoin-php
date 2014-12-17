@@ -2,8 +2,8 @@
 
 namespace Bitcoin\Key;
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Math;
-use Bitcoin\Util\NumberTheory;
 use Bitcoin\Crypto\Hash;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
@@ -32,7 +32,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public function __construct(\Mdanter\Ecc\PointInterface $point, $compressed = false)
     {
-        $this->point = $point;
+        $this->point      = $point;
         $this->compressed = $compressed;
         return $this;
     }
@@ -75,8 +75,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     public function getPubKeyHash()
     {
         $publicKey = $this->serialize('hex');
-
-        $hash = Hash::sha256ripe160($publicKey);
+        $hash      = Hash::sha256ripe160($publicKey);
         return $hash;
     }
 
@@ -87,9 +86,11 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public function getPubKeyHex()
     {
+        $math = Bitcoin::getMath();
+
         if ($this->isCompressed()) {
             $byte = self::getCompressedPrefix($this->getPoint());
-            $xHex = Math::decHex($this->getX());
+            $xHex = $math->decHex($this->getX());
             $hex  = sprintf(
                 "%s%s",
                 $byte,
@@ -97,8 +98,8 @@ class PublicKey implements KeyInterface, PublicKeyInterface
             );
 
         } else {
-            $xHex = Math::decHex($this->getX());
-            $yHex = Math::decHex($this->getY());
+            $xHex = $math->decHex($this->getX());
+            $yHex = $math->decHex($this->getY());
             $hex  = sprintf(
                 "%s%s%s",
                 PublicKey::KEY_UNCOMPRESSED,
@@ -118,7 +119,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public static function getCompressedPrefix(\Mdanter\Ecc\PointInterface $point)
     {
-        return (Math::mod($point->getY(), 2) == '0')
+        return Bitcoin::getNumberTheory()->isEven($point->getY())
             ? PublicKey::KEY_COMPRESSED_EVEN
             : PublicKey::KEY_COMPRESSED_ODD;
     }
@@ -178,8 +179,8 @@ class PublicKey implements KeyInterface, PublicKeyInterface
             throw new \Exception('Parameter to compress() must be a PointInterface or PublicKeyInterface');
         }
 
-        $byte = self::getCompressedPrefix($point);
-        $xHex    = Math::decHex($point->getX());
+        $byte  = self::getCompressedPrefix($point);
+        $xHex  = Bitcoin::getMath()->decHex($point->getX());
 
         return sprintf(
             "%s%s",
@@ -201,19 +202,17 @@ class PublicKey implements KeyInterface, PublicKeyInterface
             throw new \RuntimeException('Incorrect byte for a public key');
         }
 
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
-
-        $curve = $generator->getCurve();
+        $math   = Bitcoin::getMath();
+        $curve  = Bitcoin::getCurve();
+        $theory = Bitcoin::getNumberTheory();
 
         try {
             // x ^ 3
-            $xCubed = Math::powMod($xCoord, 3, $curve->getPrime());
-            $ySquared = Math::add($xCubed, $curve->getB());
+            $xCubed   = $math->powMod($xCoord, 3, $curve->getPrime());
+            $ySquared = $math->add($xCubed, $curve->getB());
 
             // Calculate first root
-            $root0 = NumberTheory::squareRootModP($ySquared, $curve->getPrime());
+            $root0 = $theory->squareRootModP($ySquared, $curve->getPrime());
 
             if ($root0 == null) {
                 throw new \RuntimeException('Unable to calculate sqrt mod p');
@@ -222,13 +221,13 @@ class PublicKey implements KeyInterface, PublicKeyInterface
             // Depending on the byte, we expect the Y value to be even or odd.
             // We only calculate the second y root if it's needed.
             if ($byte == PublicKey::KEY_COMPRESSED_EVEN) {
-                $yCoord = (Math::mod($root0, 2) == '0')
+                $yCoord = ($math->mod($root0, 2) == '0')
                     ? $root0
-                    : Math::sub($curve->getPrime(), $root0);
+                    : $math->sub($curve->getPrime(), $root0);
             } else {
-                $yCoord = (Math::mod($root0, 2) !== '0')
+                $yCoord = ($math->mod($root0, 2) !== '0')
                     ? $root0
-                    : Math::sub($curve->getPrime(), $root0);
+                    : $math->sub($curve->getPrime(), $root0);
             }
         } catch (\Exception $e) {
             throw $e;
@@ -249,19 +248,18 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     {
         $byte = substr($hex, 0, 2);
 
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
+        $generator = Bitcoin::getGenerator();
+        $math      = Bitcoin::getMath();
 
         if (strlen($hex) == PublicKey::LENGTH_COMPRESSED) {
             $compressed = true;
-            $xCoord = Math::hexDec(substr($hex, 2, 64));
+            $xCoord = $math->hexDec(substr($hex, 2, 64));
             $yCoord = self::recoverYfromX($xCoord, $byte, $generator);
 
         } elseif (strlen($hex) == PublicKey::LENGTH_UNCOMPRESSED) {
             $compressed = false;
-            $xCoord = Math::hexDec(substr($hex, 2, 64));
-            $yCoord = Math::hexDec(substr($hex, 66, 64));
+            $xCoord = $math->hexDec(substr($hex, 2, 64));
+            $yCoord = $math->hexDec(substr($hex, 66, 64));
 
         } else {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');

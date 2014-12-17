@@ -2,6 +2,8 @@
 
 namespace Bitcoin\Util;
 
+use Bitcoin\Bitcoin;
+
 /**
  * Class Buffer
  * @package Bitcoin
@@ -27,12 +29,12 @@ class Buffer
     {
         if (is_numeric($byteSize)) {
             // Check the integer doesn't overflow its supposed size
-            if (Math::cmp(strlen($byteString), $byteSize) > 0) {
+            if (Bitcoin::getMath()->cmp(strlen($byteString), $byteSize) > 0) {
                 throw new \Exception('Byte string exceeds maximum size');
             }
         }
 
-        $this->size = $byteSize;
+        $this->size   = $byteSize;
         $this->buffer = $byteString;
     }
 
@@ -84,7 +86,7 @@ class Buffer
             return $this->__toString();
         } else if ($type == 'int') {
             $hex = $this->__toString();
-            return Math::hexDec($hex);
+            return Bitcoin::getMath()->hexDec($hex);
         } else {
             return $this->buffer;
         }

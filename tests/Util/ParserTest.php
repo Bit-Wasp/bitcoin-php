@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Util;
 
 use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Math;
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Parser;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
@@ -127,7 +127,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testNumToVarIntOutOfRange()
     {
         // Check that this is out of range (PHP's fault)
-        $decimal  = Math::pow(2, 32) + 1;
+        $decimal  = Bitcoin::getMath()->pow(2, 32) + 1;
         $this->parser->numToVarInt($decimal);
 
     }

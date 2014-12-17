@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Script;
 
-use Bitcoin\Util\Math;
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 
@@ -246,7 +246,7 @@ class Script implements ScriptInterface
         }
 
         $op = $this->opCodes[$code];
-        $this->script .= pack("H*", (Math::decHex($op)));
+        $this->script .= pack("H*", (Bitcoin::getMath()->decHex($op)));
         return $this;
     }
 

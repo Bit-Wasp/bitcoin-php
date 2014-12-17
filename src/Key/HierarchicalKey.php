@@ -2,6 +2,8 @@
 
 namespace Bitcoin\Key;
 
+use Bitcoin\Bitcoin;
+use Bitcoin\Exceptions\ParserOutOfRange;
 use Bitcoin\Util\Base58;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Math;
@@ -70,12 +72,17 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     protected $network;
 
     /**
+     * @var \Bitcoin\Math\MathAdapter
+     */
+    protected $math;
+
+    /**
      * @param $bytes
      * @param NetworkInterface $network
      * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @throws \Exception
      */
-    public function __construct($bytes, NetworkInterface $network, GeneratorPoint $generator = null)
+    public function __construct($bytes, NetworkInterface $network)
     {
         try {
             $network->getHDPrivByte();
@@ -89,31 +96,32 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             throw new \Exception('Invalid extended key');
         }
 
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
+        try {
+            $parser = new Parser($bytes);
+            list($this->bytes, $this->depth, $this->parentFingerprint, $this->sequence, $this->chainCode) =
+                array(
+                    $parser->readBytes(4)->serialize('hex'),
+                    $parser->readBytes(1)->serialize('int'),
+                    $parser->readBytes(4)->serialize('hex'),
+                    $parser->readBytes(4)->serialize('int'),
+                    $parser->readBytes(32)
+                );
+        } catch (ParserOutOfRange $e) {
+            throw new ParserOutOfRange('Failed to extract extended key from parser');
         }
 
-        $parser = new Parser($bytes);
-        list($this->bytes, $this->depth, $this->parentFingerprint, $this->sequence, $this->chainCode) =
-            array(
-                $parser->readBytes(4)->serialize('hex'),
-                $parser->readBytes(1)->serialize('int'),
-                $parser->readBytes(4)->serialize('hex'),
-                $parser->readBytes(4)->serialize('int'),
-                $parser->readBytes(32)
-            );
+        $this->math = Bitcoin::getMath();
+        $this->generator  = Bitcoin::getGenerator();
 
         // Key data from original extended key is saved for serializing later
         if ($this->network->getHDPrivByte() == $this->bytes) {
-            $this->keyData     = Buffer::hex($parser->readBytes(33));
+            $this->keyData     = $parser->readBytes(33);
             $private           = substr($this->keyData->serialize('hex'), 2);
-            $this->privateKey  = new PrivateKey($private, true, $generator);
+            $this->privateKey  = new PrivateKey($private, true, $this->generator);
         } else {
             $this->keyData     = $parser->readBytes(33);
-            $this->publicKey   = PublicKey::fromHex($this->keyData->serialize('hex'), $generator);
+            $this->publicKey   = PublicKey::fromHex($this->keyData->serialize('hex'), $this->generator);
         }
-
-        $this->generator = $generator;
     }
 
     /**
@@ -124,15 +132,15 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @return HierarchicalKey
      */
-    public static function fromBase58($base58, NetworkInterface $network, GeneratorPoint $generator = null)
+    public static function fromBase58($base58, NetworkInterface $network)
     {
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
+        try {
+            $bytes = Base58::decodeCheck($base58);
+        } catch (\Exception $e) {
+            throw new \Exception('Failed to decode HierarchicalKey');
         }
 
-        $bytes = Base58::decodeCheck($base58);
-
-        return new HierarchicalKey($bytes, $network, $generator);
+        return new HierarchicalKey($bytes, $network);
     }
 
     /**
@@ -141,15 +149,11 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      * @return HierarchicalKey
      * @throws \Exception
      */
-    public static function generateNew(NetworkInterface $network, GeneratorPoint $generator = null)
+    public static function generateNew(NetworkInterface $network)
     {
-        if ($generator == null) {
-            $generator = EccFactory::getSecgCurves()->generator256k1();
-        }
-
-        $buffer = PrivateKey::generateKey();
-
-        return self::fromEntropy($buffer->serialize('hex'), $network, $generator);
+        $buffer  = PrivateKey::generateKey();
+        $private = self::fromEntropy($buffer->serialize('hex'), $network);
+        return $private;
     }
 
     /**
@@ -163,11 +167,10 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public static function fromEntropy(
         $random,
-        NetworkInterface $network,
-        \Mdanter\Ecc\GeneratorPoint $generator = null
+        NetworkInterface $network
     ) {
-        $hash = Hash::hmac('sha512', pack("H*", $random), "Bitcoin seed");
-        $private = substr($hash, 0, 64);
+        $hash      = Hash::hmac('sha512', pack("H*", $random), "Bitcoin seed");
+        $private   = substr($hash, 0, 64);
         $chainCode = substr($hash, 64, 64);
 
         if (PrivateKey::isValidKey($private) === false) {
@@ -184,9 +187,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             ->getBuffer()
             ->serialize('hex');
 
-        $generator = $generator ?: EccFactory::getSecgCurves()->generator256k1();
-
-        return new HierarchicalKey($bytes, $network, $generator);
+        return new HierarchicalKey($bytes, $network);
     }
 
     /**
@@ -241,7 +242,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function getChildFingerprint()
     {
-        $hash = $this->getPublicKey()->getPubKeyHash();
+        $hash        = $this->getPublicKey()->getPubKeyHash();
         $fingerprint = substr($hash, 0, 8);
         return $fingerprint;
     }
@@ -324,7 +325,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function isHardened()
     {
-        return Math::cmp($this->getSequence(), Math::hexDec('80000000')) >= 0;
+        return $this->math->cmp($this->getSequence(), $this->math->hexDec('80000000')) >= 0;
     }
 
     /**
@@ -336,11 +337,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function getWif(NetworkInterface $network = null)
     {
-        if (!$this->isPrivate()) {
-            throw new \Exception('This is not a private key');
-        }
-
-        return $this->privateKey->getWif($network);
+        return $this->getPrivateKey()->getWif($network);
     }
 
     /**
@@ -521,7 +518,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     public function getOffsetBuffer(Buffer $sequence)
     {
         $parser = new Parser();
-        $hardened = Math::cmp($sequence->serialize('int'), Math::hexDec('80000000')) >= 0;
+        $hardened = $this->math->cmp($sequence->serialize('int'), $this->math->hexDec('80000000')) >= 0;
 
         if ($hardened) {
             if ($this->isPrivate() == false) {
@@ -555,10 +552,10 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             // offset + privKey % n
             $key = new PrivateKey(
                 str_pad(
-                    Math::decHex(
-                        Math::mod(
-                            Math::add(
-                                Math::hexDec($offset->serialize('hex')),
+                    $this->math->decHex(
+                        $this->math->mod(
+                            $this->math->add(
+                                $this->math->hexDec($offset->serialize('hex')),
                                 $this->getPrivateKey()->serialize('int')
                             ),
                             $this->getGenerator()->getOrder()
@@ -610,7 +607,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
             }
 
             if ($hardened) {
-                $int = ((int)Math::hexDec('80000000')) + ((int)$int);
+                $int = ((int)$this->math->hexDec('80000000')) + ((int)$int);
             } else {
                 $int = (int)$int;
             }

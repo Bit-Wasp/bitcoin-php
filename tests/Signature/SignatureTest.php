@@ -4,6 +4,7 @@ namespace Bitcoin\Tests\Signature;
 
 use Bitcoin\Exceptions\SignatureNotCanonical;
 use Bitcoin\Signature\Signature;
+use Bitcoin\Signature\K\RandomK;
 use Bitcoin\Util\Buffer;
 
 /**
@@ -145,7 +146,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $pk = new \Bitcoin\Key\PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
         for ($i = 0; $i < 1; $i++) {
             $buf = \Bitcoin\Crypto\Random::bytes(32);
-            $sig  = $pk->sign($buf);
+            $sig  = $pk->sign($buf, new \Bitcoin\Signature\K\RandomK());
             $this->assertInstanceOf($this->sigType, $sig);
             $this->assertTrue(Signature::isCanonical(new Buffer($sig->serialize())));
         }

@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Signature;
 
-use Bitcoin\Util\Math;
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 use Bitcoin\Exceptions\ParserOutOfRange;
@@ -141,36 +141,30 @@ class Signature implements SignatureInterface
      */
     public function serialize($type = null)
     {
-        // Ensure that the R and S hex's are of even length
-        $rHex = Math::decHex($this->getR());
-        $rHex = ((strlen($rHex) % 2 == '0') ? '' : '0') . $rHex;
-        $sHex = Math::decHex($this->getS());
-        $sHex = ((strlen($sHex) % 2 == '0') ? '' : '0') . $sHex;
+        $math = Bitcoin::getMath();
 
-        $rBin = pack('H*', $rHex);
-        $sBin = pack('H*', $sHex);
+        // Ensure that the R and S hex's are of even length
+        $rBin = pack('H*', $math->decHex($this->getR()));
+        $sBin = pack('H*', $math->decHex($this->getS()));
+
         // Pad R and S if their highest bit is flipped, ie,
         // they are negative.
-        $rt = pack('H*', substr($rHex, 0, 2)) & pack('H*', '80');
+        $rt = $rBin[0] & pack('H*', '80');
         if (ord($rt) == 128) {
-            $rHex = '00' . $rHex;
+            $rBin = pack('H*', '00') . $rBin;
         }
 
-        $st = pack('H*', substr($sHex, 0, 2)) & pack('H*', '80');
+        $st = $sBin[0] & pack('H*', '80');
         if (ord($st) == 128) {
-            $sHex = '00' . $sHex;
+            $sBin = pack('H*', '00') . $sBin;
         }
-
-        //
-        $rBuf  = Buffer::hex($rHex);
-        $sBuf  = Buffer::hex($sHex);
 
         $inner = new Parser();
         $inner
             ->writeBytes(1, '02')
-            ->writeWithLength($rBuf)
+            ->writeWithLength(new Buffer($rBin))
             ->writeBytes(1, '02')
-            ->writeWithLength($sBuf);
+            ->writeWithLength(new Buffer($sBin));
 
         $outer = new Parser();
         $outer

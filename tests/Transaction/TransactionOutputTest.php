@@ -52,6 +52,14 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($script->serialize());
     }
 
+    public function testSetScript()
+    {
+        $script = new Script();
+        $script = $script->op('OP_2')->op('OP_3')->serialize();
+
+        $this->out->setScript($script);
+        $this->assertSame($script, $this->out->getScript());
+    }
     public function testSetScriptBuf()
     {
         $script = new Script();

@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Key;
 
 use Bitcoin\Key\PublicKey;
-use Bitcoin\Util\Math;
+use Bitcoin\Bitcoin;
 
 class PublicKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -92,8 +92,8 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $byte = substr($test->compressed, 0, 2);
-            $x    = Math::hexDec(substr($test->compressed, 2, 64));
-            $realy= Math::hexDec(substr($test->uncompressed, 66, 64));
+            $x    = Bitcoin::getMath()->hexDec(substr($test->compressed, 2, 64));
+            $realy= Bitcoin::getMath()->hexDec(substr($test->uncompressed, 66, 64));
             $y    = PublicKey::recoverYfromX($x, $byte);
             $this->assertSame($realy, $y);
         }

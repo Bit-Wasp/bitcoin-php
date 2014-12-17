@@ -10,6 +10,20 @@ use Bitcoin\Key\PrivateKey;
 
 class HMACDRBGTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCreateNew()
+    {
+        $drbg = new HMACDRBG('sha256', Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
+        $this->assertInstanceOf('Bitcoin\Crypto\DRBG\HMACDRBG', $drbg);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testCreateInvalidAlgorithm()
+    {
+        $drbg = new HMACDRBG('fake', Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
+        $this->assertInstanceOf('Bitcoin\Crypto\DRBG\HMACDRBG', $drbg);
+    }
 
     public function testCreateHMACDRBG()
     {

@@ -2,6 +2,10 @@
 
 namespace Bitcoin;
 
+use Bitcoin\Math\MathAdapter;
+use Bitcoin\Math\Gmp;
+use Bitcoin\Math\BcMath;
+use Bitcoin\Util\NumberTheory;
 use Mdanter\Ecc\EccFactory;
 
 /**
@@ -10,32 +14,51 @@ use Mdanter\Ecc\EccFactory;
  */
 class Bitcoin
 {
+    /**
+     * @var null|MathAdapter
+     */
     private static $math = null;
+
+    private static $numberTheory;
+
     private static $generator = null;
+
     private static $curve = null;
 
     /**
-     * @return \Mdanter\Ecc\MathAdapter
+     * @return MathAdapter
      */
     public static function getMath()
     {
-        return self::$math ?: \Mdanter\Ecc\EccFactory::getAdapter();
+        if (is_null(self::$math)) {
+            if (extension_loaded('gmp')) {
+                self::$math = new Gmp();
+            } else if (extension_loaded('bcmath')) {
+                self::$math = new BcMath();
+            }
+        }
+
+        return self::$math;
     }
 
     /**
-     * @param \Mdanter\Ecc\MathAdapter $adapter
+     * @param MathAdapter $adapter
      */
-    public static function setMath(\Mdanter\Ecc\MathAdapter $adapter)
+    public static function setMath(\Bitcoin\Math\MathAdapter $adapter)
     {
         self::$math = $adapter;
     }
 
     /**
-     * @return \Mdanter\Ecc\NumberTheory
+     * @return NumberTheory
      */
     public static function getNumberTheory()
     {
-        return \Mdanter\Ecc\EccFactory::getNumberTheory(self::getMath());
+        if (is_null(self::$numberTheory)) {
+            self::$numberTheory = new \Bitcoin\Util\NumberTheory(self::getMath());
+        }
+
+        return self::$numberTheory;
     }
 
     /**
@@ -43,7 +66,7 @@ class Bitcoin
      */
     public static function getGenerator()
     {
-        return self::$generator ?: EccFactory::getSecgCurves(self::getMath())->generator256k1();
+        return self::$generator ?: EccFactory::getSecgCurves()->generator256k1();
     }
 
     /**
@@ -59,7 +82,7 @@ class Bitcoin
      */
     public static function getCurve()
     {
-        return self::$curve ?: EccFactory::getSecgCurves(self::getMath())->curve256k1();
+        return self::$curve ?: EccFactory::getSecgCurves()->curve256k1();
     }
 
     /**

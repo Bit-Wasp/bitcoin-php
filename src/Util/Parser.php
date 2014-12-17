@@ -3,6 +3,7 @@
 namespace Bitcoin\Util;
 
 use Bitcoin\Util\Buffer;
+use Bitcoin\Bitcoin;
 use Bitcoin\Exceptions\ParserOutOfRange;
 
 /**
@@ -16,6 +17,11 @@ class Parser
      * @var string
      */
     protected $string;
+
+    /**
+     * @var \Bitcoin\Math\MathAdapter
+     */
+    protected $math;
 
     /**
      * @var int
@@ -36,6 +42,7 @@ class Parser
 
         $this->string   = $input->serialize();
         $this->position = 0;
+        $this->math     = Bitcoin::getMath();
         return $this;
     }
 
@@ -118,13 +125,13 @@ class Parser
         $byte   = $this->readBytes(1);
         $int    = $byte->serialize('int');
 
-        if (Math::cmp($int, 0xfd) < 0) {
+        if ($this->math->cmp($int, 0xfd) < 0) {
             return $byte;
-        } else if (Math::cmp($int, 0xfd) == 0) {
+        } else if ($this->math->cmp($int, 0xfd) == 0) {
             return $this->readBytes(2, true);
-        } else if (Math::cmp($int, 0xfe) == 0) {
+        } else if ($this->math->cmp($int, 0xfe) == 0) {
             return $this->readBytes(4, true);
-        } else if (Math::cmp($int, 0xff) == 0) {
+        } else if ($this->math->cmp($int, 0xff) == 0) {
             return $this->readBytes(8, true);
         }
     }
@@ -159,7 +166,7 @@ class Parser
 
         if ($length == 0) {
             return false;
-        } else if (Math::cmp($length, $bytes) !== 0) {
+        } else if ($this->math->cmp($length, $bytes) !== 0) {
             throw new ParserOutOfRange('Could not parse string of required length');
         }
 
@@ -251,7 +258,7 @@ class Parser
      */
     public function writeInt($bytes, $int, $flipBytes = false)
     {
-        $hex  = str_pad(Math::decHex($int), $bytes*2, '0', STR_PAD_LEFT);
+        $hex  = str_pad($this->math->decHex($int), $bytes*2, '0', STR_PAD_LEFT);
         $data = pack("H*", $hex);
 
         if ($flipBytes) {

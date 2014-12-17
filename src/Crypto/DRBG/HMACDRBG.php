@@ -19,11 +19,6 @@ class HMACDRBG implements DRBGInterface
     private $algorithm;
 
     /**
-     * @var GeneratorPoint
-     */
-    private $generator;
-
-    /**
      * @var string
      */
     private $K;
@@ -49,12 +44,10 @@ class HMACDRBG implements DRBGInterface
     public function __construct($algo, Buffer $entropy, Buffer $personalString = null, GeneratorPoint $generator = null)
     {
         if (!in_array($algo, hash_algos())) {
-            throw new \RuntimeException('HMAC_DRGB: Hashing algorithm not found');
+            throw new \RuntimeException('HMACDRGB: Hashing algorithm not found');
         }
 
         $this->algorithm = $algo;
-        $this->generator = $generator ?: \Mdanter\Ecc\EccFactory::getSecgCurves()->generator256k1();
-
         $this->initialize($entropy, $personalString);
         return $this;
     }

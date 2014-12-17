@@ -2,8 +2,8 @@
 
 namespace Bitcoin\Crypto\DRBG;
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Math;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Key\PrivateKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -35,7 +35,7 @@ class RFC6979 implements DRBGInterface
     public function __construct(PrivateKeyInterface $privateKey, Buffer $message, $algo = 'sha256')
     {
         $entropy         = new Buffer($privateKey->serialize() . Hash::sha256($message, true));
-        $this->generator = $privateKey->getGenerator();
+        $this->generator = Bitcoin::getGenerator();
         $this->drbg      = new HMACDRBG($algo, $entropy);
     }
 
@@ -46,13 +46,15 @@ class RFC6979 implements DRBGInterface
      */
     public function bytes($numBytes)
     {
+        $math = Bitcoin::getMath();
+
         while (true) {
             $k    = $this->drbg->bytes(32);
             $kInt = $k->serialize('int');
 
             // Check k is between [1, ... Q]
-            if (Math::cmp(1, $kInt) <= 0
-                and Math::cmp($kInt, $this->generator->getOrder()) < 0) {
+            if ($math->cmp(1, $kInt) <= 0
+                and $math->cmp($kInt, $this->generator->getOrder()) < 0) {
                 break;
             }
 

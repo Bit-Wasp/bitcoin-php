@@ -17,13 +17,4 @@ class RandomTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(32, $bytes->getSize());
     }
 
-    /**
-     * @expectedException \Bitcoin\Exceptions\RandomBytesFailure
-     */
-    public function testFailureOrWeak()
-    {
-        $random = new \Bitcoin\Crypto\Random;
-        $bytes  = $random->bytes(-1);
-    }
-
 }
