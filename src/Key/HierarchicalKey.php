@@ -570,13 +570,15 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         } else {
             // (offset*G) + (K)
             $key = new PublicKey(
-                $this->getGenerator()
+                $this// Get the EC point for this offset
+                    ->getGenerator()
                     ->mul(
                         $offset->serialize('int')
-                    )// Get the EC point for this offset
+                    )
+                    // Add it to the public key
                     ->add(
                         $this->getPublicKey()->getPoint()
-                    ), // Add it to the public key
+                    ),
                 true
             );
         }
