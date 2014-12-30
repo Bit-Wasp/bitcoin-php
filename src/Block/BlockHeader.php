@@ -92,7 +92,7 @@ class BlockHeader implements BlockHeaderInterface
     public function serialize($type = null)
     {
         $data = new Parser;
-        $data->writeInt(4, $this->getVersion(), 2);
+        $data->writeInt(4, $this->getVersion(), true);
         $data->writeBytes(32, $this->getPrevBlock(), true);
         $data->writeBytes(32, $this->getMerkleRoot(), true);
         $data->writeInt(4, $this->getTimestamp());
@@ -259,6 +259,9 @@ class BlockHeader implements BlockHeaderInterface
      */
     public function getVersion()
     {
+        if ($this->version == null) {
+            return BlockHeaderInterface::CURRENT_VERSION;
+        }
         return $this->version;
     }
 

@@ -167,17 +167,4 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     {
         return $this->serialize('hex');
     }
-
-    /**
-     * Return this object in the form of an array, compatible with bitcoind
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return array(
-            'value' => number_format($this->getValue() / 1e8, 8, ".", ""),
-            'scriptPubKey' => $this->getScript()->toArray()
-        );
-    }
 }

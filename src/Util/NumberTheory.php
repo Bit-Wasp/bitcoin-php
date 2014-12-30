@@ -3,7 +3,7 @@
 namespace Bitcoin\Util;
 
 use Bitcoin\Exceptions\SquareRootException;
-use Bitcoin\Math\MathAdapter;
+use Mdanter\Ecc\MathAdapter;
 
     /***********************************************************************
      * Copyright (C) 2012 Matyas Danter
@@ -47,11 +47,6 @@ class NumberTheory
     public function __construct(MathAdapter $adapter)
     {
         $this->adapter = $adapter;
-    }
-
-    public function isEven($i)
-    {
-        return $this->adapter->mod($i, 2) == '0';
     }
 
     public function polynomialReduceMod($poly, $polymod, $p)

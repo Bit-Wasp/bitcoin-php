@@ -239,8 +239,7 @@ class Parser
             if (!in_array('Bitcoin\SerializableInterface', class_implements($object))) {
                 throw new \RuntimeException('Objects being serialized to an array must implement the SerializableInterface');
             }
-            $buffer = new Buffer($object->serialize());
-            $parser->writeBytes($buffer->getSize(), $buffer);
+            $parser->writeBytes($object->getSize(), $object);
         }
 
         $this->string .= $parser->getBuffer()->serialize();

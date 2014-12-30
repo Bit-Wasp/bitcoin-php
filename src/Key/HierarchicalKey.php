@@ -14,6 +14,7 @@ use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\MathAdapter;
 
 /**
  * Class HierarchicalKey
@@ -72,7 +73,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     protected $network;
 
     /**
-     * @var \Bitcoin\Math\MathAdapter
+     * @var MathAdapter
      */
     protected $math;
 
@@ -475,10 +476,10 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
 
             $data      = $this->getOffsetBuffer($sequence);
             $hash      = Hash::hmac('sha512', $data->serialize(), $chainCode->serialize());
-            $parser    = new Parser();
-            $parser    = $parser->writeBytes(64, $hash);
-            $offsetBuf = $parser->readBytes(32);
-            $chainCode = $parser->readBytes(32);
+            list($offsetBuf, $chainCode) = array(
+                Buffer::hex(substr($hash, 0, 64)),
+                Buffer::hex(substr($hash, 64, 64)),
+            );
             $key       = $this->getKeyFromOffset($offsetBuf);
 
         } catch (InvalidPrivateKey $e) {
@@ -517,7 +518,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function getOffsetBuffer(Buffer $sequence)
     {
-        $parser = new Parser();
+        $parser   = new Parser();
         $hardened = $this->math->cmp($sequence->serialize('int'), $this->math->hexDec('80000000')) >= 0;
 
         if ($hardened) {
@@ -575,7 +576,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
                     ->mul(
                         $offset->serialize('int')
                     )
-                    // Add it to the public key
+                // Add it to the public key
                     ->add(
                         $this->getPublicKey()->getPoint()
                     ),

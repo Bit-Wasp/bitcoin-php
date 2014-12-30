@@ -2,11 +2,14 @@
 
 namespace Bitcoin;
 
-use Bitcoin\Math\MathAdapter;
-use Bitcoin\Math\Gmp;
-use Bitcoin\Math\BcMath;
+use Bitcoin\Math\Math;
 use Bitcoin\Util\NumberTheory;
+use Bitcoin\Network;
+use Bitcoin\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
+use Mdanter\Ecc\MathAdapter;
+use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\CurveFpInterface;
 
 /**
  * Class Bitcoin
@@ -19,12 +22,24 @@ class Bitcoin
      */
     private static $math = null;
 
-    private static $numberTheory;
+    /**
+     * @var null|NumberTheory
+     */
+    private static $numberTheory = null;
 
+    /**
+     * @var null|GeneratorPoint
+     */
     private static $generator = null;
 
+    /**
+     * @var null|NetworkInterface
+     */
     private static $network = null;
 
+    /**
+     * @var null|CurveFpInterface
+     */
     private static $curve = null;
 
     /**
@@ -32,21 +47,14 @@ class Bitcoin
      */
     public static function getMath()
     {
-        if (is_null(self::$math)) {
-            if (extension_loaded('gmp')) {
-                self::$math = new Gmp();
-            } else if (extension_loaded('bcmath')) {
-                self::$math = new BcMath();
-            }
-        }
-
-        return self::$math;
+        $math = self::$math ?: new Math();
+        return $math;
     }
 
     /**
      * @param MathAdapter $adapter
      */
-    public static function setMath(\Bitcoin\Math\MathAdapter $adapter)
+    public static function setMath(MathAdapter $adapter)
     {
         self::$math = $adapter;
     }
@@ -57,7 +65,7 @@ class Bitcoin
     public static function getNumberTheory()
     {
         if (is_null(self::$numberTheory)) {
-            self::$numberTheory = new \Bitcoin\Util\NumberTheory(self::getMath());
+            self::$numberTheory = EccFactory::getNumberTheory(self::getMath());
         }
 
         return self::$numberTheory;
@@ -74,7 +82,7 @@ class Bitcoin
     /**
      * @param \Mdanter\Ecc\GeneratorPoint $generator
      */
-    public static function setGenerator(\Mdanter\Ecc\GeneratorPoint $generator)
+    public static function setGenerator(GeneratorPoint $generator)
     {
         self::$generator = $generator;
     }
@@ -88,13 +96,16 @@ class Bitcoin
     }
 
     /**
-     * @param \Mdanter\Ecc\CurveFpInterface $curve
+     * @param CurveFpInterface $curve
      */
-    public static function setCurve(\Mdanter\Ecc\CurveFpInterface $curve)
+    public static function setCurve(CurveFpInterface $curve)
     {
         self::$curve = $curve;
     }
 
+    /**
+     * @return Network
+     */
     public static function getNetwork()
     {
         if (is_null(self::$network)) {
@@ -103,5 +114,7 @@ class Bitcoin
             $network->setHDPubByte('0488ADE4');
             self::$network = $network;
         }
+
+        return self::$network;
     }
 }

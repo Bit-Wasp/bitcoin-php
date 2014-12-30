@@ -9,6 +9,8 @@ namespace Bitcoin\Block;
  */
 interface BlockHeaderInterface
 {
+    const CURRENT_VERSION = 2;
+
     public function getVersion();
     public function getPrevBlock();
     public function getNextBlock();

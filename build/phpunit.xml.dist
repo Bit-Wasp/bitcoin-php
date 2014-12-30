@@ -3,8 +3,26 @@
     bootstrap="../vendor/autoload.php"
     colors="true">
     <testsuites>
-        <testsuite name="Bitpay Package">
-            <directory>../tests</directory>
+        <testsuite name="Crypto tests">
+            <directory>../tests/Crypto</directory>
+        </testsuite>
+        <testsuite name="Transaction tests">
+            <directory>../tests/Transaction</directory>
+        </testsuite>
+        <testsuite name="Script tests">
+            <directory>../tests/Script</directory>
+        </testsuite>
+        <testsuite name="Signature tests">
+            <directory>../tests/Signature</directory>
+        </testsuite>
+        <testsuite name="Key tests">
+            <directory>../tests/Key</directory>
+        </testsuite>
+<!--        <testsuite name="Math Tests">
+            <directory>../tests/Math</directory>
+        </testsuite>-->
+        <testsuite name="Util tests">
+            <directory>../tests/Util</directory>
         </testsuite>
     </testsuites>
 
@@ -16,5 +34,6 @@
 
     <logging>
         <log type="coverage-html" target="docs/code-coverage"/>
+        <log type="coverage-clover" target="docs/clover.xml"/>
     </logging>
 </phpunit>

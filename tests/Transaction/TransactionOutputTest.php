@@ -111,16 +111,4 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testToArray()
-    {
-        $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = Buffer::hex($hex);
-        $parser = new Parser($buffer);
-        $out    = $this->out->fromParser($parser);
-        $array  = $out->toArray();
-
-        $this->assertSame('0.00049610', $array['value']);
-        $this->assertSame('76a9140eff868646ece0af8bc979093585e80297112f1f88ac', $array['scriptPubKey']['hex']);
-        $this->assertSame('OP_DUP OP_HASH160 0eff868646ece0af8bc979093585e80297112f1f OP_EQUALVERIFY OP_CHECKSIG', $array['scriptPubKey']['asm']);
-    }
 };

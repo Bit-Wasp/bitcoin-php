@@ -24,13 +24,13 @@ class DeterministicK implements KInterface
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param Buffer $data
+     * @param Buffer $messageHash
      * @param string $algo
      * @param GeneratorPoint $generator
      */
-    public function __construct(PrivateKeyInterface $privateKey, Buffer $data, $algo = 'sha256')
+    public function __construct(PrivateKeyInterface $privateKey, Buffer $messageHash, $algo = 'sha256')
     {
-        $entropy         = new Buffer($privateKey->serialize() . $data->serialize());
+        $entropy         = new Buffer($privateKey->serialize() . $messageHash->serialize());
         $this->drbg      = new HMACDRBG($algo, $entropy);
     }
 

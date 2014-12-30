@@ -52,6 +52,15 @@ class Block implements BlockInterface
         return $this;
     }
 
+    public function serialize($type = null)
+    {
+        $header = new Buffer($this->getHeader()->serialize());
+        $parser = new Parser($header);
+        print_r($this->getTransactions());
+        $parser->writeArray($this->getTransactions());
+        return $parser->getBuffer()->serialize($type);
+    }
+
     /**
      * @param $hex
      * @return Block
@@ -61,6 +70,7 @@ class Block implements BlockInterface
     {
         $buffer = Buffer::hex($hex);
         $parser = new Parser($buffer);
+
         $block  = new self();
         $block->fromParser($parser);
         return $block;

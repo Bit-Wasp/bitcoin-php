@@ -119,7 +119,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public static function getCompressedPrefix(\Mdanter\Ecc\PointInterface $point)
     {
-        return Bitcoin::getNumberTheory()->isEven($point->getY())
+        return Bitcoin::getMath()->isEven($point->getY())
             ? PublicKey::KEY_COMPRESSED_EVEN
             : PublicKey::KEY_COMPRESSED_ODD;
     }

@@ -3,15 +3,20 @@
 namespace Bitcoin\Transaction;
 
 use Bitcoin\Bitcoin;
+use Bitcoin\Key\PrivateKeyInterface;
+use Bitcoin\SerializableInterface;
 use Bitcoin\Util\Parser;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
+use Bitcoin\Signature\Signature;
+use Bitcoin\Signature\SignatureHash;
+use Bitcoin\Signature\K\KInterface;
 
 /**
  * Class Transaction
  * @package Bitcoin
  */
-class Transaction implements TransactionInterface
+class Transaction implements TransactionInterface, SerializableInterface
 {
     /**
      * @var NetworkInterface
@@ -87,6 +92,10 @@ class Transaction implements TransactionInterface
      */
     public function getVersion()
     {
+        if (is_null($this->version)) {
+            return TransactionInterface::DEFAULT_VERSION;
+        }
+
         return $this->version;
     }
 
@@ -239,6 +248,21 @@ class Transaction implements TransactionInterface
         return $this;
     }
 
+    public function sign(PrivateKeyInterface $privateKey, TransactionOutputInterface $txOut, $inputToSign, KInterface $kProvider = null)
+    {
+        if (is_null($kProvider)) {
+            $kProvider = new \Bitcoin\Signature\K\RandomK();
+        }
+
+        $hash = (new SignatureHash($this))
+            ->calculateHash($txOut, $inputToSign);
+
+        $sig = $privateKey->sign($hash, $kProvider);
+
+
+        return $sig;
+    }
+
     /**
      * @param $parser
      * @throws \Exception
@@ -311,12 +335,25 @@ class Transaction implements TransactionInterface
      */
     public function toArray()
     {
-        $inputs = array_map(function ($input) {
-            return $input->toArray();
+        $inputs = array_map(function (TransactionInputInterface $input) {
+            return array(
+                'txid' => $input->getTransactionId(),
+                'vout' => $input->getVout(),
+                'scriptSig' => array(
+                    'hex' => $input->getScript()->serialize('hex'),
+                    'asm' => $input->getScript()->getAsm()
+                )
+            );
         }, $this->getInputs());
 
-        $outputs = array_map(function ($output) {
-            return $output->toArray();
+        $outputs = array_map(function (TransactionOutputInterface $output) {
+            return array(
+                'value' => $output->getValue(),
+                'scriptPubKey' => array(
+                    'hex' => $output->getScript()->serialize('hex'),
+                    'asm' => $output->getScript()->getAsm()
+                )
+            );
         }, $this->getOutputs());
 
         return array(
@@ -325,5 +362,15 @@ class Transaction implements TransactionInterface
             'vin' => $inputs,
             'vout' => $outputs
         );
+    }
+
+    public function __toString()
+    {
+        return $this->serialize('hex');
+    }
+
+    public function getSize($type = null)
+    {
+        return strlen($this->serialize($type));
     }
 }

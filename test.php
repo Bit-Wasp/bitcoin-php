@@ -1,31 +1,25 @@
 <?php
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Base58;
-use Bitcoin\Util\Math;
 use Bitcoin\Script\ScriptInterpreter;
-
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Util\Buffer;
-
+use Bitcoin\Block\BlockHeader;
 use Bitcoin\Util\Parser;
 use Bitcoin\Network;
 use Bitcoin\Transaction\Transaction;
+use Bitcoin\Transaction\TransactionInput;
 use Bitcoin\Transaction\TransactionOutput;
 use Bitcoin\Key\HierarchicalKey;
-
 use Bitcoin\Key\PrivateKey;
 use Bitcoin\Script\Script;
 use Bitcoin\Crypto\Hash;
 
 require_once "vendor/autoload.php";
 
+$math = Bitcoin::getMath();
 
-$privateKey = new PrivateKey('0000000000000000000000000000000000000000000000000000000000000001');
-$message = new Buffer('Satoshi Nakamoto');
-$messageHash = new Buffer(Hash::sha256($message->serialize(), true));
-$k = new Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
-$sig = $privateKey->sign($messageHash, $k);
-echo $sig->serialize('hex');
 /*
 echo Math::add(1,2);
 echo "\n";
@@ -211,39 +205,42 @@ $transaction = new \Bitcoin\Transaction\Transaction();
 $transaction->fromParser($parser);*/
 /*
 
-$input = new Bitcoin\Transaction\TransactionInput;
+$input = new TransactionInput;
 $input->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
 
-$outScript = new Bitcoin\Script\Script;
+$outScript = new Script;
 $outScript
     ->op('OP_HASH160')
     ->push('000000000000000000000000000000000000000000000000')
     ->op('OP_EQUAL');
 
-$output = new Bitcoin\Transaction\TransactionOutput;
+$output = new TransactionOutput;
 $output
     ->setScript($outScript)
-    ->setValue(Math::cmp(50, 100000000));
+    ->setValue($math->cmp(50, 100000000));
 
-$coinbase = new Bitcoin\Transaction\Transaction;
+$coinbase = new Transaction;
 $coinbase->addInput($input);
 $coinbase->addOutput($output);
 
 
 
+//$header = new \Bitcoin\Block\BlockHeader();
+//$header->setPrevBlock('0000000000000000000000000000000000000000000000000000000000000000');
+//$header->setMerkleRoot('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b');
+//$header->setTimestamp($math->hexDec('c7f5d74d'));
+//$header->setBits(Buffer::hex('f2b9441a'));
+*/
 //$b = Bitcoin\Block\Block::fromHex($block);
-$header = new Bitcoin\Block\BlockHeader();
+/*
+$header = new \Bitcoin\Block\BlockHeader();
 $header->setVersion(1);
 $header->setPrevBlock('00000000000008a3a41b85b8b29ad444def299fee21793cd8b9e567eab02cd81');
 $header->setMerkleRoot('2b12fcf1b09288fcaff797d71e950e71ae42b91e8bdb2304758dfcffc2b620e3');
-$header->setTimestamp(Math::hexDec('c7f5d74d'));
+$header->setTimestamp($math->hexDec('c7f5d74d'));
 $header->setBits(Buffer::hex('f2b9441a'));
-*/
-//$header->setPrevBlock('0000000000000000000000000000000000000000000000000000000000000000');
-//$header->setMerkleRoot('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b');
-//$header->setTimestamp(Math::hexDec('c7f5d74d'));
-//$header->setBits(Buffer::hex('f2b9441a'));
-/*$found = false;
+
+$found = false;
 $i = '1117865621';
 while ($found == false) {
     $copy = $header;
@@ -251,6 +248,8 @@ while ($found == false) {
 //$nonceStr = '42a14695';
     $nonce = Buffer::hex($nonceStr);
     $copy->setNonce($nonce);
+
+print_r($copy);
 echo "SERIALIZE\n";
 echo $copy->serialize('hex')."\n";
     $hash = Hash::sha256d($copy->serialize());
@@ -260,10 +259,134 @@ echo $copy->serialize('hex')."\n";
     $i++;
 }
 
-$b = new Bitcoin\Block\Block();
+echo $hash."\n";
+echo "done\n";
+*/
+
+$coinbase = new Transaction;
+$input = new TransactionInput;
+$input->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
+$input->setVout(0);
+$input->setScriptBuf(new Buffer('asdf123lol'));
+$coinbase->addInput($input);
+
+$pmt = array(
+    array(
+        'address' => 'RwUpzVNhxzPEin7uqUsaDaQ3wFtc2BxHGu',
+        'amount' => '10100000'
+    ),
+    array(
+        'address' => 'RhDYy4GLWh5s6Tx7Sea2mGmp2j559qNPKc',
+        'amount' => '10100000'
+    ),
+    array(
+        'address' => 'ReiayD6R4ZfnQN7rkkrqJimmP3CanygeLL',
+        'amount' => '10100000'
+    ),
+    array(
+        'address' => 'Rts7ewGF9cWQmvFLgLwiCA94Wzh52BwP6S',
+        'amount' => '10100000'
+    ),
+    array(
+        'address' => 'RfC1mM3bGrsfaAVYwneGQ8z8Hy2xcBZ8gD',
+        'amount' => '10100000'
+    ),
+    array(
+        'address' => 'RkhTwcChzH2QhnU6JhN71nFAufDn9p3xtG',
+        'amount' => '10100000'
+    ),
+    array(
+        'address' => 'RqDVB4Qvvig8oeUNGW1dyN1scUZNYWzqLn',
+        'amount' => '10100000'
+    ),
+    array(
+        'address' => 'Rern8oRnetrB7D43kuuZjam64KTwWypQk5',
+        'amount' => '10100000'
+    )
+);
+
+for($i = 0; $i < count($pmt); $i++)
+{
+    $address = Base58::decodeCheck($pmt[$i]['address']);
+    $hash = substr($address, 0, 40);
+    $output = new TransactionOutput;
+    $output
+        ->setValue($pmt[$i]['amount'])
+        ->setScript(
+        (new Script)
+        ->op('OP_DUP')
+        ->op('OP_HASH160')
+        ->push($hash)
+        ->op('OP_EQUALVERIFY')
+        ->op('OP_CHECKSIG')
+    );
+    $coinbase->addOutput($output);
+}
+echo $coinbase->serialize('hex');
+
+$merkle = (new Parser())
+    ->writeBytes(32, $coinbase->getTransactionId())
+    ->getBuffer()->serialize('hex');
+
+
+$header = new \Bitcoin\Block\BlockHeader();
+$header->setPrevBlock('00000000000008a3a41b85b8b29ad444def299fee21793cd8b9e567eab02cd81');
+$header->setMerkleRoot($merkle);
+$header->setTimestamp($math->hexDec(bin2hex(openssl_random_pseudo_bytes(8))));
+$header->setBits(Buffer::hex('f2b9441a'));
+
+echo "\n";
+$found = false;
+$i = '1';
+$s = true;
+$lastStamp = microtime($s);
+while ($found == false) {
+    $copy  = $header;
+    $nonce = Buffer::hex(str_pad(dechex($i), 8, '0', STR_PAD_LEFT));
+    $copy->setNonce($nonce);
+
+    //print_r($copy);
+
+    $hash = Hash::sha256d($copy->serialize(), true);
+    $h = new Buffer($hash);
+    //$h = (new Parser())
+       // ->writeBytes(32, $hash)
+      //  ->getBuffer();
+
+
+    //echo "Block hash? ".$h."\n";
+    if(substr($h->serialize('hex'), -4) === '0000')
+    {
+        echo ":OOO ".$h." - ".$h->serialize('hex')."\n";
+        var_dump($h);
+        break;
+    }
+
+    //if($nonceStr == '42a14695')
+      //  break;
+    if($i % 10000 == 0) {
+        echo "last 10,000 hashes took ". 10000/(microtime($s) - $lastStamp) ."\n";
+
+        $lastStamp = microtime($s);
+    }
+    $i++;
+}
+
+$block = new \Bitcoin\Block\Block();
+$block->setHeader($header);
+$block->setTransactions(array($coinbase));
+
+echo $h."\n";
+echo "Data was: ". $copy->serialize('hex')."\n";
+echo "\n\n";
+echo $block->serialize('hex')."\n";
+
+echo "done\n";
+/*
+$b = new \Bitcoin\Block\Block();
 $b->setTransactions(array($t));
 
-$h = new Bitcoin\Block\MerkleRoot($b);
+$h = new \Bitcoin\Block\MerkleRoot($b);
 echo $h->calculateHash()."\n";
 */
 /**

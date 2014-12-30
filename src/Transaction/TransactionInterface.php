@@ -8,9 +8,13 @@ namespace Bitcoin\Transaction;
  */
 interface TransactionInterface
 {
+
+    const DEFAULT_VERSION = 1;
+
     /**
      * The version parameter is encoded as a uint32
      */
+
     const MAX_VERSION  = 4294967296;
 
     /**

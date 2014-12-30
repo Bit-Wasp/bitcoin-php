@@ -230,20 +230,4 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
     {
         return $this->serialize('hex');
     }
-
-    /**
-     * Return the input in an array style as bitcoind would
-     * @return array
-     */
-    public function toArray()
-    {
-        return array(
-            'txid' => $this->getTransactionId(),
-            'vout' => $this->getVout(),
-            'scriptSig' => array(
-                'hex' => $this->getScript()->serialize('hex'),
-                'asm' => $this->getScript()->getAsm()
-            )
-        );
-    }
 }
