@@ -74,8 +74,8 @@ class BlockHeader implements BlockHeaderInterface
             $this->setPrevBlock($parser->readBytes(32, true));
             $this->setMerkleRoot($parser->readBytes(32, true));
             $this->setTimestamp($parser->readBytes(4, true)->serialize('int'));
-            $this->setBits($parser->readBytes(4));
-            $this->setNonce($parser->readBytes(4));
+            $this->setBits($parser->readBytes(4, true));
+            $this->setNonce($parser->readBytes(4, true)->serialize('int'));
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }
@@ -95,9 +95,9 @@ class BlockHeader implements BlockHeaderInterface
         $data->writeInt(4, $this->getVersion(), true);
         $data->writeBytes(32, $this->getPrevBlock(), true);
         $data->writeBytes(32, $this->getMerkleRoot(), true);
-        $data->writeInt(4, $this->getTimestamp());
-        $data->writeBytes(4, $this->getBits());
-        $data->writeBytes(4, $this->getNonce());
+        $data->writeInt(4, $this->getTimestamp(), true);
+        $data->writeBytes(4, $this->getBits(), true);
+        $data->writeInt(4, $this->getNonce(), true);
 
         return $data->getBuffer()->serialize($type);
     }
@@ -127,15 +127,17 @@ class BlockHeader implements BlockHeaderInterface
     public function getBlockHash()
     {
         $header = $this->serialize();
-        $hash   = Hash::sha256d($header);
-        return $hash;
+        $hash   = Buffer::hex(Hash::sha256d($header));
+        $parser = new Parser();
+        $parser->writeBytes(32, $hash, true);
+        return $parser->getBuffer()->serialize('hex');
     }
 
     /**
      * @param mixed $bits
      * @return $this
      */
-    public function setBits($bits)
+    public function setBits(Buffer $bits)
     {
         $this->bits = $bits;
         return $this;
