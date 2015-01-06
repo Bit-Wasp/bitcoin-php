@@ -135,16 +135,7 @@ class Hash
             throw new \Exception('PBKDF2 ERROR: Invalid parameters.');
         }
 
-        if (function_exists("hash_pbkdf2")) {
-            // The output length is in NIBBLES (4-bits) if $raw_output is false!
-            return self::pbkdf2Extension($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
-        }
 
-        return self::pbkdf2Pure($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
-    }
-
-    public static function pbkdf2Extension($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
-    {
         // The output length is in NIBBLES (4-bits) if $raw_output is false!
         if (!$rawOutput) {
             $keyLength = $keyLength * 2;
@@ -154,36 +145,6 @@ class Hash
 
         return $hash;
     }
-
-    public static function pbkdf2Pure($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
-    {
-
-        $hashLength = strlen(hash($algorithm, "", true));
-        $blockCount = ceil($keyLength / $hashLength);
-
-        $output = "";
-        for ($i = 1; $i <= $blockCount; $i++) {
-            // $i encoded as 4 bytes, big endian.
-            $last = $salt . pack("N", $i);
-            // first iteration
-            $last = $xorsum = hash_hmac($algorithm, $last, $password, true);
-            // perform the other $count - 1 iterations
-            for ($j = 1; $j < $count; $j++) {
-                $xorsum ^= ($last = hash_hmac($algorithm, $last, $password, true));
-            }
-            $output .= $xorsum;
-        }
-
-        if ($rawOutput) {
-            echo "do pure raw\n";
-            $hash = substr($output, 0, $keyLength);
-        } else {
-            echo "do pure hex\n";
-            $hash = bin2hex(substr($output, 0, $keyLength));
-        }
-        return $hash;
-    }
-
 
     /**
      * Do HMAC hashing on $data and $salt
