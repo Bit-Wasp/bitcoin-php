@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests\Util;
+namespace Bitcoin\Tests\Crypto;
 
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Util\Buffer;
@@ -77,6 +77,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
             $this->assertSame($test->result, $hash);
         }
     }
+
     /**
      * @expectedException \Exception
      * @expectedExceptionMessage PBKDF2 ERROR: Invalid hash algorithm
