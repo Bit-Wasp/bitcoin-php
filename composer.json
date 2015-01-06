@@ -12,7 +12,8 @@
     "ext-openssl": "*",
     "ext-mcrypt": "*",
     "mdanter/ecc": "~0.1",
-    "pleonasm/merkle-tree": "*"
+    "pleonasm/merkle-tree": "*",
+    "rych/hash_pbkdf2-compat": "~1.0"
   },
   "require-dev": {
     "phpmd/phpmd": "~2.1.3",
