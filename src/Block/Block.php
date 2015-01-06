@@ -30,8 +30,6 @@ class Block implements BlockInterface
      */
     public function fromParser(Parser &$parser)
     {
-        $block = new self();
-
         try {
             $header = new BlockHeader();
             $header->fromParser($parser);
@@ -56,7 +54,6 @@ class Block implements BlockInterface
     {
         $header = new Buffer($this->getHeader()->serialize());
         $parser = new Parser($header);
-        print_r($this->getTransactions());
         $parser->writeArray($this->getTransactions());
         return $parser->getBuffer()->serialize($type);
     }
