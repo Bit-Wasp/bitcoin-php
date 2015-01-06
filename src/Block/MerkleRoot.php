@@ -2,9 +2,12 @@
 
 namespace Bitcoin\Block;
 
-use Pleo\Merkle\FixedSizeTree;
-use Bitcoin\Util\Math;
 use Bitcoin\Bitcoin;
+use Bitcoin\Network;
+use Bitcoin\Util\Parser;
+use Bitcoin\Util\Buffer;
+use Pleo\Merkle\FixedSizeTree;
+use Bitcoin\Exceptions\MerkleTreeEmpty;
 
 /**
  * Class MerkleRoot
@@ -35,66 +38,17 @@ class MerkleRoot
      */
     public function __construct(BlockInterface $block)
     {
-        $this->block = $block;
+        $this->block   = $block;
         return $this;
     }
 
     /**
-     * Return the block used to construct this root
-     *
-     * @return BlockInterface
-     */
-    public function getBlock()
-    {
-        return $this->block;
-    }
-
-    /**
-     * Set a block to build a root from
-     *
-     * @param BlockInterface $block
-     * @return $this
-     */
-    public function setBlock(BlockInterface $block)
-    {
-        $this->block = $block;
-        return $this;
-    }
-
-    /**
-     * Return the closure which is used to hash this block
-     * Safely defaults to a callable for SHA256d.
-     *
-     * @return callable
-     */
-    public function getHashFxn()
-    {
-        if ($this->hashFxn == null) {
-            return \Bitcoin\Network::getHashFunction();
-        }
-        return $this->hashFxn;
-    }
-
-    /**
-     * Set a callable function to be used for hashing the merkle tree
-     *
-     * @param callable $hashFxn
-     * @return $this
-     */
-    public function setHashFxn(callable $hashFxn)
-    {
-        $this->hashFxn = $hashFxn;
-        return $this;
-    }
-
-    /**
-     * Return the last hash to be calculated.
-     *
      * @return string
      */
-    public function getLastHash()
+    private function getLastHash()
     {
-        return $this->lastHash;
+        $hash = $this->lastHash;
+        return $hash;
     }
 
     /**
@@ -102,7 +56,7 @@ class MerkleRoot
      *
      * @param string $lastHash
      */
-    public function setLastHash($lastHash)
+    private function setLastHash($lastHash)
     {
         $this->lastHash = $lastHash;
     }
@@ -115,34 +69,44 @@ class MerkleRoot
      */
     public function calculateHash()
     {
-        $hashFxn      = $this->getHashFxn();
         $transactions = $this->block->getTransactions();
         $txCount      = count($transactions);
+        $hashFxn      = Network::getHashFunction();
 
         if ($txCount == 0) {
             // TODO: Probably necessary. Should always have a coinbase at least.
-            throw new \Exception('Cannot calculate the hash of a block with no transactions');
+            throw new MerkleTreeEmpty('Cannot compute Merkle root of an empty tree');
         }
 
-        // Create a fixed size Merkle Tree
-        $tree = new FixedSizeTree($txCount + (count($txCount) % 2), $hashFxn);
+        if ($txCount == 1) {
+            $bin = $hashFxn($transactions[0]->serialize());
 
-        $lastHash = null;
-        // Compute hash of each transaction
-        foreach ($transactions as $i => $transaction) {
-            // Set value of a leaf of the merkle tree
-            $lastHash = $hashFxn($transaction->serialize());
-            $tree->set($i, $lastHash);
+        } else {
+            // Create a fixed size Merkle Tree
+            $tree = new FixedSizeTree($txCount + ($txCount % 2), $hashFxn);
+
+            // Compute hash of each transaction
+            $last = '';
+            foreach ($transactions as $i => $transaction) {
+                $last = $transaction->serialize();
+                $tree->set($i, $transaction->serialize());
+            }
+
+            // Check if we need to repeat the last hash (odd number of transactions)
+            if (!Bitcoin::getMath()->isEven($txCount)) {
+                $tree->set($txCount, $last);
+            }
+
+            $bin = $tree->hash();
         }
 
-        // Check if we need to repeat the last hash (odd number of transactions)
-        if (Bitcoin::getMath()->mod($txCount, 2) !== 0) {
-            $tree->set($txCount, $lastHash);
-        }
+        $hash = new Parser();
+        $hash = $hash
+            ->writeBytes(32, bin2hex($bin), true)
+            ->getBuffer()
+            ->serialize('hex');
 
-        // Store the last hash for later.
-        $this->setLastHash($tree->hash());
-
+        $this->setLastHash($hash);
         return $this->getLastHash();
     }
 }
