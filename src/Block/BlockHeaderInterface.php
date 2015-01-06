@@ -18,4 +18,5 @@ interface BlockHeaderInterface
     public function getTimestamp();
     public function getBits();
     public function getNonce();
+    public function getBlockHash();
 }
