@@ -160,7 +160,6 @@ class Parser
      */
     public function readBytes($bytes, $flipBytes = false)
     {
-        //echo "READ BYTES $bytes\n";
         $string = substr($this->string, $this->getPosition(), $bytes);
         $length = strlen($string);
 
@@ -257,7 +256,7 @@ class Parser
      */
     public function writeInt($bytes, $int, $flipBytes = false)
     {
-        $hex  = str_pad($this->math->decHex($int), $bytes*2, '0', STR_PAD_LEFT);
+        $hex  = str_pad($this->math->decHex((int)$int), $bytes*2, '0', STR_PAD_LEFT);
         $data = pack("H*", $hex);
 
         if ($flipBytes) {
