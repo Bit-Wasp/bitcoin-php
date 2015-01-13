@@ -145,7 +145,7 @@ class HMACDRBG implements DRBGInterface
         $temp = "";
 
         // Build a string of $numBytes bytes from hashing the seeded DRBG
-        while (strlen($temp) <  $numNumBytes) {
+        while (strlen($temp) < $numNumBytes) {
             $this->V = $this->hash($this->V);
             $temp   .= $this->V;
         }
