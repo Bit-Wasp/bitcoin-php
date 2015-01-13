@@ -134,7 +134,7 @@ class Miner
 
             $header
                 ->setVersion('1')
-                ->setyeaPrevBlock($this->lastBlockHeader->getBlockHash())
+                ->setPrevBlock($this->lastBlockHeader->getBlockHash())
                 ->setMerkleRoot($merkleHash)
                 ->setTimestamp($this->timestamp)
                 ->setBits($usingDiff);
