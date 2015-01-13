@@ -84,7 +84,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testGetLockTime()
     {
         // Default
-        $this->assertSame(4294967296, $this->transaction->getLockTime());
+        $this->assertSame('0', $this->transaction->getLockTime());
     }
 
     public function testSetLockTime()

@@ -3,6 +3,7 @@
 namespace Bitcoin\Tests\Transaction;
 
 use Bitcoin\Transaction\TransactionInput;
+use Bitcoin\Transaction\TransactionInputInterface;
 use Bitcoin\Script\Script;
 use Bitcoin\Util\Parser;
 use Bitcoin\Util\Buffer;
@@ -85,10 +86,25 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCoinbase()
     {
+        $this->in = new TransactionInput();
         $this->in->setTransactionId('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33');
+        $this->in->setVout('0');
         $this->assertFalse($this->in->isCoinbase());
 
+        $this->in = new TransactionInput();
+        $this->in->setTransactionId('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33');
+        $this->in->setVout(4294967295);
+        $this->assertFalse($this->in->isCoinbase());
+
+        $this->in = new TransactionInput();
         $this->in->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
+        $this->in->setVout(0);
+        $this->assertFalse($this->in->isCoinbase());
+
+        $this->in = new TransactionInput();
+        $this->in->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
+        $this->in->setVout(4294967295);
+
         $this->assertTrue($this->in->isCoinbase());
     }
 
