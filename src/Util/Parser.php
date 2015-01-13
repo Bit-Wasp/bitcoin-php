@@ -146,6 +146,9 @@ class Parser
     public function getVarString()
     {
         $varInt = $this->getVarInt()->serialize('int');
+        if ($this->math->cmp($varInt, 0) == 0) {
+            return new Buffer();
+        }
         $string = $this->readBytes($varInt);
         return $string;
     }
