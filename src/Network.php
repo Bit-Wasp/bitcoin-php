@@ -169,10 +169,11 @@ class Network implements NetworkInterface
     /**
      * @return callable
      */
-    public static function getHashFunction()
+    public static function getHashFunction($binary = false)
     {
-        return function($value) {
-            $hash = Hash::sha256d($value, true);
+
+        return function($value) use ($binary) {
+            $hash = Hash::sha256d($value, $binary);
             return $hash;
         };
     }
