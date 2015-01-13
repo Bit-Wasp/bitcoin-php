@@ -226,7 +226,7 @@ class Transaction implements TransactionInterface, SerializableInterface
     public function getLockTime()
     {
         if ($this->locktime === null) {
-            return TransactionInterface::MAX_LOCKTIME;
+            return '0';
         }
 
         return $this->locktime;
@@ -264,7 +264,8 @@ class Transaction implements TransactionInterface, SerializableInterface
     }
 
     /**
-     * @param $parser
+     * @param Parser $parser
+     * @throws \Bitcoin\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
     public function fromParser(Parser &$parser)
@@ -272,6 +273,7 @@ class Transaction implements TransactionInterface, SerializableInterface
         $this->setVersion($parser->readBytes(4, true)->serialize('int'));
 
         $inputC = $parser->getVarInt()->serialize('int');
+
         for ($i = 0; $i < $inputC; $i++) {
             $input = new TransactionInput();
             $this->addInput(
@@ -357,6 +359,7 @@ class Transaction implements TransactionInterface, SerializableInterface
         }, $this->getOutputs());
 
         return array(
+            'txid' => $this->getTransactionId(),
             'version' => $this->getVersion(),
             'locktime' => $this->getLockTime(),
             'vin' => $inputs,
