@@ -54,7 +54,38 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSequence()
     {
+        echo 'a';
         $this->assertSame(0xffffffff, $this->in->getSequence());
+    }
+
+    public function testConstructWithScript()
+    {
+        $t = new TransactionInput();
+        $this->assertNull($t->getTransactionId());
+        $this->assertNull($t->getVout());
+        $this->assertEquals(new Buffer, $t->getScriptBuf());
+        $this->assertNull($t->getTransactionId());
+
+        $txid = '7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33';
+        $vout = '0';
+        $scriptBuf = new Buffer('03010203');
+        $script = new Script();
+        $script->push($scriptBuf);
+        $sequence = '0';
+        $t = new TransactionInput($txid);
+        $this->assertSame($txid, $t->getTransactionId());
+
+        $t = new TransactionInput(null, $vout);
+        $this->assertSame($vout, $t->getVout());
+
+        $t = new TransactionInput(null, null, $scriptBuf);
+        $this->assertSame($scriptBuf, $t->getScriptBuf());
+
+        $t = new TransactionInput(null, null, $script);
+        $this->assertSame($script, $t->getScript());
+
+        $t = new TransactionInput(null, null, null, $sequence);
+        $this->assertSame('0', $t->getSequence());
     }
 
     public function testSetSequence()
@@ -65,7 +96,8 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function testGetScriptBuf()
     {
-        $this->assertNull($this->in->getScriptBuf());
+        $empty = new Buffer();
+        $this->assertEquals($empty, $this->in->getScriptBuf());
     }
 
     public function testSetScriptBuf()
@@ -107,6 +139,7 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->in->isCoinbase());
     }
+
 
     public function testFromParser()
     {

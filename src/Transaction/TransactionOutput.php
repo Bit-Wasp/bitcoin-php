@@ -36,10 +36,6 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      */
     public function __construct($script = null, $value = null)
     {
-        if (!is_null($value)) {
-            $this->value = $value;
-        }
-
         if (!is_null($script)) {
             if ($script instanceof Script) {
                 $this->setScript($script);
@@ -47,6 +43,9 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
                 $this->setScriptBuf($script);
             }
         }
+
+        $this->value = $value;
+
         return $this;
     }
 
@@ -111,6 +110,9 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      */
     public function getScriptBuf()
     {
+        if ($this->scriptBuf == null) {
+            return new Buffer();
+        }
         return $this->scriptBuf;
     }
 

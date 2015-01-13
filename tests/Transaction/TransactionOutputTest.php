@@ -42,7 +42,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function testGetScriptBuf()
     {
-        $this->assertNull($this->out->getScriptBuf());
+        $this->assertEquals(new Buffer(), git $this->out->getScriptBuf());
     }
 
     public function testGetScript()
@@ -59,6 +59,28 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
         $this->out->setScript($script);
         $this->assertSame($script, $this->out->getScript());
+    }
+
+    public function testConstructWithScript()
+    {
+        $t = new TransactionOutput();
+        $this->assertEquals('0', $t->getValue());
+        $this->assertEquals(new Buffer, $t->getScriptBuf());
+        $this->assertEquals((new Script(new Buffer)), $t->getScript());
+
+        $scriptBuf = new Buffer('03010203');
+        $script = new Script();
+        $script->push($scriptBuf);
+        $value = 100000000;
+
+        $t = new TransactionOutput($scriptBuf);
+        $this->assertSame($scriptBuf, $t->getScriptBuf());
+
+        $t = new TransactionOutput($script);
+        $this->assertSame($script, $t->getScript());
+
+        $t = new TransactionOutput(null, $value);
+        $this->assertSame($value, $t->getValue());
     }
 
     public function testSetScriptBuf()

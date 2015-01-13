@@ -39,15 +39,10 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
     protected $scriptBuf;
 
 
-    public function __construct($txid = null, $vout = null, $script = null, $sequence = TransactionInputInterface::DEFAULT_SEQUENCE)
+    public function __construct($txid = null, $vout = null, $script = null, $sequence = null)
     {
-        if (!is_null($txid)) {
-            $this->txid = $txid;
-        }
-
-        if (!is_null($vout)) {
-            $this->vout = $vout;
-        }
+        $this->txid = $txid;
+        $this->vout = $vout;
 
         if (!is_null($script)) {
             if ($script instanceof Script) {
