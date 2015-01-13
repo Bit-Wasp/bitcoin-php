@@ -2,6 +2,7 @@
 
 namespace Bitcoin\Transaction;
 
+use Bitcoin\Bitcoin;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
 use Bitcoin\Script\Script;
@@ -38,8 +39,26 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
     protected $scriptBuf;
 
 
-    public function __construct()
+    public function __construct($txid = null, $vout = null, $script = null, $sequence = TransactionInputInterface::DEFAULT_SEQUENCE)
     {
+        if (!is_null($txid)) {
+            $this->txid = $txid;
+        }
+
+        if (!is_null($vout)) {
+            $this->vout = $vout;
+        }
+
+        if (!is_null($script)) {
+            if ($script instanceof Script) {
+                $this->setScript($script);
+            } else if ($script instanceof Buffer) {
+                $this->setScriptBuf($script);
+            }
+        }
+
+        $this->sequence = $sequence;
+
         return $this;
     }
 
@@ -109,6 +128,9 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
      */
     public function getScriptBuf()
     {
+        if ($this->scriptBuf == null) {
+            return new Buffer();
+        }
         return $this->scriptBuf;
     }
 
@@ -158,7 +180,8 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
      */
     public function isCoinbase()
     {
-        return $this->getTransactionId() == '0000000000000000000000000000000000000000000000000000000000000000';
+        return $this->getTransactionId() == '0000000000000000000000000000000000000000000000000000000000000000'
+            && Bitcoin::getMath()->cmp($this->getVout(), Bitcoin::getMath()->hexDec('ffffffff')) == '0';
     }
 
     /**

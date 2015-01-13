@@ -34,8 +34,19 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     /**
      * Initialize class
      */
-    public function __construct()
+    public function __construct($script = null, $value = null)
     {
+        if (!is_null($value)) {
+            $this->value = $value;
+        }
+
+        if (!is_null($script)) {
+            if ($script instanceof Script) {
+                $this->setScript($script);
+            } else if ($script instanceof Buffer) {
+                $this->setScriptBuf($script);
+            }
+        }
         return $this;
     }
 

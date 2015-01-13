@@ -15,12 +15,12 @@ interface TransactionInterface
      * The version parameter is encoded as a uint32
      */
 
-    const MAX_VERSION  = 4294967296;
+    const MAX_VERSION  = '4294967295';
 
     /**
      * The locktime parameter is encoded as a uint32
      */
-    const MAX_LOCKTIME = 4294967296;
+    const MAX_LOCKTIME = '4294967295';
 
     /**
      * Get the transaction ID
