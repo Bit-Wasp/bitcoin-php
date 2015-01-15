@@ -4,6 +4,7 @@ use Bitcoin\Bitcoin;
 use Bitcoin\Util\Base58;
 use Bitcoin\Script\ScriptInterpreter;
 use Bitcoin\Signature\K\KInterface;
+use Bitcoin\Signature\SignatureHash;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Block\BlockHeader;
 use Bitcoin\Util\Parser;
@@ -14,12 +15,57 @@ use Bitcoin\Transaction\TransactionOutput;
 use Bitcoin\Key\HierarchicalKey;
 use Bitcoin\Key\PrivateKey;
 use Bitcoin\Script\Script;
+use Bitcoin\Block\MerkleRoot;
 use Bitcoin\Crypto\Hash;
-
+use Bitcoin\Block\Block;
 require_once "vendor/autoload.php";
 
 $math = Bitcoin::getMath();
 
+$d = new  \Bitcoin\Chain\Difficulty($math);
+$b = Buffer::hex('1b0404cb');
+echo $d->getTargetHash($b)."\n";
+echo $d->getDifficulty($b);
+    /*
+$key = new PrivateKey('01');
+$message = new Buffer(hash('sha256', hash('sha256', 'Satoshi Nakamoto', true), true));
+$k = new \Bitcoin\Signature\K\DeterministicK($key, $message);
+$kCopy = $k;
+$s = $key->sign($message, $k);
+print_r($s);
+
+echo $math->decHex($s->getR()).".";
+echo $math->decHEx($s->getS())."\n";
+
+
+
+$key = PrivateKey::fromWIF('KyB2Zrzedq5HLjXQy4p34r7Px3BiTeXF5JURKfzzhntYtrEYPCEz');
+
+$txOut = new TransactionOutput;
+$txOut->setScript((new Script)->op('OP_DUP')->op('OP_HASH160')->push('497f62ab09cc01fc0c892693a7acc52617ce6022')->op('OP_EQUALVERIFY')->op('OP_CHECKSIG'));
+$txOut->setValue(21000);
+
+$transaction = new Transaction;
+$input = new TransactionInput;
+$input->setTransactionId('64b80627dbf97e05c833dbc78c3b158ed63d7c316c29fc2bb982fbc17d9a17ab')
+    ->setVout('1');
+$transaction->addInput($input);
+
+$output = new TransactionOutput;
+$output->setScript(Script::payToPubKeyHash($key->getPublicKey()));
+$output->setValue(10000);
+$transaction->addOutput($output);
+
+$kProvider = new \Bitcoin\Signature\K\RandomK();
+
+$hash = (new SignatureHash($transaction))
+    ->calculateHash($txOut, 0);
+
+$sig = $key->sign($hash, $kProvider);
+    */
+//print_r($key);
+//print_r($transaction);
+//print_r($sig);
 /*
 echo Math::add(1,2);
 echo "\n";
@@ -172,7 +218,9 @@ $kk= $k->getK();
 var_dump($kk->serialize('int'));
 //echo $k->getK()."\n";
 (/)*/
+/*
 $tx = '01000000'.
+    '01'.
     '0000000000000000000000000000000000000000000000000000000000000000FFFFFFFF'.
     '4D'.
     '04FFFF001D0104455468652054696D65732030332F4A616E2F32303039204368616E63656C6C6F72206F6E206272696E6B206F66207365636F6E64206261696C6F757420666F722062616E6B73'.
@@ -183,17 +231,72 @@ $tx = '01000000'.
     '4104678AFDB0FE5548271967F1A67130B7105CD6A828E03909A67962E0EA1F61DEB649F6BC3F4CEF38C4F35504E51EC112DE5C384DF7BA0B8D578A4C702B6BF11D5FAC'.
     '00000000';
 
-$block = '01000000'.
+$header = '01000000'.
     '0000000000000000000000000000000000000000000000000000000000000000' .
     '3BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A' .
     '29AB5F49'.
     'FFFF001D'.
-    '1DAC2B7C'.
+    '1DAC2B7C';
+
+$block = $header.
     '01'.
     $tx;
 
+$s = Script::payToPubKey(\Bitcoin\Key\PublicKey::fromHex('04678AFDB0FE5548271967F1A67130B7105CD6A828E03909A67962E0EA1F61DEB649F6BC3F4CEF38C4F35504E51EC112DE5C384DF7BA0B8D578A4C702B6BF11D5F'));
+
+$b = Block::fromHex($block);
+$tx = Transaction::fromHex($tx);
+echo "Satoshis tx: ".$tx->getTransactionId()."\n";
+
+$m = new MerkleRoot($b);
+echo "merkle: ".$m->calculateHash()."\n";
+*/
+/*8
+$inputs = $tx->getInputs();
+
+echo $inputs[0]->getScript()->getAsm()."\n";
+
+$genesisMining = new \Bitcoin\Block\GenesisMiningBlockHeader();
+$genesisMining->setBits(Buffer::hex('FFFF001D'));
+
+$string = Buffer::hex("5468652054696D65732030332F4A616E2F32303039204368616E63656C6C6F72206F6E206272696E6B206F66207365636F6E64206261696C6F757420666F722062616E6B73");
+$miner = new \Bitcoin\Miner\Miner($genesisMining, $s, $string, '1231006505');
+$miner->run();
+
+//print_r($miner);
+//print_r($b);
+
 //$tx = '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff2703510c05062f503253482f0477b46d54085000538d500100b00d4254434368696e6120506f6f6c000000000172480f95000000001976a9142c30a6aaac6d96687291475d7d52f4b469f665a688ac00000000';
 
+
+
+$genesis = new BlockHeader;
+$genesis
+    ->setVersion('1')
+    ->setPrevBlock ('0000000000000000000000000000000000000000000000000000000000000000')
+    ->setMerkleRoot(Buffer::hex('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b'))
+    ->setTimestamp('1231006505')
+    ->setBits(Buffer::hex('1d00ffff'))
+    ->setNonce('2083236893');
+echo $genesis->serialize('hex')."\n";
+echo "Satoshi Genesis - \n".$genesis->getBlockHash()."\n\n";
+
+$genesis = new BlockHeader;
+$genesis
+    ->setVersion('1')
+    ->setPrevBlock ('0000000000000000000000000000000000000000000000000000000000000000')
+    ->setMerkleRoot('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b')
+    ->setTimestamp('1231006505')
+    ->setBits(Buffer::hex('1d00ffff'))
+    ->setNonce('2083236893');
+echo $genesis->serialize('hex')."\n";
+echo "Satoshi Genesis - \n".$genesis->getBlockHash()."\n\n";
+echo " satoshi merkle - \n".$genesis->getMerkleRoot()."\n";
+//print_r($genesis);
+
+
+
+*/
 
 //echo $block."\n";
 //$b = Bitcoin\Block\Block::fromHex($block);
@@ -262,7 +365,7 @@ echo $copy->serialize('hex')."\n";
 echo $hash."\n";
 echo "done\n";
 */
-
+/*
 $coinbase = new Transaction;
 $input = new TransactionInput;
 $input->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
@@ -381,7 +484,7 @@ echo "Data was: ". $copy->serialize('hex')."\n";
 echo "\n\n";
 echo $block->serialize('hex')."\n";
 
-echo "done\n";
+echo "done\n";*/
 /*
 $b = new \Bitcoin\Block\Block();
 $b->setTransactions(array($t));
