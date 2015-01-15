@@ -42,7 +42,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function testGetScriptBuf()
     {
-        $this->assertEquals(new Buffer(), git $this->out->getScriptBuf());
+        $this->assertEquals(new Buffer(), $this->out->getScriptBuf());
     }
 
     public function testGetScript()
