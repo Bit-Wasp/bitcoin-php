@@ -171,6 +171,52 @@ class Script implements ScriptInterface
     }
 
     /**
+     * Create a Pay to pubkey output
+     *
+     * @param PublicKeyInterface $public_key
+     * @return Script
+     */
+    public static function payToPubKey(PublicKeyInterface $public_key)
+    {
+        $script = new self();
+        $script->push($public_key->serialize('hex'))->op('OP_CHECKSIG');
+
+        return $script;
+    }
+
+    /**
+     * Create a P2PKH output script
+     *
+     * @param PublicKeyInterface $public_key
+     * @return Script
+     */
+    public static function payToPubKeyHash(PublicKeyInterface $public_key)
+    {
+        $hash = $public_key->getPubKeyHash();
+
+        $script = new self();
+        $script->op('OP_DUP')->op('OP_HASH160')->push($hash)->op('OP_EQUALVERIFY');
+
+        return $script;
+    }
+
+    /**
+     * Create a P2SH output script
+     *
+     * @param Script $script
+     * @return Script
+     */
+    public static function payToScriptHash(Script $script)
+    {
+        $script_hex = $script->serialize('hex');
+        $hash = Hash::sha256ripe160($script_hex);
+
+        $new_script = new self();
+        $new_script->op('OP_HASH160')->push($hash)->op('OP_EQUAL');
+        return $new_script;
+    }
+
+    /**
      * Set up registered Op Codes
      */
     public function setRegisteredOpCodes()
@@ -414,51 +460,7 @@ class Script implements ScriptInterface
         return $buffer;
     }
 
-    /**
-     * Create a Pay to pubkey output
-     *
-     * @param PublicKeyInterface $public_key
-     * @return Script
-     */
-    public static function payToPubKey(PublicKeyInterface $public_key)
-    {
-        $script = new self();
-        $script->push($public_key->serialize('hex'))->op('OP_CHECKSIG');
 
-        return $script;
-    }
-
-    /**
-     * Create a P2PKH output script
-     *
-     * @param PublicKeyInterface $public_key
-     * @return Script
-     */
-    public static function payToPubKeyHash(PublicKeyInterface $public_key)
-    {
-        $hash = $public_key->getPubKeyHash();
-
-        $script = new self();
-        $script->op('OP_DUP')->op('OP_HASH160')->push($hash)->op('OP_EQUALVERIFY');
-
-        return $script;
-    }
-
-    /**
-     * Create a P2SH output script
-     *
-     * @param Script $script
-     * @return Script
-     */
-    public static function payToScriptHash(Script $script)
-    {
-        $script_hex = $script->serialize('hex');
-        $hash = Hash::sha256ripe160($script_hex);
-
-        $new_script = new self();
-        $new_script->op('OP_HASH160')->push($hash)->op('OP_EQUAL');
-        return $new_script;
-    }
 
     /**
      * Return a varInt, based on the size of the script.
