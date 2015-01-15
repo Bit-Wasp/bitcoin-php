@@ -13,4 +13,6 @@ interface ScriptInterface
      * @return mixed
      */
     public function serialize();
+
+    public function parse();
 }
