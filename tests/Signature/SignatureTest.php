@@ -144,7 +144,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
          * Should be at least 100 to catch these, but it can take a while
          */
         $pk = new \Bitcoin\Key\PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
-        for ($i = 0; $i < 1; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $buf = \Bitcoin\Crypto\Random::bytes(32);
             $sig  = $pk->sign($buf, new \Bitcoin\Signature\K\RandomK());
             $this->assertInstanceOf($this->sigType, $sig);
