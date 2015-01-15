@@ -120,10 +120,6 @@ class Miner
 
         $usingDiff = $this->lastBlockHeader->getBits();
         $diff      = new Difficulty($this->math);
-        echo "Target    : " . $diff->getTarget($usingDiff) . "\n".
-            "  Hash     : " . $diff->getTargetHash($usingDiff) . "\n".
-            "Difficulty : " . $diff->getDifficulty($usingDiff) . "\n";
-
         $target    = $diff->getTarget($usingDiff);
 
         while ($found == false) {
