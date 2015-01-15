@@ -168,6 +168,44 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(64, $this->privateKey->getSize('hex'));
     }
 
+    public function testFromWif()
+    {
+        $math = \Bitcoin\Bitcoin::getMath();
+
+        $regular = array(
+            '5KeNtJ66K7UNpirG3574f9Z8SjPDPTc5YaSBczttdoqNdQMK5b9' => 'f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b',
+            '5J6B9UWZSxwHuJF3jv1zi2ZxMAVhA7bBvFFcZXFo7ga1UdgNtDs' => '2413fb3709b05939f04cf2e92f7d0897fc2596f9ad0b8a9ea855c7bfebaae892',
+            '5JKQJXqLFxQ9JSw2Wc4Z5ZY1v1BR8u4BfndtXZd1Kw9FsGe4ECq' => '421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87'
+        );
+        foreach($regular as $wif => $hex) {
+            $private = PrivateKey::fromWif($wif);
+            $this->assertInstanceOf('Bitcoin\Key\PrivateKey', $private);
+            $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);
+            $this->assertFalse($private->isCompressed());
+        }
+
+        $compressed = array(
+            'L3EQJoHJSXnCvNxiWBfoE7jKi89R9dcp1HPsdnVxRy6YGRmHoxKh' => 'b3615879ebf2a64542db64e29d87ae175479bafae275cdd3caf779507cac4f5b',
+            'Kwn1Y1wcKUMjdPrVxBW8uVvuyq2B8EHFTKf7zGFc7J6ueaMvFUD8' => '109dac331c97d41c6be9db32a2c3fa848d1a637807f2ab5c0e009cfb8007d1a0',
+            'KyvwuBYFruEssksxmDiQUKLwwtZt6WvFnPcdTnNPMddq15M3ezmU' => '50e36e410b227b70a1aa1abb28f1997aa6ec7a9ccddd4dc3ed708a18a0202b2f'
+        );
+
+        foreach($compressed as $wif => $hex) {
+            $private = PrivateKey::fromWif($wif);
+            $this->assertInstanceOf('Bitcoin\Key\PrivateKey', $private);
+            $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);
+            $this->assertTrue($private->isCompressed());
+        }
+    }
+
+    /**
+     * @expectedException \Bitcoin\Exceptions\Base58ChecksumFailure
+     */
+    public function testInvalidWif()
+    {
+        PrivateKey::fromWif('50akdglashdgkjadsl');
+    }
+
     public function testSign()
     {
 
@@ -179,13 +217,20 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             $privateKey = new PrivateKey($test->privKey);
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
+
             $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
+
             $sig = $privateKey->sign($messageHash, $k);
 
-            $rHex = Bitcoin::getMath()->dechex($sig->getR())."\n";
-            $sHex = Bitcoin::getMath()->decHex($sig->getS())."\n";
+            // K must be correct (from privatekey and message hash)
+            $this->assertEquals(Buffer::hex($test->expectedK), $k->getK());
+
+            // R and S should be correct
+            $rHex = Bitcoin::getMath()->dechex($sig->getR());
+            $sHex = Bitcoin::getMath()->decHex($sig->getS());
+            $this->assertSame($test->expectedRS, $rHex.$sHex);
 
         }
     }
+
 }
- 
