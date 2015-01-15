@@ -1,24 +1,23 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 30/12/14
- * Time: 13:42
- */
 
 namespace Bitcoin\Chain;
 
-use Bitcoin\Bitcoin;
+use Bitcoin\Math\Math;
 use Bitcoin\Util\Buffer;
 
-class Difficulty
+/**
+ * Class Difficulty
+ * @package Bitcoin\Chain
+ * @author Thomas Kerin
+ */
+class Difficulty implements DifficultyInterface
 {
     const MAX_TARGET = '1d00ffff';
 
     /**
      * @var Buffer
      */
-    protected $bits;
+    protected $lowestBits;
 
     /**
      * @var \Mdanter\Ecc\MathAdapter
@@ -28,37 +27,80 @@ class Difficulty
     /**
      * @param Buffer $bits
      */
-    public function __construct(Buffer $bits)
+    public function __construct(Math $math, Buffer $lowestBits = null)
     {
-        $this->bits = $bits;
-        $this->math = Bitcoin::getMath();
+        $this->math = $math;
+        $this->lowestBits = $lowestBits;
     }
 
+    /**
+     * Return the lowest 'bits' - for difficulty 1.
+     *
+     * @return Buffer
+     */
+    public function lowestBits()
+    {
+        if (is_null($this->lowestBits)) {
+            // Todo - from container?
+            return Buffer::hex(self::MAX_TARGET);
+        }
+
+        return $this->lowestBits;
+    }
+
+    /**
+     * Get Max target - that of difficulty 1.
+     *
+     * @return int|string
+     */
     public function getMaxTarget()
     {
-
-    }
-
-    public function getTarget()
-    {
-        $bitStr = $this->bits->serialize();
-        $sci    = unpack('H2exp/H6mul', $bitStr);
-
-        $target = $this->math->mul(
-            $this->math->hexDec($sci['mul']),
-            $this->math->pow(
-                2,
-                $this->math->mul(
-                    8,
-                    $this->math->sub(
-                        $this->math->hexDec($sci['exp']),
-                        '3'
-                    )
-                )
-            )
-        );
+        $bits   = $this->lowestBits();
+        $target = $this->math->getCompact($bits);
 
         return $target;
+    }
 
+    /**
+     * Get the target from a compact int.
+     *
+     * @param Buffer $bits
+     * @return int|string
+     */
+    public function getTarget(Buffer $bits)
+    {
+        $target = $this->math->getCompact($bits);
+
+        return $target;
+    }
+
+    /**
+     * Get target hash from bits.
+     *
+     * @param Buffer $bits
+     * @return int|string
+     */
+    public function getTargetHash(Buffer $bits)
+    {
+        $target = $this->getTarget($bits);
+        $target = str_pad($this->math->decHex($target), 64, '0', STR_PAD_LEFT);
+        return $target;
+    }
+
+    /**
+     * Get the difficulty of the supplied bits relative to the lowest target.
+     *
+     * @param Buffer $bits
+     * @return float|number
+     */
+    public function getDifficulty(Buffer $bits)
+    {
+        $compact = $this->math->unpackCompact($bits);
+        $lowest  = $this->math->unpackCompact($this->lowestBits());
+
+        $diff = log($lowest['mul'] / (float)$compact['mul']) + ($lowest['exp'] - $compact['exp'])*log(pow(2, 8));
+        $diff = pow(M_E, $diff);
+
+        return $diff;
     }
 }

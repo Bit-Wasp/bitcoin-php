@@ -119,8 +119,12 @@ class Miner
         $found  = false;
 
         $usingDiff = $this->lastBlockHeader->getBits();
-        $diff      = new Difficulty($usingDiff);
-        $target    = $diff->getTarget();
+        $diff      = new Difficulty($this->math);
+        echo "Target    : " . $diff->getTarget($usingDiff) . "\n".
+            "  Hash     : " . $diff->getTargetHash($usingDiff) . "\n".
+            "Difficulty : " . $diff->getDifficulty($usingDiff) . "\n";
+
+        $target    = $diff->getTarget($usingDiff);
 
         while ($found == false) {
             // Set coinbase script, and build Merkle tree & block header.
@@ -138,7 +142,6 @@ class Miner
                 ->setMerkleRoot($merkleHash)
                 ->setTimestamp($this->timestamp)
                 ->setBits($usingDiff);
-                //->setBits($this->lastBlockHeader->getBits());
 
             // Loop through all nonces (up to 2^32). Restart after modifying extranonce.
             while ($this->math->cmp($nonce, $maxNonce) <= 0) {
