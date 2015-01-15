@@ -130,11 +130,10 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $randomK = $kProvider->getK();
 
         $math = Bitcoin::getMath();
-        $G  = Bitcoin::getGenerator();
-        $n  = $G->getOrder();
-        $k  = $randomK->serialize('int');
-        $p1 = $G->mul($k);
-        $r  = $p1->getX();
+        $G    = Bitcoin::getGenerator();
+        $n    = $G->getOrder();
+        $k    = $math->mod($randomK->serialize('int'), $n);
+        $r    = $G->mul($k)->getX();
 
         if ($math->cmp($r, 0) == 0) {
             throw new \RuntimeException('Random number r = 0');
@@ -146,7 +145,10 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
                 $math->mod(
                     $math->add(
                         $messageHash->serialize('int'),
-                        $math->mul($this->serialize('int'), $r)
+                        $math->mul(
+                            $this->secretMultiplier,
+                            $r
+                        )
                     ),
                     $n
                 )
