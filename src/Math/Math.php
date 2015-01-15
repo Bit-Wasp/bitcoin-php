@@ -2,6 +2,8 @@
 
 namespace Bitcoin\Math;
 
+use Bitcoin\Util\Buffer;
+
 /**
  * Class Math
  * @package Bitcoin
@@ -131,5 +133,43 @@ class Math implements \Mdanter\Ecc\MathAdapter
         // $remainder = n - (n / q) * q
         $remainder = $this->math->sub($dividend, $this->math->mul($div, $divisor));
         return array($div, $remainder);
+    }
+
+    public function unpackCompact(Buffer $bits)
+    {
+        $bitStr = $bits->serialize();
+
+        // Unpack and decode
+        $sci    = array_map(
+            function ($value) {
+                return $this->math->hexDec($value);
+            },
+            unpack('H2exp/H6mul', $bitStr)
+        );
+        return $sci;
+    }
+
+    public function mulCompact($int, $pow)
+    {
+        return $this->math->mul(
+            $int,
+            $this->math->pow(
+                2,
+                $this->math->mul(
+                    8,
+                    $this->math->sub(
+                        $pow,
+                        3
+                    )
+                )
+            )
+        );
+    }
+
+    public function getCompact(Buffer $bits)
+    {
+        $compact = $this->unpackCompact($bits);
+        $int = $this->mulCompact($compact['mul'], $compact['exp']);
+        return $int;
     }
 }
