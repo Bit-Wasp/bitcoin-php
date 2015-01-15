@@ -248,6 +248,14 @@ class Transaction implements TransactionInterface, SerializableInterface
         return $this;
     }
 
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param TransactionOutputInterface $txOut
+     * @param $inputToSign
+     * @param KInterface $kProvider
+     * @return mixed
+     * @throws \Exception
+     */
     public function sign(PrivateKeyInterface $privateKey, TransactionOutputInterface $txOut, $inputToSign, KInterface $kProvider = null)
     {
         if (is_null($kProvider)) {
@@ -258,7 +266,6 @@ class Transaction implements TransactionInterface, SerializableInterface
             ->calculateHash($txOut, $inputToSign);
 
         $sig = $privateKey->sign($hash, $kProvider);
-
 
         return $sig;
     }
