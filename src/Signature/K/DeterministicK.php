@@ -36,11 +36,14 @@ class DeterministicK implements KInterface
     {
         $entropy         = new Buffer($privateKey->serialize() . $messageHash->serialize());
         $this->drbg      = new HMACDRBG($algo, $entropy);
+        return $this;
     }
 
     /**
      * Return a K value deterministically derived from the private key
      *  and data
+     *
+     * @return Buffer
      */
     public function getK()
     {
