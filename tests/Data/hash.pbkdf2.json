@@ -12,7 +12,7 @@
       "data": "password",
       "algo": "sha256",
       "salt": "salt",
-      "iterations": "1",
+      "iterations": 1,
       "length": 20,
       "result": "120fb6cffcf8b32c43e7225256c4f837a86548c9"
     }
