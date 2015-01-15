@@ -3,9 +3,7 @@
 namespace Bitcoin\Signature\K;
 
 use Bitcoin\Util\Buffer;
-use Bitcoin\Crypto\Hash;
 use Bitcoin\Crypto\DRBG\HMACDRBG;
-use Bitcoin\Crypto\DRBG\RFC6979;
 use Bitcoin\Key\PrivateKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
 
@@ -13,6 +11,7 @@ use Mdanter\Ecc\GeneratorPoint;
  * Class DeterministicK
  * @package Bitcoin\Signature\K
  * @author Thomas Kerin
+ * Todo: refactor so this class accepts an initialized DRBGInterface
  */
 class DeterministicK implements KInterface
 {
@@ -21,6 +20,11 @@ class DeterministicK implements KInterface
      * @var HMACDRBG
      */
     protected $drbg;
+
+    /**
+     * @var Buffer
+     */
+    protected $k;
 
     /**
      * @param PrivateKeyInterface $privateKey
@@ -40,7 +44,10 @@ class DeterministicK implements KInterface
      */
     public function getK()
     {
-        $deterministicK = $this->drbg->bytes(32);
-        return $deterministicK;
+        if (is_null($this->k)) {
+            $this->k = $this->drbg->bytes(32);
+        }
+
+        return $this->k;
     }
 }
