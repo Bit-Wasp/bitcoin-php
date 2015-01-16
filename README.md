@@ -2,12 +2,11 @@
 Bitcoin
 =======
 
-This is will hopefully grow into a full implementation of Bitcoin in PHP. 
-
 Presently supported:
-Transactions
-HD Wallets
-ECDSA Keys and signing
-Random or Deterministic K values for signatures
+
+Blocks, block headers, basic mining, difficulty calculations
+ECDSA key creation, public & private key types. Signatures and verification 
+Transactions, Signatures, Deterministic sigs
+BIP32 deterministic algorithms
 Script builder, parser
 
