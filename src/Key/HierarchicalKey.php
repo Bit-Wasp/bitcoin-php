@@ -356,12 +356,9 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         return $this->privateKey;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function sign(Buffer $messageHash, KInterface $kProvider = null)
+    public function getSecretMultiplier()
     {
-        return $this->getPrivateKey()->sign($messageHash, $kProvider);
+        return $this->getPrivateKey()->getSecretMultiplier();
     }
 
     /**

@@ -61,13 +61,4 @@ interface PublicKeyInterface
      * @return mixed
      */
     public function getPoint();
-
-    /**
-     * Verify that this public key produced the given $signature for the message $hash
-     *
-     * @param Buffer $hash
-     * @param SignatureInterface $signature
-     * @return bool
-     */
-    public function verify(Buffer $hash, SignatureInterface $signature);
 }

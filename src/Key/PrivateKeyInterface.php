@@ -22,12 +22,9 @@ interface PrivateKeyInterface
     public function getWif(NetworkInterface $network);
 
     /**
-     * Sign a buffer (hash of a message, and optionally accept a source
-     * for the K value (which can be random or deterministic)
+     * Return the decimal secret multiplier
      *
-     * @param Buffer $messageHash
-     * @param KInterface $kProvider
-     * @return mixed
+     * @return int|string
      */
-    public function sign(Buffer $messageHash, KInterface $kProvider);
+    public function getSecretMultiplier();
 }

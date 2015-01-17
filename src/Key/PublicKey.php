@@ -157,11 +157,6 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         return false;
     }
 
-    public function verify(Buffer $messageHash, SignatureInterface $signature)
-    {
-
-    }
-
     /**
      * Compress a point
      *

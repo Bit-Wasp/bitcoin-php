@@ -132,55 +132,9 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         return $withinRange and $notZero;
     }
 
-    public function sign(Buffer $messageHash, KInterface $kProvider)
+    public function getSecretMultiplier()
     {
-        $randomK = $kProvider->getK();
-
-        $math = Bitcoin::getMath();
-        $G    = Bitcoin::getGenerator();
-        $n    = $G->getOrder();
-        $k    = $math->mod($randomK->serialize('int'), $n);
-        $r    = $G->mul($k)->getX();
-
-        if ($math->cmp($r, 0) == 0) {
-            throw new \RuntimeException('Random number r = 0');
-        }
-
-        $s  = $math->mod(
-            $math->mul(
-                $math->inverseMod($k, $n),
-                $math->mod(
-                    $math->add(
-                        $messageHash->serialize('int'),
-                        $math->mul(
-                            $this->secretMultiplier,
-                            $r
-                        )
-                    ),
-                    $n
-                )
-            ),
-            $n
-        );
-
-        if ($math->cmp($s, 0) == 0) {
-            throw new \RuntimeException('Signature s = 0');
-        }
-
-   //     $halfCurveOrder = $math->div($n, 2);
-   //     if ($math->cmp($s, $halfCurveOrder) >= 0) {
-   //         $s = $math->sub($s, $halfCurveOrder);
-   //     }
-        // Depending on the byte, we expect the Y value to be even or odd.
-
-
-        // We only calculate the second y root if it's needed.
-        //if ($math->isEven($s)) {
-        //    echo "Its even\n";
-        //    $s = $math->sub($G->getOrder(), $s);
-        //}
-
-        return new Signature($r, $s);
+        return $this->secretMultiplier;
     }
 
     /**
