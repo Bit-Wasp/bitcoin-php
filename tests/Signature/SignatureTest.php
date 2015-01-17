@@ -131,24 +131,4 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('56860522993476239843569407076292679822350064328987049204205911586688428093823', $this->sig->getR());
         $this->assertEquals('75328468267675219166053001951181042681597800329127462438170420074748074627387', $this->sig->getS());
     }
-
-    public function testPrivateKeySign()
-    {
-        /**
-         * This looks enough times to try and catch some of the outliers..
-         * - Odd length hex strings need to be padded with one single '0' value,
-         *   which happens on occasion when converting from decimal to hex.
-         * - Padding also must be applied to prevent r and s from being negative.
-         * Signature lengths vary with a certain probability, but the most annoying
-         * thing while writing this test was cases where r / s were 31.5 bytes.
-         * Should be at least 100 to catch these, but it can take a while
-         */
-        $pk = new \Bitcoin\Key\PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
-        for ($i = 0; $i < 10; $i++) {
-            $buf = \Bitcoin\Crypto\Random::bytes(32);
-            $sig  = $pk->sign($buf, new \Bitcoin\Signature\K\RandomK());
-            $this->assertInstanceOf($this->sigType, $sig);
-            $this->assertTrue(Signature::isCanonical(new Buffer($sig->serialize())));
-        }
-    }
 }

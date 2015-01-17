@@ -6,7 +6,7 @@
       "message": "Satoshi Nakamoto",
       "expectedK": "8F8A276C19F4149656B280621E358CCE24F5F52542772691EE69063B74F15D15",
       "expectedRS": "934b1ea10a4b3c1757e2b0c017d0b6143ce3c9a7e6a4a49860d7a6ab210ee3d8dbbd3162d46e9f9bef7feb87c16dc13b4f6568a87f4e83f728e2443ba586675c",
-      "expectedRSLow": ""
+      "expectedRSLow": "934b1ea10a4b3c1757e2b0c017d0b6143ce3c9a7e6a4a49860d7a6ab210ee3d82442ce9d2b916064108014783e923ec36b49743e2ffa1c4496f01a512aafd9e5"
     },
     {
       "algorithm": "sha256",

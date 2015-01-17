@@ -212,6 +212,10 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         $f = file_get_contents(__DIR__.'/../Data/hmacdrbg.json');
 
         $json = json_decode($f);
+        $math = Bitcoin::getMath();
+        $generator = Bitcoin::getGenerator();
+        $signer = new \Bitcoin\Signature\Signer($math, $generator);
+
         foreach ($json->test as $c => $test) {
 
             $privateKey = new PrivateKey($test->privKey);
@@ -219,16 +223,15 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
             $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
-
-            $sig = $privateKey->sign($messageHash, $k);
+            $sig = $signer->sign($privateKey, $messageHash, $k);
 
             // K must be correct (from privatekey and message hash)
             $this->assertEquals(Buffer::hex($test->expectedK), $k->getK());
 
             // R and S should be correct
-            $rHex = Bitcoin::getMath()->dechex($sig->getR());
-            $sHex = Bitcoin::getMath()->decHex($sig->getS());
-            $this->assertSame($test->expectedRS, $rHex.$sHex);
+            $rHex = $math->dechex($sig->getR());
+            $sHex = $math->decHex($sig->getS());
+            $this->assertSame($test->expectedRSLow, $rHex.$sHex);
 
         }
     }
