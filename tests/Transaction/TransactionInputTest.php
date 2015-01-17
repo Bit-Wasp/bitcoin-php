@@ -54,7 +54,6 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSequence()
     {
-        echo 'a';
         $this->assertSame(0xffffffff, $this->in->getSequence());
     }
 

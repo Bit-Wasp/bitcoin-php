@@ -28,10 +28,9 @@ class Point implements PointInterface
      */
     public function __construct($x, $y)
     {
-        $math      = EccFactory::getAdapter();
         $generator = Bitcoin::getGenerator();
 
-        $this->point = new \Mdanter\Ecc\Point($generator->getCurve(), $x, $y, $generator->getOrder(), $math);
+        $this->point = $generator->getCurve()->getPoint($x, $y, $generator->getOrder());
         return $this;
     }
 

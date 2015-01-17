@@ -11,7 +11,7 @@
     "ext-json": "*",
     "ext-openssl": "*",
     "ext-mcrypt": "*",
-    "mdanter/ecc": "~0.1",
+    "mdanter/ecc": "dev-master",
     "pleonasm/merkle-tree": "*",
     "rych/hash_pbkdf2-compat": "~1.0"
   },

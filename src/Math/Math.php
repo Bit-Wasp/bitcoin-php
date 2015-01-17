@@ -8,11 +8,11 @@ use Bitcoin\Util\Buffer;
  * Class Math
  * @package Bitcoin
  */
-class Math implements \Mdanter\Ecc\MathAdapter
+class Math implements \Mdanter\Ecc\MathAdapterInterface
 {
     protected $math;
 
-    public function __construct(\Mdanter\Ecc\MathAdapter $math = null)
+    public function __construct(\Mdanter\Ecc\MathAdapterInterface $math = null)
     {
         if (is_null($math)) {
             $math = \Mdanter\Ecc\EccFactory::getAdapter();

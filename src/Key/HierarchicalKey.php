@@ -14,7 +14,7 @@ use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
-use Mdanter\Ecc\MathAdapter;
+use Mdanter\Ecc\MathAdapterInterface;
 
 /**
  * Class HierarchicalKey
@@ -73,7 +73,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     protected $network;
 
     /**
-     * @var MathAdapter
+     * @var MathAdapterInterface
      */
     protected $math;
 

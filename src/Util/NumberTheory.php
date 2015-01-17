@@ -3,7 +3,7 @@
 namespace Bitcoin\Util;
 
 use Bitcoin\Exceptions\SquareRootException;
-use Mdanter\Ecc\MathAdapter;
+use Mdanter\Ecc\MathAdapterInterface;
 
     /***********************************************************************
      * Copyright (C) 2012 Matyas Danter
@@ -44,7 +44,7 @@ class NumberTheory
 {
     protected $adapter;
 
-    public function __construct(MathAdapter $adapter)
+    public function __construct(MathAdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }
