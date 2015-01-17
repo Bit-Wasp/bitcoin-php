@@ -59,6 +59,13 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         return $this;
     }
 
+    /**
+     * Instantiate the class when given a WIF private key.
+     *
+     * @param string $wif
+     * @return PrivateKey
+     * @throws Base58ChecksumFailure
+     */
     public static function fromWIF($wif)
     {
         try {
@@ -159,6 +166,19 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         if ($math->cmp($s, 0) == 0) {
             throw new \RuntimeException('Signature s = 0');
         }
+
+   //     $halfCurveOrder = $math->div($n, 2);
+   //     if ($math->cmp($s, $halfCurveOrder) >= 0) {
+   //         $s = $math->sub($s, $halfCurveOrder);
+   //     }
+        // Depending on the byte, we expect the Y value to be even or odd.
+
+
+        // We only calculate the second y root if it's needed.
+        //if ($math->isEven($s)) {
+        //    echo "Its even\n";
+        //    $s = $math->sub($G->getOrder(), $s);
+        //}
 
         return new Signature($r, $s);
     }

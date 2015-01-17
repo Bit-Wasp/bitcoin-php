@@ -30,22 +30,27 @@ class Math implements \Mdanter\Ecc\MathAdapter
         }
         return $hex;
     }
+
     public function gcd2($a, $b)
     {
         return $this->math->gcd2($a, $b);
     }
+
     public function isEven($i)
     {
         return $this->math->mod($i, 2) == '0';
     }
+
     public function nextPrime($starting_value)
     {
         return $this->math->nextPrime($starting_value);
     }
+
     public function toString($value)
     {
         return $this->math->toString($value);
     }
+
     public function bitwiseAnd($a, $b)
     {
         return $this->math->bitwiseAnd($a, $b);
@@ -55,6 +60,7 @@ class Math implements \Mdanter\Ecc\MathAdapter
     {
         return $this->math->hexDec($dec);
     }
+
     public function add($augend, $addend)
     {
         return $this->math->add($augend, $addend);
@@ -68,6 +74,7 @@ class Math implements \Mdanter\Ecc\MathAdapter
     {
         return $this->math->mul($a, $b);
     }
+
     public function div($a, $b)
     {
         return $this->math->div($a, $b);
@@ -77,14 +84,17 @@ class Math implements \Mdanter\Ecc\MathAdapter
     {
         return $this->math->pow($a, $b);
     }
+
     public function powmod($base, $exponent, $modulus)
     {
         return $this->math->powmod($base, $exponent, $modulus);
     }
+
     public function jacobi($a, $n)
     {
         return $this->math->jacobi($a, $n);
     }
+
     public function cmp($first, $other)
     {
         return $this->math->cmp($first, $other);
@@ -94,30 +104,37 @@ class Math implements \Mdanter\Ecc\MathAdapter
     {
         return $this->math->mod($number, $modulus);
     }
+
     public function inverseMod($a, $n)
     {
         return $this->math->inverseMod($a, $n);
     }
+
     public function intToString($x)
     {
         return $this->math->intToString($x);
     }
+
     public function stringToInt($x)
     {
         return $this->math->stringToInt($x);
     }
+
     public function digestInteger($m)
     {
         return $this->math->digestInteger($m);
     }
+
     public function isPrime($n)
     {
         return $this->math->isPrime($n);
     }
+
     public function rand($n)
     {
         return $this->math->rand($n);
     }
+
     /**
      * Similar to gmp_div_qr, return a tuple containing the
      * result and the remainder

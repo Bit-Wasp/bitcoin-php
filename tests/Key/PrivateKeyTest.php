@@ -212,7 +212,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         $f = file_get_contents(__DIR__.'/../Data/hmacdrbg.json');
 
         $json = json_decode($f);
-        foreach ($json->test as $test) {
+        foreach ($json->test as $c => $test) {
 
             $privateKey = new PrivateKey($test->privKey);
             $message = new Buffer($test->message);
