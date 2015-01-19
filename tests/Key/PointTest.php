@@ -60,4 +60,6 @@ class PointTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($this->point->getOrder(), '115792089237316195423570985008687907852837564279074904382605163141518161494337');
     }
+
+
 } 
