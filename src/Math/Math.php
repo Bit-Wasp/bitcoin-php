@@ -23,12 +23,7 @@ class Math implements \Mdanter\Ecc\MathAdapterInterface
 
     public function decHex($dec)
     {
-        $hex = $this->math->decHex($dec);
-
-        if (strlen($hex) % 2 != '0') {
-            $hex = '0' . $hex;
-        }
-        return $hex;
+        return $this->math->decHex($dec);
     }
 
     public function gcd2($a, $b)
