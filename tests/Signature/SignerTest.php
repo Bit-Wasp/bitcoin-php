@@ -10,6 +10,7 @@ use Bitcoin\Signature\Signer;
 use Bitcoin\Signature\K\RandomK;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Bitcoin;
+use Bitcoin\Crypto\Hash;
 
 /**
  * Class SignatureTest
@@ -25,6 +26,65 @@ class SignerTest extends \PHPUnit_Framework_TestCase
     public function __construct()
     {
         $this->sigType = 'Bitcoin\Signature\Signature';
+    }
+
+
+    public function testDeterministicSign()
+    {
+
+        $f = file_get_contents(__DIR__.'/../Data/hmacdrbg.json');
+
+        $json = json_decode($f);
+        $math = Bitcoin::getMath();
+        $generator = Bitcoin::getGenerator();
+        $signer = new \Bitcoin\Signature\Signer($math, $generator);
+
+        foreach ($json->test as $c => $test) {
+
+            $privateKey = new PrivateKey($test->privKey);
+            $message = new Buffer($test->message);
+            $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
+
+            $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
+            $sig = $signer->sign($privateKey, $messageHash, $k);
+
+            // K must be correct (from privatekey and message hash)
+            $this->assertEquals(Buffer::hex($test->expectedK), $k->getK());
+
+            // R and S should be correct
+            $rHex = $math->dechex($sig->getR());
+            $sHex = $math->decHex($sig->getS());
+            $this->assertSame($test->expectedRSLow, $rHex.$sHex);
+        }
+    }
+
+    public function testHaskoinDeterministicSign()
+    {
+
+        /* $f = file_get_contents(__DIR__.'/../Data/haskoin.sigtests.json');
+
+        $json = json_decode($f);
+        $math = Bitcoin::getMath();
+        $generator = Bitcoin::getGenerator();
+        $signer = new \Bitcoin\Signature\Signer($math, $generator);
+
+        foreach ($json->test as $c => $test) {
+
+            $privateKey = new PrivateKey($test->privKey);
+            $message = new Buffer($test->message);
+            $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
+
+            $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
+            $sig = $signer->sign($privateKey, $messageHash, $k);
+
+            // K must be correct (from privatekey and message hash)
+          //  $this->assertEquals(Buffer::hex($test->expectedK), $k->getK());
+
+            // R and S should be correct
+            $rHex = $math->dechex($sig->getR());
+            $sHex = $math->decHex($sig->getS());
+            $this->assertSame($test->expectedRSLow, $rHex.$sHex);
+        }*/
     }
 
     public function testPrivateKeySign()
@@ -49,6 +109,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
 
             $this->assertInstanceOf($this->sigType, $sig);
             $this->assertTrue(Signature::isCanonical(new Buffer($sig->serialize())));
+            $this->assertTrue($signer->verify($pk->getPublicKey(), $buf, $sig));
         }
     }
 }
