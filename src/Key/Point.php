@@ -13,7 +13,6 @@ use Mdanter\Ecc\GeneratorPoint;
  */
 class Point implements PointInterface
 {
-
     /**
      * @var \Mdanter\Ecc\PointInterface
      */
