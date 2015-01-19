@@ -1,6 +1,8 @@
 
 Bitcoin
 =======
+[![Build Status](https://travis-ci.org/afk11/bitcoin.svg?branch=master)](https://travis-ci.org/afk11/bitcoin)
+
 
 Presently supported:
 
