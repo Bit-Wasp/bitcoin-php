@@ -43,9 +43,19 @@ class Signer implements SignerInterface
         $this->lowSignatures = $forceLowSignatures;
     }
 
+    /**
+     * Produce a signature for a $messageHash by a $privateKey. $kProvider can be random or
+     * deterministic (RFC6979)
+     *
+     * @param PrivateKeyInterface $privateKey
+     * @param Buffer $messageHash
+     * @param KInterface $kProvider
+     * @return Signature
+     */
     public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, KInterface $kProvider)
     {
         $randomK = $kProvider->getK();
+
         $n       = $this->generator->getOrder();
         $k       = $this->math->mod($randomK->serialize('int'), $n);
         $r       = $this->generator->mul($k)->getX();
@@ -75,15 +85,20 @@ class Signer implements SignerInterface
             throw new \RuntimeException('Signature s = 0');
         }
 
-        $halfCurveOrder = $this->math->div($this->math->add($n, 1), 2);
-
-        if ($this->lowSignatures && $this->math->cmp($s, $halfCurveOrder)) {
+        // if s < n/2
+        if ($this->lowSignatures && $this->math->cmp($s, $this->math->div($this->math->add($n, 1), 2))) {
             $s = $this->math->sub($n, $s);
         }
 
         return new Signature($r, $s);
     }
 
+    /**
+     * @param PublicKeyInterface $publicKey
+     * @param Buffer $hash
+     * @param SignatureInterface $signature
+     * @return bool
+     */
     public function verify(PublicKeyInterface $publicKey, Buffer $hash, SignatureInterface $signature)
     {
         $n     = $this->generator->getOrder();
