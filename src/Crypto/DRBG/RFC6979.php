@@ -49,7 +49,7 @@ class RFC6979 implements DRBGInterface
         $math = Bitcoin::getMath();
 
         while (true) {
-            $k    = $this->drbg->bytes(32);
+            $k    = $this->drbg->bytes($numBytes);
             $kInt = $k->serialize('int');
 
             // Check k is between [1, ... Q]
