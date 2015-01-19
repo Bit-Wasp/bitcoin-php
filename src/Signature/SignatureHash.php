@@ -87,7 +87,7 @@ class SignatureHash implements SignatureHashInterface
 
             $nOutput = $inputToSign;
             if ($nOutput >= count($outputs)) {
-                throw new \Exception("SignatureHash->calculateHash(): nOutput $nOutput is out of range");
+                return Buffer::hex('01');
             }
 
             // Resize..
