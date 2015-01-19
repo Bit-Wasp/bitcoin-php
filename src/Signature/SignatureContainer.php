@@ -6,6 +6,8 @@ use Bitcoin\Util\Buffer;
 use Bitcoin\Key\PublicKeyInterface;
 use Bitcoin\Script\ScriptInterface;
 use Bitcoin\Transaction\TransactionOutputInterface;
+use Mdanter\Ecc\MathAdapterInterface;
+use Mdanter\Ecc\GeneratorPoint;
 
 /**
  * Class SignatureContainer
@@ -19,8 +21,20 @@ class SignatureContainer
      */
     protected $signatures = array();
 
-    public function __construct()
+    /**
+     * @var
+     */
+    protected $math;
+
+    /**
+     * @var
+     */
+    protected $generator;
+
+    public function __construct(MathAdapterInterface $math, GeneratorPoint $G)
     {
+        $this->math = $math;
+        $this->generator = $G;
         return $this;
     }
 
@@ -45,8 +59,10 @@ class SignatureContainer
      */
     public function find(Buffer $messageHash, PublicKeyInterface $publicKey)
     {
-        foreach ($this->signatures as $sig) {
-            if ($publicKey->verify($messageHash, $sig)) {
+        $signer = new Signer($this->math, $this->generator);
+
+        foreach ($this->signatures as $signature) {
+            if ($signer->verify($publicKey, $messageHash, $signature)) {
                 return true;
             }
         }
