@@ -6,7 +6,7 @@
  * Time: 05:34
  */
 
-namespace Network;
+namespace Bitcoin\Network;
 
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Parser;
@@ -52,6 +52,20 @@ class Version
 
     public function serialize($type = null)
     {
+        $bytes = new Parser();
+        $bytes = $bytes
+            ->writeInt(4, $this->version)
+            ->writeBytes(32, $this->services)
+            ->writeInt(8, $this->timestamp)
+            ->writeBytes(26, $this->addrRecv)
+            ->writeBytes(26, $this->addrFrom)
+            ->writeInt(8, $this->nonce)
+            ->writeWithLength($this->userAgent)
+            ->writeInt(4, $this->startHeight)
+            ->writeInt(1, $this->relay)
+            ->getBuffer()
+            ->serialize($type);
 
+        return $bytes;
     }
 }
