@@ -3,19 +3,22 @@
 namespace Bitcoin\Math;
 
 use Bitcoin\Util\Buffer;
+use Mdanter\Ecc\MathAdapterInterface;
+use Mdanter\Ecc\EccFactory;
+use Mdanter\Ecc\NumberTheory;
 
 /**
  * Class Math
  * @package Bitcoin
  */
-class Math implements \Mdanter\Ecc\MathAdapterInterface
+class Math implements MathAdapterInterface
 {
     protected $math;
 
-    public function __construct(\Mdanter\Ecc\MathAdapterInterface $math = null)
+    public function __construct(MathAdapterInterface $math = null)
     {
         if (is_null($math)) {
-            $math = \Mdanter\Ecc\EccFactory::getAdapter();
+            $math = EccFactory::getAdapter();
         }
 
         $this->math = $math;
