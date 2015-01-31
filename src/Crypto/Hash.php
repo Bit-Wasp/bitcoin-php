@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Crypto;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 
 /**
  * Class Hash

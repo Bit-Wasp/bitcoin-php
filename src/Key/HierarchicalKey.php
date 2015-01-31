@@ -5,9 +5,9 @@ namespace Bitcoin\Key;
 use Bitcoin\Bitcoin;
 use Bitcoin\Exceptions\ParserOutOfRange;
 use Bitcoin\Base58;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
-use Bitcoin\Util\Parser;
+use Bitcoin\Parser;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
 use Bitcoin\Signature\K\KInterface;
@@ -58,7 +58,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     protected $sequence;
 
     /**
-     * @var Buffer
+     * @var \Bitcoin\Buffer
      */
     protected $chainCode;
 
@@ -510,7 +510,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      * Create a buffer containing data to be hashed hashed to yield the child offset
      *
      * @param Buffer $sequence
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      * @throws \Exception
      */
     public function getOffsetBuffer(Buffer $sequence)

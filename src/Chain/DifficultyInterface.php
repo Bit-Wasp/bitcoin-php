@@ -8,7 +8,7 @@
 
 namespace Bitcoin\Chain;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 
 interface DifficultyInterface
 {

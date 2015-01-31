@@ -3,8 +3,8 @@
 namespace Bitcoin\Signature;
 
 use Bitcoin\Crypto\Hash;
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 use Bitcoin\Script\Script;
 use Bitcoin\Transaction\TransactionInterface;
 use Bitcoin\Transaction\TransactionOutputInterface;
@@ -50,7 +50,7 @@ class SignatureHash implements SignatureHashInterface
      * @param TransactionOutputInterface $txOut
      * @param $inputToSign
      * @param int $sighashType
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      * @throws \Exception
      */
     public function calculateHash(TransactionOutputInterface $txOut, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)

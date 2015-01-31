@@ -2,8 +2,8 @@
 
 namespace Bitcoin\Block;
 
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Exceptions\ParserOutOfRange;
 
@@ -63,7 +63,7 @@ class BlockHeader implements BlockHeaderInterface
     }
 
     /**
-     * @param Parser $parser
+     * @param \Bitcoin\Parser $parser
      * @return $this
      * @throws \Bitcoin\Exceptions\ParserOutOfRange
      */

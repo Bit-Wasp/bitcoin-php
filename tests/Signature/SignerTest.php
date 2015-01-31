@@ -8,7 +8,7 @@ use Bitcoin\Crypto\Random;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\Signer;
 use Bitcoin\Signature\K\RandomK;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
 use Bitcoin\Crypto\Hash;
 

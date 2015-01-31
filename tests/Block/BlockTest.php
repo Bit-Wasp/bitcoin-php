@@ -3,8 +3,8 @@
 
 namespace Bitcoin\Tests\Block;
 
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 use Bitcoin\Block\Block;
 use Bitcoin\Block\BlockHeader;
 use Bitcoin\Transaction\Transaction;

@@ -3,8 +3,8 @@
 namespace Bitcoin\Signature;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 use Bitcoin\Exceptions\ParserOutOfRange;
 use Bitcoin\Exceptions\SignatureNotCanonical;
 
@@ -111,7 +111,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param Parser $parser
+     * @param \Bitcoin\Parser $parser
      * @return Signature
      * @throws ParserOutOfRange
      */
@@ -180,7 +180,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param Buffer $sig
+     * @param \Bitcoin\Buffer $sig
      * @return bool
      * @throws SignatureNotCanonical
      */

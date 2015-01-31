@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Crypto\DRBG;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 
 /**
  * Interface DRBGInterface
@@ -15,7 +15,7 @@ interface DRBGInterface
      * Return $numBytes bytes deterministically derived from a seed
      *
      * @param int $numNumBytes
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      */
     public function bytes($numNumBytes);
 }

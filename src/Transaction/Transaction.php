@@ -5,7 +5,7 @@ namespace Bitcoin\Transaction;
 use Bitcoin\Bitcoin;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\SerializableInterface;
-use Bitcoin\Util\Parser;
+use Bitcoin\Parser;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
 use Bitcoin\Signature\Signature;
@@ -271,7 +271,7 @@ class Transaction implements TransactionInterface, SerializableInterface
     }
 
     /**
-     * @param Parser $parser
+     * @param \Bitcoin\Parser $parser
      * @throws \Bitcoin\Exceptions\ParserOutOfRange
      * @throws \Exception
      */

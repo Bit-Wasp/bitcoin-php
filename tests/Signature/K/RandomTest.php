@@ -15,7 +15,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->bufferType = 'Bitcoin\Util\Buffer';
+        $this->bufferType = 'Bitcoin\Buffer';
     }
 
     public function setUp()

@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Crypto;
 
 use Bitcoin\Crypto\Hash;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 
 class HashTest extends \PHPUnit_Framework_TestCase
 {

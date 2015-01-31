@@ -2,8 +2,8 @@
 
 namespace Bitcoin\Block;
 
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 use Bitcoin\Exceptions\ParserOutOfRange;
 
 class Block implements BlockInterface

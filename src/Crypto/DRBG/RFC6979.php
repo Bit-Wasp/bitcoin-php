@@ -3,7 +3,7 @@
 namespace Bitcoin\Crypto\DRBG;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Key\PrivateKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -30,7 +30,7 @@ class RFC6979 implements DRBGInterface
     /**
      * @param $algo
      * @param PrivateKeyInterface $privateKey
-     * @param Buffer $message
+     * @param \Bitcoin\Buffer $message
      */
     public function __construct(PrivateKeyInterface $privateKey, Buffer $message, $algo = 'sha256')
     {
@@ -42,7 +42,7 @@ class RFC6979 implements DRBGInterface
     /**
      * Return a sequence of $numBytes bytes, which are between [1..Q]
      * @param int $numBytes
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      */
     public function bytes($numBytes)
     {

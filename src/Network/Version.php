@@ -8,8 +8,8 @@
 
 namespace Bitcoin\Network;
 
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 
 class Version
 {

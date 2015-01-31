@@ -21,7 +21,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
      */
     public function testEncode()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
+        $f    = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
@@ -44,7 +44,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
      */
     public function testEncodeDecode()
     {
-        $f    = file_get_contents(__DIR__.'/../Data/base58.encodedecode.json');
+        $f    = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
@@ -77,7 +77,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
      */
     public function testEncodeDecodeCheck()
     {
-        $f     = file_get_contents(__DIR__ . '/../Data/base58.encodedecode.json');
+        $f     = file_get_contents(__DIR__ . '/Data/base58.encodedecode.json');
         $json  = json_decode($f);
 
         foreach ($json->test as $test) {

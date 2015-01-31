@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Math;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\NumberTheory;

@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Signature;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Key\PublicKeyInterface;
 use Bitcoin\Script\ScriptInterface;
 use Bitcoin\Transaction\TransactionOutputInterface;
@@ -53,7 +53,7 @@ class SignatureContainer
     /**
      * Find a signature which is validated by the given public key
      *
-     * @param Buffer $messageHash
+     * @param \Bitcoin\Buffer $messageHash
      * @param PublicKeyInterface $publicKey
      * @return bool
      */

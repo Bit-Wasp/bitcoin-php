@@ -3,8 +3,8 @@
 namespace Bitcoin\Script;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Key\PublicKeyInterface;
@@ -449,7 +449,7 @@ class Script implements ScriptInterface
     /**
      * Return a buffer containing the hash of this script.
      *
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      */
     public function getScriptHash()
     {

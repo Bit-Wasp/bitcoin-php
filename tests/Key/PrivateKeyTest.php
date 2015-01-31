@@ -5,7 +5,7 @@ namespace Bitcoin\Tests\Key;
 use Bitcoin\Bitcoin;
 use Bitcoin\Key\PrivateKey;
 use Bitcoin\Network;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 

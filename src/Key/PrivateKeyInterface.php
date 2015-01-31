@@ -3,7 +3,7 @@
 namespace Bitcoin\Key;
 
 use Bitcoin\NetworkInterface;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Signature\K\KInterface;
 
 /**

@@ -3,7 +3,7 @@
 namespace Bitcoin\Crypto\DRBG;
 
 use Bitcoin\Crypto\Hash;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Mdanter\Ecc\GeneratorPoint;
 
 /**
@@ -37,8 +37,8 @@ class HMACDRBG implements DRBGInterface
      * Construct a HMAC deterministic byte generator.
      *
      * @param $algo
-     * @param Buffer $entropy
-     * @param Buffer $personalString
+     * @param \Bitcoin\Buffer $entropy
+     * @param \Bitcoin\Buffer $personalString
      * @param GeneratorPoint $generator
      */
     public function __construct($algo, Buffer $entropy, Buffer $personalString = null, GeneratorPoint $generator = null)
@@ -54,8 +54,8 @@ class HMACDRBG implements DRBGInterface
 
     /**
      * Initialize the DRBG with the given $entropy and $personalString
-     * @param Buffer $entropy
-     * @param Buffer $personalString
+     * @param \Bitcoin\Buffer $entropy
+     * @param \Bitcoin\Buffer $personalString
      * @return $this
      */
     public function initialize(Buffer $entropy, Buffer $personalString = null)
@@ -116,7 +116,7 @@ class HMACDRBG implements DRBGInterface
     /**
      * Reseed the DRBG with new entropy, and reset the counter.
      *
-     * @param Buffer $entropy
+     * @param \Bitcoin\Buffer $entropy
      */
     public function reseed(Buffer $entropy)
     {
@@ -138,7 +138,7 @@ class HMACDRBG implements DRBGInterface
      * Load $numBytes bytes from the DRBG
      *
      * @param int $numNumBytes
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      */
     public function bytes($numNumBytes)
     {

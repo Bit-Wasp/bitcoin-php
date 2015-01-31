@@ -3,7 +3,7 @@
 namespace Bitcoin\Chain;
 
 use Bitcoin\Math\Math;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 
 /**
  * Class Difficulty
@@ -15,7 +15,7 @@ class Difficulty implements DifficultyInterface
     const MAX_TARGET = '1d00ffff';
 
     /**
-     * @var Buffer
+     * @var \Bitcoin\Buffer
      */
     protected $lowestBits;
 
@@ -25,7 +25,7 @@ class Difficulty implements DifficultyInterface
     protected $math;
 
     /**
-     * @param Buffer $bits
+     * @param \Bitcoin\Buffer $bits
      */
     public function __construct(Math $math, Buffer $lowestBits = null)
     {
@@ -36,7 +36,7 @@ class Difficulty implements DifficultyInterface
     /**
      * Return the lowest 'bits' - for difficulty 1.
      *
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      */
     public function lowestBits()
     {
@@ -64,7 +64,7 @@ class Difficulty implements DifficultyInterface
     /**
      * Get the target from a compact int.
      *
-     * @param Buffer $bits
+     * @param \Bitcoin\Buffer $bits
      * @return int|string
      */
     public function getTarget(Buffer $bits)
@@ -77,7 +77,7 @@ class Difficulty implements DifficultyInterface
     /**
      * Get target hash from bits.
      *
-     * @param Buffer $bits
+     * @param \Bitcoin\Buffer $bits
      * @return int|string
      */
     public function getTargetHash(Buffer $bits)
@@ -90,7 +90,7 @@ class Difficulty implements DifficultyInterface
     /**
      * Get the difficulty of the supplied bits relative to the lowest target.
      *
-     * @param Buffer $bits
+     * @param \Bitcoin\Buffer $bits
      * @return float|number
      */
     public function getDifficulty(Buffer $bits)

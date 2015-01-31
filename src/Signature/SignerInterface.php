@@ -8,7 +8,7 @@
 
 namespace Bitcoin\Signature;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\Key\PublicKeyInterface;
 use Bitcoin\Signature\K\KInterface;

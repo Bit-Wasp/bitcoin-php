@@ -4,8 +4,8 @@ namespace Bitcoin\Tests\Transaction;
 
 use Bitcoin\Transaction\TransactionOutput;
 use Bitcoin\Script\Script;
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 
 class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     {
         $this->txOutType = 'Bitcoin\Transaction\TransactionOutput';
         $this->scriptType = 'Bitcoin\Script\Script';
-        $this->bufferType = 'Bitcoin\Util\Buffer';
+        $this->bufferType = 'Bitcoin\Buffer';
     }
 
     public function setUp()

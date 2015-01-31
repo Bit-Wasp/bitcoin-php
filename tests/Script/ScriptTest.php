@@ -4,7 +4,7 @@ namespace Bitcoin\Tests\Script;
 
 use Bitcoin\Script\Script;
 use Bitcoin\Key\PublicKey;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
 use Bitcoin\Crypto\Random;
 
@@ -15,6 +15,16 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
      * @var Script
      */
     protected $script;
+
+    /**
+     * @var string
+     */
+    protected $bufferType;
+
+    public function __construct()
+    {
+        $this->bufferType = 'Bitcoin\Buffer';
+    }
 
     public function setUp()
     {
@@ -229,7 +239,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $parse = $this->script->parse();
 
         $this->assertSame($parse[0], 'OP_HASH160');
-        $this->assertInstanceOf('Bitcoin\Util\Buffer', $parse[1]);
+        $this->assertInstanceOf($this->bufferType, $parse[1]);
         $this->assertSame($parse[1]->serialize(), $buf->serialize());
         $this->assertSame($parse[2], 'OP_EQUAL');
     }

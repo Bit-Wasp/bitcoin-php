@@ -10,7 +10,7 @@ use Bitcoin\SerializableInterface;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Math\Math;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Base58;
 use Bitcoin\Crypto\Random;
 use Mdanter\Ecc\EccFactory;
@@ -130,7 +130,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * Generate a buffer containing a valid key
      *
      * @param \Mdanter\Ecc\GeneratorPoint $generator
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      * @throws \Exception
      */
     public static function generateKey()

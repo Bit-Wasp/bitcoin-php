@@ -8,8 +8,8 @@
 
 namespace Bitcoin\Tests\Block;
 
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 use Bitcoin\Block\BlockHeader;
 use Bitcoin\Block\BlockHeaderInterface;
 
@@ -33,7 +33,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     public function __construct()
     {
         $this->headerType = 'Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'Bitcoin\Util\Buffer';
+        $this->bufferType = 'Bitcoin\Buffer';
     }
 
     public function setUp()

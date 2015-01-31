@@ -5,8 +5,8 @@ namespace Bitcoin\Tests\Transaction;
 use Bitcoin\Transaction\TransactionInput;
 use Bitcoin\Transaction\TransactionInputInterface;
 use Bitcoin\Script\Script;
-use Bitcoin\Util\Parser;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Parser;
+use Bitcoin\Buffer;
 
 class TransactionInputTest extends \PHPUnit_Framework_TestCase
 {

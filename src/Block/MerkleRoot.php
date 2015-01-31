@@ -4,8 +4,8 @@ namespace Bitcoin\Block;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Network;
-use Bitcoin\Util\Parser;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Parser;
+use Bitcoin\Buffer;
 use Pleo\Merkle\FixedSizeTree;
 use Bitcoin\Exceptions\MerkleTreeEmpty;
 

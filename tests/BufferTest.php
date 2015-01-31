@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Util;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
 
 class BufferTest extends \PHPUnit_Framework_TestCase
@@ -20,7 +20,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->bufferType = 'Bitcoin\Util\Buffer';
+        $this->bufferType = 'Bitcoin\Buffer';
     }
 
     public function setUp()

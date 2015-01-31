@@ -3,8 +3,8 @@
 namespace Bitcoin\Transaction;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Parser;
+use Bitcoin\Buffer;
+use Bitcoin\Parser;
 use Bitcoin\Script\Script;
 use Bitcoin\SerializableInterface;
 
@@ -119,7 +119,7 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
 
     /**
      * Get Script Buffer - just return the buffer, not the script
-     * @return Buffer
+     * @return \Bitcoin\Buffer
      */
     public function getScriptBuf()
     {
@@ -131,7 +131,7 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
 
     /**
      * Set Script Buffer
-     * @param Buffer $script
+     * @param \Bitcoin\Buffer $script
      * @return $this
      */
     public function setScriptBuf(Buffer $script)

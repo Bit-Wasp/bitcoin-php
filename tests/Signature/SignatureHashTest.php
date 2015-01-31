@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Tests\Signature;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Script\Script;
 use Bitcoin\Transaction\Transaction;
 use Bitcoin\Transaction\TransactionOutput;

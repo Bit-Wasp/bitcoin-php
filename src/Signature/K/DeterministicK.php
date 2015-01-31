@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Signature\K;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Crypto\DRBG\HMACDRBG;
 use Bitcoin\Key\PrivateKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -28,7 +28,7 @@ class DeterministicK implements KInterface
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param Buffer $messageHash
+     * @param \Bitcoin\Buffer $messageHash
      * @param string $algo
      * @param GeneratorPoint $generator
      */

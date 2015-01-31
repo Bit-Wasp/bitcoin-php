@@ -1,8 +1,8 @@
 <?php
 
-namespace Bitcoin\Util;
+namespace Bitcoin;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
 use Bitcoin\Exceptions\ParserOutOfRange;
 
@@ -19,7 +19,7 @@ class Parser
     protected $string;
 
     /**
-     * @var \Bitcoin\Math\MathAdapterInterface
+     * @var \Bitcoin\Math\Math
      */
     protected $math;
 

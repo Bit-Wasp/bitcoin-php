@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Signature;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\Key\PublicKeyInterface;
@@ -48,7 +48,7 @@ class Signer implements SignerInterface
      * deterministic (RFC6979)
      *
      * @param PrivateKeyInterface $privateKey
-     * @param Buffer $messageHash
+     * @param \Bitcoin\Buffer $messageHash
      * @param KInterface $kProvider
      * @return Signature
      */
@@ -95,7 +95,7 @@ class Signer implements SignerInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param Buffer $hash
+     * @param \Bitcoin\Buffer $hash
      * @param SignatureInterface $signature
      * @return bool
      */

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Util;
+namespace Bitcoin;
 
 use Bitcoin\Bitcoin;
 

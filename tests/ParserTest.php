@@ -1,15 +1,15 @@
 <?php
 
-namespace Bitcoin\Tests\Util;
+namespace Bitcoin\Tests;
 
-use Bitcoin\Util\Buffer;
+use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
-use Bitcoin\Util\Parser;
+use Bitcoin\Parser;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Parser
+     * @var \Bitcoin\Parser
      */
     protected $parser;
 
@@ -25,8 +25,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->parserType = 'Bitcoin\Util\Parser';
-        $this->bufferType = 'Bitcoin\Util\Buffer';
+        $this->parserType = 'Bitcoin\Parser';
+        $this->bufferType = 'Bitcoin\Buffer';
     }
 
     public function setUp()
@@ -191,7 +191,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $bytes = '41424344';
         $parser = new Parser();
-        $parser->writeBytes(4, Buffer::hex($bytes), true);
+        $parser->writeBytes(4,Buffer::hex($bytes), true);
         $returned = $parser->getBuffer()->serialize('hex');
         $this->assertSame($returned, '44434241');
     }
