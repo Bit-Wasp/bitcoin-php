@@ -43,7 +43,7 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
     }
 
 	/**
-     * @expectedException \Bitcoin\Exceptions\SquareRootException
+	 * @expectedException \LogicException
 	 */
 	public function testSqrtDataWithNoRootsBcMath()
 	{
@@ -57,7 +57,7 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @expectedException \Bitcoin\Exceptions\SquareRootException
+	 * @expectedException \LogicException
 	 */
 	public function testSqrtDataWithNoRootsGmp()
 	{
@@ -72,8 +72,9 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 	
 	public function testSqrtDataWithRootsGmp()
 	{
-		$this->math = new Gmp();
-		$this->theory = new \Bitcoin\Util\NumberTheory($this->math);
+		Bitcoin::setMath(new Gmp());
+		$this->math = Bitcoin::getMath();
+		$this->theory = $this->math->getNumberTheory();
 		
 		foreach($this->sqrt_data->has_root as $r)
 		{
@@ -89,8 +90,9 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testSqrtDataWithRootsBcMath()
 	{
-		$this->math = new BcMath();
-		$this->theory = new \Bitcoin\Util\NumberTheory($this->math);
+		Bitcoin::setMath(new BcMath());
+		$this->math = Bitcoin::getMath();
+		$this->theory = $this->math->getNumberTheory();
 		
 		foreach($this->sqrt_data->has_root as $r)
 		{
@@ -104,15 +106,18 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 	
 	public function testBcmathCompressionConsistency()
 	{
-		$this->math = new BcMath();
-		$this->theory = new \Bitcoin\Util\NumberTheory($this->math);
+		Bitcoin::setMath(new BcMath());
+		$this->math = Bitcoin::getMath();
+		$this->theory = $this->math->getNumberTheory();
 		$this->_doCompressionConsistence($this->theory);
 		
 	}
+
 	public function testGmpCompressionConsistency()
 	{
-		$this->math = new Gmp();
-		$this->theory = new \Bitcoin\Util\NumberTheory($this->math);
+		Bitcoin::setMath(new Gmp());
+		$this->math = Bitcoin::getMath();
+		$this->theory = $this->math->getNumberTheory();
 		$this->_doCompressionConsistence($this->theory);
 	}
 	
@@ -169,7 +174,8 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 
 	public function testGmpModFunction()
 	{
-		$math = new Gmp();
+		Bitcoin::setMath(new Gmp());
+		$math = Bitcoin::getMath();
 		
 		// $o->compressed, $o->decompressed public key.
 		// Check that we can compress a key properly (tests $math->mod())
@@ -192,7 +198,8 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 	
 	public function testBcmathModFunction()
 	{
-		$math = new BcMath();
+		Bitcoin::setMath(new BcMath());
+		$math = Bitcoin::getMath();
 		
 		// $o->compressed, $o->decompressed public key.
 		// Check that we can compress a key properly (tests $math->mod())
