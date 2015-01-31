@@ -2,18 +2,18 @@
 
 namespace Bitcoin\Tests\Util;
 
-use Bitcoin\Util\Base58;
+use Bitcoin\Base58;
 
 class Base58Test extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Base58
+     * @var \Bitcoin\Base58
      */
     protected $base58;
 
     public function setUp()
     {
-        $this->base58 = new Base58();
+        $this->base58 = new \Bitcoin\Base58();
     }
 
     /**
@@ -99,7 +99,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         // 12D2adLM3UKy4cH891ZFDkWmXmotrMoF <-- has typo, b replaced with c.
         //              ^
 
-        Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
+        \Bitcoin\Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
 
     }
 }

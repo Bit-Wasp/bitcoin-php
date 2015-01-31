@@ -11,7 +11,7 @@ use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Math\Math;
 use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Base58;
+use Bitcoin\Base58;
 use Bitcoin\Crypto\Random;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;

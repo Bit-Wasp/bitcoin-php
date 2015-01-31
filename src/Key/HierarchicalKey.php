@@ -4,7 +4,7 @@ namespace Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Exceptions\ParserOutOfRange;
-use Bitcoin\Util\Base58;
+use Bitcoin\Base58;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Math;
 use Bitcoin\Util\Parser;
