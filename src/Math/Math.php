@@ -140,8 +140,6 @@ class Math implements \Mdanter\Ecc\MathAdapterInterface
         return $this->math->leftShift($number, $positions);
     }
 
-
-
     /**
      * Similar to gmp_div_qr, return a tuple containing the
      * result and the remainder
@@ -188,6 +186,13 @@ class Math implements \Mdanter\Ecc\MathAdapterInterface
                 )
             )
         );
+    }
+
+    public function getNumberTheory()
+    {
+        $theory = new NumberTheory($this->math);
+
+        return $theory;
     }
 
     public function getCompact(Buffer $bits)

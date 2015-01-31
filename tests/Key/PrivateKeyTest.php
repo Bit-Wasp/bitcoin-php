@@ -6,8 +6,8 @@ use Bitcoin\Bitcoin;
 use Bitcoin\Key\PrivateKey;
 use Bitcoin\Network;
 use Bitcoin\Util\Buffer;
-use Bitcoin\Util\Math;
-
+use Bitcoin\Math\Math;
+use Mdanter\Ecc\GeneratorPoint;
 
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Crypto\DRBG\HMACDRBG;
@@ -21,6 +21,16 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
      */
     protected $privateKey;
 
+    /**
+     * @var Math
+     */
+    protected $math;
+
+    /**
+     * @var GeneratorPoint
+     */
+    protected $generator;
+
     protected $baseType = 'Bitcoin\Key\PrivateKey';
 
     protected $publicType = 'Bitcoin\Key\PublicKey';
@@ -28,6 +38,8 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->privateKey = null;
+        $this->math = Bitcoin::getMath();
+        $this->generator = Bitcoin::getGenerator();
     }
 
     public function testIsValidKey()
@@ -64,7 +76,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testCreatePrivateKey()
     {
-        $this->privateKey = new PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertInstanceOf($this->baseType, $this->privateKey);
         $this->assertSame($this->privateKey->serialize('hex'), '4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertFalse($this->privateKey->isCompressed());
@@ -86,7 +98,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreatePrivateKeyFailure()
     {
-        $this->privateKey = new PrivateKey('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
     }
 
     public function testGenerateNewUncompressed()
@@ -100,7 +112,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testSetCompressed()
     {
-        $this->privateKey = new PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertFalse($this->privateKey->isCompressed());
         $this->privateKey->setCompressed(true);
         $this->assertTrue($this->privateKey->isCompressed());
@@ -118,7 +130,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWif()
     {
-        $this->privateKey = new PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
         $network = new Network('00','05','80');
         $this->assertSame($this->privateKey->getWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
 
@@ -128,7 +140,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPubKeyHash()
     {
-        $this->privateKey = new PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertSame('d00baafc1c7f120ab2ae0aa22160b516cfcf9cfe', $this->privateKey->getPubKeyHash());
         $this->privateKey->setCompressed(true);
         $this->assertSame('c53c82d3357f1f299330d585907b7c64b6b7a5f0', $this->privateKey->getPubKeyHash());
@@ -136,7 +148,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDefaultCurve()
     {
-        $this->privateKey = new PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
         $curve = $this->privateKey->getCurve();
 
         $this->assertSame($curve->getA(), 0);
@@ -147,7 +159,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $buf                = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
-        $this->privateKey   = new PrivateKey($buf);
+        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf);
         $this->assertSame($buf->serialize(), $this->privateKey->serialize());
     }
 
@@ -155,7 +167,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     {
         $hex                = '4141414141414141414141414141414141414141414141414141414141414141';
         $buf                = Buffer::hex($hex);
-        $this->privateKey   = new PrivateKey($buf);
+        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf);
         $this->assertEquals($hex, $this->privateKey->__toString());
     }
 
@@ -163,14 +175,14 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     {
         $hex                = '4141414141414141414141414141414141414141414141414141414141414141';
         $buf                = Buffer::hex($hex);
-        $this->privateKey   = new PrivateKey($buf);
+        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf);
         $this->assertEquals(32, $this->privateKey->getSize());
         $this->assertEquals(64, $this->privateKey->getSize('hex'));
     }
 
     public function testFromWif()
     {
-        $math = \Bitcoin\Bitcoin::getMath();
+        $math = $this->math;
 
         $regular = array(
             '5KeNtJ66K7UNpirG3574f9Z8SjPDPTc5YaSBczttdoqNdQMK5b9' => 'f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b',

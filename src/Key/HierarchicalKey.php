@@ -118,7 +118,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         if ($this->network->getHDPrivByte() == $this->bytes) {
             $this->keyData     = $parser->readBytes(33);
             $private           = substr($this->keyData->serialize('hex'), 2);
-            $this->privateKey  = new PrivateKey($private, true, $this->generator);
+            $this->privateKey  = new PrivateKey($this->math, $this->generator, $private, true, $this->generator);
         } else {
             $this->keyData     = $parser->readBytes(33);
             $this->publicKey   = PublicKey::fromHex($this->keyData->serialize('hex'), $this->generator);
@@ -548,22 +548,20 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     {
         if ($this->isPrivate()) {
             // offset + privKey % n
-            $key = new PrivateKey(
-                str_pad(
-                    $this->math->decHex(
-                        $this->math->mod(
-                            $this->math->add(
-                                $this->math->hexDec($offset->serialize('hex')),
-                                $this->getPrivateKey()->serialize('int')
-                            ),
-                            $this->getGenerator()->getOrder()
-                        )
-                    ),
-                    64,
-                    '0',
-                    STR_PAD_LEFT
-                )
-            );
+            $key = new PrivateKey($this->math, $this->generator, str_pad(
+                $this->math->decHex(
+                    $this->math->mod(
+                        $this->math->add(
+                            $this->math->hexDec($offset->serialize('hex')),
+                            $this->getPrivateKey()->serialize('int')
+                        ),
+                        $this->getGenerator()->getOrder()
+                    )
+                ),
+                64,
+                '0',
+                STR_PAD_LEFT
+            ));
 
         } else {
             // (offset*G) + (K)

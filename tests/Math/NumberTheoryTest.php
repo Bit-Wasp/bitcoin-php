@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Bitcoin\Tests\Math;
 
 use Bitcoin\Bitcoin;
 use Mdanter\Ecc\Math\Gmp;
@@ -47,22 +47,23 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSqrtDataWithNoRootsBcMath()
 	{
-		$this->math = new BcMath();
-		$this->theory = new \Bitcoin\Util\NumberTheory($this->math);
+		Bitcoin::setMath(new BcMath());
+		$this->theory = Bitcoin::getMath()->getNumberTheory();
 		
 		foreach($this->sqrt_data->no_root as $r)
 		{
 			$this->theory->squareRootModP($r->a, $r->p);	
 		}
 	}
+
 	/**
 	 * @expectedException \Bitcoin\Exceptions\SquareRootException
 	 */
 	public function testSqrtDataWithNoRootsGmp()
 	{
-		$this->math = new Gmp();
-		$this->theory = new \Bitcoin\Util\NumberTheory($this->math);
-		
+		Bitcoin::setMath(new BcMath());
+		$this->theory = Bitcoin::getMath()->getNumberTheory();
+
 		foreach($this->sqrt_data->no_root as $r)
 		{
 			$this->theory->squareRootModP($r->a, $r->p);	

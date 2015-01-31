@@ -7,7 +7,7 @@ use Bitcoin\Util\NumberTheory;
 use Bitcoin\Network;
 use Bitcoin\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
-use Mdanter\Ecc\MathAdapter;
+use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\CurveFpInterface;
 
@@ -18,14 +18,9 @@ use Mdanter\Ecc\CurveFpInterface;
 class Bitcoin
 {
     /**
-     * @var null|MathAdapter
+     * @var null|MathAdapterInterface
      */
     private static $math = null;
-
-    /**
-     * @var null|NumberTheory
-     */
-    private static $numberTheory = null;
 
     /**
      * @var null|GeneratorPoint
@@ -38,12 +33,7 @@ class Bitcoin
     private static $network = null;
 
     /**
-     * @var null|CurveFpInterface
-     */
-    private static $curve = null;
-
-    /**
-     * @return MathAdapter
+     * @return MathAdapterInterface
      */
     public static function getMath()
     {
@@ -52,23 +42,11 @@ class Bitcoin
     }
 
     /**
-     * @param MathAdapter $adapter
+     * @param MathAdapterInterface $adapter
      */
-    public static function setMath(MathAdapter $adapter)
+    public static function setMath(MathAdapterInterface $adapter)
     {
-        self::$math = $adapter;
-    }
-
-    /**
-     * @return NumberTheory
-     */
-    public static function getNumberTheory()
-    {
-        if (is_null(self::$numberTheory)) {
-            self::$numberTheory = EccFactory::getNumberTheory(self::getMath());
-        }
-
-        return self::$numberTheory;
+        self::$math = new Math($adapter);
     }
 
     /**
@@ -85,22 +63,6 @@ class Bitcoin
     public static function setGenerator(GeneratorPoint $generator)
     {
         self::$generator = $generator;
-    }
-
-    /**
-     * @return \Mdanter\Ecc\CurveFp
-     */
-    public static function getCurve()
-    {
-        return self::$curve ?: EccFactory::getSecgCurves()->curve256k1();
-    }
-
-    /**
-     * @param CurveFpInterface $curve
-     */
-    public static function setCurve(CurveFpInterface $curve)
-    {
-        self::$curve = $curve;
     }
 
     /**

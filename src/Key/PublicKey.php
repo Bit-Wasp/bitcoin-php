@@ -191,15 +191,16 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      * @param GeneratorPoint $generator
      * @throws \Exception
      */
-    public static function recoverYfromX($xCoord, $byte, GeneratorPoint $generator = null)
+    public static function recoverYfromX($xCoord, $byte)
     {
         if (! in_array($byte, array(PublicKey::KEY_COMPRESSED_ODD, PUBLICKEY::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
         }
 
         $math   = Bitcoin::getMath();
-        $curve  = Bitcoin::getCurve();
-        $theory = Bitcoin::getNumberTheory();
+        $theory = $math->getNumberTheory();
+        $generator  = Bitcoin::getGenerator();
+        $curve = $generator->getCurve();
 
         try {
             // x ^ 3
@@ -260,7 +261,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
-        $point = new Point($xCoord, $yCoord, $generator);
+        $point = new Point($generator, $xCoord, $yCoord);
 
         return new self($point, $compressed);
     }

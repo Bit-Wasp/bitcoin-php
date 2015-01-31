@@ -41,7 +41,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
 
         foreach ($json->test as $c => $test) {
 
-            $privateKey = new PrivateKey($test->privKey);
+            $privateKey = new PrivateKey($math, $generator, $test->privKey);
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
@@ -101,7 +101,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
         $math = Bitcoin::getMath();
         $G = Bitcoin::getGenerator();
         $signer = new Signer($math, $G);
-        $pk = new PrivateKey('4141414141414141414141414141414141414141414141414141414141414141');
+        $pk = new PrivateKey($math, $G, '4141414141414141414141414141414141414141414141414141414141414141');
 
         for ($i = 0; $i < 10; $i++) {
             $buf = Random::bytes(32);

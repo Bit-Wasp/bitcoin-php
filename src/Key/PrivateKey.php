@@ -9,11 +9,12 @@ use Bitcoin\NetworkInterface;
 use Bitcoin\SerializableInterface;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\K\KInterface;
-use Bitcoin\Util\Math;
+use Bitcoin\Math\Math;
 use Bitcoin\Util\Buffer;
 use Bitcoin\Util\Base58;
 use Bitcoin\Crypto\Random;
 use Mdanter\Ecc\EccFactory;
+use Mdanter\Ecc\GeneratorPoint;
 
 /**
  * Class PrivateKey
@@ -35,15 +36,24 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * @var PublicKey
      */
     protected $publicKey = null;
+    /**
+     * @var
+     */
+    private $math;
 
     /**
+     * @param \Bitcoin\Math\Math $math
+     * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @param $hex
      * @param bool $compressed
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
-     * @throws \Exception
+     * @throws InvalidPrivateKey
      */
-    public function __construct($hex, $compressed = false)
-    {
+    public function __construct(
+        Math $math,
+        GeneratorPoint $generator,
+        $hex,
+        $compressed = false
+    ) {
         if ($hex instanceof Buffer) {
             $hex = $hex->serialize('hex');
         }
@@ -52,8 +62,9 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
-        $this->generator        = Bitcoin::getGenerator();
-        $this->secretMultiplier = Bitcoin::getMath()->hexDec($hex);
+        $this->math = $math;
+        $this->generator = $generator;
+        $this->secretMultiplier = $this->math->hexDec($hex);
         $this->compressed       = $compressed;
 
         return $this;
@@ -71,7 +82,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         try {
             $data = Base58::decodeCheck($wif);
             $hex  = substr($data, 2, 64);
-            $key  = new PrivateKey($hex, (strlen($data) == 68));
+            $key  = new PrivateKey(Bitcoin::getMath(), Bitcoin::getGenerator(), $hex, (strlen($data) == 68));
 
         } catch (Base58ChecksumFailure $e) {
             throw new Base58ChecksumFailure('Failed to decode WIF - was it copied correctly?');
@@ -91,24 +102,8 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public static function generateNew($compressed = false)
     {
         $keyBuffer = self::generateKey();
-        $private   = new PrivateKey($keyBuffer->serialize('hex'), $compressed);
+        $private   = new PrivateKey(Bitcoin::getMath(), Bitcoin::getGenerator(), $keyBuffer->serialize('hex'), $compressed);
         return $private;
-    }
-
-    /**
-     * Generate a buffer containing a valid key
-     *
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
-     * @return Buffer
-     * @throws \Exception
-     */
-    public static function generateKey()
-    {
-        do {
-            $buffer = Random::bytes(32);
-        } while (! self::isValidKey($buffer->serialize('hex')));
-
-        return $buffer;
     }
 
     /**
@@ -130,6 +125,21 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $notZero     = ! ($math->cmp($math->hexDec($hex), 0) == 0);
 
         return $withinRange and $notZero;
+    }
+    /**
+     * Generate a buffer containing a valid key
+     *
+     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @return Buffer
+     * @throws \Exception
+     */
+    public static function generateKey()
+    {
+        do {
+            $buffer = Random::bytes(32);
+        } while (! self::isValidKey($buffer->serialize('hex')));
+
+        return $buffer;
     }
 
     public function getSecretMultiplier()

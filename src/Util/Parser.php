@@ -19,7 +19,7 @@ class Parser
     protected $string;
 
     /**
-     * @var \Bitcoin\Math\MathAdapter
+     * @var \Bitcoin\Math\MathAdapterInterface
      */
     protected $math;
 

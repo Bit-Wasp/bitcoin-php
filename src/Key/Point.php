@@ -25,11 +25,10 @@ class Point implements PointInterface
      * @param $y
      * @param GeneratorPoint $generator
      */
-    public function __construct($x, $y)
+    public function __construct(GeneratorPoint $generator, $x, $y)
     {
-        $generator = Bitcoin::getGenerator();
-
         $this->point = $generator->getCurve()->getPoint($x, $y, $generator->getOrder());
+
         return $this;
     }
 
