@@ -3,8 +3,9 @@
 namespace Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Util\Math;
+use Bitcoin\Math\Math;
 use Bitcoin\Crypto\Hash;
+use Bitcoin\Buffer;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -155,6 +156,31 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     public function isPrivate()
     {
         return false;
+    }
+
+    public static function isCompressedOrUncompressed(Buffer $publicKey)
+    {
+        $vchPubKey = $publicKey->serialize();
+        if ($publicKey->getSize() < 33) {
+            return false;
+        }
+
+        if (ord($vchPubKey[0]) == 0x04) {
+            if ($publicKey->getSize() != 65) {
+                // Invalid length for uncompressed key
+                return false;
+            }
+        } else if (in_array($vchPubKey[0], array(
+                PublicKey::KEY_COMPRESSED_EVEN,
+                PublicKey::KEY_COMPRESSED_ODD))) {
+            if ($publicKey->getSize() != 33) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
     /**
