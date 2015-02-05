@@ -93,7 +93,7 @@ class Script implements ScriptInterface
         'OP_NEGATE' => 143,
         'OP_ABS' => 144,
         'OP_NOT' => 145,
-        'OP_0NOTEQUAL' => 156,
+        'OP_0NOTEQUAL' => 146,
         'OP_ADD' => 147,
         'OP_SUB' => 148,
         'OP_MUL' => 149,
@@ -111,6 +111,7 @@ class Script implements ScriptInterface
         'OP_LESSTHANOREQUAL' => 161,
         'OP_GREATERTHANOREQUAL' => 162,
         'OP_MIN' => 163,
+        'OP_MAX' => 164,
         'OP_WITHIN' => 165,
 
         // Crypto
@@ -382,7 +383,8 @@ class Script implements ScriptInterface
                     $lengthOfLen = 1;
                 } else if ($opCode == $this->getOpCode('OP_PUSHDATA2')) {
                     $lengthOfLen = 2;
-                } else if ($opCode == $this->getOpCode('OP_PUSHDATA4')) {
+                } else {
+                    // ($opCode == $this->getOpCode('OP_PUSHDATA4')) {
                     $lengthOfLen = 4;
                 }
 

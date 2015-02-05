@@ -12,7 +12,8 @@ interface ScriptInterface
      * //TODO: this needed?
      * @return mixed
      */
-    public function serialize();
 
     public function parse();
+
+    public function serialize($type = null);
 }
