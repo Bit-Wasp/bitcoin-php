@@ -132,11 +132,17 @@ class ScriptStack
         return $this->stack;
     }
 
+    /**
+     * @return int
+     */
     public function size()
     {
         return count($this->stack);
     }
 
+    /**
+     * @return int
+     */
     public function end()
     {
         $count = $this->size();
@@ -147,6 +153,11 @@ class ScriptStack
         return $count - 1;
     }
 
+    /**
+     * @param $pos1
+     * @param $pos2
+     * @return $this
+     */
     public function swap($pos1, $pos2)
     {
         $val1 = $this->top($pos1);
@@ -155,4 +166,4 @@ class ScriptStack
         $this->set($pos1, $val2);
         return $this;
     }
-};
+}

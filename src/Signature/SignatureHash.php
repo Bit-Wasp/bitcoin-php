@@ -41,7 +41,7 @@ class SignatureHash implements SignatureHashInterface
      * @return Buffer
      * @throws \Exception
      */
-    public function calculate (ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
         $copy     =  $this->transaction;
         $inputs   = &$copy->getInputsReference();
