@@ -6,12 +6,15 @@
  * Time: 18:48
  */
 
-namespace Bitcoin\RPC\Json;
+namespace Bitcoin\JsonRPC;
 
 use JsonRPC\Client;
 
 class JsonRPCClient
 {
+    /**
+     * @var Client
+     */
     protected $client;
 
     public function __construct($host, $port, $timeout = 5, array $headers = array())
@@ -85,5 +88,4 @@ class JsonRPCClient
     {
         $this->client->doRequest($payload);
     }
-
 }

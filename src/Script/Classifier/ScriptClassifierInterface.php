@@ -1,14 +1,24 @@
 <?php
+
+namespace Bitcoin\Script\Classifier;
+
+use Bitcoin\Script\Script;
+
 /**
- * Created by PhpStorm.
- * User: thomas
- * Date: 02/02/15
- * Time: 23:25
+ * Interface ScriptClassifierInterface
+ * @package Bitcoin\Script\Classifier
  */
+interface ScriptClassifierInterface
+{
+    const PAYTOPUBKEY = 'pubkey';
+    const PAYTOPUBKEYHASH = 'pubkeyhash';
+    const PAYTOSCRIPTHASH = 'scripthash';
+    const MULTISIG = 'multisig';
+    const NONSTANDARD = 'nonstandard';
 
-namespace Script\Classifier;
-
-
-interface ScriptClassifierInterface {
-
-}
+    public function isPayToPublicKeyHash();
+    public function isPayToPublicKey();
+    public function isPayToScriptHash();
+    public function isMultisig();
+    public function classify();
+};
