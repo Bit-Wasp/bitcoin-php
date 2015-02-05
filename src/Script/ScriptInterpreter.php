@@ -120,7 +120,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     protected $verifyP2SH = false;
 
     /**
-     * @param Script $script
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @param Transaction $transaction
      */
     public function __construct(Math $math, GeneratorPoint $generator, Transaction $transaction)
     {
@@ -202,11 +204,28 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
     }
 
+    /**
+     * @param $op
+     * @param $opCodeStr
+     * @return int
+     * @throws \Exception
+     */
     public function compareOp($op, $opCodeStr)
     {
-        return $this->math->cmp($op, $this->script->getOpCode($opCodeStr));
+        try {
+            $match = $this->math->cmp($op, $this->script->getOpCode($opCodeStr));
+        } catch (\Exception $e) {
+            $match = false;
+        }
+
+        return $match;
     }
 
+    /**
+     * @param $op
+     * @param $opCodeStr
+     * @return bool
+     */
     public function isOp($op, $opCodeStr)
     {
         return $this->compareOp($op, $opCodeStr) == 0;
@@ -227,6 +246,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         return false;
     }
 
+    /**
+     * @param $opCode
+     * @param Buffer $pushData
+     * @return bool
+     * @throws \Exception
+     */
     public function checkMinimalPush($opCode, Buffer $pushData)
     {
         $pushSize = $pushData->getSize();
@@ -249,6 +274,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         return true;
     }
 
+    /**
+     * @param $script
+     * @param $position
+     * @param $posEnd
+     * @param $opCode
+     * @param Buffer $pushData
+     * @return bool
+     * @throws \Exception
+     */
     public function getOp(&$script, &$position, $posEnd, &$opCode, Buffer &$pushData = null)
     {
         $opCode = $this->script->getOpCode('OP_INVALIDOPCODE');
@@ -338,6 +372,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param Script $scriptPubKey
      * @param $nInputToSign
      * @return bool
+     * @throws \Exception
      */
     public function verify(Script $scriptSig, Script $scriptPubKey, $nInputToSign)
     {
