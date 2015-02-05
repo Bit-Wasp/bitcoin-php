@@ -6,6 +6,7 @@ use Bitcoin\Crypto\Hash;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
 use Bitcoin\Script\Script;
+use Bitcoin\Script\ScriptInterface;
 use Bitcoin\Transaction\TransactionInterface;
 use Bitcoin\Transaction\TransactionOutputInterface;
 
@@ -21,11 +22,6 @@ class SignatureHash implements SignatureHashInterface
     protected $transaction;
 
     /**
-     * @var TransactionInterface
-     */
-    protected $copy;
-
-    /**
      * @param TransactionInterface $transaction
      */
     public function __construct(TransactionInterface $transaction)
@@ -34,30 +30,22 @@ class SignatureHash implements SignatureHashInterface
     }
 
     /**
-     * @return TransactionInterface
-     */
-    public function getTransaction()
-    {
-        return $this->transaction;
-    }
-
-    /**
      * Calculate the hash of the current transaction, when you are looking to
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
      * SIGHASH_ALL, though SIGHASH_SINGLE, SIGHASH_NONE, SIGHASH_ANYONECANPAY
      * can be used.
      *
-     * @param TransactionOutputInterface $txOut
+     * @param ScriptInterface $txOutScript
      * @param $inputToSign
      * @param int $sighashType
-     * @return \Bitcoin\Buffer
+     * @return Buffer
      * @throws \Exception
      */
-    public function calculateHash(TransactionOutputInterface $txOut, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
+    public function calculate (ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
-        $this->copy     =  $this->getTransaction();
-        $inputs         = &$this->copy->getInputsReference();
-        $outputs        = &$this->copy->getOutputsReference();
+        $copy     =  $this->transaction;
+        $inputs   = &$copy->getInputsReference();
+        $outputs  = &$copy->getOutputsReference();
 
         if ($inputToSign > count($inputs)) {
             throw new \Exception('Input does not exist');
@@ -68,7 +56,7 @@ class SignatureHash implements SignatureHashInterface
             $inputs[$i]->setScriptBuf(new Buffer());
         }
 
-        $inputs[$inputToSign]->setScript($txOut->getScript());
+        $inputs[$inputToSign]->setScript($txOutScript);
 
         if ($sighashType & 31 == SignatureHashInterface::SIGHASH_NONE) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
@@ -113,7 +101,7 @@ class SignatureHash implements SignatureHashInterface
         }
 
         // Serialize the TxCopy and append the 4 byte hashtype (little endian);
-        $txParser = new Parser($this->copy->serialize('hex'));
+        $txParser = new Parser($copy->serialize('hex'));
         $txParser->writeInt(4, $sighashType, true);
 
         $hash     = Hash::sha256d($txParser->getBuffer()->serialize());

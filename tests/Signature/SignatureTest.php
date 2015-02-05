@@ -42,7 +42,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $sigBuf = Buffer::hex($test);
-            $this->assertTrue(Signature::isCanonical($sigBuf));
+            $this->assertTrue(Signature::isDERSignature($sigBuf));
         }
     }
 
@@ -53,7 +53,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         foreach ($json->test as $c => $test) {
             try {
                 $sigBuf = Buffer::hex($test[1]);
-                Signature::isCanonical($sigBuf);
+                Signature::isDERSignature($sigBuf);
                 throw new \Exception("Failed testing for case: ". $test[0]);
             } catch (SignatureNotCanonical $e) {
                 $this->assertTrue(True);
@@ -103,10 +103,10 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
     {
         $s = '304402203bc90d68b698347ea1f4b51446a0725d177debe99736df2718a9bc82275a17c402200d250e0d75c1123d179d029680bd7e2a08a4917a7e3beff25b6dbdeadbe1598901';
 
-        Signature::isCanonical(Buffer::hex($s));
+        Signature::isDERSignature(Buffer::hex($s));
         $sig      = Signature::fromHex($s);
         $sd       = $sig->serialize('hex');
-        Signature::isCanonical(Buffer::hex($sd));
+        Signature::isDERSignature(Buffer::hex($sd));
 
         $this->assertSame($s, $sd);
     }

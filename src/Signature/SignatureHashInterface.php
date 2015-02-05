@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Signature;
 
-use Bitcoin\Transaction\TransactionOutputInterface;
+use Bitcoin\Script\ScriptInterface;
 
 /**
  * Interface SigHashInterface
@@ -38,9 +38,11 @@ interface SignatureHashInterface
      * SIGHASH_ALL, though SIGHASH_SINGLE, SIGHASH_NONE, SIGHASH_ANYONECANPAY
      * can be used.
      *
-     * @param $transaction
+     * @param ScriptInterface $txOutScript
      * @param $inputToSign
+     * @param int $sighashType
      * @return \Bitcoin\Crypto\Buffer
+     * @internal param $transaction
      */
-    public function calculateHash(TransactionOutputInterface $txOut, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL);
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL);
 }

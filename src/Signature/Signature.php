@@ -184,7 +184,7 @@ class Signature implements SignatureInterface
      * @return bool
      * @throws SignatureNotCanonical
      */
-    public static function isCanonical(Buffer $sig)
+    public static function isDERSignature(Buffer $sig)
     {
         $bin = $sig->serialize();
 

@@ -108,7 +108,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
             $sig = $signer->sign($pk, $buf, new RandomK());
 
             $this->assertInstanceOf($this->sigType, $sig);
-            $this->assertTrue(Signature::isCanonical(new Buffer($sig->serialize())));
+            $this->assertTrue(Signature::isDERSignature(new Buffer($sig->serialize())));
             $this->assertTrue($signer->verify($pk->getPublicKey(), $buf, $sig));
         }
     }

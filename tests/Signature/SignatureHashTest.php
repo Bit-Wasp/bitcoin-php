@@ -20,6 +20,10 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
      * @var Transaction
      */
     protected $tx;
+
+    /**
+     * @var string
+     */
     protected $txType;
 
     public function __construct()
@@ -36,7 +40,6 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
     public function testCreateNew()
     {
         $this->sighash = new SignatureHash($this->tx);
-        $this->assertInstanceOf($this->txType, $this->sighash->getTransaction());
     }
 
     /**
@@ -46,8 +49,9 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
     public function testFailsWithInvalidInputToSign()
     {
         $this->sighash = new SignatureHash($this->tx);
-        $o = new TransactionOutput();
-        $h = $this->sighash->calculateHash($o, 99);
+        //$o = new TransactionOutput();
+        $script = new Script();
+        $h = $this->sighash->calculate($script, 99);
     }
 
     public function testCalculateHash()
@@ -55,12 +59,11 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__ . '/../Data/signaturehash.hash.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $o = new TransactionOutput();
-            $o->setScriptBuf(Buffer::hex($test->outScript) );
+            $script = new Script(Buffer::hex($test->outScript) );
 
             $t = Transaction::fromHex($test->tx);
             $s = new SignatureHash($t);
-            $h = $s->calculateHash($o, 0);
+            $h = $s->calculate($script, 0);
 
             $this->assertEquals($h->serialize('hex'), $test->sighash);
 
