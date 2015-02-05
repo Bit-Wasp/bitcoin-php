@@ -95,6 +95,22 @@ class ScriptStack
     }
 
     /**
+     * Insert $value at a particular position
+     *
+     * @param $insertPosition
+     * @param $value
+     * @return $this
+     */
+    public function insert($insertPosition, $value)
+    {
+        $this->stack = array_slice($this->stack, 0, $insertPosition, true) +
+            array($value) +
+            array_slice($this->stack, $insertPosition, count($this->stack)-$insertPosition, true);
+
+        return $this;
+    }
+
+    /**
      * Get the $pos value from the stack
      *
      * @param $pos
@@ -115,4 +131,28 @@ class ScriptStack
     {
         return $this->stack;
     }
-}
+
+    public function size()
+    {
+        return count($this->stack);
+    }
+
+    public function end()
+    {
+        $count = $this->size();
+        if ($count == 0) {
+            return 0;
+        }
+
+        return $count - 1;
+    }
+
+    public function swap($pos1, $pos2)
+    {
+        $val1 = $this->top($pos1);
+        $val2 = $this->top($pos2);
+        $this->set($pos2, $val1);
+        $this->set($pos1, $val2);
+        return $this;
+    }
+};
