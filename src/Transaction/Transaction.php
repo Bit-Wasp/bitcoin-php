@@ -29,7 +29,7 @@ class Transaction implements TransactionInterface, SerializableInterface
     protected $version;
 
     /**
-     * @var array
+     * @var TransactionInput[]
      */
     protected $inputs = array();
 
@@ -248,6 +248,17 @@ class Transaction implements TransactionInterface, SerializableInterface
         return $this;
     }
 
+    public function signatureHash ()
+    {
+        return new SignatureHash($this);
+    }
+
+    public function verifySignature ($signature, $publicKey, $nIn, $subscript)
+    {
+
+    }
+
+
     /**
      * @param PrivateKeyInterface $privateKey
      * @param TransactionOutputInterface $txOut
@@ -263,7 +274,7 @@ class Transaction implements TransactionInterface, SerializableInterface
         }
 
         $hash = (new SignatureHash($this))
-            ->calculateHash($txOut, $inputToSign);
+            ->calculate($txOut->getScript(), $inputToSign);
 
         $sig = $privateKey->sign($hash, $kProvider);
 
