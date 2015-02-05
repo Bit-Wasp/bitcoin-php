@@ -248,17 +248,6 @@ class Transaction implements TransactionInterface, SerializableInterface
         return $this;
     }
 
-    public function signatureHash ()
-    {
-        return new SignatureHash($this);
-    }
-
-    public function verifySignature ($signature, $publicKey, $nIn, $subscript)
-    {
-
-    }
-
-
     /**
      * @param PrivateKeyInterface $privateKey
      * @param TransactionOutputInterface $txOut
