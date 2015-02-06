@@ -96,7 +96,6 @@ class Parser
      * Parse a vector from a string of data. Vectors are arrays, prefixed
      * by the number of items in the list.
      *
-     * @param $array
      * @param callable $callback
      * @return array
      */

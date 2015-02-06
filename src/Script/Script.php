@@ -163,6 +163,8 @@ class Script implements ScriptInterface
 
     /**
      * Initialize container
+     *
+     * @param Buffer $script
      */
     public function __construct(Buffer $script = null)
     {
@@ -282,8 +284,7 @@ class Script implements ScriptInterface
     /**
      * Add an opcode to the script
      *
-     * @param $opCode
-     * @throws \RuntimeException
+     * @param $code
      * @return $this
      */
     public function op($code)

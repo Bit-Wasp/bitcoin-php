@@ -2,9 +2,9 @@
 
 namespace Bitcoin\Miner;
 
-use Bitcoin\Bitcoin;
 use Bitcoin\Chain\Difficulty;
 use Bitcoin\Crypto\Hash;
+use Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
 use Bitcoin\Script\Script;
@@ -55,28 +55,40 @@ class Miner
     private $timestamp;
 
     /**
+     * @param Math $math
      * @param BlockHeaderInterface $lastBlockHeader
      * @param ScriptInterface $script
      * @param Buffer $personalString
      * @param mixed $timestamp
      */
-    public function __construct(BlockHeaderInterface $lastBlockHeader, ScriptInterface $script, Buffer $personalString = null, $timestamp = null)
-    {
+    public function __construct(
+        Math $math,
+        BlockHeaderInterface $lastBlockHeader,
+        ScriptInterface $script,
+        Buffer $personalString = null,
+        $timestamp = null
+    ) {
+        $this->math = $math;
         $this->lastBlockHeader = $lastBlockHeader;
-
         $this->script = $script;
-        $this->math = Bitcoin::getMath();
         $this->personalString = $personalString ?: new Buffer();
         $this->timestamp = $timestamp ?: time();
         return $this;
     }
 
+    /**
+     * @param array $transactions
+     * @return $this
+     */
     public function setTransactions(array $transactions)
     {
         $this->transactions = $transactions;
         return $this;
     }
 
+    /**
+     * @return Script
+     */
     public function getCoinbaseScriptBuf()
     {
         $buffer = (new Parser)
@@ -91,7 +103,9 @@ class Miner
     }
 
     /**
-     * @throws \Exception
+     * @param TransactionInterface|null $coinbaseTx
+     * @return Block
+     * @throws \Bitcoin\Exceptions\MerkleTreeEmpty
      */
     public function run(TransactionInterface $coinbaseTx = null)
     {

@@ -25,7 +25,8 @@ class Difficulty implements DifficultyInterface
     protected $math;
 
     /**
-     * @param \Bitcoin\Buffer $bits
+     * @param Math $math
+     * @param Buffer $lowestBits
      */
     public function __construct(Math $math, Buffer $lowestBits = null)
     {

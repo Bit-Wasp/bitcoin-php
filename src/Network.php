@@ -47,6 +47,7 @@ class Network implements NetworkInterface
      * @param $addressByte
      * @param $p2shByte
      * @param $privByte
+     * @param bool $testnet
      * @throws \Exception
      */
     public function __construct($addressByte, $p2shByte, $privByte, $testnet = false)
@@ -167,11 +168,11 @@ class Network implements NetworkInterface
     }
 
     /**
+     * @param bool $binary
      * @return callable
      */
     public static function getHashFunction($binary = false)
     {
-
         return function($value) use ($binary) {
             $hash = Hash::sha256d($value, $binary);
             return $hash;

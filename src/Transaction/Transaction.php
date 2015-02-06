@@ -166,12 +166,10 @@ class Transaction implements TransactionInterface, SerializableInterface
     {
         return $this->inputs;
     }
+
     /**
-     * Add an output at a specific index
-     *
-     * @param $index
      * @param TransactionOutput $output
-     * @return $this`
+     * @return $this
      */
     public function addOutput(TransactionOutput $output)
     {
@@ -303,6 +301,7 @@ class Transaction implements TransactionInterface, SerializableInterface
      * Take a $hex string, and return an instance of a Transaction
      *
      * @param $hex
+     * @param NetworkInterface $network
      * @return Transaction
      */
     public static function fromHex($hex, NetworkInterface $network = null)

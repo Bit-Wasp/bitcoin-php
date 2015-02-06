@@ -152,6 +152,7 @@ class Hash
      * @param $algo
      * @param $data
      * @param $salt
+     * @param bool $rawOutput
      * @return string
      */
     public static function hmac($algo, $data, $salt, $rawOutput = false)

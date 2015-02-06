@@ -214,7 +214,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      * Recover Y from X and a parity byte
      * @param $xCoord
      * @param $byte
-     * @param GeneratorPoint $generator
+     * @return int|string
      * @throws \Exception
      */
     public static function recoverYfromX($xCoord, $byte)
@@ -296,6 +296,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     /**
      * Serialize this according to requested type
      *
+     * @param string|null $type
      * @return string
      */
     public function serialize($type = null)

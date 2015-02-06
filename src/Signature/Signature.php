@@ -33,6 +33,7 @@ class Signature implements SignatureInterface
     /**
      * @param $r
      * @param $s
+     * @param int $sighashType
      */
     public function __construct($r, $s, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {

@@ -42,8 +42,8 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     private $math;
 
     /**
-     * @param \Bitcoin\Math\Math $math
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @param Math $math
+     * @param GeneratorPoint $generator
      * @param $hex
      * @param bool $compressed
      * @throws InvalidPrivateKey
@@ -95,9 +95,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * Generate a new private key from entropy
      *
      * @param bool $compressed
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @return PrivateKey
-     * @throws \Exception
      */
     public static function generateNew($compressed = false)
     {
@@ -110,7 +108,6 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * Check if the $hex string is a valid key, ie, less than the order of the curve.
      *
      * @param $hex
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @return bool
      */
     public static function isValidKey($hex)
@@ -129,9 +126,8 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     /**
      * Generate a buffer containing a valid key
      *
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
-     * @return \Bitcoin\Buffer
-     * @throws \Exception
+     * @return Buffer
+     * @throws \Bitcoin\Exceptions\RandomBytesFailure
      */
     public static function generateKey()
     {

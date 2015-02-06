@@ -9,11 +9,6 @@ use Bitcoin\Buffer;
 use Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Crypto\DRBG\HMACDRBG;
-use Bitcoin\Signature\K\DeterministicK;
-
-
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -31,10 +26,19 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
      */
     protected $generator;
 
+    /**
+     * @var string
+     */
     protected $baseType = 'Bitcoin\Key\PrivateKey';
 
+    /**
+     * @var string
+     */
     protected $publicType = 'Bitcoin\Key\PublicKey';
 
+    /**
+     *
+     */
     public function setUp()
     {
         $this->privateKey = null;
@@ -87,10 +91,6 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             $this->privateKey->getPublicKey()->serialize('hex')
         );
 
-        //$this->assertSame(
-          //  'b5bd079c4d57cc7fc28ecf8213a6b791625b8183',
-            //$this->privateKey->getPublicKey()->getPubKeyHash()
-        //);
     }
 
     /**
@@ -217,6 +217,4 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     {
         PrivateKey::fromWif('50akdglashdgkjadsl');
     }
-
-
 }

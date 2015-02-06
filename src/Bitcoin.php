@@ -3,7 +3,6 @@
 namespace Bitcoin;
 
 use Bitcoin\Math\Math;
-use Bitcoin\Util\NumberTheory;
 use Bitcoin\Network;
 use Bitcoin\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
@@ -33,7 +32,7 @@ class Bitcoin
     private static $network = null;
 
     /**
-     * @return MathAdapterInterface
+     * @return Math
      */
     public static function getMath()
     {
@@ -58,7 +57,7 @@ class Bitcoin
     }
 
     /**
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @param GeneratorPoint $generator
      */
     public static function setGenerator(GeneratorPoint $generator)
     {

@@ -33,6 +33,9 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
 
     /**
      * Initialize class
+     *
+     * @param null $script
+     * @param int|string|null $value
      */
     public function __construct($script = null, $value = null)
     {

@@ -270,7 +270,8 @@ class BlockHeader implements BlockHeaderInterface
     /**
      * Set the version of this block
      *
-     * @param int $version
+     * @param $version
+     * @return $this
      */
     public function setVersion($version)
     {

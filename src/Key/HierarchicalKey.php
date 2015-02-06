@@ -80,7 +80,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     /**
      * @param $bytes
      * @param NetworkInterface $network
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
+     * @throws ParserOutOfRange
      * @throws \Exception
      */
     public function __construct($bytes, NetworkInterface $network)
@@ -130,8 +130,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      *
      * @param $base58
      * @param NetworkInterface $network
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @return HierarchicalKey
+     * @throws \Exception
      */
     public static function fromBase58($base58, NetworkInterface $network)
     {
@@ -146,9 +146,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
 
     /**
      * @param NetworkInterface $network
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @return HierarchicalKey
-     * @throws \Exception
+     * @throws InvalidPrivateKey
      */
     public static function generateNew(NetworkInterface $network)
     {
@@ -162,7 +161,6 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      *
      * @param $random
      * @param NetworkInterface $network
-     * @param \Mdanter\Ecc\GeneratorPoint $generator
      * @return HierarchicalKey
      * @throws InvalidPrivateKey
      */
@@ -546,9 +544,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public function getKeyFromOffset($offset)
     {
-        if ($this->isPrivate()) {
-            // offset + privKey % n
-            $key = new PrivateKey($this->math, $this->generator, str_pad(
+        $key = $this->isPrivate()
+            ? new PrivateKey($this->math, $this->generator, str_pad(
                 $this->math->decHex(
                     $this->math->mod(
                         $this->math->add(
@@ -561,23 +558,19 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
                 64,
                 '0',
                 STR_PAD_LEFT
-            ));
-
-        } else {
-            // (offset*G) + (K)
-            $key = new PublicKey(
-                $this// Get the EC point for this offset
-                    ->getGenerator()
-                    ->mul(
-                        $offset->serialize('int')
-                    )
+            ))
+            : new PublicKey(
+                $this // Get the EC point for this offset
+            ->getGenerator()
+                ->mul(
+                    $offset->serialize('int')
+                )
                 // Add it to the public key
-                    ->add(
-                        $this->getPublicKey()->getPoint()
-                    ),
+                ->add(
+                    $this->getPublicKey()->getPoint()
+                ),
                 true
             );
-        }
 
         return $key;
     }

@@ -28,9 +28,8 @@ class DeterministicK implements KInterface
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param \Bitcoin\Buffer $messageHash
+     * @param Buffer $messageHash
      * @param string $algo
-     * @param GeneratorPoint $generator
      */
     public function __construct(PrivateKeyInterface $privateKey, Buffer $messageHash, $algo = 'sha256')
     {

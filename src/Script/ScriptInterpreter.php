@@ -48,11 +48,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @var ScriptStack
      */
-    protected $vfExecStack;
-
-    /**
-     * @var ScriptStack
-     */
     public $mainStack;
 
     /**
@@ -60,6 +55,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @var ScriptStack
      */
     protected $altStack;
+
+    /**
+     * @var ScriptStack
+     */
+    protected $vfExecStack;
 
     /**
      * Position of OP_CODESEPARATOR, for calculating SigHash
@@ -368,6 +368,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
+     * @param Script $script
+     * @return $this
+     */
+    public function setScript(Script $script = null)
+    {
+        if ($script == null) {
+            $script = new Script();
+        }
+
+        $this->script = $script;
+        return $this;
+    }
+
+    /**
      * @param Script $scriptSig
      * @param Script $scriptPubKey
      * @param $nInputToSign
@@ -377,8 +391,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function verify(Script $scriptSig, Script $scriptPubKey, $nInputToSign)
     {
         $this->inputToSign = $nInputToSign;
-        $this->script = $scriptSig;
-        if (!$this->run()) {
+        if (!$this->setScript($scriptSig)->run()) {
             return false;
         }
 
@@ -387,8 +400,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             $stackCopy = $this->mainStack;
         }
 
-        $this->script = $scriptPubKey;
-        if (!$this->run()) {
+        if (!$this->setScript($scriptSig)->run()) {
             return false;
         }
 
@@ -412,7 +424,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             if ($this->mainStack->size() == 0) {
                 throw new \Exception('Script err eval false');
             }
-
 
         }
 
