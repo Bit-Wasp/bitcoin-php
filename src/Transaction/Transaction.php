@@ -336,6 +336,11 @@ class Transaction implements TransactionInterface, SerializableInterface
             ->serialize($type);
     }
 
+    public function signatureHash()
+    {
+        return new SignatureHash($this);
+    }
+
     /**
      * Return the transaction in the format of an array compatible with bitcoind.
      *
