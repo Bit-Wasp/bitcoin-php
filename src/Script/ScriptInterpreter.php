@@ -12,6 +12,7 @@ use Bitcoin\Signature\Signature;
 use Bitcoin\Exceptions\ScriptStackException;
 use Bitcoin\Exceptions\ScriptRuntimeException;
 use Bitcoin\Signature\Signer;
+use Bitcoin\Script\ScriptInterpreterFlags;
 use Mdanter\Ecc\GeneratorPoint;
 
 /**
@@ -51,7 +52,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public $mainStack;
 
     /**
-     * Alt Stack
      * @var ScriptStack
      */
     protected $altStack;
@@ -72,79 +72,31 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     protected $opCount;
 
-    /** Configurable flags */
-
     /**
-     * @var int
+     * @var ScriptInterpreterFlags
      */
-    protected $maxBytes = 10000;
-
-    /**
-     * @var int
-     */
-    protected $maxElementSize = 520;
-
-    /**
-     * @var int
-     */
-    protected $maxOpCodes = 200;
-
-    /**
-     * @var bool
-     */
-    protected $checkDisabledOpcodes = false;
-
-    /**
-     * @var bool
-     */
-    protected $verifyDERSignatures = false;
-
-    /**
-     * @var bool
-     */
-    protected $verifyStrictEncoding = false;
-
-    /**
-     * @var bool
-     */
-    protected $requireLowestPushdata = false;
-
-    /**
-     * @var bool
-     */
-    protected $discourageUpgradableNOPS = false;
-
-    /**
-     * @var bool
-     */
-    protected $verifyP2SH = false;
+    protected $flags;
 
     /**
      * @param Math $math
      * @param GeneratorPoint $generator
      * @param Transaction $transaction
      */
-    public function __construct(Math $math, GeneratorPoint $generator, Transaction $transaction)
+    public function __construct(Math $math, GeneratorPoint $generator, Transaction $transaction, ScriptInterpreterFlags $flags = null)
     {
         $this->math                     = $math;
         $this->generator                = $generator;
         $this->transaction              = $transaction;
         $this->script                   = new Script();
+        $this->flags                    = $flags ?: ScriptInterpreterFlags::defaults();
 
         $this->mainStack                = new ScriptStack;
         $this->altStack                 = new ScriptStack;
         $this->vfExec                   = new ScriptStack;
 
-        // Set up current limits
-        $this->discourageUpgradableNOPS = true;
-        $this->maxBytes                 = 10000;
-        $this->maxElementSize           = 520;
-        $this->checkDisabledOpcodes     = true;
-        $this->requireLowestPushdata    = true;
-        $this->verifyDERSignatures      = true;
-        $this->verifyStrictEncoding     = true;
-        $this->discourageUpgradableNOPS = true;
-        $this->verifyP2SH               = true;
+        $this->constTrue                = pack("H*", '01');
+        $this->constFalse               = pack("H*", '00');
+
         return $this;
     }
 
@@ -228,7 +180,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function isOp($op, $opCodeStr)
     {
-        return $this->compareOp($op, $opCodeStr) == 0;
+        return (bool)$this->compareOp($op, $opCodeStr) == 0;
     }
 
     /**
@@ -248,20 +200,19 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     /**
      * @param $opCode
-     * @param Buffer $pushData
+     * @param string $pushData
      * @return bool
      * @throws \Exception
      */
-    public function checkMinimalPush($opCode, Buffer $pushData)
+    public function checkMinimalPush($opCode, $pushData)
     {
-        $pushSize = $pushData->getSize();
-        $data = $pushData->serialize();
+        $pushSize = strlen($pushData);
 
         if ($pushSize == 0) {
             return $this->compareOp($opCode, 'OP_0') == 0;
-        } else if ($pushSize == 1 && ord($data[0]) >= 1 && $data[0] <= 16) {
-            return $opCode == $this->script->getOpCode('OP_1') + ( ord($data[0]) - 1);
-        } else if ($pushSize == 1 && ord($data) == 0x81) {
+        } else if ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
+            return $opCode == $this->script->getOpCode('OP_1') + ( ord($pushData[0]) - 1);
+        } else if ($pushSize == 1 && ord($pushData) == 0x81) {
             return $this->compareOp($opCode, 'OP_1NEGATE') == 0;
         } else if ($pushSize <= 75) {
             return $opCode == $pushSize;
@@ -279,11 +230,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param $position
      * @param $posEnd
      * @param $opCode
-     * @param Buffer $pushData
+     * @param string $pushData
      * @return bool
      * @throws \Exception
      */
-    public function getOp(&$script, &$position, $posEnd, &$opCode, Buffer &$pushData = null)
+    public function getOp(&$script, &$position, $posEnd, &$opCode, &$pushData = null)
     {
         $opCode = $this->script->getOpCode('OP_INVALIDOPCODE');
 
@@ -308,16 +259,19 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 $size = $this->math->hexDec(bin2hex($script[$position]));
                 $position++;
             } else if ($this->isOp($opCode, 'OP_PUSHDATA2')) {
-                if ($posEnd - $position < 2) {
+                if (($posEnd - $position) < 2) {
                     return false;
                 }
-                $size = $this->math->hexDec(bin2hex(substr($script, $position, 2)));
+
+                $size = unpack("v", substr($script, $position, 2));
+                $size = $size[1];
                 $position += 2;
             } else if ($this->isOp($opCode, 'OP_PUSHDATA4')) {
                 if ($posEnd - $position < 4) {
                     return false;
                 }
-                $size = $this->math->hexDec(bin2hex(substr($script, $position, 4)));
+                $size = unpack("N", substr($script, $position, 4));
+                $size = $size[1];
                 $position += 4;
             }
 
@@ -326,7 +280,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 return false;
             }
 
-            $pushData = new Buffer(substr($script, $position, $size));
+            $pushData = substr($script, $position, $size);
             $position += $size;
 
         }
@@ -344,9 +298,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         if ($signature->getSize() == 0) {
             return true;
         }
-        $result = true;
 
-        if ($this->verifyDERSignatures) {
+        $result = true;
+        if ($this->flags->verifyDERSignatures) {
             $result &= Signature::isDERSignature($signature);
         }
 
@@ -360,7 +314,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
-        if ($this->verifyStrictEncoding && !PublicKey::isCompressedOrUncompressed($publicKey)) {
+        if ($this->flags->verifyStrictEncoding && !PublicKey::isCompressedOrUncompressed($publicKey)) {
             throw new \Exception('Invalid public key type');
         }
 
@@ -396,7 +350,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
 
         $stackCopy = new ScriptStack;
-        if ($this->verifyP2SH) {
+        if ($this->flags->verifyP2SH) {
             $stackCopy = $this->mainStack;
         }
 
@@ -414,7 +368,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $verifier = new OutputClassifier($scriptPubKey);
 
-        if ($this->verifyP2SH && $verifier->isPayToScriptHash()) {
+        if ($this->flags->verifyP2SH && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) {
                 throw new \Exception('P2SH script must be push only');
             }
@@ -436,23 +390,22 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function run()
     {
 
-        $script = $this->script->serialize();
-        $posScriptEnd = strlen($script);
-        $pos = 0;
+        $script        = $this->script->serialize();
+        $posScriptEnd  = strlen($script);
+        $pos           = 0;
         $this->opCount = 0;
-        $opCode = null;
-
-        $fExec = true;
+        $opCode        = null;
+        $fExec         = true;
 
         try {
             while ($pos < $posScriptEnd) {
-                $pushData = new Buffer();
+                $pushData = '';
 
                 if (!$this->getOp($script, $pos, $posScriptEnd, $opCode, $pushData)) {
-                    throw new \Exception('Bad opcode');
+                    throw new \Exception("Bad opcode: $opCode");
                 }
 
-                if ($pushData->getSize() > $this->maxElementSize) {
+                if (strlen($pushData) > $this->flags->maxElementSize) {
                     throw new \Exception('Error - push size');
                 }
 
@@ -460,17 +413,17 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     throw new \Exception('Error - Script Op Count');
                 }
 
-                if ($this->checkDisabledOpcodes) {
+                if ($this->flags->checkDisabledOpcodes) {
                     if ($this->isDisabledOp($opCode)) {
                         throw new \Exception('Disabled Opcode');
                     }
                 }
-
+                echo "opCode: $opCode\n";
                 if ($fExec && $opCode >= 0 && $this->compareOp($opCode, 'OP_PUSHDATA4') <= 0) {
-                    if ($this->requireLowestPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
+                    if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
                     }
-                    echo "Push ($pushData)\n";
+                    echo "Push (".bin2hex($pushData).")\n";
                     $this->mainStack->push($pushData);
 
                 } else if ($fExec || ($this->compareOp($opCode, 'OP_IF') <= 0 && $this->compareOp($opCode, 'OP_ENDIF'))) {
@@ -510,7 +463,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $this->isOp($opCode, 'OP_NOP8'):
                         case $this->isOp($opCode, 'OP_NOP9'):
                         case $this->isOp($opCode, 'OP_NOP10'):
-                            if ($this->discourageUpgradableNOPS) {
+                            if ($this->flags->discourageUpgradableNOPS) {
                                 throw new \Exception('Upgradable NOPS found - this is discouraged');
                             }
                             break;
@@ -656,8 +609,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $this->isOp($opCode, 'OP_DEPTH'):
                             $num = $this->mainStack->size();
-                            $this->mainStack->push($num);
-                            // Todo: check encoding of this... bn.getvch()
+                            $bin = pack("H*", $this->math->decHex($num));
+                            $this->mainStack->push($bin);
                             break;
 
                         case $this->isOp($opCode, 'OP_DROP'):
@@ -738,11 +691,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             // Different types could be returned here
 
                             $vch = $this->mainStack->top(-1);
-                            if ($vch instanceof Buffer) {
-                                $size = $vch->getSize();
-                            } else {
-                                throw new \Exception('Unhandled OP_SIZE type');
-                            }
+                            $size = pack("H*", $this->math->decHex(strlen($vch)));
+
                             $this->mainStack->push($size);
                             break;
 
@@ -754,7 +704,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $vch1 = $this->mainStack->top(-2);
                             $vch2 = $this->mainStack->top(-1);
-                            $equal = $vch1->serialize() == $vch2->serialize();
+
+                            $equal = $vch1 === $vch2;
 
                             // OP_NOTEQUAL is disabled
                             //if ($this->isOp($opCode, 'OP_NOTEQUAL')) {
@@ -877,7 +828,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $num = ($this->math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                                     break;
                                 default:
-                                    throw new \Exception('Invalid opcode');
+                                    throw new \Exception('Invalid opcode in maths ops');
                                 break;
                             }
                             $this->mainStack->pop();
@@ -933,9 +884,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 $hash = Hash::sha256d($vch, true);
                             }
 
-                            $buffer = new Buffer($hash, $hashLen);
                             $this->mainStack->pop();
-                            $this->mainStack->push($buffer);
+                            $this->mainStack->push($hash);
                             break;
 
                         case $this->isOp($opCode, 'OP_CODESEPARATOR'):
@@ -971,7 +921,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $success   = $signer->verify($publicKey, $sigHash, $signature);
                             $this->mainStack->pop();
                             $this->mainStack->pop();
-                            $this->mainStack->push($success ? '1' : '0');
+                            $this->mainStack->push($success ? $this->constTrue : $this->constFalse);
 
                             if ($this->isOp($opCode, 'OP_CHECKSIGVERIFY')) {
                                 if ($success) {
@@ -993,10 +943,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         */
                     }
                 }
-
-                echo "--\n";
             }
 
+            echo "\n--------\n";
             return true;
         } catch (ScriptRuntimeException $e) {
             echo "$$ SCRIPT RUNTIEM ERROR $$\n";

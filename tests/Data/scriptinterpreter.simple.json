@@ -1,0 +1,40 @@
+{
+  "test":[
+    {
+      "scriptSig": "",
+      "scriptPubKey": "74010087",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "01010102010288010187",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "0101",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "010b010b87",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "4c0107010787",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "4d010008010887",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding"
+    }
+  ]
+}
