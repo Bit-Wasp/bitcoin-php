@@ -340,12 +340,12 @@ class Script implements ScriptInterface
 
         } else if ($length <= 0xffff) {
             $parsed->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
-                ->writeInt(2, $length, false)
+                ->writeInt(2, $length, true)
                 ->writeBytes($length, $data);
 
         } else {
             $parsed->writeInt(1, $this->getOpCode('OP_PUSHDATA4'))
-                ->writeInt(4, $length, false)
+                ->writeInt(4, $length, true)
                 ->writeBytes($length, $data);
         }
 
@@ -389,7 +389,7 @@ class Script implements ScriptInterface
                     $lengthOfLen = 4;
                 }
 
-                $length = $parser->readBytes($lengthOfLen)->serialize('int');
+                $length = $parser->readBytes($lengthOfLen, true)->serialize('int');
                 $push   = $parser->readBytes($length);
 
             } else {
