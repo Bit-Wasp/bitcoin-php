@@ -16,6 +16,7 @@ install:
 script:
   - php bin/phpunit -c build/
   - php bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
+  - phpunit --coverage-clover build/logs/clover.xml
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
 matrix:
@@ -24,3 +25,6 @@ matrix:
 
 after_script:
   - ls -alh build/logs
+
+after_success:
+  - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php vendor/bin/coveralls -v; fi;'
