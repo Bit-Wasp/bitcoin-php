@@ -234,12 +234,12 @@ class Parser
         $varInt = self::numToVarInt(count($serializable));
 
         $parser = new Parser($varInt);
-        //$parser->writeInt(1, count($serializable));
 
         foreach ($serializable as $object) {
             if (!in_array('Bitcoin\SerializableInterface', class_implements($object))) {
                 throw new \RuntimeException('Objects being serialized to an array must implement the SerializableInterface');
             }
+
             $parser->writeBytes($object->getSize(), $object);
         }
 

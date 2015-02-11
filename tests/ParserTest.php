@@ -4,7 +4,11 @@ namespace Bitcoin\Tests;
 
 use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
+use Bitcoin\Network;
 use Bitcoin\Parser;
+use Bitcoin\Transaction\Transaction;
+use Bitcoin\Transaction\TransactionInput;
+use Bitcoin\Transaction\TransactionOutput;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
@@ -302,6 +306,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testGetVarString()
     {
         $strings = array(
+            '',
             '00',
             '00010203040506070809',
             '00010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102'
@@ -332,5 +337,33 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         for($i = 0; $i < count($expected); $i++) {
             $this->assertEquals($expected[$i]->serialize(), $actual[$i]->serialize());
         }
+    }
+
+    public function testWriteArray()
+    {
+        $transaction = new Transaction();
+        $input = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0);
+        $transaction->addInput($input);
+
+        $output = new TransactionOutput(null, 1);
+        $transaction->addOutput($output);
+
+        $array = array($transaction);
+
+        $parser = new Parser();
+        $parser->writeArray($array);
+        echo $parser->getBuffer()."\n";
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testWriteArrayFailure()
+    {
+        $network = new Network('00','05','80');
+        $array = array($network);
+
+        $parser = new Parser();
+        $parser->writeArray($array);
     }
 } 
