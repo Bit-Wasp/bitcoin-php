@@ -3,6 +3,7 @@
 namespace Bitcoin\Signature;
 
 use Bitcoin\Buffer;
+use Bitcoin\Crypto\Random\RBGInterface;
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\Key\PublicKeyInterface;
@@ -52,9 +53,9 @@ class Signer implements SignerInterface
      * @param KInterface $kProvider
      * @return Signature
      */
-    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, KInterface $kProvider)
+    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RBGInterface $nonce)
     {
-        $randomK = $kProvider->getK();
+        $randomK = $nonce->bytes(32);
 
         $n       = $this->generator->getOrder();
         $k       = $this->math->mod($randomK->serialize('int'), $n);

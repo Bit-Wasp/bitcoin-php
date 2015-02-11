@@ -49,7 +49,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
             $sig = $signer->sign($privateKey, $messageHash, $k);
 
             // K must be correct (from privatekey and message hash)
-            $this->assertEquals(Buffer::hex($test->expectedK), $k->getK());
+            $this->assertEquals(Buffer::hex($test->expectedK), $k->bytes(32));
 
             // R and S should be correct
             $rHex = $math->dechex($sig->getR());
@@ -106,12 +106,12 @@ class SignerTest extends \PHPUnit_Framework_TestCase
         $pk = new PrivateKey($math, $G, '4141414141414141414141414141414141414141414141414141414141414141');
 
         for ($i = 0; $i < 10; $i++) {
-            $buf = $random->bytes(32);
-            $sig = $signer->sign($pk, $buf, new RandomK());
+            $hash = $random->bytes(32);
+            $sig = $signer->sign($pk, $hash, new Random());
 
             $this->assertInstanceOf($this->sigType, $sig);
             $this->assertTrue(Signature::isDERSignature(new Buffer($sig->serialize())));
-            $this->assertTrue($signer->verify($pk->getPublicKey(), $buf, $sig));
+            $this->assertTrue($signer->verify($pk->getPublicKey(), $hash, $sig));
         }
     }
 }
