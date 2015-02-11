@@ -1,15 +1,13 @@
 <?php
 
-namespace Bitcoin\Crypto\DRBG;
-
-use Bitcoin\Buffer;
+namespace Bitcoin\Crypto\Random;
 
 /**
  * Interface DRBGInterface
  * @package Bitcoin\Crypto\DRBG
  * @author Thomas Kerin
  */
-interface DRBGInterface
+interface RBGInterface
 {
     /**
      * Return $numBytes bytes deterministically derived from a seed

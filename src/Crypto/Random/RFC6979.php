@@ -1,11 +1,12 @@
 <?php
 
-namespace Bitcoin\Crypto\DRBG;
+namespace Bitcoin\Crypto\Random;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Key\PrivateKeyInterface;
+use Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
 /**
@@ -15,7 +16,7 @@ use Mdanter\Ecc\GeneratorPoint;
  * @package Bitcoin\Crypto\DRBG
  * @author Thomas Kerin
  */
-class RFC6979 implements DRBGInterface
+class RFC6979 implements RBGInterface
 {
     /**
      * @var HMACDRBG
@@ -28,12 +29,19 @@ class RFC6979 implements DRBGInterface
     private $generator;
 
     /**
+     * @var Math
+     */
+    private $math;
+
+    /**
      * @param $algo
      * @param PrivateKeyInterface $privateKey
      * @param \Bitcoin\Buffer $message
      */
-    public function __construct(PrivateKeyInterface $privateKey, Buffer $message, $algo = 'sha256')
+    public function __construct(Math $math, $generator, $privateKey, Buffer $message, $algo = 'sha256')
     {
+        $this->generator = $generator;
+        $this->math      = $math;
         $entropy         = new Buffer($privateKey->serialize() . Hash::sha256($message, true));
         $this->generator = Bitcoin::getGenerator();
         $this->drbg      = new HMACDRBG($algo, $entropy);

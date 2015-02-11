@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Signature\K;
 
-use Bitcoin\Crypto\Random;
+use Bitcoin\Crypto\Random\Random;
 
 /**
  * Class Random

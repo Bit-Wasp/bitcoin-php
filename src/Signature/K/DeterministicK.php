@@ -3,7 +3,7 @@
 namespace Bitcoin\Signature\K;
 
 use Bitcoin\Buffer;
-use Bitcoin\Crypto\DRBG\HMACDRBG;
+use Bitcoin\Crypto\Random\HMACDRBG;
 use Bitcoin\Key\PrivateKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
 

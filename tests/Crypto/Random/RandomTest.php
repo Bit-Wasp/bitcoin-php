@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests\Util;
+namespace Bitcoin\Tests\Crypto\Random;
 
 class RandomTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase
 
     public function testBytes()
     {
-        $random = new \Bitcoin\Crypto\Random;
+        $random = new \Bitcoin\Crypto\Random\Random;
         $bytes  = $random->bytes(32);
         $this->assertInstanceOf($this->bufferType, $bytes);
         $this->assertEquals(32, $bytes->getSize());

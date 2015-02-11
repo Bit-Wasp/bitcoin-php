@@ -12,7 +12,7 @@ use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Base58;
-use Bitcoin\Crypto\Random;
+use Bitcoin\Crypto\Random\Random;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
@@ -131,8 +131,9 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public static function generateKey()
     {
+        $random = new Random();
         do {
-            $buffer = Random::bytes(32);
+            $buffer = $random->bytes(32);
         } while (! self::isValidKey($buffer->serialize('hex')));
 
         return $buffer;

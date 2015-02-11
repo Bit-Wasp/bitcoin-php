@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Crypto\DRBG;
+namespace Bitcoin\Crypto\Random;
 
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Buffer;
@@ -11,7 +11,7 @@ use Mdanter\Ecc\GeneratorPoint;
  * @package Bitcoin\Crypto\DRBG
  * @author Thomas Kerin
  */
-class HMACDRBG implements DRBGInterface
+class HMACDRBG implements RBGInterface
 {
     /**
      * @var string

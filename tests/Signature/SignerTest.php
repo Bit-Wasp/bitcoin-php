@@ -4,7 +4,7 @@ namespace Bitcoin\Tests\Signature;
 
 use Bitcoin\Exceptions\SignatureNotCanonical;
 use Bitcoin\Key\PrivateKey;
-use Bitcoin\Crypto\Random;
+use Bitcoin\Crypto\Random\Random;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\Signer;
 use Bitcoin\Signature\K\RandomK;
@@ -45,7 +45,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
-            $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
+            $k = new \Bitcoin\Crypto\Random\RFC6979($math, $generator, $privateKey, $messageHash);
             $sig = $signer->sign($privateKey, $messageHash, $k);
 
             // K must be correct (from privatekey and message hash)
@@ -100,11 +100,13 @@ class SignerTest extends \PHPUnit_Framework_TestCase
          */
         $math = Bitcoin::getMath();
         $G = Bitcoin::getGenerator();
+        $random = new Random();
+
         $signer = new Signer($math, $G);
         $pk = new PrivateKey($math, $G, '4141414141414141414141414141414141414141414141414141414141414141');
 
         for ($i = 0; $i < 10; $i++) {
-            $buf = Random::bytes(32);
+            $buf = $random->bytes(32);
             $sig = $signer->sign($pk, $buf, new RandomK());
 
             $this->assertInstanceOf($this->sigType, $sig);

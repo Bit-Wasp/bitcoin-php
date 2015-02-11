@@ -6,7 +6,7 @@ use Bitcoin\Script\Script;
 use Bitcoin\Key\PublicKey;
 use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
-use Bitcoin\Crypto\Random;
+use Bitcoin\Crypto\Random\Random;
 
 
 class ScriptTest extends \PHPUnit_Framework_TestCase
