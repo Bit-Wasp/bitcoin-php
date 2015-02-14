@@ -132,5 +132,4 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($hex, $out->__toString());
 
     }
-
 };

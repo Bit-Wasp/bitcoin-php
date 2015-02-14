@@ -71,7 +71,7 @@ class SignatureHash implements SignatureHashInterface
                 }
             }
 
-        } else if ($sighashType & 31 == SignatureHashInterface::SIGHASH_SINGLE) {
+        } elseif ($sighashType & 31 == SignatureHashInterface::SIGHASH_SINGLE) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
 

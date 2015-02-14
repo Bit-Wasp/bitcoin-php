@@ -333,12 +333,12 @@ class Script implements ScriptInterface
         if ($length < $this->getOpCode('OP_PUSHDATA1')) {
             $parsed = $parsed->writeWithLength($data);
 
-        } else if ($length <= 0xff) {
+        } elseif ($length <= 0xff) {
             $parsed->writeInt(1, $this->getOpCode('OP_PUSHDATA1'))
                 ->writeInt(1, $length, false)
                 ->writeBytes($length, $data);
 
-        } else if ($length <= 0xffff) {
+        } elseif ($length <= 0xffff) {
             $parsed->writeInt(1, $this->getOpCode('OP_PUSHDATA2'))
                 ->writeInt(2, $length, true)
                 ->writeBytes($length, $data);
@@ -373,16 +373,16 @@ class Script implements ScriptInterface
                 // False, or OP_0
                 $push = Buffer::hex('00');
 
-            } else if ($opCode < 75) {
+            } elseif ($opCode < 75) {
                 // When < 75, this opCode is the length of the following string
                 $push = $parser->readBytes($opCode);
 
-            } else if ($opCode <= 78) {
+            } elseif ($opCode <= 78) {
                 // Each pushdata opcode is followed by the length of the string.
                 // The number of bytes which encode the length change with the opcode.
                 if ($opCode == $this->getOpCode('OP_PUSHDATA1')) {
                     $lengthOfLen = 1;
-                } else if ($opCode == $this->getOpCode('OP_PUSHDATA2')) {
+                } elseif ($opCode == $this->getOpCode('OP_PUSHDATA2')) {
                     $lengthOfLen = 2;
                 } else {
                     // ($opCode == $this->getOpCode('OP_PUSHDATA4')) {

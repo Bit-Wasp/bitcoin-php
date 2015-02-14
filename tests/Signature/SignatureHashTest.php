@@ -59,7 +59,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__ . '/../Data/signaturehash.hash.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $script = new Script(Buffer::hex($test->outScript) );
+            $script = new Script(Buffer::hex($test->outScript));
 
             $t = Transaction::fromHex($test->tx);
             $s = new SignatureHash($t);

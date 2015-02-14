@@ -56,12 +56,12 @@ class Math implements MathAdapterInterface
 
     public function bitwiseXor($first, $other)
     {
-    	return $this->math->bitwiseXor($first, $other);
+        return $this->math->bitwiseXor($first, $other);
     }
 
     public function baseConvert($value, $fromBase, $toBase)
     {
-    	return $this->math->baseConvert($value, $fromBase, $toBase);
+        return $this->math->baseConvert($value, $fromBase, $toBase);
     }
 
     public function hexDec($dec)

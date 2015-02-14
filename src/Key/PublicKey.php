@@ -170,7 +170,7 @@ class PublicKey implements KeyInterface, PublicKeyInterface
                 // Invalid length for uncompressed key
                 return false;
             }
-        } else if (in_array($vchPubKey[0], array(
+        } elseif (in_array($vchPubKey[0], array(
                 PublicKey::KEY_COMPRESSED_EVEN,
                 PublicKey::KEY_COMPRESSED_ODD))) {
             if ($publicKey->getSize() != 33) {

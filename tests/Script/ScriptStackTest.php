@@ -114,4 +114,3 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->stack->top(-3), '41');
     }
 }
- 

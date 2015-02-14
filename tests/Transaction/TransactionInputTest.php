@@ -175,5 +175,4 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $in     = $this->in->fromParser($parser);
         $this->assertSame($hex, $this->in->__toString('hex'));
     }
-
 }

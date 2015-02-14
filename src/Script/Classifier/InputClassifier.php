@@ -90,11 +90,11 @@ class InputClassifier implements ScriptClassifierInterface
     {
         if ($this->isPayToPublicKey()) {
             return ScriptClassifierInterface::PAYTOPUBKEY;
-        } else if ($this->isPayToPublicKeyHash()) {
+        } elseif ($this->isPayToPublicKeyHash()) {
             return ScriptClassifierInterface::PAYTOPUBKEYHASH;
-        } else if ($this->isPayToScriptHash()) {
+        } elseif ($this->isPayToScriptHash()) {
             return ScriptClassifierInterface::PAYTOSCRIPTHASH;
-        } else if ($this->isMultisig()) {
+        } elseif ($this->isMultisig()) {
             return ScriptClassifierInterface::MULTISIG;
         }
 

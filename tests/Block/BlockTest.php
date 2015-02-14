@@ -227,5 +227,4 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($blockHex, $newBlock->serialize('hex'));
 
     }
-
 }
