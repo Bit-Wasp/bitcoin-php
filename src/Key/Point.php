@@ -111,4 +111,13 @@ class Point implements PointInterface
     {
         return $this->point->getDouble();
     }
+
+	/**
+	 * (non-PHPdoc)
+	 * @see \Mdanter\Ecc\PointInterface::isInfinity()
+	 */
+	public function isInfinity() {
+		return false;
+	}
+
 }

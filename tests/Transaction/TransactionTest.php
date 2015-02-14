@@ -103,18 +103,16 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetInputs()
     {
-        $this->assertInternalType('array', $this->transaction->getInputs());
         $this->assertEmpty($this->transaction->getInputs());
     }
 
     public function testAddInput()
     {
         $in = new TransactionInput();
-        $this->transaction->addInput($in);
+        $this->transaction->getInputs()->addInput($in);
         $inputs = $this->transaction->getInputs();
-        $this->assertInternalType('array', $this->transaction->getInputs());
         $this->assertSame(1, count($inputs));
-        $this->assertSame($in, $inputs[0]);
+        $this->assertSame($in, $inputs->getInput(0));
     }
 
     /**
@@ -122,31 +120,29 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetInputException()
     {
-        $this->transaction->getInput(0);
+        $this->transaction->getInputs()->getInput(0);
     }
 
     public function testGetInput()
     {
         $in = new TransactionInput();
-        $this->transaction->addInput($in);
-        $return = $this->transaction->getInput(0);
+        $this->transaction->getInputs()->addInput($in);
+        $return = $this->transaction->getInputs()->getInput(0);
         $this->assertSame($in, $return);
     }
 
     public function testGetOutputs()
     {
-        $this->assertInternalType('array', $this->transaction->getOutputs());
         $this->assertEmpty($this->transaction->getOutputs());
     }
 
     public function testAddOutput()
     {
         $out = new TransactionOutput();
-        $this->transaction->addOutput($out);
+        $this->transaction->getOutputs()->addOutput($out);
         $outputs = $this->transaction->getOutputs();
-        $this->assertInternalType('array', $this->transaction->getOutputs());
         $this->assertSame(1, count($outputs));
-        $this->assertSame($out, $outputs[0]);
+        $this->assertSame($out, $outputs->getOutput(0));
     }
 
     /**
@@ -154,14 +150,14 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOutputException()
     {
-        $this->transaction->getOutput(0);
+        $this->transaction->getOutputs()->getOutput(0);
     }
 
     public function testGetOutput()
     {
         $out = new TransactionOutput();
-        $this->transaction->addOutput($out);
-        $return = $this->transaction->getOutput(0);
+        $this->transaction->getOutputs()->addOutput($out);
+        $return = $this->transaction->getOutputs()->getOutput(0);
         $this->assertSame($out, $return);
     }
 
@@ -206,4 +202,4 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01 04f8de51f3b278225c0fe74a856ea2481e9ad4c9385fc10cefadaa4357ecd2c4d29904902d10e376546500c127f65d0de35b6215d49dd1ef6c67e6cdd5e781ef22', $array['scriptSig']['asm']);
 */
     }
-} 
+}
