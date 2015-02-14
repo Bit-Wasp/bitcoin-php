@@ -64,8 +64,25 @@ class TransactionInputCollection implements \Countable
         return $this->inputs;
     }
 
+    /**
+     * (non-PHPdoc)
+     * @see Countable::count()
+     */
     public function count()
     {
         return count($this->inputs);
+    }
+
+
+    /**
+     * Returns a new sliced collection
+     *
+     * @param int $start
+     * @param int $length
+     * @return \Bitcoin\Transaction\TransactionOutputCollection
+     */
+    public function slice($start, $length)
+    {
+        return new self(array_slice($this->outputs, $start, $length));
     }
 }

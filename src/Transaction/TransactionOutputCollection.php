@@ -75,6 +75,7 @@ class TransactionOutputCollection implements \Countable
 
     /**
      * Returns a new sliced collection
+     *
      * @param int $start
      * @param int $length
      * @return \Bitcoin\Transaction\TransactionOutputCollection
