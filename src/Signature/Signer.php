@@ -46,7 +46,7 @@ class Signer implements SignerInterface
 
     /**
      * Produce a signature for a $messageHash by a $privateKey. $kProvider can be random or
-     * deterministic (RFC6979)
+     * deterministic (Rfc6979)
      *
      * @param PrivateKeyInterface $privateKey
      * @param \Bitcoin\Buffer $messageHash

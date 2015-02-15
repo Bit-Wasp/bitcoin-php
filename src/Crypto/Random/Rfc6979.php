@@ -7,13 +7,7 @@ use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class DeterministicK
- * @package Bitcoin\Signature\K
- * @author Thomas Kerin
- * Todo: refactor so this class accepts an initialized DRBGInterface
- */
-class RFC6979 implements RbgInterface
+class Rfc6979 implements RbgInterface
 {
 
     /**
