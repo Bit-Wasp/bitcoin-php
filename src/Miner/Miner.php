@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Miner;
 
-use Bitcoin\Chain\Difficulty;
+use Afk11\Bitcoin\Chain\Difficulty;
 use Bitcoin\Crypto\Hash;
 use Bitcoin\Math\Math;
 use Bitcoin\Buffer;

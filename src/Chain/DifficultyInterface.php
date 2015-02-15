@@ -6,7 +6,7 @@
  * Time: 03:36
  */
 
-namespace Bitcoin\Chain;
+namespace Afk11\Bitcoin\Chain;
 
 use Bitcoin\Buffer;
 
