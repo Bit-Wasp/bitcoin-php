@@ -9,8 +9,8 @@ use Bitcoin\Script\Classifier\OutputClassifier;
 use Bitcoin\Transaction\Transaction;
 use Bitcoin\Key\PublicKey;
 use Bitcoin\Signature\Signature;
-use Bitcoin\Exceptions\ScriptStackException;
-use Bitcoin\Exceptions\ScriptRuntimeException;
+use Afk11\Bitcoin\Exceptions\ScriptStackException;
+use Afk11\Bitcoin\Exceptions\ScriptRuntimeException;
 use Bitcoin\Signature\Signer;
 use Bitcoin\Script\ScriptInterpreterFlags;
 use Mdanter\Ecc\GeneratorPoint;
@@ -292,7 +292,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @param Buffer $signature
      * @return bool
-     * @throws \Bitcoin\Exceptions\SignatureNotCanonical
+     * @throws \Afk11\Bitcoin\Exceptions\SignatureNotCanonical
      */
     public function checkSignatureEncoding(Buffer $signature)
     {

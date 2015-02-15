@@ -192,7 +192,7 @@ class Transaction implements TransactionInterface, SerializableInterface
 
     /**
      * @param \Bitcoin\Parser $parser
-     * @throws \Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
     public function fromParser(Parser &$parser)

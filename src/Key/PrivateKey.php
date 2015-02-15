@@ -3,8 +3,8 @@
 namespace Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Exceptions\Base58ChecksumFailure;
-use Bitcoin\Exceptions\InvalidPrivateKey;
+use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
+use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use Bitcoin\NetworkInterface;
 use Bitcoin\SerializableInterface;
 use Bitcoin\Signature\Signature;
@@ -127,7 +127,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * Generate a buffer containing a valid key
      *
      * @return Buffer
-     * @throws \Bitcoin\Exceptions\RandomBytesFailure
+     * @throws \Afk11\Bitcoin\Exceptions\RandomBytesFailure
      */
     public static function generateKey()
     {

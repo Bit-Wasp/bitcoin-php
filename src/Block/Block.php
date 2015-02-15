@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Block;
 
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
 class Block implements BlockInterface
 {

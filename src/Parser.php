@@ -4,7 +4,7 @@ namespace Bitcoin;
 
 use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
 /**
  * Class Parser - mainly for decoding transactions..

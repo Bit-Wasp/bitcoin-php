@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Crypto\Random;
 
 use Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
-use \Bitcoin\Exceptions\RandomBytesFailure;
+use Afk11\Bitcoin\Exceptions\RandomBytesFailure;
 
 /**
  * Class Random

@@ -8,7 +8,7 @@
 
 namespace Bitcoin\Tests\Block;
 
-use Bitcoin\Exceptions\MerkleTreeEmpty;
+use Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Afk11\Bitcoin\Block\MerkleRoot;
 use Afk11\Bitcoin\Block\Block;
 use Bitcoin\Transaction\Transaction;
@@ -46,7 +46,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Bitcoin\Exceptions\MerkleTreeEmpty
+     * @expectedException \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty
      * @expectedExceptionMessage
      */
     public function testCannotUseEmptyBlock()

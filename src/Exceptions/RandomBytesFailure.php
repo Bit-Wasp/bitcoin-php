@@ -6,7 +6,7 @@
  * Time: 12:32
  */
 
-namespace Bitcoin\Exceptions;
+namespace Afk11\Bitcoin\Exceptions;
 
 class RandomBytesFailure extends \Exception
 {

@@ -5,8 +5,8 @@ namespace Bitcoin\Signature;
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
-use Bitcoin\Exceptions\ParserOutOfRange;
-use Bitcoin\Exceptions\SignatureNotCanonical;
+use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
+use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
 
 /**
  * Class Signature

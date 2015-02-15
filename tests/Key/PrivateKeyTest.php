@@ -211,7 +211,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Bitcoin\Exceptions\Base58ChecksumFailure
+     * @expectedException \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public function testInvalidWif()
     {

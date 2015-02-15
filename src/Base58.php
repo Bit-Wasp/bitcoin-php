@@ -4,7 +4,7 @@ namespace Bitcoin;
 
 use Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\Exceptions\Base58ChecksumFailure;
+use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
 
 /**
  * Class Base58

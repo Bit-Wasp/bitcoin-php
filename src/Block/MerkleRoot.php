@@ -7,7 +7,7 @@ use Bitcoin\Network;
 use Bitcoin\Parser;
 use Bitcoin\Buffer;
 use Pleo\Merkle\FixedSizeTree;
-use Bitcoin\Exceptions\MerkleTreeEmpty;
+use \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
 
 /**
  * Class MerkleRoot

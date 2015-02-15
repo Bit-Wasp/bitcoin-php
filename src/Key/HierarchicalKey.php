@@ -3,7 +3,7 @@
 namespace Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use Bitcoin\Base58;
 use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
@@ -11,7 +11,7 @@ use Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
 use Bitcoin\Signature\K\KInterface;
-use Bitcoin\Exceptions\InvalidPrivateKey;
+use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;

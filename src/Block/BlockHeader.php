@@ -5,7 +5,7 @@ namespace Afk11\Bitcoin\Block;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
 use Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
 /**
  * Class BlockHeader
@@ -65,7 +65,7 @@ class BlockHeader implements BlockHeaderInterface
     /**
      * @param \Bitcoin\Parser $parser
      * @return $this
-     * @throws \Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser &$parser)
     {

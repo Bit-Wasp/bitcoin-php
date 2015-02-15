@@ -8,7 +8,7 @@ use Bitcoin\Parser;
 use Afk11\Bitcoin\Block\Block;
 use Afk11\Bitcoin\Block\BlockHeader;
 use Bitcoin\Transaction\Transaction;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
 class BlockTest extends \PHPUnit_Framework_TestCase
 {

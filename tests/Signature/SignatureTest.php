@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Tests\Signature;
 
-use Bitcoin\Exceptions\SignatureNotCanonical;
+use Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\K\RandomK;
 use Bitcoin\Buffer;

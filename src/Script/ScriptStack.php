@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Script;
 
-use Bitcoin\Exceptions\ScriptStackException;
+use Afk11\Bitcoin\Exceptions\ScriptStackException;
 
 /**
  * Class ScriptStack

@@ -105,7 +105,7 @@ class Miner
     /**
      * @param TransactionInterface|null $coinbaseTx
      * @return Block
-     * @throws \Bitcoin\Exceptions\MerkleTreeEmpty
+     * @throws \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty
      */
     public function run(TransactionInterface $coinbaseTx = null)
     {

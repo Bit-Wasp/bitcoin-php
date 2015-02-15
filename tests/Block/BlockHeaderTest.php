@@ -167,7 +167,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Bitcoin\Exceptions\ParserOutOfRange
+     * @expectedException \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      * @expectedExceptionMessage Failed to extract full block header from parser
      */
     public function testFromParserFailure()
