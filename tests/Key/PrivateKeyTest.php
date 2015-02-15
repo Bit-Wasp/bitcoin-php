@@ -4,7 +4,7 @@ namespace Bitcoin\Tests\Key;
 
 use Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Key\PrivateKey;
-use Bitcoin\Network;
+use Afk11\Bitcoin\Network;
 use Bitcoin\Buffer;
 use \Afk11\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;

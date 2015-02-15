@@ -1,8 +1,8 @@
 <?php
 
-namespace Bitcoin\Transaction;
+namespace Afk11\Bitcoin\Transaction;
 
-use Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\Script;
 use Bitcoin\Util\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;

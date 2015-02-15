@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Tests\Script;
 
-use Bitcoin\Script\ScriptStack;
+use Afk11\Bitcoin\Script\ScriptStack;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Afk11\Bitcoin\Exceptions\ScriptStackException;
 

@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Key;
 
 use Bitcoin\NetworkInterface;
 use Bitcoin\Buffer;
-use Bitcoin\Signature\K\KInterface;
+use Afk11\Bitcoin\Signature\K\KInterface;
 
 /**
  * Interface PrivateKeyInterface

@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Tests\Script;
 
-use Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Key\PublicKey;
 use Bitcoin\Buffer;
 use Bitcoin\Util\Math;

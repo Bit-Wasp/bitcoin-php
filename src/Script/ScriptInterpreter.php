@@ -1,24 +1,20 @@
 <?php
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
 use Afk11\Bitcoin\Crypto\Hash;
 use Afk11\Bitcoin\Math\Math;
 use Bitcoin\Buffer;
-use Bitcoin\Script\Classifier\OutputClassifier;
-use Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
+use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Key\PublicKey;
-use Bitcoin\Signature\Signature;
+use Afk11\Bitcoin\Signature\Signature;
 use Afk11\Bitcoin\Exceptions\ScriptStackException;
 use Afk11\Bitcoin\Exceptions\ScriptRuntimeException;
-use Bitcoin\Signature\Signer;
-use Bitcoin\Script\ScriptInterpreterFlags;
+use Afk11\Bitcoin\Signature\Signer;
+use Afk11\Bitcoin\Script\ScriptInterpreterFlags;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class ScriptInterpreter
- * @package Bitcoin
- */
 class ScriptInterpreter implements ScriptInterpreterInterface
 {
     /**

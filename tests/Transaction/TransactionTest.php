@@ -2,10 +2,10 @@
 
 namespace Bitcoin\Tests\Transaction;
 
-use Bitcoin\Network;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Transaction\TransactionInput;
-use Bitcoin\Transaction\TransactionOutput;
+use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionInput;
+use Afk11\Bitcoin\Transaction\TransactionOutput;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {

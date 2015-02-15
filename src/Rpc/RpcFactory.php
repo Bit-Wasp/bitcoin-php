@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Rpc;
+namespace Afk11\Bitcoin\Rpc;
 
 use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
-use Bitcoin\Rpc\Client\Bitcoind;
+use Afk11\Bitcoin\Rpc\Client\Bitcoind;
 
 class RpcFactory
 {

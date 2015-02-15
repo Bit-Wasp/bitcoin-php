@@ -37,7 +37,7 @@ class Block implements BlockInterface
             $this->setTransactions(
                 $parser->getArray(
                     function () use (&$parser) {
-                        $transaction = new \Bitcoin\Transaction\Transaction();
+                        $transaction = new \Afk11\Bitcoin\Transaction\Transaction();
                         $transaction->fromParser($parser);
                         return $transaction;
                     }

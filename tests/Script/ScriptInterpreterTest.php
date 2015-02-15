@@ -10,10 +10,10 @@ namespace Bitcoin\Tests\Script;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
-use Bitcoin\Script\Script;
-use Bitcoin\Script\ScriptInterpreter;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Script\ScriptInterpreterFlags;
+use \Afk11\Bitcoin\Script\Script;
+use \Afk11\Bitcoin\Script\ScriptInterpreter;
+use \Afk11\Bitcoin\Transaction\Transaction;
+use \Afk11\Bitcoin\Script\ScriptInterpreterFlags;
 
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 {

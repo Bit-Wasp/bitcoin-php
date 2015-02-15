@@ -3,7 +3,7 @@
 namespace Afk11\Bitcoin\Block;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Network;
+use Afk11\Bitcoin\Network;
 use Bitcoin\Parser;
 use Bitcoin\Buffer;
 use Pleo\Merkle\FixedSizeTree;

@@ -1,14 +1,9 @@
 <?php
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
-use Bitcoin\Transaction\TransactionInterface;
+use Afk11\Bitcoin\Transaction\TransactionInterface;
 
-/**
- * Interface ScriptInterpreterInterface
- * @package Bitcoin\Script
- * @author Thomas Kerin
- */
 interface ScriptInterpreterInterface
 {
 

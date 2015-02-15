@@ -1,14 +1,9 @@
 <?php
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Script\ScriptInterface;
 
-/**
- * Interface SigHashInterface
- * @package Bitcoin\SigHash
- * @author Thomas Kerin
- */
 interface SignatureHashInterface
 {
     /**

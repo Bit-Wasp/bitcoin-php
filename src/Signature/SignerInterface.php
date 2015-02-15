@@ -6,13 +6,13 @@
  * Time: 04:39
  */
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
 use Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
-use Bitcoin\Signature\K\KInterface;
+use Afk11\Bitcoin\Signature\K\KInterface;
 
 interface SignerInterface
 {

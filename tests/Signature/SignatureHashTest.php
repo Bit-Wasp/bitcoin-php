@@ -3,11 +3,11 @@
 namespace Bitcoin\Tests\Signature;
 
 use Bitcoin\Buffer;
-use Bitcoin\Script\Script;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Transaction\TransactionOutput;
-use Bitcoin\Signature\SignatureHashInterface;
-use Bitcoin\Signature\SignatureHash;
+use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionOutput;
+use Afk11\Bitcoin\Signature\SignatureHashInterface;
+use Afk11\Bitcoin\Signature\SignatureHash;
 
 class SignatureHashTest extends \PHPUnit_Framework_TestCase
 {

@@ -4,11 +4,11 @@ namespace Bitcoin\Tests;
 
 use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
-use Bitcoin\Network;
+use Afk11\Bitcoin\Network;
 use Bitcoin\Parser;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Transaction\TransactionInput;
-use Bitcoin\Transaction\TransactionOutput;
+use \Afk11\Bitcoin\Transaction\Transaction;
+use \Afk11\Bitcoin\Transaction\TransactionInput;
+use \Afk11\Bitcoin\Transaction\TransactionOutput;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {

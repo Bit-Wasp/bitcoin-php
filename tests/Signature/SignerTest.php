@@ -5,9 +5,9 @@ namespace Bitcoin\Tests\Signature;
 use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
 use \Afk11\Bitcoin\Key\PrivateKey;
 use \Afk11\Bitcoin\Crypto\Random\Random;
-use Bitcoin\Signature\Signature;
-use Bitcoin\Signature\Signer;
-use Bitcoin\Signature\K\RandomK;
+use \Afk11\Bitcoin\Signature\Signature;
+use \Afk11\Bitcoin\Signature\Signer;
+use \Afk11\Bitcoin\Signature\K\RandomK;
 use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Crypto\Hash;
@@ -37,7 +37,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         $math = Bitcoin::getMath();
         $generator = Bitcoin::getGenerator();
-        $signer = new \Bitcoin\Signature\Signer($math, $generator);
+        $signer = new \Afk11\Bitcoin\Signature\Signer($math, $generator);
 
         foreach ($json->test as $c => $test) {
             $privateKey = new PrivateKey($math, $generator, $test->privKey);

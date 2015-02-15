@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
@@ -8,11 +8,6 @@ use Bitcoin\Parser;
 use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
 
-/**
- * Class Signature
- * @package Bitcoin\Signature
- * @author Thomas Kerin
- */
 class Signature implements SignatureInterface
 {
     /**

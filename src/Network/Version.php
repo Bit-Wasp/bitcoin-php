@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 17/01/15
- * Time: 05:34
- */
 
-namespace Bitcoin\Network;
+namespace Afk11\Bitcoin\Network;
 
 use Bitcoin\Buffer;
 use Bitcoin\Parser;

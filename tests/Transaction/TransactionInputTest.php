@@ -2,9 +2,9 @@
 
 namespace Bitcoin\Tests\Transaction;
 
-use Bitcoin\Transaction\TransactionInput;
-use Bitcoin\Transaction\TransactionInputInterface;
-use Bitcoin\Script\Script;
+use Afk11\Bitcoin\Transaction\TransactionInput;
+use Afk11\Bitcoin\Transaction\TransactionInputInterface;
+use Afk11\Bitcoin\Script\Script;
 use Bitcoin\Parser;
 use Bitcoin\Buffer;
 

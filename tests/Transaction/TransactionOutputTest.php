@@ -2,8 +2,8 @@
 
 namespace Bitcoin\Tests\Transaction;
 
-use Bitcoin\Transaction\TransactionOutput;
-use Bitcoin\Script\Script;
+use Afk11\Bitcoin\Transaction\TransactionOutput;
+use Afk11\Bitcoin\Script\Script;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
 

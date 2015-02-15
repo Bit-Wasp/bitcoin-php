@@ -1,12 +1,7 @@
 <?php
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
-/**
- * Interface SignatureInterface
- * @package Bitcoin\Signature
- * @author Thomas Kerin
- */
 interface SignatureInterface
 {
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
@@ -9,10 +9,6 @@ use Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\Key\PublicKeyInterface;
 
-/**
- * Class Script
- * @package Bitcoin
- */
 class Script implements ScriptInterface
 {
     /**

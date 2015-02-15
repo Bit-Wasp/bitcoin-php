@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\Transaction;
+namespace Afk11\Bitcoin\Transaction;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
-use Bitcoin\Script\Script;
+use \Afk11\Bitcoin\Script\Script;
 use Bitcoin\SerializableInterface;
 
 /**

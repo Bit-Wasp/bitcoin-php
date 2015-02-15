@@ -1,19 +1,14 @@
 <?php
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
 use Bitcoin\Buffer;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
-use Bitcoin\Script\ScriptInterface;
-use Bitcoin\Transaction\TransactionOutputInterface;
+use Afk11\Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Transaction\TransactionOutputInterface;
 use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class SignatureContainer
- * @package Bitcoin\Signature
- * @author Thomas Kerin
- */
 class SignatureContainer
 {
     /**

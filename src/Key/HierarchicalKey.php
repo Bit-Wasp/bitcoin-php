@@ -10,7 +10,7 @@ use Bitcoin\Util\Math;
 use Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
-use Bitcoin\Signature\K\KInterface;
+use \Afk11\Bitcoin\Signature\K\KInterface;
 use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
