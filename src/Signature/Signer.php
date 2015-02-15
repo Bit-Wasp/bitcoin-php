@@ -3,7 +3,7 @@
 namespace Bitcoin\Signature;
 
 use Bitcoin\Buffer;
-use Bitcoin\Crypto\Random\RBGInterface;
+use Bitcoin\Crypto\Random\RbgInterface;
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\Key\PublicKeyInterface;
@@ -53,7 +53,7 @@ class Signer implements SignerInterface
      * @param KInterface $kProvider
      * @return Signature
      */
-    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RBGInterface $nonce)
+    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $nonce)
     {
         $randomK = $nonce->bytes(32);
 

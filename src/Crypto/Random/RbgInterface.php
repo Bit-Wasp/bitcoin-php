@@ -7,7 +7,7 @@ namespace Bitcoin\Crypto\Random;
  * @package Bitcoin\Crypto\DRBG
  * @author Thomas Kerin
  */
-interface RBGInterface
+interface RbgInterface
 {
     /**
      * Return $numBytes bytes deterministically derived from a seed

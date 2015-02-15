@@ -3,14 +3,14 @@
 namespace Bitcoin\Crypto\Random;
 
 use Bitcoin\Buffer;
-use Bitcoin\Crypto\Random\RBGInterface;
+use Bitcoin\Crypto\Random\RbgInterface;
 use \Bitcoin\Exceptions\RandomBytesFailure;
 
 /**
  * Class Random
  * @package Bitcoin\Random
  */
-class Random implements RBGInterface
+class Random implements RbgInterface
 {
 
     /**

@@ -11,7 +11,7 @@ use Mdanter\Ecc\GeneratorPoint;
  * @package Bitcoin\Crypto\DRBG
  * @author Thomas Kerin
  */
-class HMACDRBG implements RBGInterface
+class HMACDRBG implements RbgInterface
 {
     /**
      * @var string

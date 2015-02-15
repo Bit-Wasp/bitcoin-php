@@ -13,7 +13,7 @@ use Mdanter\Ecc\GeneratorPoint;
  * @author Thomas Kerin
  * Todo: refactor so this class accepts an initialized DRBGInterface
  */
-class RFC6979 implements RBGInterface
+class RFC6979 implements RbgInterface
 {
 
     /**
