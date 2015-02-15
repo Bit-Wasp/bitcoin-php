@@ -14,7 +14,7 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
     public function testCreateNew()
     {
         $drbg = new HmacDrbg('sha256', Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
-        $this->assertInstanceOf('Bitcoin\Crypto\Random\HMACDRBG', $drbg);
+        $this->assertInstanceOf('Afk11\Bitcoin\Crypto\Random\HMACDRBG', $drbg);
     }
 
     /**
@@ -23,7 +23,6 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
     public function testCreateInvalidAlgorithm()
     {
         $drbg = new HmacDrbg('fake', \Afk11\Bitcoin\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
-        $this->assertInstanceOf('Bitcoin\Crypto\Random\HMACDRBG', $drbg);
     }
 
     public function testCreateHMACDRBG()

@@ -27,7 +27,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function __construct()
     {
         $this->network = new Network('00', '05', '80');
-        $this->txType = 'Bitcoin\Transaction\Transaction';
+        $this->txType = 'Afk11\Bitcoin\Transaction\Transaction';
     }
 
     public function setUp()

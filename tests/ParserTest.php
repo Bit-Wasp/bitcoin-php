@@ -29,8 +29,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->parserType = 'Bitcoin\Parser';
-        $this->bufferType = 'Bitcoin\Buffer';
+        $this->parserType = 'Afk11\Bitcoin\Parser';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()

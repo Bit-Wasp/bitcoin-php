@@ -17,7 +17,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
      */
     protected $network;
 
-    protected $baseType = 'Bitcoin\Key\HierarchicalKey';
+    protected $baseType = 'Afk11\Bitcoin\Key\HierarchicalKey';
 
     public function setUp()
     {

@@ -7,7 +7,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $bufferType = 'Bitcoin\Buffer';
+    protected $bufferType = 'Afk11\Bitcoin\Buffer';
 
     public function setUp()
     {

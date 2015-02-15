@@ -19,9 +19,9 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->txOutType = 'Bitcoin\Transaction\TransactionOutput';
-        $this->scriptType = 'Bitcoin\Script\Script';
-        $this->bufferType = 'Bitcoin\Buffer';
+        $this->txOutType = 'Afk11\Bitcoin\Transaction\TransactionOutput';
+        $this->scriptType = 'Afk11\Bitcoin\Script\Script';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()

@@ -21,8 +21,8 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->baseType = 'Bitcoin\Transaction\TransactionInput';
-        $this->scriptType = 'Bitcoin\Script\Script';
+        $this->baseType = 'Afk11\Bitcoin\Transaction\TransactionInput';
+        $this->scriptType = 'Afk11\Bitcoin\Script\Script';
     }
 
     public function setUp()

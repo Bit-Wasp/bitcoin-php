@@ -2,10 +2,9 @@
 
 namespace Afk11\Bitcoin\Tests\Math;
 
-use \Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Bitcoin;
 use Mdanter\Ecc\Math\Gmp;
 use Mdanter\Ecc\GeneratorPoint;
-use \Afk11\Bitcoin\Util\NumberTheory;
 
 class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 {

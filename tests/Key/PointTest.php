@@ -2,8 +2,8 @@
 
 namespace Afk11\Bitcoin\Tests\Key;
 
-use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Key\Point;
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Key\Point;
 
 class PointTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
      */
     protected $point;
 
-    protected $baseType = 'Bitcoin\Key\Point';
+    protected $baseType = 'Afk11\Bitcoin\Key\Point';
 
     protected $generator;
 

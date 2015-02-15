@@ -2,8 +2,8 @@
 
 namespace Afk11\Bitcoin\Tests\Key;
 
-use \Afk11\Bitcoin\Key\PublicKey;
-use \Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Key\PublicKey;
+use Afk11\Bitcoin\Bitcoin;
 
 class PublicKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +17,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->publicKey = null;
-        $this->publicType = 'Bitcoin\Key\PublicKey';
+        $this->publicType = 'Afk11\Bitcoin\Key\PublicKey';
     }
 
     public function testFromHex()

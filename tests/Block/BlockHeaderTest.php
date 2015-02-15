@@ -32,8 +32,8 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->headerType = 'Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'Bitcoin\Buffer';
+        $this->headerType = 'Afk11\Bitcoin\Block\BlockHeader';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()

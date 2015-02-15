@@ -5,8 +5,6 @@ namespace Afk11\Bitcoin\Tests\Signature;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Transaction\Transaction;
-use Afk11\Bitcoin\Transaction\TransactionOutput;
-use Afk11\Bitcoin\Signature\SignatureHashInterface;
 use Afk11\Bitcoin\Signature\SignatureHash;
 
 class SignatureHashTest extends \PHPUnit_Framework_TestCase
@@ -28,7 +26,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->txType = 'Bitcoin\Transaction\Transaction';
+        $this->txType = 'Afk11\Bitcoin\Transaction\Transaction';
     }
 
     public function setUp()

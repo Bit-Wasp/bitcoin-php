@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 02/01/15
- * Time: 02:23
- */
 
 namespace Afk11\Bitcoin\Tests\Block;
 
@@ -22,7 +16,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->rootType = 'Bitcoin\Block\MerkleRoot';
+        $this->rootType = 'Afk11\Bitcoin\Block\MerkleRoot';
     }
 
     public function setUp()

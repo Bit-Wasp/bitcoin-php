@@ -231,7 +231,7 @@ class Parser
         $parser = new Parser($varInt);
 
         foreach ($serializable as $object) {
-            if (!in_array('Bitcoin\SerializableInterface', class_implements($object))) {
+            if (!in_array('Afk11\Bitcoin\SerializableInterface', class_implements($object))) {
                 throw new \RuntimeException('Objects being serialized to an array must implement the SerializableInterface');
             }
 
