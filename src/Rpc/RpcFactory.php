@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\RPC;
+namespace Bitcoin\Rpc;
 
 use Bitcoin\JsonRPC\JsonRPCClient;
-use Bitcoin\RPC\Client\Bitcoind;
+use Bitcoin\Rpc\Client\Bitcoind;
 
-class RPCFactory
+class RpcFactory
 {
     public static function bitcoind($host, $port, $user, $password, $timeout = 5, $headers = array())
     {

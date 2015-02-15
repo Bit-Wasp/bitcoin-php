@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\RPC\Client;
+namespace Bitcoin\Rpc\Client;
 
 use Bitcoin\JsonRPC\JsonRPCClient;
 use Bitcoin\Transaction\Transaction;
