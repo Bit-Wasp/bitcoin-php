@@ -6,19 +6,19 @@
  * Time: 09:38
  */
 
-namespace Bitcoin\Tests\Script;
+namespace Afk11\Bitcoin\Tests\Script;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Buffer;
-use Bitcoin\Script\Script;
-use Bitcoin\Script\ScriptInterpreter;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Script\ScriptInterpreterFlags;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Script\Script;
+use \Afk11\Bitcoin\Script\ScriptInterpreter;
+use \Afk11\Bitcoin\Transaction\Transaction;
+use \Afk11\Bitcoin\Script\ScriptInterpreterFlags;
 
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Bitcoin\Math\Math
+     * @var \Afk11\Bitcoin\Math\Math
      */
     public $math;
 
@@ -47,21 +47,93 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         }
         return $flags;
     }
-
-    public function ootestScriptindividual()
+    public function testGetOpValid()
     {
-        $script = new Script(Buffer::hex('4d010008010887'));
+        $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), new ScriptInterpreterFlags());
 
-        echo "try script: ".$script->getAsm()."\n";
-        echo "    script: ".$script->serialize('hex')."\n";
+        $script = pack("H*", '0100');
+        $position = 0;
+        $end = 2;
+        $opCode = null;
+        $pushdata = null;
+        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(1, $opCode);
+        $this->assertSame(chr(0), $pushdata);
 
-        $flags = $this->setFlags('verifyP2SH,verifyStrictEncoding');
-        $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), $flags);
+        $s = '';
+        for ($j = 1; $j < 256; $j++)
+            $s .= '41';
+        $script = pack("H*", '4cff'.$s);
+        $position = 0;
+        $end = strlen($script);
+        $opCode = null;
+        $pushdata = null;
+        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(76, $opCode);
+        $this->assertSame(pack("H*", $s), $pushdata);
 
-        $i->setScript($script);
+        $s = '';
+        for ($j = 1; $j < 260; $j++)
+            $s .= '41';
+        $script = pack("cvH*", 0x4d, 260, $s);
+        $position = 0;
+        $end = strlen($script)+1;
+        $opCode = null;
+        $pushdata = null;
+        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(77, $opCode);
+        $this->assertSame(pack("H*", $s), $pushdata);
+    }
 
-        $return = $i->run();
-        $this->assertTrue($return);
+    public function testGetOpInvalid()
+    {
+        $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), new ScriptInterpreterFlags());
+
+        $script = '';
+        $position = 10;
+        $end = 0;
+        $opCode = null;
+        $pushdata = null;
+        $this->assertFalse($i->getOp($script, $position, $end, $opCode, $pushdata));
+
+        $position = 11;
+        $end = -1;
+        $opCode = null;
+        $pushdata = null;
+        $this->assertFalse($i->getOp($script, $position, $end, $opCode, $pushdata));
+
+        // Test a failure - should return false since there aren't two bytes
+        $script = pack("H*", '0200');
+        $position = 0;
+        $end = 2;
+        $opCode = null;
+        $pushdata = null;
+        $this->assertFalse($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(2, $opCode);
+        $this->assertSame(null, $pushdata);
+
+        // Test a failure - pushdata without length or string
+        $script = pack("H*", '4c');
+        $position = 0;
+        $end = strlen($script);
+        $opCode = null;
+        $pushdata = null;
+        $this->assertFalse($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(76, $opCode);
+        $this->assertSame(null, $pushdata);
+
+        // pushdata size (249) is less than length (255)
+        $s = '';
+        for ($j = 1; $j < 250; $j++)
+            $s .= '41';
+        $script = pack("H*", '4cff'.$s);
+        $position = 0;
+        $end = strlen($script);
+        $opCode = null;
+        $pushdata = null;
+        $this->assertFalse($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(76, $opCode);
+        $this->assertSame(null, $pushdata);
 
     }
 
@@ -70,8 +142,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $f = file_get_contents(__DIR__ . '/../Data/scriptinterpreter.simple.json');
         $json = json_decode($f);
 
-        // Pass with a dummy transaction since not testing OP_CHECKSIG
-
+        // Pass a dummy transaction since not testing OP_CHECKSIG
 
         foreach ($json->test as $test) {
             $flags = $this->setFlags($test->flags);
@@ -86,4 +157,5 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
         }
     }
+
 }

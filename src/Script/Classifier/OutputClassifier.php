@@ -1,14 +1,10 @@
 <?php
 
-namespace Bitcoin\Script\Classifier;
+namespace Afk11\Bitcoin\Script\Classifier;
 
-use Bitcoin\Key\PublicKey;
-use Bitcoin\Script\Script;
+use Afk11\Bitcoin\Key\PublicKey;
+use Afk11\Bitcoin\Script\Script;
 
-/**
- * Class OutputClassifier
- * @package Bitcoin\Script\Classifier
- */
 class OutputClassifier implements ScriptClassifierInterface
 {
 

@@ -1,13 +1,9 @@
 <?php
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
-use Bitcoin\Exceptions\ScriptStackException;
+use Afk11\Bitcoin\Exceptions\ScriptStackException;
 
-/**
- * Class ScriptStack
- * @package Bitcoin
- */
 class ScriptStack
 {
     /**

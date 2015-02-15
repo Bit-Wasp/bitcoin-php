@@ -1,11 +1,7 @@
 <?php
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
-/**
- * Interface ScriptInterface
- * @package Bitcoin
- */
 interface ScriptInterface
 {
     /**

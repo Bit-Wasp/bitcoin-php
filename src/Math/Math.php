@@ -1,16 +1,12 @@
 <?php
 
-namespace Bitcoin\Math;
+namespace Afk11\Bitcoin\Math;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\NumberTheory;
 
-/**
- * Class Math
- * @package Bitcoin
- */
 class Math implements MathAdapterInterface
 {
     protected $math;

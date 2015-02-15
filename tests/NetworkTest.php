@@ -1,8 +1,8 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Afk11\Bitcoin\Tests;
 
-use Bitcoin\Network;
+use Afk11\Bitcoin\Network;
 
 class NetworkTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreatesInstance()
     {
         $this->network = new Network('00', '05', '80', true);
-        $this->assertInstanceOf('Bitcoin\NetworkInterface', $this->network);
+        $this->assertInstanceOf('Afk11\Bitcoin\NetworkInterface', $this->network);
     }
 
     /**
@@ -82,7 +82,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreateTestnet()
     {
         $this->network = $this->getTestNetwork();
-        $this->assertInstanceOf('Bitcoin\NetworkInterface', $this->network);
+        $this->assertInstanceOf('Afk11\Bitcoin\NetworkInterface', $this->network);
         $this->assertInternalType('bool', $this->network->isTestnet());
         $this->assertTrue($this->network->isTestnet());
     }
@@ -90,7 +90,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreateLivenet()
     {
         $this->network = $this->getLiveNetwork();
-        $this->assertInstanceOf('Bitcoin\NetworkInterface', $this->network);
+        $this->assertInstanceOf('Afk11\Bitcoin\NetworkInterface', $this->network);
         $this->assertInternalType('bool', $this->network->isTestnet());
         $this->assertFalse($this->network->isTestnet());
     }

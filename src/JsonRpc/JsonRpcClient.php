@@ -1,22 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 01/02/15
- * Time: 18:48
- */
 
-namespace Bitcoin\JsonRPC;
+namespace Afk11\Bitcoin\JsonRpc;
 
 use JsonRPC\Client;
 
-class JsonRPCClient
+class JsonRpcClient
 {
     /**
      * @var Client
      */
     protected $client;
 
+    /**
+     * @param $host
+     * @param $port
+     * @param int $timeout
+     * @param array $headers
+     */
     public function __construct($host, $port, $timeout = 5, array $headers = array())
     {
         $this->client = new Client("http://$host:$port/", $timeout, $headers);
@@ -41,49 +41,84 @@ class JsonRPCClient
         return $this->client->execute($method, $params);
     }
 
+    /**
+     * @param $username
+     * @param $password
+     * @return $this
+     */
     public function authentication($username, $password)
     {
         $this->client->authentication($username, $password);
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function batch()
     {
         $this->client->batch();
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function send()
     {
         $this->client->batch();
         return $this;
     }
 
+    /**
+     * @param $command
+     * @param array $arguments
+     * @return mixed
+     */
     public function execute($command, array $arguments = array())
     {
         return $this->client->execute($command, $arguments);
     }
 
+    /**
+     * @param $procedure
+     * @param array $params
+     * @return array
+     */
     public function prepareRequest($procedure, array $params = array())
     {
         return $this->client->prepareRequest($procedure, $params);
     }
 
+    /**
+     * @param array $payload
+     * @return mixed
+     */
     public function parseResponse(array $payload)
     {
         return $this->client->parseResponse($payload);
     }
 
+    /**
+     * @param array $payload
+     * @return mixed
+     */
     public function getResult(array $payload)
     {
         return $this->client->getResult($payload);
     }
 
+    /**
+     * @param $code
+     */
     public function handleRpcErrors($code)
     {
         $this->client->handleRpcErrors($code);
     }
 
+    /**
+     * @param $payload
+     */
     public function doRequest($payload)
     {
         $this->client->doRequest($payload);

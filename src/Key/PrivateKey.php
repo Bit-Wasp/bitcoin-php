@@ -1,25 +1,21 @@
 <?php
 
-namespace Bitcoin\Key;
+namespace Afk11\Bitcoin\Key;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Exceptions\Base58ChecksumFailure;
-use Bitcoin\Exceptions\InvalidPrivateKey;
-use Bitcoin\NetworkInterface;
-use Bitcoin\SerializableInterface;
-use Bitcoin\Signature\Signature;
-use Bitcoin\Signature\K\KInterface;
-use Bitcoin\Math\Math;
-use Bitcoin\Buffer;
-use Bitcoin\Base58;
-use Bitcoin\Crypto\Random;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
+use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
+use \Afk11\Bitcoin\NetworkInterface;
+use \Afk11\Bitcoin\SerializableInterface;
+use \Afk11\Bitcoin\Signature\Signature;
+use \Afk11\Bitcoin\Signature\K\KInterface;
+use \Afk11\Bitcoin\Math\Math;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Base58;
+use \Afk11\Bitcoin\Crypto\Random\Random;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class PrivateKey
- * @package Bitcoin
- */
 class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInterface
 {
     /**
@@ -127,12 +123,13 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * Generate a buffer containing a valid key
      *
      * @return Buffer
-     * @throws \Bitcoin\Exceptions\RandomBytesFailure
+     * @throws \Afk11\Bitcoin\Exceptions\RandomBytesFailure
      */
     public static function generateKey()
     {
+        $random = new Random();
         do {
-            $buffer = Random::bytes(32);
+            $buffer = $random->bytes(32);
         } while (! self::isValidKey($buffer->serialize('hex')));
 
         return $buffer;

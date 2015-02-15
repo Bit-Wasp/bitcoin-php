@@ -1,19 +1,19 @@
 <?php
 
-namespace Bitcoin\Tests\Util;
+namespace Afk11\Bitcoin\Tests\Util;
 
-use Bitcoin\Base58;
+use Afk11\Bitcoin\Base58;
 
 class Base58Test extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Bitcoin\Base58
+     * @var \Afk11\Bitcoin\Base58
      */
     protected $base58;
 
     public function setUp()
     {
-        $this->base58 = new \Bitcoin\Base58();
+        $this->base58 = new \Afk11\Bitcoin\Base58();
     }
 
     /**
@@ -89,7 +89,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Bitcoin\Exceptions\Base58ChecksumFailure
+     * @expectedException \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public function testDecodeCheckChecksumFailure()
     {
@@ -99,7 +99,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         // 12D2adLM3UKy4cH891ZFDkWmXmotrMoF <-- has typo, b replaced with c.
         //              ^
 
-        \Bitcoin\Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
+        \Afk11\Bitcoin\Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
 
     }
 }

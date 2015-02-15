@@ -1,13 +1,13 @@
 <?php
 
-namespace Bitcoin\Tests\Util;
+namespace Afk11\Bitcoin\Tests\Crypto\Random;
 
 class RandomTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var string
      */
-    protected $bufferType = 'Bitcoin\Buffer';
+    protected $bufferType = 'Afk11\Bitcoin\Buffer';
 
     public function setUp()
     {
@@ -16,7 +16,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase
 
     public function testBytes()
     {
-        $random = new \Bitcoin\Crypto\Random;
+        $random = new \Afk11\Bitcoin\Crypto\Random\Random;
         $bytes  = $random->bytes(32);
         $this->assertInstanceOf($this->bufferType, $bytes);
         $this->assertEquals(32, $bytes->getSize());

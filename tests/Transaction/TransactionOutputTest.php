@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\Tests\Transaction;
+namespace Afk11\Bitcoin\Tests\Transaction;
 
-use Bitcoin\Transaction\TransactionOutput;
-use Bitcoin\Script\Script;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use Afk11\Bitcoin\Transaction\TransactionOutput;
+use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
 
 class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,9 +19,9 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->txOutType = 'Bitcoin\Transaction\TransactionOutput';
-        $this->scriptType = 'Bitcoin\Script\Script';
-        $this->bufferType = 'Bitcoin\Buffer';
+        $this->txOutType = 'Afk11\Bitcoin\Transaction\TransactionOutput';
+        $this->scriptType = 'Afk11\Bitcoin\Script\Script';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()

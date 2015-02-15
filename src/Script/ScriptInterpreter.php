@@ -1,24 +1,20 @@
 <?php
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Math\Math;
-use Bitcoin\Buffer;
-use Bitcoin\Script\Classifier\OutputClassifier;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Key\PublicKey;
-use Bitcoin\Signature\Signature;
-use Bitcoin\Exceptions\ScriptStackException;
-use Bitcoin\Exceptions\ScriptRuntimeException;
-use Bitcoin\Signature\Signer;
-use Bitcoin\Script\ScriptInterpreterFlags;
+use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
+use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Key\PublicKey;
+use Afk11\Bitcoin\Signature\Signature;
+use Afk11\Bitcoin\Exceptions\ScriptStackException;
+use Afk11\Bitcoin\Exceptions\ScriptRuntimeException;
+use Afk11\Bitcoin\Signature\Signer;
+use Afk11\Bitcoin\Script\ScriptInterpreterFlags;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class ScriptInterpreter
- * @package Bitcoin
- */
 class ScriptInterpreter implements ScriptInterpreterInterface
 {
     /**
@@ -92,7 +88,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $this->mainStack                = new ScriptStack;
         $this->altStack                 = new ScriptStack;
-        $this->vfExec                   = new ScriptStack;
+        $this->vfExecStack              = new ScriptStack;
 
         $this->constTrue                = pack("H*", '01');
         $this->constFalse               = pack("H*", '00');
@@ -238,11 +234,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     {
         $opCode = $this->script->getOpCode('OP_INVALIDOPCODE');
 
-        if ($position >= $posEnd) {
-            return false;
-        }
-
-        if ($posEnd - $position < 1) {
+        if ($this->math->cmp($position, $posEnd) >= 0) {
             return false;
         }
 
@@ -252,13 +244,16 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             // opCode < OP_PUSHDATA1 - then just take opCode as the length, do not seek more
             if ($this->compareOp($opCode, 'OP_PUSHDATA1') < 0) {
                 $size = $opCode;
-            } elseif ($this->isOp($opCode, 'OP_PUSHDATA1')) {
+
+            } else if ($this->isOp($opCode, 'OP_PUSHDATA1')) {
                 if ($posEnd - $position < 1) {
                     return false;
                 }
-                $size = $this->math->hexDec(bin2hex($script[$position]));
+
+                $size = ord($script[$position]);
                 $position++;
-            } elseif ($this->isOp($opCode, 'OP_PUSHDATA2')) {
+
+            } else if ($this->isOp($opCode, 'OP_PUSHDATA2')) {
                 if (($posEnd - $position) < 2) {
                     return false;
                 }
@@ -266,12 +261,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 $size = unpack("v", substr($script, $position, 2));
                 $size = $size[1];
                 $position += 2;
-            } elseif ($this->isOp($opCode, 'OP_PUSHDATA4')) {
+
+            } else if ($this->isOp($opCode, 'OP_PUSHDATA4')) {
                 if ($posEnd - $position < 4) {
                     return false;
                 }
-                $size = unpack("N", substr($script, $position, 4));
+                $size = unpack("V", substr($script, $position, 4));
                 $size = $size[1];
+
                 $position += 4;
             }
 
@@ -291,7 +288,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @param Buffer $signature
      * @return bool
-     * @throws \Bitcoin\Exceptions\SignatureNotCanonical
+     * @throws \Afk11\Bitcoin\Exceptions\SignatureNotCanonical
      */
     public function checkSignatureEncoding(Buffer $signature)
     {
@@ -395,11 +392,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $pos           = 0;
         $this->opCount = 0;
         $opCode        = null;
-        $fExec         = true;
+        $checkFExec = function () {
+            $c = 0;
+            for ($i = 0, $len = $this->vfExecStack->end(); $i < $len; $i++) {
+                if ($this->vfExecStack->top(0-$len-$i) == true) {
+                    $c++;
+                }
+            }
+            return (bool)$c;
+        };
 
         try {
             while ($pos < $posScriptEnd) {
                 $pushData = '';
+                $fExec = !$checkFExec();
 
                 if (!$this->getOp($script, $pos, $posScriptEnd, $opCode, $pushData)) {
                     throw new \Exception("Bad opcode: $opCode");
@@ -418,12 +424,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         throw new \Exception('Disabled Opcode');
                     }
                 }
-                echo "opCode: $opCode\n";
+
                 if ($fExec && $opCode >= 0 && $this->compareOp($opCode, 'OP_PUSHDATA4') <= 0) {
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
                     }
-                    echo "Push (".bin2hex($pushData).")\n";
                     $this->mainStack->push($pushData);
 
                 } elseif ($fExec || ($this->compareOp($opCode, 'OP_IF') <= 0 && $this->compareOp($opCode, 'OP_ENDIF'))) {
@@ -476,16 +481,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 if ($this->mainStack->size() < 1) {
                                     throw new \Exception('Unbalanced conditional');
                                 }
+                                // todo
                                 $string = $this->mainStack->top(-1);
                                 $value = $this->castToBool($value);
                                 if ($this->isOp($opCode, 'OP_NOTIF')) {
                                     $value = !$value;
                                 }
                                 $this->mainStack->pop();
-                                echo $string."\n";
                             }
                             $this->vfExecStack->push($value);
-
                             break;
 
                         case $this->isOp($opCode, 'OP_ELSE'):
@@ -497,7 +501,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $this->isOp($opCode, 'OP_ENDIF'):
-                            if ($this->vfExec->size() == 0) {
+                            if ($this->vfExecStack->size() == 0) {
                                 throw new \Exception('Unbalanced conditional');
                             }
                             // vfExecStack->popBack()
@@ -515,6 +519,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Error: verify');
                             }
 
+                            break;
+
+                        case $this->isOp($opCode, 'OP_RESERVED'):
+                            // todo
                             break;
 
                         case $this->isOp($opCode, 'OP_RETURN'):
@@ -945,7 +953,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 }
             }
 
-            echo "\n--------\n";
             return true;
         } catch (ScriptRuntimeException $e) {
             echo "$$ SCRIPT RUNTIEM ERROR $$\n";

@@ -1,13 +1,9 @@
 <?php
 
-namespace Bitcoin\Script\Classifier;
+namespace Afk11\Bitcoin\Script\Classifier;
 
-use Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\Script;
 
-/**
- * Interface ScriptClassifierInterface
- * @package Bitcoin\Script\Classifier
- */
 interface ScriptClassifierInterface
 {
     const PAYTOPUBKEY = 'pubkey';

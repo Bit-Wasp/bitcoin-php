@@ -1,17 +1,12 @@
 <?php
 
-namespace Bitcoin\Block;
+namespace Afk11\Bitcoin\Block;
 
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
-/**
- * Class BlockHeader
- * @package Block
- * @author Thomas Kerin
- */
 class BlockHeader implements BlockHeaderInterface
 {
     /**
@@ -63,9 +58,9 @@ class BlockHeader implements BlockHeaderInterface
     }
 
     /**
-     * @param \Bitcoin\Parser $parser
+     * @param \Afk11\Bitcoin\Parser $parser
      * @return $this
-     * @throws \Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser &$parser)
     {
@@ -121,7 +116,6 @@ class BlockHeader implements BlockHeaderInterface
     }
 
     /**
-     *
      * @return mixed
      */
     public function getBlockHash()

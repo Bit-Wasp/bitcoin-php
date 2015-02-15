@@ -1,16 +1,11 @@
 <?php
 
-namespace Bitcoin;
+namespace Afk11\Bitcoin;
 
-use Bitcoin\Buffer;
-use Bitcoin\Bitcoin;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
-/**
- * Class Parser - mainly for decoding transactions..
- *
- * @package Bitcoin
- */
 class Parser
 {
     /**
@@ -19,7 +14,7 @@ class Parser
     protected $string;
 
     /**
-     * @var \Bitcoin\Math\Math
+     * @var \Afk11\Bitcoin\Math\Math
      */
     protected $math;
 
@@ -234,12 +229,12 @@ class Parser
         $varInt = self::numToVarInt(count($serializable));
 
         $parser = new Parser($varInt);
-        //$parser->writeInt(1, count($serializable));
 
         foreach ($serializable as $object) {
-            if (!in_array('Bitcoin\SerializableInterface', class_implements($object))) {
+            if (!in_array('Afk11\Bitcoin\SerializableInterface', class_implements($object))) {
                 throw new \RuntimeException('Objects being serialized to an array must implement the SerializableInterface');
             }
+
             $parser->writeBytes($object->getSize(), $object);
         }
 

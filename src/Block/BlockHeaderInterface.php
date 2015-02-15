@@ -1,12 +1,7 @@
 <?php
 
-namespace Bitcoin\Block;
+namespace Afk11\Bitcoin\Block;
 
-/**
- * Interface BlockHeaderInterface
- * @package Bitcoin\Block
- * @author Thomas Kerin
- */
 interface BlockHeaderInterface
 {
     const CURRENT_VERSION = 2;

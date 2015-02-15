@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Transaction;
+namespace Afk11\Bitcoin\Transaction;
 
 class TransactionInputCollection implements \Countable
 {
@@ -79,7 +79,7 @@ class TransactionInputCollection implements \Countable
      *
      * @param int $start
      * @param int $length
-     * @return \Bitcoin\Transaction\TransactionOutputCollection
+     * @return \Afk11\Bitcoin\Transaction\TransactionOutputCollection
      */
     public function slice($start, $length)
     {

@@ -1,17 +1,12 @@
 <?php
 
-namespace Bitcoin\Crypto\DRBG;
+namespace Afk11\Bitcoin\Crypto\Random;
 
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Buffer;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class HMACDRBG
- * @package Bitcoin\Crypto\DRBG
- * @author Thomas Kerin
- */
-class HMACDRBG implements DRBGInterface
+class HmacDrbg implements RbgInterface
 {
     /**
      * @var string
@@ -37,8 +32,8 @@ class HMACDRBG implements DRBGInterface
      * Construct a HMAC deterministic byte generator.
      *
      * @param $algo
-     * @param \Bitcoin\Buffer $entropy
-     * @param \Bitcoin\Buffer $personalString
+     * @param \Afk11\Bitcoin\Buffer $entropy
+     * @param \Afk11\Bitcoin\Buffer $personalString
      * @param GeneratorPoint $generator
      */
     public function __construct($algo, Buffer $entropy, Buffer $personalString = null, GeneratorPoint $generator = null)
@@ -54,8 +49,8 @@ class HMACDRBG implements DRBGInterface
 
     /**
      * Initialize the DRBG with the given $entropy and $personalString
-     * @param \Bitcoin\Buffer $entropy
-     * @param \Bitcoin\Buffer $personalString
+     * @param \Afk11\Bitcoin\Buffer $entropy
+     * @param \Afk11\Bitcoin\Buffer $personalString
      * @return $this
      */
     public function initialize(Buffer $entropy, Buffer $personalString = null)
@@ -116,7 +111,7 @@ class HMACDRBG implements DRBGInterface
     /**
      * Reseed the DRBG with new entropy, and reset the counter.
      *
-     * @param \Bitcoin\Buffer $entropy
+     * @param \Afk11\Bitcoin\Buffer $entropy
      */
     public function reseed(Buffer $entropy)
     {
@@ -138,7 +133,7 @@ class HMACDRBG implements DRBGInterface
      * Load $numBytes bytes from the DRBG
      *
      * @param int $numNumBytes
-     * @return \Bitcoin\Buffer
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function bytes($numNumBytes)
     {

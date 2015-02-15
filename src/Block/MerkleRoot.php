@@ -1,19 +1,14 @@
 <?php
 
-namespace Bitcoin\Block;
+namespace Afk11\Bitcoin\Block;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Network;
-use Bitcoin\Parser;
-use Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Network;
+use \Afk11\Bitcoin\Parser;
+use \Afk11\Bitcoin\Buffer;
 use Pleo\Merkle\FixedSizeTree;
-use Bitcoin\Exceptions\MerkleTreeEmpty;
+use \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
 
-/**
- * Class MerkleRoot
- * @package Bitcoin\Block
- * @author Thomas Kerin
- */
 class MerkleRoot
 {
     /**

@@ -1,15 +1,19 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Afk11\Bitcoin\Tests;
 
-use Bitcoin\Buffer;
-use Bitcoin\Bitcoin;
-use Bitcoin\Parser;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Network;
+use \Afk11\Bitcoin\Parser;
+use \Afk11\Bitcoin\Transaction\Transaction;
+use \Afk11\Bitcoin\Transaction\TransactionInput;
+use \Afk11\Bitcoin\Transaction\TransactionOutput;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Bitcoin\Parser
+     * @var \Afk11\Bitcoin\Parser
      */
     protected $parser;
 
@@ -25,8 +29,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->parserType = 'Bitcoin\Parser';
-        $this->bufferType = 'Bitcoin\Buffer';
+        $this->parserType = 'Afk11\Bitcoin\Parser';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()
@@ -302,6 +306,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     public function testGetVarString()
     {
         $strings = array(
+            '',
             '00',
             '00010203040506070809',
             '00010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102'
@@ -333,4 +338,38 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expected[$i]->serialize(), $actual[$i]->serialize());
         }
     }
-}
+
+    public function testWriteArray()
+    {
+        $transaction = new Transaction();
+        $input  = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0);
+        $output = new TransactionOutput(null, 1);
+        $transaction
+            ->getInputs()
+            ->addInput($input);
+
+        $transaction
+            ->getOutputs()
+            ->addOutput($output);
+
+        $array  = array($transaction, $transaction);
+        $parser = new Parser();
+        $parser->writeArray($array);
+
+        $this->assertSame('010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $transaction->serialize('hex'));
+        $this->assertSame('02010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $parser->getBuffer()->serialize('hex'));
+
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testWriteArrayFailure()
+    {
+        $network = new Network('00','05','80');
+        $array = array($network);
+
+        $parser = new Parser();
+        $parser->writeArray($array);
+    }
+} 

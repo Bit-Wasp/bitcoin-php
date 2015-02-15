@@ -1,15 +1,12 @@
 <?php
 
-namespace Bitcoin\Crypto;
+namespace Afk11\Bitcoin\Crypto\Random;
 
-use Bitcoin\Buffer;
-use \Bitcoin\Exceptions\RandomBytesFailure;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Crypto\Random\RbgInterface;
+use Afk11\Bitcoin\Exceptions\RandomBytesFailure;
 
-/**
- * Class Random
- * @package Bitcoin\Random
- */
-class Random
+class Random implements RbgInterface
 {
 
     /**
@@ -18,7 +15,7 @@ class Random
      * @return Buffer
      * @throws RandomBytesFailure
      */
-    public static function bytes($length = 32)
+    public function bytes($length = 32)
     {
         $random = mcrypt_create_iv(32, \MCRYPT_DEV_URANDOM);
 

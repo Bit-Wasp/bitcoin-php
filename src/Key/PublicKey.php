@@ -1,19 +1,15 @@
 <?php
 
-namespace Bitcoin\Key;
+namespace Afk11\Bitcoin\Key;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Math\Math;
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Math\Math;
+use \Afk11\Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Buffer;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class PublicKey
- * @package Bitcoin
- */
 class PublicKey implements KeyInterface, PublicKeyInterface
 {
 

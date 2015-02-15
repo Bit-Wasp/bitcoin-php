@@ -1,12 +1,10 @@
 <?php
 
-namespace Bitcoin\Tests\Script;
+namespace Afk11\Bitcoin\Tests\Script;
 
-use Bitcoin\Script\Script;
-use Bitcoin\Key\PublicKey;
-use Bitcoin\Buffer;
-use Bitcoin\Util\Math;
-use Bitcoin\Crypto\Random;
+use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Key\PublicKey;
+use Afk11\Bitcoin\Buffer;
 
 class ScriptTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +20,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->bufferType = 'Bitcoin\Buffer';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()

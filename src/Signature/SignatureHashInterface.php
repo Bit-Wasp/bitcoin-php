@@ -1,14 +1,9 @@
 <?php
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Script\ScriptInterface;
 
-/**
- * Interface SigHashInterface
- * @package Bitcoin\SigHash
- * @author Thomas Kerin
- */
 interface SignatureHashInterface
 {
     /**
@@ -41,7 +36,7 @@ interface SignatureHashInterface
      * @param ScriptInterface $txOutScript
      * @param $inputToSign
      * @param int $sighashType
-     * @return \Bitcoin\Crypto\Buffer
+     * @return \Afk11\Bitcoin\Crypto\Buffer
      * @internal param $transaction
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL);

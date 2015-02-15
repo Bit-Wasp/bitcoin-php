@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\Tests\Transaction;
+namespace Afk11\Bitcoin\Tests\Transaction;
 
-use Bitcoin\Network;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Transaction\TransactionInput;
-use Bitcoin\Transaction\TransactionOutput;
+use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionInput;
+use Afk11\Bitcoin\Transaction\TransactionOutput;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function __construct()
     {
         $this->network = new Network('00', '05', '80');
-        $this->txType = 'Bitcoin\Transaction\Transaction';
+        $this->txType = 'Afk11\Bitcoin\Transaction\Transaction';
     }
 
     public function setUp()

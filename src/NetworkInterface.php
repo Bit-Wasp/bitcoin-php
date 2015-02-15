@@ -1,11 +1,7 @@
 <?php
 
-namespace Bitcoin;
+namespace Afk11\Bitcoin;
 
-/**
- * Interface NetworkInterface
- * @package Bitcoin
- */
 interface NetworkInterface
 {
     /**

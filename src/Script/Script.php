@@ -1,18 +1,14 @@
 <?php
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Parser;
 
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Key\PublicKeyInterface;
+use \Afk11\Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Key\PublicKeyInterface;
 
-/**
- * Class Script
- * @package Bitcoin
- */
 class Script implements ScriptInterface
 {
     /**
@@ -452,7 +448,7 @@ class Script implements ScriptInterface
     /**
      * Return a buffer containing the hash of this script.
      *
-     * @return \Bitcoin\Buffer
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function getScriptHash()
     {

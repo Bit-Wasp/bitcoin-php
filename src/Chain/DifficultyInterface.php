@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 15/01/15
- * Time: 03:36
- */
 
-namespace Bitcoin\Chain;
+namespace Afk11\Bitcoin\Chain;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 
 interface DifficultyInterface
 {

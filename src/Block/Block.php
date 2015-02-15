@@ -1,10 +1,10 @@
 <?php
 
-namespace Bitcoin\Block;
+namespace Afk11\Bitcoin\Block;
 
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
 class Block implements BlockInterface
 {
@@ -37,7 +37,7 @@ class Block implements BlockInterface
             $this->setTransactions(
                 $parser->getArray(
                     function () use (&$parser) {
-                        $transaction = new \Bitcoin\Transaction\Transaction();
+                        $transaction = new \Afk11\Bitcoin\Transaction\Transaction();
                         $transaction->fromParser($parser);
                         return $transaction;
                     }
@@ -50,6 +50,10 @@ class Block implements BlockInterface
         return $this;
     }
 
+    /**
+     * @param null $type
+     * @return string
+     */
     public function serialize($type = null)
     {
         $header = new Buffer($this->getHeader()->serialize());

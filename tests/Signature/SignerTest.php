@@ -1,16 +1,15 @@
 <?php
 
-namespace Bitcoin\Tests\Signature;
+namespace Afk11\Bitcoin\Tests\Signature;
 
-use Bitcoin\Exceptions\SignatureNotCanonical;
-use Bitcoin\Key\PrivateKey;
-use Bitcoin\Crypto\Random;
-use Bitcoin\Signature\Signature;
-use Bitcoin\Signature\Signer;
-use Bitcoin\Signature\K\RandomK;
-use Bitcoin\Buffer;
-use Bitcoin\Bitcoin;
-use Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
+use Afk11\Bitcoin\Key\PrivateKey;
+use Afk11\Bitcoin\Crypto\Random\Random;
+use Afk11\Bitcoin\Signature\Signature;
+use Afk11\Bitcoin\Signature\Signer;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Crypto\Hash;
 
 /**
  * Class SignatureTest
@@ -25,7 +24,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->sigType = 'Bitcoin\Signature\Signature';
+        $this->sigType = 'Afk11\Bitcoin\Signature\Signature';
     }
 
 
@@ -37,18 +36,18 @@ class SignerTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         $math = Bitcoin::getMath();
         $generator = Bitcoin::getGenerator();
-        $signer = new \Bitcoin\Signature\Signer($math, $generator);
+        $signer = new \Afk11\Bitcoin\Signature\Signer($math, $generator);
 
         foreach ($json->test as $c => $test) {
             $privateKey = new PrivateKey($math, $generator, $test->privKey);
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
-            $k = new \Bitcoin\Signature\K\DeterministicK($privateKey, $messageHash);
+            $k = new \Afk11\Bitcoin\Crypto\Random\Rfc6979($math, $generator, $privateKey, $messageHash);
             $sig = $signer->sign($privateKey, $messageHash, $k);
 
             // K must be correct (from privatekey and message hash)
-            $this->assertEquals(Buffer::hex($test->expectedK), $k->getK());
+            $this->assertEquals(Buffer::hex($test->expectedK), $k->bytes(32));
 
             // R and S should be correct
             $rHex = $math->dechex($sig->getR());
@@ -99,16 +98,18 @@ class SignerTest extends \PHPUnit_Framework_TestCase
          */
         $math = Bitcoin::getMath();
         $G = Bitcoin::getGenerator();
+        $random = new Random();
+
         $signer = new Signer($math, $G);
         $pk = new PrivateKey($math, $G, '4141414141414141414141414141414141414141414141414141414141414141');
 
         for ($i = 0; $i < 10; $i++) {
-            $buf = Random::bytes(32);
-            $sig = $signer->sign($pk, $buf, new RandomK());
+            $hash = $random->bytes(32);
+            $sig = $signer->sign($pk, $hash, new Random());
 
             $this->assertInstanceOf($this->sigType, $sig);
             $this->assertTrue(Signature::isDERSignature(new Buffer($sig->serialize())));
-            $this->assertTrue($signer->verify($pk->getPublicKey(), $buf, $sig));
+            $this->assertTrue($signer->verify($pk->getPublicKey(), $hash, $sig));
         }
     }
 }

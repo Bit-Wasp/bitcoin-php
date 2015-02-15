@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 06/02/15
- * Time: 11:43
- */
 
-namespace Bitcoin\Script;
+namespace Afk11\Bitcoin\Script;
 
 class ScriptInterpreterFlags
 {

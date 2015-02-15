@@ -1,16 +1,12 @@
 <?php
 
-namespace Bitcoin\Key;
+namespace Afk11\Bitcoin\Key;
 
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class Point
- * @package Bitcoin
- */
 class Point implements PointInterface
 {
     /**

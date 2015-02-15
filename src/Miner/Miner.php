@@ -1,27 +1,23 @@
 <?php
 
-namespace Bitcoin\Miner;
+namespace Afk11\Bitcoin\Miner;
 
-use Bitcoin\Chain\Difficulty;
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Math\Math;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
-use Bitcoin\Script\Script;
-use Bitcoin\Script\ScriptInterface;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Transaction\TransactionInterface;
-use Bitcoin\Transaction\TransactionInput;
-use Bitcoin\Transaction\TransactionOutput;
-use Bitcoin\Block\Block;
-use Bitcoin\Block\MerkleRoot;
-use Bitcoin\Block\BlockHeader;
-use Bitcoin\Block\BlockHeaderInterface;
+use Afk11\Bitcoin\Chain\Difficulty;
+use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionInterface;
+use Afk11\Bitcoin\Transaction\TransactionInput;
+use Afk11\Bitcoin\Transaction\TransactionOutput;
+use Afk11\Bitcoin\Block\Block;
+use Afk11\Bitcoin\Block\MerkleRoot;
+use Afk11\Bitcoin\Block\BlockHeader;
+use Afk11\Bitcoin\Block\BlockHeaderInterface;
 
-/**
- * Class Miner
- * @package Bitcoin\Miner
- */
 class Miner
 {
     /**
@@ -105,7 +101,7 @@ class Miner
     /**
      * @param TransactionInterface|null $coinbaseTx
      * @return Block
-     * @throws \Bitcoin\Exceptions\MerkleTreeEmpty
+     * @throws \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty
      */
     public function run(TransactionInterface $coinbaseTx = null)
     {

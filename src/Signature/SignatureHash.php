@@ -1,21 +1,17 @@
 <?php
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
-use Bitcoin\Script\Script;
-use Bitcoin\Script\ScriptInterface;
-use Bitcoin\Transaction\TransactionInterface;
-use Bitcoin\Transaction\TransactionOutputInterface;
-use Bitcoin\Transaction\TransactionInputCollection;
-use Bitcoin\Transaction\TransactionOutputCollection;
+use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Transaction\TransactionInterface;
+use Afk11\Bitcoin\Transaction\TransactionOutputInterface;
+use Afk11\Bitcoin\Transaction\TransactionInputCollection;
+use Afk11\Bitcoin\Transaction\TransactionOutputCollection;
 
-/**
- * Class SigHashBuilder
- * @package Bitcoin
- */
 class SignatureHash implements SignatureHashInterface
 {
     /**

@@ -1,11 +1,7 @@
 <?php
 
-namespace Bitcoin\Block;
+namespace Afk11\Bitcoin\Block;
 
-/**
- * Class GenesisMiningBlockHeader
- * @package Bitcoin\Block
- */
 class GenesisMiningBlockHeader extends BlockHeader
 {
     public function getBlockHash()

@@ -6,12 +6,12 @@
  * Time: 00:04
  */
 
-namespace Bitcoin\Tests\Block;
+namespace Afk11\Bitcoin\Tests\Block;
 
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
-use Bitcoin\Block\BlockHeader;
-use Bitcoin\Block\BlockHeaderInterface;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Block\BlockHeader;
+use Afk11\Bitcoin\Block\BlockHeaderInterface;
 
 class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,8 +32,8 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->headerType = 'Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'Bitcoin\Buffer';
+        $this->headerType = 'Afk11\Bitcoin\Block\BlockHeader';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()
@@ -167,7 +167,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Bitcoin\Exceptions\ParserOutOfRange
+     * @expectedException \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      * @expectedExceptionMessage Failed to extract full block header from parser
      */
     public function testFromParserFailure()

@@ -1,21 +1,17 @@
 <?php
 
-namespace Bitcoin\Transaction;
+namespace Afk11\Bitcoin\Transaction;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Key\PrivateKeyInterface;
-use Bitcoin\SerializableInterface;
-use Bitcoin\Parser;
-use Bitcoin\Crypto\Hash;
-use Bitcoin\NetworkInterface;
-use Bitcoin\Signature\Signature;
-use Bitcoin\Signature\SignatureHash;
-use Bitcoin\Signature\K\KInterface;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Key\PrivateKeyInterface;
+use \Afk11\Bitcoin\SerializableInterface;
+use \Afk11\Bitcoin\Parser;
+use \Afk11\Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\NetworkInterface;
+use \Afk11\Bitcoin\Signature\Signature;
+use \Afk11\Bitcoin\Signature\SignatureHash;
+use \Afk11\Bitcoin\Signature\K\KInterface;
 
-/**
- * Class Transaction
- * @package Bitcoin
- */
 class Transaction implements TransactionInterface, SerializableInterface
 {
     /**
@@ -179,7 +175,7 @@ class Transaction implements TransactionInterface, SerializableInterface
     public function sign(PrivateKeyInterface $privateKey, TransactionOutputInterface $txOut, $inputToSign, KInterface $kProvider = null)
     {
         if (is_null($kProvider)) {
-            $kProvider = new \Bitcoin\Signature\K\RandomK();
+            $kProvider = new \Afk11\Bitcoin\Signature\K\RandomK();
         }
 
         $hash = (new SignatureHash($this))
@@ -191,8 +187,8 @@ class Transaction implements TransactionInterface, SerializableInterface
     }
 
     /**
-     * @param \Bitcoin\Parser $parser
-     * @throws \Bitcoin\Exceptions\ParserOutOfRange
+     * @param \Afk11\Bitcoin\Parser $parser
+     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
     public function fromParser(Parser &$parser)

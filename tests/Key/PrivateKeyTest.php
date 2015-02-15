@@ -1,12 +1,12 @@
 <?php
 
-namespace Bitcoin\Tests\Key;
+namespace Afk11\Bitcoin\Tests\Key;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Key\PrivateKey;
-use Bitcoin\Network;
-use Bitcoin\Buffer;
-use Bitcoin\Math\Math;
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Key\PrivateKey;
+use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase
@@ -29,12 +29,12 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $baseType = 'Bitcoin\Key\PrivateKey';
+    protected $baseType = 'Afk11\Bitcoin\Key\PrivateKey';
 
     /**
      * @var string
      */
-    protected $publicType = 'Bitcoin\Key\PublicKey';
+    protected $publicType = 'Afk11\Bitcoin\Key\PublicKey';
 
     /**
      *
@@ -191,7 +191,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         );
         foreach ($regular as $wif => $hex) {
             $private = PrivateKey::fromWif($wif);
-            $this->assertInstanceOf('Bitcoin\Key\PrivateKey', $private);
+            $this->assertInstanceOf('Afk11\Bitcoin\Key\PrivateKey', $private);
             $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);
             $this->assertFalse($private->isCompressed());
         }
@@ -204,14 +204,14 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
         foreach ($compressed as $wif => $hex) {
             $private = PrivateKey::fromWif($wif);
-            $this->assertInstanceOf('Bitcoin\Key\PrivateKey', $private);
+            $this->assertInstanceOf('Afk11\Bitcoin\Key\PrivateKey', $private);
             $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);
             $this->assertTrue($private->isCompressed());
         }
     }
 
     /**
-     * @expectedException \Bitcoin\Exceptions\Base58ChecksumFailure
+     * @expectedException \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public function testInvalidWif()
     {

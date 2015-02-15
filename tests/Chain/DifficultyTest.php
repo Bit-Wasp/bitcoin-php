@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Tests\Chain;
+namespace Afk11\Bitcoin\Tests\Chain;
 
-use Bitcoin\Buffer;
-use Bitcoin\Math\Math;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Bitcoin;
 
 class DifficultyTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,14 +13,14 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->math = new Math;
+        $this->math = Bitcoin::getMath();;
         $this->bits = Buffer::hex('1d00ffff');
         $this->targetHash = '00000000ffff0000000000000000000000000000000000000000000000000000';
     }
 
     public function testDefaultLowestDifficulty()
     {
-        $difficulty = new \Bitcoin\Chain\Difficulty($this->math);
+        $difficulty = new \Afk11\Bitcoin\Chain\Difficulty($this->math);
 
         $this->assertEquals($this->bits, $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
@@ -28,7 +28,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
 
     public function testLowestDifficulty()
     {
-        $difficulty = new \Bitcoin\Chain\Difficulty($this->math, $this->bits);
+        $difficulty = new \Afk11\Bitcoin\Chain\Difficulty($this->math, $this->bits);
 
         $this->assertEquals($this->bits, $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
@@ -37,7 +37,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
     public function testSetLowestDifficulty()
     {
         $bits = Buffer::hex('1e123456');
-        $difficulty = new \Bitcoin\Chain\Difficulty($this->math, $bits);
+        $difficulty = new \Afk11\Bitcoin\Chain\Difficulty($this->math, $bits);
         $this->assertEquals($bits, $difficulty->lowestBits());
     }
 
@@ -49,7 +49,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
         foreach ($json->test as $test) {
             $default = Buffer::hex($test->defaultBits);
             $bits = Buffer::hex($test->bits);
-            $difficulty = new \Bitcoin\Chain\Difficulty($this->math, $default);
+            $difficulty = new \Afk11\Bitcoin\Chain\Difficulty($this->math, $default);
 
             $this->assertEquals($test->targetHash, $difficulty->getTargetHash($bits));
             $this->assertEquals($test->difficulty, $difficulty->getDifficulty($bits));

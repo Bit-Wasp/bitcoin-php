@@ -1,19 +1,15 @@
 <?php
 
-namespace Bitcoin\Signature;
+namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Buffer;
-use Bitcoin\Signature\K\KInterface;
-use Bitcoin\Key\PrivateKeyInterface;
-use Bitcoin\Key\PublicKeyInterface;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Crypto\Random\RbgInterface;
+use Afk11\Bitcoin\Signature\K\KInterface;
+use Afk11\Bitcoin\Key\PrivateKeyInterface;
+use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;
 
-/**
- * Class Signer
- * @package Bitcoin\Signature
- * @author Thomas Kerin
- */
 class Signer implements SignerInterface
 {
     /**
@@ -45,16 +41,16 @@ class Signer implements SignerInterface
 
     /**
      * Produce a signature for a $messageHash by a $privateKey. $kProvider can be random or
-     * deterministic (RFC6979)
+     * deterministic (Rfc6979)
      *
      * @param PrivateKeyInterface $privateKey
-     * @param \Bitcoin\Buffer $messageHash
-     * @param KInterface $kProvider
+     * @param Buffer $messageHash
+     * @param RbgInterface $nonce
      * @return Signature
      */
-    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, KInterface $kProvider)
+    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $nonce)
     {
-        $randomK = $kProvider->getK();
+        $randomK = $nonce->bytes(32);
 
         $n       = $this->generator->getOrder();
         $k       = $this->math->mod($randomK->serialize('int'), $n);
@@ -95,7 +91,7 @@ class Signer implements SignerInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param \Bitcoin\Buffer $hash
+     * @param \Afk11\Bitcoin\Buffer $hash
      * @param SignatureInterface $signature
      * @return bool
      */

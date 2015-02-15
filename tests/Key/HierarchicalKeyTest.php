@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Tests\Key;
+namespace Afk11\Bitcoin\Tests\Key;
 
-use Bitcoin\Network;
-use Bitcoin\Key\HierarchicalKey;
+use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Key\HierarchicalKey;
 
 class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +17,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
      */
     protected $network;
 
-    protected $baseType = 'Bitcoin\Key\HierarchicalKey';
+    protected $baseType = 'Afk11\Bitcoin\Key\HierarchicalKey';
 
     public function setUp()
     {

@@ -1,14 +1,14 @@
 <?php
 
 
-namespace Bitcoin\Tests\Block;
+namespace Afk11\Bitcoin\Tests\Block;
 
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
-use Bitcoin\Block\Block;
-use Bitcoin\Block\BlockHeader;
-use Bitcoin\Transaction\Transaction;
-use Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Block\Block;
+use Afk11\Bitcoin\Block\BlockHeader;
+use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
 class BlockTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,9 +35,9 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->blockType = 'Bitcoin\Block\Block';
-        $this->headerType = 'Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'Bitcoin\Util\Buffer';
+        $this->blockType = 'Afk11\Bitcoin\Block\Block';
+        $this->headerType = 'Afk11\Bitcoin\Block\BlockHeader';
+        $this->bufferType = 'Afk11\Bitcoin\Buffer';
     }
 
     public function setUp()

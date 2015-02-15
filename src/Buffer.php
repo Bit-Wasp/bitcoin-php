@@ -1,13 +1,9 @@
 <?php
 
-namespace Bitcoin;
+namespace Afk11\Bitcoin;
 
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 
-/**
- * Class Buffer
- * @package Bitcoin
- */
 class Buffer
 {
     /**

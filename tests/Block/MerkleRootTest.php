@@ -1,17 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 02/01/15
- * Time: 02:23
- */
 
-namespace Bitcoin\Tests\Block;
+namespace Afk11\Bitcoin\Tests\Block;
 
-use Bitcoin\Exceptions\MerkleTreeEmpty;
-use Bitcoin\Block\MerkleRoot;
-use Bitcoin\Block\Block;
-use Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
+use Afk11\Bitcoin\Block\MerkleRoot;
+use Afk11\Bitcoin\Block\Block;
+use Afk11\Bitcoin\Transaction\Transaction;
 
 class MerkleRootTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +16,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->rootType = 'Bitcoin\Block\MerkleRoot';
+        $this->rootType = 'Afk11\Bitcoin\Block\MerkleRoot';
     }
 
     public function setUp()
@@ -46,7 +40,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Bitcoin\Exceptions\MerkleTreeEmpty
+     * @expectedException \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty
      * @expectedExceptionMessage
      */
     public function testCannotUseEmptyBlock()
@@ -68,7 +62,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
         $block->setTransactions($array);
 
         $hasher = function ($value) {
-            return \Bitcoin\Crypto\Hash::ripemd160d($value);
+            return \Afk11\Bitcoin\Crypto\Hash::ripemd160d($value);
         };
 
         $root = new MerkleRoot($block, $hasher);
