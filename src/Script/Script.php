@@ -6,7 +6,7 @@ use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
 
-use Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Key\PublicKeyInterface;
 
 /**

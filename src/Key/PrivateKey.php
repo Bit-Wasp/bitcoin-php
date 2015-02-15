@@ -12,7 +12,7 @@ use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Base58;
-use Bitcoin\Crypto\Random\Random;
+use \Afk11\Bitcoin\Crypto\Random\Random;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 

@@ -4,13 +4,13 @@ namespace Bitcoin\Tests\Signature;
 
 use Bitcoin\Exceptions\SignatureNotCanonical;
 use Bitcoin\Key\PrivateKey;
-use Bitcoin\Crypto\Random\Random;
+use \Afk11\Bitcoin\Crypto\Random\Random;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\Signer;
 use Bitcoin\Signature\K\RandomK;
 use Bitcoin\Buffer;
 use Bitcoin\Bitcoin;
-use Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Crypto\Hash;
 
 /**
  * Class SignatureTest
@@ -44,7 +44,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
-            $k = new \Bitcoin\Crypto\Random\Rfc6979($math, $generator, $privateKey, $messageHash);
+            $k = new \Afk11\Bitcoin\Crypto\Random\Rfc6979($math, $generator, $privateKey, $messageHash);
             $sig = $signer->sign($privateKey, $messageHash, $k);
 
             // K must be correct (from privatekey and message hash)

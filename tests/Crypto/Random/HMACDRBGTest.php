@@ -5,8 +5,8 @@ namespace Bitcoin\Tests\Crypto\Random;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
-use Bitcoin\Crypto\Hash;
-use Bitcoin\Crypto\Random\HmacDrbg;
+use \Afk11\Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Crypto\Random\HmacDrbg;
 use Bitcoin\Key\PrivateKey;
 
 class HMACDRBGTest extends \PHPUnit_Framework_TestCase

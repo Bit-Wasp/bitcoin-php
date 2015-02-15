@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Script;
 
-use Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Script\Classifier\OutputClassifier;

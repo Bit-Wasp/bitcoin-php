@@ -4,7 +4,7 @@ namespace Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
 use Bitcoin\Math\Math;
-use Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Buffer;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;

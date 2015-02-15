@@ -9,7 +9,7 @@
 namespace Bitcoin\Signature;
 
 use Bitcoin\Buffer;
-use Bitcoin\Crypto\Random\RbgInterface;
+use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\Key\PublicKeyInterface;
 use Bitcoin\Signature\K\KInterface;

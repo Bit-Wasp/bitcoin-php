@@ -41,7 +41,7 @@ interface SignatureHashInterface
      * @param ScriptInterface $txOutScript
      * @param $inputToSign
      * @param int $sighashType
-     * @return \Bitcoin\Crypto\Buffer
+     * @return \Afk11\Bitcoin\Crypto\Buffer
      * @internal param $transaction
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL);

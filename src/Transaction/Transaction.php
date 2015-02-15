@@ -6,7 +6,7 @@ use Bitcoin\Bitcoin;
 use Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\SerializableInterface;
 use Bitcoin\Parser;
-use Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\SignatureHash;

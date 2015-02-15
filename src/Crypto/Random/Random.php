@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Crypto\Random;
+namespace Afk11\Bitcoin\Crypto\Random;
 
 use Bitcoin\Buffer;
-use Bitcoin\Crypto\Random\RbgInterface;
+use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use \Bitcoin\Exceptions\RandomBytesFailure;
 
 /**

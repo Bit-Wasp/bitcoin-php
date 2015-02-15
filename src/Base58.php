@@ -3,7 +3,7 @@
 namespace Bitcoin;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Exceptions\Base58ChecksumFailure;
 
 /**

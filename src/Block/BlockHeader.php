@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Block;
 
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
-use Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Exceptions\ParserOutOfRange;
 
 /**

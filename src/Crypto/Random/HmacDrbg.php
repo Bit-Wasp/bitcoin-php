@@ -1,8 +1,8 @@
 <?php
 
-namespace Bitcoin\Crypto\Random;
+namespace Afk11\Bitcoin\Crypto\Random;
 
-use Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Buffer;
 use Mdanter\Ecc\GeneratorPoint;
 

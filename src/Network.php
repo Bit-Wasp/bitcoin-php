@@ -2,7 +2,7 @@
 
 namespace Bitcoin;
 
-use Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Crypto\Hash;
 
 /**
  * Class Network

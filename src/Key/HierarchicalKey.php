@@ -8,7 +8,7 @@ use Bitcoin\Base58;
 use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
 use Bitcoin\Parser;
-use Bitcoin\Crypto\Hash;
+use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\NetworkInterface;
 use Bitcoin\Signature\K\KInterface;
 use Bitcoin\Exceptions\InvalidPrivateKey;

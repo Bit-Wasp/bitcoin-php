@@ -16,7 +16,7 @@ class RandomTest extends \PHPUnit_Framework_TestCase
 
     public function testBytes()
     {
-        $random = new \Bitcoin\Crypto\Random\Random;
+        $random = new \Afk11\Bitcoin\Crypto\Random\Random;
         $bytes  = $random->bytes(32);
         $this->assertInstanceOf($this->bufferType, $bytes);
         $this->assertEquals(32, $bytes->getSize());

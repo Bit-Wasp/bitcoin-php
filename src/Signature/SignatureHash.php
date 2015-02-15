@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Signature;
 
-use Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
 use Bitcoin\Script\Script;

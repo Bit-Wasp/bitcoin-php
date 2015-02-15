@@ -68,7 +68,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
         $block->setTransactions($array);
 
         $hasher = function ($value) {
-            return \Bitcoin\Crypto\Hash::ripemd160d($value);
+            return \Afk11\Bitcoin\Crypto\Hash::ripemd160d($value);
         };
 
         $root = new MerkleRoot($block, $hasher);
