@@ -14,9 +14,9 @@ install:
   - composer install
 
 script:
-  - php bin/phpunit -c build/
+  - php bin/phpunit -c build/ --coverage-clover build/logs/clover.xml
   - php bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
-  - phpunit --coverage-clover build/logs/clover.xml
+##  - phpunit --coverage-clover build/logs/clover.xml
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
 matrix:

@@ -57,10 +57,10 @@ class Parser
     {
         if ($decimal < 0xfd) {
             $bin = chr($decimal);
-        } else if ($decimal <= 0xffff) {
+        } elseif ($decimal <= 0xffff) {
             // Uint16
             $bin = pack("Cv", 0xfd, $decimal);
-        } else if ($decimal <= 0xffffffff) {
+        } elseif ($decimal <= 0xffffffff) {
             // Uint32
             $bin = pack("CV", 0xfe, $decimal);
         } else {
@@ -126,11 +126,11 @@ class Parser
 
         if ($this->math->cmp($int, 0xfd) < 0) {
             return $byte;
-        } else if ($this->math->cmp($int, 0xfd) == 0) {
+        } elseif ($this->math->cmp($int, 0xfd) == 0) {
             return $this->readBytes(2, true);
-        } else if ($this->math->cmp($int, 0xfe) == 0) {
+        } elseif ($this->math->cmp($int, 0xfe) == 0) {
             return $this->readBytes(4, true);
-        } else if ($this->math->cmp($int, 0xff) == 0) {
+        } elseif ($this->math->cmp($int, 0xff) == 0) {
             return $this->readBytes(8, true);
         }
     }
@@ -167,7 +167,7 @@ class Parser
 
         if ($length == 0) {
             return false;
-        } else if ($this->math->cmp($length, $bytes) !== 0) {
+        } elseif ($this->math->cmp($length, $bytes) !== 0) {
             throw new ParserOutOfRange('Could not parse string of required length');
         }
 

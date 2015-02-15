@@ -34,7 +34,6 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
-
             $privKey     = new PrivateKey($math, $generator, $test->privKey);
             $messageHash = Buffer::hex(Hash::sha256($test->message));
             $entropy     = new Buffer($privKey->serialize() . $messageHash->serialize());
@@ -43,5 +42,4 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(strtolower($test->expectedK), strtolower($k->serialize('hex')));
         }
     }
-
 }

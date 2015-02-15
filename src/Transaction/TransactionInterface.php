@@ -37,48 +37,18 @@ interface TransactionInterface
     public function getVersion();
 
     /**
-     * Get a particular input by it's $index
-     *
-     * @param $index
-     * @return mixed
-     */
-    public function getInput($index);
-
-    /**
      * Return an array of all inputs
      *
-     * @return mixed
+     * @return TransactionInputCollection
      */
     public function getInputs();
 
     /**
-     * Return a reference to the internal array containing the inputs
-     *
-     * @return array
-     */
-    public function &getInputsReference();
-
-    /**
-     * Get a particular output by it's $index
-     *
-     * @param $index
-     * @return mixed
-     */
-    public function getOutput($index);
-
-    /**
      * Return an array of all outputs
      *
-     * @return mixed
+     * @return TransactionOutputCollection
      */
     public function getOutputs();
-
-    /**
-     * Return a reference to the internal array containing the outputs
-     *
-     * @return mixed
-     */
-    public function &getOutputsReference();
 
     /**
      * Return the locktime for this transaction

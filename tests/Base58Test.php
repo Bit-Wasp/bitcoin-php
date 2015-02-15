@@ -49,7 +49,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
 
         foreach ($json->test as $test) {
             $encoded = $this->base58->encode($test[0]);
-            $this->assertSame($test[1],$encoded);
+            $this->assertSame($test[1], $encoded);
 
             $back    = $this->base58->decode($encoded);
             $this->assertSame($test[0], $back);

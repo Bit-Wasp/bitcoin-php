@@ -122,5 +122,4 @@ class BufferTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($this->buffer->getMaxSize());
         $this->assertSame($this->buffer->getMaxSize(), $maxSize);
     }
-
-} 
+}

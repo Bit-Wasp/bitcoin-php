@@ -127,7 +127,7 @@ class Miner
             $coinbaseTx->addOutput($output);
         }
 
-        $inputs = &$coinbaseTx->getInputsReference();
+        $inputs = $coinbaseTx->getInputs();
         $header = new BlockHeader();
         $block  = new Block;
         $found  = false;
@@ -138,7 +138,7 @@ class Miner
 
         while ($found == false) {
             // Set coinbase script, and build Merkle tree & block header.
-            $inputs[0]->setScript($this->getCoinbaseScriptBuf());
+            $inputs->getInput(0)->setScript($this->getCoinbaseScriptBuf());
 
             $transactions = array_merge(array($coinbaseTx), $this->transactions);
             $block->setTransactions($transactions);

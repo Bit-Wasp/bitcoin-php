@@ -15,7 +15,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
 
     public function testCreatesInstance()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->assertInstanceOf('Bitcoin\NetworkInterface', $this->network);
     }
 
@@ -25,7 +25,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInstanceFailsNotHex()
     {
-        $this->network = new Network('hi','00','00', true);
+        $this->network = new Network('hi', '00', '00', true);
     }
 
     /**
@@ -34,7 +34,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInstanceFailsP2shNotHex()
     {
-        $this->network = new Network('00','hi','00', true);
+        $this->network = new Network('00', 'hi', '00', true);
     }
 
     /**
@@ -43,7 +43,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInstanceFailsPrivNotHex()
     {
-        $this->network = new Network('00','00','hi', true);
+        $this->network = new Network('00', '00', 'hi', true);
     }
 
     /**
@@ -52,30 +52,30 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInstanceFailsNotBool()
     {
-        $this->network = new Network('aa','00','ab', 'nogood');
+        $this->network = new Network('aa', '00', 'ab', 'nogood');
     }
 
     public function testDefaultTestnetFlag()
     {
-        $this->network = new Network('00','05','80');
+        $this->network = new Network('00', '05', '80');
         $this->assertFalse($this->network->isTestnet());
     }
 
     public function testGetAddressByte()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->assertSame('00', $this->network->getAddressByte());
     }
 
     public function testGetP2shByte()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->assertSame('05', $this->network->getP2shByte());
     }
 
     public function testGetPrivByte()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->assertSame('80', $this->network->getPrivByte());
     }
 
@@ -98,12 +98,12 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
 
     private function getTestNetwork()
     {
-        return new Network('00','05','80',true);
+        return new Network('00', '05', '80', true);
     }
 
     private function getLiveNetwork()
     {
-        return new Network('00','05','80',false);
+        return new Network('00', '05', '80', false);
     }
 
     /**
@@ -112,7 +112,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHDPrivByteException()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->network->getHDPrivByte();
     }
 
@@ -121,7 +121,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHDPrivByte()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->network->setHDPrivByte('0488B21E');
         $this->assertSame('0488B21E', $this->network->getHDPrivByte());
     }
@@ -131,7 +131,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetHDPrivByte()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->network->setHDPrivByte('0488B21E');
         $this->assertSame('0488B21E', $this->network->getHDPrivByte());
     }
@@ -142,7 +142,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHDPubByteException()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->network->getHDPubByte();
     }
     /**
@@ -150,7 +150,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHDPubByte()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->network->setHDPubByte('0488B21E');
         $this->assertSame('0488B21E', $this->network->getHDPubByte());
     }
@@ -160,10 +160,8 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetHDPubByte()
     {
-        $this->network = new Network('00','05','80',true);
+        $this->network = new Network('00', '05', '80', true);
         $this->network->setHDPubByte('0488B21E');
         $this->assertSame('0488B21E', $this->network->getHDPubByte());
     }
-
-
 }

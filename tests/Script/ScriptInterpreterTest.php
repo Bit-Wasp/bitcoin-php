@@ -42,7 +42,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     {
         $array = explode(",", $flagStr);
         $flags = new ScriptInterpreterFlags();
-        foreach($array as $activeFlag) {
+        foreach ($array as $activeFlag) {
             $flags->$activeFlag = true;
         }
         return $flags;
