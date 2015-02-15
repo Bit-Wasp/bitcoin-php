@@ -191,7 +191,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $bytes = '41424344';
         $parser = new Parser();
-        $parser->writeBytes(4,Buffer::hex($bytes), true);
+        $parser->writeBytes(4, Buffer::hex($bytes), true);
         $returned = $parser->getBuffer()->serialize('hex');
         $this->assertSame($returned, '44434241');
     }
@@ -329,8 +329,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         };
 
         $actual   = $parser->getArray($callback);
-        for($i = 0; $i < count($expected); $i++) {
+        for ($i = 0; $i < count($expected); $i++) {
             $this->assertEquals($expected[$i]->serialize(), $actual[$i]->serialize());
         }
     }
-} 
+}

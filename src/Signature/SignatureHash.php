@@ -9,6 +9,8 @@ use Bitcoin\Script\Script;
 use Bitcoin\Script\ScriptInterface;
 use Bitcoin\Transaction\TransactionInterface;
 use Bitcoin\Transaction\TransactionOutputInterface;
+use Bitcoin\Transaction\TransactionInputCollection;
+use Bitcoin\Transaction\TransactionOutputCollection;
 
 /**
  * Class SigHashBuilder
@@ -43,9 +45,9 @@ class SignatureHash implements SignatureHashInterface
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
-        $copy     =  $this->transaction;
-        $inputs   = &$copy->getInputsReference();
-        $outputs  = &$copy->getOutputsReference();
+        $copy     = $this->transaction;
+        $inputs   = $copy->getInputs();
+        $outputs  = $copy->getOutputs();
 
         if ($inputToSign > count($inputs)) {
             throw new \Exception('Input does not exist');
@@ -53,23 +55,23 @@ class SignatureHash implements SignatureHashInterface
 
         // Default SIGHASH_ALL procedure: null all input scripts
         for ($i = 0; $i < count($inputs); $i++) {
-            $inputs[$i]->setScriptBuf(new Buffer());
+            $inputs->getInput($i)->setScriptBuf(new Buffer());
         }
 
-        $inputs[$inputToSign]->setScript($txOutScript);
+        $inputs->getInput($inputToSign)->setScript($txOutScript);
 
         if ($sighashType & 31 == SignatureHashInterface::SIGHASH_NONE) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
 
-            $outputs = array();
+            $outputs = new TransactionOutputCollection();
 
             for ($i = 0; $i < count($inputs); $i++) {
                 if ($i != $inputToSign) {
-                    $inputs[$i]->setSequence(0);
+                    $inputs->getInput($i)->setSequence(0);
                 }
             }
 
-        } else if ($sighashType & 31 == SignatureHashInterface::SIGHASH_SINGLE) {
+        } elseif ($sighashType & 31 == SignatureHashInterface::SIGHASH_SINGLE) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
 
@@ -79,25 +81,25 @@ class SignatureHash implements SignatureHashInterface
             }
 
             // Resize..
-            $outputs = array_slice($outputs, 0, ($nOutput+1));
+            $outputs = $outputs->slice(0, $nOutput + 1);
 
             // Set to null
             for ($i = 0; $i < $nOutput; $i++) {
-                $outputs[$i]->setScript(new Script());
+                $outputs->getOutput($i)->setScript(new Script());
             }
 
             // Let the others update at will
             for ($i = 0; $i < count($outputs); $i++) {
                 if ($i != $inputToSign) {
-                    $inputs[$i]->setSequence(0);
+                    $inputs->getInput($i)->setSequence(0);
                 }
             }
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
         if ($sighashType & 31 == SignatureHashInterface::SIGHASH_ANYONECANPAY) {
-            $input  = $inputs[$inputToSign];
-            $inputs = array($input);
+            $input  = $inputs->getInput($inputToSign);
+            $inputs = new TransactionInputCollection([ $input ]);
         }
 
         // Serialize the TxCopy and append the 4 byte hashtype (little endian);
@@ -106,6 +108,7 @@ class SignatureHash implements SignatureHashInterface
 
         $hash     = Hash::sha256d($txParser->getBuffer()->serialize());
         $buffer   = Buffer::hex($hash);
+
         return $buffer;
     }
 }

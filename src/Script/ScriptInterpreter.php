@@ -210,15 +210,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         if ($pushSize == 0) {
             return $this->compareOp($opCode, 'OP_0') == 0;
-        } else if ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
+        } elseif ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
             return $opCode == $this->script->getOpCode('OP_1') + ( ord($pushData[0]) - 1);
-        } else if ($pushSize == 1 && ord($pushData) == 0x81) {
+        } elseif ($pushSize == 1 && ord($pushData) == 0x81) {
             return $this->compareOp($opCode, 'OP_1NEGATE') == 0;
-        } else if ($pushSize <= 75) {
+        } elseif ($pushSize <= 75) {
             return $opCode == $pushSize;
-        } else if ($pushSize <= 255) {
+        } elseif ($pushSize <= 255) {
             return $this->compareOp($opCode, 'OP_PUSHDATA1') == 0;
-        } else if ($pushSize <= 65535) {
+        } elseif ($pushSize <= 65535) {
             return $this->compareOp($opCode, 'OP_PUSHDATA2') == 0;
         }
 
@@ -252,13 +252,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             // opCode < OP_PUSHDATA1 - then just take opCode as the length, do not seek more
             if ($this->compareOp($opCode, 'OP_PUSHDATA1') < 0) {
                 $size = $opCode;
-            } else if ($this->isOp($opCode, 'OP_PUSHDATA1')) {
+            } elseif ($this->isOp($opCode, 'OP_PUSHDATA1')) {
                 if ($posEnd - $position < 1) {
                     return false;
                 }
                 $size = $this->math->hexDec(bin2hex($script[$position]));
                 $position++;
-            } else if ($this->isOp($opCode, 'OP_PUSHDATA2')) {
+            } elseif ($this->isOp($opCode, 'OP_PUSHDATA2')) {
                 if (($posEnd - $position) < 2) {
                     return false;
                 }
@@ -266,7 +266,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 $size = unpack("v", substr($script, $position, 2));
                 $size = $size[1];
                 $position += 2;
-            } else if ($this->isOp($opCode, 'OP_PUSHDATA4')) {
+            } elseif ($this->isOp($opCode, 'OP_PUSHDATA4')) {
                 if ($posEnd - $position < 4) {
                     return false;
                 }
@@ -426,7 +426,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     echo "Push (".bin2hex($pushData).")\n";
                     $this->mainStack->push($pushData);
 
-                } else if ($fExec || ($this->compareOp($opCode, 'OP_IF') <= 0 && $this->compareOp($opCode, 'OP_ENDIF'))) {
+                } elseif ($fExec || ($this->compareOp($opCode, 'OP_IF') <= 0 && $this->compareOp($opCode, 'OP_ENDIF'))) {
                     switch ($opCode)
                     {
                         case $this->isOp($opCode, 'OP_1NEGATE'):
@@ -874,13 +874,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             if ($this->isOp($opCode, 'OP_RIPEMD160')) {
                                 $hash = Hash::ripemd160($vch, true);
-                            } else if ($this->isOp($opCode, 'OP_SHA1')) {
+                            } elseif ($this->isOp($opCode, 'OP_SHA1')) {
                                 $hash = Hash::sha1($vch, true);
-                            } else if ($this->isOp($opCode, 'OP_SHA256')) {
+                            } elseif ($this->isOp($opCode, 'OP_SHA256')) {
                                 $hash = Hash::sha256($vch, true);
-                            } else if ($this->isOp($opCode, 'OP_HASH160')) {
+                            } elseif ($this->isOp($opCode, 'OP_HASH160')) {
                                 $hash = Hash::sha256ripe160($vch->serialize('hex'), true);
-                            } else if ($this->isOp($opCode, 'OP_HASH256')) {
+                            } elseif ($this->isOp($opCode, 'OP_HASH256')) {
                                 $hash = Hash::sha256d($vch, true);
                             }
 

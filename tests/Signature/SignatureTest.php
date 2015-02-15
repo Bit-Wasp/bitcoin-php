@@ -56,7 +56,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
                 Signature::isDERSignature($sigBuf);
                 throw new \Exception("Failed testing for case: ". $test[0]);
             } catch (SignatureNotCanonical $e) {
-                $this->assertTrue(True);
+                $this->assertTrue(true);
             }
         }
     }

@@ -8,7 +8,6 @@ use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
 use Bitcoin\Crypto\Random;
 
-
 class ScriptTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -351,7 +350,8 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     {
         $data = Buffer::hex(
             '41414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141' .
-            '4141414141414141414141414141414141414141414141414141414141414141');
+            '4141414141414141414141414141414141414141414141414141414141414141'
+        );
         $this->script->push($data);
         $script = $this->script->serialize();
         $firstOpCode = ord($script[0]);
@@ -458,5 +458,4 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         }
 
     }
-
 }

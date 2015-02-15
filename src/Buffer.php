@@ -84,7 +84,7 @@ class Buffer
     {
         if ($type == 'hex') {
             return $this->__toString();
-        } else if ($type == 'int') {
+        } elseif ($type == 'int') {
             $hex = $this->__toString();
             return Bitcoin::getMath()->hexDec($hex);
         } else {

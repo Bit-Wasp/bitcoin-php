@@ -182,8 +182,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
             $hex    = $pubkey->serialize('hex');
             $bin    = $pubkey->serialize();
 
-            for($i = 0; $i < count($bin); $i++)
-            {
+            for ($i = 0; $i < count($bin); $i++) {
                 $nHex = bin2hex(substr($bin, $i, 1));
                 $hHex = substr($hex, $i*2, 2);
                 $this->assertSame($nHex, $hHex);

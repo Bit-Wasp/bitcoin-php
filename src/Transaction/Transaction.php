@@ -29,14 +29,14 @@ class Transaction implements TransactionInterface, SerializableInterface
     protected $version;
 
     /**
-     * @var TransactionInput[]
+     * @var TransactionInputCollection
      */
-    protected $inputs = array();
+    protected $inputs = null;
 
     /**
-     * @var array
+     * @var TransactionOutputCollection
      */
-    protected $outputs = array();
+    protected $outputs = null;
 
     /**
      * @var
@@ -49,7 +49,9 @@ class Transaction implements TransactionInterface, SerializableInterface
     public function __construct(NetworkInterface $network = null)
     {
         $this->setNetwork($network);
-        return $this;
+
+        $this->inputs = new TransactionInputCollection();
+        $this->outputs = new TransactionOutputCollection();
     }
 
     /**
@@ -117,40 +119,9 @@ class Transaction implements TransactionInterface, SerializableInterface
     }
 
     /**
-     * Add an input to this transaction
-     *
-     * @param TransactionInput $input
-     * @return $this
-     */
-    public function addInput(TransactionInput $input)
-    {
-        if (!empty($input)) {
-            $this->inputs[] = $input;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get a specific input by it's index in the array
-     *
-     * @param $index
-     * @return mixed
-     * @throws \Exception
-     */
-    public function getInput($index)
-    {
-        if (!isset($this->inputs[$index])) {
-            throw new \Exception('Input at this index does not exist');
-        }
-
-        return $this->inputs[$index];
-    }
-
-    /**
      * Get the array of inputs in the transaction
      *
-     * @return array
+     * @return TransactionInputCollection
      */
     public function getInputs()
     {
@@ -158,60 +129,11 @@ class Transaction implements TransactionInterface, SerializableInterface
     }
 
     /**
-     * Return a reference to the array containing the inputs
-     *
-     * @return array
-     */
-    public function &getInputsReference()
-    {
-        return $this->inputs;
-    }
-
-    /**
-     * @param TransactionOutput $output
-     * @return $this
-     */
-    public function addOutput(TransactionOutput $output)
-    {
-        if (!empty($output)) {
-            $this->outputs[] = $output;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get an output at the specific index
-     *
-     * @param $index
-     * @return mixed
-     * @throws \Exception
-     */
-    public function getOutput($index)
-    {
-        if (!isset($this->outputs[$index])) {
-            throw new \Exception('Output at this index does not exist');
-        }
-
-        return $this->outputs[$index];
-    }
-
-    /**
      * Get Outputs
      *
-     * @return array
+     * @return TransactionOutputCollection
      */
     public function getOutputs()
-    {
-        return $this->outputs;
-    }
-
-    /**
-     * Return a reference to the internal outputs
-     *
-     * @return array
-     */
-    public function &getOutputsReference()
     {
         return $this->outputs;
     }
@@ -281,7 +203,7 @@ class Transaction implements TransactionInterface, SerializableInterface
 
         for ($i = 0; $i < $inputC; $i++) {
             $input = new TransactionInput();
-            $this->addInput(
+            $this->inputs->addInput(
                 $input->fromParser($parser)
             );
         }
@@ -289,7 +211,7 @@ class Transaction implements TransactionInterface, SerializableInterface
         $outputC = $parser->getVarInt()->serialize('int');
         for ($i = 0; $i < $outputC; $i++) {
             $output = new TransactionOutput();
-            $this->addOutput(
+            $this->outputs->addOutput(
                 $output->fromParser($parser)
             );
         }
@@ -327,8 +249,8 @@ class Transaction implements TransactionInterface, SerializableInterface
 
         $parser = new Parser();
         $parser->writeInt(4, $this->getVersion(), true)
-            ->writeArray($this->getInputs())
-            ->writeArray($this->getOutputs())
+            ->writeArray($this->inputs->getInputs())
+            ->writeArray($this->outputs->getOutputs())
             ->writeInt(4, $this->getLockTime(), true);
 
         return $parser
@@ -357,7 +279,7 @@ class Transaction implements TransactionInterface, SerializableInterface
                     'asm' => $input->getScript()->getAsm()
                 )
             );
-        }, $this->getInputs());
+        }, $this->getInputs()->getInputs());
 
         $outputs = array_map(function (TransactionOutputInterface $output) {
             return array(
@@ -367,7 +289,7 @@ class Transaction implements TransactionInterface, SerializableInterface
                     'asm' => $output->getScript()->getAsm()
                 )
             );
-        }, $this->getOutputs());
+        }, $this->getOutputs()->getOutputs());
 
         return array(
             'txid' => $this->getTransactionId(),

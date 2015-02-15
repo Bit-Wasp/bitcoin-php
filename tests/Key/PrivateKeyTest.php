@@ -131,7 +131,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     public function testGetWif()
     {
         $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
-        $network = new Network('00','05','80');
+        $network = new Network('00', '05', '80');
         $this->assertSame($this->privateKey->getWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
 
         $this->privateKey->setCompressed(true);
@@ -189,7 +189,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             '5J6B9UWZSxwHuJF3jv1zi2ZxMAVhA7bBvFFcZXFo7ga1UdgNtDs' => '2413fb3709b05939f04cf2e92f7d0897fc2596f9ad0b8a9ea855c7bfebaae892',
             '5JKQJXqLFxQ9JSw2Wc4Z5ZY1v1BR8u4BfndtXZd1Kw9FsGe4ECq' => '421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87'
         );
-        foreach($regular as $wif => $hex) {
+        foreach ($regular as $wif => $hex) {
             $private = PrivateKey::fromWif($wif);
             $this->assertInstanceOf('Bitcoin\Key\PrivateKey', $private);
             $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);
@@ -202,7 +202,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             'KyvwuBYFruEssksxmDiQUKLwwtZt6WvFnPcdTnNPMddq15M3ezmU' => '50e36e410b227b70a1aa1abb28f1997aa6ec7a9ccddd4dc3ed708a18a0202b2f'
         );
 
-        foreach($compressed as $wif => $hex) {
+        foreach ($compressed as $wif => $hex) {
             $private = PrivateKey::fromWif($wif);
             $this->assertInstanceOf('Bitcoin\Key\PrivateKey', $private);
             $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);

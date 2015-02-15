@@ -42,7 +42,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
         if (!is_null($script)) {
             if ($script instanceof Script) {
                 $this->setScript($script);
-            } else if ($script instanceof Buffer) {
+            } elseif ($script instanceof Buffer) {
                 $this->setScriptBuf($script);
             }
         }

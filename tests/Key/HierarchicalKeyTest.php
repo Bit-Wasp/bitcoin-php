@@ -22,7 +22,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->key = null;
-        $this->network = new Network('00','05','80', false);
+        $this->network = new Network('00', '05', '80', false);
         $this->network->setHDPubByte('0488b21e')
             ->setHDPrivByte('0488ade4');
     }
@@ -53,7 +53,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateWithInvalidNetwork()
     {
-        $network   = new Network('00','05','80', false);
+        $network   = new Network('00', '05', '80', false);
         $key       = '0488b21e000000000000000000011d24b100df71e57af92a078155d1b37361066548e062286c0add7be854e51b02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
         $this->key = new HierarchicalKey($key, $network);
     }
@@ -147,7 +147,8 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     {
         $key       = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $this->key = HierarchicalKey::fromBase58($key, $this->network);
-        $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $this->key->getPrivateKey()->serialize('hex'));;
+        $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $this->key->getPrivateKey()->serialize('hex'));
+        ;
     }
 
     public function testGetPublicKey()
