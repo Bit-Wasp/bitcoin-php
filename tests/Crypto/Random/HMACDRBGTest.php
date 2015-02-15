@@ -6,14 +6,14 @@ namespace Bitcoin\Tests\Crypto\Random;
 use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
 use Bitcoin\Crypto\Hash;
-use Bitcoin\Crypto\Random\HMACDRBG;
+use Bitcoin\Crypto\Random\HmacDrbg;
 use Bitcoin\Key\PrivateKey;
 
 class HMACDRBGTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreateNew()
     {
-        $drbg = new HMACDRBG('sha256', Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
+        $drbg = new HmacDrbg('sha256', Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
         $this->assertInstanceOf('Bitcoin\Crypto\Random\HMACDRBG', $drbg);
     }
 
@@ -22,7 +22,7 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInvalidAlgorithm()
     {
-        $drbg = new HMACDRBG('fake', \Bitcoin\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
+        $drbg = new HmacDrbg('fake', \Bitcoin\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
         $this->assertInstanceOf('Bitcoin\Crypto\Random\HMACDRBG', $drbg);
     }
 
@@ -37,7 +37,7 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
             $privKey     = new PrivateKey($math, $generator, $test->privKey);
             $messageHash = Buffer::hex(Hash::sha256($test->message));
             $entropy     = new Buffer($privKey->serialize() . $messageHash->serialize());
-            $drbg        = new HMACDRBG($test->algorithm, $entropy);
+            $drbg        = new HmacDrbg($test->algorithm, $entropy);
             $k           = $drbg->bytes(32);
             $this->assertEquals(strtolower($test->expectedK), strtolower($k->serialize('hex')));
         }

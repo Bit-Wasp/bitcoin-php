@@ -17,7 +17,7 @@ class RFC6979 implements RbgInterface
 {
 
     /**
-     * @var HMACDRBG
+     * @var HmacDrbg
      */
     protected $drbg;
 
@@ -46,7 +46,7 @@ class RFC6979 implements RbgInterface
         $this->math      = $math;
         $this->generator = $generator;
         $entropy         = new Buffer($privateKey->serialize() . $messageHash->serialize());
-        $this->drbg      = new HMACDRBG($algo, $entropy);
+        $this->drbg      = new HmacDrbg($algo, $entropy);
         return $this;
     }
 

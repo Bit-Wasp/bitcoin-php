@@ -7,11 +7,11 @@ use Bitcoin\Buffer;
 use Mdanter\Ecc\GeneratorPoint;
 
 /**
- * Class HMACDRBG
+ * Class HmacDrbg
  * @package Bitcoin\Crypto\DRBG
  * @author Thomas Kerin
  */
-class HMACDRBG implements RbgInterface
+class HmacDrbg implements RbgInterface
 {
     /**
      * @var string
