@@ -1,8 +1,8 @@
 <?php
 
-namespace Bitcoin\Tests\Chain;
+namespace Afk11\Bitcoin\Tests\Chain;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Math\Math;
 
 class DifficultyTest extends \PHPUnit_Framework_TestCase

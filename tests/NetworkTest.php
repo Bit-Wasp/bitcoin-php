@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Afk11\Bitcoin\Tests;
 
 use Afk11\Bitcoin\Network;
 

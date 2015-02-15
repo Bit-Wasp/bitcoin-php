@@ -6,10 +6,10 @@
  * Time: 09:38
  */
 
-namespace Bitcoin\Tests\Script;
+namespace Afk11\Bitcoin\Tests\Script;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
 use \Afk11\Bitcoin\Script\Script;
 use \Afk11\Bitcoin\Script\ScriptInterpreter;
 use \Afk11\Bitcoin\Transaction\Transaction;

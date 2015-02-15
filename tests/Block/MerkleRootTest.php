@@ -6,7 +6,7 @@
  * Time: 02:23
  */
 
-namespace Bitcoin\Tests\Block;
+namespace Afk11\Bitcoin\Tests\Block;
 
 use Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Afk11\Bitcoin\Block\MerkleRoot;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests\Key;
+namespace Afk11\Bitcoin\Tests\Key;
 
 use Afk11\Bitcoin\Network;
 use Afk11\Bitcoin\Key\HierarchicalKey;

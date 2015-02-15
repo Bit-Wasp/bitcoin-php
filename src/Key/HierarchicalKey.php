@@ -2,24 +2,20 @@
 
 namespace Afk11\Bitcoin\Key;
 
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
-use Bitcoin\Base58;
-use Bitcoin\Buffer;
-use Bitcoin\Util\Math;
-use Bitcoin\Parser;
+use \Afk11\Bitcoin\Base58;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Util\Math;
+use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\NetworkInterface;
+use \Afk11\Bitcoin\NetworkInterface;
 use \Afk11\Bitcoin\Signature\K\KInterface;
 use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;
 
-/**
- * Class HierarchicalKey
- * @package Bitcoin
- */
 class HierarchicalKey implements PrivateKeyInterface, KeyInterface
 {
     /**
@@ -58,7 +54,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     protected $sequence;
 
     /**
-     * @var \Bitcoin\Buffer
+     * @var Buffer
      */
     protected $chainCode;
 
@@ -508,7 +504,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      * Create a buffer containing data to be hashed hashed to yield the child offset
      *
      * @param Buffer $sequence
-     * @return \Bitcoin\Buffer
+     * @return \Afk11\Bitcoin\Buffer
      * @throws \Exception
      */
     public function getOffsetBuffer(Buffer $sequence)

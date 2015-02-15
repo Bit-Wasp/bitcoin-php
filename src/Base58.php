@@ -1,15 +1,11 @@
 <?php
 
-namespace Bitcoin;
+namespace Afk11\Bitcoin;
 
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
 
-/**
- * Class Base58
- * @package Bitcoin
- */
 class Base58
 {
     /**

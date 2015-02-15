@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests\Script;
+namespace Afk11\Bitcoin\Tests\Script;
 
 use Afk11\Bitcoin\Script\ScriptStack;
 use Afk11\Bitcoin\Key\PublicKeyInterface;

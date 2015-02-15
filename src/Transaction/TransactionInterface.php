@@ -2,10 +2,6 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
-/**
- * Interface TransactionInterface
- * @package Bitcoin
- */
 interface TransactionInterface
 {
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Bitcoin\Tests\Signature;
+namespace Afk11\Bitcoin\Tests\Signature;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Transaction\TransactionOutput;

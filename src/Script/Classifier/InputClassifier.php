@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Script\Classifier;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Script\Script;
 

@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Afk11\Bitcoin\Script\ScriptInterface;
 use Afk11\Bitcoin\Transaction\TransactionOutputInterface;
@@ -48,7 +48,7 @@ class SignatureContainer
     /**
      * Find a signature which is validated by the given public key
      *
-     * @param \Bitcoin\Buffer $messageHash
+     * @param \Afk11\Bitcoin\Buffer $messageHash
      * @param PublicKeyInterface $publicKey
      * @return bool
      */

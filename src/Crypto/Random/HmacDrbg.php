@@ -3,14 +3,9 @@
 namespace Afk11\Bitcoin\Crypto\Random;
 
 use Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class HmacDrbg
- * @package Bitcoin\Crypto\DRBG
- * @author Thomas Kerin
- */
 class HmacDrbg implements RbgInterface
 {
     /**
@@ -37,8 +32,8 @@ class HmacDrbg implements RbgInterface
      * Construct a HMAC deterministic byte generator.
      *
      * @param $algo
-     * @param \Bitcoin\Buffer $entropy
-     * @param \Bitcoin\Buffer $personalString
+     * @param \Afk11\Bitcoin\Buffer $entropy
+     * @param \Afk11\Bitcoin\Buffer $personalString
      * @param GeneratorPoint $generator
      */
     public function __construct($algo, Buffer $entropy, Buffer $personalString = null, GeneratorPoint $generator = null)
@@ -54,8 +49,8 @@ class HmacDrbg implements RbgInterface
 
     /**
      * Initialize the DRBG with the given $entropy and $personalString
-     * @param \Bitcoin\Buffer $entropy
-     * @param \Bitcoin\Buffer $personalString
+     * @param \Afk11\Bitcoin\Buffer $entropy
+     * @param \Afk11\Bitcoin\Buffer $personalString
      * @return $this
      */
     public function initialize(Buffer $entropy, Buffer $personalString = null)
@@ -116,7 +111,7 @@ class HmacDrbg implements RbgInterface
     /**
      * Reseed the DRBG with new entropy, and reset the counter.
      *
-     * @param \Bitcoin\Buffer $entropy
+     * @param \Afk11\Bitcoin\Buffer $entropy
      */
     public function reseed(Buffer $entropy)
     {
@@ -138,7 +133,7 @@ class HmacDrbg implements RbgInterface
      * Load $numBytes bytes from the DRBG
      *
      * @param int $numNumBytes
-     * @return \Bitcoin\Buffer
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function bytes($numNumBytes)
     {

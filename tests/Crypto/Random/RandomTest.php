@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests\Crypto\Random;
+namespace Afk11\Bitcoin\Tests\Crypto\Random;
 
 class RandomTest extends \PHPUnit_Framework_TestCase
 {

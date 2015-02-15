@@ -2,24 +2,20 @@
 
 namespace Afk11\Bitcoin\Key;
 
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
 use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use Bitcoin\NetworkInterface;
-use Bitcoin\SerializableInterface;
+use \Afk11\Bitcoin\NetworkInterface;
+use \Afk11\Bitcoin\SerializableInterface;
 use \Afk11\Bitcoin\Signature\Signature;
 use \Afk11\Bitcoin\Signature\K\KInterface;
 use \Afk11\Bitcoin\Math\Math;
-use Bitcoin\Buffer;
-use Bitcoin\Base58;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Base58;
 use \Afk11\Bitcoin\Crypto\Random\Random;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
-/**
- * Class PrivateKey
- * @package Bitcoin
- */
 class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInterface
 {
     /**

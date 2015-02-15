@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use Afk11\Bitcoin\Signature\K\KInterface;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
@@ -91,7 +91,7 @@ class Signer implements SignerInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param \Bitcoin\Buffer $hash
+     * @param \Afk11\Bitcoin\Buffer $hash
      * @param SignatureInterface $signature
      * @return bool
      */

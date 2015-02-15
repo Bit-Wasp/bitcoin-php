@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\Tests;
+namespace Afk11\Bitcoin\Tests;
 
-use Bitcoin\Buffer;
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Network;
-use Bitcoin\Parser;
+use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Transaction\Transaction;
 use \Afk11\Bitcoin\Transaction\TransactionInput;
 use \Afk11\Bitcoin\Transaction\TransactionOutput;
@@ -13,7 +13,7 @@ use \Afk11\Bitcoin\Transaction\TransactionOutput;
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Bitcoin\Parser
+     * @var \Afk11\Bitcoin\Parser
      */
     protected $parser;
 

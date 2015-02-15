@@ -1,16 +1,11 @@
 <?php
 
-namespace Bitcoin;
+namespace Afk11\Bitcoin;
 
-use Bitcoin\Buffer;
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
-/**
- * Class Parser - mainly for decoding transactions..
- *
- * @package Bitcoin
- */
 class Parser
 {
     /**

@@ -3,8 +3,8 @@
 namespace Afk11\Bitcoin\Signature;
 
 use Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
 use Afk11\Bitcoin\Transaction\TransactionInterface;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Bitcoin;
+namespace Afk11\Bitcoin;
 
-use \Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Network;
-use Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\GeneratorPoint;

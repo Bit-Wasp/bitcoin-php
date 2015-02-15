@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Script;
 
 use Afk11\Bitcoin\Crypto\Hash;
 use Afk11\Bitcoin\Math\Math;
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
 use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Key\PublicKey;

@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\Tests\Script;
+namespace Afk11\Bitcoin\Tests\Script;
 
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Key\PublicKey;
-use Bitcoin\Buffer;
-use Bitcoin\Util\Math;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Util\Math;
 use Afk11\Bitcoin\Crypto\Random\Random;
 
 class ScriptTest extends \PHPUnit_Framework_TestCase

@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\Tests\Signature;
+namespace Afk11\Bitcoin\Tests\Signature;
 
 use Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
 use Afk11\Bitcoin\Signature\Signature;
 use Afk11\Bitcoin\Signature\K\RandomK;
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 
 /**
  * Class SignatureTest

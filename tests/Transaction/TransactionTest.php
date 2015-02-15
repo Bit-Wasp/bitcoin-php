@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Tests\Transaction;
+namespace Afk11\Bitcoin\Tests\Transaction;
 
 use Afk11\Bitcoin\Network;
 use Afk11\Bitcoin\Transaction\Transaction;

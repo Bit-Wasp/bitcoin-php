@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Tests\Key;
+namespace Afk11\Bitcoin\Tests\Key;
 
 use \Afk11\Bitcoin\Key\PublicKey;
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 
 class PublicKeyTest extends \PHPUnit_Framework_TestCase
 {

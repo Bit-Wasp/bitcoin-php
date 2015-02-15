@@ -8,7 +8,7 @@
 
 namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
 use Afk11\Bitcoin\Key\PublicKeyInterface;

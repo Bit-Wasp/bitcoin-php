@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Bitcoin\Tests\Crypto\Random;
+namespace Afk11\Bitcoin\Tests\Crypto\Random;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Buffer;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\Crypto\Random\HmacDrbg;
 use \Afk11\Bitcoin\Key\PrivateKey;
@@ -22,7 +22,7 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInvalidAlgorithm()
     {
-        $drbg = new HmacDrbg('fake', \Bitcoin\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
+        $drbg = new HmacDrbg('fake', \Afk11\Bitcoin\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
         $this->assertInstanceOf('Bitcoin\Crypto\Random\HMACDRBG', $drbg);
     }
 

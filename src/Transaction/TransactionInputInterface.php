@@ -2,11 +2,6 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
-/**
- * Interface TransactionInputInterface
- * @package Bitcoin
- * @author Thomas Kerin
- */
 interface TransactionInputInterface
 {
     /**

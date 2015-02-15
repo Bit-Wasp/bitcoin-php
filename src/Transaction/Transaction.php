@@ -2,20 +2,16 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Key\PrivateKeyInterface;
-use Bitcoin\SerializableInterface;
-use Bitcoin\Parser;
+use \Afk11\Bitcoin\SerializableInterface;
+use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\NetworkInterface;
+use \Afk11\Bitcoin\NetworkInterface;
 use \Afk11\Bitcoin\Signature\Signature;
 use \Afk11\Bitcoin\Signature\SignatureHash;
 use \Afk11\Bitcoin\Signature\K\KInterface;
 
-/**
- * Class Transaction
- * @package Bitcoin
- */
 class Transaction implements TransactionInterface, SerializableInterface
 {
     /**
@@ -191,7 +187,7 @@ class Transaction implements TransactionInterface, SerializableInterface
     }
 
     /**
-     * @param \Bitcoin\Parser $parser
+     * @param \Afk11\Bitcoin\Parser $parser
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      * @throws \Exception
      */

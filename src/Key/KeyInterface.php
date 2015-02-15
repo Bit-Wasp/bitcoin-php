@@ -2,10 +2,6 @@
 
 namespace Afk11\Bitcoin\Key;
 
-/**
- * Interface KeyInterface
- * @package Bitcoin
- */
 interface KeyInterface
 {
     /**

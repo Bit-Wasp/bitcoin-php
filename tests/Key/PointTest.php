@@ -1,8 +1,8 @@
 <?php
 
-namespace Bitcoin\Tests\Key;
+namespace Afk11\Bitcoin\Tests\Key;
 
-use Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Key\Point;
 
 class PointTest extends \PHPUnit_Framework_TestCase

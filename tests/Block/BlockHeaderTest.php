@@ -6,10 +6,10 @@
  * Time: 00:04
  */
 
-namespace Bitcoin\Tests\Block;
+namespace Afk11\Bitcoin\Tests\Block;
 
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Block\BlockHeader;
 use Afk11\Bitcoin\Block\BlockHeaderInterface;
 

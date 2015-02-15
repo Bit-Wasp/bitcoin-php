@@ -2,8 +2,8 @@
 
 namespace Afk11\Bitcoin\Network;
 
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
 
 class Version
 {

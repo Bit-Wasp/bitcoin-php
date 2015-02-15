@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Crypto\Random;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
 use Afk11\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
@@ -31,6 +31,8 @@ class Rfc6979 implements RbgInterface
     protected $k;
 
     /**
+     * @param Math $math
+     * @param GeneratorPoint $generator
      * @param PrivateKeyInterface $privateKey
      * @param Buffer $messageHash
      * @param string $algo
@@ -46,8 +48,9 @@ class Rfc6979 implements RbgInterface
 
     /**
      * Return a K value deterministically derived from the private key
-     *  and data
+     * and data
      *
+     * @param int $numBytes
      * @return Buffer
      */
     public function bytes($numBytes)

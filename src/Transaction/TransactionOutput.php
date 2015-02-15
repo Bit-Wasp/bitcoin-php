@@ -3,21 +3,16 @@
 namespace Afk11\Bitcoin\Transaction;
 
 use Afk11\Bitcoin\Script\Script;
-use Bitcoin\Util\Math;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
-use Bitcoin\SerializableInterface;
+use Afk11\Bitcoin\Util\Math;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\SerializableInterface;
 
-/**
- * Class TransactionOutput
- * @package Bitcoin
- * @author Thomas Kerin
- */
 class TransactionOutput implements TransactionOutputInterface, SerializableInterface
 {
 
     /**
-     * @var \Bitcoin\Buffer
+     * @var \Afk11\Bitcoin\Buffer
      */
     protected $value;
 
@@ -27,7 +22,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     protected $script;
 
     /**
-     * @var \Bitcoin\Buffer
+     * @var \Afk11\Bitcoin\Buffer
      */
     protected $scriptBuf;
 
@@ -109,7 +104,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     /**
      * Return the current script buffer
      *
-     * @return \Bitcoin\Buffer
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function getScriptBuf()
     {
@@ -122,7 +117,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     /**
      * Set Script Buffer
      *
-     * @param \Bitcoin\Buffer $buffer
+     * @param \Afk11\Bitcoin\Buffer $buffer
      * @return $this
      */
     public function setScriptBuf(Buffer $buffer)

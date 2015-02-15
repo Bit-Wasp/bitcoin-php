@@ -1,14 +1,9 @@
 <?php
 
-namespace Bitcoin;
+namespace Afk11\Bitcoin;
 
 use Afk11\Bitcoin\Crypto\Hash;
 
-/**
- * Class Network
- * @package Bitcoin
- * @author Thomas Kerin
- */
 class Network implements NetworkInterface
 {
     /**

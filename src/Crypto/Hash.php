@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Crypto;
 
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\Buffer;
 
 /**
  * Class Hash

@@ -1,11 +1,11 @@
 <?php
 
-namespace Bitcoin\Tests\Transaction;
+namespace Afk11\Bitcoin\Tests\Transaction;
 
 use Afk11\Bitcoin\Transaction\TransactionOutput;
 use Afk11\Bitcoin\Script\Script;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
 
 class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 {

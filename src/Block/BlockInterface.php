@@ -2,10 +2,6 @@
 
 namespace Afk11\Bitcoin\Block;
 
-/**
- * Interface BlockInterface
- * @package Bitcoin\Block
- */
 interface BlockInterface
 {
     const CURRENT_VERSION = 2;

@@ -2,9 +2,9 @@
 
 namespace Afk11\Bitcoin\Signature;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Buffer;
-use Bitcoin\Parser;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
 
@@ -107,7 +107,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param \Bitcoin\Parser $parser
+     * @param \Afk11\Bitcoin\Parser $parser
      * @return Signature
      * @throws ParserOutOfRange
      */
@@ -176,7 +176,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param \Bitcoin\Buffer $sig
+     * @param \Afk11\Bitcoin\Buffer $sig
      * @return bool
      * @throws SignatureNotCanonical
      */

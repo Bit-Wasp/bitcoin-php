@@ -2,15 +2,10 @@
 
 namespace Afk11\Bitcoin\Key;
 
-use Bitcoin\NetworkInterface;
-use Bitcoin\Buffer;
+use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Signature\K\KInterface;
 
-/**
- * Interface PrivateKeyInterface
- * @package Bitcoin
- * @author Thomas Kerin
- */
 interface PrivateKeyInterface
 {
     /**

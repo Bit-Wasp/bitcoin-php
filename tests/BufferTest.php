@@ -1,10 +1,10 @@
 <?php
 
-namespace Bitcoin\Tests\Util;
+namespace Afk11\Bitcoin\Tests\Util;
 
-use Bitcoin\Bitcoin;
-use Bitcoin\Buffer;
-use Bitcoin\Util\Math;
+use \Afk11\Bitcoin\Bitcoin;
+use \Afk11\Bitcoin\Buffer;
+use \Afk11\Bitcoin\Util\Math;
 
 class BufferTest extends \PHPUnit_Framework_TestCase
 {
