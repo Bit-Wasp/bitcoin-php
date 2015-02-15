@@ -4,37 +4,79 @@
       "scriptSig": "",
       "scriptPubKey": "74010087",
       "result": true,
-      "flags": "verifyP2SH,verifyStrictEncoding"
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "OP_DEPTH 0 OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "01010102010288010187",
       "result": true,
-      "flags": "verifyP2SH,verifyStrictEncoding"
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "1 2 2 OP_EQUALVERIFY 1 OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0101",
       "result": true,
-      "flags": "verifyP2SH,verifyStrictEncoding"
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "1"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "010b010b87",
       "result": true,
-      "flags": "verifyP2SH,verifyStrictEncoding"
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "11 11 OP_EQUALVERIFY"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "4c0107010787",
       "result": true,
-      "flags": "verifyP2SH,verifyStrictEncoding"
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "07 07 OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "4d010008010887",
       "result": true,
-      "flags": "verifyP2SH,verifyStrictEncoding"
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "08 08 OP_EQUAL"
+    },
+    {
+      "scriptSig": "4e010000000109010987",
+      "scriptPubKey": "",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "09 09 OP_EQUAL"
+    },
+    {
+      "scriptSig": "0101",
+      "scriptPubKey": "61",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "01 OP_NOP"
+    },
+    {
+      "scriptSig": "01010101",
+      "scriptPubKey": "69",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "1 1 OP_VERIFY"
+    },
+    {
+      "scriptSig": "51",
+      "scriptPubKey": "5f936087",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "1 15 OP_ADD 16"
+    },
+    {
+      "scriptSig": "0000",
+      "scriptPubKey": "635067010168",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "0 IF OP_RESERVED OP_ENDIF 1 OP_ENDIF"
     }
+
   ]
 }

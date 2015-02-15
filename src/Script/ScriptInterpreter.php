@@ -92,7 +92,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $this->mainStack                = new ScriptStack;
         $this->altStack                 = new ScriptStack;
-        $this->vfExec                   = new ScriptStack;
+        $this->vfExecStack              = new ScriptStack;
 
         $this->constTrue                = pack("H*", '01');
         $this->constFalse               = pack("H*", '00');
@@ -238,11 +238,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     {
         $opCode = $this->script->getOpCode('OP_INVALIDOPCODE');
 
-        if ($position >= $posEnd) {
-            return false;
-        }
-
-        if ($posEnd - $position < 1) {
+        if ($this->math->cmp($position, $posEnd) >= 0) {
             return false;
         }
 
@@ -252,12 +248,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             // opCode < OP_PUSHDATA1 - then just take opCode as the length, do not seek more
             if ($this->compareOp($opCode, 'OP_PUSHDATA1') < 0) {
                 $size = $opCode;
+
             } else if ($this->isOp($opCode, 'OP_PUSHDATA1')) {
                 if ($posEnd - $position < 1) {
                     return false;
                 }
-                $size = $this->math->hexDec(bin2hex($script[$position]));
+
+                $size = ord($script[$position]);
                 $position++;
+
             } else if ($this->isOp($opCode, 'OP_PUSHDATA2')) {
                 if (($posEnd - $position) < 2) {
                     return false;
@@ -266,6 +265,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 $size = unpack("v", substr($script, $position, 2));
                 $size = $size[1];
                 $position += 2;
+
             } else if ($this->isOp($opCode, 'OP_PUSHDATA4')) {
                 if ($posEnd - $position < 4) {
                     return false;
@@ -395,11 +395,21 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $pos           = 0;
         $this->opCount = 0;
         $opCode        = null;
-        $fExec         = true;
+        $checkFExec = function () {
+            $c = 0;
+            for ($i = 0, $len = $this->vfExecStack->end(); $i < $len; $i++) {
+                if ($this->vfExecStack->top(0-$len-$i) == true) {
+                    $c++;
+                }
+            }
+            return (bool)$c;
+        };
+        //echo "start: "; var_dump((bool)$checkFExec());
 
         try {
             while ($pos < $posScriptEnd) {
                 $pushData = '';
+                $fExec = !$checkFExec();
 
                 if (!$this->getOp($script, $pos, $posScriptEnd, $opCode, $pushData)) {
                     throw new \Exception("Bad opcode: $opCode");
@@ -418,7 +428,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         throw new \Exception('Disabled Opcode');
                     }
                 }
-                echo "opCode: $opCode\n";
+
                 if ($fExec && $opCode >= 0 && $this->compareOp($opCode, 'OP_PUSHDATA4') <= 0) {
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
@@ -482,7 +492,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $value = !$value;
                                 }
                                 $this->mainStack->pop();
-                                echo $string."\n";
                             }
                             $this->vfExecStack->push($value);
 
@@ -497,7 +506,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $this->isOp($opCode, 'OP_ENDIF'):
-                            if ($this->vfExec->size() == 0) {
+                            if ($this->vfExecStack->size() == 0) {
                                 throw new \Exception('Unbalanced conditional');
                             }
                             // vfExecStack->popBack()
@@ -517,6 +526,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             break;
 
+                        case $this->isOp($opCode, 'OP_RESERVED'):
+                            echo "reserved\n";
+                            var_dump($fExec);
+                            break;
                         case $this->isOp($opCode, 'OP_RETURN'):
                             throw new \Exception('Error: OP_RETURN');
                             break;
