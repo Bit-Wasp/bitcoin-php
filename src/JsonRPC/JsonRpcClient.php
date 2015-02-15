@@ -6,7 +6,7 @@
  * Time: 18:48
  */
 
-namespace Bitcoin\JsonRpc;
+namespace Afk11\Bitcoin\JsonRpc;
 
 use JsonRPC\Client;
 

@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Rpc\Client;
 
-use Bitcoin\JsonRpc\JsonRpcClient;
+use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
 use Bitcoin\Transaction\Transaction;
 
 class Bitcoind

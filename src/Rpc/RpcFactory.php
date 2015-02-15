@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Rpc;
 
-use Bitcoin\JsonRpc\JsonRpcClient;
+use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
 use Bitcoin\Rpc\Client\Bitcoind;
 
 class RpcFactory
