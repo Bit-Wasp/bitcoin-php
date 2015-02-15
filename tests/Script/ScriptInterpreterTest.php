@@ -47,8 +47,45 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         }
         return $flags;
     }
+    public function testGetOpValid()
+    {
+        $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), new ScriptInterpreterFlags());
 
-    public function testGetOp()
+        $script = pack("H*", '0100');
+        $position = 0;
+        $end = 2;
+        $opCode = null;
+        $pushdata = null;
+        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(1, $opCode);
+        $this->assertSame(chr(0), $pushdata);
+
+        $s = '';
+        for ($j = 1; $j < 256; $j++)
+            $s .= '41';
+        $script = pack("H*", '4cff'.$s);
+        $position = 0;
+        $end = strlen($script);
+        $opCode = null;
+        $pushdata = null;
+        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(76, $opCode);
+        $this->assertSame(pack("H*", $s), $pushdata);
+
+        $s = '';
+        for ($j = 1; $j < 260; $j++)
+            $s .= '41';
+        $script = pack("cvH*", 0x4d, 260, $s);
+        $position = 0;
+        $end = strlen($script)+1;
+        $opCode = null;
+        $pushdata = null;
+        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
+        $this->assertSame(77, $opCode);
+        $this->assertSame(pack("H*", $s), $pushdata);
+    }
+
+    public function testGetOpInvalid()
     {
         $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), new ScriptInterpreterFlags());
 
@@ -75,17 +112,6 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(2, $opCode);
         $this->assertSame(null, $pushdata);
 
-        $script = pack("H*", '0100');
-        $position = 0;
-        $end = 2;
-        $opCode = null;
-        $pushdata = null;
-        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
-        $this->assertSame(1, $opCode);
-        $this->assertSame(chr(0), $pushdata);
-
-
-
         // Test a failure - pushdata without length or string
         $script = pack("H*", '4c');
         $position = 0;
@@ -96,6 +122,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(76, $opCode);
         $this->assertSame(null, $pushdata);
 
+        // pushdata size (249) is less than length (255)
         $s = '';
         for ($j = 1; $j < 250; $j++)
             $s .= '41';
@@ -108,48 +135,6 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(76, $opCode);
         $this->assertSame(null, $pushdata);
 
-        $s = '';
-        for ($j = 1; $j < 256; $j++)
-            $s .= '41';
-        $script = pack("H*", '4cff'.$s);
-        $position = 0;
-        $end = strlen($script);
-        $opCode = null;
-        $pushdata = null;
-        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
-        $this->assertSame(76, $opCode);
-        $this->assertSame(pack("H*", $s), $pushdata);
-
-
-        $s = '';
-        for ($j = 1; $j < 260; $j++)
-            $s .= '41';
-        $script = pack("cvH*", 0x4d, 260, $s);
-        $position = 0;
-        $end = strlen($script)+1;
-        $opCode = null;
-        $pushdata = null;
-        $this->assertTrue($i->getOp($script, $position, $end, $opCode, $pushdata));
-        $this->assertSame(77, $opCode);
-        $this->assertSame(pack("H*", $s), $pushdata);
-
-    }
-
-    public function ootestScriptindividual()
-    {
-        $script = new Script(Buffer::hex('4d010008010887'));
-
-        echo "try script: ".$script->getAsm()."\n";
-        echo "    script: ".$script->serialize('hex')."\n";
-
-        $flags = $this->setFlags('verifyP2SH,verifyStrictEncoding');
-        $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), $flags);
-
-        $i->setScript($script);
-
-        $return = $i->run();
-        $this->assertTrue($return);
-
     }
 
     public function testScript()
@@ -157,8 +142,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $f = file_get_contents(__DIR__ . '/../Data/scriptinterpreter.simple.json');
         $json = json_decode($f);
 
-        // Pass with a dummy transaction since not testing OP_CHECKSIG
-
+        // Pass a dummy transaction since not testing OP_CHECKSIG
 
         foreach ($json->test as $test) {
             $flags = $this->setFlags($test->flags);
@@ -173,4 +157,5 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
         }
     }
+
 }

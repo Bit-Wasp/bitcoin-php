@@ -270,8 +270,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 if ($posEnd - $position < 4) {
                     return false;
                 }
-                $size = unpack("N", substr($script, $position, 4));
+                $size = unpack("V", substr($script, $position, 4));
                 $size = $size[1];
+
                 $position += 4;
             }
 
@@ -404,7 +405,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             }
             return (bool)$c;
         };
-        //echo "start: "; var_dump((bool)$checkFExec());
 
         try {
             while ($pos < $posScriptEnd) {
@@ -433,7 +433,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
                     }
-                    echo "Push (".bin2hex($pushData).")\n";
                     $this->mainStack->push($pushData);
 
                 } elseif ($fExec || ($this->compareOp($opCode, 'OP_IF') <= 0 && $this->compareOp($opCode, 'OP_ENDIF'))) {
@@ -486,6 +485,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 if ($this->mainStack->size() < 1) {
                                     throw new \Exception('Unbalanced conditional');
                                 }
+                                // todo
                                 $string = $this->mainStack->top(-1);
                                 $value = $this->castToBool($value);
                                 if ($this->isOp($opCode, 'OP_NOTIF')) {
@@ -494,7 +494,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 $this->mainStack->pop();
                             }
                             $this->vfExecStack->push($value);
-
                             break;
 
                         case $this->isOp($opCode, 'OP_ELSE'):
@@ -527,9 +526,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $this->isOp($opCode, 'OP_RESERVED'):
-                            echo "reserved\n";
-                            var_dump($fExec);
+                            // todo
                             break;
+
                         case $this->isOp($opCode, 'OP_RETURN'):
                             throw new \Exception('Error: OP_RETURN');
                             break;
@@ -958,7 +957,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 }
             }
 
-            echo "\n--------\n";
             return true;
         } catch (ScriptRuntimeException $e) {
             echo "$$ SCRIPT RUNTIEM ERROR $$\n";

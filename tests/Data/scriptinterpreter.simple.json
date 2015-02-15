@@ -43,7 +43,7 @@
       "desc": "08 08 OP_EQUAL"
     },
     {
-      "scriptSig": "4e010000000109010987",
+      "scriptSig": "4e0100000009010987",
       "scriptPubKey": "",
       "result": true,
       "flags": "verifyP2SH,verifyStrictEncoding",

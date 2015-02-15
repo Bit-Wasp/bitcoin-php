@@ -338,22 +338,27 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expected[$i]->serialize(), $actual[$i]->serialize());
         }
     }
-<<<<<<< HEAD
 
     public function testWriteArray()
     {
         $transaction = new Transaction();
-        $input = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0);
-        $transaction->addInput($input);
-
+        $input  = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0);
         $output = new TransactionOutput(null, 1);
-        $transaction->addOutput($output);
+        $transaction
+            ->getInputs()
+            ->addInput($input);
 
-        $array = array($transaction);
+        $transaction
+            ->getOutputs()
+            ->addOutput($output);
 
+        $array  = array($transaction, $transaction);
         $parser = new Parser();
         $parser->writeArray($array);
-        echo $parser->getBuffer()."\n";
+
+        $this->assertSame('010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $transaction->serialize('hex'));
+        $this->assertSame('02010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $parser->getBuffer()->serialize('hex'));
+
     }
 
     /**
@@ -368,6 +373,3 @@ class ParserTest extends \PHPUnit_Framework_TestCase
         $parser->writeArray($array);
     }
 } 
-=======
-}
->>>>>>> master
