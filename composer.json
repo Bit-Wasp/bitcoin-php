@@ -14,7 +14,7 @@
     "mdanter/ecc": "dev-master",
     "pleonasm/merkle-tree": "*",
     "fguillot/json-rpc": "dev-master",
-    "rych/hash_pbkdf2-compat": "~1.0",
+    "rych/hash_pbkdf2-compat": "~1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.3.1",
