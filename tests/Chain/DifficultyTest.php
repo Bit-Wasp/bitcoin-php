@@ -3,7 +3,7 @@
 namespace Afk11\Bitcoin\Tests\Chain;
 
 use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Bitcoin;
 
 class DifficultyTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->math = new Math;
+        $this->math = Bitcoin::getMath();;
         $this->bits = Buffer::hex('1d00ffff');
         $this->targetHash = '00000000ffff0000000000000000000000000000000000000000000000000000';
     }
