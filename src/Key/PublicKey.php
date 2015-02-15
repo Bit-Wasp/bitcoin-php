@@ -1,9 +1,9 @@
 <?php
 
-namespace Bitcoin\Key;
+namespace Afk11\Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Math\Math;
+use \Afk11\Bitcoin\Math\Math;
 use \Afk11\Bitcoin\Crypto\Hash;
 use Bitcoin\Buffer;
 use Mdanter\Ecc\EccFactory;

@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Key;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Key\Point;
+use \Afk11\Bitcoin\Key\Point;
 
 class PointTest extends \PHPUnit_Framework_TestCase
 {

@@ -18,7 +18,7 @@ use Bitcoin\Script\ScriptInterpreterFlags;
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Bitcoin\Math\Math
+     * @var \Afk11\Bitcoin\Math\Math
      */
     public $math;
 

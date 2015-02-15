@@ -10,8 +10,8 @@ namespace Bitcoin\Signature;
 
 use Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
-use Bitcoin\Key\PrivateKeyInterface;
-use Bitcoin\Key\PublicKeyInterface;
+use Afk11\Bitcoin\Key\PrivateKeyInterface;
+use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Bitcoin\Signature\K\KInterface;
 
 interface SignerInterface

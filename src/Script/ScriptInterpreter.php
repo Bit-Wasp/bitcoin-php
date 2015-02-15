@@ -3,11 +3,11 @@
 namespace Bitcoin\Script;
 
 use Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\Math\Math;
+use Afk11\Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Script\Classifier\OutputClassifier;
 use Bitcoin\Transaction\Transaction;
-use Bitcoin\Key\PublicKey;
+use Afk11\Bitcoin\Key\PublicKey;
 use Bitcoin\Signature\Signature;
 use Afk11\Bitcoin\Exceptions\ScriptStackException;
 use Afk11\Bitcoin\Exceptions\ScriptRuntimeException;

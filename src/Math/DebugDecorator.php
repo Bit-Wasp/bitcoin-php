@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Math;
+namespace Afk11\Bitcoin\Math;
 
 use Mdanter\Ecc\MathAdapterInterface;
 

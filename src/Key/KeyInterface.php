@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Key;
+namespace Afk11\Bitcoin\Key;
 
 /**
  * Interface KeyInterface

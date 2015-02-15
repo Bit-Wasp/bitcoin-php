@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Script;
 
 use Bitcoin\Script\Script;
-use Bitcoin\Key\PublicKey;
+use Afk11\Bitcoin\Key\PublicKey;
 use Bitcoin\Buffer;
 use Bitcoin\Util\Math;
 use Afk11\Bitcoin\Crypto\Random\Random;

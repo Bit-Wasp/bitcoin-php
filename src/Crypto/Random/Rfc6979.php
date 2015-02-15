@@ -3,8 +3,8 @@
 namespace Afk11\Bitcoin\Crypto\Random;
 
 use Bitcoin\Buffer;
-use Bitcoin\Key\PrivateKeyInterface;
-use Bitcoin\Math\Math;
+use Afk11\Bitcoin\Key\PrivateKeyInterface;
+use Afk11\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
 class Rfc6979 implements RbgInterface

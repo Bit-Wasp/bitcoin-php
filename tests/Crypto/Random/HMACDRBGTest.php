@@ -7,7 +7,7 @@ use Bitcoin\Bitcoin;
 use Bitcoin\Buffer;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\Crypto\Random\HmacDrbg;
-use Bitcoin\Key\PrivateKey;
+use \Afk11\Bitcoin\Key\PrivateKey;
 
 class HMACDRBGTest extends \PHPUnit_Framework_TestCase
 {

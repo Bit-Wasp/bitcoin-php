@@ -2,7 +2,7 @@
 
 namespace Bitcoin;
 
-use Bitcoin\Math\Math;
+use \Afk11\Bitcoin\Math\Math;
 use Bitcoin\Network;
 use Bitcoin\NetworkInterface;
 use Mdanter\Ecc\EccFactory;

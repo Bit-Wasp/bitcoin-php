@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Chain;
 
-use Bitcoin\Math\Math;
+use Afk11\Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 
 /**

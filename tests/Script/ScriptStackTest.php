@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Script;
 
 use Bitcoin\Script\ScriptStack;
-use Bitcoin\Key\PublicKeyInterface;
+use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Afk11\Bitcoin\Exceptions\ScriptStackException;
 
 class ScriptStackTest extends \PHPUnit_Framework_TestCase

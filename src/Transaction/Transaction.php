@@ -3,7 +3,7 @@
 namespace Bitcoin\Transaction;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Key\PrivateKeyInterface;
+use \Afk11\Bitcoin\Key\PrivateKeyInterface;
 use Bitcoin\SerializableInterface;
 use Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Key;
+namespace Afk11\Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
@@ -9,7 +9,7 @@ use Bitcoin\NetworkInterface;
 use Bitcoin\SerializableInterface;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\K\KInterface;
-use Bitcoin\Math\Math;
+use \Afk11\Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Base58;
 use \Afk11\Bitcoin\Crypto\Random\Random;

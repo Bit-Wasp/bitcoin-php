@@ -3,7 +3,7 @@
 namespace Bitcoin\Signature;
 
 use Bitcoin\Buffer;
-use Bitcoin\Key\PublicKeyInterface;
+use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Bitcoin\Script\ScriptInterface;
 use Bitcoin\Transaction\TransactionOutputInterface;
 use Mdanter\Ecc\MathAdapterInterface;

@@ -3,7 +3,7 @@
 namespace Bitcoin\Script\Classifier;
 
 use Bitcoin\Buffer;
-use Bitcoin\Key\PublicKey;
+use Afk11\Bitcoin\Key\PublicKey;
 use Bitcoin\Script\Script;
 
 /**

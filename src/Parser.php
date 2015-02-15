@@ -19,7 +19,7 @@ class Parser
     protected $string;
 
     /**
-     * @var \Bitcoin\Math\Math
+     * @var \Afk11\Bitcoin\Math\Math
      */
     protected $math;
 

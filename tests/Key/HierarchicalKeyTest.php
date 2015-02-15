@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Key;
 
 use Bitcoin\Network;
-use Bitcoin\Key\HierarchicalKey;
+use Afk11\Bitcoin\Key\HierarchicalKey;
 
 class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 {

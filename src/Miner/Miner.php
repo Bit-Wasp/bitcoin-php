@@ -4,7 +4,7 @@ namespace Bitcoin\Miner;
 
 use Afk11\Bitcoin\Chain\Difficulty;
 use Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\Math\Math;
+use Afk11\Bitcoin\Math\Math;
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
 use Bitcoin\Script\Script;

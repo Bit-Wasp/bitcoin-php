@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Key;
+namespace Afk11\Bitcoin\Key;
 
 use Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;

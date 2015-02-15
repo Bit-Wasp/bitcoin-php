@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Chain;
 
 use Bitcoin\Buffer;
-use Bitcoin\Math\Math;
+use Afk11\Bitcoin\Math\Math;
 
 class DifficultyTest extends \PHPUnit_Framework_TestCase
 {

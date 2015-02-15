@@ -3,7 +3,7 @@
 namespace Bitcoin\Tests\Signature;
 
 use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
-use Bitcoin\Key\PrivateKey;
+use \Afk11\Bitcoin\Key\PrivateKey;
 use \Afk11\Bitcoin\Crypto\Random\Random;
 use Bitcoin\Signature\Signature;
 use Bitcoin\Signature\Signer;

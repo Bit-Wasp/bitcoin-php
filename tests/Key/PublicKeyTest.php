@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Tests\Key;
 
-use Bitcoin\Key\PublicKey;
+use \Afk11\Bitcoin\Key\PublicKey;
 use Bitcoin\Bitcoin;
 
 class PublicKeyTest extends \PHPUnit_Framework_TestCase

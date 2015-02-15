@@ -3,10 +3,10 @@
 namespace Bitcoin\Tests\Key;
 
 use Bitcoin\Bitcoin;
-use Bitcoin\Key\PrivateKey;
+use \Afk11\Bitcoin\Key\PrivateKey;
 use Bitcoin\Network;
 use Bitcoin\Buffer;
-use Bitcoin\Math\Math;
+use \Afk11\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase

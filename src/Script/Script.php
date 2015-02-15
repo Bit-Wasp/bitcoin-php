@@ -7,7 +7,7 @@ use Bitcoin\Buffer;
 use Bitcoin\Parser;
 
 use \Afk11\Bitcoin\Crypto\Hash;
-use Bitcoin\Key\PublicKeyInterface;
+use \Afk11\Bitcoin\Key\PublicKeyInterface;
 
 /**
  * Class Script
