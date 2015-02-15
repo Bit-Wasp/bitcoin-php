@@ -2,7 +2,7 @@
 
 namespace Bitcoin\Rpc;
 
-use Bitcoin\JsonRPC\JsonRPCClient;
+use Bitcoin\JsonRpc\JsonRpcClient;
 use Bitcoin\Rpc\Client\Bitcoind;
 
 class RpcFactory
@@ -10,7 +10,7 @@ class RpcFactory
     public static function bitcoind($host, $port, $user, $password, $timeout = 5, $headers = array())
     {
 
-        $jsonRPCclient = new JsonRPCClient($host, $port, $timeout, $headers);
+        $jsonRPCclient = new JsonRpcClient($host, $port, $timeout, $headers);
 
         if (!is_null($user) && !is_null($password)) {
             $jsonRPCclient->authentication($user, $password);

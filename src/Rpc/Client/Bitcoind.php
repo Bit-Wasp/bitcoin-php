@@ -2,17 +2,17 @@
 
 namespace Bitcoin\Rpc\Client;
 
-use Bitcoin\JsonRPC\JsonRPCClient;
+use Bitcoin\JsonRpc\JsonRpcClient;
 use Bitcoin\Transaction\Transaction;
 
 class Bitcoind
 {
     /**
-     * @var JsonRPCClient
+     * @var JsonRpcClient
      */
     protected $client;
 
-    public function __construct(JsonRPCClient $client)
+    public function __construct(JsonRpcClient $client)
     {
         $this->client = $client;
         return $this;

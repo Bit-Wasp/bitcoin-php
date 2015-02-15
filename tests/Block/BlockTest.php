@@ -5,8 +5,8 @@ namespace Bitcoin\Tests\Block;
 
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
-use Bitcoin\Block\Block;
-use Bitcoin\Block\BlockHeader;
+use Afk11\Bitcoin\Block\Block;
+use Afk11\Bitcoin\Block\BlockHeader;
 use Bitcoin\Transaction\Transaction;
 use Bitcoin\Exceptions\ParserOutOfRange;
 

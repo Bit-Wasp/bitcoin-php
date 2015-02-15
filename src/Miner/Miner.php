@@ -13,10 +13,10 @@ use Bitcoin\Transaction\Transaction;
 use Bitcoin\Transaction\TransactionInterface;
 use Bitcoin\Transaction\TransactionInput;
 use Bitcoin\Transaction\TransactionOutput;
-use Bitcoin\Block\Block;
-use Bitcoin\Block\MerkleRoot;
-use Bitcoin\Block\BlockHeader;
-use Bitcoin\Block\BlockHeaderInterface;
+use Afk11\Bitcoin\Block\Block;
+use Afk11\Bitcoin\Block\MerkleRoot;
+use Afk11\Bitcoin\Block\BlockHeader;
+use Afk11\Bitcoin\Block\BlockHeaderInterface;
 
 /**
  * Class Miner

@@ -9,8 +9,8 @@
 namespace Bitcoin\Tests\Block;
 
 use Bitcoin\Exceptions\MerkleTreeEmpty;
-use Bitcoin\Block\MerkleRoot;
-use Bitcoin\Block\Block;
+use Afk11\Bitcoin\Block\MerkleRoot;
+use Afk11\Bitcoin\Block\Block;
 use Bitcoin\Transaction\Transaction;
 
 class MerkleRootTest extends \PHPUnit_Framework_TestCase

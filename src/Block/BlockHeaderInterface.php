@@ -1,6 +1,6 @@
 <?php
 
-namespace Bitcoin\Block;
+namespace Afk11\Bitcoin\Block;
 
 /**
  * Interface BlockHeaderInterface

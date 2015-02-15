@@ -6,11 +6,11 @@
  * Time: 18:48
  */
 
-namespace Bitcoin\JsonRPC;
+namespace Bitcoin\JsonRpc;
 
 use JsonRPC\Client;
 
-class JsonRPCClient
+class JsonRpcClient
 {
     /**
      * @var Client

@@ -10,8 +10,8 @@ namespace Bitcoin\Tests\Block;
 
 use Bitcoin\Buffer;
 use Bitcoin\Parser;
-use Bitcoin\Block\BlockHeader;
-use Bitcoin\Block\BlockHeaderInterface;
+use Afk11\Bitcoin\Block\BlockHeader;
+use Afk11\Bitcoin\Block\BlockHeaderInterface;
 
 class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 {
