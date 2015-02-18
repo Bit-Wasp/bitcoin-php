@@ -8,6 +8,8 @@ use Afk11\Bitcoin\Buffer;
 class Difficulty implements DifficultyInterface
 {
     const MAX_TARGET = '1d00ffff';
+    
+    const DIFF_PRECISION = 12;
 
     /**
      * @var \Afk11\Bitcoin\Buffer
@@ -91,12 +93,16 @@ class Difficulty implements DifficultyInterface
      */
     public function getDifficulty(Buffer $bits)
     {
-        $compact = $this->math->unpackCompact($bits);
-        $lowest  = $this->math->unpackCompact($this->lowestBits());
-
-        $diff = log($lowest['mul'] / (float)$compact['mul']) + ($lowest['exp'] - $compact['exp'])*log(pow(2, 8));
-        $diff = pow(M_E, $diff);
-
-        return $diff;
+        $target = $this->math->getCompact($bits);
+        
+        $lowest  = $this->math->getCompact($this->lowestBits());
+        $lowest = $this->math->mul($lowest, $this->math->pow(10, self::DIFF_PRECISION));
+        
+        $difficulty = str_pad($this->math->div($lowest, $target), self::DIFF_PRECISION + 1, '0', STR_PAD_LEFT);
+        
+        $intPart = substr($difficulty, 0, 0 - self::DIFF_PRECISION);
+        $decPart = substr($difficulty, 0 - self::DIFF_PRECISION, self::DIFF_PRECISION);
+        
+        return $intPart . '.' . $decPart;
     }
 }
