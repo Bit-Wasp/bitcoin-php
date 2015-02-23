@@ -89,7 +89,7 @@ class MerkleRoot
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)
-            if (!Bitcoin::getMath()->isEven($txCount)) {
+            if (!$txCount % 2 === 0) {
                 $tree->set($txCount, $last);
             }
 
