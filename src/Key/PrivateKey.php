@@ -117,7 +117,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         // Not zero
         $notZero     = ! ($math->cmp($math->hexDec($hex), 0) == 0);
 
-        return $withinRange and $notZero;
+        return $withinRange && $notZero;
     }
     /**
      * Generate a buffer containing a valid key
