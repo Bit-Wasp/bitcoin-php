@@ -74,6 +74,16 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     protected $flags;
 
     /**
+     * @var string
+     */
+    protected $constTrue;
+
+    /**
+     * @var string
+     */
+    protected $constFalse;
+
+    /**
      * @param Math $math
      * @param GeneratorPoint $generator
      * @param Transaction $transaction
