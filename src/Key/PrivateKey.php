@@ -19,7 +19,7 @@ use Mdanter\Ecc\GeneratorPoint;
 class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInterface
 {
     /**
-     * @var int
+     * @var int|string
      */
     protected $secretMultiplier;
 
