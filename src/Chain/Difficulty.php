@@ -17,7 +17,7 @@ class Difficulty implements DifficultyInterface
     protected $lowestBits;
 
     /**
-     * @var \Mdanter\Ecc\MathAdapter
+     * @var \Mdanter\Ecc\MathAdapterInterface
      */
     protected $math;
 

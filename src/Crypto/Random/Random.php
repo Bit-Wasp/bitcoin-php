@@ -3,7 +3,6 @@
 namespace Afk11\Bitcoin\Crypto\Random;
 
 use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use Afk11\Bitcoin\Exceptions\RandomBytesFailure;
 
 class Random implements RbgInterface

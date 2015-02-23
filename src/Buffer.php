@@ -91,7 +91,7 @@ class Buffer
     /**
      * Print the contents of the buffer as a string
      *
-     * @return mixed
+     * @return string
      */
     public function __toString()
     {
