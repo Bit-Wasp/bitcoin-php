@@ -7,13 +7,10 @@ use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
 use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use \Afk11\Bitcoin\NetworkInterface;
 use \Afk11\Bitcoin\SerializableInterface;
-use \Afk11\Bitcoin\Signature\Signature;
-use \Afk11\Bitcoin\Signature\K\KInterface;
 use \Afk11\Bitcoin\Math\Math;
 use \Afk11\Bitcoin\Buffer;
 use \Afk11\Bitcoin\Base58;
 use \Afk11\Bitcoin\Crypto\Random\Random;
-use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInterface
