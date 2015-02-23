@@ -2,12 +2,11 @@
 
 namespace Afk11\Bitcoin\Block;
 
-use \Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Network;
-use \Afk11\Bitcoin\Parser;
-use \Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Buffer;
 use Pleo\Merkle\FixedSizeTree;
-use \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
+use Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
 
 class MerkleRoot
 {
