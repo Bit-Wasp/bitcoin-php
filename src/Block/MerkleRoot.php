@@ -2,6 +2,7 @@
 
 namespace Afk11\Bitcoin\Block;
 
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Network;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Buffer;
@@ -26,12 +27,19 @@ class MerkleRoot
     protected $lastHash;
 
     /**
+     * @var Math
+     */
+    private $math;
+
+    /**
      * Instantiate the class when given a block
      *
+     * @param Math $math
      * @param BlockInterface $block
      */
-    public function __construct(BlockInterface $block)
+    public function __construct(Math $math, BlockInterface $block)
     {
+        $this->math = $math;
         $this->block   = $block;
         return $this;
     }
@@ -88,7 +96,8 @@ class MerkleRoot
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)
-            if (!$txCount % 2 === 0) {
+
+            if (!$this->math->isEven($txCount)) {
                 $tree->set($txCount, $last);
             }
 

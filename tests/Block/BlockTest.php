@@ -3,6 +3,8 @@
 
 namespace Afk11\Bitcoin\Tests\Block;
 
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Block\Block;
@@ -16,6 +18,11 @@ class BlockTest extends \PHPUnit_Framework_TestCase
      * @var Block
      */
     protected $block;
+
+    /**
+     * @var Math
+     */
+    protected $math;
 
     /**
      * @var string
@@ -42,7 +49,8 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->block = new Block;
+        $this->math = Bitcoin::getMath();
+        $this->block = new Block($this->math);
     }
 
     public function testCreateBlock()
@@ -119,8 +127,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
             $txHex;
 
         $parser = new Parser($blockHex);
-        $block = new Block;
-        $newBlock = $block->fromParser($parser);
+        $newBlock = $this->block->fromParser($parser);
 
         $this->assertInstanceOf($this->blockType, $newBlock);
 
@@ -222,7 +229,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
             $txHex);
 
         $parser = new Parser($blockHex);
-        $block = new Block;
+        $block = new Block($this->math);
         $newBlock = $block->fromParser($parser);
         $this->assertSame($blockHex, $newBlock->serialize('hex'));
 

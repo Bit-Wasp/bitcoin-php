@@ -125,7 +125,7 @@ class Miner
 
         $inputs = $coinbaseTx->getInputs();
         $header = new BlockHeader();
-        $block  = new Block;
+        $block  = new Block($this->math);
         $found  = false;
 
         $usingDiff = $this->lastBlockHeader->getBits();
@@ -139,7 +139,7 @@ class Miner
             $transactions = array_merge(array($coinbaseTx), $this->transactions);
             $block->setTransactions($transactions);
 
-            $merkleRoot = new MerkleRoot($block);
+            $merkleRoot = new MerkleRoot($this, $block);
             $merkleHash = $merkleRoot->calculateHash();
 
             $header
