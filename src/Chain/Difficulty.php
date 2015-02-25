@@ -17,7 +17,7 @@ class Difficulty implements DifficultyInterface
     protected $lowestBits;
 
     /**
-     * @var \Mdanter\Ecc\MathAdapter
+     * @var \Mdanter\Ecc\MathAdapterInterface
      */
     protected $math;
 
@@ -63,7 +63,7 @@ class Difficulty implements DifficultyInterface
      * Get the target from a compact int.
      *
      * @param \Afk11\Bitcoin\Buffer $bits
-     * @return int|string
+     * @return string
      */
     public function getTarget(Buffer $bits)
     {
@@ -89,7 +89,7 @@ class Difficulty implements DifficultyInterface
      * Get the difficulty of the supplied bits relative to the lowest target.
      *
      * @param \Afk11\Bitcoin\Buffer $bits
-     * @return float|number
+     * @return string
      */
     public function getDifficulty(Buffer $bits)
     {

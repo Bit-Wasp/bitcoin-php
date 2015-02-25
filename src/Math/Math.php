@@ -154,7 +154,7 @@ class Math implements MathAdapterInterface
      * result and the remainder
      *
      * @param $dividend
-     * @param $divisor
+     * @param integer $divisor
      * @return array
      */
     public function divQr($dividend, $divisor)

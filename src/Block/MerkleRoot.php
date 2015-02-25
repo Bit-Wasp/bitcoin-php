@@ -2,12 +2,12 @@
 
 namespace Afk11\Bitcoin\Block;
 
-use \Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Network;
-use \Afk11\Bitcoin\Parser;
-use \Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Buffer;
 use Pleo\Merkle\FixedSizeTree;
-use \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
+use Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
 
 class MerkleRoot
 {
@@ -27,12 +27,19 @@ class MerkleRoot
     protected $lastHash;
 
     /**
+     * @var Math
+     */
+    private $math;
+
+    /**
      * Instantiate the class when given a block
      *
+     * @param Math $math
      * @param BlockInterface $block
      */
-    public function __construct(BlockInterface $block)
+    public function __construct(Math $math, BlockInterface $block)
     {
+        $this->math = $math;
         $this->block   = $block;
         return $this;
     }
@@ -89,7 +96,8 @@ class MerkleRoot
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)
-            if (!Bitcoin::getMath()->isEven($txCount)) {
+
+            if (!$this->math->isEven($txCount)) {
                 $tree->set($txCount, $last);
             }
 

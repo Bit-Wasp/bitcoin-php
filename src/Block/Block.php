@@ -2,6 +2,8 @@
 
 namespace Afk11\Bitcoin\Block;
 
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
@@ -9,9 +11,9 @@ use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 class Block implements BlockInterface
 {
     /**
-     * @var Buffer
+     * @var Math
      */
-    protected $magicBytes;
+    protected $math;
 
     /**
      * @var BlockHeader
@@ -70,20 +72,22 @@ class Block implements BlockInterface
     public static function fromHex($hex)
     {
         $buffer = Buffer::hex($hex);
+        $math = Bitcoin::getMath();
         $parser = new Parser($buffer);
 
-        $block  = new self();
+        $block  = new self($math);
         $block->fromParser($parser);
         return $block;
     }
 
     /**
      * Instantiate class
+     * @param Math $math
      */
-    public function __construct()
+    public function __construct(Math $math)
     {
         $this->header = new BlockHeader();
-        return $this;
+        $this->math = $math;
     }
 
     /**
@@ -116,7 +120,7 @@ class Block implements BlockInterface
      */
     public function getMerkleRoot()
     {
-        $root = new MerkleRoot($this);
+        $root = new MerkleRoot($this->math, $this);
         return $root->calculateHash();
     }
 
