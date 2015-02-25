@@ -51,17 +51,17 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         // Keys must be < the order of the curve
         // Order of secp256k1 - 1
 
-        $key1 = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140';
+        $key1 = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140');
         $this->assertTrue(PrivateKey::isValidKey($key1));
 
-        $key2 = '4141414141414141414141414141414141414141414141414141414141414141';
+        $key2 = $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertTrue(PrivateKey::isValidKey($key2));
 
-        $key3 = '8000000000000000000000000000000000000000000000000000000000000000';
+        $key3 = $this->math->hexDec('8000000000000000000000000000000000000000000000000000000000000000');
         $this->assertTrue(PrivateKey::isValidKey($key3));
 
-        $key4 = '8000000000000000000000000000000000000000000000000000000000000001';
-        $this->assertTrue(PrivateKey::isValidKey($key3));
+        $key4 = $this->math->hexDec('8000000000000000000000000000000000000000000000000000000000000001');
+        $this->assertTrue(PrivateKey::isValidKey($key4));
 
     }
 
@@ -71,16 +71,19 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     public function testIsValidKeyFailure()
     {
         // Order of secp256k1
-        $order = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
+        $order = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
         $this->assertFalse(PrivateKey::isValidKey($order));
 
-        $key1 = '0000000000000000000000000000000000000000000000000000000000000000';
+        $key1 = $this->math->hexDec('0000000000000000000000000000000000000000000000000000000000000000');
         $this->assertFalse(PrivateKey::isValidKey($key1));
     }
 
     public function testCreatePrivateKey()
     {
-        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
+        $hex = '4141414141414141414141414141414141414141414141414141414141414141';
+        $key = $this->math->hexDec($hex);
+        $this->privateKey   = new PrivateKey($this->math, $this->generator, $key);
+
         $this->assertInstanceOf($this->baseType, $this->privateKey);
         $this->assertSame($this->privateKey->serialize('hex'), '4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertFalse($this->privateKey->isCompressed());
@@ -98,7 +101,8 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreatePrivateKeyFailure()
     {
-        $this->privateKey = new PrivateKey($this->math, $this->generator, 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+        $dec = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, $dec);
     }
 
     public function testGenerateNewUncompressed()
@@ -112,7 +116,8 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testSetCompressed()
     {
-        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
+        $dec = $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, $dec);
         $this->assertFalse($this->privateKey->isCompressed());
         $this->privateKey->setCompressed(true);
         $this->assertTrue($this->privateKey->isCompressed());
@@ -130,7 +135,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWif()
     {
-        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141'));
         $network = new Network('00', '05', '80');
         $this->assertSame($this->privateKey->getWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
 
@@ -140,7 +145,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPubKeyHash()
     {
-        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
+        $this->privateKey = new PrivateKey($this->math, $this->generator, $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141'));
         $this->assertSame('d00baafc1c7f120ab2ae0aa22160b516cfcf9cfe', $this->privateKey->getPubKeyHash());
         $this->privateKey->setCompressed(true);
         $this->assertSame('c53c82d3357f1f299330d585907b7c64b6b7a5f0', $this->privateKey->getPubKeyHash());
@@ -148,7 +153,9 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDefaultCurve()
     {
-        $this->privateKey = new PrivateKey($this->math, $this->generator, '4141414141414141414141414141414141414141414141414141414141414141');
+        $key = $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141');
+
+        $this->privateKey = new PrivateKey($this->math, $this->generator, $key);
         $curve = $this->privateKey->getCurve();
 
         $this->assertSame($curve->getA(), 0);
@@ -159,23 +166,23 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $buf                = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
-        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf);
+        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf->serialize('int'));
         $this->assertSame($buf->serialize(), $this->privateKey->serialize());
     }
 
     public function test__toString()
     {
-        $hex                = '4141414141414141414141414141414141414141414141414141414141414141';
-        $buf                = Buffer::hex($hex);
-        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf);
+        $hex = '4141414141414141414141414141414141414141414141414141414141414141';
+        $key = $this->math->hexDec($hex);
+        $this->privateKey   = new PrivateKey($this->math, $this->generator, $key);
         $this->assertEquals($hex, $this->privateKey->__toString());
     }
 
     public function testGetSize()
     {
-        $hex                = '4141414141414141414141414141414141414141414141414141414141414141';
-        $buf                = Buffer::hex($hex);
-        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf);
+        $hex = '4141414141414141414141414141414141414141414141414141414141414141';
+        $key = $this->math->hexDec($hex);
+        $this->privateKey   = new PrivateKey($this->math, $this->generator, $key);
         $this->assertEquals(32, $this->privateKey->getSize());
         $this->assertEquals(64, $this->privateKey->getSize('hex'));
     }

@@ -44,20 +44,17 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public function __construct(
         Math $math,
         GeneratorPoint $generator,
-        $hex,
+        $int,
         $compressed = false
     ) {
-        if ($hex instanceof Buffer) {
-            $hex = $hex->serialize('hex');
-        }
 
-        if (! self::isValidKey($hex)) {
+        if (! self::isValidKey($int)) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
         $this->math = $math;
         $this->generator = $generator;
-        $this->secretMultiplier = $this->math->hexDec($hex);
+        $this->secretMultiplier = $int;
         $this->compressed       = $compressed;
 
         return $this;
@@ -72,10 +69,13 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public static function fromWIF($wif)
     {
+        $math = Bitcoin::getMath();
+        $G = Bitcoin::getGenerator();
+
         try {
             $data = Base58::decodeCheck($wif);
-            $hex  = substr($data, 2, 64);
-            $key  = new PrivateKey(Bitcoin::getMath(), Bitcoin::getGenerator(), $hex, (strlen($data) == 68));
+            $key  = $math->hexdec(substr($data, 2, 64));
+            $key  = new PrivateKey($math, $G, $key, (strlen($data) == 68));
 
         } catch (Base58ChecksumFailure $e) {
             throw new Base58ChecksumFailure('Failed to decode WIF - was it copied correctly?');
@@ -92,8 +92,11 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public static function generateNew($compressed = false)
     {
+        $math = Bitcoin::getMath();
+        $G = Bitcoin::getGenerator();
         $keyBuffer = self::generateKey();
-        $private   = new PrivateKey(Bitcoin::getMath(), Bitcoin::getGenerator(), $keyBuffer->serialize('hex'), $compressed);
+        $private   = new PrivateKey($math, $G, $keyBuffer->serialize('int'), $compressed);
+
         return $private;
     }
 
@@ -103,19 +106,20 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      * @param $hex
      * @return bool
      */
-    public static function isValidKey($hex)
+    public static function isValidKey($int)
     {
         $math        = Bitcoin::getMath();
         $generator   = Bitcoin::getGenerator();
 
         // Less than the order of the curve
-        $withinRange = $math->cmp($math->hexDec($hex), $generator->getOrder()) < 0;
+        $withinRange = $math->cmp($int, $generator->getOrder()) < 0;
 
         // Not zero
-        $notZero     = ! ($math->cmp($math->hexDec($hex), 0) == 0);
+        $notZero     = ! ($math->cmp($int, '0') == 0);
 
         return $withinRange && $notZero;
     }
+
     /**
      * Generate a buffer containing a valid key
      *
@@ -127,7 +131,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $random = new Random();
         do {
             $buffer = $random->bytes(32);
-        } while (! self::isValidKey($buffer->serialize('hex')));
+        } while (! self::isValidKey($buffer->serialize('int')));
 
         return $buffer;
     }

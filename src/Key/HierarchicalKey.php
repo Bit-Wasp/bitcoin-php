@@ -113,8 +113,8 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         // Key data from original extended key is saved for serializing later
         if ($this->network->getHDPrivByte() == $this->bytes) {
             $this->keyData     = $parser->readBytes(33);
-            $private           = substr($this->keyData->serialize('hex'), 2);
-            $this->privateKey  = new PrivateKey($this->math, $this->generator, $private, true, $this->generator);
+            $private           = $this->math->hexdec(substr($this->keyData->serialize('hex'), 2));
+            $this->privateKey  = new PrivateKey($this->math, $this->generator, $private, true);
         } else {
             $this->keyData     = $parser->readBytes(33);
             $this->publicKey   = PublicKey::fromHex($this->keyData->serialize('hex'), $this->generator);
@@ -165,10 +165,14 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         NetworkInterface $network
     ) {
         $hash      = Hash::hmac('sha512', pack("H*", $random), "Bitcoin seed");
-        $private   = substr($hash, 0, 64);
+
+        $math = Bitcoin::getMath();
+        $private = substr($hash, 0, 64);
         $chainCode = substr($hash, 64, 64);
 
-        if (PrivateKey::isValidKey($private) === false) {
+        $privateDec = $math->hexDec($private);
+
+        if (PrivateKey::isValidKey($privateDec) === false) {
             throw new InvalidPrivateKey("Entropy produced an invalid key.. Odds of this happening are very low.");
         }
 
@@ -541,32 +545,30 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     public function getKeyFromOffset($offset)
     {
         $key = $this->isPrivate()
-            ? new PrivateKey($this->math, $this->generator, str_pad(
-                $this->math->decHex(
-                    $this->math->mod(
-                        $this->math->add(
-                            $this->math->hexDec($offset->serialize('hex')),
-                            $this->getPrivateKey()->serialize('int')
-                        ),
-                        $this->getGenerator()->getOrder()
-                    )
-                ),
-                64,
-                '0',
-                STR_PAD_LEFT
-            ))
-            : new PublicKey(
-                $this // Get the EC point for this offset
-            ->getGenerator()
-                ->mul(
-                    $offset->serialize('int')
+            ? new PrivateKey(
+                $this->math,
+                $this->generator,
+                $this->math->mod(
+                    $this->math->add(
+                        $this->math->hexDec($offset->serialize('hex')),
+                        $this->getPrivateKey()->serialize('int')
+                    ),
+                    $this->getGenerator()->getOrder()
                 )
-                // Add it to the public key
-                ->add(
-                    $this->getPublicKey()->getPoint()
-                ),
-                true
-            );
+            )
+
+                    : new PublicKey(
+                        $this // Get the EC point for this offset
+                    ->getGenerator()
+                    ->mul(
+                        $offset->serialize('int')
+                    )
+                        // Add it to the public key
+                        ->add(
+                            $this->getPublicKey()->getPoint()
+                        ),
+                        true
+                    );
 
         return $key;
     }
