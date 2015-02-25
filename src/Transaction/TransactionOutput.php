@@ -3,7 +3,7 @@
 namespace Afk11\Bitcoin\Transaction;
 
 use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Util\Math;
+use Afk11\Bitcoin\Script\ScriptInterface;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\SerializableInterface;
@@ -17,7 +17,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     protected $value;
 
     /**
-     * @var Script
+     * @var ScriptInterface
      */
     protected $script;
 
@@ -35,7 +35,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     public function __construct($script = null, $value = null)
     {
         if (!is_null($script)) {
-            if ($script instanceof Script) {
+            if ($script instanceof ScriptInterface) {
                 $this->setScript($script);
             } elseif ($script instanceof Buffer) {
                 $this->setScriptBuf($script);
@@ -78,7 +78,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
      * object. If not, returns script from scriptBuf (which can simply
      * be null).
      *
-     * @return Script
+     * @return ScriptInterface
      */
     public function getScript()
     {
@@ -92,10 +92,10 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     /**
      * Set a Script
      *
-     * @param Script $script
+     * @param ScriptInterface $script
      * @return $this
      */
-    public function setScript(Script $script)
+    public function setScript(ScriptInterface $script)
     {
         $this->script = $script;
         return $this;

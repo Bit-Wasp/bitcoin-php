@@ -5,12 +5,13 @@ namespace Afk11\Bitcoin\Script\Classifier;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\ScriptInterface;
 
 class InputClassifier implements ScriptClassifierInterface
 {
 
     /**
-     * @var Script
+     * @var ScriptInterface
      */
     private $script;
 
@@ -20,9 +21,9 @@ class InputClassifier implements ScriptClassifierInterface
     private $evalScript;
 
     /**
-     * @param Script $script
+     * @param ScriptInterface $script
      */
-    public function __construct(Script $script)
+    public function __construct(ScriptInterface $script)
     {
         $this->script = $script;
         $this->evalScript = $script->parse();

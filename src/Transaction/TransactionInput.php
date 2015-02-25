@@ -6,6 +6,7 @@ use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Buffer;
 use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\ScriptInterface;
 use \Afk11\Bitcoin\SerializableInterface;
 
 class TransactionInput implements TransactionInputInterface, SerializableInterface
@@ -20,12 +21,12 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
     protected $vout;
 
     /**
-     * @var
+     * @var int
      */
     protected $sequence;
 
     /**
-     * @var Script
+     * @var ScriptInterface
      */
     protected $script;
 
@@ -34,14 +35,19 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
      */
     protected $scriptBuf;
 
-
+    /**
+     * @param null $txid
+     * @param null $vout
+     * @param ScriptInterface|Buffer $script
+     * @param int $sequence
+     */
     public function __construct($txid = null, $vout = null, $script = null, $sequence = null)
     {
         $this->txid = $txid;
         $this->vout = $vout;
 
         if (!is_null($script)) {
-            if ($script instanceof Script) {
+            if ($script instanceof ScriptInterface) {
                 $this->setScript($script);
             } elseif ($script instanceof Buffer) {
                 $this->setScriptBuf($script);
@@ -155,10 +161,10 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
     /**
      * Set a Script
      *
-     * @param Script $script
+     * @param ScriptInterface $script
      * @return $this
      */
-    public function setScript(Script $script)
+    public function setScript(ScriptInterface $script)
     {
         $this->script = $script;
         return $this;
