@@ -16,7 +16,7 @@ use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;
 
-class HierarchicalKey implements PrivateKeyInterface, KeyInterface
+class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
 {
     /**
      * @var PrivateKey
@@ -121,24 +121,6 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         }
     }
 
-    /**
-     * Import from a BIP32 extended key
-     *
-     * @param $base58
-     * @param NetworkInterface $network
-     * @return HierarchicalKey
-     * @throws \Exception
-     */
-    public static function fromBase58($base58, NetworkInterface $network)
-    {
-        try {
-            $bytes = Base58::decodeCheck($base58);
-        } catch (\Exception $e) {
-            throw new \Exception('Failed to decode HierarchicalKey');
-        }
-
-        return new HierarchicalKey($bytes, $network);
-    }
 
     /**
      * @param NetworkInterface $network
@@ -147,7 +129,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
      */
     public static function generateNew(NetworkInterface $network)
     {
-        $buffer  = PrivateKey::generateKey();
+        $buffer  = PrivateKeyFactory::generate();
         $private = self::fromEntropy($buffer->serialize('hex'), $network);
         return $private;
     }
@@ -354,6 +336,10 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
         return $this->privateKey;
     }
 
+    /**
+     * @return int
+     * @throws \Exception
+     */
     public function getSecretMultiplier()
     {
         return $this->getPrivateKey()->getSecretMultiplier();
@@ -376,56 +362,13 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
     }
 
     /**
-     * Return an extended private key in base58.
-     *
-     * @return string
-     * @throws \Exception
+     * @return \Mdanter\Ecc\PointInterface
      */
-    public function getExtendedPrivateKey()
+    public function getPoint()
     {
-        if (!$this->isPrivate()) {
-            throw new \Exception('This is not a private key');
-        }
-
-        $bytes = new Parser();
-        $bytes = $bytes
-            ->writeBytes(4, $this->getNetwork()->getHDPrivByte())
-            ->writeInt(1, $this->getDepth())
-            ->writeBytes(4, $this->getFingerprint())
-            ->writeInt(4, $this->getSequence())
-            ->writeBytes(32, $this->getChainCode()->serialize('hex'))
-            ->writeBytes(1, '00')
-            ->writeBytes(32, $this->getPrivateKey()->serialize('hex'))
-            ->getBuffer()
-            ->serialize('hex');
-
-        $base58 = Base58::encodeCheck($bytes);
-
-        return $base58;
+        return $this->getPublicKey()->getPoint();
     }
 
-    /**
-     * Return a base58 encoded extended public key
-     *
-     * @return string
-     */
-    public function getExtendedPublicKey()
-    {
-        $bytes = new Parser();
-        $bytes = $bytes
-            ->writeBytes(4, Buffer::hex($this->getNetwork()->getHDPubByte()))
-            ->writeInt(1, $this->getDepth())
-            ->writeBytes(4, $this->getFingerprint())
-            ->writeInt(4, $this->getSequence())
-            ->writeBytes(32, $this->getChainCode()->serialize('hex'))
-            ->writeBytes(33, $this->getPublicKey()->serialize('hex'))
-            ->getBuffer()
-            ->serialize('hex');
-
-        $base58 = Base58::encodeCheck($bytes);
-
-        return $base58;
-    }
 
     /**
      * Serialize a key into 'hex', or a byte string by default
@@ -562,7 +505,7 @@ class HierarchicalKey implements PrivateKeyInterface, KeyInterface
                     ->getGenerator()
                     ->mul(
                         $offset->serialize('int')
-                    )
+                        )
                         // Add it to the public key
                         ->add(
                             $this->getPublicKey()->getPoint()

@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Key;
 
-interface PublicKeyInterface
+interface PublicKeyInterface extends KeyInterface
 {
     /**
      * Length of an uncompressed key
@@ -31,30 +31,11 @@ interface PublicKeyInterface
     const KEY_COMPRESSED_ODD = '03';
 
     /**
-     * Get the X coordinate in decimal
-     *
-     * @return mixed
-     */
-    public function getX();
-
-    /**
-     * Get the Y coordinate in decimal
-     *
-     * @return mixed
-     */
-    public function getY();
-
-    /**
-     * Get the curve for the point
-     *
-     * @return mixed
-     */
-    public function getCurve();
-
-    /**
      * Get public key point on the curve
      *
      * @return mixed
      */
     public function getPoint();
+
+
 }

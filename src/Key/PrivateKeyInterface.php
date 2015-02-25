@@ -6,15 +6,8 @@ use Afk11\Bitcoin\NetworkInterface;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Signature\K\KInterface;
 
-interface PrivateKeyInterface
+interface PrivateKeyInterface extends KeyInterface
 {
-    /**
-     * Return the WIF key
-     *
-     * @param NetworkInterface $network
-     * @return mixed
-     */
-    public function getWif(NetworkInterface $network);
 
     /**
      * Return the decimal secret multiplier
@@ -22,4 +15,9 @@ interface PrivateKeyInterface
      * @return int|string
      */
     public function getSecretMultiplier();
+
+    /**
+     * @return PublicKeyInterface
+     */
+    public function getPublicKey();
 }

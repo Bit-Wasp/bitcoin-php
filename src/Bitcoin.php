@@ -53,7 +53,7 @@ class Bitcoin
      */
     public static function getGenerator()
     {
-        return self::$generator ?: EccFactory::getSecgCurves()->generator256k1();
+        return self::$generator ?: EccFactory::getSecgCurves(self::getMath())->generator256k1();
     }
 
     /**
@@ -71,8 +71,8 @@ class Bitcoin
     {
         if (is_null(self::$network)) {
             $network = new Network('00', '05', '80');
-            $network->setHDPubByte('0488B21E');
-            $network->setHDPubByte('0488ADE4');
+            $network->setHDPubByte('0488b21e');
+            $network->setHDPubByte('0488ade4');
             self::$network = $network;
         }
 

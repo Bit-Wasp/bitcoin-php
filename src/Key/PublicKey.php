@@ -10,8 +10,12 @@ use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
 
-class PublicKey implements KeyInterface, PublicKeyInterface
+class PublicKey implements PublicKeyInterface
 {
+    /**
+     * @var Math
+     */
+    protected $math;
 
     /**
      * @var PointInterface
@@ -29,7 +33,8 @@ class PublicKey implements KeyInterface, PublicKeyInterface
      */
     public function __construct(\Mdanter\Ecc\PointInterface $point, $compressed = false)
     {
-        $this->point      = $point;
+        $this->math = Bitcoin::getMath();
+        $this->point = $point;
         $this->compressed = $compressed;
         return $this;
     }
@@ -43,30 +48,6 @@ class PublicKey implements KeyInterface, PublicKeyInterface
     }
 
     /**
-     * @return int|string
-     */
-    public function getX()
-    {
-        return $this->getPoint()->getX();
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getY()
-    {
-        return $this->getPoint()->getY();
-    }
-
-    /**
-     * @return \Mdanter\Ecc\CurveFpInterface
-     */
-    public function getCurve()
-    {
-        return $this->getPoint()->getCurve();
-    }
-
-    /**
      * @return mixed|string
      */
     public function getPubKeyHash()
@@ -74,38 +55,6 @@ class PublicKey implements KeyInterface, PublicKeyInterface
         $publicKey = $this->serialize('hex');
         $hash      = Hash::sha256ripe160($publicKey);
         return $hash;
-    }
-
-    /**
-     * Return the hex string for this public key
-     *
-     * @return string
-     */
-    public function getPubKeyHex()
-    {
-        $math = Bitcoin::getMath();
-
-        if ($this->isCompressed()) {
-            $byte = self::getCompressedPrefix($this->getPoint());
-            $xHex = $math->decHex($this->getX());
-            $hex  = sprintf(
-                "%s%s",
-                $byte,
-                str_pad($xHex, 64, '0', STR_PAD_LEFT)
-            );
-
-        } else {
-            $xHex = $math->decHex($this->getX());
-            $yHex = $math->decHex($this->getY());
-            $hex  = sprintf(
-                "%s%s%s",
-                PublicKey::KEY_UNCOMPRESSED,
-                str_pad($xHex, 64, '0', STR_PAD_LEFT),
-                str_pad($yHex, 64, '0', STR_PAD_LEFT)
-            );
-        }
-
-        return $hex;
     }
 
     /**

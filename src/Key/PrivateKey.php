@@ -3,17 +3,12 @@
 namespace Afk11\Bitcoin\Key;
 
 use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
 use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use \Afk11\Bitcoin\NetworkInterface;
 use \Afk11\Bitcoin\SerializableInterface;
 use \Afk11\Bitcoin\Math\Math;
-use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Base58;
-use \Afk11\Bitcoin\Crypto\Random\Random;
 use Mdanter\Ecc\GeneratorPoint;
 
-class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInterface
+class PrivateKey implements PrivateKeyInterface, SerializableInterface
 {
     /**
      * @var int|string
@@ -21,18 +16,19 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     protected $secretMultiplier;
 
     /**
-     * @var \Mdanter\Ecc\CurveFp
+     * @var
      */
-    protected $curve;
+    private $math;
+
+    /**
+     * @var GeneratorPoint
+     */
+    private $generator;
 
     /**
      * @var PublicKey
      */
-    protected $publicKey = null;
-    /**
-     * @var
-     */
-    private $math;
+    protected $publicKey;
 
     /**
      * @param Math $math
@@ -55,49 +51,9 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         $this->math = $math;
         $this->generator = $generator;
         $this->secretMultiplier = $int;
-        $this->compressed       = $compressed;
+        $this->compressed = $compressed;
 
         return $this;
-    }
-
-    /**
-     * Instantiate the class when given a WIF private key.
-     *
-     * @param string $wif
-     * @return PrivateKey
-     * @throws Base58ChecksumFailure
-     */
-    public static function fromWIF($wif)
-    {
-        $math = Bitcoin::getMath();
-        $G = Bitcoin::getGenerator();
-
-        try {
-            $data = Base58::decodeCheck($wif);
-            $key  = $math->hexdec(substr($data, 2, 64));
-            $key  = new PrivateKey($math, $G, $key, (strlen($data) == 68));
-
-        } catch (Base58ChecksumFailure $e) {
-            throw new Base58ChecksumFailure('Failed to decode WIF - was it copied correctly?');
-        }
-
-        return $key;
-    }
-
-    /**
-     * Generate a new private key from entropy
-     *
-     * @param bool $compressed
-     * @return PrivateKey
-     */
-    public static function generateNew($compressed = false)
-    {
-        $math = Bitcoin::getMath();
-        $G = Bitcoin::getGenerator();
-        $keyBuffer = self::generateKey();
-        $private   = new PrivateKey($math, $G, $keyBuffer->serialize('int'), $compressed);
-
-        return $private;
     }
 
     /**
@@ -108,34 +64,19 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public static function isValidKey($int)
     {
-        $math        = Bitcoin::getMath();
-        $generator   = Bitcoin::getGenerator();
+        $math = Bitcoin::getMath();
+        $generator = Bitcoin::getGenerator();
 
-        // Less than the order of the curve
+        // Less than the order of the curve, and not zero
         $withinRange = $math->cmp($int, $generator->getOrder()) < 0;
-
-        // Not zero
-        $notZero     = ! ($math->cmp($int, '0') == 0);
+        $notZero = ! ($math->cmp($int, '0') === 0);
 
         return $withinRange && $notZero;
     }
 
     /**
-     * Generate a buffer containing a valid key
-     *
-     * @return Buffer
-     * @throws \Afk11\Bitcoin\Exceptions\RandomBytesFailure
+     * @return int
      */
-    public static function generateKey()
-    {
-        $random = new Random();
-        do {
-            $buffer = $random->bytes(32);
-        } while (! self::isValidKey($buffer->serialize('int')));
-
-        return $buffer;
-    }
-
     public function getSecretMultiplier()
     {
         return $this->secretMultiplier;
@@ -152,7 +93,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function isCompressed()
     {
@@ -167,7 +108,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public function getPublicKey()
     {
         if ($this->publicKey == null) {
-            $point = Bitcoin::getGenerator()->mul($this->serialize('int'));
+            $point = $this->generator->mul($this->getSecretMultiplier());
             $this->publicKey  = new PublicKey($point, $this->compressed);
         }
 
@@ -194,18 +135,11 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
     public function setCompressed($setting)
     {
         $this->compressed = $setting;
-        $this->getPublicKey();
-        $this->publicKey->setCompressed($setting);
+        $this->getPublicKey()->setCompressed($setting);
+
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getCurve()
-    {
-        return Bitcoin::getGenerator()->getCurve();
-    }
 
     /**
      * Return the hex representation of the key
@@ -213,7 +147,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     private function getHex()
     {
-        $hex = Bitcoin::getMath()->decHex($this->secretMultiplier);
+        $hex = $this->math->decHex($this->getSecretMultiplier());
         return str_pad($hex, 64, '0', STR_PAD_LEFT);
     }
 
@@ -228,7 +162,7 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
         if ($type == 'hex') {
             return $this->getHex();
         } elseif ($type == 'int') {
-            return $this->secretMultiplier;
+            return $this->getSecretMultiplier();
         } else {
             return pack("H*", $this->getHex());
         }
@@ -255,24 +189,6 @@ class PrivateKey implements KeyInterface, PrivateKeyInterface, SerializableInter
      */
     public function __toString()
     {
-        return $this->getHex();
-    }
-
-    /**
-     * When given a network, return a WIF
-     *
-     * @param NetworkInterface $network
-     * @return string
-     */
-    public function getWif(NetworkInterface $network)
-    {
-        $hex = sprintf(
-            "%s%s%s",
-            $network->getPrivByte(),
-            $this->getHex(),
-            ($this->isCompressed() ? '01' : '')
-        );
-
-        return Base58::encodeCheck($hex);
+        return PrivateKeyFactory::toHex($this);
     }
 }

@@ -7,6 +7,7 @@ use Afk11\Bitcoin\Key\PrivateKey;
 use Afk11\Bitcoin\Network;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Key\PrivateKeyFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase
@@ -149,18 +150,6 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('d00baafc1c7f120ab2ae0aa22160b516cfcf9cfe', $this->privateKey->getPubKeyHash());
         $this->privateKey->setCompressed(true);
         $this->assertSame('c53c82d3357f1f299330d585907b7c64b6b7a5f0', $this->privateKey->getPubKeyHash());
-    }
-
-    public function testGetDefaultCurve()
-    {
-        $key = $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141');
-
-        $this->privateKey = new PrivateKey($this->math, $this->generator, $key);
-        $curve = $this->privateKey->getCurve();
-
-        $this->assertSame($curve->getA(), 0);
-        $this->assertSame($curve->getB(), 7);
-        $this->assertSame($curve->getPrime(), '115792089237316195423570985008687907853269984665640564039457584007908834671663');
     }
 
     public function testSerialize()
