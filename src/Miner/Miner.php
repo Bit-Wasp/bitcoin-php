@@ -51,24 +51,40 @@ class Miner
     private $timestamp;
 
     /**
+     * @var int
+     */
+    private $version;
+
+    /**
+     * @var bool
+     */
+    private $report;
+
+    /**
      * @param Math $math
      * @param BlockHeaderInterface $lastBlockHeader
      * @param ScriptInterface $script
      * @param Buffer $personalString
      * @param mixed $timestamp
+     * @param int $version
+     * @param bool $report
      */
     public function __construct(
         Math $math,
         BlockHeaderInterface $lastBlockHeader,
         ScriptInterface $script,
         Buffer $personalString = null,
-        $timestamp = null
+        $timestamp = null,
+        $version = 1,
+        $report = false
     ) {
         $this->math = $math;
         $this->lastBlockHeader = $lastBlockHeader;
         $this->script = $script;
         $this->personalString = $personalString ?: new Buffer();
         $this->timestamp = $timestamp ?: time();
+        $this->version = $version;
+        $this->report = $report;
         return $this;
     }
 
@@ -119,8 +135,8 @@ class Miner
             $output->setValue(5000000000);
 
             $coinbaseTx = new Transaction;
-            $coinbaseTx->addInput($input);
-            $coinbaseTx->addOutput($output);
+            $coinbaseTx->getInputs()->addInput($input);
+            $coinbaseTx->getOutputs()->addOutput($output);
         }
 
         $inputs = $coinbaseTx->getInputs();
@@ -139,15 +155,17 @@ class Miner
             $transactions = array_merge(array($coinbaseTx), $this->transactions);
             $block->setTransactions($transactions);
 
-            $merkleRoot = new MerkleRoot($this, $block);
+            $merkleRoot = new MerkleRoot($this->math, $block);
             $merkleHash = $merkleRoot->calculateHash();
 
             $header
-                ->setVersion('1')
+                ->setVersion($this->version)
                 ->setPrevBlock($this->lastBlockHeader->getBlockHash())
                 ->setMerkleRoot($merkleHash)
                 ->setTimestamp($this->timestamp)
                 ->setBits($usingDiff);
+
+            $t = microtime(true);
 
             // Loop through all nonces (up to 2^32). Restart after modifying extranonce.
             while ($this->math->cmp($nonce, $maxNonce) <= 0) {
@@ -160,6 +178,13 @@ class Miner
                 if ($this->math->cmp($hash->serialize('int'), $target) <= 0) {
                     $found = true;
                     break;
+                }
+
+                if ($this->report && $nonce % 100000 === 0) {
+                    $time = microtime(true) - $t;
+                    $khash = $nonce / $time / 1000;
+
+                    echo "extraNonce[{$this->extraNonce}] nonce[{$nonce}] time[{$time}] khash/s[{$khash}] \n";
                 }
             }
 
