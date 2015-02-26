@@ -4,12 +4,13 @@ namespace Afk11\Bitcoin\Script\Classifier;
 
 use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Script\ScriptInterface;
 
 class OutputClassifier implements ScriptClassifierInterface
 {
 
     /**
-     * @var Script
+     * @var ScriptInterface
      */
     private $script;
 
@@ -19,9 +20,9 @@ class OutputClassifier implements ScriptClassifierInterface
     private $evalScript;
 
     /**
-     * @param Script $script
+     * @param ScriptInterface $script
      */
-    public function __construct(Script $script)
+    public function __construct(ScriptInterface $script)
     {
         $this->script = $script;
         $this->evalScript = $script->parse();
@@ -105,6 +106,6 @@ class OutputClassifier implements ScriptClassifierInterface
             return ScriptClassifierInterface::MULTISIG;
         }
 
-        return ScriptClassifierInterface::UNKNOWN;
+        return ScriptClassifierInterface::NONSTANDARD;
     }
 }

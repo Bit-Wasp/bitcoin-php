@@ -33,7 +33,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     private $inputToSign;
 
     /**
-     * @var Script
+     * @var ScriptInterface
      */
     private $script;
 
@@ -329,10 +329,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
-     * @param Script $script
+     * @param ScriptInterface $script
      * @return $this
      */
-    public function setScript(Script $script = null)
+    public function setScript(ScriptInterface $script = null)
     {
         if ($script == null) {
             $script = new Script();
@@ -343,13 +343,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
-     * @param Script $scriptSig
-     * @param Script $scriptPubKey
+     * @param ScriptInterface $scriptSig
+     * @param ScriptInterface $scriptPubKey
      * @param $nInputToSign
      * @return bool
      * @throws \Exception
      */
-    public function verify(Script $scriptSig, Script $scriptPubKey, $nInputToSign)
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign)
     {
         $this->inputToSign = $nInputToSign;
         if (!$this->setScript($scriptSig)->run()) {

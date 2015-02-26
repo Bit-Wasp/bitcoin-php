@@ -202,10 +202,10 @@ class Script implements ScriptInterface
     /**
      * Create a P2SH output script
      *
-     * @param Script $script
+     * @param ScriptInterface $script
      * @return Script
      */
-    public static function payToScriptHash(Script $script)
+    public static function payToScriptHash(ScriptInterface $script)
     {
         $script_hex = $script->serialize('hex');
         $hash = Hash::sha256ripe160($script_hex);
