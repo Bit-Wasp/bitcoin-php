@@ -4,8 +4,11 @@ namespace Afk11\Bitcoin\Key;
 
 use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
+use Afk11\Bitcoin\NetworkInterface;
 use \Afk11\Bitcoin\SerializableInterface;
 use \Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
+use Afk11\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKey implements PrivateKeyInterface, SerializableInterface
@@ -140,15 +143,28 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
         return $this;
     }
 
-
     /**
-     * Return the hex representation of the key
+     * @param NetworkInterface $network
      * @return string
      */
-    private function getHex()
+    public function toWif(NetworkInterface $network = null)
     {
-        $hex = $this->math->decHex($this->getSecretMultiplier());
-        return str_pad($hex, 64, '0', STR_PAD_LEFT);
+        $network ?: Bitcoin::getNetwork();
+
+        $wifSerializer = new WifPrivateKeySerializer($this->math, new HexPrivateKeySerializer($this->math, $this->generator));
+        $wif = $wifSerializer->serialize($network, $this);
+        return $wif;
+    }
+
+    /**
+     * @return string
+     */
+    public function toHex()
+    {
+        $hexSerializer = new HexPrivateKeySerializer($this->math, $this->generator);
+
+        $hex = $hexSerializer->serialize($this);
+        return $hex;
     }
 
     /**
@@ -160,11 +176,11 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
     public function serialize($type = null)
     {
         if ($type == 'hex') {
-            return $this->getHex();
+            return $this->toHex();
         } elseif ($type == 'int') {
             return $this->getSecretMultiplier();
         } else {
-            return pack("H*", $this->getHex());
+            return pack("H*", $this->toHex());
         }
     }
 
@@ -177,7 +193,7 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
     public function getSize($type = null)
     {
         if ($type == 'hex') {
-            return strlen($this->getHex());
+            return strlen($this->toHex());
         } else {
             return 32;
         }
@@ -189,6 +205,6 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
      */
     public function __toString()
     {
-        return PrivateKeyFactory::toHex($this);
+        return $this->toHex();
     }
 }

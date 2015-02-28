@@ -5,23 +5,13 @@ namespace Afk11\Bitcoin\Key;
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Crypto\Random\Random;
 use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use Afk11\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
+use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyFactory
 {
-    /**
-     * @param bool $compressed
-     * @return PrivateKey
-     */
-    public static function generate($compressed = true)
-    {
-        $secret = self::generateSecret();
-        $privateKey = new PrivateKey(Bitcoin::getMath(), Bitcoin::getGenerator(), $secret, $compressed);
-        return $privateKey;
-    }
-
     /**
      * Generate a buffer containing a valid key
      *
@@ -39,67 +29,63 @@ class PrivateKeyFactory
         return $buffer;
     }
 
-    public static function fromInt($int)
-    {
-        if (!PrivateKey::isValidKey($int)) {
-            throw new InvalidPrivateKey('Invalid private key');
-        }
-    }
-
     /**
-     * @param $wif
+     * @param $int
+     * @param bool $compressed
+     * @param Math $math
+     * @param GeneratorPoint $generator
      * @return PrivateKey
      */
-    public static function fromWif($wif)
+    public static function fromInt($int, $compressed = true, Math $math = null, GeneratorPoint $generator = null)
     {
-        $math = Bitcoin::getMath();
-        $generator = Bitcoin::getGenerator();
-
-        $wifSerializer = new WifPrivateKeySerializer($math, new HexPrivateKeySerializer($math, $generator));
-        $privateKey = $wifSerializer->parse($wif);
+        $math = $math ?: Bitcoin::getMath();
+        $generator = $generator ?: Bitcoin::getGenerator();
+        $privateKey = new PrivateKey($math, $generator, $int, $compressed);
         return $privateKey;
     }
 
     /**
-     * @param PrivateKeyInterface $privateKey
-     * @param NetworkInterface $network
-     * @return string
+     * @param bool $compressed
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @return PrivateKey
      */
-    public static function toWif(PrivateKeyInterface $privateKey, NetworkInterface $network = null)
+    public static function generate($compressed = true, Math $math = null, GeneratorPoint $generator = null)
     {
-        $math = Bitcoin::getMath();
-        $generator = Bitcoin::getGenerator();
-        $network ?: Bitcoin::getNetwork();
-
-        $wifSerializer = new WifPrivateKeySerializer($math, new HexPrivateKeySerializer($math, $generator));
-        $wif = $wifSerializer->serialize($network, $privateKey);
-        return $wif;
+        $math = $math ?: Bitcoin::getMath();
+        $generator = $generator ?: Bitcoin::getGenerator();
+        $secret = self::generateSecret();
+        return self::fromInt($secret->serialize('int'), $compressed, $math, $generator);
     }
 
     /**
-     * @param PrivateKeyInterface $privateKey
-     * @return string
+     * @param $wif
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @return PrivateKey
+     * @throws InvalidPrivateKey
      */
-    public static function toHex(PrivateKeyInterface $privateKey)
+    public static function fromWif($wif, Math $math = null, GeneratorPoint $generator = null)
     {
-        $math = Bitcoin::getMath();
-        $generator = Bitcoin::getGenerator();
-        $hexSerializer = new HexPrivateKeySerializer($math, $generator);
+        $math = $math ?: Bitcoin::getMath();
+        $generator = $generator ?: Bitcoin::getGenerator();
+        $wifSerializer = new WifPrivateKeySerializer($math, new HexPrivateKeySerializer($math, $generator));
+        $privateKey = $wifSerializer->parse($wif);
 
-        $hex = $hexSerializer->serialize($privateKey);
-        return $hex;
+        return $privateKey;
     }
 
     /**
      * @param $hex
+     * @param Math $math
+     * @param GeneratorPoint $generator
      * @return PrivateKey
      */
-    public static function fromHex($hex)
+    public static function fromHex($hex, Math $math = null, GeneratorPoint $generator = null)
     {
-        $math = Bitcoin::getMath();
-        $generator = Bitcoin::getGenerator();
+        $math = $math ?: Bitcoin::getMath();
+        $generator = $generator ?: Bitcoin::getGenerator();
         $hexSerializer = new HexPrivateKeySerializer($math, $generator);
-
         $privateKey = $hexSerializer->parse($hex);
         return $privateKey;
     }

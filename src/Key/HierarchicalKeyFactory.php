@@ -5,47 +5,44 @@ namespace Afk11\Bitcoin\Key;
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
 use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\NetworkInterface;
 use Afk11\Bitcoin\Crypto\Hash;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Base58;
+use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
+use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use Mdanter\Ecc\GeneratorPoint;
 
 class HierarchicalKeyFactory
 {
 
-    public static function generateMasterKey(NetworkInterface $network)
+    public static function generateMasterKey(NetworkInterface $network, Math $math = null, GeneratorPoint $generator = null)
     {
+        $math = $math ?: Bitcoin::getMath();
+        $generator = $generator ?: Bitcoin::getGenerator();
+
         $buffer  = PrivateKeyFactory::generate();
-        $private = self::fromEntropy($buffer->serialize('hex'), $network);
+        $private = self::fromEntropy($buffer->serialize('hex'));
         return $private;
     }
 
-    public static function fromEntropy($entropy, NetworkInterface $network)
+    public static function fromEntropy($entropy, Math $math = null, GeneratorPoint $generator = null)
     {
-        $math = Bitcoin::getMath();
+        $math = $math ?: Bitcoin::getMath();
+        $generator = $generator ?: Bitcoin::getGenerator();
+
         $hash = Hash::hmac('sha512', pack("H*", $entropy), "Bitcoin seed");
+        $depth = 0;
+        $parentFingerprint = Buffer::hex('00000000');
+        $sequence = '00000000';
+        $chainCode = Buffer::hex(substr($hash, 64, 64));
+        $private = PrivateKeyFactory::fromHex(substr($hash, 0, 64));
 
-        $private = substr($hash, 0, 64);
-        $chainCode = substr($hash, 64, 64);
+        $key = new HierarchicalKey($math, $generator, $depth, $parentFingerprint, $sequence, $chainCode, $private);
 
-        $privateDec = $math->hexDec($private);
-
-        if (PrivateKey::isValidKey($privateDec) === false) {
-            throw new InvalidPrivateKey("Entropy produced an invalid key.. Odds of this happening are very low.");
-        }
-
-        $bytes = new Parser();
-        $bytes = $bytes->writeBytes(4, $network->getHDPrivByte())
-            ->writeInt(1, '0')
-            ->writeBytes(4, Buffer::hex('00000000'))
-            ->writeBytes(4, '00000000')
-            ->writeBytes(32, $chainCode)
-            ->writeBytes(33, '00' . $private)
-            ->getBuffer()
-            ->serialize('hex');
-
-        return new HierarchicalKey($bytes, $network);
+        return $key;
     }
 
     /**
@@ -54,77 +51,14 @@ class HierarchicalKeyFactory
      * @return HierarchicalKey
      * @throws Base58ChecksumFailure
      */
-    public static function fromExtended($extendedKey, NetworkInterface $network = null)
+    public static function fromExtended($extendedKey, NetworkInterface $network = null, Math $math = null, GeneratorPoint $generator = null)
     {
-        $network ?: Bitcoin::getNetwork();
+        $network = $network ?: Bitcoin::getNetwork();
+        $math = $math ?: Bitcoin::getMath();
+        $generator = $generator ?: Bitcoin::getGenerator();
 
-        try {
-            $bytes = Base58::decodeCheck($extendedKey);
-        } catch (Base58ChecksumFailure $e) {
-            throw new Base58ChecksumFailure('Failed to decode HierarchicalKey');
-        }
-
-        return new HierarchicalKey($bytes, $network);
-    }
-
-    /**
-     * @param HierarchicalKey $key
-     * @return string
-     */
-    public static function toExtendedKey(HierarchicalKey $key)
-    {
-        return $key->isPrivate()
-            ? self::toExtendedPrivateKey($key)
-            : self::toExtendedPublicKey($key);
-    }
-
-    /**
-     * @param HierarchicalKey $key
-     * @return string
-     */
-    public static function toExtendedPublicKey(HierarchicalKey $key)
-    {
-        $hex = PublicKeyFactory::toHex($key->getPublicKey());
-
-        $bytes = new Parser();
-        $bytes = $bytes
-            ->writeBytes(4, $key->getNetwork()->getHDPrivByte())
-            ->writeInt(1, $key->getDepth())
-            ->writeBytes(4, $key->getFingerprint())
-            ->writeInt(4, $key->getSequence())
-            ->writeBytes(32, $key->getChainCode()->serialize('hex'))
-            ->writeBytes(33, $hex)
-            ->getBuffer()
-            ->serialize('hex');
-
-        $base58 = Base58::encodeCheck($bytes);
-
-        return $base58;
-    }
-
-    /**
-     * @param HierarchicalKey $key
-     * @return string
-     * @throws \Exception
-     */
-    public static function toExtendedPrivateKey(HierarchicalKey $key)
-    {
-        $hex = PrivateKeyFactory::toHex($key->getPrivateKey());
-
-        $bytes = new Parser();
-        $bytes = $bytes
-            ->writeBytes(4, $key->getNetwork()->getHDPrivByte())
-            ->writeInt(1, $key->getDepth())
-            ->writeBytes(4, $key->getFingerprint())
-            ->writeInt(4, $key->getSequence())
-            ->writeBytes(32, $key->getChainCode()->serialize('hex'))
-            ->writeBytes(1, '00')
-            ->writeBytes(32, $hex)
-            ->getBuffer()
-            ->serialize('hex');
-
-        $base58 = Base58::encodeCheck($bytes);
-
-        return $base58;
+        $extSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($math, $generator, $network));
+        $key = $extSerializer->parse($extendedKey);
+        return $key;
     }
 }

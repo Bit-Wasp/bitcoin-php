@@ -4,15 +4,14 @@ namespace Afk11\Bitcoin\Key;
 
 use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
-use \Afk11\Bitcoin\Base58;
 use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Util\Math;
+use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
+use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use \Afk11\Bitcoin\Math\Math;
 use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\NetworkInterface;
-use \Afk11\Bitcoin\Signature\K\KInterface;
 use \Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;
 
@@ -21,7 +20,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     /**
      * @var PrivateKey
      */
-    protected $privateKey = null;
+    protected $privateKey;
 
     /**
      * @var PublicKey
@@ -74,101 +73,48 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     protected $math;
 
     /**
+     * @var bool
+     */
+    protected $private = false;
+
+    /**
      * @param $bytes
      * @param NetworkInterface $network
      * @throws ParserOutOfRange
      * @throws \Exception
      */
-    public function __construct($bytes, NetworkInterface $network)
+    //public function __construct($bytes, NetworkInterface $network)
+    public function __construct(Math $math, GeneratorPoint $generator, $depth, $parentFingerprint, $sequence, Buffer $chainCode, KeyInterface $key)
     {
-        try {
-            $network->getHDPrivByte();
-            $network->getHDPubByte();
-            $this->network = $network;
-        } catch (\Exception $e) {
-            throw new \Exception('Network not configured for HD wallets');
-        }
+        $this->math = $math;
+        $this->generator = $generator;
+        $this->depth = $depth;
+        $this->parentFingerprint = $parentFingerprint;
+        $this->sequence = $sequence;
+        $this->chainCode = $chainCode;
 
-        if (strlen($bytes) !== 156) {
-            throw new \Exception('Invalid extended key');
-        }
-
-        try {
-            $parser = new Parser($bytes);
-            list($this->bytes, $this->depth, $this->parentFingerprint, $this->sequence, $this->chainCode) =
-                array(
-                    $parser->readBytes(4)->serialize('hex'),
-                    $parser->readBytes(1)->serialize('int'),
-                    $parser->readBytes(4)->serialize('hex'),
-                    $parser->readBytes(4)->serialize('int'),
-                    $parser->readBytes(32)
-                );
-        } catch (ParserOutOfRange $e) {
-            throw new ParserOutOfRange('Failed to extract extended key from parser');
-        }
-
-        $this->math = Bitcoin::getMath();
-        $this->generator  = Bitcoin::getGenerator();
-
-        // Key data from original extended key is saved for serializing later
-        if ($this->network->getHDPrivByte() == $this->bytes) {
-            $this->keyData     = $parser->readBytes(33);
-            $private           = $this->math->hexdec(substr($this->keyData->serialize('hex'), 2));
-            $this->privateKey  = new PrivateKey($this->math, $this->generator, $private, true);
+        if ($key->isPrivate()) {
+            echo "create priv";
+            $this->privateKey = $key;
+            $this->private = true;
+            $keyData = '00' . $this->getPrivateKey()->toHex();
         } else {
-            $this->keyData     = $parser->readBytes(33);
-            $this->publicKey   = PublicKey::fromHex($this->keyData->serialize('hex'), $this->generator);
+            echo "create pub";
+            $this->publicKey = $key;
+            $keyData = $this->getPublicKey()->toHex();
         }
-    }
 
-
-    /**
-     * @param NetworkInterface $network
-     * @return HierarchicalKey
-     * @throws InvalidPrivateKey
-     */
-    public static function generateNew(NetworkInterface $network)
-    {
-        $buffer  = PrivateKeyFactory::generate();
-        $private = self::fromEntropy($buffer->serialize('hex'), $network);
-        return $private;
+        $this->keyData = Buffer::hex($keyData);
     }
 
     /**
-     * Generate a master key from entropy
+     * Return the depth of this key. This is limited to 256 sequential derivations.
      *
-     * @param $random
-     * @param NetworkInterface $network
-     * @return HierarchicalKey
-     * @throws InvalidPrivateKey
+     * @return int
      */
-    public static function fromEntropy(
-        $random,
-        NetworkInterface $network
-    ) {
-        $hash      = Hash::hmac('sha512', pack("H*", $random), "Bitcoin seed");
-
-        $math = Bitcoin::getMath();
-        $private = substr($hash, 0, 64);
-        $chainCode = substr($hash, 64, 64);
-
-        $privateDec = $math->hexDec($private);
-
-        if (PrivateKey::isValidKey($privateDec) === false) {
-            throw new InvalidPrivateKey("Entropy produced an invalid key.. Odds of this happening are very low.");
-        }
-
-        $bytes = new Parser();
-        $bytes = $bytes->writeBytes(4, $network->getHDPrivByte())
-            ->writeInt(1, '0')
-            ->writeBytes(4, Buffer::hex('00000000'))
-            ->writeBytes(4, '00000000')
-            ->writeBytes(32, $chainCode)
-            ->writeBytes(33, '00' . $private)
-            ->getBuffer()
-            ->serialize('hex');
-
-        return new HierarchicalKey($bytes, $network);
+    public function getDepth()
+    {
+        return $this->depth;
     }
 
     /**
@@ -181,26 +127,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     public function getSequence()
     {
         return $this->sequence;
-    }
-
-    /**
-     * Return the network object
-     *
-     * @return NetworkInterface
-     */
-    public function getNetwork()
-    {
-        return $this->network;
-    }
-
-    /**
-     * Return the depth of this key. This is limited to 256 sequential derivations.
-     *
-     * @return int
-     */
-    public function getDepth()
-    {
-        return $this->depth;
     }
 
     /**
@@ -261,14 +187,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getPubKeyHash()
-    {
-        return $this->getPublicKey()->getPubKeyHash();
-    }
-
-    /**
      * Get the generator point for this curve
      *
      * @return \Mdanter\Ecc\GeneratorPoint
@@ -276,49 +194,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     public function getGenerator()
     {
         return $this->generator;
-    }
-
-    /**
-     * Return whether the wif/address are compressed. For HD wallets
-     * this is always true
-     *
-     * @return bool
-     */
-    public function isCompressed()
-    {
-        return true;
-    }
-
-    /**
-     * Return whether this is a private key
-     *
-     * @return bool
-     */
-    public function isPrivate()
-    {
-        return $this->privateKey instanceof PrivateKey;
-    }
-
-    /**
-     * Return whether the key is hardened
-     *
-     * @return bool
-     */
-    public function isHardened()
-    {
-        return $this->math->cmp($this->getSequence(), $this->math->hexDec('80000000')) >= 0;
-    }
-
-    /**
-     * Return a WIF private key if set
-     *
-     * @param NetworkInterface $network
-     * @return mixed|string
-     * @throws \Exception
-     */
-    public function getWif(NetworkInterface $network = null)
-    {
-        return $this->getPrivateKey()->getWif($network);
     }
 
     /**
@@ -362,12 +237,127 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     }
 
     /**
+     * @return HierarchicalKey
+     */
+    public function derivePublic()
+    {
+        if ($this->isPrivate()) {
+            $this->private = false;
+            $this->privateKey = null;
+        }
+
+        return $this;
+    }
+
+    /**
      * @return \Mdanter\Ecc\PointInterface
      */
     public function getPoint()
     {
         return $this->getPublicKey()->getPoint();
     }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function toHex()
+    {
+        if ($this->isPrivate()) {
+            return $this->getPrivateKey()->toHex();
+        } else {
+            return $this->getPublicKey()->toHex();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPubKeyHash()
+    {
+        return $this->getPublicKey()->getPubKeyHash();
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     * @throws \Exception
+     */
+    public function toWif(NetworkInterface $network)
+    {
+        return $this->getPrivateKey()->toWif($network);
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     */
+    public function toExtendedKey(NetworkInterface $network)
+    {
+        $extendedSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($this->math, $this->generator, $network));
+        $extended = $extendedSerializer->serialize($this);
+        return $extended;
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     */
+    public function toExtendedPrivateKey(NetworkInterface $network)
+    {
+        if (!$this->isPrivate()) {
+            throw new \LogicException('Cannot create extended private key from public');
+        }
+
+        return $this->toExtendedKey($network);
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     */
+    public function toExtendedPublicKey(NetworkInterface $network)
+    {
+        $clone = clone($this);
+        return $clone->derivePublic()->toExtendedKey($network);
+    }
+
+    /**
+     * Return whether the wif/address are compressed. For HD wallets
+     * this is always true
+     *
+     * @return bool
+     */
+    public function isCompressed()
+    {
+        return true;
+    }
+
+    /**
+     * Return whether this is a private key
+     *
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return $this->private == true;
+    }
+
+    /**
+     * Return whether the key is hardened
+     *
+     * @return bool
+     */
+    public function isHardened()
+    {
+        return $this->math->cmp($this->getSequence(), $this->math->hexDec('80000000')) >= 0;
+    }
+
+
+
+
+
+
 
 
     /**
@@ -399,8 +389,10 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @return HierarchicalKey
      * @throws \Exception
      */
-    public function deriveChild($sequence)
+    public function deriveChild($sequence, NetworkInterface $network = null)
     {
+        $network = $network ?: Bitcoin::getNetwork();
+
         // Generate offset
         $chainCode = $this->getChainCode();
 
@@ -428,23 +420,17 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             throw $e;
         }
 
-        $bytes = new Parser();
-        $bytes = $bytes
-            ->writeBytes(4, Buffer::hex($this->getNetwork()->getHDPrivByte()))
-            ->writeInt(1, ((int)$this->getDepth() + 1))
-            ->writeBytes(4, $this->getChildFingerprint())
-            ->writeBytes(4, $sequence->serialize('hex'))
-            ->writeBytes(32, $chainCode->serialize('hex'))
-            ->writeBytes(
-                33,
-                (   $key->isPrivate()
-                        ? '00' . $key->serialize('hex')
-                        : $key->serialize('hex')   )
-            )
-            ->getBuffer()
-            ->serialize('hex');
+        $key =  new HierarchicalKey(
+            $this->math,
+            $this->generator,
+            $this->getDepth()+1,
+            $this->getChildFingerprint(),
+            $sequence->serialize('hex'),
+            $chainCode,
+            $key
+        );
 
-        return new HierarchicalKey($bytes, $this->getNetwork(), $this->getGenerator());
+        return $key;
     }
 
     /**
@@ -460,7 +446,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
         $hardened = $this->math->cmp($sequence->serialize('int'), $this->math->hexDec('80000000')) >= 0;
 
         if ($hardened) {
-            if ($this->isPrivate() == false) {
+            if ($this->isPrivate() === false) {
                 throw new \Exception("Can't derive a hardened key without the private key");
             }
 

@@ -108,7 +108,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateNewUncompressed()
     {
-        $this->privateKey = PrivateKey::generateNew(false);
+        $this->privateKey = PrivateKeyFactory::generate(false);
         $this->assertInstanceOf($this->baseType, $this->privateKey);
         $this->assertFalse($this->privateKey->isCompressed());
         $this->assertTrue($this->privateKey->isPrivate());
@@ -127,7 +127,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateNewCompressed()
     {
-        $this->privateKey = PrivateKey::generateNew(true);
+        $this->privateKey = PrivateKeyFactory::generate(true);
         $this->assertInstanceOf($this->baseType, $this->privateKey);
         $this->assertTrue($this->privateKey->isCompressed());
         $this->assertTrue($this->privateKey->isPrivate());
@@ -138,10 +138,10 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     {
         $this->privateKey = new PrivateKey($this->math, $this->generator, $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141'));
         $network = new Network('00', '05', '80');
-        $this->assertSame($this->privateKey->getWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
+        $this->assertSame($this->privateKey->toWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
 
         $this->privateKey->setCompressed(true);
-        $this->assertSame($this->privateKey->getWif($network), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
+        $this->assertSame($this->privateKey->toWif($network), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
     }
 
     public function testGetPubKeyHash()
@@ -185,10 +185,11 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             '5J6B9UWZSxwHuJF3jv1zi2ZxMAVhA7bBvFFcZXFo7ga1UdgNtDs' => '2413fb3709b05939f04cf2e92f7d0897fc2596f9ad0b8a9ea855c7bfebaae892',
             '5JKQJXqLFxQ9JSw2Wc4Z5ZY1v1BR8u4BfndtXZd1Kw9FsGe4ECq' => '421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87'
         );
+
         foreach ($regular as $wif => $hex) {
-            $private = PrivateKey::fromWif($wif);
-            $this->assertInstanceOf('Afk11\Bitcoin\Key\PrivateKey', $private);
-            $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);
+            $private = PrivateKeyFactory::fromWif($wif);
+            $this->assertInstanceOf($this->baseType, $private);
+            $this->assertTrue($math->cmp($math->hexDec($hex), $private->getSecretMultiplier()) == 0);
             $this->assertFalse($private->isCompressed());
         }
 
@@ -199,9 +200,9 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         );
 
         foreach ($compressed as $wif => $hex) {
-            $private = PrivateKey::fromWif($wif);
-            $this->assertInstanceOf('Afk11\Bitcoin\Key\PrivateKey', $private);
-            $this->assertTrue($math->cmp($math->hexDec($hex), $private->serialize('int')) == 0);
+            $private = PrivateKeyFactory::fromWif($wif);
+            $this->assertInstanceOf($this->baseType, $private);
+            $this->assertTrue($math->cmp($math->hexDec($hex), $private->getSecretMultiplier()) == 0);
             $this->assertTrue($private->isCompressed());
         }
     }
@@ -211,6 +212,6 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidWif()
     {
-        PrivateKey::fromWif('50akdglashdgkjadsl');
+        PrivateKeyFactory::fromWif('50akdglashdgkjadsl');
     }
 }

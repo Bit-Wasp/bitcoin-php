@@ -6,6 +6,7 @@ use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Math\Math;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -58,6 +59,62 @@ class PublicKey implements PublicKeyInterface
     }
 
     /**
+     * @param Buffer $publicKey
+     * @return bool
+     */
+    public static function isCompressedOrUncompressed(Buffer $publicKey)
+    {
+        $vchPubKey = $publicKey->serialize();
+        if ($publicKey->getSize() < 33) {
+            return false;
+        }
+
+        if (ord($vchPubKey[0]) == 0x04) {
+            if ($publicKey->getSize() != 65) {
+                // Invalid length for uncompressed key
+                return false;
+            }
+        } elseif (in_array($vchPubKey[0], array(
+            PublicKey::KEY_COMPRESSED_EVEN,
+            PublicKey::KEY_COMPRESSED_ODD))) {
+            if ($publicKey->getSize() != 33) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Compress a point
+     *
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    public static function compress($data)
+    {
+        if ($data instanceof \Mdanter\Ecc\PointInterface) {
+            $point = $data;
+        } elseif ($data instanceof PublicKeyInterface) {
+            $point = $data->getPoint();
+        } else {
+            throw new \Exception('Parameter to compress() must be a PointInterface or PublicKeyInterface');
+        }
+
+        $byte  = self::getCompressedPrefix($point);
+        $xHex  = Bitcoin::getMath()->decHex($point->getX());
+
+        return sprintf(
+            "%s%s",
+            $byte,
+            str_pad($xHex, 64, '0', STR_PAD_LEFT)
+        );
+    }
+
+    /**
      * Return the prefix for an address, based on the point.
      *
      * @param PointInterface $point
@@ -103,58 +160,6 @@ class PublicKey implements PublicKeyInterface
         return false;
     }
 
-    public static function isCompressedOrUncompressed(Buffer $publicKey)
-    {
-        $vchPubKey = $publicKey->serialize();
-        if ($publicKey->getSize() < 33) {
-            return false;
-        }
-
-        if (ord($vchPubKey[0]) == 0x04) {
-            if ($publicKey->getSize() != 65) {
-                // Invalid length for uncompressed key
-                return false;
-            }
-        } elseif (in_array($vchPubKey[0], array(
-                PublicKey::KEY_COMPRESSED_EVEN,
-                PublicKey::KEY_COMPRESSED_ODD))) {
-            if ($publicKey->getSize() != 33) {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Compress a point
-     *
-     * @param $data
-     * @return string
-     * @throws \Exception
-     */
-    public static function compress($data)
-    {
-        if ($data instanceof \Mdanter\Ecc\PointInterface) {
-            $point = $data;
-        } elseif ($data instanceof PublicKeyInterface) {
-            $point = $data->getPoint();
-        } else {
-            throw new \Exception('Parameter to compress() must be a PointInterface or PublicKeyInterface');
-        }
-
-        $byte  = self::getCompressedPrefix($point);
-        $xHex  = Bitcoin::getMath()->decHex($point->getX());
-
-        return sprintf(
-            "%s%s",
-            $byte,
-            str_pad($xHex, 64, '0', STR_PAD_LEFT)
-        );
-    }
-
     /**
      * Recover Y from X and a parity byte
      * @param $xCoord
@@ -188,11 +193,11 @@ class PublicKey implements PublicKeyInterface
             // Depending on the byte, we expect the Y value to be even or odd.
             // We only calculate the second y root if it's needed.
             if ($byte == PublicKey::KEY_COMPRESSED_EVEN) {
-                $yCoord = ($math->mod($root0, 2) == '0')
+                $yCoord = ($math->isEven($root0))
                     ? $root0
                     : $math->sub($curve->getPrime(), $root0);
             } else {
-                $yCoord = ($math->mod($root0, 2) !== '0')
+                $yCoord = (!$math->isEven($root0))
                     ? $root0
                     : $math->sub($curve->getPrime(), $root0);
             }
@@ -204,39 +209,14 @@ class PublicKey implements PublicKeyInterface
     }
 
     /**
-     * Generate public key from Hex
-     *
-     * @param $hex
-     * @param GeneratorPoint $generator
-     * @return PublicKey
-     * @throws \Exception
+     * @return string
      */
-    public static function fromHex($hex, GeneratorPoint $generator = null)
+    public function toHex()
     {
-        $byte = substr($hex, 0, 2);
-
-        $generator = Bitcoin::getGenerator();
-        $math      = Bitcoin::getMath();
-
-        if (strlen($hex) == PublicKey::LENGTH_COMPRESSED) {
-            $compressed = true;
-            $xCoord = $math->hexDec(substr($hex, 2, 64));
-            $yCoord = self::recoverYfromX($xCoord, $byte, $generator);
-
-        } elseif (strlen($hex) == PublicKey::LENGTH_UNCOMPRESSED) {
-            $compressed = false;
-            $xCoord = $math->hexDec(substr($hex, 2, 64));
-            $yCoord = $math->hexDec(substr($hex, 66, 64));
-
-        } else {
-            throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
-        }
-
-        $point = new Point($generator, $xCoord, $yCoord);
-
-        return new self($point, $compressed);
+        $serializer = new HexPublicKeySerializer($this->math, Bitcoin::getGenerator());
+        $hex = $serializer->serialize($this);
+        return $hex;
     }
-
 
     /**
      * Serialize this according to requested type
@@ -246,7 +226,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function serialize($type = null)
     {
-        $hex = $this->getPubKeyHex();
+        $hex = $this->toHex();
 
         if ($type == 'hex') {
             return $hex;
@@ -255,7 +235,6 @@ class PublicKey implements PublicKeyInterface
         return pack("H*", $hex);
     }
 
-
     /**
      * Return the hex representation of the public key
      *
@@ -263,7 +242,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function __toString()
     {
-        return $this->getPubKeyHex();
+        return $this->toHex();
     }
 
     /**
@@ -275,7 +254,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function getSize($type = null)
     {
-        $hex = $this->getPubKeyHex();
+        $hex = $this->toHex();
 
         if ($type == 'hex') {
             return strlen($hex);

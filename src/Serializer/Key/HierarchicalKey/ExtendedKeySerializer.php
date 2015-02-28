@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Serializer\Key\HierarchicalKey;
+namespace Afk11\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use Afk11\Bitcoin\NetworkInterface;
 use Afk11\Bitcoin\Base58;
@@ -27,7 +27,7 @@ class ExtendedKeySerializer
      */
     public function serialize(HierarchicalKey $key)
     {
-        $bytes = $this->hexSerializer->serialize($this->hexSerializer->getNetwork(), $key);
+        $bytes = $this->hexSerializer->serialize($key);
         $base58 = Base58::encodeCheck($bytes);
         return $base58;
     }
@@ -42,8 +42,7 @@ class ExtendedKeySerializer
     public function parse($base58)
     {
         $payload = Base58::decodeCheck($base58);
-        $hierarchicalKey = $this->hexSerializer->parse($this->hexSerializer->getNetwork(), $payload);
+        $hierarchicalKey = $this->hexSerializer->parse($payload);
         return $hierarchicalKey;
     }
-
 }

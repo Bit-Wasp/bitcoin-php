@@ -1,19 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 25/02/15
- * Time: 14:14
- */
 
-namespace Afk11\Serializer\Key\HierarchicalKey;
+
+namespace Afk11\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
 use Afk11\Bitcoin\Key\PublicKeyFactory;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\NetworkInterface;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Key\HierarchicalKey;
+use Mdanter\Ecc\GeneratorPoint;
 
 class HexExtendedKeySerializer
 {
@@ -24,8 +21,9 @@ class HexExtendedKeySerializer
 
     /**
      * @param NetworkInterface $network
+     * @throws \Exception
      */
-    public function __construct(NetworkInterface $network)
+    public function __construct(Math $math, GeneratorPoint $generator, NetworkInterface $network)
     {
         try {
             $network->getHDPrivByte();
@@ -33,10 +31,26 @@ class HexExtendedKeySerializer
         } catch (\Exception $e) {
             throw new \Exception('Network not configured for HD wallets');
         }
-
+        $this->math = $math;
+        $this->generator = $generator;
         $this->network = $network;
     }
 
+    /**
+     * @return Math
+     */
+    public function getMath()
+    {
+        return $this->math;
+    }
+
+    /**
+     * @return GeneratorPoint
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
+    }
     /**
      * @return NetworkInterface
      */
@@ -51,20 +65,23 @@ class HexExtendedKeySerializer
      */
     public function serialize(HierarchicalKey $key)
     {
-        $keydata = $key->getKeyData();
+        list ($prefix, $keyData) = $key->isPrivate()
+            ? array($this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->toHex())
+            : array($this->network->getHDPubByte(), $key->getPublicKey()->toHex());
 
         $bytes = new Parser();
         $bytes
-            ->writeBytes(4, $this->network->getHDPrivByte())
+            ->writeBytes(4, $prefix)
             ->writeInt(1, $key->getDepth())
             ->writeBytes(4, $key->getFingerprint())
             ->writeInt(4, $key->getSequence())
             ->writeBytes(32, $key->getChainCode()->serialize('hex'))
-            ->writeBytes(33, $keydata);
+            ->writeBytes(33, $keyData);
 
         $hex = $bytes
             ->getBuffer()
             ->serialize('hex');
+        echo "Serialize: [$hex]\n";
 
         return $hex;
     }
@@ -76,7 +93,7 @@ class HexExtendedKeySerializer
      * @throws ParserOutOfRange
      * @throws \Exception
      */
-    public function parse($network, $hex)
+    public function parse($hex)
     {
         if (strlen($hex) !== 156) {
             throw new \Exception('Invalid extended key');
@@ -95,17 +112,20 @@ class HexExtendedKeySerializer
                 );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract extended key from parser');
+
         }
 
         // Key data from original extended key is saved for serializing later
-        if ($network->getHDPrivByte() == $bytes) {
+        if ($this->network->getHDPrivByte() == $bytes) {
             $keyData = substr($keyData->serialize('hex'), 2);
             $key = PrivateKeyFactory::fromHex($keyData)->setCompressed(true);
         } else {
             $key = PublicKeyFactory::fromHex($keyData);
         }
 
-        $hd = new HierarchicalKey($depth, $parentFingerprint, $sequence, $chainCode, $key);
+        echo "PARSE: [$bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData]\n";
+
+        $hd = new HierarchicalKey($this->math, $this->generator, $depth, $parentFingerprint, $sequence, $chainCode, $key);
 
         return $hd;
     }

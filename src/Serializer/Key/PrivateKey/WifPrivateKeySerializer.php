@@ -64,14 +64,15 @@ class WifPrivateKeySerializer
         // [2 bytes, <either 32 or 33>, 4 bytes
         $payload = Base58::decodeCheck($wif);
 
-        $hex = substr($payload, 2, (strlen($payload)-8-2));
+        $hex = substr($payload, 2);
         $hexLen = strlen($hex);
 
-        if ($hexLen !== 64 || $hexLen !== 66) {
+        if ($hexLen !== 64 && $hexLen !== 66) {
             throw new InvalidPrivateKey("Private key should be always be 32 or 33 bytes (depending on if it's compressed)");
         }
 
-        $private = $this->hexSerializer->parse($hex);
+        $key = substr($hex, 0, 64);
+        $private = $this->hexSerializer->parse($key);
         $private->setCompressed(strlen($hex) === 66);
 
         return $private;
