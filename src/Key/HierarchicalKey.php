@@ -18,16 +18,6 @@ use Mdanter\Ecc\MathAdapterInterface;
 class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
 {
     /**
-     * @var PrivateKey
-     */
-    protected $privateKey;
-
-    /**
-     * @var PublicKey
-     */
-    protected $publicKey;
-
-    /**
      * @var \Mdanter\Ecc\GeneratorPoint
      */
     protected $generator;
@@ -73,38 +63,25 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     protected $math;
 
     /**
-     * @var bool
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @param $depth
+     * @param $parentFingerprint
+     * @param $sequence
+     * @param Buffer $chainCode
+     * @param KeyInterface $key
      */
-    protected $private = false;
-
-    /**
-     * @param $bytes
-     * @param NetworkInterface $network
-     * @throws ParserOutOfRange
-     * @throws \Exception
-     */
-    //public function __construct($bytes, NetworkInterface $network)
     public function __construct(Math $math, GeneratorPoint $generator, $depth, $parentFingerprint, $sequence, Buffer $chainCode, KeyInterface $key)
     {
         $this->math = $math;
         $this->generator = $generator;
         $this->depth = $depth;
-        $this->parentFingerprint = $parentFingerprint;
         $this->sequence = $sequence;
+        $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
 
-        if ($key->isPrivate()) {
-            echo "create priv";
-            $this->privateKey = $key;
-            $this->private = true;
-            $keyData = '00' . $this->getPrivateKey()->toHex();
-        } else {
-            echo "create pub";
-            $this->publicKey = $key;
-            $keyData = $this->getPublicKey()->toHex();
-        }
-
-        $this->keyData = Buffer::hex($keyData);
+        $key->setCompressed(true);
+        $this->key = $key;
     }
 
     /**
@@ -166,27 +143,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     }
 
     /**
-     * Return the network bytes for the current extended key.
-     *
-     * @return string
-     */
-    public function getBytes()
-    {
-        return $this->bytes;
-    }
-
-    /**
-     * Return the 'key data' portion of the current extended key. This is 33 bytes,
-     * and private keys are prefixed with 1 null byte.
-     *
-     * @return string
-     */
-    public function getKeyData()
-    {
-        return $this->keyData;
-    }
-
-    /**
      * Get the generator point for this curve
      *
      * @return \Mdanter\Ecc\GeneratorPoint
@@ -194,21 +150,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     public function getGenerator()
     {
         return $this->generator;
-    }
-
-    /**
-     * Return the current private key
-     *
-     * @return PrivateKey
-     * @throws \Exception
-     */
-    public function getPrivateKey()
-    {
-        if (!$this->isPrivate()) {
-            throw new \Exception('This is not a private key');
-        }
-
-        return $this->privateKey;
     }
 
     /**
@@ -221,40 +162,47 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     }
 
     /**
+     * @return PrivateKeyInterface
+     */
+    public function getPrivateKey()
+    {
+        if ($this->key->isPrivate()) {
+            return $this->key;
+        }
+
+        throw new \RuntimeException('Unable to get private key, not known');
+    }
+
+    /**
      * Get the public key the private key or public key.
      *
      * @return PublicKey
      */
     public function getPublicKey()
     {
-        try {
-            $public = $this->getPrivateKey()->getPublicKey();
-        } catch (\Exception $e) {
-            $public = $this->publicKey;
-        }
-
-        return $public;
-    }
-
-    /**
-     * @return HierarchicalKey
-     */
-    public function derivePublic()
-    {
         if ($this->isPrivate()) {
-            $this->private = false;
-            $this->privateKey = null;
+            return $this->getPrivateKey()->getPublicKey();
+        } else {
+            return $this->key;
         }
-
-        return $this;
     }
-
     /**
      * @return \Mdanter\Ecc\PointInterface
      */
     public function getPoint()
     {
         return $this->getPublicKey()->getPoint();
+    }
+    /**
+     * @return HierarchicalKey
+     */
+    public function toPublic()
+    {
+        if ($this->isPrivate()) {
+            $this->key = $this->getPrivateKey()->getPublicKey();
+        }
+
+        return $this;
     }
 
     /**
@@ -319,7 +267,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     public function toExtendedPublicKey(NetworkInterface $network)
     {
         $clone = clone($this);
-        return $clone->derivePublic()->toExtendedKey($network);
+        return $clone->toPublic()->toExtendedKey($network);
     }
 
     /**
@@ -340,7 +288,8 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      */
     public function isPrivate()
     {
-        return $this->private == true;
+        return $this->key->isPrivate();
+        //return $this->key implements PrivateKeyInterface;
     }
 
     /**
@@ -356,10 +305,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
 
 
 
-
-
-
-
     /**
      * Serialize a key into 'hex', or a byte string by default
      *
@@ -368,6 +313,8 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      */
     public function serialize($type = null)
     {
+        $keydata = ($this->isPrivate() ? '00' : '') . $this->key->toHex();
+
         $bytes = new Parser();
         $bytes = $bytes
             ->writeBytes(4, $this->getBytes())
@@ -375,7 +322,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             ->writeBytes(4, $this->getFingerprint())
             ->writeInt(4, $this->getSequence())
             ->writeBytes(32, $this->getChainCode())
-            ->writeBytes(33, $this->getKeyData())
+            ->writeBytes(33, $keydata)
             ->getBuffer()
             ->serialize($type);
 
@@ -399,14 +346,9 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
         try {
             // can be easily wrapped in a loop that recurses until
             // the desired key is created, without the other stuff.
-            $parser = new Parser();
-            $sequence = $parser
-                ->writeInt(4, $sequence)
-                ->getBuffer();
-
             $data      = $this->getOffsetBuffer($sequence);
             $hash      = Hash::hmac('sha512', $data->serialize(), $chainCode->serialize());
-            list($offsetBuf, $chainCode) = array(
+            list ($offsetBuf, $chainCode) = array(
                 Buffer::hex(substr($hash, 0, 64)),
                 Buffer::hex(substr($hash, 64, 64)),
             );
@@ -425,7 +367,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             $this->generator,
             $this->getDepth()+1,
             $this->getChildFingerprint(),
-            $sequence->serialize('hex'),
+            $sequence,
             $chainCode,
             $key
         );
@@ -440,10 +382,10 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @return \Afk11\Bitcoin\Buffer
      * @throws \Exception
      */
-    public function getOffsetBuffer(Buffer $sequence)
+    public function getOffsetBuffer($sequence)
     {
         $parser   = new Parser();
-        $hardened = $this->math->cmp($sequence->serialize('int'), $this->math->hexDec('80000000')) >= 0;
+        $hardened = $this->math->cmp($sequence, $this->math->hexDec('80000000')) >= 0;
 
         if ($hardened) {
             if ($this->isPrivate() === false) {
@@ -459,7 +401,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
         }
 
         return $parser
-            ->writeBytes(4, $sequence->serialize('hex'))
+            ->writeInt(4, $sequence)
             ->getBuffer();
     }
 
@@ -491,7 +433,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
                     ->getGenerator()
                     ->mul(
                         $offset->serialize('int')
-                        )
+                    )
                         // Add it to the public key
                         ->add(
                             $this->getPublicKey()->getPoint()
@@ -510,12 +452,10 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      */
     public function decodePath($path)
     {
-        $array = explode("/", $path);
-        foreach ($array as $c => &$int) {
-            if ($c == 0) {
-                continue;
-            }
+        $pathPieces = explode("/", $path);
+        $newPath = array();
 
+        foreach ($pathPieces as $c => $int) {
             $hardened = false;
 
             if (in_array(substr(strtolower($int), -1), array("h", "'")) === true) {
@@ -525,14 +465,13 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             }
 
             if ($hardened) {
-                $int = ((int)$this->math->hexDec('80000000')) + ((int)$int);
-            } else {
-                $int = (int)$int;
+                $int = $this->math->add($this->math->hexdec('80000000'), $int);
             }
+
+            $newPath[] = $int;
         }
 
-        $path = implode("/", $array);
-
+        $path = implode("/", $newPath);
         return $path;
     }
 }

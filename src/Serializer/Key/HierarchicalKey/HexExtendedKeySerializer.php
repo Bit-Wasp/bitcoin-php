@@ -31,6 +31,7 @@ class HexExtendedKeySerializer
         } catch (\Exception $e) {
             throw new \Exception('Network not configured for HD wallets');
         }
+
         $this->math = $math;
         $this->generator = $generator;
         $this->network = $network;
@@ -65,7 +66,7 @@ class HexExtendedKeySerializer
      */
     public function serialize(HierarchicalKey $key)
     {
-        list ($prefix, $keyData) = $key->isPrivate()
+        list ($prefix, $data) = ($key->isPrivate())
             ? array($this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->toHex())
             : array($this->network->getHDPubByte(), $key->getPublicKey()->toHex());
 
@@ -76,12 +77,11 @@ class HexExtendedKeySerializer
             ->writeBytes(4, $key->getFingerprint())
             ->writeInt(4, $key->getSequence())
             ->writeBytes(32, $key->getChainCode()->serialize('hex'))
-            ->writeBytes(33, $keyData);
+            ->writeBytes(33, $data);
 
         $hex = $bytes
             ->getBuffer()
             ->serialize('hex');
-        echo "Serialize: [$hex]\n";
 
         return $hex;
     }
@@ -101,7 +101,7 @@ class HexExtendedKeySerializer
 
         try {
             $parser = new Parser($hex);
-            list($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) =
+            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) =
                 array(
                     $parser->readBytes(4)->serialize('hex'),
                     $parser->readBytes(1)->serialize('int'),
@@ -112,18 +112,11 @@ class HexExtendedKeySerializer
                 );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract extended key from parser');
-
         }
 
-        // Key data from original extended key is saved for serializing later
-        if ($this->network->getHDPrivByte() == $bytes) {
-            $keyData = substr($keyData->serialize('hex'), 2);
-            $key = PrivateKeyFactory::fromHex($keyData)->setCompressed(true);
-        } else {
-            $key = PublicKeyFactory::fromHex($keyData);
-        }
-
-        echo "PARSE: [$bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData]\n";
+        $key = ($this->network->getHDPrivByte() == $bytes)
+            ? PrivateKeyFactory::fromHex(substr($keyData, 2))->setCompressed(true)
+            : PublicKeyFactory::fromHex($keyData);
 
         $hd = new HierarchicalKey($this->math, $this->generator, $depth, $parentFingerprint, $sequence, $chainCode, $key);
 

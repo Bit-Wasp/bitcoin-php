@@ -17,8 +17,13 @@ use Mdanter\Ecc\GeneratorPoint;
 
 class HierarchicalKeyFactory
 {
-
-    public static function generateMasterKey(NetworkInterface $network, Math $math = null, GeneratorPoint $generator = null)
+    /**
+     * @param NetworkInterface $network
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @return HierarchicalKey
+     */
+    public static function generateMasterKey(Math $math = null, GeneratorPoint $generator = null)
     {
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
@@ -28,6 +33,12 @@ class HierarchicalKeyFactory
         return $private;
     }
 
+    /**
+     * @param $entropy
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @return HierarchicalKey
+     */
     public static function fromEntropy($entropy, Math $math = null, GeneratorPoint $generator = null)
     {
         $math = $math ?: Bitcoin::getMath();
@@ -51,9 +62,9 @@ class HierarchicalKeyFactory
      * @return HierarchicalKey
      * @throws Base58ChecksumFailure
      */
-    public static function fromExtended($extendedKey, NetworkInterface $network = null, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromExtended($extendedKey, NetworkInterface $network, Math $math = null, GeneratorPoint $generator = null)
     {
-        $network = $network ?: Bitcoin::getNetwork();
+        //$network = $network ?: Bitcoin::getNetwork();
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
 

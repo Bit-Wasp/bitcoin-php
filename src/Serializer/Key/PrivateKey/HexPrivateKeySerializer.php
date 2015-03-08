@@ -46,7 +46,6 @@ class HexPrivateKeySerializer
      */
     public function parse($string)
     {
-        // todo detect hex characters
         $multiplier = $this->math->hexDec($string);
         $privateKey = new PrivateKey($this->math, $this->generator, $multiplier, false);
         return $privateKey;

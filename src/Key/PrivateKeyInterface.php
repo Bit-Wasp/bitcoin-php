@@ -2,10 +2,6 @@
 
 namespace Afk11\Bitcoin\Key;
 
-use Afk11\Bitcoin\NetworkInterface;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Signature\K\KInterface;
-
 interface PrivateKeyInterface extends KeyInterface
 {
 
