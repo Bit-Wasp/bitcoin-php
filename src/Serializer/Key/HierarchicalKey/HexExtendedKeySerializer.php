@@ -74,7 +74,7 @@ class HexExtendedKeySerializer
         $bytes
             ->writeBytes(4, $prefix)
             ->writeInt(1, $key->getDepth())
-            ->writeBytes(4, $key->getFingerprint())
+            ->writeInt(4, $key->getFingerprint())
             ->writeInt(4, $key->getSequence())
             ->writeBytes(32, $key->getChainCode()->serialize('hex'))
             ->writeBytes(33, $data);
@@ -105,7 +105,7 @@ class HexExtendedKeySerializer
                 array(
                     $parser->readBytes(4)->serialize('hex'),
                     $parser->readBytes(1)->serialize('int'),
-                    $parser->readBytes(4)->serialize('hex'),
+                    $parser->readBytes(4)->serialize('int'),
                     $parser->readBytes(4)->serialize('int'),
                     $parser->readBytes(32),
                     $parser->readBytes(33)

@@ -170,14 +170,14 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     {
         $key       = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $this->key = HierarchicalKeyFactory::fromExtended($key, $this->network);
-        $this->assertSame('615914f3', $this->key->getFingerprint());
+        $this->assertSame(Bitcoin::getMath()->hexDec('615914f3'), $this->key->getFingerprint());
     }
 
     public function testGetChildFingerprint()
     {
         $key       = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $this->key = HierarchicalKeyFactory::fromExtended($key, $this->network);
-        $this->assertSame('a282920f', $this->key->getChildFingerprint());
+        $this->assertSame(Bitcoin::getMath()->hexDec('a282920f'), $this->key->getChildFingerprint());
     }
 
     public function testGetPrivateKey()

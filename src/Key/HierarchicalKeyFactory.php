@@ -46,7 +46,7 @@ class HierarchicalKeyFactory
 
         $hash = Hash::hmac('sha512', pack("H*", $entropy), "Bitcoin seed");
         $depth = 0;
-        $parentFingerprint = Buffer::hex('00000000');
+        $parentFingerprint = 0;
         $sequence = 0;
         $chainCode = Buffer::hex(substr($hash, 64, 64));
         $private = PrivateKeyFactory::fromHex(substr($hash, 0, 64));

@@ -114,7 +114,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     public function getFingerprint()
     {
         if ($this->getDepth() == 0) {
-            return '00000000';
+            return 0;
         }
 
         return $this->parentFingerprint;
@@ -127,7 +127,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     public function getChildFingerprint()
     {
         $hash        = $this->getPublicKey()->getPubKeyHash();
-        $fingerprint = substr($hash, 0, 8);
+        $fingerprint = $this->math->hexDec(substr($hash, 0, 8));
         return $fingerprint;
     }
 
