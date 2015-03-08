@@ -302,33 +302,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
         return $this->math->cmp($this->getSequence(), $this->math->hexDec('80000000')) >= 0;
     }
 
-
-
-
-    /**
-     * Serialize a key into 'hex', or a byte string by default
-     *
-     * @param null $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $keydata = ($this->isPrivate() ? '00' : '') . $this->key->toHex();
-
-        $bytes = new Parser();
-        $bytes = $bytes
-            ->writeBytes(4, $this->getBytes())
-            ->writeInt(1, $this->getDepth())
-            ->writeBytes(4, $this->getFingerprint())
-            ->writeInt(4, $this->getSequence())
-            ->writeBytes(32, $this->getChainCode())
-            ->writeBytes(33, $keydata)
-            ->getBuffer()
-            ->serialize($type);
-
-        return $bytes;
-    }
-
     /**
      * Derive a child key
      *
@@ -336,9 +309,8 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @return HierarchicalKey
      * @throws \Exception
      */
-    public function deriveChild($sequence, NetworkInterface $network = null)
+    public function deriveChild($sequence)
     {
-        $network = $network ?: Bitcoin::getNetwork();
 
         // Generate offset
         $chainCode = $this->getChainCode();
@@ -356,8 +328,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
 
         } catch (InvalidPrivateKey $e) {
             // Invalid keys should trigger recursion.. 1:1^128
-            $newSequence = (int)$sequence->serialize('int') + 1;
-            return $this->deriveChild($newSequence);
+            return $this->deriveChild(++$sequence);
         } catch (\Exception $e) {
             throw $e;
         }
