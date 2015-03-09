@@ -2,8 +2,6 @@
 
 namespace Afk11\Bitcoin\Key;
 
-use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use \Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
@@ -188,6 +186,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             return $this->key;
         }
     }
+    
     /**
      * @return \Mdanter\Ecc\PointInterface
      */
@@ -195,6 +194,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     {
         return $this->getPublicKey()->getPoint();
     }
+
     /**
      * @return HierarchicalKey
      */
@@ -291,7 +291,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     public function isPrivate()
     {
         return $this->key->isPrivate();
-        //return $this->key implements PrivateKeyInterface;
     }
 
     /**
@@ -320,15 +319,15 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
         try {
             // can be easily wrapped in a loop that recurses until
             // the desired key is created, without the other stuff.
-            $data      = $this->getOffsetBuffer($sequence);
-            $hash      = Hash::hmac('sha512', $data->serialize(), pack("H*", $chainHex));
+            $data = $this->getHmacSeed($sequence);
+            $hash = Hash::hmac('sha512', $data->serialize(), pack("H*", $chainHex));
 
-            list ($offsetBuf, $chainHex) = array(
-                Buffer::hex(substr($hash, 0, 64)),
+            list ($offset, $chainHex) = array(
+                $this->math->hexDec(substr($hash, 0, 64)),
                 substr($hash, 64, 64),
             );
 
-            $key       = $this->getKeyFromOffset($offsetBuf);
+            $key = KeyFactory::fromKeyAndOffset($this->key, $offset, $this->math, $this->generator);
 
         } catch (InvalidPrivateKey $e) {
             // Invalid keys should trigger recursion.. 1:1^128
@@ -357,7 +356,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @return \Afk11\Bitcoin\Buffer
      * @throws \Exception
      */
-    public function getOffsetBuffer($sequence)
+    public function getHmacSeed($sequence)
     {
         $parser   = new Parser();
         $hardened = $this->math->cmp($sequence, $this->math->hexDec('80000000')) >= 0;
@@ -380,42 +379,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             ->getBuffer();
     }
 
-    /**
-     * Create a key when given an offset buffer. This returns either a public
-     * or private key depending on the current key type.
-     *
-     * @param $offset
-     * @return PrivateKey|PublicKey
-     * @throws \Exception
-     */
-    public function getKeyFromOffset(Buffer $offset)
-    {
-        $key = $this->isPrivate()
-            ? PrivateKeyFactory::fromInt(
-                $this->math->mod(
-                    $this->math->add(
-                        $this->math->hexDec($offset->serialize('hex')),
-                        $this->getPrivateKey()->getSecretMultiplier()
-                    ),
-                    $this->getGenerator()->getOrder()
-                ),
-                true
-            )
-            : new PublicKey(
-                $this // Get the EC point for this offset
-                ->getGenerator()
-                    ->mul(
-                        $offset->serialize('int')
-                    )
-                // Add it to the public key
-                    ->add(
-                        $this->getPublicKey()->getPoint()
-                    ),
-                true
-            );
-
-        return $key;
-    }
 
     /**
      * Decodes a BIP32 path: ie, m/0/1'/2/3' -> m/0/2147483649/2/2147483651
