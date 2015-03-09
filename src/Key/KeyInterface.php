@@ -24,4 +24,9 @@ interface KeyInterface
      * @return bool
      */
     public function isPrivate();
+
+    /**
+     * @return mixed
+     */
+    public function toHex();
 }

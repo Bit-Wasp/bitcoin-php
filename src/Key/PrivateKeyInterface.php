@@ -2,6 +2,8 @@
 
 namespace Afk11\Bitcoin\Key;
 
+use Afk11\Bitcoin\NetworkInterface;
+
 interface PrivateKeyInterface extends KeyInterface
 {
 
@@ -16,4 +18,10 @@ interface PrivateKeyInterface extends KeyInterface
      * @return PublicKeyInterface
      */
     public function getPublicKey();
+
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     */
+    public function toWif(NetworkInterface $network);
 }

@@ -66,8 +66,9 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @param $depth
      * @param $parentFingerprint
      * @param $sequence
-     * @param Buffer $chainCode
+     * @param $chainCode
      * @param KeyInterface $key
+     * @throws \Exception
      */
     public function __construct(Math $math, GeneratorPoint $generator, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
     {
@@ -186,7 +187,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             return $this->key;
         }
     }
-    
+
     /**
      * @return \Mdanter\Ecc\PointInterface
      */
@@ -353,7 +354,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * Create a buffer containing data to be hashed hashed to yield the child offset
      *
      * @param Buffer $sequence
-     * @return \Afk11\Bitcoin\Buffer
+     * @return Buffer
      * @throws \Exception
      */
     public function getHmacSeed($sequence)
@@ -368,10 +369,10 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
 
             $parser
                 ->writeBytes(1, '00')
-                ->writeBytes(32, $this->getPrivateKey()->serialize('hex'));
+                ->writeBytes(32, $this->getPrivateKey()->toHex());
 
         } else {
-            $parser->writeBytes(33, $this->getPublicKey()->serialize('hex'));
+            $parser->writeBytes(33, $this->getPublicKey()->toHex());
         }
 
         return $parser
