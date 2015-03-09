@@ -28,7 +28,7 @@ class HierarchicalKeyFactory
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
 
-        $buffer  = PrivateKeyFactory::generate();
+        $buffer  = PrivateKeyFactory::generate(true, $math, $generator);
         $private = self::fromEntropy($buffer->serialize('hex'));
         return $private;
     }
@@ -48,7 +48,8 @@ class HierarchicalKeyFactory
         $depth = 0;
         $parentFingerprint = 0;
         $sequence = 0;
-        $chainCode = Buffer::hex(substr($hash, 64, 64));
+        $chainCode = $math->hexDec(substr($hash, 64, 64));
+
         $private = PrivateKeyFactory::fromHex(substr($hash, 0, 64));
 
         $key = new HierarchicalKey($math, $generator, $depth, $parentFingerprint, $sequence, $chainCode, $private);

@@ -43,7 +43,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     protected $sequence;
 
     /**
-     * @var Buffer
+     * @var int
      */
     protected $chainCode;
 
@@ -71,7 +71,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @param Buffer $chainCode
      * @param KeyInterface $key
      */
-    public function __construct(Math $math, GeneratorPoint $generator, $depth, $parentFingerprint, $sequence, Buffer $chainCode, KeyInterface $key)
+    public function __construct(Math $math, GeneratorPoint $generator, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
     {
         $this->math = $math;
         $this->generator = $generator;
@@ -79,7 +79,6 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
         $this->sequence = $sequence;
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
-
         $key->setCompressed(true);
         $this->key = $key;
     }
@@ -311,19 +310,21 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      */
     public function deriveChild($sequence)
     {
-
         // Generate offset
-        $chainCode = $this->getChainCode();
+
+        $chainHex = str_pad($this->math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
 
         try {
             // can be easily wrapped in a loop that recurses until
             // the desired key is created, without the other stuff.
             $data      = $this->getOffsetBuffer($sequence);
-            $hash      = Hash::hmac('sha512', $data->serialize(), $chainCode->serialize());
-            list ($offsetBuf, $chainCode) = array(
+
+            $hash      = Hash::hmac('sha512', $data->serialize(), pack("H*", $chainHex));
+            list ($offsetBuf, $chainHex) = array(
                 Buffer::hex(substr($hash, 0, 64)),
-                Buffer::hex(substr($hash, 64, 64)),
+                substr($hash, 64, 64),
             );
+
             $key       = $this->getKeyFromOffset($offsetBuf);
 
         } catch (InvalidPrivateKey $e) {
@@ -339,7 +340,7 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             $this->getDepth()+1,
             $this->getChildFingerprint(),
             $sequence,
-            $chainCode,
+            $this->math->hexDec($chainHex),
             $key
         );
 

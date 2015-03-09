@@ -76,7 +76,7 @@ class HexExtendedKeySerializer
             ->writeInt(1, $key->getDepth())
             ->writeInt(4, $key->getFingerprint())
             ->writeInt(4, $key->getSequence())
-            ->writeBytes(32, $key->getChainCode()->serialize('hex'))
+            ->writeInt(32, $key->getChainCode())
             ->writeBytes(33, $data);
 
         $hex = $bytes
@@ -107,7 +107,7 @@ class HexExtendedKeySerializer
                     $parser->readBytes(1)->serialize('int'),
                     $parser->readBytes(4)->serialize('int'),
                     $parser->readBytes(4)->serialize('int'),
-                    $parser->readBytes(32),
+                    $parser->readBytes(32)->serialize('int'),
                     $parser->readBytes(33)
                 );
         } catch (ParserOutOfRange $e) {
