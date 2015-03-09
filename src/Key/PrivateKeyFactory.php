@@ -36,10 +36,11 @@ class PrivateKeyFactory
      * @param GeneratorPoint $generator
      * @return PrivateKey
      */
-    public static function fromInt($int, $compressed = true, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromInt($int, $compressed = false, Math $math = null, GeneratorPoint $generator = null)
     {
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
+
         $privateKey = new PrivateKey($math, $generator, $int, $compressed);
         return $privateKey;
     }
@@ -50,10 +51,11 @@ class PrivateKeyFactory
      * @param GeneratorPoint $generator
      * @return PrivateKey
      */
-    public static function generate($compressed = true, Math $math = null, GeneratorPoint $generator = null)
+    public static function generate($compressed = false, Math $math = null, GeneratorPoint $generator = null)
     {
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
+
         $secret = self::generateSecret();
         return self::fromInt($secret->serialize('int'), $compressed, $math, $generator);
     }
@@ -69,6 +71,7 @@ class PrivateKeyFactory
     {
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
+
         $wifSerializer = new WifPrivateKeySerializer($math, new HexPrivateKeySerializer($math, $generator));
         $privateKey = $wifSerializer->parse($wif);
 
@@ -77,16 +80,19 @@ class PrivateKeyFactory
 
     /**
      * @param $hex
+     * @param bool $compressed
      * @param Math $math
      * @param GeneratorPoint $generator
-     * @return PrivateKey
+     * @return $this
      */
-    public static function fromHex($hex, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromHex($hex, $compressed = false, Math $math = null, GeneratorPoint $generator = null)
     {
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
+
         $hexSerializer = new HexPrivateKeySerializer($math, $generator);
-        $privateKey = $hexSerializer->parse($hex);
+        $privateKey = $hexSerializer->parse($hex)->setCompressed($compressed);
+
         return $privateKey;
     }
 }

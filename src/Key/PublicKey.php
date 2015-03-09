@@ -96,7 +96,7 @@ class PublicKey implements PublicKeyInterface
      */
     public static function compress($data)
     {
-        if ($data instanceof \Mdanter\Ecc\PointInterface) {
+        if ($data instanceof PointInterface) {
             $point = $data;
         } elseif ($data instanceof PublicKeyInterface) {
             $point = $data->getPoint();
@@ -120,7 +120,7 @@ class PublicKey implements PublicKeyInterface
      * @param PointInterface $point
      * @return string
      */
-    public static function getCompressedPrefix(\Mdanter\Ecc\PointInterface $point)
+    public static function getCompressedPrefix(PointInterface $point)
     {
         return Bitcoin::getMath()->isEven($point->getY())
             ? PublicKey::KEY_COMPRESSED_EVEN

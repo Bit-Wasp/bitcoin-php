@@ -73,13 +73,16 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      */
     public function __construct(Math $math, GeneratorPoint $generator, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
     {
+        if (!$key->isCompressed()) {
+            throw new \Exception('A HierarchicalKey must always be compressed');
+        }
+
         $this->math = $math;
         $this->generator = $generator;
         $this->depth = $depth;
         $this->sequence = $sequence;
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
-        $key->setCompressed(true);
         $this->key = $key;
     }
 
@@ -318,8 +321,8 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
             // can be easily wrapped in a loop that recurses until
             // the desired key is created, without the other stuff.
             $data      = $this->getOffsetBuffer($sequence);
-
             $hash      = Hash::hmac('sha512', $data->serialize(), pack("H*", $chainHex));
+
             list ($offsetBuf, $chainHex) = array(
                 Buffer::hex(substr($hash, 0, 64)),
                 substr($hash, 64, 64),
@@ -385,33 +388,31 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @return PrivateKey|PublicKey
      * @throws \Exception
      */
-    public function getKeyFromOffset($offset)
+    public function getKeyFromOffset(Buffer $offset)
     {
         $key = $this->isPrivate()
-            ? new PrivateKey(
-                $this->math,
-                $this->generator,
+            ? PrivateKeyFactory::fromInt(
                 $this->math->mod(
                     $this->math->add(
                         $this->math->hexDec($offset->serialize('hex')),
-                        $this->getPrivateKey()->serialize('int')
+                        $this->getPrivateKey()->getSecretMultiplier()
                     ),
                     $this->getGenerator()->getOrder()
-                )
+                ),
+                true
             )
-
-                    : new PublicKey(
-                        $this // Get the EC point for this offset
-                    ->getGenerator()
+            : new PublicKey(
+                $this // Get the EC point for this offset
+                ->getGenerator()
                     ->mul(
                         $offset->serialize('int')
                     )
-                        // Add it to the public key
-                        ->add(
-                            $this->getPublicKey()->getPoint()
-                        ),
-                        true
-                    );
+                // Add it to the public key
+                    ->add(
+                        $this->getPublicKey()->getPoint()
+                    ),
+                true
+            );
 
         return $key;
     }

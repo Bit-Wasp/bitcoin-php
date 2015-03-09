@@ -17,6 +17,11 @@ use Mdanter\Ecc\GeneratorPoint;
 
 class HierarchicalKeyFactory
 {
+    private static function masterKey()
+    {
+
+    }
+
     /**
      * @param NetworkInterface $network
      * @param Math $math
@@ -50,7 +55,7 @@ class HierarchicalKeyFactory
         $sequence = 0;
         $chainCode = $math->hexDec(substr($hash, 64, 64));
 
-        $private = PrivateKeyFactory::fromHex(substr($hash, 0, 64));
+        $private = PrivateKeyFactory::fromHex(substr($hash, 0, 64), true);
 
         $key = new HierarchicalKey($math, $generator, $depth, $parentFingerprint, $sequence, $chainCode, $private);
 
