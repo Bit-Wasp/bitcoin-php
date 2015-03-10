@@ -81,6 +81,6 @@ class HexPublicKeySerializer
 
         $point = $this->generator->getCurve()->getPoint($xCoord, $yCoord);
 
-        return new PublicKey($this->math, $point, $compressed);
+        return new PublicKey($this->math, $this->generator, $point, $compressed);
     }
 }

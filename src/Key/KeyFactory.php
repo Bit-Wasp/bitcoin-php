@@ -28,14 +28,14 @@ class KeyFactory
             );
         } else {
             return PublicKeyFactory::fromPoint(
-                $generator // Get the EC point for this offset
+                $generator// Get the EC point for this offset
                 ->mul(
                     $offset
                 )
                 // Add it to the public key
-                ->add(
-                    $key->getPoint()
-                ),
+                    ->add(
+                        $key->getPoint()
+                    ),
                 true,
                 $math,
                 $generator

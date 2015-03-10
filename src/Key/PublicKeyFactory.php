@@ -23,12 +23,19 @@ class PublicKeyFactory
      * @param PointInterface $point
      * @param bool $compressed
      * @param Math $math
+     * @param GeneratorPoint $generator
      * @return PublicKey
      */
-    public static function fromPoint(PointInterface $point, $compressed = false, Math $math = null)
-    {
+    public static function fromPoint(
+        PointInterface $point,
+        $compressed = false,
+        Math $math = null,
+        GeneratorPoint $generator = null
+    ) {
         $math = $math ?: Bitcoin::getMath();
-        $publicKey = new PublicKey($math, $point, $compressed);
+        $generator = $generator ?: Bitcoin::getGenerator();
+
+        $publicKey = new PublicKey($math, $generator, $point, $compressed);
         return $publicKey;
     }
 

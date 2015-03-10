@@ -36,5 +36,4 @@ interface PublicKeyInterface extends KeyInterface
      * @return mixed
      */
     public function getPoint();
-
 }

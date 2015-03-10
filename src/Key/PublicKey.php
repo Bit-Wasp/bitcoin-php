@@ -27,17 +27,27 @@ class PublicKey implements PublicKeyInterface
      * @var bool
      */
     protected $compressed;
+    /**
+     * @var GeneratorPoint
+     */
+    private $generator;
 
     /**
      * @param Math $math
+     * @param GeneratorPoint $generator
      * @param PointInterface $point
      * @param bool $compressed
      */
-    public function __construct(Math $math, \Mdanter\Ecc\PointInterface $point, $compressed = false)
-    {
+    public function __construct(
+        Math $math,
+        GeneratorPoint $generator,
+        \Mdanter\Ecc\PointInterface $point,
+        $compressed = false
+    ) {
         $this->math = $math;
         $this->point = $point;
         $this->compressed = $compressed;
+        $this->generator = $generator;
     }
 
     /**
@@ -213,7 +223,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function toHex()
     {
-        $serializer = new HexPublicKeySerializer($this->math, $this->getPoint()->getCurve());
+        $serializer = new HexPublicKeySerializer($this->math, $this->generator);
         $hex = $serializer->serialize($this);
         return $hex;
     }

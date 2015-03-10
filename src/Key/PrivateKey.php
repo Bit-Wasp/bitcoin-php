@@ -112,7 +112,7 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
     {
         if ($this->publicKey == null) {
             $point = $this->generator->mul($this->getSecretMultiplier());
-            $this->publicKey  = new PublicKey($this->math, $point, $this->compressed);
+            $this->publicKey  = new PublicKey($this->math, $this->generator, $point, $this->compressed);
         }
 
         return $this->publicKey;

@@ -7,7 +7,8 @@ use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Transaction\TransactionInterface;
 
-class TransactionSerializer {
+class TransactionSerializer
+{
 
     public function serialize(TransactionInterface $transaction)
     {
@@ -50,8 +51,7 @@ class TransactionSerializer {
                         ->setTransactionId($parser->readBytes(32, true)->serialize('hex'))
                         ->setVout($parser->readBytes(4)->serialize('int'))
                         ->setScriptBuf($parser->getVarString())
-                        ->setSequence($parser->readBytes(4)->serialize('int')
-                    );
+                        ->setSequence($parser->readBytes(4)->serialize('int'));
                     $input->fromParser($parser);
                     return $input;
                 }
