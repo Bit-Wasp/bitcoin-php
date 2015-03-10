@@ -29,15 +29,15 @@ class PublicKey implements PublicKeyInterface
     protected $compressed;
 
     /**
+     * @param Math $math
      * @param PointInterface $point
      * @param bool $compressed
      */
-    public function __construct(\Mdanter\Ecc\PointInterface $point, $compressed = false)
+    public function __construct(Math $math, \Mdanter\Ecc\PointInterface $point, $compressed = false)
     {
-        $this->math = Bitcoin::getMath();
+        $this->math = $math;
         $this->point = $point;
         $this->compressed = $compressed;
-        return $this;
     }
 
     /**
@@ -213,7 +213,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function toHex()
     {
-        $serializer = new HexPublicKeySerializer($this->math, Bitcoin::getGenerator());
+        $serializer = new HexPublicKeySerializer($this->math, $this->getPoint()->getCurve());
         $hex = $serializer->serialize($this);
         return $hex;
     }

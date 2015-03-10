@@ -79,10 +79,10 @@ class TransactionInputCollection implements \Countable
      *
      * @param int $start
      * @param int $length
-     * @return \Afk11\Bitcoin\Transaction\TransactionOutputCollection
+     * @return \Afk11\Bitcoin\Transaction\TransactionInputCollection
      */
     public function slice($start, $length)
     {
-        return new self(array_slice($this->outputs, $start, $length));
+        return new self(array_slice($this->inputs, $start, $length));
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Afk11\Bitcoin\Key;
 
-use \Afk11\Bitcoin\Bitcoin;
-use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
 

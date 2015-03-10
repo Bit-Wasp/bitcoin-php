@@ -38,21 +38,18 @@ class HexPublicKeySerializer
         $point = $publicKey->getPoint();
 
         if ($publicKey->isCompressed()) {
-            $xHex = $this->math->decHex($point->getX());
-            $hex  = sprintf(
+            $hex = sprintf(
                 "%s%s",
                 PublicKey::getCompressedPrefix($point),
-                str_pad($xHex, 64, '0', STR_PAD_LEFT)
+                str_pad($this->math->decHex($point->getX()), 64, '0', STR_PAD_LEFT)
             );
 
         } else {
-            $xHex = $this->math->decHex($point->getX());
-            $yHex = $this->math->decHex($point->getY());
-            $hex  = sprintf(
+            $hex = sprintf(
                 "%s%s%s",
                 PublicKey::KEY_UNCOMPRESSED,
-                str_pad($xHex, 64, '0', STR_PAD_LEFT),
-                str_pad($yHex, 64, '0', STR_PAD_LEFT)
+                str_pad($this->math->decHex($point->getX()), 64, '0', STR_PAD_LEFT),
+                str_pad($this->math->decHex($point->getY()), 64, '0', STR_PAD_LEFT)
             );
         }
 
@@ -84,6 +81,6 @@ class HexPublicKeySerializer
 
         $point = $this->generator->getCurve()->getPoint($xCoord, $yCoord);
 
-        return new PublicKey($point, $compressed);
+        return new PublicKey($this->math, $point, $compressed);
     }
 }
