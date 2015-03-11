@@ -17,7 +17,7 @@ use \Afk11\Bitcoin\Signature\SignatureHash;
 use \Afk11\Bitcoin\Signature\K\KInterface;
 use Afk11\Bitcoin\Signature\Signer;
 
-class Transaction implements TransactionInterface, SerializableInterface
+class Transaction implements TransactionInterface
 {
     /**
      * @var NetworkInterface

@@ -2,7 +2,9 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
-interface TransactionInterface
+use Afk11\Bitcoin\SerializableInterface;
+
+interface TransactionInterface extends SerializableInterface
 {
 
     const DEFAULT_VERSION = 1;

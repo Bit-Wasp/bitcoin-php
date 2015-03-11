@@ -4,6 +4,7 @@ namespace Afk11\Bitcoin\Serializer\Block;
 
 use Afk11\Bitcoin\Block\Block;
 use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Block\BlockInterface;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
@@ -19,8 +20,9 @@ class HexBlockSerializer
      * @param HexBlockHeaderSerializer $headerSerializer
      * @param TransactionCollectionSerializer $txColSerializer
      */
-    public function __construct(HexBlockHeaderSerializer $headerSerializer, TransactionCollectionSerializer $txColSerializer)
+    public function __construct(Math $math, HexBlockHeaderSerializer $headerSerializer, TransactionCollectionSerializer $txColSerializer)
     {
+        $this->math = $math;
         $this->headerSerializer = $headerSerializer;
         $this->txColSerializer = $txColSerializer;
     }
@@ -33,7 +35,7 @@ class HexBlockSerializer
     public function fromParser(Parser &$parser)
     {
         try {
-            $block = new Block();
+            $block = new Block($this->math);
             $block->setHeader($this->headerSerializer->fromParser($parser));
             $block->setTransactions($this->txColSerializer->fromParser($parser));
         } catch (ParserOutOfRange $e) {
