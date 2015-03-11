@@ -7,13 +7,13 @@ class TransactionCollection implements \Countable
     private $transactions = [];
 
     /**
-     * Initialize a new collection with a list of inputs.
+     * Initialize a new collection with a list of transactions.
      *
-     * @param TransactionInterface[] $inputs
+     * @param TransactionInterface[] $transactions
      */
-    public function __construct(array $inputs = [])
+    public function __construct(array $transactions = [])
     {
-        $this->addTransactions($inputs);
+        $this->addTransactions($transactions);
     }
 
     /**
@@ -27,7 +27,7 @@ class TransactionCollection implements \Countable
     }
 
     /**
-     * Adds a list of inputs to the collection.
+     * Adds a list of transactions to the collection.
      *
      * @param TransactionInterface[] $transactions
      */
@@ -39,7 +39,7 @@ class TransactionCollection implements \Countable
     }
 
     /**
-     * Gets an input at the given index.
+     * Gets an transaction at the given index.
      *
      * @param int $index
      * @throws \OutOfRangeException when $index is less than 0 or greater than the number of transactions.
@@ -55,9 +55,9 @@ class TransactionCollection implements \Countable
     }
 
     /**
-     * Returns all the inputs in the collection.
+     * Returns all the transactions in the collection.
      *
-     * @return TransactionInputInterface[]
+     * @return TransactionInterface[]
      */
     public function getTransactions()
     {

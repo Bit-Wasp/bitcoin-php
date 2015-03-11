@@ -9,28 +9,24 @@ use Afk11\Bitcoin\Transaction\TransactionInterface;
 
 class TransactionSerializer
 {
+    public $inputsSerializer;
+    public $outputsSerializer;
+
+    public function __construct()
+    {
+        $this->inputsSerializer = new TransactionInputCollectionSerializer(new TransactionInputSerializer);
+        $this->outputsSerializer = new TransactionOutputCollectionSerializer(new TransactionOutputSerializer);
+    }
 
     public function serialize(TransactionInterface $transaction)
     {
+        $inputs = $this->inputsSerializer->serialize($transaction->getInputs());
+        $outputs = $this->outputsSerializer->serialize($transaction->getOutputs());
+
         $parser = new Parser();
         $parser->writeInt(4, $transaction->getVersion(), true);
-        foreach ($transaction->getInputs()->getInputs() as $input) {
-            $parser
-                ->writeBytes(32, $input->getTransactionId(), true)
-                ->writeInt(4, $input->getVout())
-                ->writeWithLength(
-                    new Buffer($input->getScript()->serialize())
-                );
-        }
-
-        foreach ($transaction->getOutputs()->getOutputs() as $output) {
-            $parser
-                ->writeInt(8, $output->getValue(), true)
-                ->writeWithLength(
-                    new Buffer($$output->getScript()->serialize())
-                );
-        }
-
+        $parser->writeArray($inputs);
+        $parser->writeArray($outputs);
         $parser->writeInt(4, $transaction->getLockTime(), true);
 
         return $parser
@@ -52,11 +48,11 @@ class TransactionSerializer
                         ->setVout($parser->readBytes(4)->serialize('int'))
                         ->setScriptBuf($parser->getVarString())
                         ->setSequence($parser->readBytes(4)->serialize('int'));
-                    $input->fromParser($parser);
                     return $input;
                 }
             )
         );
+
         $transaction->getOutputs()->addOutputs(
             $parser->getArray(
                 function () use (&$parser) {
@@ -68,6 +64,7 @@ class TransactionSerializer
                 }
             )
         );
+
         $transaction->setLockTime($parser->readBytes(4, true)->serialize('int'));
         return $transaction;
     }

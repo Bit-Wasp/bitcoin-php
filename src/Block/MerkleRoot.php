@@ -81,7 +81,7 @@ class MerkleRoot
         }
 
         if ($txCount == 1) {
-            $hash = $hashFxn($transactions[0]->serialize());
+            $hash = $hashFxn(hex2bin($transactions->getTransaction(0)->toHex()));
             $buffer = new Buffer($hash);
 
         } else {
@@ -90,9 +90,9 @@ class MerkleRoot
 
             // Compute hash of each transaction
             $last = '';
-            foreach ($transactions as $i => $transaction) {
-                $last = $transaction->serialize();
-                $tree->set($i, $transaction->serialize());
+            foreach ($transactions->getTransactions() as $i => $transaction) {
+                $last = pack("H*", $transaction->toHex());
+                $tree->set($i, $last);
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)

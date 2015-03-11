@@ -2,6 +2,9 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
+
 class TransactionInputCollection implements \Countable
 {
     private $inputs = [];
@@ -72,7 +75,6 @@ class TransactionInputCollection implements \Countable
     {
         return count($this->inputs);
     }
-
 
     /**
      * Returns a new sliced collection

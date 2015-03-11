@@ -53,10 +53,5 @@ interface TransactionInterface
      */
     public function getLockTime();
 
-    /**
-     * Get the network for this transaction
-     *
-     * @return mixed
-     */
-    public function getNetwork();
+    public function toHex();
 }

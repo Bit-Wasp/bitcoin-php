@@ -221,7 +221,7 @@ class Parser
 
     /**
      * Take an array containing serializable objects.
-     * @param $serializable
+     * @param s$serializable
      * @return $this
      */
     public function writeArray($serializable)

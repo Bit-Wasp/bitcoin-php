@@ -4,6 +4,7 @@ namespace Afk11\Bitcoin\Rpc\Client;
 
 use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
 use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionFactory;
 
 class Bitcoind
 {
@@ -31,7 +32,7 @@ class Bitcoind
         $tx = $this->client->execute('getrawtransaction', array($txid));
 
         if ($verbose) {
-            $tx = Transaction::fromHex($tx);
+            $tx = TransactionFactory::fromHex($tx);
         }
 
         return $tx;

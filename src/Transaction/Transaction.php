@@ -3,16 +3,20 @@
 namespace Afk11\Bitcoin\Transaction;
 
 use \Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Crypto\Random\Random;
+use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use \Afk11\Bitcoin\Key\PrivateKeyInterface;
 use \Afk11\Bitcoin\SerializableInterface;
 use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use \Afk11\Bitcoin\Signature\Signature;
 use \Afk11\Bitcoin\Signature\SignatureHash;
 use \Afk11\Bitcoin\Signature\K\KInterface;
+use Afk11\Bitcoin\Signature\Signer;
 
-class Transaction implements TransactionInterface, SerializableInterface
+class Transaction implements TransactionInterface
 {
     /**
      * @var NetworkInterface
@@ -40,12 +44,10 @@ class Transaction implements TransactionInterface, SerializableInterface
     protected $locktime;
 
     /**
-     * @param NetworkInterface $network
+     * @internal param NetworkInterface $network
      */
-    public function __construct(NetworkInterface $network = null)
+    public function __construct()
     {
-        $this->setNetwork($network);
-
         $this->inputs = new TransactionInputCollection();
         $this->outputs = new TransactionOutputCollection();
     }
@@ -53,27 +55,9 @@ class Transaction implements TransactionInterface, SerializableInterface
     /**
      * @inheritdoc
      */
-    public function getNetwork()
-    {
-        return $this->network;
-    }
-
-    /**
-     * Set a network to a transaction
-     *
-     * @param NetworkInterface $network
-     */
-    public function setNetwork(NetworkInterface $network = null)
-    {
-        $this->network = $network;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getTransactionId()
     {
-        $hex  = $this->serialize();
+        $hex  = pack("H*", $this->toHex());
         $hash = Hash::sha256d($hex);
 
         $txid = new Parser();
@@ -115,6 +99,16 @@ class Transaction implements TransactionInterface, SerializableInterface
     }
 
     /**
+     * @param TransactionInputCollection $inputs
+     * @return $this
+     */
+    public function setInputs(TransactionInputCollection $inputs)
+    {
+        $this->inputs = $inputs;
+        return $this;
+    }
+
+    /**
      * Get the array of inputs in the transaction
      *
      * @return TransactionInputCollection
@@ -122,6 +116,16 @@ class Transaction implements TransactionInterface, SerializableInterface
     public function getInputs()
     {
         return $this->inputs;
+    }
+
+    /**
+     * @param TransactionOutputCollection $outputs
+     * @return $this
+     */
+    public function setOutputs(TransactionOutputCollection $outputs)
+    {
+        $this->outputs = $outputs;
+        return $this;
     }
 
     /**
@@ -168,92 +172,26 @@ class Transaction implements TransactionInterface, SerializableInterface
      * @param PrivateKeyInterface $privateKey
      * @param TransactionOutputInterface $txOut
      * @param $inputToSign
-     * @param KInterface $kProvider
-     * @return mixed
+     * @param RbgInterface $random
+     * @return Signature
      * @throws \Exception
      */
-    public function sign(PrivateKeyInterface $privateKey, TransactionOutputInterface $txOut, $inputToSign, KInterface $kProvider = null)
+    public function sign(PrivateKeyInterface $privateKey, TransactionOutputInterface $txOut, $inputToSign, RbgInterface $random = null)
     {
-        if (is_null($kProvider)) {
-            $kProvider = new \Afk11\Bitcoin\Signature\K\RandomK();
+        if (is_null($random)) {
+            $random = new Random();
         }
 
-        $hash = (new SignatureHash($this))
-            ->calculate($txOut->getScript(), $inputToSign);
-
-        $sig = $privateKey->sign($hash, $kProvider);
+        $hash = $this->signatureHash()->calculate($txOut->getScript(), $inputToSign);
+        $signer = new Signer(Bitcoin::getMath(), Bitcoin::getGenerator());
+        $sig = $signer->sign($hash, $hash, $random);
 
         return $sig;
     }
 
     /**
-     * @param \Afk11\Bitcoin\Parser $parser
-     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
-     * @throws \Exception
+     * @return SignatureHash
      */
-    public function fromParser(Parser &$parser)
-    {
-        $this->setVersion($parser->readBytes(4, true)->serialize('int'));
-
-        $inputC = $parser->getVarInt()->serialize('int');
-
-        for ($i = 0; $i < $inputC; $i++) {
-            $input = new TransactionInput();
-            $this->inputs->addInput(
-                $input->fromParser($parser)
-            );
-        }
-
-        $outputC = $parser->getVarInt()->serialize('int');
-        for ($i = 0; $i < $outputC; $i++) {
-            $output = new TransactionOutput();
-            $this->outputs->addOutput(
-                $output->fromParser($parser)
-            );
-        }
-
-        $this->setLockTime($parser->readBytes(4, true)->serialize('int'));
-    }
-
-    /**
-     * Take a $hex string, and return an instance of a Transaction
-     *
-     * @param $hex
-     * @param NetworkInterface $network
-     * @return Transaction
-     */
-    public static function fromHex($hex, NetworkInterface $network = null)
-    {
-        $parser = new Parser($hex);
-        $transaction = new self();
-        $transaction->fromParser($parser);
-        return $transaction;
-    }
-
-    /**
-     * Serialize this object to a binary string ($type = null), hex string ($type = 'hex'),
-     * int (although this isn't meaningful), or a bitcoind style array.
-     *
-     * @param $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        if ($type == 'array') {
-            return $this->toArray();
-        }
-
-        $parser = new Parser();
-        $parser->writeInt(4, $this->getVersion(), true)
-            ->writeArray($this->inputs->getInputs())
-            ->writeArray($this->outputs->getOutputs())
-            ->writeInt(4, $this->getLockTime(), true);
-
-        return $parser
-            ->getBuffer()
-            ->serialize($type);
-    }
-
     public function signatureHash()
     {
         return new SignatureHash($this);
@@ -296,13 +234,22 @@ class Transaction implements TransactionInterface, SerializableInterface
         );
     }
 
-    public function __toString()
+    /**
+     * @return string
+     */
+    public function toHex()
     {
-        return $this->serialize('hex');
+        $serializer = new TransactionSerializer();
+        $hex = $serializer->serialize($this);
+        return $hex;
     }
 
-    public function getSize($type = null)
+    /**
+     * @return string
+     */
+    public function __toString()
     {
-        return strlen($this->serialize($type));
+        return $this->toHex();
     }
+
 }

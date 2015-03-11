@@ -7,6 +7,8 @@ use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Transaction\TransactionCollection;
+use Afk11\Bitcoin\Transaction\TransactionFactory;
 
 class Block implements BlockInterface
 {
@@ -21,9 +23,9 @@ class Block implements BlockInterface
     protected $header;
 
     /**
-     * @var array
+     * @var TransactionCollection
      */
-    protected $transactions = array();
+    protected $transactions;
 
     /**
      * @param Parser $parser
@@ -36,11 +38,10 @@ class Block implements BlockInterface
             $header = new BlockHeader();
             $header->fromParser($parser);
             $this->setHeader($header);
-            $this->setTransactions(
+            $this->getTransactions()->addTransactions(
                 $parser->getArray(
                     function () use (&$parser) {
-                        $transaction = new \Afk11\Bitcoin\Transaction\Transaction();
-                        $transaction->fromParser($parser);
+                        $transaction = TransactionFactory::fromParser($parser);
                         return $transaction;
                     }
                 )
@@ -60,7 +61,7 @@ class Block implements BlockInterface
     {
         $header = new Buffer($this->getHeader()->serialize());
         $parser = new Parser($header);
-        $parser->writeArray($this->getTransactions());
+        $parser->writeArray($this->getTransactions()->getTransactions());
         return $parser->getBuffer()->serialize($type);
     }
 
@@ -88,6 +89,8 @@ class Block implements BlockInterface
     {
         $this->header = new BlockHeader();
         $this->math = $math;
+        $this->transactions = new TransactionCollection();
+        return $this;
     }
 
     /**
@@ -127,7 +130,7 @@ class Block implements BlockInterface
     /**
      * Return the array of transactions from this block
      *
-     * @return array
+     * @return TransactionCollection
      */
     public function getTransactions()
     {
@@ -140,9 +143,9 @@ class Block implements BlockInterface
      * @param array $array
      * @return $this
      */
-    public function setTransactions(array $array)
+    public function setTransactions(TransactionCollection $collection)
     {
-        $this->transactions = $array;
+        $this->transactions = $collection;
         return $this;
     }
 }
