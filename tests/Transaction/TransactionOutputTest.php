@@ -113,7 +113,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $buffer = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $s = new TransactionInputSerializer();
+        $s = new TransactionOutputSerializer();
         $out = $s->parse($buffer);
         $this->assertEquals($buffer, $out->getBuffer()->serialize('hex'));
     }

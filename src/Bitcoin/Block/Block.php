@@ -43,7 +43,8 @@ class Block implements BlockInterface
     /**
      * Return the blocks header
      * TODO: Perhaps these should only be instantiated from a full block?
-     * @return BlockHeader
+     *
+     * @return BlockHeaderInterface
      */
     public function getHeader()
     {
