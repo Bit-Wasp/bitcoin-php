@@ -2,7 +2,9 @@
 
 namespace Afk11\Bitcoin\Block;
 
-interface BlockHeaderInterface
+use Afk11\Bitcoin\SerializableInterface;
+
+interface BlockHeaderInterface extends SerializableInterface
 {
     const CURRENT_VERSION = 2;
 

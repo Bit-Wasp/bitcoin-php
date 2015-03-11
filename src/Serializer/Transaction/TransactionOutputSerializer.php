@@ -25,17 +25,28 @@ class TransactionOutputSerializer
     }
 
     /**
+     * @param Parser $parser
+     * @return \Afk11\Bitcoin\Transaction\TransactionOutput
+     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
+     */
+    public function fromParser(Parser &$parser)
+    {
+        $output = new \Afk11\Bitcoin\Transaction\TransactionOutput();
+        $output
+            ->setValue($parser->readBytes(8, true)->serialize('int'))
+            ->setScriptBuf($parser->getVarString());
+        return $output;
+    }
+
+    /**
      * @param $string
      * @return \Afk11\Bitcoin\Transaction\TransactionOutput
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function parse($string)
     {
-        $output = new \Afk11\Bitcoin\Transaction\TransactionOutput();
         $parser = new Parser($string);
-        $output
-            ->setValue($parser->readBytes(8, true)->serialize('int'))
-            ->setScriptBuf($parser->getVarString());
+        $output = $this->fromParser($parser);
         return $output;
 
     }

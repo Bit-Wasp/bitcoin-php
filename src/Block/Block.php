@@ -7,6 +7,11 @@ use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\SerializableInterface;
+use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use Afk11\Bitcoin\Serializer\Block\HexBlockSerializer;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use Afk11\Bitcoin\Transaction\TransactionCollection;
 use Afk11\Bitcoin\Transaction\TransactionFactory;
 
@@ -26,60 +31,6 @@ class Block implements BlockInterface
      * @var TransactionCollection
      */
     protected $transactions;
-
-    /**
-     * @param Parser $parser
-     * @return Block
-     * @throws ParserOutOfRange
-     */
-    public function fromParser(Parser &$parser)
-    {
-        try {
-            $header = new BlockHeader();
-            $header->fromParser($parser);
-            $this->setHeader($header);
-            $this->getTransactions()->addTransactions(
-                $parser->getArray(
-                    function () use (&$parser) {
-                        $transaction = TransactionFactory::fromParser($parser);
-                        return $transaction;
-                    }
-                )
-            );
-        } catch (ParserOutOfRange $e) {
-            throw new ParserOutOfRange('Failed to extract full block header from parser');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param null $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $header = new Buffer($this->getHeader()->serialize());
-        $parser = new Parser($header);
-        $parser->writeArray($this->getTransactions()->getTransactions());
-        return $parser->getBuffer()->serialize($type);
-    }
-
-    /**
-     * @param $hex
-     * @return Block
-     * @throws ParserOutOfRange
-     */
-    public static function fromHex($hex)
-    {
-        $buffer = Buffer::hex($hex);
-        $math = Bitcoin::getMath();
-        $parser = new Parser($buffer);
-
-        $block  = new self($math);
-        $block->fromParser($parser);
-        return $block;
-    }
 
     /**
      * Instantiate class
@@ -147,5 +98,15 @@ class Block implements BlockInterface
     {
         $this->transactions = $collection;
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBuffer()
+    {
+        $serializer = new HexBlockSerializer(new HexBlockHeaderSerializer(), new TransactionCollectionSerializer(new TransactionSerializer()));
+        $hex = $serializer->serialize($this);
+        return $hex;
     }
 }

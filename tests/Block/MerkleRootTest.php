@@ -91,11 +91,11 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
     {
         $hex1 = '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff070456720e1b017bffffffff0100f2052a010000004341048cb16dcb7db3dd9ebee9f677d487c6272a93841e73a96589ba214a0324798048794a9fafe9e8d761e77f3eba3d45b1618f25493eee1ac598bdef3951aaca0a63ac00000000';
         $tx1 = TransactionFactory::fromHex($hex1);
-        $this->assertSame($hex1, $tx1->toHex());
+        $this->assertSame($hex1, $tx1->getBuffer()->serialize('hex'));
 
         $hex2 = '01000000015132aa73be95888c4ceefd27c2be87df5c03e463afa0be4161e6740e85c9b154010000008b48304502202b69c4847d96f9d6fcdfeb3c277ab16471f45577236eafd15baa504a5655d1ae022100a40c1fcd609e360b98e5d48b58c1afcf7c308b799868b0c47e6b55c726e67125014104d4dfd5815e61e2496856326ea23443b1e6b2067ddb1e14f22c6b700e27043976a73f5d0312a332fc4c6a87513d296e54b12dedb635aa5f7cecfd3a891acdf0acffffffff0280509b1b050000001976a914669b317ee66d134446517794c81cd304e115609088ac00e40b54020000001976a9141a1487913d49504f3e7672868b35caf85b68940888ac00000000';
         $tx2 = TransactionFactory::fromHex($hex2);
-        $this->assertSame($hex2, $tx2->toHex());
+        $this->assertSame($hex2, $tx2->getBuffer()->serialize('hex'));
 
         $block = new Block($this->math);
         $block->setTransactions($array);
@@ -104,7 +104,6 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
 
         $hash = $root->calculateHash();
         $this->assertSame('e22e7f473e3c50e2a5eab4ee1bc1bd8bb6d21a5485542ccebbda9282bb75491f', $hash);
-
     }
 
     public function testWithOnlyOddNumberOfTransactions()

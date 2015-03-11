@@ -8,8 +8,9 @@ use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
 use \Afk11\Bitcoin\SerializableInterface;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
-class TransactionInput implements TransactionInputInterface, SerializableInterface
+class TransactionInput implements TransactionInputInterface
 {
     /**
      * @var
@@ -214,40 +215,12 @@ class TransactionInput implements TransactionInputInterface, SerializableInterfa
     }
 
     /**
-     * Serialize the transaction input.
-     *
-     * @param $type
-     * @return string
+     * @return Buffer
      */
-    public function serialize($type = null)
+    public function getBuffer()
     {
-        $parser = new Parser;
-        $parser
-            ->writeBytes(32, $this->getTransactionId(), true)
-            ->writeInt(4, $this->getVout())
-            ->writeWithLength(
-                new Buffer($this->getScript()->serialize())
-            )
-            ->writeInt(4, $this->getSequence(), true);
-
-        return $parser
-            ->getBuffer()
-            ->serialize($type);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSize($type = null)
-    {
-        return strlen($this->serialize($type));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function __toString()
-    {
-        return $this->serialize('hex');
+        $serializer = new TransactionInputSerializer();
+        $out = $serializer->serialize($this);
+        return $out;
     }
 }

@@ -36,7 +36,7 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
             $key = $math->hexDec($test->privKey);
             $privKey     = new PrivateKey($math, $generator, $key);
             $messageHash = Buffer::hex(Hash::sha256($test->message));
-            $entropy     = new Buffer($privKey->serialize() . $messageHash->serialize());
+            $entropy     = new Buffer($privKey->getBuffer()->serialize() . $messageHash->serialize());
             $drbg        = new HmacDrbg($test->algorithm, $entropy);
             $k           = $drbg->bytes(32);
             $this->assertEquals(strtolower($test->expectedK), strtolower($k->serialize('hex')));

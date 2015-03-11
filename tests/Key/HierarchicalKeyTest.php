@@ -184,7 +184,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     {
         $key       = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
         $this->key = HierarchicalKeyFactory::fromExtended($key, $this->network);
-        $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $this->key->getPrivateKey()->serialize('hex'));
+        $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $this->key->getPrivateKey()->getBuffer()->serialize('hex'));
     }
 
     /**

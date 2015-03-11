@@ -4,6 +4,7 @@ namespace Afk11\Bitcoin\Transaction;
 
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\SerializableInterface;
@@ -146,36 +147,10 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function serialize($type = null)
+    public function getBuffer()
     {
-        $parser = new Parser;
-        $parser
-            ->writeInt(8, $this->getValue(), true)
-            ->writeWithLength(
-                new Buffer($this->getScript()->serialize())
-            );
-
-        return $parser
-            ->getBuffer()
-            ->serialize($type);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSize($type = null)
-    {
-        return strlen($this->serialize($type));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function __toString()
-    {
-        return $this->serialize('hex');
+        $serializer = new TransactionOutputSerializer();
+        $out = $serializer->serialize($this);
+        return $out;
     }
 }

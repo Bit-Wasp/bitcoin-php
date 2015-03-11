@@ -3,6 +3,7 @@
 namespace Afk11\Bitcoin\Transaction;
 
 use \Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\Random;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use \Afk11\Bitcoin\Key\PrivateKeyInterface;
@@ -16,7 +17,7 @@ use \Afk11\Bitcoin\Signature\SignatureHash;
 use \Afk11\Bitcoin\Signature\K\KInterface;
 use Afk11\Bitcoin\Signature\Signer;
 
-class Transaction implements TransactionInterface
+class Transaction implements TransactionInterface, SerializableInterface
 {
     /**
      * @var NetworkInterface
@@ -57,7 +58,7 @@ class Transaction implements TransactionInterface
      */
     public function getTransactionId()
     {
-        $hex  = pack("H*", $this->toHex());
+        $hex  = pack("H*", $this->getBuffer());
         $hash = Hash::sha256d($hex);
 
         $txid = new Parser();
@@ -235,9 +236,9 @@ class Transaction implements TransactionInterface
     }
 
     /**
-     * @return string
+     * @return Buffer
      */
-    public function toHex()
+    public function getBuffer()
     {
         $serializer = new TransactionSerializer();
         $hex = $serializer->serialize($this);
@@ -249,7 +250,6 @@ class Transaction implements TransactionInterface
      */
     public function __toString()
     {
-        return $this->toHex();
+        return $this->getBuffer()->serialize('hex');
     }
-
 }

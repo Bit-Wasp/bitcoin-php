@@ -67,8 +67,8 @@ class HexExtendedKeySerializer
     public function serialize(HierarchicalKey $key)
     {
         list ($prefix, $data) = ($key->isPrivate())
-            ? array($this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->toHex())
-            : array($this->network->getHDPubByte(), $key->getPublicKey()->toHex());
+            ? array($this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->getBuffer())
+            : array($this->network->getHDPubByte(), $key->getPublicKey()->getBuffer());
 
         $bytes = new Parser();
         $bytes
@@ -80,27 +80,19 @@ class HexExtendedKeySerializer
             ->writeBytes(33, $data);
 
         $hex = $bytes
-            ->getBuffer()
-            ->serialize('hex');
+            ->getBuffer();
 
         return $hex;
     }
 
     /**
-     * @param NetworkInterface $network
-     * @param $hex
+     * @param Parser $parser
      * @return HierarchicalKey
      * @throws ParserOutOfRange
-     * @throws \Exception
      */
-    public function parse($hex)
+    public function fromParser(Parser &$parser)
     {
-        if (strlen($hex) !== 156) {
-            throw new \Exception('Invalid extended key');
-        }
-
         try {
-            $parser = new Parser($hex);
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) =
                 array(
                     $parser->readBytes(4)->serialize('hex'),
@@ -120,6 +112,25 @@ class HexExtendedKeySerializer
 
         $hd = new HierarchicalKey($this->math, $this->generator, $depth, $parentFingerprint, $sequence, $chainCode, $key);
 
+        return $hd;
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @param $hex
+     * @return HierarchicalKey
+     * @throws ParserOutOfRange
+     * @throws \Exception
+     */
+    public function parse($hex)
+    {
+        if (strlen($hex) !== 156) {
+            throw new \Exception('Invalid extended key');
+        }
+
+        $parser = new Parser($hex);
+
+        $hd = $this->fromParser($parser);
         return $hd;
     }
 }

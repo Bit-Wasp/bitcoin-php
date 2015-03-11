@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin;
 
-class Buffer implements SerializableInterface
+class Buffer
 {
     /**
      * @var int|null

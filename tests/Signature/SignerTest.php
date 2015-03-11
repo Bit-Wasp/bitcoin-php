@@ -103,7 +103,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
         $signer = new Signer($math, $G);
         $pk = new PrivateKey($math, $G, '4141414141414141414141414141414141414141414141414141414141414141');
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $hash = $random->bytes(32);
             $sig = $signer->sign($pk, $hash, new Random());
 

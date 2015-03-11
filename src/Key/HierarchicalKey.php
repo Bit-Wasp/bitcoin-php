@@ -212,12 +212,12 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
      * @return string
      * @throws \Exception
      */
-    public function toHex()
+    public function getBuffer()
     {
         if ($this->isPrivate()) {
-            return $this->getPrivateKey()->toHex();
+            return $this->getPrivateKey()->getBuffer();
         } else {
-            return $this->getPublicKey()->toHex();
+            return $this->getPublicKey()->getBuffer();
         }
     }
 
@@ -369,10 +369,10 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
 
             $parser
                 ->writeBytes(1, '00')
-                ->writeBytes(32, $this->getPrivateKey()->toHex());
+                ->writeBytes(32, $this->getPrivateKey()->getBuffer());
 
         } else {
-            $parser->writeBytes(33, $this->getPublicKey()->toHex());
+            $parser->writeBytes(33, $this->getPublicKey()->getBuffer());
         }
 
         return $parser

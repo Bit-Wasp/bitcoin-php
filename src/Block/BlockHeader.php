@@ -6,6 +6,8 @@ use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Crypto\Hash;
 use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\SerializableInterface;
+use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 
 class BlockHeader implements BlockHeaderInterface
 {
@@ -45,64 +47,10 @@ class BlockHeader implements BlockHeaderInterface
     protected $nonce;
 
     /**
-     * @param $hex
-     * @return BlockHeader
-     */
-    public static function fromHex($hex)
-    {
-        $buffer = Buffer::hex($hex);
-        $parser = new Parser($buffer);
-        $block  = new self();
-        $block->fromParser($parser);
-        return $block;
-    }
-
-    /**
-     * @param \Afk11\Bitcoin\Parser $parser
-     * @return $this
-     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
-     */
-    public function fromParser(Parser &$parser)
-    {
-        try {
-            $this->setVersion($parser->readBytes(4, true)->serialize('int'));
-            $this->setPrevBlock($parser->readBytes(32, true));
-            $this->setMerkleRoot($parser->readBytes(32, true));
-            $this->setTimestamp($parser->readBytes(4, true)->serialize('int'));
-            $this->setBits($parser->readBytes(4, true));
-            $this->setNonce($parser->readBytes(4, true)->serialize('int'));
-        } catch (ParserOutOfRange $e) {
-            throw new ParserOutOfRange('Failed to extract full block header from parser');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Serialize the block header to binary (default) or hex.
-     *
-     * @param null $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $data = new Parser;
-        $data->writeInt(4, $this->getVersion(), true);
-        $data->writeBytes(32, $this->getPrevBlock(), true);
-        $data->writeBytes(32, $this->getMerkleRoot(), true);
-        $data->writeInt(4, $this->getTimestamp(), true);
-        $data->writeBytes(4, $this->getBits(), true);
-        $data->writeInt(4, $this->getNonce(), true);
-
-        return $data->getBuffer()->serialize($type);
-    }
-
-    /**
      * Instantiate class
      */
     public function __construct()
     {
-        return $this;
     }
 
     /**
@@ -120,7 +68,7 @@ class BlockHeader implements BlockHeaderInterface
      */
     public function getBlockHash()
     {
-        $header = $this->serialize();
+        $header = pack("H*", $this->getBuffer());
         $hash   = Buffer::hex(Hash::sha256d($header));
         $parser = new Parser();
         $parser->writeBytes(32, $hash, true);
@@ -271,5 +219,15 @@ class BlockHeader implements BlockHeaderInterface
     {
         $this->version = $version;
         return $this;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getBuffer()
+    {
+        $serializer = new HexBlockHeaderSerializer();
+        $hex = $serializer->serialize($this);
+        return $hex;
     }
 }

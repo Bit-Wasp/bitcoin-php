@@ -4,11 +4,13 @@
 namespace Afk11\Bitcoin\Tests\Block;
 
 use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Block\BlockFactory;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Block\Block;
 use Afk11\Bitcoin\Block\BlockHeader;
+use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use Afk11\Bitcoin\Serializer\Block\HexBlockSerializer;
 use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use Afk11\Bitcoin\Transaction\TransactionCollection;
@@ -127,8 +129,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
             '01'.
             $txHex;
 
-        $parser = new Parser($blockHex);
-        $newBlock = $this->block->fromParser($parser);
+        $newBlock = BlockFactory::fromHex($blockHex);
 
         $this->assertInstanceOf($this->blockType, $newBlock);
 
@@ -198,17 +199,28 @@ class BlockTest extends \PHPUnit_Framework_TestCase
             '01'.
             $txHex);
 
-        $newBlock = Block::fromHex($blockHex);
+        $newBlock = BlockFactory::fromHex($blockHex);
 
         $this->assertInstanceOf($this->blockType, $newBlock);
 
         $this->assertSame($newBlock->getHeader()->getMerkleRoot()->serialize('hex'), $newBlock->getMerkleRoot());
-        $this->assertSame($blockHex, $newBlock->serialize('hex'));
+        $this->assertSame($blockHex, $newBlock->getBuffer()->serialize('hex'));
     }
 
     public function testSerialize()
     {
-        $txHex = '01000000'.
+
+        $blockHex = strtolower(
+            //header
+            '01000000'.
+            '0000000000000000000000000000000000000000000000000000000000000000' .
+            '3BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A' .
+            '29AB5F49'.
+            'FFFF001D'.
+            '1DAC2B7C'.
+            '01'.
+            //tx
+            '01000000'.
             '01'.
             '0000000000000000000000000000000000000000000000000000000000000000FFFFFFFF'.
             '4D'.
@@ -218,21 +230,10 @@ class BlockTest extends \PHPUnit_Framework_TestCase
             '00F2052A01000000'.
             '43'.
             '4104678AFDB0FE5548271967F1A67130B7105CD6A828E03909A67962E0EA1F61DEB649F6BC3F4CEF38C4F35504E51EC112DE5C384DF7BA0B8D578A4C702B6BF11D5FAC'.
-            '00000000';
+            '00000000');
 
-        $blockHex = strtolower('01000000'.
-            '0000000000000000000000000000000000000000000000000000000000000000' .
-            '3BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A' .
-            '29AB5F49'.
-            'FFFF001D'.
-            '1DAC2B7C'.
-            '01'.
-            $txHex);
-
-        $parser = new Parser($blockHex);
-        $block = new Block($this->math);
-        $newBlock = $block->fromParser($parser);
-        $this->assertSame($blockHex, $newBlock->serialize('hex'));
+        $newBlock = BlockFactory::fromHex($blockHex);
+        $this->assertSame($blockHex, $newBlock->getBuffer()->serialize('hex'));
 
     }
 }

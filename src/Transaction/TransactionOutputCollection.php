@@ -43,7 +43,7 @@ class TransactionOutputCollection implements \Countable
      *
      * @param int $index
      * @throws \OutOfRangeException when index is less than 0 or greater than the number of outputs.
-     * @return TransactionOutputInterface[]
+     * @return TransactionOutputInterface
      */
     public function getOutput($index)
     {

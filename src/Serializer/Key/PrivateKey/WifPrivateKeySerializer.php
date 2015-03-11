@@ -39,7 +39,7 @@ class WifPrivateKeySerializer
      */
     public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey)
     {
-        $hex = $this->hexSerializer->serialize($privateKey);
+        $hex = $this->hexSerializer->serialize($privateKey)->serialize('hex');
 
         $payload = sprintf(
             "%s%s%s",

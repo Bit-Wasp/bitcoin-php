@@ -484,6 +484,11 @@ class Script implements ScriptInterface
         return bin2hex($this->script);
     }
 
+    public function getBuffer()
+    {
+        return new Buffer($this->script);
+    }
+
     /**
      * Serialize the script into a hex string or a byte string
      *

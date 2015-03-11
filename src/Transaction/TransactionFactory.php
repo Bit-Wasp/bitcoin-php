@@ -7,12 +7,19 @@ use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
 class TransactionFactory
 {
+    /**
+     * @return Transaction
+     */
     public static function create()
     {
         $transaction = new Transaction;
         return $transaction;
     }
 
+    /**
+     * @param $string
+     * @return Transaction
+     */
     public static function fromHex($string)
     {
         $serializer = new TransactionSerializer;
@@ -20,29 +27,14 @@ class TransactionFactory
         return $hex;
     }
 
+    /**
+     * @param Parser $parser
+     * @return Transaction
+     */
     public static function fromParser(Parser &$parser)
     {
-        $transaction = new Transaction;
-        $transaction->setVersion($parser->readBytes(4, true)->serialize('int'));
-
-        $inputC = $parser->getVarInt()->serialize('int');
-
-        for ($i = 0; $i < $inputC; $i++) {
-            $input = new TransactionInput();
-            $transaction->getInputs()->addInput(
-                $input->fromParser($parser)
-            );
-        }
-
-        $outputC = $parser->getVarInt()->serialize('int');
-        for ($i = 0; $i < $outputC; $i++) {
-            $output = new TransactionOutput();
-            $transaction->getOutputs()->addOutput(
-                $output->fromParser($parser)
-            );
-        }
-
-        $transaction->setLockTime($parser->readBytes(4, true)->serialize('int'));
-        return $transaction;
+        $serializer = new TransactionSerializer;
+        $hex = $serializer->fromParser($parser);
+        return $hex;
     }
 }

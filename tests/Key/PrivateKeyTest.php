@@ -86,7 +86,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         $this->privateKey   = new PrivateKey($this->math, $this->generator, $key);
 
         $this->assertInstanceOf($this->baseType, $this->privateKey);
-        $this->assertSame($this->privateKey->serialize('hex'), '4141414141414141414141414141414141414141414141414141414141414141');
+        $this->assertSame($this->privateKey->getBuffer()->serialize('hex'), '4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertFalse($this->privateKey->isCompressed());
         $this->assertTrue($this->privateKey->isPrivate());
         $this->assertInstanceOf($this->publicType, $this->privateKey->getPublicKey());
@@ -94,7 +94,6 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
             '04eec7245d6b7d2ccb30380bfbe2a3648cd7a942653f5aa340edcea1f2836866198bd9fc8678e246f23f40bfe8d928d3f37a51642aed1d5b471a1a0db4f71891ea',
             $this->privateKey->getPublicKey()->serialize('hex')
         );
-
     }
 
     /**
@@ -154,26 +153,8 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $buf                = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
-        $this->privateKey   = new PrivateKey($this->math, $this->generator, $buf->serialize('int'));
-        $this->assertSame($buf->serialize(), $this->privateKey->serialize());
-    }
-
-    public function test__toString()
-    {
-        $hex = '4141414141414141414141414141414141414141414141414141414141414141';
-        $key = $this->math->hexDec($hex);
-        $this->privateKey   = new PrivateKey($this->math, $this->generator, $key);
-        $this->assertEquals($hex, $this->privateKey->__toString());
-    }
-
-    public function testGetSize()
-    {
-        $hex = '4141414141414141414141414141414141414141414141414141414141414141';
-        $key = $this->math->hexDec($hex);
-        $this->privateKey   = new PrivateKey($this->math, $this->generator, $key);
-        $this->assertEquals(32, $this->privateKey->getSize());
-        $this->assertEquals(64, $this->privateKey->getSize('hex'));
+        $this->privateKey   = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->assertSame('4141414141414141414141414141414141414141414141414141414141414141', $this->privateKey->getBuffer()->serialize('hex'));
     }
 
     public function testFromWif()

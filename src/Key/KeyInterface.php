@@ -2,7 +2,9 @@
 
 namespace Afk11\Bitcoin\Key;
 
-interface KeyInterface
+use Afk11\Bitcoin\SerializableInterface;
+
+interface KeyInterface extends SerializableInterface
 {
     /**
      * Check if the key should be be using compressed format
@@ -28,5 +30,5 @@ interface KeyInterface
     /**
      * @return mixed
      */
-    public function toHex();
+    public function getBuffer();
 }

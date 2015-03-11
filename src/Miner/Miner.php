@@ -170,7 +170,7 @@ class Miner
             // Loop through all nonces (up to 2^32). Restart after modifying extranonce.
             while ($this->math->cmp($nonce, $maxNonce) <= 0) {
                 $header->setNonce($nonce++);
-                $hashS = Hash::sha256d($header->serialize());
+                $hashS = Hash::sha256d(pack("H*", $header->getBuffer()));
                 $hash = (new Parser())
                     ->writeBytes(32, $hashS, true)
                     ->getBuffer();

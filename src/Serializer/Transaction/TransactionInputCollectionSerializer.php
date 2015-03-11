@@ -36,12 +36,11 @@ class TransactionInputCollectionSerializer
     }
 
     /**
-     * @param $string
+     * @param Parser $parser
      * @return TransactionInputCollection
      */
-    public function parse($string)
+    public function fromParser(Parser &$parser)
     {
-        $parser = new Parser($string);
         $inputs = new TransactionInputCollection;
         $inputs->addInputs(
             $parser->getArray(
@@ -57,6 +56,17 @@ class TransactionInputCollectionSerializer
             )
         );
 
+        return $inputs;
+    }
+
+    /**
+     * @param $string
+     * @return TransactionInputCollection
+     */
+    public function parse($string)
+    {
+        $parser = new Parser($string);
+        $inputs = $this->fromParser($parser);
         return $inputs;
     }
 }

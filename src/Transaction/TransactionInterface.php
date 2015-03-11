@@ -38,6 +38,7 @@ interface TransactionInterface
      * @return TransactionInputCollection
      */
     public function getInputs();
+    public function setInputs(TransactionInputCollection $inputs);
 
     /**
      * Return an array of all outputs
@@ -45,13 +46,11 @@ interface TransactionInterface
      * @return TransactionOutputCollection
      */
     public function getOutputs();
-
+    public function setOutputs(TransactionOutputCollection $outputs);
     /**
      * Return the locktime for this transaction
      *
      * @return mixed
      */
     public function getLockTime();
-
-    public function toHex();
 }

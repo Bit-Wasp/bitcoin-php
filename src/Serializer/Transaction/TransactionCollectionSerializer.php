@@ -35,14 +35,13 @@ class TransactionCollectionSerializer
     }
 
     /**
-     * @param $string
+     * @param Parser $parser
      * @return TransactionCollection
      */
-    public function parse($string)
+    public function fromParser(Parser &$parser)
     {
-        $parser = new Parser($string);
-        $inputs = new TransactionCollection;
-        $inputs->addTransactions(
+        $transactions = new TransactionCollection;
+        $transactions->addTransactions(
             $parser->getArray(
                 function () use (&$parser) {
                     $transaction = TransactionFactory::fromParser($parser);
@@ -50,7 +49,17 @@ class TransactionCollectionSerializer
                 }
             )
         );
+        return $transactions;
+    }
 
+    /**
+     * @param $string
+     * @return TransactionCollection
+     */
+    public function parse($string)
+    {
+        $parser = new Parser($string);
+        $inputs = $this->fromParser($parser);
         return $inputs;
     }
 }

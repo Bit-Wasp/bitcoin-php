@@ -4,6 +4,8 @@ namespace Afk11\Bitcoin\Transaction;
 
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionInputCollectionSerializer;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
 class TransactionInputCollection implements \Countable
 {
@@ -86,5 +88,15 @@ class TransactionInputCollection implements \Countable
     public function slice($start, $length)
     {
         return new self(array_slice($this->inputs, $start, $length));
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getBuffer()
+    {
+        $serializer = new TransactionInputCollectionSerializer(new TransactionInputSerializer());
+        $out = $serializer->serialize($this);
+        return $out;
     }
 }

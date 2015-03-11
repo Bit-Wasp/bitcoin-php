@@ -221,7 +221,7 @@ class PublicKey implements PublicKeyInterface
     /**
      * @return string
      */
-    public function toHex()
+    public function getBuffer()
     {
         $serializer = new HexPublicKeySerializer($this->math, $this->generator);
         $hex = $serializer->serialize($this);
@@ -236,7 +236,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function serialize($type = null)
     {
-        $hex = $this->toHex();
+        $hex = $this->getBuffer();
 
         if ($type == 'hex') {
             return $hex;
@@ -252,7 +252,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function __toString()
     {
-        return $this->toHex();
+        return $this->getBuffer();
     }
 
     /**
@@ -264,7 +264,7 @@ class PublicKey implements PublicKeyInterface
      */
     public function getSize($type = null)
     {
-        $hex = $this->toHex();
+        $hex = $this->getBuffer();
 
         if ($type == 'hex') {
             return strlen($hex);

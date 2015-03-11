@@ -5,19 +5,34 @@ namespace Afk11\Bitcoin\Serializer\Transaction;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionFactory;
 use Afk11\Bitcoin\Transaction\TransactionInterface;
 
 class TransactionSerializer
 {
+    /**
+     * @var TransactionInputCollectionSerializer
+     */
     public $inputsSerializer;
+
+    /**
+     * @var TransactionOutputCollectionSerializer
+     */
     public $outputsSerializer;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->inputsSerializer = new TransactionInputCollectionSerializer(new TransactionInputSerializer);
         $this->outputsSerializer = new TransactionOutputCollectionSerializer(new TransactionOutputSerializer);
     }
 
+    /**
+     * @param TransactionInterface $transaction
+     * @return string
+     */
     public function serialize(TransactionInterface $transaction)
     {
         $inputs = $this->inputsSerializer->serialize($transaction->getInputs());
@@ -30,14 +45,18 @@ class TransactionSerializer
         $parser->writeInt(4, $transaction->getLockTime(), true);
 
         return $parser
-            ->getBuffer()
-            ->serialize('hex');
+            ->getBuffer();
     }
 
-    public function parse($hex)
+    /**
+     * @param Parser $parser
+     * @return Transaction
+     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \Exception
+     */
+    public function fromParser(Parser &$parser)
     {
-        $parser = new Parser($hex);
-        $transaction = new Transaction;
+        $transaction = TransactionFactory::create();
         $transaction->setVersion($parser->readBytes(4, true)->serialize('int'));
         $transaction->getInputs()->addInputs(
             $parser->getArray(
@@ -66,6 +85,17 @@ class TransactionSerializer
         );
 
         $transaction->setLockTime($parser->readBytes(4, true)->serialize('int'));
+        return $transaction;
+    }
+
+    /**
+     * @param $hex
+     * @return Transaction
+     */
+    public function parse($hex)
+    {
+        $parser = new Parser($hex);
+        $transaction = $this->fromParser($parser);
         return $transaction;
     }
 }

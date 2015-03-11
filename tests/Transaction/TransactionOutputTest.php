@@ -2,6 +2,7 @@
 
 namespace Afk11\Bitcoin\Tests\Transaction;
 
+use Afk11\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use Afk11\Bitcoin\Transaction\TransactionOutput;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Buffer;
@@ -16,6 +17,10 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     protected $txOutType;
     protected $scriptType;
     protected $bufferType;
+    /**
+     * @var TransactionOutputSerializer
+     */
+    protected $serializer;
 
     public function __construct()
     {
@@ -27,6 +32,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->out = new TransactionOutput();
+        $this->serializer = new TransactionOutputSerializer();
     }
 
     public function testGetValueDefault()
@@ -99,37 +105,16 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     {
         $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
         $parser = new Parser($buffer);
-        $out = $this->out->fromParser($parser);
+        $out = $this->serializer->fromParser($parser);
         $this->assertInstanceOf($this->txOutType, $out);
     }
 
     public function testSerialize()
     {
-        $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = Buffer::hex($hex);
+        $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
         $parser = new Parser($buffer);
         $out    = $this->out->fromParser($parser);
-        $this->assertSame($hex, $out->serialize('hex'));
+        $this->assertEquals($buffer, $out->getBuffer());
     }
 
-    public function testGetSize()
-    {
-        $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = Buffer::hex($hex);
-        $parser = new Parser($buffer);
-        $out    = $this->out->fromParser($parser);
-        $this->assertSame(34, $out->getSize());
-        $this->assertSame(68, $out->getSize('hex'));
-
-    }
-
-    public function test__toString()
-    {
-        $hex    = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
-        $buffer = Buffer::hex($hex);
-        $parser = new Parser($buffer);
-        $out    = $this->out->fromParser($parser);
-        $this->assertSame($hex, $out->__toString());
-
-    }
 };

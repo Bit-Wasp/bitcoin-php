@@ -221,7 +221,7 @@ class Parser
 
     /**
      * Take an array containing serializable objects.
-     * @param s$serializable
+     * @param Buffer[]|SerializableInterface[]
      * @return $this
      */
     public function writeArray($serializable)
@@ -231,11 +231,15 @@ class Parser
         $parser = new Parser($varInt);
 
         foreach ($serializable as $object) {
-            if (!in_array('Afk11\Bitcoin\SerializableInterface', class_implements($object))) {
-                throw new \RuntimeException('Objects being serialized to an array must implement the SerializableInterface');
+            if (in_array('Afk11\Bitcoin\SerializableInterface', class_implements($object))) {
+                $object = $object->getBuffer();
             }
 
-            $parser->writeBytes($object->getSize(), $object);
+            if ($object instanceof Buffer) {
+                $parser->writeBytes($object->getSize(), $object);
+            } else {
+                throw new \RuntimeException('Input to writeArray must be Buffer[], or SerializableInterface[]');
+            }
         }
 
         $this->string .= $parser->getBuffer()->serialize();

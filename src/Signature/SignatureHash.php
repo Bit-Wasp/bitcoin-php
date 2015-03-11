@@ -59,7 +59,7 @@ class SignatureHash implements SignatureHashInterface
         if ($sighashType & 31 == SignatureHashInterface::SIGHASH_NONE) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
 
-            $outputs = new TransactionOutputCollection();
+            $copy->setOutputs(new TransactionOutputCollection());
 
             for ($i = 0; $i < count($inputs); $i++) {
                 if ($i != $inputToSign) {
@@ -95,11 +95,11 @@ class SignatureHash implements SignatureHashInterface
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
         if ($sighashType & 31 == SignatureHashInterface::SIGHASH_ANYONECANPAY) {
             $input  = $inputs->getInput($inputToSign);
-            $inputs = new TransactionInputCollection([ $input ]);
+            $copy->setInputs(new TransactionInputCollection([ $input ]));
         }
 
         // Serialize the TxCopy and append the 4 byte hashtype (little endian);
-        $txParser = new Parser($copy->serialize('hex'));
+        $txParser = new Parser($copy->getBuffer());
         $txParser->writeInt(4, $sighashType, true);
 
         $hash     = Hash::sha256d($txParser->getBuffer()->serialize());

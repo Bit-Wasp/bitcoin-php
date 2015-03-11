@@ -2,7 +2,9 @@
 
 namespace Afk11\Bitcoin\Script;
 
-interface ScriptInterface
+use Afk11\Bitcoin\SerializableInterface;
+
+interface ScriptInterface extends SerializableInterface
 {
     /**
      * //TODO: this needed?

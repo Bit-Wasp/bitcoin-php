@@ -30,7 +30,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf($this->publicType, $this->publicKey);
             $this->assertSame($test->compressed, $this->publicKey->serialize('hex'));
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
-            $this->assertSame($this->publicKey->toHex(), $test->compressed);
+            $this->assertSame($this->publicKey->getBuffer(), $test->compressed);
             $this->assertTrue($this->publicKey->isCompressed());
             $this->assertSame($this->publicKey->__toString(), $test->compressed);
             $this->assertSame(33, $this->publicKey->getSize());
@@ -47,7 +47,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf($this->publicType, $this->publicKey);
             $this->assertSame($test->uncompressed, $this->publicKey->serialize('hex'));
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
-            $this->assertSame($this->publicKey->toHex(), $test->uncompressed);
+            $this->assertSame($this->publicKey->getBuffer(), $test->uncompressed);
             $this->assertSame($this->publicKey->__toString(), $test->uncompressed);
             $this->assertFalse($this->publicKey->isCompressed());
             $this->assertSame(65, $this->publicKey->getSize());

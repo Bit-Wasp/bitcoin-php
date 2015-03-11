@@ -2,7 +2,11 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
-class TransactionCollection implements \Countable
+use Afk11\Bitcoin\SerializableInterface;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
+use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
+
+class TransactionCollection implements \Countable, SerializableInterface
 {
     private $transactions = [];
 
@@ -83,5 +87,16 @@ class TransactionCollection implements \Countable
     public function slice($start, $length)
     {
         return new self(array_slice($this->transactions, $start, $length));
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuffer()
+    {
+        // vector interface?
+        $serializer = new TransactionCollectionSerializer(new TransactionSerializer());
+        $out = $serializer->serialize($this);
+        return $out;
     }
 }

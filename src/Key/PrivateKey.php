@@ -11,7 +11,7 @@ use Afk11\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use Afk11\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use Mdanter\Ecc\GeneratorPoint;
 
-class PrivateKey implements PrivateKeyInterface, SerializableInterface
+class PrivateKey implements PrivateKeyInterface
 {
     /**
      * @var int|string
@@ -159,10 +159,9 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
     /**
      * @return string
      */
-    public function toHex()
+    public function getBuffer()
     {
         $hexSerializer = new HexPrivateKeySerializer($this->math, $this->generator);
-
         $hex = $hexSerializer->serialize($this);
         return $hex;
     }
@@ -176,11 +175,11 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
     public function serialize($type = null)
     {
         if ($type == 'hex') {
-            return $this->toHex();
+            return $this->getBuffer();
         } elseif ($type == 'int') {
             return $this->getSecretMultiplier();
         } else {
-            return pack("H*", $this->toHex());
+            return pack("H*", $this->getBuffer());
         }
     }
 
@@ -193,7 +192,7 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
     public function getSize($type = null)
     {
         if ($type == 'hex') {
-            return strlen($this->toHex());
+            return strlen($this->getBuffer());
         } else {
             return 32;
         }
@@ -205,6 +204,6 @@ class PrivateKey implements PrivateKeyInterface, SerializableInterface
      */
     public function __toString()
     {
-        return $this->toHex();
+        return $this->getBuffer();
     }
 }

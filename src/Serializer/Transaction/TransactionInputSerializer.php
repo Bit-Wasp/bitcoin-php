@@ -18,12 +18,27 @@ class TransactionInputSerializer
         $parser
             ->writeBytes(32, $input->getTransactionId(), true)
             ->writeInt(4, $input->getVout())
-            ->writeWithLength(
-                new Buffer($input->getScript()->serialize())
-            )
+            ->writeWithLength(new Buffer($input->getScript()->serialize()))
             ->writeInt(4, $input->getSequence());
 
         return $parser->getBuffer();
+    }
+
+    /**
+     * @param Parser $parser
+     * @return \Afk11\Bitcoin\Transaction\TransactionInput
+     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
+     */
+    public function fromParser(Parser &$parser)
+    {
+        $input = new \Afk11\Bitcoin\Transaction\TransactionInput();
+        $input
+            ->setTransactionId($parser->readBytes(32, true)->serialize('hex'))
+            ->setVout($parser->readBytes(4)->serialize('int'))
+            ->setScriptBuf($parser->getVarString())
+            ->setSequence($parser->readBytes(4)->serialize('int'));
+
+        return $input;
     }
 
     /**
@@ -34,14 +49,7 @@ class TransactionInputSerializer
     public function parse($string)
     {
         $parser = new Parser($string);
-
-        $input = new \Afk11\Bitcoin\Transaction\TransactionInput();
-        $input
-            ->setTransactionId($parser->readBytes(32, true)->serialize('hex'))
-            ->setVout($parser->readBytes(4)->serialize('int'))
-            ->setScriptBuf($parser->getVarString())
-            ->setSequence($parser->readBytes(4)->serialize('int'));
-
+        $input = $this->fromParser($parser);
         return $input;
     }
 }

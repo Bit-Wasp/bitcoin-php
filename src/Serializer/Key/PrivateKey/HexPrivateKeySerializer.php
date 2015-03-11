@@ -2,6 +2,8 @@
 
 namespace Afk11\Bitcoin\Serializer\Key\PrivateKey;
 
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Key\PrivateKey;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
 use Afk11\Bitcoin\Math\Math;
@@ -31,15 +33,25 @@ class HexPrivateKeySerializer
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @return string
+     * @return Buffer
      */
     public function serialize(PrivateKeyInterface $privateKey)
     {
         $multiplier = $privateKey->getSecretMultiplier();
         $hex = str_pad($this->math->decHex($multiplier), 64, '0', STR_PAD_LEFT);
-        return $hex;
+        $out = Buffer::hex($hex);
+        return $out;
     }
 
+    /**
+     * @param Parser $parser
+     * @return PrivateKey
+     */
+    public function fromParser(Parser &$parser)
+    {
+        $bytes = $parser->readBytes(32);
+        return $this->parse($bytes->serialize('hex'));
+    }
     /**
      * @param $string
      * @return PrivateKey
