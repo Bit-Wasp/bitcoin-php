@@ -2,6 +2,7 @@
 
 namespace Afk11\Bitcoin\Tests\Script;
 
+use Afk11\Bitcoin\Key\PublicKeyFactory;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Buffer;
@@ -383,7 +384,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function testPayToPubKey()
     {
-        $pubkey = PublicKey::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
+        $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
         $script = Script::payToPubKey($pubkey);
         $parsed = $script->parse();
         $this->assertSame($parsed[0]->serialize('hex'), '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
@@ -392,7 +393,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function testPayToPubKeyHash()
     {
-        $pubkey = PublicKey::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
+        $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
         $script = Script::payToPubKeyHash($pubkey);
         $parsed = $script->parse();
         $this->assertSame($parsed[0], 'OP_DUP');

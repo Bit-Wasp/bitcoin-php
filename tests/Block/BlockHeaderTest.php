@@ -1,13 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 02/01/15
- * Time: 00:04
- */
 
 namespace Afk11\Bitcoin\Tests\Block;
 
+use Afk11\Bitcoin\Block\BlockHeaderFactory;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Block\BlockHeader;
@@ -34,6 +29,11 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->headerType = 'Afk11\Bitcoin\Block\BlockHeader';
         $this->bufferType = 'Afk11\Bitcoin\Buffer';
+    }
+
+    private function getGenesisHex()
+    {
+        return '0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c';
     }
 
     public function setUp()
@@ -126,10 +126,8 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function testFromParser()
     {
-        $genesisHeader = '0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c';
-        $buffer = Buffer::hex($genesisHeader);
-        $parser = new Parser($buffer);
-        $result = $this->header->fromParser($parser);
+
+        $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
 
         $this->assertInstanceOf($this->headerType, $result);
         $this->assertSame('1', $result->getVersion());
@@ -150,19 +148,13 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $genesisHeader = '0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c';
-        $buffer = Buffer::hex($genesisHeader);
-        $parser = new Parser($buffer);
-        $result = $this->header->fromParser($parser);
-        $this->assertSame($genesisHeader, $result->serialize('hex'));
+        $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
+        $this->assertSame($this->getGenesisHex(), $result->getBuffer()->serialize('hex'));
     }
 
     public function testGetBlockHash()
     {
-        $genesisHeader = '0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c';
-        $buffer = Buffer::hex($genesisHeader);
-        $parser = new Parser($buffer);
-        $result = $this->header->fromParser($parser);
+        $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
         $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $result->getBlockHash());
     }
 
@@ -173,15 +165,13 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     public function testFromParserFailure()
     {
         $genesisHeader = '0100000000000000000000003BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A29AB5F49FFFF001D1DAC2B7C';
-        $buffer = Buffer::hex($genesisHeader);
-        $parser = new Parser($buffer);
-        $this->header->fromParser($parser);
+        $header = BlockHeaderFactory::fromHex($genesisHeader);
+
     }
 
     public function testFromHex()
     {
-        $genesisHeader = '0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c';
-        $header = BlockHeader::fromHex($genesisHeader);
+        $header = BlockHeaderFactory::fromHex($this->getGenesisHex());
         $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $header->getBlockHash());
     }
 };

@@ -4,6 +4,7 @@ namespace Afk11\Bitcoin\Tests\Key;
 
 use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Key\PublicKeyFactory;
 
 class PublicKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,16 +26,13 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $this->publicKey = PublicKey::fromHex($test->compressed);
+            $this->publicKey = PublicKeyFactory::fromHex($test->compressed);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
-            $this->assertSame($test->compressed, $this->publicKey->serialize('hex'));
+            $this->assertSame($test->compressed, $this->publicKey->getBuffer()->serialize('hex'));
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
-            $this->assertInstanceOf('\Mdanter\Ecc\CurveFpInterface', $this->publicKey->getCurve());
-            $this->assertSame($this->publicKey->getPubKeyHex(), $test->compressed);
+            $this->assertSame($this->publicKey->getBuffer()->serialize('hex'), $test->compressed);
             $this->assertTrue($this->publicKey->isCompressed());
             $this->assertSame($this->publicKey->__toString(), $test->compressed);
-            $this->assertSame(33, $this->publicKey->getSize());
-            $this->assertSame(66, $this->publicKey->getSize('hex'));
         }
     }
 
@@ -43,16 +41,14 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $this->publicKey = PublicKey::fromHex($test->uncompressed);
+            $this->publicKey = PublicKeyFactory::fromHex($test->uncompressed);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
-            $this->assertSame($test->uncompressed, $this->publicKey->serialize('hex'));
+            $this->assertSame($test->uncompressed, $this->publicKey->getBuffer()->serialize('hex'));
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
-            $this->assertInstanceOf('\Mdanter\Ecc\CurveFpInterface', $this->publicKey->getCurve());
-            $this->assertSame($this->publicKey->getPubKeyHex(), $test->uncompressed);
+            $this->assertSame($this->publicKey->getBuffer()->serialize('hex'), $test->uncompressed);
             $this->assertSame($this->publicKey->__toString(), $test->uncompressed);
             $this->assertFalse($this->publicKey->isCompressed());
-            $this->assertSame(65, $this->publicKey->getSize());
-            $this->assertSame(130, $this->publicKey->getSize('hex'));
+
         }
     }
 
@@ -62,9 +58,9 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function testFromHexInvalidLength()
     {
         $hex = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44febaa';
-        $this->publicKey = PublicKey::fromHex($hex);
+        $this->publicKey = PublicKeyFactory::fromHex($hex);
         $this->assertInstanceOf($this->publicType, $this->publicKey);
-        $this->assertSame($hex, $this->publicKey->serialize('hex'));
+        $this->assertSame($hex, $this->publicKey->getBuffer()->serialize('hex'));
     }
 
     /**
@@ -73,7 +69,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function testFromHexInvalidByte()
     {
         $hex = '01cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
-        $this->publicKey = PublicKey::fromHex($hex);
+        $this->publicKey = PublicKeyFactory::fromHex($hex);
     }
 
     /**
@@ -82,7 +78,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function testFromHexInvalidByte2()
     {
         $hex = '04cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
-        $this->publicKey = PublicKey::fromHex($hex);
+        $this->publicKey = PublicKeyFactory::fromHex($hex);
     }
 
     public function testRecoverYfromX()
@@ -114,7 +110,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $key        = PublicKey::fromHex($test->uncompressed);
+            $key        = PublicKeyFactory::fromHex($test->uncompressed);
             $compressed = PublicKey::compress($key);
             $this->assertSame($compressed, $test->compressed);
         }
@@ -123,7 +119,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function testCompressPoint()
     {
         $hex             = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
-        $this->publicKey = PublicKey::fromHex($hex);
+        $this->publicKey = PublicKeyFactory::fromHex($hex);
         $point           = $this->publicKey->getPoint();
         $compressed      = PublicKey::compress($point);
         $this->assertSame($hex, $compressed);
@@ -142,7 +138,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__.'/../Data/publickey.pubkeyhash.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $pubkey = PublicKey::fromHex($test->key);
+            $pubkey = PublicKeyFactory::fromHex($test->key);
             $hash   = $pubkey->getPubKeyHash();
             $this->assertSame($hash, $test->hash);
         }
@@ -153,7 +149,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $pub = PublicKey::fromHex($test->uncompressed);
+            $pub = PublicKeyFactory::fromHex($test->uncompressed);
             $this->assertFalse($pub->isCompressed());
             $pub->setCompressed(true);
             $this->assertTrue($pub->isCompressed());
@@ -165,7 +161,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $pub = PublicKey::fromHex($test->compressed);
+            $pub = PublicKeyFactory::fromHex($test->compressed);
             $this->assertTrue($pub->isCompressed());
             $pub->setCompressed(false);
             $this->assertFalse($pub->isCompressed());
@@ -178,9 +174,9 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
-            $pubkey = PublicKey::fromHex($test->compressed);
-            $hex    = $pubkey->serialize('hex');
-            $bin    = $pubkey->serialize();
+            $pubkey = PublicKeyFactory::fromHex($test->compressed);
+            $hex    = $pubkey->getBuffer()->serialize('hex');
+            $bin    = $pubkey->getBuffer()->serialize();
 
             for ($i = 0; $i < count($bin); $i++) {
                 $nHex = bin2hex(substr($bin, $i, 1));
@@ -194,7 +190,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetCompressedFailure()
     {
-        $pub = PublicKey::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
+        $pub = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
         $pub->setCompressed('a');
     }
 }

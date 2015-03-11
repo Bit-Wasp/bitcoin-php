@@ -33,9 +33,10 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $privKey     = new PrivateKey($math, $generator, $test->privKey);
+            $key = $math->hexDec($test->privKey);
+            $privKey     = new PrivateKey($math, $generator, $key);
             $messageHash = Buffer::hex(Hash::sha256($test->message));
-            $entropy     = new Buffer($privKey->serialize() . $messageHash->serialize());
+            $entropy     = new Buffer($privKey->getBuffer()->serialize() . $messageHash->serialize());
             $drbg        = new HmacDrbg($test->algorithm, $entropy);
             $k           = $drbg->bytes(32);
             $this->assertEquals(strtolower($test->expectedK), strtolower($k->serialize('hex')));

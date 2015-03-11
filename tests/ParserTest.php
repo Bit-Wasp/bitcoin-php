@@ -7,6 +7,8 @@ use \Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Network;
 use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionCollection;
+use Afk11\Bitcoin\Transaction\TransactionFactory;
 use \Afk11\Bitcoin\Transaction\TransactionInput;
 use \Afk11\Bitcoin\Transaction\TransactionOutput;
 
@@ -341,7 +343,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteArray()
     {
-        $transaction = new Transaction();
+        $transaction = TransactionFactory::create();
         $input  = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0);
         $output = new TransactionOutput(null, 1);
         $transaction
@@ -352,11 +354,11 @@ class ParserTest extends \PHPUnit_Framework_TestCase
             ->getOutputs()
             ->addOutput($output);
 
-        $array  = array($transaction, $transaction);
+        $array  = new TransactionCollection(array($transaction, $transaction));
         $parser = new Parser();
-        $parser->writeArray($array);
+        $parser->writeArray($array->getBuffer());
 
-        $this->assertSame('010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $transaction->serialize('hex'));
+        $this->assertSame('010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $transaction->getBuffer()->serialize('hex'));
         $this->assertSame('02010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $parser->getBuffer()->serialize('hex'));
 
     }
