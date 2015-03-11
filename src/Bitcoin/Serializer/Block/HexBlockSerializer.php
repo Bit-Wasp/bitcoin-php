@@ -17,6 +17,7 @@ class HexBlockSerializer
 
     /**
      * @param HexBlockHeaderSerializer $headerSerializer
+     * @param TransactionCollectionSerializer $txColSerializer
      */
     public function __construct(HexBlockHeaderSerializer $headerSerializer, TransactionCollectionSerializer $txColSerializer)
     {
