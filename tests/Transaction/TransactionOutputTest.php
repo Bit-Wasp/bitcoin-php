@@ -2,6 +2,7 @@
 
 namespace Afk11\Bitcoin\Tests\Transaction;
 
+use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use Afk11\Bitcoin\Transaction\TransactionOutput;
 use Afk11\Bitcoin\Script\Script;
@@ -111,10 +112,10 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
-        $parser = new Parser($buffer);
-        $out    = $this->out->fromParser($parser);
-        $this->assertEquals($buffer, $out->getBuffer());
+        $buffer = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
+        $s = new TransactionInputSerializer();
+        $out = $s->parse($buffer);
+        $this->assertEquals($buffer, $out->getBuffer()->serialize('hex'));
     }
 
 };

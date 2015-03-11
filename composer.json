@@ -1,7 +1,7 @@
 {
   "autoload": {
     "psr-4": {
-      "Afk11\\Bitcoin\\": "src/",
+      "Afk11\\Bitcoin\\": "src/Bitcoin/",
       "Afk11\\Bitcoin\\Tests\\": "tests/"
     }
   },

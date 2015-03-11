@@ -92,7 +92,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf($this->publicType, $this->privateKey->getPublicKey());
         $this->assertSame(
             '04eec7245d6b7d2ccb30380bfbe2a3648cd7a942653f5aa340edcea1f2836866198bd9fc8678e246f23f40bfe8d928d3f37a51642aed1d5b471a1a0db4f71891ea',
-            $this->privateKey->getPublicKey()->serialize('hex')
+            $this->privateKey->getPublicKey()->getBuffer()->serialize('hex')
         );
     }
 

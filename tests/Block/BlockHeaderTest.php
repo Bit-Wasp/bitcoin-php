@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 02/01/15
- * Time: 00:04
- */
 
 namespace Afk11\Bitcoin\Tests\Block;
 
