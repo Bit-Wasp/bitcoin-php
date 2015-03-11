@@ -42,7 +42,6 @@ class SignerTest extends \PHPUnit_Framework_TestCase
 
         foreach ($json->test as $c => $test) {
             $privateKey = PrivateKeyFactory::fromHex($test->privKey, false, $this->math, $this->generator);
-            $privateKey = new PrivateKey($this->math, $this->generator, $this->math->hexDec($test->privKey));
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
@@ -102,7 +101,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
         $random = new Random();
 
         $signer = new Signer($this->math, $this->generator);
-        $pk = PrivateKeyFactory::fromInt('4141414141414141414141414141414141414141414141414141414141414141', $this->math, $this->generator);
+        $pk = PrivateKeyFactory::fromInt('4141414141414141414141414141414141414141414141414141414141414141', false, $this->math, $this->generator);
 
         for ($i = 0; $i < 2; $i++) {
             $hash = $random->bytes(32);
