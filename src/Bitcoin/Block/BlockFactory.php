@@ -12,7 +12,7 @@ class BlockFactory
     /**
      * @return HexBlockSerializer
      */
-    public function getSerializer()
+    public static function getSerializer()
     {
         $serializer = new HexBlockSerializer(new HexBlockHeaderSerializer(), new TransactionCollectionSerializer(new TransactionSerializer()));
         return $serializer;
