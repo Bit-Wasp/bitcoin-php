@@ -10,6 +10,8 @@ use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
 use Afk11\Bitcoin\Transaction\Transaction;
+use Afk11\Bitcoin\Transaction\TransactionCollection;
+use Afk11\Bitcoin\Transaction\TransactionFactory;
 use Afk11\Bitcoin\Transaction\TransactionInterface;
 use Afk11\Bitcoin\Transaction\TransactionInput;
 use Afk11\Bitcoin\Transaction\TransactionOutput;
@@ -31,9 +33,9 @@ class Miner
     private $lastBlockHeader;
 
     /**
-     * @var array
+     * @var TransactionCollection
      */
-    private $transactions = array();
+    private $transactions;
 
     /**
      * @var int
@@ -85,6 +87,7 @@ class Miner
         $this->timestamp = $timestamp ?: time();
         $this->version = $version;
         $this->report = $report;
+        $this->transactions = new TransactionCollection();
         return $this;
     }
 
@@ -92,7 +95,7 @@ class Miner
      * @param array $transactions
      * @return $this
      */
-    public function setTransactions(array $transactions)
+    public function setTransactions(TransactionCollection $transactions)
     {
         $this->transactions = $transactions;
         return $this;
@@ -134,7 +137,7 @@ class Miner
             $output->setScript($this->script);
             $output->setValue(5000000000);
 
-            $coinbaseTx = new Transaction;
+            $coinbaseTx = TransactionFactory::create();
             $coinbaseTx->getInputs()->addInput($input);
             $coinbaseTx->getOutputs()->addOutput($output);
         }
@@ -152,8 +155,8 @@ class Miner
             // Set coinbase script, and build Merkle tree & block header.
             $inputs->getInput(0)->setScript($this->getCoinbaseScriptBuf());
 
-            $transactions = array_merge(array($coinbaseTx), $this->transactions);
-            $block->setTransactions($transactions);
+            $transactions = array_merge(array($coinbaseTx), $this->transactions->getTransactions());
+            $block->setTransactions(new TransactionCollection($transactions));
 
             $merkleRoot = new MerkleRoot($this->math, $block);
             $merkleHash = $merkleRoot->calculateHash();
@@ -170,9 +173,9 @@ class Miner
             // Loop through all nonces (up to 2^32). Restart after modifying extranonce.
             while ($this->math->cmp($nonce, $maxNonce) <= 0) {
                 $header->setNonce($nonce++);
-                $hashS = Hash::sha256d(pack("H*", $header->getBuffer()));
+
                 $hash = (new Parser())
-                    ->writeBytes(32, $hashS, true)
+                    ->writeBytes(32, Hash::sha256d($header->getBuffer()->serialize()), true)
                     ->getBuffer();
 
                 if ($this->math->cmp($hash->serialize('int'), $target) <= 0) {

@@ -1,9 +1,10 @@
 <?php
 
 use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Block\Block;
+use Afk11\Bitcoin\Key\PrivateKeyFactory;
+use Afk11\Bitcoin\Block\BlockFactory;
 use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
-use Afk11\Bitcoin\Key\PrivateKey;
+
 use Afk11\Bitcoin\Miner\Miner;
 use Afk11\Bitcoin\Network;
 use Afk11\Bitcoin\Script\Script;
@@ -14,8 +15,8 @@ require __DIR__ . "/../vendor/autoload.php";
 $network = new Network('6f', 'c4', 'ef', true);
 
 // generate a privatekey so we can received the BTC
-$privKey = PrivateKey::generateNew(true);
-var_dump($privKey->getWif($network));
+$privKey = PrivateKeyFactory::create(true);
+var_dump($privKey->toWif($network));
 
 // get latest block from RPC
 $rpc = new JsonRpcClient(getenv('BITCOINLIB_RPC_HOST') ?: 'localhost', "18332");
@@ -23,7 +24,7 @@ $rpc->authentication(getenv('BITCOINLIB_RPC_USER') ?: 'bitcoin', getenv('BITCOIN
 $latest = $rpc->getblock($rpc->getbestblockhash(), false);
 
 // init latest block
-$prev = Block::fromHex($latest);
+$prev = BlockFactory::fromHex($latest);
 
 // mining in the future \o/
 $timestamp = time() + (3600 * 2);

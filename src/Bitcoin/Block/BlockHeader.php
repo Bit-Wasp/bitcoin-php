@@ -45,10 +45,23 @@ class BlockHeader implements BlockHeaderInterface
     protected $nonce;
 
     /**
-     * Instantiate class
+     * @param null $version
+     * @param null $prevBlock
+     * @param null $nextBlock
+     * @param null $merkleRoot
+     * @param null $timestamp
+     * @param null $bits
+     * @param null $nonce
      */
-    public function __construct()
+    public function __construct($version = null, $prevBlock = null, $nextBlock = null, $merkleRoot = null, $timestamp = null, $bits = null, $nonce = null)
     {
+        $this->version = $version;
+        $this->prevBlock = $prevBlock;
+        $this->nextBlock = $nextBlock;
+        $this->merkleRoot = $merkleRoot;
+        $this->timestamp = $timestamp;
+        $this->bits = $bits;
+        $this->nonce = $nonce;
     }
 
     /**
@@ -62,6 +75,16 @@ class BlockHeader implements BlockHeaderInterface
     }
 
     /**
+     * @param mixed $bits
+     * @return $this
+     */
+    public function setBits(Buffer $bits)
+    {
+        $this->bits = $bits;
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getBlockHash()
@@ -71,16 +94,6 @@ class BlockHeader implements BlockHeaderInterface
         $parser = new Parser();
         $parser->writeBytes(32, $hash, true);
         return $parser->getBuffer()->serialize('hex');
-    }
-
-    /**
-     * @param mixed $bits
-     * @return $this
-     */
-    public function setBits(Buffer $bits)
-    {
-        $this->bits = $bits;
-        return $this;
     }
 
     /**
@@ -211,7 +224,7 @@ class BlockHeader implements BlockHeaderInterface
      * Set the version of this block
      *
      * @param $version
-     * @return $this
+     * @return BlockHeaderInterface
      */
     public function setVersion($version)
     {

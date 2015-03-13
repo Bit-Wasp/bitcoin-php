@@ -2,9 +2,7 @@
 
 namespace Afk11\Bitcoin\Block;
 
-use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use Afk11\Bitcoin\Serializer\Block\HexBlockSerializer;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;

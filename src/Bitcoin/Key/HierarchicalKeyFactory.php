@@ -35,7 +35,7 @@ class HierarchicalKeyFactory
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();
 
-        $buffer  = PrivateKeyFactory::generate(true, $math, $generator);
+        $buffer  = PrivateKeyFactory::create(true, $math, $generator);
         $private = self::fromEntropy($buffer->serialize('hex'));
         return $private;
     }

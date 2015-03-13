@@ -51,7 +51,7 @@ class PrivateKeyFactory
      * @param GeneratorPoint $generator
      * @return PrivateKey
      */
-    public static function generate($compressed = false, Math $math = null, GeneratorPoint $generator = null)
+    public static function create($compressed = false, Math $math = null, GeneratorPoint $generator = null)
     {
         $math = $math ?: Bitcoin::getMath();
         $generator = $generator ?: Bitcoin::getGenerator();

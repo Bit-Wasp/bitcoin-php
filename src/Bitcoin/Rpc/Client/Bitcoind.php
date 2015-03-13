@@ -2,9 +2,11 @@
 
 namespace Afk11\Bitcoin\Rpc\Client;
 
+use Afk11\Bitcoin\Block\BlockFactory;
+use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
-use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Transaction\TransactionFactory;
+use Afk11\Bitcoin\Transaction\TransactionInterface;
 
 class Bitcoind
 {
@@ -23,9 +25,60 @@ class Bitcoind
     }
 
     /**
+     * @return mixed
+     */
+    public function getbestblockhash()
+    {
+        $hash = $this->client->execute('getbestblockhash');
+        return $hash;
+    }
+
+    /**
+     * @param $blockHeight
+     * @return mixed
+     */
+    public function getblockhash($blockHeight)
+    {
+        $hash = $this->client->execute('getblockhash', array($blockHeight));
+        return $hash;
+    }
+
+    public function getblock($blockhash)
+    {
+        $blockArray = $this->client->execute('getblock', array($blockhash, true));
+        $block = BlockFactory::create();
+
+        // Build block header
+        $block->getHeader()
+            ->setVersion($blockArray['version'])
+            ->setBits(Buffer::hex($blockArray['bits']))
+            ->setTimestamp($blockArray['time'])
+            ->setMerkleRoot($blockArray['merkleroot'])
+            ->setNonce($blockArray['nonce'])
+            ->setPrevBlock($blockArray['previousblockhash'])
+            ->setNextBlock(@$blockArray['nextblockhash']);
+
+        // Establish batch query for loading transactions
+        $this->client->batch();
+        foreach ($blockArray['tx'] as $txid) {
+            $this->client->getrawtransaction($txid);
+        }
+        $result = $this->client->send();
+
+        // Build the transactions
+        $block->getTransactions()->addTransactions(
+            array_map(function($value) {
+                return TransactionFactory::fromHex($value);
+            }, $result)
+        );
+
+        return $block;
+    }
+
+    /**
      * @param $txid
      * @param bool $verbose
-     * @return Transaction|mixed
+     * @return TransactionInterface|mixed
      */
     public function getrawtransaction($txid, $verbose = false)
     {
@@ -36,5 +89,16 @@ class Bitcoind
         }
 
         return $tx;
+    }
+
+    /**
+     * @param TransactionInterface $transaction
+     * @return mixed
+     */
+    public function sendrawtransaction(TransactionInterface $transaction)
+    {
+        $hex = $transaction->getBuffer()->serialize('hex');
+        $send = $this->client->execute('sendrawtransaction', array($hex));
+        return $send;
     }
 }

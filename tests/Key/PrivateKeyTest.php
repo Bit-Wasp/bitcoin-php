@@ -107,7 +107,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateNewUncompressed()
     {
-        $this->privateKey = PrivateKeyFactory::generate(false);
+        $this->privateKey = PrivateKeyFactory::create(false);
         $this->assertInstanceOf($this->baseType, $this->privateKey);
         $this->assertFalse($this->privateKey->isCompressed());
         $this->assertTrue($this->privateKey->isPrivate());
@@ -126,7 +126,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateNewCompressed()
     {
-        $this->privateKey = PrivateKeyFactory::generate(true);
+        $this->privateKey = PrivateKeyFactory::create(true);
         $this->assertInstanceOf($this->baseType, $this->privateKey);
         $this->assertTrue($this->privateKey->isCompressed());
         $this->assertTrue($this->privateKey->isPrivate());

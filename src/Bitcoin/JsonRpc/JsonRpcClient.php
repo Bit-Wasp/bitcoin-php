@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\JsonRpc;
 
 use JsonRPC\Client;
 
-class JsonRpcClient
+class JsonRpcClient extends Client
 {
     /**
      * @var Client
@@ -62,12 +62,11 @@ class JsonRpcClient
     }
 
     /**
-     * @return $this
+     * @return array
      */
     public function send()
     {
-        $this->client->batch();
-        return $this;
+        return $this->client->send();
     }
 
     /**
