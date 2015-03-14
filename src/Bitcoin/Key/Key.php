@@ -8,12 +8,11 @@ use Afk11\Bitcoin\Network\NetworkInterface;
 abstract class Key implements KeyInterface
 {
     /**
-     * @param NetworkInterface $network
      * @return \Afk11\Bitcoin\Address\ScriptHashAddress
      */
-    public function getAddress(NetworkInterface $network)
+    public function getAddress()
     {
-        $address = AddressFactory::fromKey($network, $this);
+        $address = AddressFactory::fromKey($this);
         return $address;
     }
 }

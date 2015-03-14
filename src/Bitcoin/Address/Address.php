@@ -7,6 +7,10 @@ use Afk11\Bitcoin\Network\NetworkInterface;
 
 abstract class Address implements AddressInterface
 {
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     */
     public function getAddress(NetworkInterface $network)
     {
         return Base58::encodeCheck($this->getPrefixByte($network) . $this->getHash());

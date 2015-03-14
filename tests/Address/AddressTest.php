@@ -4,10 +4,12 @@ namespace Address;
 
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Key\PublicKeyFactory;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Script\ScriptFactory;
 use Symfony\Component\Yaml\Yaml;
 
-class AddressTest extends \PHPUnit_Framework_TestCase {
+class AddressTest extends \PHPUnit_Framework_TestCase
+{
 
     public function getVectors()
     {
@@ -37,17 +39,22 @@ class AddressTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @dataProvider getVectors
+     * @param $type
+     * @param NetworkInterface $network
+     * @param $data
+     * @param $address
+     * @throws \Exception
      */
-    public function testAddress($type, $network, $data, $address)
+    public function testAddress($type, NetworkInterface $network, $data, $address)
     {
         if ($type == 'pubkeyhash') {
-            $obj = PublicKeyFactory::fromHex($data)->getAddress($network);
+            $obj = PublicKeyFactory::fromHex($data)->getAddress();
         } else if ($type == 'script') {
-            $obj = ScriptFactory::fromHex($data)->getAddress($network);
+            $obj = ScriptFactory::fromHex($data)->getAddress();
         } else {
             throw new \Exception('Unknown address type');
         }
 
-        $this->assertEquals($obj->getAddress(), $address);
+        $this->assertEquals($obj->getAddress($network), $address);
     }
 }

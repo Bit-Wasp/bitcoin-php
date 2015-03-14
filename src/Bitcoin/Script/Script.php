@@ -241,9 +241,9 @@ class Script implements ScriptInterface
      * @param NetworkInterface $network
      * @return \Afk11\Bitcoin\Address\ScriptHashAddress
      */
-    public function getAddress(NetworkInterface $network)
+    public function getAddress()
     {
-        $address = AddressFactory::fromScript($network, $this);
+        $address = AddressFactory::fromScript($this);
         return $address;
     }
 

@@ -3,13 +3,11 @@
 namespace Afk11\Bitcoin\Address;
 
 use Afk11\Bitcoin\Key\KeyInterface;
-use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Script\ScriptInterface;
 
 class AddressFactory
 {
     /**
-     * @param NetworkInterface $network
      * @param KeyInterface $key
      * @return PayToPubKeyHashAddress
      */
@@ -20,7 +18,6 @@ class AddressFactory
     }
 
     /**
-     * @param NetworkInterface $network
      * @param ScriptInterface $script
      * @return ScriptHashAddress
      */
