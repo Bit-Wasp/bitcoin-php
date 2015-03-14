@@ -45,7 +45,8 @@ class BitcoinTest extends \PHPUnit_Framework_TestCase
         $default = new Network('00', '05', '80');
         $default
             ->setHDPubByte('0488b21e')
-            ->setHDPrivByte('0488ade4');
+            ->setHDPrivByte('0488ade4')
+            ->setNetMagicBytes('d9b4bef9');
 
         $custom = new Network('fc','fd','00');
 

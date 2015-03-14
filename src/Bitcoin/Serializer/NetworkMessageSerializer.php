@@ -2,14 +2,14 @@
 
 namespace Afk11\Bitcoin\Serializer;
 
-
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Network\NetworkMessageInterface;
 use Afk11\Bitcoin\Crypto\Hash;
 
-class NetworkMessageSerializer {
+class NetworkMessageSerializer
+{
 
     /**
      * @var NetworkInterface

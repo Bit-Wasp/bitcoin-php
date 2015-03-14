@@ -50,5 +50,4 @@ interface NetworkInterface
      * @return string
      */
     public function getNetMagicBytes();
-
 }
