@@ -52,15 +52,15 @@ class Network implements NetworkInterface
      */
     public function __construct($addressByte, $p2shByte, $privByte, $testnet = false)
     {
-        if (!(ctype_xdigit($addressByte) and strlen($addressByte) == 2)) {
+        if (!(ctype_xdigit($addressByte) && strlen($addressByte) == 2)) {
             throw new \Exception("address byte must be 1 hexadecimal byte");
         }
 
-        if (!(ctype_xdigit($p2shByte) and strlen($p2shByte) == 2)) {
+        if (!(ctype_xdigit($p2shByte) && strlen($p2shByte) == 2)) {
             throw new \Exception("p2sh byte must be 1 hexadecimal byte");
         }
 
-        if (!(ctype_xdigit($privByte) and strlen($privByte) == 2)) {
+        if (!(ctype_xdigit($privByte) && strlen($privByte) == 2)) {
             throw new \Exception("priv byte must be 1 hexadecimal byte");
         }
 
@@ -69,9 +69,9 @@ class Network implements NetworkInterface
         }
 
         $this->addressByte = $addressByte;
-        $this->p2shByte    = $p2shByte;
-        $this->privByte    = $privByte;
-        $this->testnet     = $testnet;
+        $this->p2shByte = $p2shByte;
+        $this->privByte = $privByte;
+        $this->testnet = $testnet;
     }
 
     /**
@@ -129,7 +129,7 @@ class Network implements NetworkInterface
      */
     public function setHDPubByte($byte)
     {
-        if (!empty($byte) and ctype_xdigit($byte) == true) {
+        if (!empty($byte) && ctype_xdigit($byte) == true) {
             $this->xpubByte = $byte;
         }
 
@@ -159,7 +159,7 @@ class Network implements NetworkInterface
      */
     public function setHDPrivByte($bytes)
     {
-        if (!empty($bytes) and ctype_xdigit($bytes) == true) {
+        if (!empty($bytes) && ctype_xdigit($bytes) == true) {
             $this->xprivByte = $bytes;
         }
 
