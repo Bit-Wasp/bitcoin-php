@@ -202,7 +202,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         if ($pushSize == 0) {
             return $opcodes->isThisOp($opCode, 'OP_0');
         } elseif ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
-            return $opCode == $this->script->getOpCodes()->getOpByName('OP_1') + (ord($pushData[0]) - 1);
+            return $opCode == $opcodes->getOpByName('OP_1') + (ord($pushData[0]) - 1);
         } elseif ($pushSize == 1 && ord($pushData) == 0x81) {
             return $opcodes->isThisOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
