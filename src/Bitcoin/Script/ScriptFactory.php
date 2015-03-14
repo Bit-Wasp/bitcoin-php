@@ -13,6 +13,16 @@ class ScriptFactory
     }
 
     /**
+     * @param $string
+     * @return Script
+     */
+    public static function fromHex($string)
+    {
+        return self::create()
+            ->set($string);
+    }
+
+    /**
      * @return ScriptStack
      */
     public static function stack()
