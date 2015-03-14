@@ -26,6 +26,17 @@ class TransactionFactory
     }
 
     /**
+     * @param TransactionInterface $tx
+     * @return TransactionBuilder
+     */
+    public static function builder(TransactionInterface $tx = null)
+    {
+        $tx = $tx ?: TransactionFactory::create();
+        $builder = new TransactionBuilder($tx);
+        return $builder;
+    }
+
+    /**
      * @param $string
      * @return Transaction
      */

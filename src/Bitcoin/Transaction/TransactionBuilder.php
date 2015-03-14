@@ -19,10 +19,9 @@ class TransactionBuilder
     /**
      * @param TransactionInterface $tx
      */
-    public function __construct(TransactionInterface $tx = null, NetworkInterface $network = null)
+    public function __construct(TransactionInterface $tx = null)
     {
         $this->transaction = $tx ?: TransactionFactory::create();
-        $this->network = $network ?: Bitcoin::getNetwork();
     }
 
     /**
