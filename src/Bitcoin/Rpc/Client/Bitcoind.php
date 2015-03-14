@@ -21,7 +21,6 @@ class Bitcoind
     public function __construct(JsonRpcClient $client)
     {
         $this->client = $client;
-        return $this;
     }
 
     public function getinfo()
@@ -49,6 +48,10 @@ class Bitcoind
         return $hash;
     }
 
+    /**
+     * @param $blockhash
+     * @return \Afk11\Bitcoin\Block\Block
+     */
     public function getblock($blockhash)
     {
         $blockArray = $this->client->execute('getblock', array($blockhash, true));
@@ -67,7 +70,7 @@ class Bitcoind
         // Establish batch query for loading transactions
         $this->client->batch();
         foreach ($blockArray['tx'] as $txid) {
-            $this->client->getrawtransaction($txid);
+            $this->client->execute('getrawtransaction', array($txid));
         }
         $result = $this->client->send();
 
@@ -84,7 +87,7 @@ class Bitcoind
     /**
      * @param $txid
      * @param bool $verbose
-     * @return TransactionInterface|mixed
+     * @return TransactionInterface
      */
     public function getrawtransaction($txid, $verbose = false)
     {
@@ -103,7 +106,7 @@ class Bitcoind
      */
     public function sendrawtransaction(TransactionInterface $transaction)
     {
-        $hex = $transaction->getBuffer()->serialize('hex');
+        $hex = $transaction->getBuffer()->getHex();
         $send = $this->client->execute('sendrawtransaction', array($hex));
         return $send;
     }
