@@ -208,20 +208,14 @@ class Transaction implements TransactionInterface
             return array(
                 'txid' => $input->getTransactionId(),
                 'vout' => $input->getVout(),
-                'scriptSig' => array(
-                    'hex' => $input->getScript()->getBuffer()->serialize('hex'),
-                    'asm' => $input->getScript()->getAsm()
-                )
+                'scriptSig' => $input->getScript()->toArray()
             );
         }, $this->getInputs()->getInputs());
 
         $outputs = array_map(function (TransactionOutputInterface $output) {
             return array(
                 'value' => $output->getValue(),
-                'scriptPubKey' => array(
-                    'hex' => $output->getScript()->getBuffer()->serialize('hex'),
-                    'asm' => $output->getScript()->getAsm()
-                )
+                'scriptPubKey' => $output->getScript()->toArray()
             );
         }, $this->getOutputs()->getOutputs());
 
