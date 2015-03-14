@@ -11,7 +11,6 @@ use Afk11\Bitcoin\Crypto\Hash;
 use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\GeneratorPoint;
-use Mdanter\Ecc\MathAdapterInterface;
 
 class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInterface
 {
@@ -56,7 +55,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     protected $network;
 
     /**
-     * @var MathAdapterInterface
+     * @var Math
      */
     protected $math;
 
