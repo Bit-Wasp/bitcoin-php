@@ -44,7 +44,6 @@ class HmacDrbg implements RbgInterface
 
         $this->algorithm = $algo;
         $this->initialize($entropy, $personalString);
-        return $this;
     }
 
     /**

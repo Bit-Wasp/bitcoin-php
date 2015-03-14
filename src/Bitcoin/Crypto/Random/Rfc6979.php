@@ -43,7 +43,6 @@ class Rfc6979 implements RbgInterface
         $this->generator = $generator;
         $entropy         = new Buffer($privateKey->getBuffer()->serialize() . $messageHash->serialize());
         $this->drbg      = new HmacDrbg($algo, $entropy);
-        return $this;
     }
 
     /**

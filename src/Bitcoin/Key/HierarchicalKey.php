@@ -46,9 +46,9 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     protected $chainCode;
 
     /**
-     * @var Buffer
+     * @var KeyInterface
      */
-    protected $keyData;
+    protected $key;
 
     /**
      * @var NetworkInterface
