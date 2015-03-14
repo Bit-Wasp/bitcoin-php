@@ -30,7 +30,7 @@ class TransactionInputSerializer
      * @return TransactionInput
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         return new TransactionInput(
             $parser->readBytes(32, true)->serialize('hex'),

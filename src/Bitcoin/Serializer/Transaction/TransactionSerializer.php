@@ -49,7 +49,7 @@ class TransactionSerializer
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         return TransactionFactory::create()
             ->setVersion($parser->readBytes(4, true)->serialize('int'))

@@ -108,7 +108,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getDisabledOpcodes()
     {
@@ -165,7 +165,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     /**
      * @param $op
-     * @param $opCodeStr
+     * @param string $opCodeStr
      * @return bool
      */
     public function isOp($op, $opCodeStr)
@@ -202,7 +202,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         if ($pushSize == 0) {
             return $opcodes->isThisOp($opCode, 'OP_0');
         } elseif ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
-            return $opCode == $this->script->getOpCodes()->getOpByName('OP_1') + ( ord($pushData[0]) - 1);
+            return $opCode == $this->script->getOpCodes()->getOpByName('OP_1') + (ord($pushData[0]) - 1);
         } elseif ($pushSize == 1 && ord($pushData) == 0x81) {
             return $opcodes->isThisOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
@@ -219,7 +219,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @param $script
      * @param $position
-     * @param $posEnd
+     * @param integer $posEnd
      * @param $opCode
      * @param string $pushData
      * @return bool
@@ -377,15 +377,16 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function run()
     {
         $opcodes = $this->script->getOpCodes();
-        $script        = $this->script->getBuffer()->serialize();
-        $posScriptEnd  = strlen($script);
-        $pos           = 0;
+        $script = $this->script->getBuffer()->serialize();
+        $posScriptEnd = strlen($script);
+        $pos = 0;
         $this->opCount = 0;
-        $opCode        = null;
+        $opCode = null;
+
         $checkFExec = function () {
             $c = 0;
             for ($i = 0, $len = $this->vfExecStack->end(); $i < $len; $i++) {
-                if ($this->vfExecStack->top(0-$len-$i) == true) {
+                if ($this->vfExecStack->top(0 - $len - $i) == true) {
                     $c++;
                 }
             }
@@ -581,8 +582,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $string1 = $this->mainStack->top(-6);
                             $string2 = $this->mainStack->top(-5);
-                            $this->mainStack->erase($this->mainStack->size()-6);
-                            $this->mainStack->erase($this->mainStack->size()-4);
+                            $this->mainStack->erase($this->mainStack->size() - 6);
+                            $this->mainStack->erase($this->mainStack->size() - 4);
                             $this->mainStack->push($string1);
                             $this->mainStack->push($string2);
                             break;
@@ -793,10 +794,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $num = $this->math->sub($num1, $num2);
                                     break;
                                 case $this->isOp($opCode, 'OP_BOOLAND'):
-                                    $num = ($this->math->cmp($num1, $_bn0) !== 0 && $this->math->cmp($num2, $_bn0) !== 0 );
+                                    $num = ($this->math->cmp($num1, $_bn0) !== 0 && $this->math->cmp($num2, $_bn0) !== 0);
                                     break;
                                 case $this->isOp($opCode, 'OP_BOOLOR'):
-                                    $num = ($this->math->cmp($num1, $_bn0) !== 0 || $this->math->cmp($num2, $_bn0) !== 0 );
+                                    $num = ($this->math->cmp($num1, $_bn0) !== 0 || $this->math->cmp($num2, $_bn0) !== 0);
                                     break;
                                 case $this->isOp($opCode, 'OP_NUMEQUAL'):
                                     $num = ($this->math->cmp($num1, $num2) == 0);
@@ -909,12 +910,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $signature = SignatureFactory::fromHex($vchSig);
                             $publicKey = PublicKeyFactory::fromHex($vchPubKey);
 
-                            $scriptCode= new Buffer(substr($script, $this->hashStartPos, $posScriptEnd));
+                            $scriptCode = new Buffer(substr($script, $this->hashStartPos, $posScriptEnd));
                             $script    = new Script($scriptCode);
                             $sigHash   = $this->transaction->signatureHash()->calculate($script, $this->inputToSign, $signature->getSighashType());
                             $signer    = new Signer($this->math, $this->generator);
 
-                           // $hash = $this->transaction->get
+                            // $hash = $this->transaction->get
                             $hash      = new Buffer();
                             $success   = $signer->verify($publicKey, $sigHash, $signature);
                             $this->mainStack->pop();
@@ -938,7 +939,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation');
                             }
                             break;
-                        */
+                         */
                     }
                 }
             }
@@ -953,7 +954,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return false;
 
         } catch (\Exception $e) {
-            echo "E: ".$e->getMessage()."\n";
+            echo "E: " . $e->getMessage() . "\n";
             return false;
         }
     }

@@ -154,17 +154,17 @@ class Opcodes
             'OP_2SWAP' => 114,
 
             // Splice
-            'OP_CAT' => 126,                    /* disabled */
-            'OP_SUBSTR' => 127,                 /* disabled */
-            'OP_LEFT' => 128,                   /* disabled */
-            'OP_RIGHT' => 129,                  /* disabled */
-            'OP_SIZE' => 130,                   /* disabled */
+            'OP_CAT' => 126, /* disabled */
+            'OP_SUBSTR' => 127, /* disabled */
+            'OP_LEFT' => 128, /* disabled */
+            'OP_RIGHT' => 129, /* disabled */
+            'OP_SIZE' => 130, /* disabled */
 
             // Bitwise logic
-            'OP_INVERT' => 131,                 /* Disabled */
-            'OP_AND' => 132,                    /* Disabled */
-            'OP_OR' => 133,                     /* Disabled */
-            'OP_XOR' => 134,                    /* Disabled */
+            'OP_INVERT' => 131, /* Disabled */
+            'OP_AND' => 132, /* Disabled */
+            'OP_OR' => 133, /* Disabled */
+            'OP_XOR' => 134, /* Disabled */
             'OP_EQUAL' => 135,
             'OP_EQUALVERIFY' => 136,
 

@@ -40,7 +40,7 @@ class TransactionInputCollectionSerializer
      * @param Parser $parser
      * @return TransactionInputCollection
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         $inputs = new TransactionInputCollection;
         $inputs->addInputs(

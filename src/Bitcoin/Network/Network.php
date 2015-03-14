@@ -44,27 +44,27 @@ class Network implements NetworkInterface
     /**
      * Load basic data, throw exception if it's not provided
      *
-     * @param $addressByte
-     * @param $p2shByte
-     * @param $privByte
+     * @param string $addressByte
+     * @param string $p2shByte
+     * @param string $privByte
      * @param bool $testnet
      * @throws \Exception
      */
     public function __construct($addressByte, $p2shByte, $privByte, $testnet = false)
     {
-        if (! (ctype_xdigit($addressByte) and strlen($addressByte) == 2)) {
+        if (!(ctype_xdigit($addressByte) and strlen($addressByte) == 2)) {
             throw new \Exception("address byte must be 1 hexadecimal byte");
         }
 
-        if (! (ctype_xdigit($p2shByte) and strlen($p2shByte) == 2)) {
+        if (!(ctype_xdigit($p2shByte) and strlen($p2shByte) == 2)) {
             throw new \Exception("p2sh byte must be 1 hexadecimal byte");
         }
 
-        if (! (ctype_xdigit($privByte) and strlen($privByte) == 2)) {
+        if (!(ctype_xdigit($privByte) and strlen($privByte) == 2)) {
             throw new \Exception("priv byte must be 1 hexadecimal byte");
         }
 
-        if (! is_bool($testnet)) {
+        if (!is_bool($testnet)) {
             throw new \Exception("Testnet parameter must be a boolean");
         }
 
@@ -125,7 +125,7 @@ class Network implements NetworkInterface
     /**
      * Set version bytes for XPUB key
      *
-     * @param $byte
+     * @param string $byte
      * @return $this
      */
     public function setHDPubByte($byte)
@@ -140,7 +140,7 @@ class Network implements NetworkInterface
     /**
      * Get version bytes for XPRIV key
      *
-     * @return null
+     * @return string
      * @throws \Exception
      */
     public function getHDPrivByte()
@@ -155,7 +155,7 @@ class Network implements NetworkInterface
     /**
      * Set version bytes for XPRIV key
      *
-     * @param $bytes
+     * @param string $bytes
      * @return $this
      */
     public function setHDPrivByte($bytes)
@@ -168,7 +168,7 @@ class Network implements NetworkInterface
     }
 
     /**
-     * @param $bytes
+     * @param string $bytes
      * @return $this
      */
     public function setNetMagicBytes($bytes)
@@ -178,7 +178,7 @@ class Network implements NetworkInterface
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getNetMagicBytes()
     {
@@ -187,7 +187,7 @@ class Network implements NetworkInterface
 
     /**
      * @param bool $binary
-     * @return callable
+     * @return \Closure
      */
     public static function getHashFunction($binary = false)
     {

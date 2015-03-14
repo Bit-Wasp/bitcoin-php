@@ -82,7 +82,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param $hashtype
+     * @param integer $hashtype
      * @return $this
      */
     private function setSighashType($hashtype)

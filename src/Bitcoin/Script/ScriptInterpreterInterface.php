@@ -22,5 +22,5 @@ interface ScriptInterpreterInterface
      * @param $sighash_type
      * @return mixed
      */
-  //  public function run(TransactionInterface $transaction, $index, $sighash_type);
+    //  public function run(TransactionInterface $transaction, $index, $sighash_type);
 }

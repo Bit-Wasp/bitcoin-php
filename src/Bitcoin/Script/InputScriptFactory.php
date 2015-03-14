@@ -10,7 +10,7 @@ class InputScriptFactory
     /**
      * @param SignatureInterface $signature
      * @param PublicKeyInterface $publicKey
-     * @return $this
+     * @return Script
      */
     public function payToPubKeyHash(SignatureInterface $signature, PublicKeyInterface $publicKey)
     {

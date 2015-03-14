@@ -22,7 +22,6 @@ class HexPublicKeySerializer
 
     /**
      * @param Math $math
-     * @param GeneratorPoint $G
      */
     public function __construct(Math $math, GeneratorPoint $generator)
     {
