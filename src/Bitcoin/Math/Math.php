@@ -134,11 +134,6 @@ class Math implements MathAdapterInterface
         return $this->math->isPrime($n);
     }
 
-    public function rand($n)
-    {
-        return $this->math->rand($n);
-    }
-
     public function rightShift($number, $positions)
     {
         return $this->math->rightShift($number, $positions);

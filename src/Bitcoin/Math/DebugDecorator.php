@@ -152,18 +152,6 @@ class DebugDecorator implements MathAdapterInterface
 
     /**
      * (non-PHPdoc)
-     * @see \Mdanter\Ecc\MathAdapterInterface::rand()
-     */
-    public function rand($n)
-    {
-        $func = __METHOD__;
-        $args = func_get_args();
-
-        return call_user_func([$this, 'call'], $func, $args);
-    }
-
-    /**
-     * (non-PHPdoc)
      * @see \Mdanter\Ecc\MathAdapterInterface::bitwiseAnd()
      */
     public function bitwiseAnd($first, $other)
