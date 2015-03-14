@@ -88,23 +88,22 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param Math $math
      * @param GeneratorPoint $generator
      * @param Transaction $transaction
+     * @param ScriptInterpreterFlags $flags
      */
     public function __construct(Math $math, GeneratorPoint $generator, Transaction $transaction, ScriptInterpreterFlags $flags = null)
     {
-        $this->math                     = $math;
-        $this->generator                = $generator;
-        $this->transaction              = $transaction;
-        $this->script                   = new Script();
-        $this->flags                    = $flags ?: ScriptInterpreterFlags::defaults();
+        $this->math = $math;
+        $this->generator = $generator;
+        $this->transaction = $transaction;
+        $this->script = ScriptFactory::create();
+        $this->flags = $flags ?: ScriptInterpreterFlags::defaults();
 
-        $this->mainStack                = new ScriptStack;
-        $this->altStack                 = new ScriptStack;
-        $this->vfExecStack              = new ScriptStack;
+        $this->mainStack = ScriptFactory::stack();
+        $this->altStack = ScriptFactory::stack();
+        $this->vfExecStack = ScriptFactory::stack();
 
-        $this->constTrue                = pack("H*", '01');
-        $this->constFalse               = pack("H*", '00');
-
-        return $this;
+        $this->constTrue = pack("H*", '01');
+        $this->constFalse = pack("H*", '00');
     }
 
     /**
@@ -306,7 +305,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function setScript(ScriptInterface $script = null)
     {
         if ($script == null) {
-            $script = new Script();
+            $script = ScriptFactory::create();
         }
         $this->script = $script;
         return $this;
@@ -326,7 +325,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return false;
         }
 
-        $stackCopy = new ScriptStack;
+        $stackCopy = ScriptFactory::stack();
         if ($this->flags->verifyP2SH) {
             $stackCopy = $this->mainStack;
         }
@@ -900,14 +899,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $signature = SignatureFactory::fromHex($vchSig);
                             $publicKey = PublicKeyFactory::fromHex($vchPubKey);
 
-                            $scriptCode = new Buffer(substr($script, $this->hashStartPos, $posScriptEnd));
-                            $script    = new Script($scriptCode);
-                            $sigHash   = $this->transaction->signatureHash()->calculate($script, $this->inputToSign, $signature->getSighashType());
+                            $script = ScriptFactory::create()->set(new Buffer(substr($script, $this->hashStartPos, $posScriptEnd)));
+                            $sigHash = $this->transaction
+                                ->signatureHash()
+                                ->calculate($script, $this->inputToSign, $signature->getSighashType());
                             $signer    = new Signer($this->math, $this->generator);
-
-                            // $hash = $this->transaction->get
-                            $hash      = new Buffer();
                             $success   = $signer->verify($publicKey, $sigHash, $signature);
+
                             $this->mainStack->pop();
                             $this->mainStack->pop();
                             $this->mainStack->push($success ? $this->constTrue : $this->constFalse);

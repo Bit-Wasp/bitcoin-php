@@ -30,7 +30,6 @@ class SignatureContainer
     {
         $this->math = $math;
         $this->generator = $G;
-        return $this;
     }
 
     /**

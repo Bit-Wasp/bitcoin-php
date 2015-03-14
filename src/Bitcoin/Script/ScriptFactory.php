@@ -13,6 +13,14 @@ class ScriptFactory
     }
 
     /**
+     * @return ScriptStack
+     */
+    public static function stack()
+    {
+        return new ScriptStack();
+    }
+
+    /**
      * @return OutputScriptFactory
      */
     public static function scriptPubKey()

@@ -92,7 +92,6 @@ class Miner
         $this->version = $version;
         $this->report = $report;
         $this->transactions = new TransactionCollection();
-        return $this;
     }
 
     /**
