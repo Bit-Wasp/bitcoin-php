@@ -3,7 +3,7 @@
 namespace Afk11\Bitcoin\Key;
 
 use Afk11\Bitcoin\Address\AddressFactory;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 
 abstract class Key implements KeyInterface
 {

@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Tests;
 
-use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Network\Network;
 
 class NetworkTest extends \PHPUnit_Framework_TestCase
 {

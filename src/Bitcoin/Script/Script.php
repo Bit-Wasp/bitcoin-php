@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Script;
 
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Address\AddressFactory;
 use Afk11\Bitcoin\Crypto\Hash;

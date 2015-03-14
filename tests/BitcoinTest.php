@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Tests;
 
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Network\Network;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Math\Gmp;
 

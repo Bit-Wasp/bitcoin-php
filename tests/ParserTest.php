@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Tests;
 
 use \Afk11\Bitcoin\Buffer;
 use \Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Network\Network;
 use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Transaction\TransactionCollection;

@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Address;
 
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Script\ScriptInterface;
 
 class ScriptHashAddress extends Address

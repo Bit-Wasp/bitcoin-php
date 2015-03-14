@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin;
+namespace Afk11\Bitcoin\Network;
 
 interface NetworkInterface
 {
@@ -28,21 +28,27 @@ interface NetworkInterface
     /**
      * Check if the network is testnet
      *
-     * @return mixed
+     * @return bool
      */
     public function isTestnet();
 
     /**
      * Return the HD public bytes for this network
      *
-     * @return mixed
+     * @return string
      */
     public function getHDPubByte();
 
     /**
      * Return the HD private bytes for this network
      *
-     * @return mixed
+     * @return string
      */
     public function getHDPrivByte();
+
+    /**
+     * @return string
+     */
+    public function getNetMagicBytes();
+
 }

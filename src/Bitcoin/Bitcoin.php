@@ -3,6 +3,8 @@
 namespace Afk11\Bitcoin;
 
 use Afk11\Bitcoin\Math\Math;
+use Afk11\Bitcoin\Network\Network;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -78,7 +80,9 @@ class Bitcoin
             $network = new Network('00', '05', '80');
             $network
                 ->setHDPubByte('0488b21e')
-                ->setHDPrivByte('0488ade4');
+                ->setHDPrivByte('0488ade4')
+                ->setNetMagicBytes('d9b4bef9');
+
             self::$network = $network;
         }
 

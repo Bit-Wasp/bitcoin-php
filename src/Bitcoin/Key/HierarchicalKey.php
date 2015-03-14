@@ -8,7 +8,7 @@ use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;

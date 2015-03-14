@@ -5,7 +5,7 @@ namespace Afk11\Bitcoin\Transaction;
 use Afk11\Bitcoin\Address\AddressInterface;
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
 use Afk11\Bitcoin\Script\ScriptFactory;
 

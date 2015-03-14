@@ -39,7 +39,7 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @depends testGetOpCode
+     * @depends testGetOp
      * @expectedException \Exception
      */
     public function testGetOpCodeException()

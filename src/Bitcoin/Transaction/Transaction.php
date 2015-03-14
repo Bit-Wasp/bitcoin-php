@@ -9,7 +9,7 @@ use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use \Afk11\Bitcoin\Key\PrivateKeyInterface;
 use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
-use \Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use \Afk11\Bitcoin\Signature\Signature;
 use \Afk11\Bitcoin\Signature\SignatureHash;

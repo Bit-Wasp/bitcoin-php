@@ -7,7 +7,7 @@ use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
 use Afk11\Bitcoin\Key\PublicKeyFactory;
 use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Key\HierarchicalKey;
 use Mdanter\Ecc\GeneratorPoint;

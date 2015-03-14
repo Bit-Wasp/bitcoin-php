@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Key;
 
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 
 interface PrivateKeyInterface extends KeyInterface
 {

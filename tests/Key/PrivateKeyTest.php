@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Tests\Key;
 
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Key\PrivateKey;
-use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Network\Network;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;

@@ -4,7 +4,7 @@ namespace Afk11\Bitcoin\Key;
 
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use Afk11\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;

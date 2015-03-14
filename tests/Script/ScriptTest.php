@@ -266,16 +266,10 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->script->parse();
     }
 
-    public function testPushdata3()
-    {
-
-
-    }
-
     public function testPayToPubKey()
     {
         $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::payToPubKey($pubkey);
+        $script = ScriptFactory::scriptPubKey()->payToPubKey($pubkey);
         $parsed = $script->parse();
         $this->assertSame($parsed[0]->serialize('hex'), '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
         $this->assertSame($parsed[1], 'OP_CHECKSIG');
@@ -284,7 +278,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     public function testPayToPubKeyHash()
     {
         $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::payToPubKeyHash($pubkey);
+        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pubkey);
         $parsed = $script->parse();
         $this->assertSame($parsed[0], 'OP_DUP');
         $this->assertSame($parsed[1], 'OP_HASH160');
@@ -327,7 +321,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
             ->op('OP_3')
             ->op('OP_CHECKMULTISIG');
 
-        $scriptHash = ScriptFactory::payToScriptHash($script);
+        $scriptHash = ScriptFactory::scriptPubKey()->payToScriptHash($script);
         $parsed     = $scriptHash->parse();
         $this->assertSame($parsed[0], 'OP_HASH160');
         $this->assertSame($parsed[1]->serialize('hex'), 'f7c29c0c6d319e33c9250fca0cb61a500621d93e');

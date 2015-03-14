@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Tests\Transaction;
 
-use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Network\Network;
 use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Transaction\TransactionFactory;
 use Afk11\Bitcoin\Transaction\TransactionInput;

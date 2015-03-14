@@ -8,7 +8,7 @@ use Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
 use Afk11\Bitcoin\Key\PrivateKey;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
 use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 
 class WifPrivateKeySerializer
 {

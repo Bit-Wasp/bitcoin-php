@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin;
+namespace Afk11\Bitcoin\Network;
 
 use Afk11\Bitcoin\Crypto\Hash;
 
@@ -29,12 +29,17 @@ class Network implements NetworkInterface
     /**
      * @var null|string
      */
-    protected $xpubByte = null;
+    protected $xpubByte;
 
     /**
      * @var null|string
      */
-    protected $xprivByte = null;
+    protected $xprivByte;
+
+    /**
+     * @var string
+     */
+    protected $netMagicBytes;
 
     /**
      * Load basic data, throw exception if it's not provided
@@ -160,6 +165,24 @@ class Network implements NetworkInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @param $bytes
+     * @return $this
+     */
+    public function setNetMagicBytes($bytes)
+    {
+        $this->netMagicBytes = $bytes;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNetMagicBytes()
+    {
+        return $this->netMagicBytes;
     }
 
     /**

@@ -7,7 +7,7 @@ use Afk11\Bitcoin\Block\BlockFactory;
 use Afk11\Bitcoin\Rpc\RpcFactory;
 use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
 use Afk11\Bitcoin\Miner\Miner;
-use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Network\Network;
 
 require __DIR__ . "/../vendor/autoload.php";
 

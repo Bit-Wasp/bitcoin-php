@@ -3,7 +3,7 @@
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Address;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
-use Afk11\Bitcoin\Network;
+use Afk11\Bitcoin\Network\Network;
 
 require __DIR__ . "/../vendor/autoload.php";
 

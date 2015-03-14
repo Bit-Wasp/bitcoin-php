@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Serializer\Key\HierarchicalKey;
 
-use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Network\NetworkInterface;
 use Afk11\Bitcoin\Base58;
 use Afk11\Bitcoin\Key\HierarchicalKey;
 
