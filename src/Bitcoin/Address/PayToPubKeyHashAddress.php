@@ -8,31 +8,26 @@ use Afk11\Bitcoin\Key\KeyInterface;
 class PayToPubKeyHashAddress extends Address
 {
     /**
-     * @var NetworkInterface
-     */
-    private $network;
-
-    /**
      * @var KeyInterface
      */
     private $key;
 
     /**
-     * @param NetworkInterface $network
      * @param KeyInterface $key
+     * @internal param NetworkInterface $network
      */
-    public function __construct(NetworkInterface $network, KeyInterface $key)
+    public function __construct(KeyInterface $key)
     {
-        $this->network = $network;
         $this->key = $key;
     }
 
     /**
+     * @param NetworkInterface $network
      * @return string
      */
-    public function getPrefixByte()
+    public function getPrefixByte(NetworkInterface $network)
     {
-        return $this->network->getAddressByte();
+        return $network->getAddressByte();
     }
 
     /**

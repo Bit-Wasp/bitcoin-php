@@ -13,9 +13,9 @@ class AddressFactory
      * @param KeyInterface $key
      * @return PayToPubKeyHashAddress
      */
-    public static function fromKey(NetworkInterface $network, KeyInterface $key)
+    public static function fromKey(KeyInterface $key)
     {
-        $address = new PayToPubKeyHashAddress($network, $key);
+        $address = new PayToPubKeyHashAddress($key);
         return $address;
     }
 
@@ -24,9 +24,9 @@ class AddressFactory
      * @param ScriptInterface $script
      * @return ScriptHashAddress
      */
-    public static function fromScript(NetworkInterface $network, ScriptInterface $script)
+    public static function fromScript(ScriptInterface $script)
     {
-        $address = new ScriptHashAddress($network, $script);
+        $address = new ScriptHashAddress($script);
         return $address;
     }
 }

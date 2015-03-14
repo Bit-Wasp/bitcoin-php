@@ -8,31 +8,25 @@ use Afk11\Bitcoin\Script\ScriptInterface;
 class ScriptHashAddress extends Address
 {
     /**
-     * @var NetworkInterface
-     */
-    private $network;
-
-    /**
      * @var ScriptInterface
      */
     private $script;
 
     /**
-     * @param NetworkInterface $network
      * @param ScriptInterface $script
      */
-    public function __construct(NetworkInterface $network, ScriptInterface $script)
+    public function __construct(ScriptInterface $script)
     {
-        $this->network = $network;
         $this->script = $script;
     }
 
     /**
+     * @param NetworkInterface $network
      * @return string
      */
-    public function getPrefixByte()
+    public function getPrefixByte(NetworkInterface $network)
     {
-        return $this->network->getP2shByte();
+        return $network->getP2shByte();
     }
 
     /**
