@@ -86,6 +86,21 @@ class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
     }
 
     /**
+     * @param Math $math
+     * @param $sequence
+     * @return int|string
+     */
+    public static function hardenedSequence(Math $math, $sequence)
+    {
+        $hardened = $math->hexDec('80000000');
+        if ($math->cmp($sequence, $hardened) >= 0) {
+            throw new \LogicException('Sequence is already for a hardened key');
+        }
+
+        return $math->add($hardened, $sequence);
+    }
+
+    /**
      * Return the depth of this key. This is limited to 256 sequential derivations.
      *
      * @return int

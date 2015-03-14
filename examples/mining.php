@@ -4,8 +4,8 @@ use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Script\ScriptFactory;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
 use Afk11\Bitcoin\Block\BlockFactory;
+use Afk11\Bitcoin\Rpc\RpcFactory;
 use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
-
 use Afk11\Bitcoin\Miner\Miner;
 use Afk11\Bitcoin\Network;
 
@@ -19,12 +19,14 @@ $privKey = PrivateKeyFactory::create(true);
 var_dump($privKey->toWif($network));
 
 // get latest block from RPC
-$rpc = new JsonRpcClient(getenv('BITCOINLIB_RPC_HOST') ?: 'localhost', "18332");
-$rpc->authentication(getenv('BITCOINLIB_RPC_USER') ?: 'bitcoin', getenv('BITCOINLIB_RPC_PASSWORD') ?: 'YOUR_PASSWORD');
-$latest = $rpc->getblock($rpc->getbestblockhash(), false);
+$rpc = RpcFactory::bitcoind(
+    getenv('BITCOINLIB_RPC_HOST') ?: 'localhost', 
+    "18332",
+    getenv('BITCOINLIB_RPC_USER') ?: 'bitcoin', 
+    getenv('BITCOINLIB_RPC_PASSWORD') ?: 'YOUR_PASSWORD'
+);
 
-// init latest block
-$prev = BlockFactory::fromHex($latest);
+$latest = $rpc->getblock($rpc->getbestblockhash(), false);
 
 // mining in the future \o/
 $timestamp = time() + (3600 * 2);
@@ -33,7 +35,7 @@ $timestamp = time() + (3600 * 2);
 $script = ScriptFactory::payToPubKey($privKey->getPublicKey());
 
 // init miner
-$miner = new Miner(Bitcoin::getMath(), $prev->getHeader(), $script, null, $timestamp, 2, true);
+$miner = new Miner(Bitcoin::getMath(), $latest->getHeader(), $script, null, $timestamp, 2, true);
 
 // let's GO!
 var_dump("mining!");

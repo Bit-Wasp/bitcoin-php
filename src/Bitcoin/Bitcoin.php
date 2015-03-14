@@ -76,8 +76,9 @@ class Bitcoin
     {
         if (is_null(self::$network)) {
             $network = new Network('00', '05', '80');
-            $network->setHDPubByte('0488b21e');
-            $network->setHDPubByte('0488ade4');
+            $network
+                ->setHDPubByte('0488b21e')
+                ->setHDPrivByte('0488ade4');
             self::$network = $network;
         }
 
