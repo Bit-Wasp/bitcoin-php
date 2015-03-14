@@ -15,4 +15,14 @@ interface ScriptInterface extends SerializableInterface
      * @return array
      */
     public function parse();
+
+    /**
+     * @return Opcodes
+     */
+    public function getOpcodes();
+
+    /**
+     * @return mixed
+     */
+    public function isPushOnly();
 }

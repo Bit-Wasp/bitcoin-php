@@ -150,6 +150,18 @@ class Script implements ScriptInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isPushOnly()
+    {
+        $pushOnly = true;
+        foreach ($this->parse() as $entity) {
+            $pushOnly &= $entity instanceof Buffer;
+        }
+        return $pushOnly;
+    }
+
+    /**
      * When given a Buffer or hex string, set the script to be this.
      *
      * @param null|Buffer $scriptData
