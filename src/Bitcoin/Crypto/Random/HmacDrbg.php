@@ -36,7 +36,7 @@ class HmacDrbg implements RbgInterface
      * @param \Afk11\Bitcoin\Buffer $personalString
      * @param GeneratorPoint $generator
      */
-    public function __construct($algo, Buffer $entropy, Buffer $personalString = null, GeneratorPoint $generator = null)
+    public function __construct($algo, Buffer $entropy, Buffer $personalString = null)
     {
         if (!in_array($algo, hash_algos())) {
             throw new \RuntimeException('HMACDRGB: Hashing algorithm not found');
@@ -79,7 +79,7 @@ class HmacDrbg implements RbgInterface
     /**
      * Update the K and V values.
      *
-     * @param null $data
+     * @param string|null $data
      * @return $this
      */
     public function update($data = null)
