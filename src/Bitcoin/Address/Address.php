@@ -8,6 +8,6 @@ abstract class Address implements AddressInterface
 {
     public function getAddress()
     {
-        return Base58::encode($this->getPrefixByte() . $this->getHash());
+        return Base58::encodeCheck($this->getPrefixByte() . $this->getHash());
     }
 }

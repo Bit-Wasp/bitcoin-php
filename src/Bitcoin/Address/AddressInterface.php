@@ -2,7 +2,6 @@
 
 namespace Afk11\Bitcoin\Address;
 
-
 interface AddressInterface
 {
     /**

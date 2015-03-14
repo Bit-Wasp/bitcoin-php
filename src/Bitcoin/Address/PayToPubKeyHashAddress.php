@@ -8,7 +8,6 @@
 
 namespace Afk11\Bitcoin\Address;
 
-
 use Afk11\Bitcoin\Base58;
 use Afk11\Bitcoin\Address\AddressInterface;
 use Afk11\Bitcoin\NetworkInterface;
@@ -51,5 +50,4 @@ class PayToPubKeyHashAddress extends Address
     {
         return $this->key->getPubKeyHash();
     }
-
 }
