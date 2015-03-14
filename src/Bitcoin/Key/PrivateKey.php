@@ -51,7 +51,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $compressed = false
     ) {
 
-        if (! self::isValidKey($int)) {
+        if (!self::isValidKey($int)) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
@@ -74,7 +74,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
         // Less than the order of the curve, and not zero
         $withinRange = $math->cmp($int, $generator->getOrder()) < 0;
-        $notZero = ! ($math->cmp($int, '0') === 0);
+        $notZero = !($math->cmp($int, '0') === 0);
 
         return $withinRange && $notZero;
     }
@@ -114,7 +114,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         if ($this->publicKey == null) {
             $point = $this->generator->mul($this->getSecretMultiplier());
-            $this->publicKey  = new PublicKey($this->math, $this->generator, $point, $this->compressed);
+            $this->publicKey = new PublicKey($this->math, $this->generator, $point, $this->compressed);
         }
 
         return $this->publicKey;

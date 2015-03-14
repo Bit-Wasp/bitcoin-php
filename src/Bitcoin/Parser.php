@@ -214,7 +214,7 @@ class Parser
     public function writeWithLength(Buffer $buffer)
     {
         $varInt = self::numToVarInt($buffer->getSize());
-        $buffer = new Buffer($varInt->serialize() .  $buffer->serialize());
+        $buffer = new Buffer($varInt->serialize() . $buffer->serialize());
         $this->writeBytes($buffer->getSize(), $buffer);
         return $this;
     }
@@ -254,7 +254,7 @@ class Parser
      */
     public function writeInt($bytes, $int, $flipBytes = false)
     {
-        $hex  = str_pad($this->math->decHex($int), $bytes*2, '0', STR_PAD_LEFT);
+        $hex  = str_pad($this->math->decHex($int), $bytes * 2, '0', STR_PAD_LEFT);
         $data = pack("H*", $hex);
 
         if ($flipBytes) {

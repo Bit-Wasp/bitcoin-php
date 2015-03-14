@@ -33,7 +33,7 @@ class ExtendedKeySerializer
     }
 
     /**
-     * @param $base58
+     * @param string $base58
      * @return HierarchicalKey
      * @throws \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
