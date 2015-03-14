@@ -17,7 +17,17 @@ class HexExtendedKeySerializer
     /**
      * @var NetworkInterface
      */
-    public $network;
+    private $network;
+
+    /**
+     * @var Math
+     */
+    private $math;
+
+    /**
+     * @var GeneratorPoint
+     */
+    private $generator;
 
     /**
      * @param NetworkInterface $network
@@ -128,7 +138,6 @@ class HexExtendedKeySerializer
         }
 
         $parser = new Parser($hex);
-
         $hd = $this->fromParser($parser);
         return $hd;
     }
