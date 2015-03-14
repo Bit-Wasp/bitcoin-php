@@ -9,9 +9,15 @@
  * ext-gmp
  * ext-mcrypt
 
+##Installation
+You can install this library via Composer:
+`composer require afk11/bitcoin`
+or 
+```{
+    "require": "afk11\bitcoin"
+```}
 
-
-#Presently supported:
+##Presently supported:
 
  - Blocks, block headers, basic mining, difficulty calculations
  - ECDSA key creation, public & private key types. 
@@ -23,15 +29,14 @@
  - RPC bindings to Bitcoin Core's RPC, getting OOP responses :)
  - Easy serialization to binary representation of most classes
 
-#Todo:
+##Todo:
   - TransactionBuilder
   - Full script interpreter
   - NetworkMessageSerializer (for network messages, blocks, tx's)
   - SPV
   - P2P
   - EC Adapter to work with either phpecc or secp256k1-php
-
-
+  
 # Examples  
 ## Generate private keys
 ```

@@ -1,4 +1,16 @@
 {
+  "name": "afk11/bitcoin",
+  "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
+  "type": "library",
+  "homepage": "https://github.com/afk11/bitcoin",
+  "licence": "MIT",
+  "authors": [
+    {
+      "name": "Thomas Kerin",
+      "homepage": "https://thomaskerin.io",
+      "role": "Author"
+    }
+  ],
   "autoload": {
     "psr-4": {
       "Afk11\\Bitcoin\\": "src/Bitcoin/",
