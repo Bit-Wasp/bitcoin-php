@@ -1,7 +1,14 @@
 
-Bitcoin
+##Bitcoin
 =======
 [![Build Status](https://travis-ci.org/afk11/bitcoin.svg?branch=master)](https://travis-ci.org/afk11/bitcoin)
+
+## Requirements
+ * PHP 5.4+
+ * Composer
+ * ext-gmp
+ * ext-mcrypt
+
 
 
 #Presently supported:

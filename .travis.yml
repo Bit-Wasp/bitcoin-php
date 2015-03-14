@@ -19,7 +19,8 @@ script:
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
 after_script:
-  - ls -alh build/logs
+    - wget https://scrutinizer-ci.com/ocular.phar
+    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi;'
 
-after_success:
-  - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php vendor/bin/coveralls -v; fi;'
+matrix:
+    fast_finish: true
