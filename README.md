@@ -16,8 +16,7 @@ Bitcoin
  - RPC bindings to Bitcoin Core's RPC, getting OOP responses :)
  - Easy serialization to binary representation of most classes
 
-#Todo: 
-
+#Todo:
   - TransactionBuilder
   - Full script interpreter
   - NetworkMessageSerializer (for network messages, blocks, tx's)
@@ -27,18 +26,21 @@ Bitcoin
 
 
 # Examples  
-`
+## Generate private keys
+```
  // Create private keys
  use Afk11\Bitcoin\Key\PrivateKeyFactory;
  
+ $network = Bitcoin::GetNetwork();
  $private = PrivateKeyFactory:create(true);
  $public = $private->getPublicKey();
- echo $private->getBuffer();
- echo $public->getBuffer();
-`
+ echo $private->getBuffer() . "\n";
+ echo $public->getBuffer() . "\n";
+ echo $public->getAddress($network) . "\n";
+```
 
-`
-// Explore the Blockchain using OOP bindings to the daemon
+## Explore the blockchain using OOP bindings to the RPFC
+```
 use Afk11\Bitcoin\Rpc\RpcFactory;
 
 $bitcoind = RpcFactory::bitcoind('127.0.0.1', 18332, 'bitcoinrpc', 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi55QwWgN6Ng6');
@@ -47,6 +49,4 @@ $hash = $bitcoind->getbestblockhash();
 $block = $bitcoind->getblock($hash);
 $tx = $bitcoind->getTransactions()->getTransaction(10);
 echo $tx->getTransactionId();
-
-
-`
+```
