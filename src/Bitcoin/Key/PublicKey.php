@@ -179,13 +179,13 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public static function recoverYfromX($xCoord, $byte)
     {
-        if (! in_array($byte, array(PublicKey::KEY_COMPRESSED_ODD, PUBLICKEY::KEY_COMPRESSED_EVEN))) {
+        if (!in_array($byte, array(PublicKey::KEY_COMPRESSED_ODD, PUBLICKEY::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
         }
 
         $math   = Bitcoin::getMath();
         $theory = $math->getNumberTheory();
-        $generator  = Bitcoin::getGenerator();
+        $generator = Bitcoin::getGenerator();
         $curve = $generator->getCurve();
 
         try {

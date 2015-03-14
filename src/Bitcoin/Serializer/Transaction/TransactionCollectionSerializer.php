@@ -38,12 +38,12 @@ class TransactionCollectionSerializer
      * @param Parser $parser
      * @return TransactionCollection
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         $transactions = new TransactionCollection;
         $transactions->addTransactions(
             $parser->getArray(
-                function () use (&$parser) {
+                function() use (&$parser) {
                     $transaction = TransactionFactory::fromParser($parser);
                     return $transaction;
                 }

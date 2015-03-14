@@ -42,7 +42,7 @@ class HexBlockSerializer
      * @return Block
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         try {
             $block = new Block($this->math);
@@ -69,7 +69,7 @@ class HexBlockSerializer
 
     /**
      * @param BlockInterface $block
-     * @return string
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function serialize(BlockInterface $block)
     {

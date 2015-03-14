@@ -151,7 +151,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * Return the chain code - a deterministic 'salt' for HMAC-SHA512
      * in child derivations
      *
-     * @return Buffer
+     * @return integer
      */
     public function getChainCode()
     {
@@ -352,10 +352,10 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
             throw $e;
         }
 
-        $key =  new HierarchicalKey(
+        $key = new HierarchicalKey(
             $this->math,
             $this->generator,
-            $this->getDepth()+1,
+            $this->getDepth() + 1,
             $this->getChildFingerprint(),
             $sequence,
             $this->math->hexDec($chainHex),

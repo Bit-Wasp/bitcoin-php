@@ -40,7 +40,7 @@ class TransactionFactory
      * @param Parser $parser
      * @return Transaction
      */
-    public static function fromParser(Parser &$parser)
+    public static function fromParser(Parser & $parser)
     {
         $serializer = self::getSerializer();
         $hex = $serializer->fromParser($parser);

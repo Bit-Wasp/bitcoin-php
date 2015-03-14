@@ -42,7 +42,7 @@ class Parser
     /**
      * Convert a decimal number into a VarInt Buffer
      *
-     * @param $decimal
+     * @param integer $decimal
      * @return Buffer
      * @throws \Exception
      */
@@ -179,7 +179,7 @@ class Parser
     /**
      * Write $data as $bytes bytes. Can be flipped if needed.
      *
-     * @param $bytes
+     * @param integer $bytes
      * @param $data
      * @param bool $flipBytes
      * @return $this
@@ -247,7 +247,7 @@ class Parser
     /**
      * Write an integer to the buffer
      *
-     * @param $bytes
+     * @param integer $bytes
      * @param $int
      * @param bool $flipBytes
      * @return $this

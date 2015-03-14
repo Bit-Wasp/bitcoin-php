@@ -204,7 +204,7 @@ class Transaction implements TransactionInterface
      */
     public function toArray()
     {
-        $inputs = array_map(function (TransactionInputInterface $input) {
+        $inputs = array_map(function(TransactionInputInterface $input) {
             return array(
                 'txid' => $input->getTransactionId(),
                 'vout' => $input->getVout(),
@@ -215,7 +215,7 @@ class Transaction implements TransactionInterface
             );
         }, $this->getInputs()->getInputs());
 
-        $outputs = array_map(function (TransactionOutputInterface $output) {
+        $outputs = array_map(function(TransactionOutputInterface $output) {
             return array(
                 'value' => $output->getValue(),
                 'scriptPubKey' => array(

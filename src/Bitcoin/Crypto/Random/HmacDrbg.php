@@ -31,7 +31,7 @@ class HmacDrbg implements RbgInterface
     /**
      * Construct a HMAC deterministic byte generator.
      *
-     * @param $algo
+     * @param string $algo
      * @param \Afk11\Bitcoin\Buffer $entropy
      * @param \Afk11\Bitcoin\Buffer $personalString
      * @param GeneratorPoint $generator
@@ -68,7 +68,7 @@ class HmacDrbg implements RbgInterface
 
     /**
      * Return the hash of the given binary $data
-     * @param $data
+     * @param string $data
      * @return string
      */
     public function hash($data)

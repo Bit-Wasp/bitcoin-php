@@ -24,7 +24,7 @@ class PrivateKeyFactory
 
         do {
             $buffer = $random->bytes(32);
-        } while (! PrivateKey::isValidKey($buffer->serialize('int')));
+        } while (!PrivateKey::isValidKey($buffer->serialize('int')));
 
         return $buffer;
     }

@@ -39,12 +39,12 @@ class TransactionOutputCollectionSerializer
      * @param Parser $parser
      * @return TransactionOutputCollection
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         $outputs = new TransactionOutputCollection;
         $outputs->addOutputs(
             $parser->getArray(
-                function () use (&$parser) {
+                function() use (&$parser) {
                     $output = new \Afk11\Bitcoin\Transaction\TransactionOutput();
                     $output
                         ->setValue($parser->readBytes(8, true)->serialize('int'))

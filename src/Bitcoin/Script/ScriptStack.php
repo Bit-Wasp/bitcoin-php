@@ -93,7 +93,7 @@ class ScriptStack
     /**
      * Insert $value at a particular position
      *
-     * @param $insertPosition
+     * @param integer $insertPosition
      * @param $value
      * @return $this
      */
@@ -101,7 +101,7 @@ class ScriptStack
     {
         $this->stack = array_slice($this->stack, 0, $insertPosition, true) +
             array($value) +
-            array_slice($this->stack, $insertPosition, count($this->stack)-$insertPosition, true);
+            array_slice($this->stack, $insertPosition, count($this->stack) - $insertPosition, true);
 
         return $this;
     }
@@ -150,8 +150,8 @@ class ScriptStack
     }
 
     /**
-     * @param $pos1
-     * @param $pos2
+     * @param integer $pos1
+     * @param integer $pos2
      * @return $this
      */
     public function swap($pos1, $pos2)

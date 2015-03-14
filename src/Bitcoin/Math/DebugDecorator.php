@@ -20,7 +20,7 @@ class DebugDecorator implements MathAdapterInterface
     public function __construct(MathAdapterInterface $adapter, $callback = null)
     {
         $this->adapter = $adapter;
-        $this->writer = $callback ?: function ($message) {
+        $this->writer = $callback ?: function($message) {
             echo $message;
         };
     }
@@ -51,7 +51,7 @@ class DebugDecorator implements MathAdapterInterface
      */
     private function call($func, $args)
     {
-        $strArgs = array_map(function ($arg) {
+        $strArgs = array_map(function($arg) {
             return var_export($this->adapter->toString($arg), true);
         }, $args);
 
@@ -59,7 +59,7 @@ class DebugDecorator implements MathAdapterInterface
             list(, $func) = explode('::', $func);
         }
 
-        $res = call_user_func_array([ $this->adapter, $func ], $args);
+        $res = call_user_func_array([$this->adapter, $func], $args);
 
         $this->writeln($func . '(' . implode(', ', $strArgs) . ') => ' . var_export($this->adapter->toString($res), true));
 
@@ -75,7 +75,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -87,7 +87,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -99,7 +99,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -111,7 +111,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -123,7 +123,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -135,7 +135,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -147,7 +147,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -159,7 +159,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -171,7 +171,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -192,7 +192,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -204,7 +204,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -216,7 +216,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -228,7 +228,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -240,7 +240,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -252,7 +252,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -264,7 +264,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -276,7 +276,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -288,7 +288,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -300,7 +300,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -312,7 +312,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
     /**
      * (non-PHPdoc)
@@ -323,7 +323,7 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 
     /**
@@ -335,6 +335,6 @@ class DebugDecorator implements MathAdapterInterface
         $func = __METHOD__;
         $args = func_get_args();
 
-        return call_user_func([ $this, 'call' ], $func, $args);
+        return call_user_func([$this, 'call'], $func, $args);
     }
 }

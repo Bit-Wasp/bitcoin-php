@@ -94,7 +94,7 @@ class Block implements BlockInterface
     }
 
     /**
-     * @return string
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function getBuffer()
     {
