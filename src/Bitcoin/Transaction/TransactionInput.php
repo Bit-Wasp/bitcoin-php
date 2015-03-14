@@ -4,7 +4,6 @@ namespace Afk11\Bitcoin\Transaction;
 
 use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
 use \Afk11\Bitcoin\SerializableInterface;
@@ -32,9 +31,9 @@ class TransactionInput implements TransactionInputInterface
     protected $script;
 
     /**
-     * @var Buffer
+     * @var ScriptInterface
      */
-    protected $scriptBuf;
+    protected $outputScript;
 
     /**
      * @param null $txid
@@ -42,22 +41,14 @@ class TransactionInput implements TransactionInputInterface
      * @param ScriptInterface|Buffer $script
      * @param int $sequence
      */
-    public function __construct($txid = null, $vout = null, $script = null, $sequence = null)
+    public function __construct($txid = null, $vout = null, ScriptInterface $script = null, $sequence = null)
     {
         $this->txid = $txid;
         $this->vout = $vout;
-
-        if (!is_null($script)) {
-            if ($script instanceof ScriptInterface) {
-                $this->setScript($script);
-            } elseif ($script instanceof Buffer) {
-                $this->setScriptBuf($script);
-            }
-        }
-
         $this->sequence = $sequence;
-
-        return $this;
+        if ($script !== null) {
+            $this->setScript($script);
+        }
     }
 
     /**
@@ -121,29 +112,6 @@ class TransactionInput implements TransactionInputInterface
     }
 
     /**
-     * Get Script Buffer - just return the buffer, not the script
-     * @return \Afk11\Bitcoin\Buffer
-     */
-    public function getScriptBuf()
-    {
-        if ($this->scriptBuf == null) {
-            return new Buffer();
-        }
-        return $this->scriptBuf;
-    }
-
-    /**
-     * Set Script Buffer
-     * @param \Afk11\Bitcoin\Buffer $script
-     * @return $this
-     */
-    public function setScriptBuf(Buffer $script)
-    {
-        $this->scriptBuf = $script;
-        return $this;
-    }
-
-    /**
      * Return an initialized script. Checks if already has a script
      * object. If not, returns script from scriptBuf (which can simply
      * be null).
@@ -154,7 +122,6 @@ class TransactionInput implements TransactionInputInterface
     {
         if ($this->script == null) {
             $this->script = new Script();
-            $this->script->set($this->getScriptBuf());
         }
         return $this->script;
     }
@@ -169,6 +136,24 @@ class TransactionInput implements TransactionInputInterface
     {
         $this->script = $script;
         return $this;
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @return $this
+     */
+    public function setOutputScript(ScriptInterface $script)
+    {
+        $this->outputScript = $script;
+        return $this;
+    }
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getOutputScript()
+    {
+        return $this->outputScript;
     }
 
     /**

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 06/02/15
- * Time: 09:38
- */
 
 namespace Afk11\Bitcoin\Tests\Script;
 
@@ -12,7 +6,7 @@ use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Buffer;
 use \Afk11\Bitcoin\Script\Script;
 use \Afk11\Bitcoin\Script\ScriptInterpreter;
-use \Afk11\Bitcoin\Transaction\Transaction;
+use \Afk11\Bitcoin\Transaction\TransactionFactory;
 use \Afk11\Bitcoin\Script\ScriptInterpreterFlags;
 
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
@@ -49,7 +43,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     }
     public function testGetOpValid()
     {
-        $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), new ScriptInterpreterFlags());
+        $i = new ScriptInterpreter($this->math, $this->G, TransactionFactory::create(), new ScriptInterpreterFlags());
 
         $script = pack("H*", '0100');
         $position = 0;
@@ -87,7 +81,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOpInvalid()
     {
-        $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), new ScriptInterpreterFlags());
+        $i = new ScriptInterpreter($this->math, $this->G, TransactionFactory::create(), new ScriptInterpreterFlags());
 
         $script = '';
         $position = 10;
@@ -146,7 +140,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
         foreach ($json->test as $test) {
             $flags = $this->setFlags($test->flags);
-            $i = new ScriptInterpreter($this->math, $this->G, new Transaction(), $flags);
+            $i = new ScriptInterpreter($this->math, $this->G, TransactionFactory::create(), $flags);
             $scriptSig = new Script(Buffer::hex($test->scriptSig));
             $scriptPubKey = new Script(Buffer::hex($test->scriptPubKey));
 

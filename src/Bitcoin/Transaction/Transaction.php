@@ -7,14 +7,12 @@ use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\Random;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use \Afk11\Bitcoin\Key\PrivateKeyInterface;
-use \Afk11\Bitcoin\SerializableInterface;
 use \Afk11\Bitcoin\Parser;
 use \Afk11\Bitcoin\Crypto\Hash;
 use \Afk11\Bitcoin\NetworkInterface;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use \Afk11\Bitcoin\Signature\Signature;
 use \Afk11\Bitcoin\Signature\SignatureHash;
-use \Afk11\Bitcoin\Signature\K\KInterface;
 use Afk11\Bitcoin\Signature\Signer;
 
 class Transaction implements TransactionInterface
@@ -179,13 +177,14 @@ class Transaction implements TransactionInterface
      */
     public function sign(PrivateKeyInterface $privateKey, TransactionOutputInterface $txOut, $inputToSign, RbgInterface $random = null)
     {
+        $hash = $this->signatureHash()->calculate($txOut->getScript(), $inputToSign);
+
         if (is_null($random)) {
             $random = new Random();
         }
 
-        $hash = $this->signatureHash()->calculate($txOut->getScript(), $inputToSign);
         $signer = new Signer(Bitcoin::getMath(), Bitcoin::getGenerator());
-        $sig = $signer->sign($hash, $hash, $random);
+        $sig = $signer->sign($privateKey, $hash, $random);
 
         return $sig;
     }
@@ -210,7 +209,7 @@ class Transaction implements TransactionInterface
                 'txid' => $input->getTransactionId(),
                 'vout' => $input->getVout(),
                 'scriptSig' => array(
-                    'hex' => $input->getScript()->serialize('hex'),
+                    'hex' => $input->getScript()->getBuffer()->serialize('hex'),
                     'asm' => $input->getScript()->getAsm()
                 )
             );
@@ -220,7 +219,7 @@ class Transaction implements TransactionInterface
             return array(
                 'value' => $output->getValue(),
                 'scriptPubKey' => array(
-                    'hex' => $output->getScript()->serialize('hex'),
+                    'hex' => $output->getScript()->getBuffer()->serialize('hex'),
                     'asm' => $output->getScript()->getAsm()
                 )
             );

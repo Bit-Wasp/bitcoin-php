@@ -6,7 +6,6 @@ use Afk11\Bitcoin\Transaction\TransactionInterface;
 
 interface ScriptInterpreterInterface
 {
-
     const SCRIPT_ERR_BAD_OPCODE = "";
     const SCRIPT_ERR_PUSH_SIZE = "";
     const SCRIPT_ERR_OP_COUNT = "";

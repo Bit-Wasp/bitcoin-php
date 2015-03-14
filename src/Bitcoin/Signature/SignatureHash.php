@@ -50,7 +50,7 @@ class SignatureHash implements SignatureHashInterface
 
         // Default SIGHASH_ALL procedure: null all input scripts
         for ($i = 0; $i < count($inputs); $i++) {
-            $inputs->getInput($i)->setScriptBuf(new Buffer());
+            $inputs->getInput($i)->setScript(new Script());
         }
 
         $inputs->getInput($inputToSign)->setScript($txOutScript);

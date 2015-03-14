@@ -24,6 +24,12 @@ class Bitcoind
         return $this;
     }
 
+    public function getinfo()
+    {
+        $info = $this->client->execute('getinfo');
+        return $info;
+    }
+
     /**
      * @return mixed
      */
@@ -67,7 +73,7 @@ class Bitcoind
 
         // Build the transactions
         $block->getTransactions()->addTransactions(
-            array_map(function($value) {
+            array_map(function ($value) {
                 return TransactionFactory::fromHex($value);
             }, $result)
         );

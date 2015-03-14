@@ -63,7 +63,6 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $t = new TransactionInput();
         $this->assertNull($t->getTransactionId());
         $this->assertNull($t->getVout());
-        $this->assertEquals(new Buffer, $t->getScriptBuf());
         $this->assertNull($t->getTransactionId());
 
         $txid = '7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33';
@@ -78,9 +77,6 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $t = new TransactionInput(null, $vout);
         $this->assertSame($vout, $t->getVout());
 
-        $t = new TransactionInput(null, null, $scriptBuf);
-        $this->assertSame($scriptBuf, $t->getScriptBuf());
-
         $t = new TransactionInput(null, null, $script);
         $this->assertSame($script, $t->getScript());
 
@@ -94,26 +90,11 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(10240, $this->in->getSequence());
     }
 
-    public function testGetScriptBuf()
-    {
-        $empty = new Buffer();
-        $this->assertEquals($empty, $this->in->getScriptBuf());
-    }
-
-    public function testSetScriptBuf()
-    {
-        $script = new Script();
-        $script = $script->op('OP_2')->op('OP_3')->serialize();
-        $buffer = new Buffer($script);
-        $this->in->setScriptBuf($buffer);
-        $this->assertSame($script, $this->in->getScriptBuf()->serialize());
-    }
-
     public function testGetScript()
     {
         $script = $this->in->getScript();
         $this->assertInstanceOf($this->scriptType, $script);
-        $this->assertEmpty($script->serialize());
+        $this->assertEmpty($script->getBuffer()->serialize());
     }
 
     public function testIsCoinbase()
@@ -139,7 +120,6 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($this->in->isCoinbase());
     }
-
 
     public function testFromParser()
     {

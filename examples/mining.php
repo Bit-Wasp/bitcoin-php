@@ -1,13 +1,13 @@
 <?php
 
 use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Script\ScriptFactory;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
 use Afk11\Bitcoin\Block\BlockFactory;
 use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
 
 use Afk11\Bitcoin\Miner\Miner;
 use Afk11\Bitcoin\Network;
-use Afk11\Bitcoin\Script\Script;
 
 require __DIR__ . "/../vendor/autoload.php";
 
@@ -30,7 +30,7 @@ $prev = BlockFactory::fromHex($latest);
 $timestamp = time() + (3600 * 2);
 
 // create script to pay ourselves
-$script = Script::payToPubKey($privKey->getPublicKey());
+$script = ScriptFactory::payToPubKey($privKey->getPublicKey());
 
 // init miner
 $miner = new Miner(Bitcoin::getMath(), $prev->getHeader(), $script, null, $timestamp, 2, true);

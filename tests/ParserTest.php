@@ -345,7 +345,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
     {
         $transaction = TransactionFactory::create();
         $input  = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0);
-        $output = new TransactionOutput(null, 1);
+        $output = new TransactionOutput(1, null);
         $transaction
             ->getInputs()
             ->addInput($input);

@@ -29,22 +29,15 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     /**
      * Initialize class
      *
-     * @param null $script
+     * @param ScriptInterface $script
      * @param int|string|null $value
      */
-    public function __construct($script = null, $value = null)
+    public function __construct($value = null, ScriptInterface $script = null)
     {
-        if (!is_null($script)) {
-            if ($script instanceof ScriptInterface) {
-                $this->setScript($script);
-            } elseif ($script instanceof Buffer) {
-                $this->setScriptBuf($script);
-            }
+        if ($script !== null) {
+            $this->setScript($script);
         }
-
         $this->value = $value;
-
-        return $this;
     }
 
     /**
@@ -83,7 +76,7 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     public function getScript()
     {
         if ($this->script == null) {
-            $this->script = new Script($this->getScriptBuf());
+            $this->script = new Script();
         }
 
         return $this->script;
@@ -98,31 +91,6 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     public function setScript(ScriptInterface $script)
     {
         $this->script = $script;
-        return $this;
-    }
-
-    /**
-     * Return the current script buffer
-     *
-     * @return \Afk11\Bitcoin\Buffer
-     */
-    public function getScriptBuf()
-    {
-        if ($this->scriptBuf == null) {
-            return new Buffer();
-        }
-        return $this->scriptBuf;
-    }
-
-    /**
-     * Set Script Buffer
-     *
-     * @param \Afk11\Bitcoin\Buffer $buffer
-     * @return $this
-     */
-    public function setScriptBuf(Buffer $buffer)
-    {
-        $this->scriptBuf = $buffer;
         return $this;
     }
 

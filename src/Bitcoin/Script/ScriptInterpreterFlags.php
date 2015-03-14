@@ -21,7 +21,7 @@ class ScriptInterpreterFlags
     public static function defaults()
     {
         $flags = new self();
-        // Set up current limits
+        // Set up present settings
         $flags->discourageUpgradableNOPS = true;
         $flags->maxBytes                 = 10000;
         $flags->maxElementSize           = 520;

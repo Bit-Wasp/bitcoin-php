@@ -4,6 +4,8 @@ namespace Afk11\Bitcoin\Serializer\Transaction;
 
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Transaction\TransactionInput;
 use Afk11\Bitcoin\Transaction\TransactionInputInterface;
 
 class TransactionInputSerializer
@@ -15,35 +17,32 @@ class TransactionInputSerializer
     public function serialize(TransactionInputInterface $input)
     {
         $parser = new Parser();
-        $parser
+        return $parser
             ->writeBytes(32, $input->getTransactionId(), true)
             ->writeInt(4, $input->getVout())
-            ->writeWithLength(new Buffer($input->getScript()->serialize()))
-            ->writeInt(4, $input->getSequence());
-
-        return $parser->getBuffer();
+            ->writeWithLength($input->getScript()->getBuffer())
+            ->writeInt(4, $input->getSequence())
+            ->getBuffer();
     }
 
     /**
      * @param Parser $parser
-     * @return \Afk11\Bitcoin\Transaction\TransactionInput
+     * @return TransactionInput
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser &$parser)
     {
-        $input = new \Afk11\Bitcoin\Transaction\TransactionInput();
-        $input
-            ->setTransactionId($parser->readBytes(32, true)->serialize('hex'))
-            ->setVout($parser->readBytes(4)->serialize('int'))
-            ->setScriptBuf($parser->getVarString())
-            ->setSequence($parser->readBytes(4)->serialize('int'));
-
-        return $input;
+        return new TransactionInput(
+            $parser->readBytes(32, true)->serialize('hex'),
+            $parser->readBytes(4)->serialize('int'),
+            new Script($parser->getVarString()),
+            $parser->readBytes(4)->serialize('int')
+        );
     }
 
     /**
      * @param $string
-     * @return \Afk11\Bitcoin\Transaction\TransactionInput
+     * @return TransactionInput
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function parse($string)

@@ -3,6 +3,7 @@
 namespace Afk11\Bitcoin\Serializer\Transaction;
 
 use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Transaction\TransactionOutputCollection;
 
 class TransactionOutputCollectionSerializer
@@ -47,7 +48,7 @@ class TransactionOutputCollectionSerializer
                     $output = new \Afk11\Bitcoin\Transaction\TransactionOutput();
                     $output
                         ->setValue($parser->readBytes(8, true)->serialize('int'))
-                        ->setScriptBuf($parser->getVarString());
+                        ->setScript(new Script($parser->getVarString()));
                     return $output;
                 }
             )
@@ -63,7 +64,7 @@ class TransactionOutputCollectionSerializer
     public function parse($string)
     {
         $parser = new Parser($string);
-        $outputs = $this->parser($parser);
+        $outputs = $this->fromParser($parser);
         return $outputs;
     }
 }

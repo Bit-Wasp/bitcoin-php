@@ -45,4 +45,8 @@ $bitcoind = RpcFactory::bitcoind('127.0.0.1', 18332, 'bitcoinrpc', 'BBpsLqmCCx7V
 
 $hash = $bitcoind->getbestblockhash();
 $block = $bitcoind->getblock($hash);
+$tx = $bitcoind->getTransactions()->getTransaction(10);
+echo $tx->getTransactionId();
+
+
 `

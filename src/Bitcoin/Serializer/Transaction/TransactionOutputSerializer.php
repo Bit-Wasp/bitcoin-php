@@ -4,6 +4,8 @@ namespace Afk11\Bitcoin\Serializer\Transaction;
 
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Transaction\TransactionOutput;
 use Afk11\Bitcoin\Transaction\TransactionOutputInterface;
 
 class TransactionOutputSerializer
@@ -15,32 +17,28 @@ class TransactionOutputSerializer
     public function serialize(TransactionOutputInterface $output)
     {
         $parser = new Parser();
-        $parser
+        return $parser
             ->writeInt(8, $output->getValue(), true)
-            ->writeWithLength(
-                new Buffer($output->getScript()->serialize())
-            );
-
-        return $parser->getBuffer();
+            ->writeWithLength($output->getScript()->getBuffer())
+            ->getBuffer();
     }
 
     /**
      * @param Parser $parser
-     * @return \Afk11\Bitcoin\Transaction\TransactionOutput
+     * @return TransactionOutput
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser &$parser)
     {
-        $output = new \Afk11\Bitcoin\Transaction\TransactionOutput();
-        $output
-            ->setValue($parser->readBytes(8, true)->serialize('int'))
-            ->setScriptBuf($parser->getVarString());
-        return $output;
+        return new TransactionOutput(
+            $parser->readBytes(8, true)->serialize('int'),
+            new Script($parser->getVarString())
+        );
     }
 
     /**
      * @param $string
-     * @return \Afk11\Bitcoin\Transaction\TransactionOutput
+     * @return TransactionOutput
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function parse($string)
@@ -48,6 +46,5 @@ class TransactionOutputSerializer
         $parser = new Parser($string);
         $output = $this->fromParser($parser);
         return $output;
-
     }
 }

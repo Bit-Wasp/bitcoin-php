@@ -8,6 +8,7 @@ interface ScriptClassifierInterface
     const PAYTOPUBKEYHASH = 'pubkeyhash';
     const PAYTOSCRIPTHASH = 'scripthash';
     const MULTISIG = 'multisig';
+    const UNKNOWN = 'unknown';
     const NONSTANDARD = 'nonstandard';
 
     /**

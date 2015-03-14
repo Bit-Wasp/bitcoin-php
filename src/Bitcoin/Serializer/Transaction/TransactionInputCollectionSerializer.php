@@ -3,6 +3,7 @@
 namespace Afk11\Bitcoin\Serializer\Transaction;
 
 use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Transaction\TransactionInputCollection;
 
 class TransactionInputCollectionSerializer
@@ -49,7 +50,7 @@ class TransactionInputCollectionSerializer
                     $input
                         ->setTransactionId($parser->readBytes(32, true)->serialize('hex'))
                         ->setVout($parser->readBytes(4)->serialize('int'))
-                        ->setScriptBuf($parser->getVarString())
+                        ->setScript(new Script($parser->getVarString()))
                         ->setSequence($parser->readBytes(4)->serialize('int'));
                     return $input;
                 }

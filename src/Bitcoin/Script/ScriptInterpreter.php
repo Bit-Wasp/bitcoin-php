@@ -124,7 +124,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     {
         return array_map(
             function ($value) {
-                return $this->script->getOpCode($value);
+                return $this->script->getOpCodes()->getOpByName($value);
             },
             $this->getDisabledOpcodes()
         );
@@ -134,7 +134,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param $opCodeStr
      * @return bool
      */
-    public function isDisabledOpCode($opCodeStr)
+    public function isDisabledOpByName($opCodeStr)
     {
         return in_array($opCodeStr, $this->getDisabledOpcodes());
     }
@@ -164,28 +164,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @param $op
      * @param $opCodeStr
-     * @return int
-     * @throws \Exception
-     */
-    public function compareOp($op, $opCodeStr)
-    {
-        try {
-            $match = $this->math->cmp($op, $this->script->getOpCode($opCodeStr));
-        } catch (\Exception $e) {
-            $match = false;
-        }
-
-        return $match;
-    }
-
-    /**
-     * @param $op
-     * @param $opCodeStr
      * @return bool
      */
     public function isOp($op, $opCodeStr)
     {
-        return (bool)$this->compareOp($op, $opCodeStr) == 0;
+        return (bool)$this->script->getOpcodes()->isThisOp($op, $opCodeStr) == 0;
     }
 
     /**
@@ -212,19 +195,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function checkMinimalPush($opCode, $pushData)
     {
         $pushSize = strlen($pushData);
+        $opcodes = $this->script->getOpCodes();
 
         if ($pushSize == 0) {
-            return $this->compareOp($opCode, 'OP_0') == 0;
+            return $opcodes->isThisOp($opCode, 'OP_0');
         } elseif ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
-            return $opCode == $this->script->getOpCode('OP_1') + ( ord($pushData[0]) - 1);
+            return $opCode == $this->script->getOpCodes()->getOpByName('OP_1') + ( ord($pushData[0]) - 1);
         } elseif ($pushSize == 1 && ord($pushData) == 0x81) {
-            return $this->compareOp($opCode, 'OP_1NEGATE') == 0;
+            return $opcodes->isThisOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
             return $opCode == $pushSize;
         } elseif ($pushSize <= 255) {
-            return $this->compareOp($opCode, 'OP_PUSHDATA1') == 0;
+            return $opcodes->isThisOp($opCode, 'OP_PUSHDATA1');
         } elseif ($pushSize <= 65535) {
-            return $this->compareOp($opCode, 'OP_PUSHDATA2') == 0;
+            return $opcodes->isThisOp($opCode, 'OP_PUSHDATA2');
         }
 
         return true;
@@ -241,7 +225,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function getOp(&$script, &$position, $posEnd, &$opCode, &$pushData = null)
     {
-        $opCode = $this->script->getOpCode('OP_INVALIDOPCODE');
+        $opcodes = $this->script->getOpcodes();
+        $opCode = $opcodes->getOpByName('OP_INVALIDOPCODE');
 
         if ($this->math->cmp($position, $posEnd) >= 0) {
             return false;
@@ -249,35 +234,31 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $opCode = ord($script[$position++]);
 
-        if ($this->compareOp($opCode, 'OP_PUSHDATA4') <= 0) {
-            // opCode < OP_PUSHDATA1 - then just take opCode as the length, do not seek more
-            if ($this->compareOp($opCode, 'OP_PUSHDATA1') < 0) {
+        if ($opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
+            if ($opcodes->cmp($opCode, 'OP_PUSHDATA1') < 0) {
                 $size = $opCode;
 
-            } else if ($this->isOp($opCode, 'OP_PUSHDATA1')) {
+            } else if ($opcodes->isThisOp($opCode, 'OP_PUSHDATA1')) {
                 if ($posEnd - $position < 1) {
                     return false;
                 }
-
                 $size = ord($script[$position]);
                 $position++;
 
-            } else if ($this->isOp($opCode, 'OP_PUSHDATA2')) {
+            } else if ($opcodes->isThisOp($opCode, 'OP_PUSHDATA2')) {
                 if (($posEnd - $position) < 2) {
                     return false;
                 }
-
                 $size = unpack("v", substr($script, $position, 2));
                 $size = $size[1];
                 $position += 2;
 
-            } else if ($this->isOp($opCode, 'OP_PUSHDATA4')) {
+            } else {
                 if ($posEnd - $position < 4) {
                     return false;
                 }
                 $size = unpack("V", substr($script, $position, 4));
                 $size = $size[1];
-
                 $position += 4;
             }
 
@@ -288,7 +269,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
             $pushData = substr($script, $position, $size);
             $position += $size;
-
         }
 
         return true;
@@ -336,7 +316,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         if ($script == null) {
             $script = new Script();
         }
-
         $this->script = $script;
         return $this;
     }
@@ -395,8 +374,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function run()
     {
-
-        $script        = $this->script->serialize();
+        $opcodes = $this->script->getOpCodes();
+        $script        = $this->script->getBuffer()->serialize();
         $posScriptEnd  = strlen($script);
         $pos           = 0;
         $this->opCount = 0;
@@ -424,7 +403,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     throw new \Exception('Error - push size');
                 }
 
-                if ($this->compareOp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
+                if ($this->script->getOpcodes()->isThisOp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
                     throw new \Exception('Error - Script Op Count');
                 }
 
@@ -434,13 +413,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     }
                 }
 
-                if ($fExec && $opCode >= 0 && $this->compareOp($opCode, 'OP_PUSHDATA4') <= 0) {
+                if ($fExec && $opCode >= 0 && $opcodes->isThisOp($opCode, 'OP_PUSHDATA4') <= 0) {
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
                     }
                     $this->mainStack->push($pushData);
 
-                } elseif ($fExec || ($this->compareOp($opCode, 'OP_IF') <= 0 && $this->compareOp($opCode, 'OP_ENDIF'))) {
+                } elseif ($fExec || ($opcodes->isThisOp($opCode, 'OP_IF') <= 0 && $opcodes->isThisOp($opCode, 'OP_ENDIF'))) {
                     switch ($opCode)
                     {
                         case $this->isOp($opCode, 'OP_1NEGATE'):
@@ -460,7 +439,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $this->isOp($opCode, 'OP_14'):
                         case $this->isOp($opCode, 'OP_15'):
                         case $this->isOp($opCode, 'OP_16'):
-                            $num = $opCode - ($this->script->getOpCode('OP_1') - 1);
+                            $num = $opCode - ($opcodes->getOpByName('OP_1') - 1);
                             $this->mainStack->push($num);
                             break;
 
