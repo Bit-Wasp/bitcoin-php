@@ -53,7 +53,7 @@ or
  echo $public->getAddress($network) . "\n";
 ```
 
-## Explore the blockchain using OOP bindings to the RPFC
+## Explore the blockchain using OOP bindings to the RPC
 ```
 use Afk11\Bitcoin\Rpc\RpcFactory;
 
