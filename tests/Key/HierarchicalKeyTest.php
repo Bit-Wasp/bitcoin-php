@@ -10,6 +10,10 @@ use Afk11\Bitcoin\Key\HierarchicalKey;
 class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var
+     */
+    protected $math;
+    /**
      *
      * @var HierarchicalKey
      */
@@ -30,6 +34,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
+        $this->math = Bitcoin::getMath();
         $this->key = null;
         $this->network = new Network('00', '05', '80', false);
         $this->network->setHDPubByte('0488b21e')
@@ -38,7 +43,12 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 
     private function compareToPrivVectors(HierarchicalKey $key, $vectors)
     {
+        $
+        $this->assertSame($vectors->secret_wif, $key->toWif($this->network));
         $this->assertSame($vectors->address, $key->getAddress()->getAddress($this->network));
+        $this->assertSame($this->math->hexDec($vectors->secret_hex), $key->getSecretMultiplier());
+        //$this->assertSame($vectors->xprv_hex, $key->getBuffer()->getHex());
+        //$this->assertSame($vectors->xpub_hex, $key->toPublic()->getBuffer()->getHex());
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
         $this->assertSame($vectors->xpub_b58, $key->toExtendedPublicKey($this->network), 'correct xpub');
     }

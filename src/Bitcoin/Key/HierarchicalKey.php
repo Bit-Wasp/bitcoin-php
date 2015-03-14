@@ -85,18 +85,17 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     }
 
     /**
-     * @param Math $math
      * @param $sequence
      * @return int|string
      */
-    public static function hardenedSequence(Math $math, $sequence)
+    public function getHardenedSequence($sequence)
     {
-        $hardened = $math->hexDec('80000000');
-        if ($math->cmp($sequence, $hardened) >= 0) {
+        $hardened = $this->math->hexDec('80000000');
+        if ($this->math->cmp($sequence, $hardened) >= 0) {
             throw new \LogicException('Sequence is already for a hardened key');
         }
 
-        return $math->add($hardened, $sequence);
+        return $this->math->add($hardened, $sequence);
     }
 
     /**
@@ -141,8 +140,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      */
     public function getChildFingerprint()
     {
-        $hash        = $this->getPublicKey()->getPubKeyHash();
-        $fingerprint = $this->math->hexDec(substr($hash, 0, 8));
+        $fingerprint = $this->math->hexDec(substr($this->getPublicKey()->getPubKeyHash(), 0, 8));
         return $fingerprint;
     }
 
@@ -223,7 +221,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     }
 
     /**
-     * @return string
+     * @return Buffer
      * @throws \Exception
      */
     public function getBuffer()
@@ -396,7 +394,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
 
 
     /**
-     * Decodes a BIP32 path: ie, m/0/1'/2/3' -> m/0/2147483649/2/2147483651
+     * Decodes a BIP32 path into it's actual 32bit sequence numbers: ie, m/0/1'/2/3' -> m/0/2147483649/2/2147483651
      *
      * @param $path
      * @return string
@@ -406,20 +404,20 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
         $pathPieces = explode("/", $path);
         $newPath = array();
 
-        foreach ($pathPieces as $c => $int) {
+        foreach ($pathPieces as $c => $sequence) {
             $hardened = false;
 
-            if (in_array(substr(strtolower($int), -1), array("h", "'")) === true) {
-                $intEnd = strlen($int) - 1;
-                $int = substr($int, 0, $intEnd);
+            if (in_array(substr(strtolower($sequence), -1), array("h", "'")) === true) {
+                $intEnd = strlen($sequence) - 1;
+                $sequence = substr($sequence, 0, $intEnd);
                 $hardened = true;
             }
 
             if ($hardened) {
-                $int = $this->math->add($this->math->hexdec('80000000'), $int);
+                $sequence = $this->getHardenedSequence($sequence);
             }
 
-            $newPath[] = $int;
+            $newPath[] = $sequence;
         }
 
         $path = implode("/", $newPath);

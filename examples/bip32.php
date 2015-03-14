@@ -16,7 +16,7 @@ $master = HierarchicalKeyFactory::generateMasterKey();
 echo $master->toExtendedPrivateKey($network) . "\n";
 echo "Address: " . $makeAddress->fromKey($master) . "\n\n";
 
-$key1 = $master->deriveChild(HierarchicalKey::hardenedSequence($math, 0));
+$key1 = $master->deriveChild($master->getHardenedSequence(0));
 echo $key1->toExtendedPrivateKey($network) . "\n";
 echo "Address: " . $makeAddress->fromKey($key1) . "\n\n";
 
