@@ -175,7 +175,7 @@ class Network implements NetworkInterface
         $this->netMagicBytes = $bytes;
         return $this;
     }
-    
+
     /**
      * @return string
      * @throws \Exception

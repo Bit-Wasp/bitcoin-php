@@ -69,6 +69,30 @@ class Buffer
     }
 
     /**
+     * @return string
+     */
+    public function getBinary()
+    {
+        return $this->buffer;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHex()
+    {
+        return bin2hex($this->getBinary());
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getInt()
+    {
+        return Bitcoin::getMath()->hexDec($this->getHex());
+    }
+
+    /**
      * Serialize a the buffer to hex, an integer, or a byte string
      *
      * @param string|null $type
