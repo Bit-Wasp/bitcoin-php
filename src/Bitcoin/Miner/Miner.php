@@ -9,7 +9,6 @@ use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
-use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Transaction\TransactionCollection;
 use Afk11\Bitcoin\Transaction\TransactionFactory;
 use Afk11\Bitcoin\Transaction\TransactionInterface;
@@ -22,6 +21,11 @@ use Afk11\Bitcoin\Block\BlockHeaderInterface;
 
 class Miner
 {
+    /**
+     * @var Math
+     */
+    private $math;
+
     /**
      * @var ScriptInterface
      */
