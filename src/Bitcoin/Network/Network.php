@@ -72,7 +72,6 @@ class Network implements NetworkInterface
         $this->p2shByte    = $p2shByte;
         $this->privByte    = $privByte;
         $this->testnet     = $testnet;
-        return $this;
     }
 
     /**
@@ -115,7 +114,7 @@ class Network implements NetworkInterface
      */
     public function getHDPubByte()
     {
-        if ($this->xpubByte == null) {
+        if ($this->xpubByte === null) {
             throw new \Exception('No HD xpub byte was set');
         }
 
@@ -145,7 +144,7 @@ class Network implements NetworkInterface
      */
     public function getHDPrivByte()
     {
-        if ($this->xprivByte == null) {
+        if ($this->xprivByte === null) {
             throw new \Exception('No HD xpriv byte was set');
         }
 
@@ -176,12 +175,17 @@ class Network implements NetworkInterface
         $this->netMagicBytes = $bytes;
         return $this;
     }
-
+    
     /**
      * @return string
+     * @throws \Exception
      */
     public function getNetMagicBytes()
     {
+        if ($this->netMagicBytes === null) {
+            throw new \Exception('No network magic bytes were set');
+        }
+
         return $this->netMagicBytes;
     }
 
