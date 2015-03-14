@@ -108,18 +108,20 @@ class Signature implements SignatureInterface
      */
     public static function isDERSignature(Buffer $sig)
     {
-        $checkVal = function ($fieldName, $typePrefix, $length, $binaryString) {
+        $checkVal = function ($fieldName, $start, $length, $binaryString) {
             if ($length == 0) {
                 throw new SignatureNotCanonical('Signature '.$fieldName.' length is zero');
             }
+            $typePrefix = ord(substr($binaryString, $start - 2, 1));
             if ($typePrefix !== 0x02) {
                 throw new SignatureNotCanonical('Signature '.$fieldName.' value type mismatch');
             }
-            $vAnd = $binaryString[0] & pack("H*", '80');
+            $val = substr($binaryString, $start, $length);
+            $vAnd = $val[0] & pack("H*", '80');
             if (ord($vAnd) === 128) {
                 throw new SignatureNotCanonical('Signature '.$fieldName.' value is negative');
             }
-            if ($length > 1 && ord($binaryString[0]) == 0x00 && !ord(($binaryString[1] & pack('H*', '80')))) {
+            if ($length > 1 && ord($val[0]) == 0x00 && !ord(($val[1] & pack('H*', '80')))) {
                 throw new SignatureNotCanonical('Signature '.$fieldName.' value excessively padded');
             }
         };
@@ -143,22 +145,19 @@ class Signature implements SignatureInterface
         }
 
         $lenR = ord($bin[3]);
-        $rType = ord(substr($bin, 2, 1));
-        $r = substr($bin, 4, $lenR);
+        $startR = 4;
         if (5 + $lenR >= $sig->getSize()) {
             throw new SignatureNotCanonical('Signature S length misplaced');
         }
 
         $lenS = ord($bin[5 + $lenR]);
         $startS = 4 + $lenR + 2;
-        $sType = ord(substr($bin, $startS - 2, 1));
-        $s = substr($bin, $startS, $lenS);
         if (($lenR + $lenS + 7) !== $sig->getSize()) {
             throw new SignatureNotCanonical('Signature R+S length mismatch');
         }
 
-        $checkVal('R', $rType, $lenR, $r);
-        $checkVal('S', $sType, $lenS, $s);
+        $checkVal('R', $startR, $lenR, $bin);
+        $checkVal('S', $startS, $lenS, $bin);
 
         return true;
 

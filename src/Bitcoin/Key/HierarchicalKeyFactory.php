@@ -36,12 +36,12 @@ class HierarchicalKeyFactory
         $generator = $generator ?: Bitcoin::getGenerator();
 
         $buffer  = PrivateKeyFactory::create(true, $math, $generator);
-        $private = self::fromEntropy($buffer->serialize('hex'));
+        $private = self::fromEntropy($buffer->getBuffer()->serialize('hex'));
         return $private;
     }
 
     /**
-     * @param $entropy
+     * @param string $entropy
      * @param Math $math
      * @param GeneratorPoint $generator
      * @return HierarchicalKey
@@ -52,20 +52,22 @@ class HierarchicalKeyFactory
         $generator = $generator ?: Bitcoin::getGenerator();
 
         $hash = Hash::hmac('sha512', pack("H*", $entropy), "Bitcoin seed");
-        $depth = 0;
-        $parentFingerprint = 0;
-        $sequence = 0;
-        $chainCode = $math->hexDec(substr($hash, 64, 64));
 
-        $private = PrivateKeyFactory::fromHex(substr($hash, 0, 64), true);
-
-        $key = new HierarchicalKey($math, $generator, $depth, $parentFingerprint, $sequence, $chainCode, $private);
+        $key = new HierarchicalKey(
+            $math,
+            $generator,
+            0,
+            0,
+            0,
+            $math->hexDec(substr($hash, 64, 64)),
+            PrivateKeyFactory::fromHex(substr($hash, 0, 64), true)
+        );
 
         return $key;
     }
 
     /**
-     * @param $extendedKey
+     * @param string $extendedKey
      * @param NetworkInterface $network
      * @return HierarchicalKey
      * @throws Base58ChecksumFailure
