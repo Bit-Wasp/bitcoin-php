@@ -2,7 +2,9 @@
 
 namespace Afk11\Bitcoin\Signature;
 
-interface SignatureInterface
+use Afk11\Bitcoin\SerializableInterface;
+
+interface SignatureInterface extends SerializableInterface
 {
     /**
      * Return the R value
@@ -17,4 +19,10 @@ interface SignatureInterface
      * @return int
      */
     public function getS();
+
+    /**
+     * Return the sighash type
+     * @return int
+     */
+    public function getSigHashType();
 }

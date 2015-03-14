@@ -2,11 +2,10 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
-use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Script\Script;
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
-use \Afk11\Bitcoin\SerializableInterface;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
 class TransactionInput implements TransactionInputInterface
@@ -31,9 +30,9 @@ class TransactionInput implements TransactionInputInterface
     protected $script;
 
     /**
-     * @var ScriptInterface
+     * @var TransactionOutputInterface
      */
-    protected $outputScript;
+    protected $prevOutput;
 
     /**
      * @param null $txid
@@ -139,21 +138,21 @@ class TransactionInput implements TransactionInputInterface
     }
 
     /**
-     * @param ScriptInterface $script
+     * @param TransactionOutput $output
      * @return $this
      */
-    public function setOutputScript(ScriptInterface $script)
+    public function setPrevOutput(TransactionOutput $output)
     {
-        $this->outputScript = $script;
+        $this->prevOutput = $output;
         return $this;
     }
 
     /**
      * @return ScriptInterface
      */
-    public function getOutputScript()
+    public function getPrevOutput()
     {
-        return $this->outputScript;
+        return $this->prevOutput;
     }
 
     /**

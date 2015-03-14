@@ -3,7 +3,6 @@
 namespace Afk11\Bitcoin\Script\Classifier;
 
 use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
 
 class OutputClassifier implements ScriptClassifierInterface
@@ -33,7 +32,7 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        $script = $this->script->serialize();
+        $script = $this->script->getBuffer()->serialize();
 
         if (strlen($script) == 35 // Binary
             && strlen($this->evalScript[0]) == 33*2 // hex string
@@ -75,7 +74,7 @@ class OutputClassifier implements ScriptClassifierInterface
     public function isPayToScriptHash()
     {
         return (
-            strlen($this->script->serialize()) == 23
+            strlen($this->script->getBuffer()->serialize()) == 23
             && count($this->evalScript) == 3
             && $this->evalScript[0] == 'OP_HASH160'
             && (strlen($this->evalScript[1]) == 20*2)

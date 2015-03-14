@@ -2,8 +2,6 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionInputCollectionSerializer;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
@@ -91,7 +89,7 @@ class TransactionInputCollection implements \Countable
     }
 
     /**
-     * @return Buffer
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function getBuffer()
     {

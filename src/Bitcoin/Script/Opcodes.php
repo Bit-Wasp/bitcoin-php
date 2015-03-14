@@ -5,7 +5,7 @@ namespace Afk11\Bitcoin\Script;
 class Opcodes
 {
     /**
-     * @param Math $math
+     *
      */
     public function __construct()
     {

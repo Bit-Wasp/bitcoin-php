@@ -12,9 +12,19 @@ use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
 class HexBlockSerializer
 {
     /**
+     * @var Math
+     */
+    protected $math;
+
+    /**
      * @var HexBlockHeaderSerializer
      */
     protected $headerSerializer;
+
+    /**
+     * @var TransactionCollectionSerializer
+     */
+    protected $txColSerializer;
 
     /**
      * @param HexBlockHeaderSerializer $headerSerializer

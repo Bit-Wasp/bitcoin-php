@@ -3,9 +3,11 @@
 namespace Afk11\Bitcoin\Script;
 
 use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Key\PublicKeyFactory;
 use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
+use Afk11\Bitcoin\Signature\SignatureFactory;
 use Afk11\Bitcoin\Transaction\Transaction;
 use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Signature\Signature;
@@ -904,8 +906,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 return false;
                             }
 
-                            $signature = Signature::fromHex($vchSig);
-                            $publicKey = PublicKey::fromHex($vchPubKey);
+                            $signature = SignatureFactory::fromHex($vchSig);
+                            $publicKey = PublicKeyFactory::fromHex($vchPubKey);
 
                             $scriptCode= new Buffer(substr($script, $this->hashStartPos, $posScriptEnd));
                             $script    = new Script($scriptCode);

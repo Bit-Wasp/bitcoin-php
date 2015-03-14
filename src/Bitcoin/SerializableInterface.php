@@ -6,7 +6,7 @@ interface SerializableInterface
 {
     /**
      * @param null $type
-     * @return mixed
+     * @return Buffer
      */
     public function getBuffer();
 }

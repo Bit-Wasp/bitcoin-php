@@ -22,11 +22,6 @@ class TransactionOutput implements TransactionOutputInterface, SerializableInter
     protected $script;
 
     /**
-     * @var \Afk11\Bitcoin\Buffer
-     */
-    protected $scriptBuf;
-
-    /**
      * Initialize class
      *
      * @param ScriptInterface $script

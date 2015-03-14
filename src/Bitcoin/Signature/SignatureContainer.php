@@ -77,7 +77,7 @@ class SignatureContainer
 
         foreach ($parsed as $data) {
             try {
-                $signature = Signature::fromHex($data->serialize('hex'));
+                $signature = SignatureFactory::fromHex($data->serialize('hex'));
                 $this->add($signature);
             } catch (\Exception $e) {
                 continue;

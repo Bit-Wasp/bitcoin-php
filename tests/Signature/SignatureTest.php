@@ -2,9 +2,9 @@
 
 namespace Afk11\Bitcoin\Tests\Signature;
 
-use Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
-use Afk11\Bitcoin\Signature\Signature;
+use Afk11\Bitcoin\Exceptions\SignatureNotCanonical;use Afk11\Bitcoin\Signature\Signature;
 use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Signature\SignatureFactory;
 
 /**
  * Class SignatureTest
@@ -60,7 +60,6 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-
     public function testCreatesSignature()
     {
         $this->sig = new Signature('15148391597642804072346119047125209977057190235171731969261106466169304622925', '29241524176690745465970782157695275252863180202254265092780741319779241938696');
@@ -71,7 +70,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
     {
         $this->sig = new Signature('56860522993476239843569407076292679822350064328987049204205911586688428093823', '75328468267675219166053001951181042681597800329127462438170420074748074627387');
         $this->assertInstanceOf($this->sigType, $this->sig);
-        $this->assertEquals('304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01', $this->sig->serialize('hex'));
+        $this->assertEquals('304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01', $this->sig->getBuffer()->serialize('hex'));
     }
 
     public function testDefaultSighashType()
@@ -102,12 +101,10 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
     {
         $s = '304402203bc90d68b698347ea1f4b51446a0725d177debe99736df2718a9bc82275a17c402200d250e0d75c1123d179d029680bd7e2a08a4917a7e3beff25b6dbdeadbe1598901';
 
-        Signature::isDERSignature(Buffer::hex($s));
-        $sig      = Signature::fromHex($s);
-        $sd       = $sig->serialize('hex');
-        Signature::isDERSignature(Buffer::hex($sd));
-
-        $this->assertSame($s, $sd);
+        $this->assertTrue(Signature::isDERSignature(Buffer::hex($s)));
+        $sig      = SignatureFactory::fromHex($s);
+        $this->assertTrue(Signature::isDERSignature($sig->getBuffer()));
+        $this->assertSame($s, $sig->getBuffer()->serialize('hex'));
     }
 
     public function testSignaturesConsistent()
@@ -115,8 +112,8 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $f    = file_get_contents(__DIR__ . '/../Data/signatures_blockchain.json');
         $json = json_decode($f);
         foreach ($json->test as $c => $test) {
-            $sig  = Signature::fromHex($test);
-            $sd   = $sig->serialize('hex');
+            $sig  = SignatureFactory::fromHex($test);
+            $sd   = $sig->getBuffer()->serialize('hex');
             $this->assertSame($test, $sd);
         }
     }
@@ -124,7 +121,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
     public function testFromHex()
     {
         $hex = '304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01';
-        $this->sig = Signature::fromHex($hex);
+        $this->sig = SignatureFactory::fromHex($hex);
 
         $this->assertInstanceOf('Afk11\Bitcoin\Signature\Signature', $this->sig);
         $this->assertEquals('56860522993476239843569407076292679822350064328987049204205911586688428093823', $this->sig->getR());

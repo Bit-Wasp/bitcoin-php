@@ -1,15 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 14/03/15
- * Time: 01:40
- */
 
 namespace Afk11\Bitcoin\Address;
 
-use Afk11\Bitcoin\Base58;
-use Afk11\Bitcoin\Address\AddressInterface;
 use Afk11\Bitcoin\NetworkInterface;
 use Afk11\Bitcoin\Key\KeyInterface;
 

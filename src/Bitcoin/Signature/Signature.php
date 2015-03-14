@@ -2,10 +2,7 @@
 
 namespace Afk11\Bitcoin\Signature;
 
-use \Afk11\Bitcoin\Bitcoin;
 use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Parser;
-use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
 
 class Signature implements SignatureInterface
@@ -95,84 +92,13 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param $hex
-     * @return Signature
+     * @return \Afk11\Bitcoin\Buffer
      */
-    public static function fromHex($hex)
+    public function getBuffer()
     {
-        $parser    = new Parser($hex);
-        $signature = new Signature(0, 0);
-        $signature = $signature->fromParser($parser);
-        return $signature;
-    }
-
-    /**
-     * @param \Afk11\Bitcoin\Parser $parser
-     * @return Signature
-     * @throws ParserOutOfRange
-     */
-    public function fromParser(Parser &$parser)
-    {
-        try {
-            $parser->readBytes(1);
-            $outer    = $parser->getVarString();
-            $this->setSighashType($parser->readBytes(1)->serialize('int'));
-
-            $parse    = new Parser($outer);
-            $parse->readBytes(1);
-            $this->setR($parse->getVarString()->serialize('int'));
-
-            $parse->readBytes(1);
-            $this->setS($parse->getVarString()->serialize('int'));
-        } catch (ParserOutOfRange $e) {
-            throw new ParserOutOfRange('Failed to extract full signature from parser');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param null $type
-     * @return string
-     */
-    public function serialize($type = null)
-    {
-        $math = Bitcoin::getMath();
-
-        // Ensure that the R and S hex's are of even length
-        $rBin = pack('H*', $math->decHex($this->getR()));
-        $sBin = pack('H*', $math->decHex($this->getS()));
-
-        // Pad R and S if their highest bit is flipped, ie,
-        // they are negative.
-        $rt = $rBin[0] & pack('H*', '80');
-        if (ord($rt) == 128) {
-            $rBin = pack('H*', '00') . $rBin;
-        }
-
-        $st = $sBin[0] & pack('H*', '80');
-        if (ord($st) == 128) {
-            $sBin = pack('H*', '00') . $sBin;
-        }
-
-        $inner = new Parser();
-        $inner
-            ->writeBytes(1, '02')
-            ->writeWithLength(new Buffer($rBin))
-            ->writeBytes(1, '02')
-            ->writeWithLength(new Buffer($sBin));
-
-        $outer = new Parser();
-        $outer
-            ->writeBytes(1, '30')
-            ->writeWithLength($inner->getBuffer())
-            ->writeInt(1, $this->getSighashType(), true);
-
-        $serialized = $outer
-            ->getBuffer()
-            ->serialize($type);
-
-        return $serialized;
+        $serializer = SignatureFactory::getSerializer();
+        $buffer = $serializer->serialize($this);
+        return $buffer;
     }
 
     /**

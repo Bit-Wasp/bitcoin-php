@@ -99,7 +99,6 @@ class SignerTest extends \PHPUnit_Framework_TestCase
          * Should be at least 100 to catch these, but it can take a while
          */
         $random = new Random();
-
         $signer = new Signer($this->math, $this->generator);
         $pk = PrivateKeyFactory::fromInt('4141414141414141414141414141414141414141414141414141414141414141', false, $this->math, $this->generator);
 
@@ -108,7 +107,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
             $sig = $signer->sign($pk, $hash, new Random());
 
             $this->assertInstanceOf($this->sigType, $sig);
-            $this->assertTrue(Signature::isDERSignature(new Buffer($sig->serialize())));
+            $this->assertTrue(Signature::isDERSignature($sig->getBuffer()));
             $this->assertTrue($signer->verify($pk->getPublicKey(), $hash, $sig));
         }
     }

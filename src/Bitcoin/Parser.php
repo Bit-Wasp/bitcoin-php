@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin;
 
-use \Afk11\Bitcoin\Exceptions\ParserOutOfRange;
+use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
 
 class Parser
 {
@@ -126,6 +126,8 @@ class Parser
         } elseif ($this->math->cmp($int, 0xff) == 0) {
             return $this->readBytes(8, true);
         }
+
+        throw new \Exception('Data too large');
     }
 
     /**
@@ -224,10 +226,7 @@ class Parser
      */
     public function writeArray($serializable)
     {
-        $varInt = self::numToVarInt(count($serializable));
-
-        $parser = new Parser($varInt);
-
+        $parser = new Parser(self::numToVarInt(count($serializable)));
         foreach ($serializable as $object) {
             if (in_array('Afk11\Bitcoin\SerializableInterface', class_implements($object))) {
                 $object = $object->getBuffer();

@@ -3,7 +3,6 @@
 namespace Afk11\Bitcoin\Address;
 
 use Afk11\Bitcoin\NetworkInterface;
-use Afk11\Bitcoin\Key\KeyInterface;
 use Afk11\Bitcoin\Script\ScriptInterface;
 
 class ScriptHashAddress extends Address
@@ -20,7 +19,7 @@ class ScriptHashAddress extends Address
 
     /**
      * @param NetworkInterface $network
-     * @param KeyInterface $key
+     * @param ScriptInterface $key
      */
     public function __construct(NetworkInterface $network, ScriptInterface $script)
     {
