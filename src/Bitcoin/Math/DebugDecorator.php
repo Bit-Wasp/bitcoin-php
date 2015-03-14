@@ -51,7 +51,7 @@ class DebugDecorator implements MathAdapterInterface
      */
     private function call($func, $args)
     {
-        $strArgs = array_map(function($arg) {
+        $strArgs = array_map(function ($arg) {
             return var_export($this->adapter->toString($arg), true);
         }, $args);
 
