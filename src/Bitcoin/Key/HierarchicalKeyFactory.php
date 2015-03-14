@@ -14,9 +14,9 @@ use Mdanter\Ecc\GeneratorPoint;
 class HierarchicalKeyFactory
 {
     /**
-     * @param $math
+     * @param Math $math
      * @param $generator
-     * @param $network
+     * @param NetworkInterface $network
      * @return ExtendedKeySerializer
      */
     public static function getSerializer($math, $generator, $network)

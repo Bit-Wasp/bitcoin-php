@@ -82,7 +82,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param $hashtype
+     * @param integer $hashtype
      * @return $this
      */
     private function setSighashType($hashtype)
@@ -147,7 +147,7 @@ class Signature implements SignatureInterface
             throw new SignatureNotCanonical('Signature R length is zero');
         }
 
-        $rAnd   = $r[0] & pack('H*', '80');
+        $rAnd = $r[0] & pack('H*', '80');
         if (ord($rAnd) == 128) {
             throw new SignatureNotCanonical('Signature R value is negative');
         }
@@ -164,7 +164,7 @@ class Signature implements SignatureInterface
             throw new SignatureNotCanonical('Signature S length is zero');
         }
 
-        $sAnd   = $s[0] & pack('H*', '80');
+        $sAnd = $s[0] & pack('H*', '80');
         if (ord($sAnd) == 128) {
             throw new SignatureNotCanonical('Signature S value negative');
         }

@@ -93,8 +93,8 @@ class SignatureHash implements SignatureHashInterface
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
         if ($sighashType & 31 == SignatureHashInterface::SIGHASH_ANYONECANPAY) {
-            $input  = $inputs->getInput($inputToSign);
-            $copy->setInputs(new TransactionInputCollection([ $input ]));
+            $input = $inputs->getInput($inputToSign);
+            $copy->setInputs(new TransactionInputCollection([$input]));
         }
 
         // Serialize the TxCopy and append the 4 byte hashtype (little endian);

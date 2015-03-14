@@ -67,7 +67,7 @@ class BlockHeader implements BlockHeaderInterface
     /**
      * Return the bits for this block
      *
-     * @return mixed
+     * @return null|Buffer
      */
     public function getBits()
     {
@@ -75,7 +75,7 @@ class BlockHeader implements BlockHeaderInterface
     }
 
     /**
-     * @param mixed $bits
+     * @param Buffer $bits
      * @return $this
      */
     public function setBits(Buffer $bits)
@@ -166,7 +166,7 @@ class BlockHeader implements BlockHeaderInterface
      * Return the nonce from this block. This is the value which
      * is iterated while mining.
      *
-     * @return mixed
+     * @return null|integer
      */
     public function getNonce()
     {

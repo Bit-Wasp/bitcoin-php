@@ -13,7 +13,7 @@ interface TransactionInterface extends NetworkMessageInterface
      * The version parameter is encoded as a uint32
      */
 
-    const MAX_VERSION  = '4294967295';
+    const MAX_VERSION = '4294967295';
 
     /**
      * The locktime parameter is encoded as a uint32

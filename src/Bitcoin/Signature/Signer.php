@@ -59,7 +59,7 @@ class Signer implements SignerInterface
             throw new \RuntimeException('Random number r = 0');
         }
 
-        $s  = $this->math->mod(
+        $s = $this->math->mod(
             $this->math->mul(
                 $this->math->inverseMod($k, $n),
                 $this->math->mod(

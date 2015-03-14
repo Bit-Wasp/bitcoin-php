@@ -3,9 +3,7 @@
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Script\ScriptFactory;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
-use Afk11\Bitcoin\Block\BlockFactory;
 use Afk11\Bitcoin\Rpc\RpcFactory;
-use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
 use Afk11\Bitcoin\Miner\Miner;
 use Afk11\Bitcoin\Network\Network;
 

@@ -120,7 +120,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * Return the hash of the associated public key
      *
-     * @return mixed
+     * @return string
      */
     public function getPubKeyHash()
     {
@@ -130,7 +130,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * Set that this key should be compressed
      *
-     * @param $setting
+     * @param boolean $setting
      * @return $this
      * @throws \Exception
      */
@@ -156,7 +156,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @return string
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function getBuffer()
     {
@@ -168,7 +168,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * Serialize to desired type: hex, decimal, or binary
      *
-     * @param null $type
+     * @param string $type
      * @return int|mixed|string
      */
     public function serialize($type = null)
@@ -199,7 +199,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     /**
      * Return hex string representation of private key
-     * @return string
+     * @return \Afk11\Bitcoin\Buffer
      */
     public function __toString()
     {

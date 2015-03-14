@@ -39,7 +39,7 @@ class TransactionOutputCollectionSerializer
      * @param Parser $parser
      * @return TransactionOutputCollection
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         $outputs = new TransactionOutputCollection;
         $outputs->addOutputs(

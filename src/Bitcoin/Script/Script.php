@@ -47,7 +47,7 @@ class Script implements ScriptInterface
     /**
      * Add an opcode to the script
      *
-     * @param $name
+     * @param string $name
      * @return $this
      */
     public function op($name)
@@ -94,7 +94,7 @@ class Script implements ScriptInterface
                 ->writeBytes($length, $data);
         }
 
-        $this->script .=  $parsed->getBuffer()->serialize();
+        $this->script .= $parsed->getBuffer()->serialize();
         return $this;
     }
 
@@ -152,7 +152,7 @@ class Script implements ScriptInterface
     /**
      * When given a Buffer or hex string, set the script to be this.
      *
-     * @param $scriptData
+     * @param null|Buffer $scriptData
      * @return $this
      */
     public function set($scriptData)
@@ -207,7 +207,7 @@ class Script implements ScriptInterface
     /**
      * Return a varInt, based on the size of the script.
      *
-     * @return string
+     * @return Buffer
      * @throws \Exception
      */
     public function getVarInt()

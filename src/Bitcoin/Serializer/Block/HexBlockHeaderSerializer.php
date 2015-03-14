@@ -27,7 +27,7 @@ class HexBlockHeaderSerializer
      * @return BlockHeader
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         $header = new BlockHeader();
         try {

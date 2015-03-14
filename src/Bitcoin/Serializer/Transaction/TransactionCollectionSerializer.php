@@ -38,7 +38,7 @@ class TransactionCollectionSerializer
      * @param Parser $parser
      * @return TransactionCollection
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         $transactions = new TransactionCollection;
         $transactions->addTransactions(

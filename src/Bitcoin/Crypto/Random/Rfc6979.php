@@ -57,7 +57,7 @@ class Rfc6979 implements RbgInterface
     {
         if (is_null($this->k)) {
             while (true) {
-                $this->k    = $this->drbg->bytes($numBytes);
+                $this->k = $this->drbg->bytes($numBytes);
                 $kInt = $this->k->serialize('int');
 
                 // Check k is between [1, ... Q]

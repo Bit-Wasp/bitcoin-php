@@ -28,7 +28,7 @@ class TransactionOutputSerializer
      * @return TransactionOutput
      * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
      */
-    public function fromParser(Parser &$parser)
+    public function fromParser(Parser & $parser)
     {
         return new TransactionOutput(
             $parser->readBytes(8, true)->serialize('int'),
