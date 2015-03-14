@@ -16,7 +16,7 @@ class Buffer
 
     /**
      * @param $byteString
-     * @param null $byteSize
+     * @param null|integer $byteSize
      * @throws \Exception
      */
     public function __construct($byteString = '', $byteSize = null)
@@ -45,7 +45,7 @@ class Buffer
     /**
      * Create a new buffer from a hex string
      * @param $hex
-     * @param null $bitSize
+     * @param integer $bitSize
      * @return Buffer
      * @throws \Exception
      */

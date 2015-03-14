@@ -79,7 +79,7 @@ class ScriptStack
     /**
      * Set $value to the $pos position in the stack (Relative to the top)
      *
-     * @param $pos
+     * @param integer $pos
      * @param $value
      * @return $this
      */
