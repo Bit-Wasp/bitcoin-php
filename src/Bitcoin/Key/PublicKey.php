@@ -10,7 +10,7 @@ use Afk11\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
 
-class PublicKey implements PublicKeyInterface
+class PublicKey extends Key implements PublicKeyInterface
 {
     /**
      * @var Math

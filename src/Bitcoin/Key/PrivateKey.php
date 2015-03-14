@@ -10,7 +10,7 @@ use Afk11\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use Afk11\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use Mdanter\Ecc\GeneratorPoint;
 
-class PrivateKey implements PrivateKeyInterface
+class PrivateKey extends Key implements PrivateKeyInterface
 {
     /**
      * @var int|string

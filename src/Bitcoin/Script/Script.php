@@ -2,10 +2,12 @@
 
 namespace Afk11\Bitcoin\Script;
 
-use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Parser;
-use \Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\NetworkInterface;
+use Afk11\Bitcoin\Parser;
+use Afk11\Bitcoin\Address\AddressFactory;
+use Afk11\Bitcoin\Crypto\Hash;
 
 class Script implements ScriptInterface
 {
@@ -221,6 +223,16 @@ class Script implements ScriptInterface
     public function getBuffer()
     {
         return new Buffer($this->script);
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @return \Afk11\Bitcoin\Address\ScriptHashAddress
+     */
+    public function getAddress(NetworkInterface $network)
+    {
+        $address = AddressFactory::fromScript($network, $this);
+        return $address;
     }
 
     /**

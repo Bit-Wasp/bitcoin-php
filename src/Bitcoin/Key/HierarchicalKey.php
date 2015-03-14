@@ -13,7 +13,7 @@ use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;
 
-class HierarchicalKey implements PrivateKeyInterface, PublicKeyInterface
+class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInterface
 {
     /**
      * @var \Mdanter\Ecc\GeneratorPoint
