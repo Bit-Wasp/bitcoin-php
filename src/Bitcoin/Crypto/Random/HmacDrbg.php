@@ -34,7 +34,6 @@ class HmacDrbg implements RbgInterface
      * @param string $algo
      * @param \Afk11\Bitcoin\Buffer $entropy
      * @param \Afk11\Bitcoin\Buffer $personalString
-     * @param GeneratorPoint $generator
      */
     public function __construct($algo, Buffer $entropy, Buffer $personalString = null)
     {
