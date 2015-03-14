@@ -17,7 +17,7 @@ You can install this library via Composer:
 or 
 ```{
     "require": "afk11\bitcoin"
-```}
+}```
 
 ##Presently supported:
 
