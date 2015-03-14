@@ -214,7 +214,7 @@ class BlockHeader implements BlockHeaderInterface
      */
     public function getVersion()
     {
-        if ($this->version == null) {
+        if ($this->version === null) {
             return BlockHeaderInterface::CURRENT_VERSION;
         }
         return $this->version;

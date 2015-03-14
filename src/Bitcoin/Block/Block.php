@@ -35,7 +35,6 @@ class Block implements BlockInterface
         $this->header = new BlockHeader();
         $this->math = $math;
         $this->transactions = new TransactionCollection();
-        return $this;
     }
 
     /**

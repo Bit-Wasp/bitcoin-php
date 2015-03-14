@@ -19,7 +19,7 @@ class ScriptHashAddress extends Address
 
     /**
      * @param NetworkInterface $network
-     * @param ScriptInterface $key
+     * @param ScriptInterface $script
      */
     public function __construct(NetworkInterface $network, ScriptInterface $script)
     {

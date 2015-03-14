@@ -41,4 +41,4 @@ $block = $miner->run();
 
 // result
 var_dump($block->getHeader()->getBlockHash());
-var_dump($block->serialize('hex'));
+echo $block->getBuffer();
