@@ -35,8 +35,8 @@ class TransactionInput implements TransactionInputInterface
     protected $prevOutput;
 
     /**
-     * @param null $txid
-     * @param null $vout
+     * @param string|null $txid
+     * @param string|null $vout
      * @param ScriptInterface|Buffer $script
      * @param int $sequence
      */
