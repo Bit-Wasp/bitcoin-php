@@ -24,7 +24,7 @@ $rpc = RpcFactory::bitcoind(
     getenv('BITCOINLIB_RPC_PASSWORD') ?: 'YOUR_PASSWORD'
 );
 
-$latest = $rpc->getblock($rpc->getbestblockhash(), false);
+$latest = $rpc->getblock($rpc->getbestblockhash());
 
 // mining in the future \o/
 $timestamp = time() + (3600 * 2);
