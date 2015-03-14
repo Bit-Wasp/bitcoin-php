@@ -17,7 +17,7 @@ class Block implements BlockInterface
     protected $math;
 
     /**
-     * @var BlockHeader
+     * @var BlockHeaderInterface
      */
     protected $header;
 
