@@ -108,6 +108,22 @@ class Signature implements SignatureInterface
      */
     public static function isDERSignature(Buffer $sig)
     {
+        $checkVal = function ($fieldName, $typePrefix, $length, $binaryString) {
+            if ($length == 0) {
+                throw new SignatureNotCanonical('Signature '.$fieldName.' length is zero');
+            }
+            if ($typePrefix !== 0x02) {
+                throw new SignatureNotCanonical('Signature '.$fieldName.' value type mismatch');
+            }
+            $vAnd = $binaryString[0] & pack("H*", '80');
+            if (ord($vAnd) === 128) {
+                throw new SignatureNotCanonical('Signature '.$fieldName.' value is negative');
+            }
+            if ($length > 1 && ord($binaryString[0]) == 0x00 && !ord(($binaryString[1] & pack('H*', '80')))) {
+                throw new SignatureNotCanonical('Signature '.$fieldName.' value excessively padded');
+            }
+        };
+
         $bin = $sig->serialize();
 
         if ($sig->getSize() < 9) {
@@ -126,52 +142,23 @@ class Signature implements SignatureInterface
             throw new SignatureNotCanonical('Signature has wrong length marker');
         }
 
-        $lenR   = ord($bin[3]);
-        $r      = substr($bin, 4, $lenR);
+        $lenR = ord($bin[3]);
+        $rType = ord(substr($bin, 2, 1));
+        $r = substr($bin, 4, $lenR);
         if (5 + $lenR >= $sig->getSize()) {
             throw new SignatureNotCanonical('Signature S length misplaced');
         }
 
-        $lenS   = ord($bin[5 + $lenR]);
+        $lenS = ord($bin[5 + $lenR]);
         $startS = 4 + $lenR + 2;
-        $s      = substr($bin, $startS, $lenS);
+        $sType = ord(substr($bin, $startS - 2, 1));
+        $s = substr($bin, $startS, $lenS);
         if (($lenR + $lenS + 7) !== $sig->getSize()) {
             throw new SignatureNotCanonical('Signature R+S length mismatch');
         }
 
-        if (ord(substr($bin, 2, 1)) !== 0x02) {
-            throw new SignatureNotCanonical('Signature R value type mismatch');
-        }
-
-        if ($lenR == 0) {
-            throw new SignatureNotCanonical('Signature R length is zero');
-        }
-
-        $rAnd   = $r[0] & pack('H*', '80');
-        if (ord($rAnd) == 128) {
-            throw new SignatureNotCanonical('Signature R value is negative');
-        }
-
-        if ($lenR > 1 && ord($r[0]) == 0x00 && !ord(($r[1] & pack('H*', '80')))) {
-            throw new SignatureNotCanonical('Signature R value excessively padded');
-        }
-
-        if (ord(substr($bin, $startS - 2, 1)) !== 0x02) {
-            throw new SignatureNotCanonical('Signature S value type mismatch');
-        }
-
-        if ($lenS == 0) {
-            throw new SignatureNotCanonical('Signature S length is zero');
-        }
-
-        $sAnd   = $s[0] & pack('H*', '80');
-        if (ord($sAnd) == 128) {
-            throw new SignatureNotCanonical('Signature S value negative');
-        }
-
-        if ($lenS > 1 && ord($s[0]) == 0x00 && !ord(($s[1] & pack("H*", '80'))) == 0x80) {
-            throw new SignatureNotCanonical('Signature S value excessively padded');
-        }
+        $checkVal('R', $rType, $lenR, $r);
+        $checkVal('S', $sType, $lenS, $s);
 
         return true;
 
