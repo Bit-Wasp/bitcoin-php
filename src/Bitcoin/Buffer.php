@@ -5,7 +5,7 @@ namespace Afk11\Bitcoin;
 class Buffer
 {
     /**
-     * @var int|null
+     * @var int|double|null
      */
     protected $size;
 

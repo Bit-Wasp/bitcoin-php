@@ -18,6 +18,11 @@ class MerkleRoot
     protected $block;
 
     /**
+     * @var Math
+     */
+    protected $math;
+
+    /**
      * @var callable
      */
     protected $hashFxn;
@@ -36,7 +41,6 @@ class MerkleRoot
     {
         $this->math = $math;
         $this->block = $block;
-        return $this;
     }
 
     /**
@@ -91,7 +95,7 @@ class MerkleRoot
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)
-            if (!Bitcoin::getMath()->isEven($txCount)) {
+            if (!$this->math->isEven($txCount)) {
                 $tree->set($txCount, $last);
             }
 
