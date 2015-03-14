@@ -22,8 +22,6 @@ class Point implements PointInterface
     public function __construct(GeneratorPoint $generator, $x, $y)
     {
         $this->point = $generator->getCurve()->getPoint($x, $y, $generator->getOrder());
-
-        return $this;
     }
 
     /**

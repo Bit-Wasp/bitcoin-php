@@ -16,19 +16,19 @@ use Mdanter\Ecc\GeneratorPoint;
 class Bitcoin
 {
     /**
-     * @var null|MathAdapterInterface
+     * @var MathAdapterInterface
      */
-    private static $math = null;
+    private static $math;
 
     /**
-     * @var null|GeneratorPoint
+     * @var GeneratorPoint
      */
-    private static $generator = null;
+    private static $generator;
 
     /**
-     * @var null|NetworkInterface
+     * @var NetworkInterface
      */
-    private static $network = null;
+    private static $network;
 
     /**
      * @return Math

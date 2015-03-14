@@ -28,6 +28,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
     private $generator;
 
     /**
+     * @var bool
+     */
+    private $compressed;
+
+    /**
      * @var PublicKey
      */
     protected $publicKey;
@@ -54,8 +59,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $this->generator = $generator;
         $this->secretMultiplier = $int;
         $this->compressed = $compressed;
-
-        return $this;
     }
 
     /**
@@ -163,46 +166,5 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $hexSerializer = new HexPrivateKeySerializer($this->math, $this->generator);
         $hex = $hexSerializer->serialize($this);
         return $hex;
-    }
-
-    /**
-     * Serialize to desired type: hex, decimal, or binary
-     *
-     * @param string $type
-     * @return int|mixed|string
-     */
-    public function serialize($type = null)
-    {
-        if ($type == 'hex') {
-            return $this->getBuffer();
-        } elseif ($type == 'int') {
-            return $this->getSecretMultiplier();
-        } else {
-            return pack("H*", $this->getBuffer());
-        }
-    }
-
-    /**
-     * Return the length of the private key. 32 for binary, 64 for hex.
-     *
-     * @param null $type
-     * @return int
-     */
-    public function getSize($type = null)
-    {
-        if ($type == 'hex') {
-            return strlen($this->getBuffer());
-        } else {
-            return 32;
-        }
-    }
-
-    /**
-     * Return hex string representation of private key
-     * @return \Afk11\Bitcoin\Buffer
-     */
-    public function __toString()
-    {
-        return $this->getBuffer();
     }
 }
