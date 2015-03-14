@@ -31,7 +31,6 @@ class Script implements ScriptInterface
     {
         $this->set($script);
         $this->opcodes = new Opcodes;
-        return $this;
     }
 
     /**

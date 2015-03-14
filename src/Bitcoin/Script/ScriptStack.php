@@ -16,7 +16,6 @@ class ScriptStack
      */
     public function __construct()
     {
-        return $this;
     }
 
     /**

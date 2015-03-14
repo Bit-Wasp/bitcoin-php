@@ -1,6 +1,7 @@
 <?php
 
 namespace Afk11\Bitcoin\Address;
+
 use Afk11\Bitcoin\Network\NetworkInterface;
 
 interface AddressInterface

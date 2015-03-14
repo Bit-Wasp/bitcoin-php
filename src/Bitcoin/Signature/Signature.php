@@ -29,7 +29,7 @@ class Signature implements SignatureInterface
      */
     public function __construct($r, $s, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
-        return $this
+        $this
             ->setR($r)
             ->setS($s)
             ->setSighashType($sighashType);
