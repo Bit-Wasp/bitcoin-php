@@ -20,7 +20,7 @@ class DebugDecorator implements MathAdapterInterface
     public function __construct(MathAdapterInterface $adapter, $callback = null)
     {
         $this->adapter = $adapter;
-        $this->writer = $callback ?: function($message) {
+        $this->writer = $callback ?: function ($message) {
             echo $message;
         };
     }
@@ -176,6 +176,30 @@ class DebugDecorator implements MathAdapterInterface
 
     /**
      * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapterInterface::baseConvert()
+     */
+    public function baseConvert($first, $other, $to)
+    {
+        $func = __METHOD__;
+        $args = func_get_args();
+
+        return call_user_func([$this, 'call'], $func, $args);
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \Mdanter\Ecc\MathAdapterInterface::bitwiseXor()
+     */
+    public function bitwiseXor($first, $other)
+    {
+        $func = __METHOD__;
+        $args = func_get_args();
+
+        return call_user_func([$this, 'call'], $func, $args);
+    }
+
+    /**
+     * (non-PHPdoc)
      * @see \Mdanter\Ecc\MathAdapterInterface::toString()
      */
     public function toString($value)
@@ -218,6 +242,7 @@ class DebugDecorator implements MathAdapterInterface
 
         return call_user_func([$this, 'call'], $func, $args);
     }
+
 
     /**
      * (non-PHPdoc)

@@ -125,7 +125,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function getDisabledOps()
     {
         return array_map(
-            function($value) {
+            function ($value) {
                 return $this->script->getOpCodes()->getOpByName($value);
             },
             $this->getDisabledOpcodes()
@@ -377,12 +377,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function run()
     {
         $opcodes = $this->script->getOpCodes();
-        $script        = $this->script->getBuffer()->serialize();
-        $posScriptEnd  = strlen($script);
-        $pos           = 0;
+        $script = $this->script->getBuffer()->serialize();
+        $posScriptEnd = strlen($script);
+        $pos = 0;
         $this->opCount = 0;
-        $opCode        = null;
-        $checkFExec = function() {
+        $opCode = null;
+
+        $checkFExec = function () {
             $c = 0;
             for ($i = 0, $len = $this->vfExecStack->end(); $i < $len; $i++) {
                 if ($this->vfExecStack->top(0 - $len - $i) == true) {

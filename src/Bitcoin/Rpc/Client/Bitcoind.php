@@ -73,7 +73,7 @@ class Bitcoind
 
         // Build the transactions
         $block->getTransactions()->addTransactions(
-            array_map(function($value) {
+            array_map(function ($value) {
                 return TransactionFactory::fromHex($value);
             }, $result)
         );

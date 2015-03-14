@@ -45,7 +45,7 @@ class TransactionInputCollectionSerializer
         $inputs = new TransactionInputCollection;
         $inputs->addInputs(
             $parser->getArray(
-                function() use (&$parser) {
+                function () use (&$parser) {
                     $input = new \Afk11\Bitcoin\Transaction\TransactionInput();
                     $input
                         ->setTransactionId($parser->readBytes(32, true)->serialize('hex'))
