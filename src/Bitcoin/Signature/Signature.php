@@ -110,19 +110,19 @@ class Signature implements SignatureInterface
     {
         $checkVal = function ($fieldName, $start, $length, $binaryString) {
             if ($length == 0) {
-                throw new SignatureNotCanonical('Signature '.$fieldName.' length is zero');
+                throw new SignatureNotCanonical('Signature ' . $fieldName . ' length is zero');
             }
             $typePrefix = ord(substr($binaryString, $start - 2, 1));
             if ($typePrefix !== 0x02) {
-                throw new SignatureNotCanonical('Signature '.$fieldName.' value type mismatch');
+                throw new SignatureNotCanonical('Signature ' . $fieldName . ' value type mismatch');
             }
             $val = substr($binaryString, $start, $length);
             $vAnd = $val[0] & pack("H*", '80');
             if (ord($vAnd) === 128) {
-                throw new SignatureNotCanonical('Signature '.$fieldName.' value is negative');
+                throw new SignatureNotCanonical('Signature ' . $fieldName . ' value is negative');
             }
             if ($length > 1 && ord($val[0]) == 0x00 && !ord(($val[1] & pack('H*', '80')))) {
-                throw new SignatureNotCanonical('Signature '.$fieldName.' value excessively padded');
+                throw new SignatureNotCanonical('Signature ' . $fieldName . ' value excessively padded');
             }
         };
 

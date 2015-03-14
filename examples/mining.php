@@ -30,7 +30,7 @@ $latest = $rpc->getblock($rpc->getbestblockhash(), false);
 $timestamp = time() + (3600 * 2);
 
 // create script to pay ourselves
-$script = ScriptFactory::payToPubKey($privKey->getPublicKey());
+$script = ScriptFactory::scriptPubKey()->payToPubKey($privKey->getPublicKey());
 
 // init miner
 $miner = new Miner(Bitcoin::getMath(), $latest->getHeader(), $script, null, $timestamp, 2, true);
