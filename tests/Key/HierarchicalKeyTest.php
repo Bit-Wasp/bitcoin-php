@@ -38,7 +38,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 
     private function compareToPrivVectors(HierarchicalKey $key, $vectors)
     {
-        $this->assertSame($vectors->address, $key->getAddress($this->network)->getAddress());
+        $this->assertSame($vectors->address, $key->getAddress()->getAddress($this->network));
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
         $this->assertSame($vectors->xpub_b58, $key->toExtendedPublicKey($this->network), 'correct xpub');
     }
