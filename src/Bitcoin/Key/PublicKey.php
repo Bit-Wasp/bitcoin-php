@@ -174,10 +174,11 @@ class PublicKey extends Key implements PublicKeyInterface
      * Recover Y from X and a parity byte
      * @param $xCoord
      * @param $byte
+     * @param GeneratorPoint $generator
      * @return int|string
      * @throws \Exception
      */
-    public static function recoverYfromX($xCoord, $byte)
+    public static function recoverYfromX($xCoord, $byte, GeneratorPoint $generator)
     {
         if (!in_array($byte, array(PublicKey::KEY_COMPRESSED_ODD, PUBLICKEY::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
@@ -185,7 +186,6 @@ class PublicKey extends Key implements PublicKeyInterface
 
         $math   = Bitcoin::getMath();
         $theory = $math->getNumberTheory();
-        $generator = Bitcoin::getGenerator();
         $curve = $generator->getCurve();
 
         try {

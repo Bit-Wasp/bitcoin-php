@@ -84,13 +84,13 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function testRecoverYfromX()
     {
         $f = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
-
+        $g = Bitcoin::getGenerator();
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $byte = substr($test->compressed, 0, 2);
             $x    = Bitcoin::getMath()->hexDec(substr($test->compressed, 2, 64));
             $realy= Bitcoin::getMath()->hexDec(substr($test->uncompressed, 66, 64));
-            $y    = PublicKey::recoverYfromX($x, $byte);
+            $y    = PublicKey::recoverYfromX($x, $byte, $g);
             $this->assertSame($realy, $y);
         }
 
@@ -102,7 +102,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function testRecoverYfromXException()
     {
         $x = 0;
-        PublicKey::recoverYfromX($x, '02');
+        PublicKey::recoverYfromX($x, '02', Bitcoin::getGenerator());
     }
 
     public function testCompressKeys()
