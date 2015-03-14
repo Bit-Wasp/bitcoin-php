@@ -129,7 +129,7 @@ class Network implements NetworkInterface
      */
     public function setHDPubByte($byte)
     {
-        if (!empty($byte) && ctype_xdigit($byte) == true) {
+        if (!empty($byte) && ctype_xdigit($byte) === true) {
             $this->xpubByte = $byte;
         }
 
@@ -159,7 +159,7 @@ class Network implements NetworkInterface
      */
     public function setHDPrivByte($bytes)
     {
-        if (!empty($bytes) && ctype_xdigit($bytes) == true) {
+        if (!empty($bytes) && ctype_xdigit($bytes) === true) {
             $this->xprivByte = $bytes;
         }
 
