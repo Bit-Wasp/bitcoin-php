@@ -164,16 +164,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
-     * @param $op
-     * @param string $opCodeStr
-     * @return bool
-     */
-    public function isOp($op, $opCodeStr)
-    {
-        return (bool)$this->script->getOpcodes()->isThisOp($op, $opCodeStr) == 0;
-    }
-
-    /**
      * Cast the value to a boolean
      *
      * @param $value
@@ -200,17 +190,17 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $opcodes = $this->script->getOpCodes();
 
         if ($pushSize == 0) {
-            return $opcodes->isThisOp($opCode, 'OP_0');
+            return $opcodes->isOp($opCode, 'OP_0');
         } elseif ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
             return $opCode == $opcodes->getOpByName('OP_1') + (ord($pushData[0]) - 1);
         } elseif ($pushSize == 1 && ord($pushData) == 0x81) {
-            return $opcodes->isThisOp($opCode, 'OP_1NEGATE');
+            return $opcodes->isOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
             return $opCode == $pushSize;
         } elseif ($pushSize <= 255) {
-            return $opcodes->isThisOp($opCode, 'OP_PUSHDATA1');
+            return $opcodes->isOp($opCode, 'OP_PUSHDATA1');
         } elseif ($pushSize <= 65535) {
-            return $opcodes->isThisOp($opCode, 'OP_PUSHDATA2');
+            return $opcodes->isOp($opCode, 'OP_PUSHDATA2');
         }
 
         return true;
@@ -240,14 +230,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             if ($opcodes->cmp($opCode, 'OP_PUSHDATA1') < 0) {
                 $size = $opCode;
 
-            } else if ($opcodes->isThisOp($opCode, 'OP_PUSHDATA1')) {
+            } else if ($opcodes->isOp($opCode, 'OP_PUSHDATA1')) {
                 if ($posEnd - $position < 1) {
                     return false;
                 }
                 $size = ord($script[$position]);
                 $position++;
 
-            } else if ($opcodes->isThisOp($opCode, 'OP_PUSHDATA2')) {
+            } else if ($opcodes->isOp($opCode, 'OP_PUSHDATA2')) {
                 if (($posEnd - $position) < 2) {
                     return false;
                 }
@@ -406,7 +396,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     throw new \Exception('Error - push size');
                 }
 
-                if ($this->script->getOpcodes()->isThisOp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
+                if ($this->script->getOpcodes()->isOp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
                     throw new \Exception('Error - Script Op Count');
                 }
 
@@ -416,56 +406,56 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     }
                 }
 
-                if ($fExec && $opCode >= 0 && $opcodes->isThisOp($opCode, 'OP_PUSHDATA4') <= 0) {
+                if ($fExec && $opCode >= 0 && $opcodes->isOp($opCode, 'OP_PUSHDATA4') <= 0) {
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
                     }
                     $this->mainStack->push($pushData);
 
-                } elseif ($fExec || ($opcodes->isThisOp($opCode, 'OP_IF') <= 0 && $opcodes->isThisOp($opCode, 'OP_ENDIF'))) {
+                } elseif ($fExec || ($opcodes->isOp($opCode, 'OP_IF') <= 0 && $opcodes->isOp($opCode, 'OP_ENDIF'))) {
                     switch ($opCode)
                     {
-                        case $this->isOp($opCode, 'OP_1NEGATE'):
-                        case $this->isOp($opCode, 'OP_1'):
-                        case $this->isOp($opCode, 'OP_2'):
-                        case $this->isOp($opCode, 'OP_3'):
-                        case $this->isOp($opCode, 'OP_4'):
-                        case $this->isOp($opCode, 'OP_5'):
-                        case $this->isOp($opCode, 'OP_6'):
-                        case $this->isOp($opCode, 'OP_7'):
-                        case $this->isOp($opCode, 'OP_8'):
-                        case $this->isOp($opCode, 'OP_9'):
-                        case $this->isOp($opCode, 'OP_10'):
-                        case $this->isOp($opCode, 'OP_11'):
-                        case $this->isOp($opCode, 'OP_12'):
-                        case $this->isOp($opCode, 'OP_13'):
-                        case $this->isOp($opCode, 'OP_14'):
-                        case $this->isOp($opCode, 'OP_15'):
-                        case $this->isOp($opCode, 'OP_16'):
+                        case $opcodes->isOp($opCode, 'OP_1NEGATE'):
+                        case $opcodes->isOp($opCode, 'OP_1'):
+                        case $opcodes->isOp($opCode, 'OP_2'):
+                        case $opcodes->isOp($opCode, 'OP_3'):
+                        case $opcodes->isOp($opCode, 'OP_4'):
+                        case $opcodes->isOp($opCode, 'OP_5'):
+                        case $opcodes->isOp($opCode, 'OP_6'):
+                        case $opcodes->isOp($opCode, 'OP_7'):
+                        case $opcodes->isOp($opCode, 'OP_8'):
+                        case $opcodes->isOp($opCode, 'OP_9'):
+                        case $opcodes->isOp($opCode, 'OP_10'):
+                        case $opcodes->isOp($opCode, 'OP_11'):
+                        case $opcodes->isOp($opCode, 'OP_12'):
+                        case $opcodes->isOp($opCode, 'OP_13'):
+                        case $opcodes->isOp($opCode, 'OP_14'):
+                        case $opcodes->isOp($opCode, 'OP_15'):
+                        case $opcodes->isOp($opCode, 'OP_16'):
                             $num = $opCode - ($opcodes->getOpByName('OP_1') - 1);
                             $this->mainStack->push($num);
                             break;
 
-                        case $this->isOp($opCode, 'OP_NOP'):
+                        case $opcodes->isOp($opCode, 'OP_NOP'):
                             break;
 
-                        case $this->isOp($opCode, 'OP_NOP1'):
-                        case $this->isOp($opCode, 'OP_NOP2'):
-                        case $this->isOp($opCode, 'OP_NOP3'):
-                        case $this->isOp($opCode, 'OP_NOP4'):
-                        case $this->isOp($opCode, 'OP_NOP5'):
-                        case $this->isOp($opCode, 'OP_NOP6'):
-                        case $this->isOp($opCode, 'OP_NOP7'):
-                        case $this->isOp($opCode, 'OP_NOP8'):
-                        case $this->isOp($opCode, 'OP_NOP9'):
-                        case $this->isOp($opCode, 'OP_NOP10'):
+                        case $opcodes->isOp($opCode, 'OP_NOP1'):
+                        case $opcodes->isOp($opCode, 'OP_NOP2'):
+                        case $opcodes->isOp($opCode, 'OP_NOP3'):
+                        case $opcodes->isOp($opCode, 'OP_NOP4'):
+                        case $opcodes->isOp($opCode, 'OP_NOP5'):
+                        case $opcodes->isOp($opCode, 'OP_NOP6'):
+                        case $opcodes->isOp($opCode, 'OP_NOP7'):
+                        case $opcodes->isOp($opCode, 'OP_NOP8'):
+                        case $opcodes->isOp($opCode, 'OP_NOP9'):
+                        case $opcodes->isOp($opCode, 'OP_NOP10'):
                             if ($this->flags->discourageUpgradableNOPS) {
                                 throw new \Exception('Upgradable NOPS found - this is discouraged');
                             }
                             break;
 
-                        case $this->isOp($opCode, 'OP_IF'):
-                        case $this->isOp($opCode, 'OP_NOTIF'):
+                        case $opcodes->isOp($opCode, 'OP_IF'):
+                        case $opcodes->isOp($opCode, 'OP_NOTIF'):
                             // <expression> if [statements] [else [statements]] endif
                             $value = false;
                             if ($fExec) {
@@ -475,7 +465,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 // todo
                                 $string = $this->mainStack->top(-1);
                                 $value = $this->castToBool($value);
-                                if ($this->isOp($opCode, 'OP_NOTIF')) {
+                                if ($opcodes->isOp($opCode, 'OP_NOTIF')) {
                                     $value = !$value;
                                 }
                                 $this->mainStack->pop();
@@ -483,7 +473,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->vfExecStack->push($value);
                             break;
 
-                        case $this->isOp($opCode, 'OP_ELSE'):
+                        case $opcodes->isOp($opCode, 'OP_ELSE'):
                             if ($this->vfExecStack->size() == 0) {
                                 throw new \Exception('Unbalanced conditional');
                             }
@@ -491,7 +481,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             // todo
                             break;
 
-                        case $this->isOp($opCode, 'OP_ENDIF'):
+                        case $opcodes->isOp($opCode, 'OP_ENDIF'):
                             if ($this->vfExecStack->size() == 0) {
                                 throw new \Exception('Unbalanced conditional');
                             }
@@ -499,7 +489,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             // todo
                             break;
 
-                        case $this->isOp($opCode, 'OP_VERIFY'):
+                        case $opcodes->isOp($opCode, 'OP_VERIFY'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation');
                             }
@@ -512,15 +502,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             break;
 
-                        case $this->isOp($opCode, 'OP_RESERVED'):
+                        case $opcodes->isOp($opCode, 'OP_RESERVED'):
                             // todo
                             break;
 
-                        case $this->isOp($opCode, 'OP_RETURN'):
+                        case $opcodes->isOp($opCode, 'OP_RETURN'):
                             throw new \Exception('Error: OP_RETURN');
                             break;
 
-                        case $this->isOp($opCode, 'OP_TOALTSTACK'):
+                        case $opcodes->isOp($opCode, 'OP_TOALTSTACK'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_TOALTSTACK');
                             }
@@ -529,14 +519,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             //$this->mainStack->pop();
                             break;
 
-                        case $this->isOp($opCode, 'OP_FROMALTSTACK'):
+                        case $opcodes->isOp($opCode, 'OP_FROMALTSTACK'):
                             if ($this->altStack->size() < 1) {
                                 throw new \Exception('Invalid alt-stack operation OP_FROMALTSTACK');
                             }
                             $this->mainStack->push($this->altStack->pop());
                             break;
 
-                        case $this->isOp($opCode, 'OP_2DROP'):
+                        case $opcodes->isOp($opCode, 'OP_2DROP'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_2DROP');
                             }
@@ -544,7 +534,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->pop();
                             break;
 
-                        case $this->isOp($opCode, 'OP_2DUP'):
+                        case $opcodes->isOp($opCode, 'OP_2DUP'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_2DUP');
                             }
@@ -554,7 +544,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($string2);
                             break;
 
-                        case $this->isOp($opCode, 'OP_3DUP'):
+                        case $opcodes->isOp($opCode, 'OP_3DUP'):
                             if ($this->mainStack->size() < 3) {
                                 throw new \Exception('Invalid stack operation OP_3DUP');
                             }
@@ -566,7 +556,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($string3);
                             break;
 
-                        case $this->isOp($opCode, 'OP_2OVER'):
+                        case $opcodes->isOp($opCode, 'OP_2OVER'):
                             if ($this->mainStack->size() < 4) {
                                 throw new \Exception('Invalid stack operation OP_2OVER');
                             }
@@ -576,7 +566,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($string2);
                             break;
 
-                        case $this->isOp($opCode, 'OP_2ROT'):
+                        case $opcodes->isOp($opCode, 'OP_2ROT'):
                             if ($this->mainStack->size() < 6) {
                                 throw new \Exception('Invalid stack operation OP_2ROT');
                             }
@@ -588,7 +578,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($string2);
                             break;
 
-                        case $this->isOp($opCode, 'OP_2SWAP'):
+                        case $opcodes->isOp($opCode, 'OP_2SWAP'):
                             if ($this->mainStack->size() < 4) {
                                 throw new \Exception('Invalid stack operation OP_2SWAP');
                             }
@@ -596,7 +586,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->swap(-3, -1);
                             break;
 
-                        case $this->isOp($opCode, 'OP_IFDUP'):
+                        case $opcodes->isOp($opCode, 'OP_IFDUP'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_IFDUP');
                             }
@@ -606,20 +596,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             break;
 
-                        case $this->isOp($opCode, 'OP_DEPTH'):
+                        case $opcodes->isOp($opCode, 'OP_DEPTH'):
                             $num = $this->mainStack->size();
                             $bin = pack("H*", $this->math->decHex($num));
                             $this->mainStack->push($bin);
                             break;
 
-                        case $this->isOp($opCode, 'OP_DROP'):
+                        case $opcodes->isOp($opCode, 'OP_DROP'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_DROP');
                             }
                             $this->mainStack->pop();
                             break;
 
-                        case $this->isOp($opCode, 'OP_DUP'):
+                        case $opcodes->isOp($opCode, 'OP_DUP'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_DUP');
                             }
@@ -627,14 +617,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($vch);
                             break;
 
-                        case $this->isOp($opCode, 'OP_NIP'):
+                        case $opcodes->isOp($opCode, 'OP_NIP'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_NIP');
                             }
                             $this->mainStack->erase($this->mainStack->end() - 2);
                             break;
 
-                        case $this->isOp($opCode, 'OP_OVER'):
+                        case $opcodes->isOp($opCode, 'OP_OVER'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_OVER');
                             }
@@ -642,8 +632,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($vch);
                             break;
 
-                        case $this->isOp($opCode, 'OP_PICK'):
-                        case $this->isOp($opCode, 'OP_ROLL'):
+                        case $opcodes->isOp($opCode, 'OP_PICK'):
+                        case $opcodes->isOp($opCode, 'OP_ROLL'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operationOP_PICK');
                             }
@@ -653,13 +643,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation OP_PICK');
                             }
                             $vch = $this->mainStack->top(0 - $n - 1);
-                            if ($this->isOp($opCode, 'OP_ROLL')) {
+                            if ($opcodes->isOp($opCode, 'OP_ROLL')) {
                                 $this->mainStack->erase($this->mainStack->end() - $n - 1);
                             }
                             $this->mainStack->push($vch);
                             break;
 
-                        case $this->isOp($opCode, 'OP_ROT'):
+                        case $opcodes->isOp($opCode, 'OP_ROT'):
                             if ($this->mainStack->size() < 3) {
                                 throw new \Exception('Invalid stack operation OP_ROT');
                             }
@@ -667,14 +657,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->swap(-2, -1);
                             break;
 
-                        case $this->isOp($opCode, 'OP_SWAP'):
+                        case $opcodes->isOp($opCode, 'OP_SWAP'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_SWAP');
                             }
                             $this->mainStack->swap(-2, -1);
                             break;
 
-                        case $this->isOp($opCode, 'OP_TUCK'):
+                        case $opcodes->isOp($opCode, 'OP_TUCK'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_TUCK');
                             }
@@ -682,7 +672,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->insert($this->mainStack->end() - 2, $vch);
                             break;
 
-                        case $this->isOp($opCode, 'OP_SIZE'):
+                        case $opcodes->isOp($opCode, 'OP_SIZE'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_SIZE');
                             }
@@ -695,8 +685,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($size);
                             break;
 
-                        case $this->isOp($opCode, 'OP_EQUAL'):
-                        case $this->isOp($opCode, 'OP_EQUALVERIFY'):
+                        case $opcodes->isOp($opCode, 'OP_EQUAL'):
+                        case $opcodes->isOp($opCode, 'OP_EQUALVERIFY'):
                         //case $this->isOp($opCode, 'OP_NOTEQUAL'): // use OP_NUMNOTEQUAL
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_EQUAL');
@@ -715,7 +705,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->pop();
                             $this->mainStack->push(($equal ? true : false));
 
-                            if ($this->isOp($opCode, 'OP_EQUALVERIFY')) {
+                            if ($opcodes->isOp($opCode, 'OP_EQUALVERIFY')) {
                                 if ($equal) {
                                     $this->mainStack->pop();
                                 } else {
@@ -724,36 +714,36 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             break;
 
-                        case $this->isOp($opCode, 'OP_1ADD'):
-                        case $this->isOp($opCode, 'OP_1SUB'):
-                        case $this->isOp($opCode, 'OP_NEGATE'):
-                        case $this->isOp($opCode, 'OP_ABS'):
-                        case $this->isOp($opCode, 'OP_NOT'):
-                        case $this->isOp($opCode, 'OP_0NOTEQUAL'):
+                        case $opcodes->isOp($opCode, 'OP_1ADD'):
+                        case $opcodes->isOp($opCode, 'OP_1SUB'):
+                        case $opcodes->isOp($opCode, 'OP_NEGATE'):
+                        case $opcodes->isOp($opCode, 'OP_ABS'):
+                        case $opcodes->isOp($opCode, 'OP_NOT'):
+                        case $opcodes->isOp($opCode, 'OP_0NOTEQUAL'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation 1ADD');
                             }
                             $num = $this->mainStack->top(-1);
 
                             switch ($opCode) {
-                                case $this->isOp($opCode, 'OP_1ADD'):
+                                case $opcodes->isOp($opCode, 'OP_1ADD'):
                                     $num = $this->math->add($num, '1');
                                     break;
-                                case $this->isOp($opCode, 'OP_1SUB'):
+                                case $opcodes->isOp($opCode, 'OP_1SUB'):
                                     $num = $this->math->sub($num, '1');
                                     break;
-                                case $this->isOp($opCode, 'OP_NEGATE'):
+                                case $opcodes->isOp($opCode, 'OP_NEGATE'):
                                     $num = $this->math->sub(0, $num);
                                     break;
-                                case $this->isOp($opCode, 'OP_ABS'):
+                                case $opcodes->isOp($opCode, 'OP_ABS'):
                                     if ($this->math->cmp($num, '0') < 0) {
                                         $num = $this->math->sub(0, $num);
                                     }
                                     break;
-                                case $this->isOp($opCode, 'OP_NOT'):
+                                case $opcodes->isOp($opCode, 'OP_NOT'):
                                     $num = ($this->math->cmp($num, '0') == 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_0NOTEQUAL'):
+                                case $opcodes->isOp($opCode, 'OP_0NOTEQUAL'):
                                     $num = ($this->math->cmp($num, '0') !== 0);
                                     break;
                                 default:
@@ -766,19 +756,19 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
 
-                        case $this->isOp($opCode, 'OP_ADD'):
-                        case $this->isOp($opCode, 'OP_SUB'):
-                        case $this->isOp($opCode, 'OP_BOOLAND'):
-                        case $this->isOp($opCode, 'OP_BOOLOR'):
-                        case $this->isOp($opCode, 'OP_NUMEQUAL'):
-                        case $this->isOp($opCode, 'OP_NUMEQUALVERIFY'):
-                        case $this->isOp($opCode, 'OP_NUMNOTEQUAL'):
-                        case $this->isOp($opCode, 'OP_LESSTHAN'):
-                        case $this->isOp($opCode, 'OP_GREATERTHAN'):
-                        case $this->isOp($opCode, 'OP_LESSTHANOREQUAL'):
-                        case $this->isOp($opCode, 'OP_GREATERTHANOREQUAL'):
-                        case $this->isOp($opCode, 'OP_MIN'):
-                        case $this->isOp($opCode, 'OP_MAX'):
+                        case $opcodes->isOp($opCode, 'OP_ADD'):
+                        case $opcodes->isOp($opCode, 'OP_SUB'):
+                        case $opcodes->isOp($opCode, 'OP_BOOLAND'):
+                        case $opcodes->isOp($opCode, 'OP_BOOLOR'):
+                        case $opcodes->isOp($opCode, 'OP_NUMEQUAL'):
+                        case $opcodes->isOp($opCode, 'OP_NUMEQUALVERIFY'):
+                        case $opcodes->isOp($opCode, 'OP_NUMNOTEQUAL'):
+                        case $opcodes->isOp($opCode, 'OP_LESSTHAN'):
+                        case $opcodes->isOp($opCode, 'OP_GREATERTHAN'):
+                        case $opcodes->isOp($opCode, 'OP_LESSTHANOREQUAL'):
+                        case $opcodes->isOp($opCode, 'OP_GREATERTHANOREQUAL'):
+                        case $opcodes->isOp($opCode, 'OP_MIN'):
+                        case $opcodes->isOp($opCode, 'OP_MAX'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation (greater than)');
                             }
@@ -787,43 +777,43 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $_bn0 = '0';
 
                             switch ($opCode) {
-                                case $this->isOp($opCode, 'OP_ADD'):
+                                case $opcodes->isOp($opCode, 'OP_ADD'):
                                     $num = $this->math->add($num1, $num2);
                                     break;
-                                case $this->isOp($opCode, 'OP_SUB'):
+                                case $opcodes->isOp($opCode, 'OP_SUB'):
                                     $num = $this->math->sub($num1, $num2);
                                     break;
-                                case $this->isOp($opCode, 'OP_BOOLAND'):
+                                case $opcodes->isOp($opCode, 'OP_BOOLAND'):
                                     $num = ($this->math->cmp($num1, $_bn0) !== 0 && $this->math->cmp($num2, $_bn0) !== 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_BOOLOR'):
+                                case $opcodes->isOp($opCode, 'OP_BOOLOR'):
                                     $num = ($this->math->cmp($num1, $_bn0) !== 0 || $this->math->cmp($num2, $_bn0) !== 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_NUMEQUAL'):
+                                case $opcodes->isOp($opCode, 'OP_NUMEQUAL'):
                                     $num = ($this->math->cmp($num1, $num2) == 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_NUMEQUALVERIFY'):
+                                case $opcodes->isOp($opCode, 'OP_NUMEQUALVERIFY'):
                                     $num = ($this->math->cmp($num1, $num2) == 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_NUMNOTEQUAL'):
+                                case $opcodes->isOp($opCode, 'OP_NUMNOTEQUAL'):
                                     $num = ($this->math->cmp($num1, $num2) !== 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_LESSTHAN'):
+                                case $opcodes->isOp($opCode, 'OP_LESSTHAN'):
                                     $num = ($this->math->cmp($num1, $num2) < 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_GREATERTHAN'):
+                                case $opcodes->isOp($opCode, 'OP_GREATERTHAN'):
                                     $num = ($this->math->cmp($num1, $num2) > 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_LESSTHANOREQUAL'):
+                                case $opcodes->isOp($opCode, 'OP_LESSTHANOREQUAL'):
                                     $num = ($this->math->cmp($num1, $num2) <= 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_GREATERTHANOREQUAL'):
+                                case $opcodes->isOp($opCode, 'OP_GREATERTHANOREQUAL'):
                                     $num = ($this->math->cmp($num1, $num2) >= 0);
                                     break;
-                                case $this->isOp($opCode, 'OP_MIN'):
+                                case $opcodes->isOp($opCode, 'OP_MIN'):
                                     $num = ($this->math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
                                     break;
-                                case $this->isOp($opCode, 'OP_MAX'):
+                                case $opcodes->isOp($opCode, 'OP_MAX'):
                                     $num = ($this->math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                                     break;
                                 default:
@@ -833,7 +823,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->pop();
                             $this->mainStack->pop();
                             $this->mainStack->push($num);
-                            if ($this->isOp($opCode, 'OP_NUMEQUALVERIFY')) {
+                            if ($opcodes->isOp($opCode, 'OP_NUMEQUALVERIFY')) {
                                 if ($this->castToBool($this->mainStack->top(-1))) {
                                     $this->mainStack->pop();
                                 } else {
@@ -842,7 +832,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             break;
 
-                        case $this->isOp($opCode, 'OP_WITHIN'):
+                        case $opcodes->isOp($opCode, 'OP_WITHIN'):
                             if ($this->mainStack->size() < 3) {
                                 throw new \Exception('Invalid stack operation');
                             }
@@ -856,30 +846,30 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($value ? true : false);
                             break;
 
-                        case $this->isOp($opCode, 'OP_RIPEMD160'):
-                        case $this->isOp($opCode, 'OP_SHA1'):
-                        case $this->isOp($opCode, 'OP_SHA256'):
-                        case $this->isOp($opCode, 'OP_HASH160'):
-                        case $this->isOp($opCode, 'OP_HASH256'):
+                        case $opcodes->isOp($opCode, 'OP_RIPEMD160'):
+                        case $opcodes->isOp($opCode, 'OP_SHA1'):
+                        case $opcodes->isOp($opCode, 'OP_SHA256'):
+                        case $opcodes->isOp($opCode, 'OP_HASH160'):
+                        case $opcodes->isOp($opCode, 'OP_HASH256'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation');
                             }
                             $vch = $this->mainStack->top(-1);
                             $hashLen = (
-                                $this->isOp($opCode, 'OP_RIPEMD160')
-                                || $this->isOp($opCode, 'OP_SHA1')
-                                || $this->isOp($opCode, 'OP_HASH160')
+                                $opcodes->isOp($opCode, 'OP_RIPEMD160')
+                                || $opcodes->isOp($opCode, 'OP_SHA1')
+                                || $opcodes->isOp($opCode, 'OP_HASH160')
                             ) ? 20 : 32;
 
-                            if ($this->isOp($opCode, 'OP_RIPEMD160')) {
+                            if ($opcodes->isOp($opCode, 'OP_RIPEMD160')) {
                                 $hash = Hash::ripemd160($vch, true);
-                            } elseif ($this->isOp($opCode, 'OP_SHA1')) {
+                            } elseif ($opcodes->isOp($opCode, 'OP_SHA1')) {
                                 $hash = Hash::sha1($vch, true);
-                            } elseif ($this->isOp($opCode, 'OP_SHA256')) {
+                            } elseif ($opcodes->isOp($opCode, 'OP_SHA256')) {
                                 $hash = Hash::sha256($vch, true);
-                            } elseif ($this->isOp($opCode, 'OP_HASH160')) {
+                            } elseif ($opcodes->isOp($opCode, 'OP_HASH160')) {
                                 $hash = Hash::sha256ripe160($vch->serialize('hex'), true);
-                            } elseif ($this->isOp($opCode, 'OP_HASH256')) {
+                            } elseif ($opcodes->isOp($opCode, 'OP_HASH256')) {
                                 $hash = Hash::sha256d($vch, true);
                             }
 
@@ -887,15 +877,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->push($hash);
                             break;
 
-                        case $this->isOp($opCode, 'OP_CODESEPARATOR'):
+                        case $opcodes->isOp($opCode, 'OP_CODESEPARATOR'):
                             if ($this->mainStack->size() < 4) {
                                 throw new \Exception('Invalid stack operation');
                             }
                             $this->hashStartPos = $pos;
                             break;
 
-                        case $this->isOp($opCode, 'OP_CHECKSIG'):
-                        case $this->isOp($opCode, 'OP_CHECKSIGVERIFY'):
+                        case $opcodes->isOp($opCode, 'OP_CHECKSIG'):
+                        case $opcodes->isOp($opCode, 'OP_CHECKSIGVERIFY'):
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation');
                             }
@@ -922,7 +912,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $this->mainStack->pop();
                             $this->mainStack->push($success ? $this->constTrue : $this->constFalse);
 
-                            if ($this->isOp($opCode, 'OP_CHECKSIGVERIFY')) {
+                            if ($opcodes->isOp($opCode, 'OP_CHECKSIGVERIFY')) {
                                 if ($success) {
                                     $this->mainStack->pop();
                                 } else {
