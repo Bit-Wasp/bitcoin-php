@@ -96,7 +96,7 @@ class Miner
     }
 
     /**
-     * @param array $transactions
+     * @param TransactionCollection $transactions
      * @return $this
      */
     public function setTransactions(TransactionCollection $transactions)

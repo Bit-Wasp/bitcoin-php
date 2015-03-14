@@ -95,7 +95,7 @@ class Difficulty implements DifficultyInterface
     {
         $target = $this->math->getCompact($bits);
         
-        $lowest  = $this->math->getCompact($this->lowestBits());
+        $lowest = $this->math->getCompact($this->lowestBits());
         $lowest = $this->math->mul($lowest, $this->math->pow(10, self::DIFF_PRECISION));
         
         $difficulty = str_pad($this->math->div($lowest, $target), self::DIFF_PRECISION + 1, '0', STR_PAD_LEFT);
