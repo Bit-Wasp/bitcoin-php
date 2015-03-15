@@ -30,7 +30,7 @@ class Script implements ScriptInterface
     public function __construct(Buffer $script = null)
     {
         $this->set($script);
-        $this->opcodes = new Opcodes;
+        $this->opcodes = ScriptFactory::opCodes();
     }
 
     /**
