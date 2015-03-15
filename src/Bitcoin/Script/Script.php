@@ -237,7 +237,6 @@ class Script implements ScriptInterface
     }
 
     /**
-     * @param NetworkInterface $network
      * @return \Afk11\Bitcoin\Address\ScriptHashAddress
      */
     public function getAddress()
