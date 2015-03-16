@@ -33,7 +33,7 @@ class TransactionFactory
     public static function builder(TransactionInterface $tx = null)
     {
         $tx = $tx ?: TransactionFactory::create();
-        $builder = new TransactionBuilder($tx, Bitcoin::getMath(), Bitcoin::getGenerator());
+        $builder = new TransactionBuilder(Bitcoin::getMath(), Bitcoin::getGenerator(), $tx);
         return $builder;
     }
 
