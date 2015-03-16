@@ -18,6 +18,16 @@ class ScriptParser
     private $script;
 
     /**
+     * @var int
+     */
+    private $ptr;
+
+    /**
+     * @var string
+     */
+    private $scriptRaw;
+
+    /**
      * @param Math $math
      * @param ScriptInterface $script
      */
@@ -130,7 +140,7 @@ class ScriptParser
         $data = array();
 
         $opCode = null;
-        $pushData = new Buffer();
+        $pushData = null;
 
         while ($this->next($opCode, $pushData)) {
             if ($opCode < 1) {

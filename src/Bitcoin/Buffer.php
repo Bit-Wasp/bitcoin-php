@@ -5,7 +5,7 @@ namespace Afk11\Bitcoin;
 class Buffer
 {
     /**
-     * @var int|double|null
+     * @var int|double
      */
     protected $size;
 
@@ -15,7 +15,7 @@ class Buffer
     protected $buffer;
 
     /**
-     * @param $byteString
+     * @param string $byteString
      * @param null|integer $byteSize
      * @throws \Exception
      */
