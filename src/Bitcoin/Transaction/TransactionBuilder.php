@@ -35,9 +35,11 @@ class TransactionBuilder
     private $inputSigs = [];
 
     /**
+     * @param Math $math
+     * @param GeneratorPoint $generatorPoint
      * @param TransactionInterface $tx
      */
-    public function __construct(TransactionInterface $tx = null, Math $math, GeneratorPoint $generatorPoint)
+    public function __construct(Math $math, GeneratorPoint $generatorPoint, TransactionInterface $tx = null)
     {
         $this->transaction = $tx ?: TransactionFactory::create();
         for ($i = 0; $i < $this->transaction->getInputs()->count(); $i++) {
