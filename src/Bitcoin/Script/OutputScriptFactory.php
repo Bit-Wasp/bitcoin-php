@@ -5,30 +5,37 @@ namespace Afk11\Bitcoin\Script;
 use Afk11\Bitcoin\Address\Address;
 use Afk11\Bitcoin\Address\ScriptHashAddress;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
+use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
 
 class OutputScriptFactory
 {
+    /**
+     * @param ScriptInterface $script
+     * @return OutputClassifier
+     */
+    public function classify(ScriptInterface $script)
+    {
+        return new OutputClassifier($script);
+    }
+
     /**
      * @param Address $address
      * @return Script
      */
     public function payToAddress(Address $address)
     {
-        if ($address instanceof ScriptHashAddress) {
-            $script = ScriptFactory::create()
+        return ($address instanceof ScriptHashAddress
+            ? ScriptFactory::create()
                 ->op('OP_HASH160')
                 ->push($address->getHash())
-                ->op('OP_EQUAL');
-        } else {
-            $script = ScriptFactory::create()
+                ->op('OP_EQUAL')
+            : ScriptFactory::create()
                 ->op('OP_DUP')
                 ->op('OP_HASH160')
                 ->push($address->getHash())
                 ->op('OP_EQUALVERIFY')
-                ->op('OP_CHECKSIG');
-        }
+                ->op('OP_CHECKSIG'));
 
-        return $script;
     }
 
     /**

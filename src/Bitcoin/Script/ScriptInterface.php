@@ -7,6 +7,13 @@ use Afk11\Bitcoin\Address\Address;
 
 interface ScriptInterface extends SerializableInterface
 {
+    const PAYTOPUBKEY = 'pubkey';
+    const PAYTOPUBKEYHASH = 'pubkeyhash';
+    const PAYTOSCRIPTHASH = 'scripthash';
+    const MULTISIG = 'multisig';
+    const UNKNOWN = 'unknown';
+    const NONSTANDARD = 'nonstandard';
+
     /**
      * @return mixed
      */
@@ -18,9 +25,9 @@ interface ScriptInterface extends SerializableInterface
     public function getAddress();
 
     /**
-     * @return array
+     * @return ScriptParser
      */
-    public function parse();
+    public function getScriptParser();
 
     /**
      * @return Opcodes

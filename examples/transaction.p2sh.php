@@ -21,9 +21,8 @@ $bitcoind = RpcFactory::bitcoind($host, $port, $user, $pass);
 $privateKey1 = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d5', true);
 $privateKey2 = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d6', true);
 
-$script = ScriptFactory::multisig(2, array($privateKey1, $privateKey2));
-$redeemScript = ScriptFactory::redeemScript($script);
-$recipient = $script->getAddress();
+$redeemScript = ScriptFactory::multisig(2, array($privateKey1->getPublicKey(), $privateKey2->getPublicKey()));
+$recipient = $redeemScript->getAddress();
 echo "[P2SH address: " . $recipient->getAddress($network) ." ]\n";
 
 $myTx = $bitcoind->getrawtransaction('6783f952acbce7cbe09cb1ad495462485043ac73be318cade5e51e8639efae3a', true);

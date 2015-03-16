@@ -24,7 +24,7 @@ class OutputClassifier implements ScriptClassifierInterface
     public function __construct(ScriptInterface $script)
     {
         $this->script = $script;
-        $this->evalScript = $script->parse();
+        $this->evalScript = $script->getScriptParser()->parse();
     }
 
     /**

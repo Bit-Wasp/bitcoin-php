@@ -8,9 +8,11 @@
 
 namespace Afk11\Bitcoin\Script;
 
-
+use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Key\PublicKeyFactory;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
+use Afk11\Bitcoin\Signature\Signer;
 
 class RedeemScript extends Script
 {
@@ -25,21 +27,56 @@ class RedeemScript extends Script
     private $keys = [];
 
     /**
-     * @param ScriptInterface $script
+     * @param integer $m
+     * @param \Afk11\Bitcoin\Key\PublicKeyInterface[] $keys
      */
-    public function __construct(ScriptInterface $script)
+    public function __construct($m, array $keys)
     {
-        $parse = $script->parse();
+        parent::__construct();
 
-        $last = count($parse)-2;
-        for ($i = 1; $i < $last; $i++) {
-            $this->keys[] = PublicKeyFactory::fromHex($parse[$i]);
+        $n = count($keys);
+        if ($m > $n) {
+            throw new \LogicException('Required number of sigs exceeds number of public keys');
+        }
+        if ($n > 16) {
+            throw new \LogicException('Number of public keys is greater than 16');
         }
 
-        $this->m = $parse[0];
-        $this->script = $script->getBuffer()->serialize();
+        $ops = $this->getOpCodes();
+        $opM = $ops->getOp($ops->getOpByName('OP_1') - 1 + $m);
+        $opN = $ops->getOp($ops->getOpByName('OP_1') - 1 + $n);
+
+        $this->op($opM);
+        foreach ($keys as $key) {
+            if (!$key instanceof PublicKey) {
+                throw new \LogicException('Values in $keys[] must be a PublicKey');
+            }
+
+            $this->keys[] = $key;
+            $this->push($key->getBuffer());
+        }
+        $this
+            ->op($opN)
+            ->op('OP_CHECKMULTISIG');
+
+        $this->m = $m;
     }
 
+    /**
+     * @return \Afk11\Bitcoin\Buffer|int
+     */
+    public function getRequiredSigCount()
+    {
+        return $this->m;
+    }
+
+    /**
+     * @return int
+     */
+    public function getKeyCount()
+    {
+        return count($this->keys);
+    }
     /**
      * @return PublicKeyInterface[]
      */

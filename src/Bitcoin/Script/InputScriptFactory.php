@@ -4,12 +4,23 @@ namespace Afk11\Bitcoin\Script;
 
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Buffer;
+use Afk11\Bitcoin\Script\Classifier\InputClassifier;
+use Afk11\Bitcoin\Signature\SignatureCollection;
 use Afk11\Bitcoin\Signature\SignatureInterface;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Afk11\Bitcoin\Signature\Signer;
 
 class InputScriptFactory
 {
+    /**
+     * @param ScriptInterface $script
+     * @return InputClassifier
+     */
+    public function classify(ScriptInterface $script)
+    {
+        return new InputClassifier($script);
+    }
+
     /**
      * @param SignatureInterface $signature
      * @param PublicKeyInterface $publicKey
@@ -24,37 +35,31 @@ class InputScriptFactory
 
     /**
      * @param RedeemScript $redeemScript
-     * @param array $sigs
+     * @param SignatureCollection $sigs
      * @param Buffer $hash
      * @return array
      */
-    public function multisigP2sh(RedeemScript $redeemScript, array $sigs, Buffer $hash)
+    public function multisigP2sh(RedeemScript $redeemScript, SignatureCollection $sigs, Buffer $hash)
     {
         $signer = new Signer(Bitcoin::getMath(), Bitcoin::getGenerator());
-        $copy = $sigs;
-        $linked = array();
-        $ordered = array();
-        do {
-            $sig = array_pop($copy);
-
-            foreach ($redeemScript->getKeys() as $key) {
-                if ($signer->verify($key, $hash, $sig)) {
-                    $linked[$key->getPubKeyHash()] = $sig;
-                    break;
-                }
-            }
-        } while(count($copy) > 0);
-
+        $linked = $signer->associateSigs($sigs, $hash, $redeemScript->getKeys());
+        $script = ScriptFactory::create()->op('OP_0');
         foreach ($redeemScript->getKeys() as $key) {
-            $ordered[] = $linked[$key->getPubKeyHash()];
-            unset($linked[$key->getPubKeyHash()]);
+            if (isset($linked[$key->getPubKeyHash()])) {
+                $script->push($linked[$key->getPubKeyHash()]->getBuffer());
+            }
         }
+        $script->push($redeemScript->getBuffer());
 
-        return $ordered;
+        return $script;
     }
 
+    /**
+     * @param SignatureInterface $signature
+     * @return $this
+     */
     public function payToPubKey(SignatureInterface $signature)
     {
-
+        return ScriptFactory::create()->push($signature->getBuffer());
     }
 }

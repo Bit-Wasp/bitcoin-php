@@ -37,8 +37,8 @@ class TransactionSerializer
         $parser = new Parser();
         return $parser
             ->writeInt(4, $transaction->getVersion(), true)
-            ->writeArray($this->inputsSerializer->serialize($transaction->getInputs()))
-            ->writeArray($this->outputsSerializer->serialize($transaction->getOutputs()))
+            ->writeArray($transaction->getInputs()->getBuffer())
+            ->writeArray($transaction->getOutputs()->getBuffer())
             ->writeInt(4, $transaction->getLockTime(), true)
             ->getBuffer();
     }

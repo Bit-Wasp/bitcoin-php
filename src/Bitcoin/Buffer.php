@@ -93,6 +93,15 @@ class Buffer
     }
 
     /**
+     * @return Buffer
+     * @throws \Exception
+     */
+    public function getVarInt()
+    {
+        return Parser::numToVarInt($this->getSize());
+    }
+
+    /**
      * Serialize a the buffer to hex, an integer, or a byte string
      *
      * @param string|null $type

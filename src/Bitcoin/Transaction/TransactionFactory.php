@@ -2,6 +2,7 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
+use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
@@ -32,7 +33,7 @@ class TransactionFactory
     public static function builder(TransactionInterface $tx = null)
     {
         $tx = $tx ?: TransactionFactory::create();
-        $builder = new TransactionBuilder($tx);
+        $builder = new TransactionBuilder($tx, Bitcoin::getMath(), Bitcoin::getGenerator());
         return $builder;
     }
 

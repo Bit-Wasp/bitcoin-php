@@ -5,6 +5,7 @@ namespace Afk11\Bitcoin\Signature;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Crypto\Random\RbgInterface;
 use Afk11\Bitcoin\Key\PrivateKeyInterface;
+use Afk11\Bitcoin\Key\PublicKey;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;
@@ -36,6 +37,34 @@ class Signer implements SignerInterface
         $this->math = $math;
         $this->generator = $G;
         $this->lowSignatures = $forceLowSignatures;
+    }
+
+    /**
+     * @param SignatureCollection $signatures
+     * @param Buffer $messageHash
+     * @param \Afk11\Bitcoin\Key\PublicKeyInterface[] $publicKeys
+     * @return SignatureInterface[]
+     */
+    public function associateSigs(SignatureCollection $signatures, Buffer $messageHash, array $publicKeys)
+    {
+        $sigCount = count($signatures);
+        $linked = [];
+
+        foreach ($signatures->getSignatures() as $c => $signature) {
+            foreach ($publicKeys as $key) {
+                $verify = $this->verify($key, $messageHash, $signature);
+                if ($verify) {
+                    $linked[$key->getPubKeyHash()] = $signature;
+                    if (count($linked) == $sigCount) {
+                        break 2;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $linked;
     }
 
     /**

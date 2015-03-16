@@ -2,6 +2,7 @@
 
 namespace Afk11\Bitcoin\Tests\Key;
 
+use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Key\HierarchicalKeyFactory;
 use Afk11\Bitcoin\Network\Network;
@@ -10,7 +11,7 @@ use Afk11\Bitcoin\Key\HierarchicalKey;
 class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var
+     * @var Math
      */
     protected $math;
     /**
@@ -43,12 +44,8 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 
     private function compareToPrivVectors(HierarchicalKey $key, $vectors)
     {
-        $
         $this->assertSame($vectors->secret_wif, $key->toWif($this->network));
         $this->assertSame($vectors->address, $key->getAddress()->getAddress($this->network));
-        $this->assertSame($this->math->hexDec($vectors->secret_hex), $key->getSecretMultiplier());
-        //$this->assertSame($vectors->xprv_hex, $key->getBuffer()->getHex());
-        //$this->assertSame($vectors->xpub_hex, $key->toPublic()->getBuffer()->getHex());
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
         $this->assertSame($vectors->xpub_b58, $key->toExtendedPublicKey($this->network), 'correct xpub');
     }
