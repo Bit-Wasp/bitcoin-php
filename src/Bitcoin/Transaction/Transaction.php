@@ -57,8 +57,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTransactionId()
     {
-        $hex  = pack("H*", $this->getBuffer());
-        $hash = Hash::sha256d($hex);
+        $hash = Hash::sha256d($this->getBuffer());
 
         $txid = new Parser();
         $txid = $txid
