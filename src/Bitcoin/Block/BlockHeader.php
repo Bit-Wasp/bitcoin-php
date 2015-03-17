@@ -5,9 +5,10 @@ namespace Afk11\Bitcoin\Block;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Serializable;
 use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 
-class BlockHeader implements BlockHeaderInterface
+class BlockHeader extends Serializable implements BlockHeaderInterface
 {
     /**
      * @var null|int

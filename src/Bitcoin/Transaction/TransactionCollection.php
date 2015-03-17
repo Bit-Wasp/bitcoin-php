@@ -2,11 +2,12 @@
 
 namespace Afk11\Bitcoin\Transaction;
 
+use Afk11\Bitcoin\Serializable;
 use Afk11\Bitcoin\SerializableInterface;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
-class TransactionCollection implements \Countable, SerializableInterface
+class TransactionCollection extends Serializable implements \Countable, SerializableInterface
 {
     private $transactions = [];
 

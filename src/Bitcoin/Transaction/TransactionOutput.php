@@ -4,11 +4,12 @@ namespace Afk11\Bitcoin\Transaction;
 
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Serializable;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\SerializableInterface;
 
-class TransactionOutput implements TransactionOutputInterface, SerializableInterface
+class TransactionOutput extends Serializable implements TransactionOutputInterface, SerializableInterface
 {
 
     /**

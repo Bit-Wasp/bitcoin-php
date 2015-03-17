@@ -6,16 +6,18 @@ use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Script\Script;
 use Afk11\Bitcoin\Script\ScriptInterface;
+use Afk11\Bitcoin\Serializable;
 use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
-class TransactionInput implements TransactionInputInterface
+class TransactionInput extends Serializable implements TransactionInputInterface
 {
     /**
-     * @var
+     * @var string
      */
     protected $txid;
+
     /**
-     * @var
+     * @var int
      */
     protected $vout;
 

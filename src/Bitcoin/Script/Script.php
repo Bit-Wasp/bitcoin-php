@@ -7,8 +7,9 @@ use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Parser;
 use Afk11\Bitcoin\Address\AddressFactory;
 use Afk11\Bitcoin\Crypto\Hash;
+use Afk11\Bitcoin\Serializable;
 
-class Script implements ScriptInterface
+class Script extends Serializable implements ScriptInterface
 {
 
     /**

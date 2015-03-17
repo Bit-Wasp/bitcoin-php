@@ -4,8 +4,9 @@ namespace Afk11\Bitcoin\Signature;
 
 use \Afk11\Bitcoin\Buffer;
 use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
+use Afk11\Bitcoin\Serializable;
 
-class Signature implements SignatureInterface
+class Signature extends Serializable implements SignatureInterface
 {
     /**
      * @var int
