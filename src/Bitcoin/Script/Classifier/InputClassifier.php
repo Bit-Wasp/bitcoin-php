@@ -86,15 +86,15 @@ class InputClassifier implements ScriptClassifierInterface
     public function classify()
     {
         if ($this->isPayToPublicKey()) {
-            return ScriptClassifierInterface::PAYTOPUBKEY;
+            return InputClassifier::PAYTOPUBKEY;
         } elseif ($this->isPayToPublicKeyHash()) {
-            return ScriptClassifierInterface::PAYTOPUBKEYHASH;
+            return InputClassifier::PAYTOPUBKEYHASH;
         } elseif ($this->isPayToScriptHash()) {
-            return ScriptClassifierInterface::PAYTOSCRIPTHASH;
+            return InputClassifier::PAYTOSCRIPTHASH;
         } elseif ($this->isMultisig()) {
-            return ScriptClassifierInterface::MULTISIG;
+            return InputClassifier::MULTISIG;
         }
 
-        return ScriptClassifierInterface::UNKNOWN;
+        return InputClassifier::UNKNOWN;
     }
 }

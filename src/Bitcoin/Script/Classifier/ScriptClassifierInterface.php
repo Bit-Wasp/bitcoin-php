@@ -4,6 +4,13 @@ namespace Afk11\Bitcoin\Script\Classifier;
 
 interface ScriptClassifierInterface
 {
+    const PAYTOPUBKEY = 'pubkey';
+    const PAYTOPUBKEYHASH = 'pubkeyhash';
+    const PAYTOSCRIPTHASH = 'scripthash';
+    const MULTISIG = 'multisig';
+    const UNKNOWN = 'unknown';
+    const NONSTANDARD = 'nonstandard';
+
     /**
      * @return bool
      */
