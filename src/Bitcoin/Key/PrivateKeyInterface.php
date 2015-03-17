@@ -23,5 +23,5 @@ interface PrivateKeyInterface extends KeyInterface
      * @param NetworkInterface $network
      * @return string
      */
-    public function toWif(NetworkInterface $network);
+    public function toWif(NetworkInterface $network = null);
 }

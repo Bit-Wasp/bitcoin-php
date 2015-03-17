@@ -7,6 +7,7 @@ use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Key\HierarchicalKeyFactory;
 use Afk11\Bitcoin\Network\Network;
 use Afk11\Bitcoin\Key\HierarchicalKey;
+use Afk11\Bitcoin\Network\NetworkFactory;
 
 class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,17 +38,19 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     {
         $this->math = Bitcoin::getMath();
         $this->key = null;
-        $this->network = new Network('00', '05', '80', false);
-        $this->network->setHDPubByte('0488b21e')
-            ->setHDPrivByte('0488ade4');
+        $this->network = NetworkFactory::bitcoin();
     }
 
     private function compareToPrivVectors(HierarchicalKey $key, $vectors)
     {
         $this->assertSame($vectors->secret_wif, $key->toWif($this->network));
+        $this->assertSame($vectors->secret_wif, $key->toWif());
         $this->assertSame($vectors->address, $key->getAddress()->getAddress($this->network));
+        $this->assertSame($vectors->address, $key->getAddress()->getAddress());
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
+        $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey(), 'correct xprv');
         $this->assertSame($vectors->xpub_b58, $key->toExtendedPublicKey($this->network), 'correct xpub');
+        $this->assertSame($vectors->xpub_b58, $key->toExtendedPublicKey(), 'correct xpub');
     }
 
     public function testGenerateNew()
@@ -151,9 +154,11 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateWithInvalidNetwork()
     {
-        // No longer required, network not required to create an instance
-        $network   = new Network('00', '05', '80', false);
-        $key       = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
+        $network = new Network('ff', 'ff', 'ff');
+        $network->setHDPrivByte('ffffffff')
+                ->setHDPubByte('ffffffff');
+
+        $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
         HierarchicalKeyFactory::fromExtended($key, $network);
     }
 

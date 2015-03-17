@@ -8,6 +8,7 @@ use Afk11\Bitcoin\Network\Network;
 use Afk11\Bitcoin\Buffer;
 use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
+use Afk11\Bitcoin\Network\NetworkFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase
@@ -136,11 +137,13 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     public function testGetWif()
     {
         $this->privateKey = new PrivateKey($this->math, $this->generator, $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141'));
-        $network = new Network('00', '05', '80');
+        $network = NetworkFactory::bitcoin();
         $this->assertSame($this->privateKey->toWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
+        $this->assertSame($this->privateKey->toWif(), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
 
         $this->privateKey->setCompressed(true);
         $this->assertSame($this->privateKey->toWif($network), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
+        $this->assertSame($this->privateKey->toWif(), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
     }
 
     public function testGetPubKeyHash()

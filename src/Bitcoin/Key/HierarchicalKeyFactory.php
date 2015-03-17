@@ -21,7 +21,7 @@ class HierarchicalKeyFactory
      */
     public static function getSerializer($math, $generator, $network)
     {
-        $extSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($math, $generator, $network));
+        $extSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($math, $generator, $network));
         return $extSerializer;
     }
 

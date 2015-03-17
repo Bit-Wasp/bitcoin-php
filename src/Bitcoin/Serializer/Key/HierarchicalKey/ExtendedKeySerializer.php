@@ -16,7 +16,7 @@ class ExtendedKeySerializer
     /**
      * @param HexExtendedKeySerializer $hexSerializer
      */
-    public function __construct(NetworkInterface $network, HexExtendedKeySerializer $hexSerializer)
+    public function __construct(HexExtendedKeySerializer $hexSerializer)
     {
         $this->hexSerializer = $hexSerializer;
     }

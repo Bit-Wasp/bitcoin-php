@@ -5,6 +5,7 @@ namespace Afk11\Bitcoin\Tests;
 use Afk11\Bitcoin\Bitcoin;
 use Afk11\Bitcoin\Math\Math;
 use Afk11\Bitcoin\Network\Network;
+use Afk11\Bitcoin\Network\NetworkFactory;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Math\Gmp;
 
@@ -23,10 +24,11 @@ class BitcoinTest extends \PHPUnit_Framework_TestCase
     {
         Bitcoin::setMath(new Math());
         Bitcoin::setGenerator(EccFactory::getSecgCurves(Bitcoin::getMath())->generator256k1());
+        Bitcoin::setNetwork(Bitcoin::getDefaultNetwork()); // (re)set back to default
     }
+
     public function testGetMath()
     {
-        $bitcoin = new Bitcoin;
         $default = Bitcoin::getMath();
         $this->assertEquals($default, Bitcoin::getMath());
     }
@@ -42,16 +44,13 @@ class BitcoinTest extends \PHPUnit_Framework_TestCase
 
     public function testGetNetwork()
     {
-        $default = new Network('00', '05', '80');
-        $default
-            ->setHDPubByte('0488b21e')
-            ->setHDPrivByte('0488ade4')
-            ->setNetMagicBytes('d9b4bef9');
+        $default = Bitcoin::getDefaultNetwork();
+        $bitcoin = NetworkFactory::bitcoin();
+        $viacoin = NetworkFactory::viacoin();
 
-        $custom = new Network('fc','fd','00');
-
+        $this->assertEquals($default, $bitcoin);
         $this->assertEquals($default, Bitcoin::getNetwork());
-        Bitcoin::setNetwork($custom);
-        $this->assertSame($custom, Bitcoin::getNetwork());
+        Bitcoin::setNetwork($viacoin);
+        $this->assertSame($viacoin, Bitcoin::getNetwork());
     }
 }

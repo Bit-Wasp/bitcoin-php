@@ -247,7 +247,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @return string
      * @throws \Exception
      */
-    public function toWif(NetworkInterface $network)
+    public function toWif(NetworkInterface $network = null)
     {
         return $this->getPrivateKey()->toWif($network);
     }
@@ -260,7 +260,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     {
         $network = $network ?: Bitcoin::getNetwork();
 
-        $extendedSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($this->math, $this->generator, $network));
+        $extendedSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($this->math, $this->generator, $network));
         $extended = $extendedSerializer->serialize($this);
         return $extended;
     }
@@ -269,7 +269,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedPrivateKey(NetworkInterface $network)
+    public function toExtendedPrivateKey(NetworkInterface $network = null)
     {
         if (!$this->isPrivate()) {
             throw new \LogicException('Cannot create extended private key from public');
@@ -282,7 +282,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedPublicKey(NetworkInterface $network)
+    public function toExtendedPublicKey(NetworkInterface $network = null)
     {
         $clone = clone($this);
         return $clone->toPublic()->toExtendedKey($network);

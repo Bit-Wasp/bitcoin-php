@@ -30,6 +30,8 @@ class HexExtendedKeySerializer
     private $generator;
 
     /**
+     * @param Math             $math
+     * @param GeneratorPoint   $generator
      * @param NetworkInterface $network
      * @throws \Exception
      */
@@ -114,6 +116,11 @@ class HexExtendedKeySerializer
                 );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract extended key from parser');
+        }
+
+        if ($bytes !== $this->network->getHDPubByte() && $bytes !== $this->network->getHDPrivByte()) {
+            throw new \InvalidArgumentException("HD key magic bytes do not match network magic bytes");
+
         }
 
         $key = ($this->network->getHDPrivByte() == $bytes)
