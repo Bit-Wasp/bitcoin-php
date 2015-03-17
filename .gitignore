@@ -8,3 +8,4 @@ build/docs/*
 build/logs/*
 build/cache/*
 build/cache/lint.cache
+phpunit.xml
