@@ -2,7 +2,7 @@
 
 namespace Afk11\Bitcoin\Script;
 
-use Afk11\Bitcoin\Address\Address;
+use Afk11\Bitcoin\Address\AddressInterface;
 use Afk11\Bitcoin\Address\ScriptHashAddress;
 use Afk11\Bitcoin\Key\PublicKeyInterface;
 use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
@@ -19,10 +19,10 @@ class OutputScriptFactory
     }
 
     /**
-     * @param Address $address
+     * @param AddressInterface $address
      * @return Script
      */
-    public function payToAddress(Address $address)
+    public function payToAddress(AddressInterface $address)
     {
         return ($address instanceof ScriptHashAddress
             ? ScriptFactory::create()

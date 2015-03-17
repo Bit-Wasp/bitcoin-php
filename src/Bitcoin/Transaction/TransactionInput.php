@@ -143,7 +143,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      * @param TransactionOutput $output
      * @return $this
      */
-    public function setPrevOutput(TransactionOutput $output)
+    public function setPrevOutput(TransactionOutputInterface $output)
     {
         $this->prevOutput = $output;
         return $this;
