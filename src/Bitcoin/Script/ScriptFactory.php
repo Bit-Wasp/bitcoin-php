@@ -25,7 +25,7 @@ class ScriptFactory
     public static function multisig($m, array $keys = array(), $sort = true)
     {
         if ($sort) {
-            usort($keys, function(KeyInterface $a, KeyInterface $b) {
+            usort($keys, function (KeyInterface $a, KeyInterface $b) {
                 $av = (string)$a;
                 $bv = (string)$b;
 

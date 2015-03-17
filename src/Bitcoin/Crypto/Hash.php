@@ -12,7 +12,7 @@ class Hash
 {
     /**
      * Normalize data so it is always a string
-     * 
+     *
      * @param Buffer|string $data
      * @return string
      */

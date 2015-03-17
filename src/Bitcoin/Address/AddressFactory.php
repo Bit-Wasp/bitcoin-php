@@ -36,7 +36,8 @@ class AddressFactory
      * @return ScriptHashAddress
      * @throws \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure
      */
-    public static function fromString($address, NetworkInterface $network = null) {
+    public static function fromString($address, NetworkInterface $network = null)
+    {
         $network = $network ?: Bitcoin::getNetwork();
 
         $data = Base58::decodeCheck($address);
