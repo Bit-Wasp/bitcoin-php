@@ -44,7 +44,7 @@ class TransactionCollectionSerializer
         $transactions->addTransactions(
             $parser->getArray(
                 function () use (&$parser) {
-                    $transaction = TransactionFactory::fromParser($parser);
+                    $transaction = $this->serializer->fromParser($parser);
                     return $transaction;
                 }
             )

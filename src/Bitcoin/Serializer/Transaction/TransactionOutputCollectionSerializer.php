@@ -45,10 +45,7 @@ class TransactionOutputCollectionSerializer
         $outputs->addOutputs(
             $parser->getArray(
                 function () use (&$parser) {
-                    $output = new \Afk11\Bitcoin\Transaction\TransactionOutput();
-                    $output
-                        ->setValue($parser->readBytes(8, true)->serialize('int'))
-                        ->setScript(new Script($parser->getVarString()));
+                    $output = $this->outputSerializer->fromParser($parser);
                     return $output;
                 }
             )
