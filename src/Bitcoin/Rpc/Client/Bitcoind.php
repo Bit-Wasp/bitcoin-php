@@ -92,7 +92,9 @@ class Bitcoind
     public function getrawtransaction($txid, $verbose = false)
     {
         $tx = $this->client->execute('getrawtransaction', array($txid));
-
+        if ($tx === false) {
+            throw new \Exception('FALSE from rpc?');
+        }
         if ($verbose) {
             $tx = TransactionFactory::fromHex($tx);
         }
@@ -104,10 +106,10 @@ class Bitcoind
      * @param TransactionInterface $transaction
      * @return mixed
      */
-    public function sendrawtransaction(TransactionInterface $transaction)
+    public function sendrawtransaction(TransactionInterface $transaction, $allowExtremeFees = false)
     {
         $hex = $transaction->getBuffer()->getHex();
-        $send = $this->client->execute('sendrawtransaction', array($hex));
+        $send = $this->client->execute('sendrawtransaction', array($hex, $allowExtremeFees));
         return $send;
     }
 }
