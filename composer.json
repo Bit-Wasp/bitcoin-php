@@ -25,7 +25,7 @@
     "ext-mcrypt": "*",
     "mdanter/ecc": "dev-master",
     "pleonasm/merkle-tree": "*",
-    "fguillot/json-rpc": "*",
+    "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0"
   },
   "require-dev": {
