@@ -2,9 +2,8 @@
 
 namespace Afk11\Bitcoin\Tests\Signature;
 
-use Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
-use Afk11\Bitcoin\Key\PrivateKey;
 use Afk11\Bitcoin\Crypto\Random\Random;
+use Afk11\Bitcoin\Crypto\Random\Rfc6979;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
 use Afk11\Bitcoin\Signature\Signature;
 use Afk11\Bitcoin\Signature\Signer;
@@ -41,12 +40,11 @@ class SignerTest extends \PHPUnit_Framework_TestCase
         $signer = new \Afk11\Bitcoin\Signature\Signer($this->math, $this->generator, true);
 
         foreach ($json->test as $c => $test) {
-            echo "DO: $c\n";
             $privateKey = PrivateKeyFactory::fromHex($test->privKey, false, $this->math, $this->generator);
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
-            $k = new \Afk11\Bitcoin\Crypto\Random\Rfc6979($this->math, $this->generator, $privateKey, $messageHash);
+            $k = new Rfc6979($this->math, $this->generator, $privateKey, $messageHash);
             $sig = $signer->sign($privateKey, $messageHash, $k);
 
             // K must be correct (from privatekey and message hash)
