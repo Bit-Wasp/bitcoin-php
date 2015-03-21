@@ -38,9 +38,10 @@ class SignerTest extends \PHPUnit_Framework_TestCase
 
         $json = json_decode($f);
 
-        $signer = new \Afk11\Bitcoin\Signature\Signer($this->math, $this->generator);
+        $signer = new \Afk11\Bitcoin\Signature\Signer($this->math, $this->generator, true);
 
         foreach ($json->test as $c => $test) {
+            echo "DO: $c\n";
             $privateKey = PrivateKeyFactory::fromHex($test->privKey, false, $this->math, $this->generator);
             $message = new Buffer($test->message);
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
