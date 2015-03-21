@@ -17,6 +17,7 @@
       "Afk11\\Bitcoin\\Tests\\": "tests/"
     }
   },
+  "minimum-stability": "dev",
   "require": {
     "php": ">=5.4.0",
     "ext-gmp": "*",
