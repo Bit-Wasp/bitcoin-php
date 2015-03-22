@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 
 class ScriptParserTest extends \PHPUnit_Framework_TestCase {
 
@@ -76,7 +76,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase {
         $parse = $this->script->getScriptParser()->parse();
 
         $this->assertSame($parse[0], 'OP_HASH160');
-        $this->assertInstanceOf('Afk11\Bitcoin\Buffer', $parse[1]);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Buffer', $parse[1]);
         $this->assertSame($parse[1]->serialize(), $buf->serialize());
         $this->assertSame($parse[2], 'OP_EQUAL');
     }

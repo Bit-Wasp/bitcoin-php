@@ -1,14 +1,14 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\Address\AddressFactory;
-use Afk11\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 
 abstract class Key implements KeyInterface
 {
     /**
-     * @return \Afk11\Bitcoin\Address\ScriptHashAddress
+     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
      */
     public function getAddress()
     {

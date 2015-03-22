@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Chain;
+namespace BitWasp\Bitcoin\Chain;
 
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Buffer;
 
 interface DifficultyInterface
 {

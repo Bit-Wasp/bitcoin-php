@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Network;
+namespace BitWasp\Bitcoin\Network;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
 
 class Version
 {

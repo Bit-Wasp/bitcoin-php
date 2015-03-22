@@ -6,13 +6,13 @@
  * Time: 20:49
  */
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Key\PublicKeyFactory;
-use Afk11\Bitcoin\Key\PublicKeyInterface;
-use Afk11\Bitcoin\Signature\Signer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Signature\Signer;
 
 class RedeemScript extends Script
 {
@@ -28,7 +28,7 @@ class RedeemScript extends Script
 
     /**
      * @param integer $m
-     * @param \Afk11\Bitcoin\Key\PublicKeyInterface[] $keys
+     * @param \BitWasp\Bitcoin\Key\PublicKeyInterface[] $keys
      */
     public function __construct($m, array $keys)
     {
@@ -63,7 +63,7 @@ class RedeemScript extends Script
     }
 
     /**
-     * @return \Afk11\Bitcoin\Buffer|int
+     * @return \BitWasp\Bitcoin\Buffer|int
      */
     public function getRequiredSigCount()
     {

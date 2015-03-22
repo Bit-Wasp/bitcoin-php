@@ -1,18 +1,18 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Script\ScriptInterface;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\SerializableInterface;
 
 class TransactionOutput implements TransactionOutputInterface, SerializableInterface
 {
 
     /**
-     * @var \Afk11\Bitcoin\Buffer
+     * @var \BitWasp\Bitcoin\Buffer
      */
     protected $value;
 

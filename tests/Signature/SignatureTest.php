@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Signature;
+namespace BitWasp\Bitcoin\Tests\Signature;
 
-use Afk11\Bitcoin\Exceptions\SignatureNotCanonical;use Afk11\Bitcoin\Signature\Signature;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Signature\SignatureFactory;
+use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;use BitWasp\Bitcoin\Signature\Signature;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Signature\SignatureFactory;
 
 /**
  * Class SignatureTest
@@ -27,7 +27,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
      */
     public function __construct()
     {
-        $this->sigType = 'Afk11\Bitcoin\Signature\Signature';
+        $this->sigType = 'BitWasp\Bitcoin\Signature\Signature';
     }
 
     public function setUp()
@@ -123,7 +123,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $hex = '304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01';
         $this->sig = SignatureFactory::fromHex($hex);
 
-        $this->assertInstanceOf('Afk11\Bitcoin\Signature\Signature', $this->sig);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Signature\Signature', $this->sig);
         $this->assertEquals('56860522993476239843569407076292679822350064328987049204205911586688428093823', $this->sig->getR());
         $this->assertEquals('75328468267675219166053001951181042681597800329127462438170420074748074627387', $this->sig->getS());
     }

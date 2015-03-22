@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
 interface TransactionOutputInterface
 {

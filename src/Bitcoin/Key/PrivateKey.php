@@ -1,13 +1,13 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
-use Afk11\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
+use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKey extends Key implements PrivateKeyInterface
@@ -159,7 +159,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function getBuffer()
     {

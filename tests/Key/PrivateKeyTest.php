@@ -1,13 +1,13 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Key;
+namespace BitWasp\Bitcoin\Tests\Key;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Key\PrivateKey;
-use Afk11\Bitcoin\Network\Network;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PrivateKey;
+use BitWasp\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase
@@ -30,12 +30,12 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $baseType = 'Afk11\Bitcoin\Key\PrivateKey';
+    protected $baseType = 'BitWasp\Bitcoin\Key\PrivateKey';
 
     /**
      * @var string
      */
-    protected $publicType = 'Afk11\Bitcoin\Key\PublicKey';
+    protected $publicType = 'BitWasp\Bitcoin\Key\PublicKey';
 
     /**
      *
@@ -189,7 +189,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure
+     * @expectedException \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public function testInvalidWif()
     {

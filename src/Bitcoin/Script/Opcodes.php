@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
 class Opcodes
 {

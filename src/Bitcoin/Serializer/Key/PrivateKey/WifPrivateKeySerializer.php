@@ -1,14 +1,14 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Key\PrivateKey;
+namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
-use Afk11\Bitcoin\Base58;
-use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
-use Afk11\Bitcoin\Key\PrivateKey;
-use Afk11\Bitcoin\Key\PrivateKeyInterface;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
+use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Key\PrivateKey;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 
 class WifPrivateKeySerializer
 {

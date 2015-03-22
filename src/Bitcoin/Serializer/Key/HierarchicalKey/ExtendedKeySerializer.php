@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Key\HierarchicalKey;
+namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Base58;
-use Afk11\Bitcoin\Key\HierarchicalKey;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Key\HierarchicalKey;
 
 class ExtendedKeySerializer
 {
@@ -35,8 +35,8 @@ class ExtendedKeySerializer
     /**
      * @param string $base58
      * @return HierarchicalKey
-     * @throws \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure
-     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     * @throws \BitWasp\Bitcoin\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
     public function parse($base58)

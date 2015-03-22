@@ -6,7 +6,7 @@
  * Time: 18:24
  */
 
-namespace Afk11\Bitcoin\Exceptions;
+namespace BitWasp\Bitcoin\Exceptions;
 
 class JsonRpcError extends \Exception
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Block;
+namespace BitWasp\Bitcoin\Block;
 
-use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 
 class BlockHeaderFactory
 {

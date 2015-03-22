@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Math;
+namespace BitWasp\Bitcoin\Math;
 
 use Mdanter\Ecc\MathAdapterInterface;
 

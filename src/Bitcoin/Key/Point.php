@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;

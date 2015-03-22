@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Crypto;
+namespace BitWasp\Bitcoin\Tests\Crypto;
 
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Buffer;
 
 class HashTest extends \PHPUnit_Framework_TestCase
 {

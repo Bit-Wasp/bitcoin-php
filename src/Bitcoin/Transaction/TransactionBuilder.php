@@ -1,20 +1,20 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
-use Afk11\Bitcoin\Address\AddressInterface;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Crypto\Random\Random;
-use Afk11\Bitcoin\Crypto\Random\Rfc6979;
-use Afk11\Bitcoin\Key\PrivateKeyInterface;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
-use Afk11\Bitcoin\Script\RedeemScript;
-use Afk11\Bitcoin\Script\ScriptFactory;
-use Afk11\Bitcoin\Script\ScriptInterface;
-use Afk11\Bitcoin\Signature\SignatureCollection;
-use Afk11\Bitcoin\Signature\SignatureHashInterface;
-use Afk11\Bitcoin\Signature\Signer;
+use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\RedeemScript;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Signature\SignatureCollection;
+use BitWasp\Bitcoin\Signature\SignatureHashInterface;
+use BitWasp\Bitcoin\Signature\Signer;
 use Mdanter\Ecc\GeneratorPoint;
 
 class TransactionBuilder
@@ -115,7 +115,7 @@ class TransactionBuilder
     /**
      * @param PrivateKeyInterface $privKey
      * @param Buffer $hash
-     * @return \Afk11\Bitcoin\Signature\Signature
+     * @return \BitWasp\Bitcoin\Signature\Signature
      */
     public function sign(PrivateKeyInterface $privKey, Buffer $hash)
     {

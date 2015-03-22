@@ -1,19 +1,19 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script;
 
-use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Script\ScriptFactory;
-use \Afk11\Bitcoin\Script\ScriptInterpreter;
-use \Afk11\Bitcoin\Transaction\TransactionFactory;
-use \Afk11\Bitcoin\Script\ScriptInterpreterFlags;
+use \BitWasp\Bitcoin\Bitcoin;
+use \BitWasp\Bitcoin\Buffer;
+use \BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use \BitWasp\Bitcoin\Script\ScriptInterpreter;
+use \BitWasp\Bitcoin\Transaction\TransactionFactory;
+use \BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
 
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Afk11\Bitcoin\Math\Math
+     * @var \BitWasp\Bitcoin\Math\Math
      */
     public $math;
 

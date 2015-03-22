@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Address;
+namespace BitWasp\Bitcoin\Address;
 
-use Afk11\Bitcoin\Key\KeyInterface;
-use Afk11\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Key\KeyInterface;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class AddressFactory
 {

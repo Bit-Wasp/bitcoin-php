@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer;
+namespace BitWasp\Bitcoin\Serializer;
 
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Network\NetworkMessageInterface;
-use Afk11\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Network\NetworkMessageInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
 
 class NetworkMessageSerializer
 {

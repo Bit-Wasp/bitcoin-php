@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use Afk11\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 
 interface SignatureHashInterface
 {
@@ -36,7 +36,7 @@ interface SignatureHashInterface
      * @param ScriptInterface $txOutScript
      * @param $inputToSign
      * @param int $sighashType
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      * @internal param $transaction
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL);

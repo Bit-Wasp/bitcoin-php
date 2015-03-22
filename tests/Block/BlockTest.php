@@ -1,20 +1,20 @@
 <?php
 
 
-namespace Afk11\Bitcoin\Tests\Block;
+namespace BitWasp\Bitcoin\Tests\Block;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Block\BlockFactory;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Block\Block;
-use Afk11\Bitcoin\Block\BlockHeader;
-use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
-use Afk11\Bitcoin\Serializer\Block\HexBlockSerializer;
-use Afk11\Bitcoin\Transaction\Transaction;
-use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
-use Afk11\Bitcoin\Transaction\TransactionCollection;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Bitcoin\Block\BlockHeader;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class BlockTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,9 +46,9 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->blockType = 'Afk11\Bitcoin\Block\Block';
-        $this->headerType = 'Afk11\Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'Afk11\Bitcoin\Buffer';
+        $this->blockType = 'BitWasp\Bitcoin\Block\Block';
+        $this->headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
+        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
     }
 
     public function setUp()
@@ -69,7 +69,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTransactions()
     {
-        $this->assertInstanceOf('Afk11\Bitcoin\Transaction\TransactionCollection', $this->block->getTransactions());
+        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $this->block->getTransactions());
         $this->assertEmpty($this->block->getTransactions());
     }
 
@@ -133,7 +133,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf($this->blockType, $newBlock);
 
-        $this->assertInstanceOf('Afk11\Bitcoin\Transaction\TransactionCollection', $newBlock->getTransactions());
+        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
         $this->assertSame($newBlock->getHeader()->getMerkleRoot()->serialize('hex'), $newBlock->getMerkleRoot());
     }

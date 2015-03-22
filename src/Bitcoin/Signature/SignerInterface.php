@@ -1,11 +1,11 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Crypto\Random\RbgInterface;
-use Afk11\Bitcoin\Key\PrivateKeyInterface;
-use Afk11\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
 
 interface SignerInterface
 {

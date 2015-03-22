@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Math\Math;
 
 class ScriptParser
 {

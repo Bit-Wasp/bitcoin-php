@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Address\AddressFactory;
-use Afk11\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Crypto\Hash;
 
 class Script implements ScriptInterface
 {
@@ -44,7 +44,7 @@ class Script implements ScriptInterface
     }
 
     /**
-     * @return \Afk11\Bitcoin\Address\ScriptHashAddress
+     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
      */
     public function getAddress()
     {
@@ -73,7 +73,7 @@ class Script implements ScriptInterface
     /**
      * Return a buffer containing the hash of this script.
      *
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function getScriptHash()
     {

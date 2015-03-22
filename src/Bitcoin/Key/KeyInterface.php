@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\SerializableInterface;
 
 interface KeyInterface extends SerializableInterface
 {

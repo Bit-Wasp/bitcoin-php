@@ -1,15 +1,15 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Block;
+namespace BitWasp\Bitcoin\Tests\Block;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Block\BlockFactory;
-use Afk11\Bitcoin\Exceptions\MerkleTreeEmpty;
-use Afk11\Bitcoin\Block\MerkleRoot;
-use Afk11\Bitcoin\Block\Block;
-use Afk11\Bitcoin\Transaction\Transaction;
-use Afk11\Bitcoin\Transaction\TransactionCollection;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
+use BitWasp\Bitcoin\Block\MerkleRoot;
+use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class MerkleRootTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->rootType = 'Afk11\Bitcoin\Block\MerkleRoot';
+        $this->rootType = 'BitWasp\Bitcoin\Block\MerkleRoot';
     }
 
     public function setUp()
@@ -42,7 +42,7 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty
+     * @expectedException \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      * @expectedExceptionMessage
      */
     public function testCannotUseEmptyBlock()

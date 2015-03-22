@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Math;
+namespace BitWasp\Bitcoin\Tests\Math;
 
-use Afk11\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Bitcoin;
 use Mdanter\Ecc\Math\Gmp;
 use Mdanter\Ecc\GeneratorPoint;
 

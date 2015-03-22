@@ -1,11 +1,11 @@
 <?php
 
-namespace Afk11\Bitcoin\Block;
+namespace BitWasp\Bitcoin\Block;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 
 class BlockHeader implements BlockHeaderInterface
 {

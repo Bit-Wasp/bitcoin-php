@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Block;
+namespace BitWasp\Bitcoin\Serializer\Block;
 
-use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
-use Afk11\Bitcoin\Parser;
+use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Parser;
 
-use Afk11\Bitcoin\Block\BlockHeader;
-use Afk11\Bitcoin\Block\BlockHeaderInterface;
+use BitWasp\Bitcoin\Block\BlockHeader;
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
 class HexBlockHeaderSerializer
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Script\ScriptInterface;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
 class TransactionInput implements TransactionInputInterface
 {

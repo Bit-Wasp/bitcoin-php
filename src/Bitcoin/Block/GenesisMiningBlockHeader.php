@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Block;
+namespace BitWasp\Bitcoin\Block;
 
 class GenesisMiningBlockHeader extends BlockHeader
 {

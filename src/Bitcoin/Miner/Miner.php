@@ -1,23 +1,23 @@
 <?php
 
-namespace Afk11\Bitcoin\Miner;
+namespace BitWasp\Bitcoin\Miner;
 
-use Afk11\Bitcoin\Chain\Difficulty;
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Script\ScriptInterface;
-use Afk11\Bitcoin\Transaction\TransactionCollection;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
-use Afk11\Bitcoin\Transaction\TransactionInterface;
-use Afk11\Bitcoin\Transaction\TransactionInput;
-use Afk11\Bitcoin\Transaction\TransactionOutput;
-use Afk11\Bitcoin\Block\Block;
-use Afk11\Bitcoin\Block\MerkleRoot;
-use Afk11\Bitcoin\Block\BlockHeader;
-use Afk11\Bitcoin\Block\BlockHeaderInterface;
+use BitWasp\Bitcoin\Chain\Difficulty;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Bitcoin\Block\MerkleRoot;
+use BitWasp\Bitcoin\Block\BlockHeader;
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
 class Miner
 {
@@ -123,7 +123,7 @@ class Miner
     /**
      * @param TransactionInterface|null $coinbaseTx
      * @return Block
-     * @throws \Afk11\Bitcoin\Exceptions\MerkleTreeEmpty
+     * @throws \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      */
     public function run(TransactionInterface $coinbaseTx = null)
     {

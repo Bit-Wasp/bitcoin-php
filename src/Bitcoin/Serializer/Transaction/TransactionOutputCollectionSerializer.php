@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Transaction;
+namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 
 class TransactionOutputCollectionSerializer
 {
@@ -45,7 +45,7 @@ class TransactionOutputCollectionSerializer
         $outputs->addOutputs(
             $parser->getArray(
                 function () use (&$parser) {
-                    $output = new \Afk11\Bitcoin\Transaction\TransactionOutput();
+                    $output = new \BitWasp\Bitcoin\Transaction\TransactionOutput();
                     $output
                         ->setValue($parser->readBytes(8, true)->serialize('int'))
                         ->setScript(new Script($parser->getVarString()));

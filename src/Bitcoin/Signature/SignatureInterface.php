@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use Afk11\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\SerializableInterface;
 
 interface SignatureInterface extends SerializableInterface
 {

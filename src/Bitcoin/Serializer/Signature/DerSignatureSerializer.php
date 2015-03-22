@@ -1,13 +1,13 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Signature;
+namespace BitWasp\Bitcoin\Serializer\Signature;
 
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Signature\Signature;
-use Afk11\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Signature\Signature;
+use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 class DerSignatureSerializer
 {

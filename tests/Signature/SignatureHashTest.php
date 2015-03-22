@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Signature;
+namespace BitWasp\Bitcoin\Tests\Signature;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Transaction\Transaction;
-use Afk11\Bitcoin\Signature\SignatureHash;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Signature\SignatureHash;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class SignatureHashTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +27,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->txType = 'Afk11\Bitcoin\Transaction\Transaction';
+        $this->txType = 'BitWasp\Bitcoin\Transaction\Transaction';
     }
 
     public function setUp()

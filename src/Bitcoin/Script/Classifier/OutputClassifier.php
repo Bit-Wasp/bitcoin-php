@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Script\Classifier;
+namespace BitWasp\Bitcoin\Script\Classifier;
 
-use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class OutputClassifier implements ScriptClassifierInterface
 {

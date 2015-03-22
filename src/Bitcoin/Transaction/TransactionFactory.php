@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
 class TransactionFactory
 {

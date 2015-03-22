@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
-use Afk11\Bitcoin\Serializer\Transaction\TransactionInputCollectionSerializer;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputCollectionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
 class TransactionInputCollection implements \Countable
 {
@@ -81,7 +81,7 @@ class TransactionInputCollection implements \Countable
      *
      * @param int $start
      * @param int $length
-     * @return \Afk11\Bitcoin\Transaction\TransactionInputCollection
+     * @return \BitWasp\Bitcoin\Transaction\TransactionInputCollection
      */
     public function slice($start, $length)
     {
@@ -89,7 +89,7 @@ class TransactionInputCollection implements \Countable
     }
 
     /**
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function getBuffer()
     {

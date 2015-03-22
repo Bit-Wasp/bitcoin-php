@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\SerializableInterface;
-use Afk11\Bitcoin\Address\Address;
+use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\Address\Address;
 
 interface ScriptInterface extends SerializableInterface
 {

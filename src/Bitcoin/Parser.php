@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin;
+namespace BitWasp\Bitcoin;
 
-use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
 
 class Parser
 {
@@ -12,7 +12,7 @@ class Parser
     protected $string;
 
     /**
-     * @var \Afk11\Bitcoin\Math\Math
+     * @var \BitWasp\Bitcoin\Math\Math
      */
     protected $math;
 
@@ -227,7 +227,7 @@ class Parser
     {
         $parser = new Parser(self::numToVarInt(count($serializable)));
         foreach ($serializable as $object) {
-            if (in_array('Afk11\Bitcoin\SerializableInterface', class_implements($object))) {
+            if (in_array('BitWasp\Bitcoin\SerializableInterface', class_implements($object))) {
                 $object = $object->getBuffer();
             }
 

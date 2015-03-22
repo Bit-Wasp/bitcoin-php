@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests;
+namespace BitWasp\Bitcoin\Tests;
 
-use Afk11\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Network\Network;
 
 class NetworkTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreatesInstance()
     {
         $this->network = new Network('00', '05', '80', true);
-        $this->assertInstanceOf('Afk11\Bitcoin\Network\NetworkInterface', $this->network);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Network\NetworkInterface', $this->network);
     }
 
     /**
@@ -82,7 +82,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreateTestnet()
     {
         $this->network = $this->getTestNetwork();
-        $this->assertInstanceOf('Afk11\Bitcoin\Network\NetworkInterface', $this->network);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Network\NetworkInterface', $this->network);
         $this->assertInternalType('bool', $this->network->isTestnet());
         $this->assertTrue($this->network->isTestnet());
     }
@@ -90,7 +90,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreateLivenet()
     {
         $this->network = $this->getLiveNetwork();
-        $this->assertInstanceOf('Afk11\Bitcoin\Network\NetworkInterface', $this->network);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Network\NetworkInterface', $this->network);
         $this->assertInternalType('bool', $this->network->isTestnet());
         $this->assertFalse($this->network->isTestnet());
     }

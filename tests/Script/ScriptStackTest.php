@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script;
 
-use Afk11\Bitcoin\Script\ScriptStack;
-use Afk11\Bitcoin\Key\PublicKeyInterface;
-use Afk11\Bitcoin\Exceptions\ScriptStackException;
+use BitWasp\Bitcoin\Script\ScriptStack;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 
 class ScriptStackTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Afk11\Bitcoin\Exceptions\ScriptStackException
+     * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptStackException
      */
     public function testPopException()
     {
@@ -83,7 +83,7 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Afk11\Bitcoin\Exceptions\ScriptStackException
+     * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptStackException
      */
     public function testEraseException()
     {

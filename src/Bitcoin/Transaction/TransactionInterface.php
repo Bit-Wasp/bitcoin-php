@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
-use Afk11\Bitcoin\Network\NetworkMessageInterface;
+use BitWasp\Bitcoin\Network\NetworkMessageInterface;
 
 interface TransactionInterface extends NetworkMessageInterface
 {

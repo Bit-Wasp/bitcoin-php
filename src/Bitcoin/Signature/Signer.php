@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Crypto\Random\RbgInterface;
-use Afk11\Bitcoin\Key\PrivateKeyInterface;
-use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;
 
@@ -42,7 +42,7 @@ class Signer implements SignerInterface
     /**
      * @param SignatureCollection $signatures
      * @param Buffer $messageHash
-     * @param \Afk11\Bitcoin\Key\PublicKeyInterface[] $publicKeys
+     * @param \BitWasp\Bitcoin\Key\PublicKeyInterface[] $publicKeys
      * @return SignatureInterface[]
      */
     public function associateSigs(SignatureCollection $signatures, Buffer $messageHash, array $publicKeys)
@@ -119,7 +119,7 @@ class Signer implements SignerInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param \Afk11\Bitcoin\Buffer $hash
+     * @param \BitWasp\Bitcoin\Buffer $hash
      * @param SignatureInterface $signature
      * @return bool
      */

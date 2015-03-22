@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Chain;
+namespace BitWasp\Bitcoin\Chain;
 
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Buffer;
 
 class Difficulty implements DifficultyInterface
 {
@@ -62,7 +62,7 @@ class Difficulty implements DifficultyInterface
     /**
      * Get the target from a compact int.
      *
-     * @param \Afk11\Bitcoin\Buffer $bits
+     * @param \BitWasp\Bitcoin\Buffer $bits
      * @return string
      */
     public function getTarget(Buffer $bits)

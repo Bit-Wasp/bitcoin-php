@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Key;
+namespace BitWasp\Bitcoin\Tests\Key;
 
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Key\HierarchicalKeyFactory;
-use Afk11\Bitcoin\Network\Network;
-use Afk11\Bitcoin\Key\HierarchicalKey;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Key\HierarchicalKey;
 
 class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $baseType = 'Afk11\Bitcoin\Key\HierarchicalKey';
+    protected $baseType = 'BitWasp\Bitcoin\Key\HierarchicalKey';
 
     /**
      *

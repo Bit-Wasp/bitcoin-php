@@ -1,15 +1,15 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
-use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
+use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use Mdanter\Ecc\GeneratorPoint;
 
 class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInterface

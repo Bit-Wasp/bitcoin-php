@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Math\Math;
-use \Afk11\Bitcoin\Crypto\Hash;
-use \Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
+use \BitWasp\Bitcoin\Bitcoin;
+use \BitWasp\Bitcoin\Math\Math;
+use \BitWasp\Bitcoin\Crypto\Hash;
+use \BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
 

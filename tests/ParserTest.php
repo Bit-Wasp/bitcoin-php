@@ -1,21 +1,21 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests;
+namespace BitWasp\Bitcoin\Tests;
 
-use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Network\Network;
-use \Afk11\Bitcoin\Parser;
-use \Afk11\Bitcoin\Transaction\Transaction;
-use Afk11\Bitcoin\Transaction\TransactionCollection;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
-use \Afk11\Bitcoin\Transaction\TransactionInput;
-use \Afk11\Bitcoin\Transaction\TransactionOutput;
+use \BitWasp\Bitcoin\Buffer;
+use \BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Network\Network;
+use \BitWasp\Bitcoin\Parser;
+use \BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use \BitWasp\Bitcoin\Transaction\TransactionInput;
+use \BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 class ParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Afk11\Bitcoin\Parser
+     * @var \BitWasp\Bitcoin\Parser
      */
     protected $parser;
 
@@ -31,8 +31,8 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->parserType = 'Afk11\Bitcoin\Parser';
-        $this->bufferType = 'Afk11\Bitcoin\Buffer';
+        $this->parserType = 'BitWasp\Bitcoin\Parser';
+        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
     }
 
     public function setUp()

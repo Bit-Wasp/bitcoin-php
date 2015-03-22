@@ -6,9 +6,9 @@
  * Time: 20:41
  */
 
-namespace Afk11\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script;
 
-use Afk11\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Opcodes;
 
 class OpcodesTest extends \PHPUnit_Framework_TestCase {
 

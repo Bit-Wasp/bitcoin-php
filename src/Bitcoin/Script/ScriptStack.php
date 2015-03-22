@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Exceptions\ScriptStackException;
+use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 
 class ScriptStack
 {

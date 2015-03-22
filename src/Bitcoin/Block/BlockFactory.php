@@ -1,13 +1,13 @@
 <?php
 
-namespace Afk11\Bitcoin\Block;
+namespace BitWasp\Bitcoin\Block;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
-use Afk11\Bitcoin\Serializer\Block\HexBlockSerializer;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
 class BlockFactory
 {

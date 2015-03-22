@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script;
 
-use Afk11\Bitcoin\Key\PublicKeyFactory;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Script\ScriptFactory;
-use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Buffer;
 
 class ScriptTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->bufferType = 'Afk11\Bitcoin\Buffer';
+        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
     }
 
     public function setUp()
@@ -33,7 +33,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     public function testGetOpCodes()
     {
         $opCodes = $this->script->getOpCodes();
-        $this->assertInstanceOf('Afk11\Bitcoin\Script\Opcodes', $opCodes);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Opcodes', $opCodes);
     }
 
     public function testDefaultSerializeBinary()

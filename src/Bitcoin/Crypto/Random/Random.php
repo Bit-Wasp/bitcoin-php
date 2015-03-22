@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Crypto\Random;
+namespace BitWasp\Bitcoin\Crypto\Random;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Exceptions\RandomBytesFailure;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Exceptions\RandomBytesFailure;
 
 class Random implements RbgInterface
 {

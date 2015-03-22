@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Address;
+namespace BitWasp\Bitcoin\Address;
 
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Key\KeyInterface;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Key\KeyInterface;
 
 class PayToPubKeyHashAddress extends Address
 {

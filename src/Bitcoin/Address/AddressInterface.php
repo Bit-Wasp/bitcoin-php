@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Address;
+namespace BitWasp\Bitcoin\Address;
 
-use Afk11\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 
 interface AddressInterface
 {

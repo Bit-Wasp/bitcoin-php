@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin;
+namespace BitWasp\Bitcoin;
 
-use \Afk11\Bitcoin\Crypto\Hash;
-use \Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
+use \BitWasp\Bitcoin\Crypto\Hash;
+use \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 
 class Base58
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
 class KeyFactory

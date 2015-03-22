@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Block;
+namespace BitWasp\Bitcoin\Block;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\SerializableInterface;
 
 interface BlockHeaderInterface extends SerializableInterface
 {

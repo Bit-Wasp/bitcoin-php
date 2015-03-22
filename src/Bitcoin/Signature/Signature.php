@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Exceptions\SignatureNotCanonical;
+use \BitWasp\Bitcoin\Buffer;
+use \BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 
 class Signature implements SignatureInterface
 {
@@ -92,7 +92,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function getBuffer()
     {
@@ -102,7 +102,7 @@ class Signature implements SignatureInterface
     }
 
     /**
-     * @param \Afk11\Bitcoin\Buffer $sig
+     * @param \BitWasp\Bitcoin\Buffer $sig
      * @return bool
      * @throws SignatureNotCanonical
      */

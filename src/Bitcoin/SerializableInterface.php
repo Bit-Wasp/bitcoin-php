@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin;
+namespace BitWasp\Bitcoin;
 
 interface SerializableInterface
 {

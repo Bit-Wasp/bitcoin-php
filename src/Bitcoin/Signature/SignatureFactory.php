@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Serializer\Signature\DerSignatureSerializer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 
 class SignatureFactory
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Rpc\Client;
+namespace BitWasp\Bitcoin\Rpc\Client;
 
-use Afk11\Bitcoin\Block\BlockFactory;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\JsonRpc\JsonRpcClient;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
-use Afk11\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class Bitcoind
 {
@@ -50,7 +50,7 @@ class Bitcoind
 
     /**
      * @param $blockhash
-     * @return \Afk11\Bitcoin\Block\Block
+     * @return \BitWasp\Bitcoin\Block\Block
      */
     public function getblock($blockhash)
     {

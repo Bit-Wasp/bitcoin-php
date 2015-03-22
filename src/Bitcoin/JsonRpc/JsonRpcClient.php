@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\JsonRpc;
+namespace BitWasp\Bitcoin\JsonRpc;
 
-use Afk11\Bitcoin\Exceptions\JsonRpcError;
+use BitWasp\Bitcoin\Exceptions\JsonRpcError;
 use JsonRPC\Client;
 
 class JsonRpcClient extends Client

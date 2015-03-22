@@ -1,15 +1,15 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Script\ScriptInterface;
-use Afk11\Bitcoin\Transaction\TransactionInterface;
-use Afk11\Bitcoin\Transaction\TransactionInputCollection;
-use Afk11\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 
 class SignatureHash implements SignatureHashInterface
 {

@@ -1,19 +1,19 @@
 <?php
 
-namespace Afk11\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction;
 
-use \Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Crypto\Random\Random;
-use Afk11\Bitcoin\Crypto\Random\RbgInterface;
-use \Afk11\Bitcoin\Key\PrivateKeyInterface;
-use \Afk11\Bitcoin\Parser;
-use \Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use \Afk11\Bitcoin\Signature\Signature;
-use \Afk11\Bitcoin\Signature\SignatureHash;
-use Afk11\Bitcoin\Signature\Signer;
+use \BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
+use \BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use \BitWasp\Bitcoin\Parser;
+use \BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use \BitWasp\Bitcoin\Signature\Signature;
+use \BitWasp\Bitcoin\Signature\SignatureHash;
+use BitWasp\Bitcoin\Signature\Signer;
 
 class Transaction implements TransactionInterface
 {

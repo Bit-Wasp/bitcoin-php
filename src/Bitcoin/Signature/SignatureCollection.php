@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Signature;
 
-use Afk11\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class SignatureCollection implements \Countable
 {
@@ -101,7 +101,7 @@ class SignatureCollection implements \Countable
      *
      * @param int $start
      * @param int $length
-     * @return \Afk11\Bitcoin\Signature\SignatureCollection
+     * @return \BitWasp\Bitcoin\Signature\SignatureCollection
      */
     public function slice($start, $length)
     {
@@ -109,7 +109,7 @@ class SignatureCollection implements \Countable
     }
 
     /**
-     * @return \Afk11\Bitcoin\Buffer[]
+     * @return \BitWasp\Bitcoin\Buffer[]
      */
     public function getBuffer()
     {

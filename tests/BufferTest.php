@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Util;
+namespace BitWasp\Bitcoin\Tests\Util;
 
-use \Afk11\Bitcoin\Bitcoin;
-use \Afk11\Bitcoin\Buffer;
-use \Afk11\Bitcoin\Util\Math;
+use \BitWasp\Bitcoin\Bitcoin;
+use \BitWasp\Bitcoin\Buffer;
+use \BitWasp\Bitcoin\Util\Math;
 
 class BufferTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +20,7 @@ class BufferTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->bufferType = 'Afk11\Bitcoin\Buffer';
+        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
     }
 
     public function setUp()

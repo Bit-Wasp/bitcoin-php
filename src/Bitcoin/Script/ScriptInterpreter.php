@@ -1,19 +1,19 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Key\PublicKeyFactory;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
-use Afk11\Bitcoin\Signature\SignatureFactory;
-use Afk11\Bitcoin\Transaction\Transaction;
-use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Signature\Signature;
-use Afk11\Bitcoin\Exceptions\ScriptStackException;
-use Afk11\Bitcoin\Exceptions\ScriptRuntimeException;
-use Afk11\Bitcoin\Signature\Signer;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Signature\SignatureFactory;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Signature\Signature;
+use BitWasp\Bitcoin\Exceptions\ScriptStackException;
+use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
+use BitWasp\Bitcoin\Signature\Signer;
 use Mdanter\Ecc\GeneratorPoint;
 
 class ScriptInterpreter implements ScriptInterpreterInterface
@@ -208,7 +208,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @param Buffer $signature
      * @return bool
-     * @throws \Afk11\Bitcoin\Exceptions\SignatureNotCanonical
+     * @throws \BitWasp\Bitcoin\Exceptions\SignatureNotCanonical
      */
     public function checkSignatureEncoding(Buffer $signature)
     {

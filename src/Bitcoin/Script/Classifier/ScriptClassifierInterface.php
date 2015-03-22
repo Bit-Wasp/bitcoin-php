@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Script\Classifier;
+namespace BitWasp\Bitcoin\Script\Classifier;
 
 interface ScriptClassifierInterface
 {

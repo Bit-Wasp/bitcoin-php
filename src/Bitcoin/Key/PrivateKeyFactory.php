@@ -1,13 +1,13 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Crypto\Random\Random;
-use Afk11\Bitcoin\Exceptions\InvalidPrivateKey;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
-use Afk11\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
+use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyFactory
@@ -15,8 +15,8 @@ class PrivateKeyFactory
     /**
      * Generate a buffer containing a valid key
      *
-     * @return \Afk11\Bitcoin\Buffer
-     * @throws \Afk11\Bitcoin\Exceptions\RandomBytesFailure
+     * @return \BitWasp\Bitcoin\Buffer
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
     public static function generateSecret()
     {

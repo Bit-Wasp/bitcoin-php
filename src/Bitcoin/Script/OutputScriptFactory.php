@@ -1,11 +1,11 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Address\Address;
-use Afk11\Bitcoin\Address\ScriptHashAddress;
-use Afk11\Bitcoin\Key\PublicKeyInterface;
-use Afk11\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Address\Address;
+use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 
 class OutputScriptFactory
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Transaction;
+namespace BitWasp\Bitcoin\Tests\Transaction;
 
-use Afk11\Bitcoin\Network\Network;
-use Afk11\Bitcoin\Transaction\Transaction;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
-use Afk11\Bitcoin\Transaction\TransactionInput;
-use Afk11\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,7 +28,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function __construct()
     {
         $this->network = new Network('00', '05', '80');
-        $this->txType = 'Afk11\Bitcoin\Transaction\Transaction';
+        $this->txType = 'BitWasp\Bitcoin\Transaction\Transaction';
     }
 
     public function setUp()

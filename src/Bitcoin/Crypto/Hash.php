@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Crypto;
+namespace BitWasp\Bitcoin\Crypto;
 
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Buffer;
 
 /**
  * Class Hash

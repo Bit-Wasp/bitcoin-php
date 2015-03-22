@@ -1,14 +1,14 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Exceptions\Base58ChecksumFailure;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
-use Afk11\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
+use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use Mdanter\Ecc\GeneratorPoint;
 
 class HierarchicalKeyFactory

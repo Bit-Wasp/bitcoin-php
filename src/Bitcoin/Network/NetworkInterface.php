@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Network;
+namespace BitWasp\Bitcoin\Network;
 
 interface NetworkInterface
 {

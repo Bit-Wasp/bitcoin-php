@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Block;
+namespace BitWasp\Bitcoin\Tests\Block;
 
-use Afk11\Bitcoin\Block\BlockHeaderFactory;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Block\BlockHeader;
-use Afk11\Bitcoin\Block\BlockHeaderInterface;
+use BitWasp\Bitcoin\Block\BlockHeaderFactory;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Block\BlockHeader;
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
 class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,8 +27,8 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->headerType = 'Afk11\Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'Afk11\Bitcoin\Buffer';
+        $this->headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
+        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
     }
 
     private function getGenesisHex()
@@ -159,7 +159,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Afk11\Bitcoin\Exceptions\ParserOutOfRange
+     * @expectedException \BitWasp\Bitcoin\Exceptions\ParserOutOfRange
      * @expectedExceptionMessage Failed to extract full block header from parser
      */
     public function testFromParserFailure()

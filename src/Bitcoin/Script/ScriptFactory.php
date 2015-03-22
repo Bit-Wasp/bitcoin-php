@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Buffer;
 
 class ScriptFactory
 {
@@ -16,7 +16,7 @@ class ScriptFactory
 
     /**
      * @param $m
-     * @param \Afk11\Bitcoin\Key\KeyInterface[] $keys
+     * @param \BitWasp\Bitcoin\Key\KeyInterface[] $keys
      * @return Script
      */
     public static function multisig($m, array $keys = array())

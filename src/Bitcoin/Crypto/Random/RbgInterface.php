@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Crypto\Random;
+namespace BitWasp\Bitcoin\Crypto\Random;
 
 interface RbgInterface
 {
@@ -8,7 +8,7 @@ interface RbgInterface
      * Return $numBytes bytes deterministically derived from a seed
      *
      * @param int $numNumBytes
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function bytes($numNumBytes);
 }

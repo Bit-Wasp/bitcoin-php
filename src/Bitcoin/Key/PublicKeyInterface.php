@@ -1,6 +1,6 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
 interface PublicKeyInterface extends KeyInterface
 {

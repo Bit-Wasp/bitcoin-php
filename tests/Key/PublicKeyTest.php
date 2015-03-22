@@ -1,10 +1,10 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Key;
+namespace BitWasp\Bitcoin\Tests\Key;
 
-use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 
 class PublicKeyTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +18,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->publicKey = null;
-        $this->publicType = 'Afk11\Bitcoin\Key\PublicKey';
+        $this->publicType = 'BitWasp\Bitcoin\Key\PublicKey';
     }
 
     public function testFromHex()

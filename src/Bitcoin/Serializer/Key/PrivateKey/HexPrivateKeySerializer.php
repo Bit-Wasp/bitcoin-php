@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Key\PrivateKey;
+namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Key\PrivateKey;
-use Afk11\Bitcoin\Key\PrivateKeyInterface;
-use Afk11\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Key\PrivateKey;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
 class HexPrivateKeySerializer

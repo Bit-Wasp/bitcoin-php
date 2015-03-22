@@ -1,13 +1,13 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Transaction;
+namespace BitWasp\Bitcoin\Tests\Transaction;
 
-use Afk11\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
-use Afk11\Bitcoin\Transaction\TransactionInput;
-use Afk11\Bitcoin\Transaction\TransactionInputInterface;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Buffer;
 
 class TransactionInputTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,8 +22,8 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->baseType = 'Afk11\Bitcoin\Transaction\TransactionInput';
-        $this->scriptType = 'Afk11\Bitcoin\Script\Script';
+        $this->baseType = 'BitWasp\Bitcoin\Transaction\TransactionInput';
+        $this->scriptType = 'BitWasp\Bitcoin\Script\Script';
     }
 
     public function setUp()

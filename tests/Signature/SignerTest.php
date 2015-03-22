@@ -1,15 +1,15 @@
 <?php
 
-namespace Afk11\Bitcoin\Tests\Signature;
+namespace BitWasp\Bitcoin\Tests\Signature;
 
-use Afk11\Bitcoin\Crypto\Random\Random;
-use Afk11\Bitcoin\Crypto\Random\Rfc6979;
-use Afk11\Bitcoin\Key\PrivateKeyFactory;
-use Afk11\Bitcoin\Signature\Signature;
-use Afk11\Bitcoin\Signature\Signer;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Signature\Signature;
+use BitWasp\Bitcoin\Signature\Signer;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Hash;
 
 /**
  * Class SignatureTest
@@ -24,7 +24,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->sigType = 'Afk11\Bitcoin\Signature\Signature';
+        $this->sigType = 'BitWasp\Bitcoin\Signature\Signature';
         $this->math = Bitcoin::getMath();
         $this->generator = Bitcoin::getGenerator();
     }
@@ -37,7 +37,7 @@ class SignerTest extends \PHPUnit_Framework_TestCase
 
         $json = json_decode($f);
 
-        $signer = new \Afk11\Bitcoin\Signature\Signer($this->math, $this->generator, true);
+        $signer = new \BitWasp\Bitcoin\Signature\Signer($this->math, $this->generator, true);
 
         foreach ($json->test as $c => $test) {
             $privateKey = PrivateKeyFactory::fromHex($test->privKey, false, $this->math, $this->generator);

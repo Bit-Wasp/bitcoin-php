@@ -1,12 +1,12 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Transaction;
+namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Script\Script;
-use Afk11\Bitcoin\Transaction\TransactionInput;
-use Afk11\Bitcoin\Transaction\TransactionInputInterface;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 
 class TransactionInputSerializer
 {
@@ -28,7 +28,7 @@ class TransactionInputSerializer
     /**
      * @param Parser $parser
      * @return TransactionInput
-     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \BitWasp\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser & $parser)
     {
@@ -43,7 +43,7 @@ class TransactionInputSerializer
     /**
      * @param $string
      * @return TransactionInput
-     * @throws \Afk11\Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \BitWasp\Bitcoin\Exceptions\ParserOutOfRange
      */
     public function parse($string)
     {

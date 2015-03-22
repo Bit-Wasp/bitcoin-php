@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key;
 
-use Afk11\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 
 interface PrivateKeyInterface extends KeyInterface
 {

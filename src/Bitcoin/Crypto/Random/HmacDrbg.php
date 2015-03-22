@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Crypto\Random;
+namespace BitWasp\Bitcoin\Crypto\Random;
 
-use Afk11\Bitcoin\Crypto\Hash;
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Buffer;
 use Mdanter\Ecc\GeneratorPoint;
 
 class HmacDrbg implements RbgInterface
@@ -32,8 +32,8 @@ class HmacDrbg implements RbgInterface
      * Construct a HMAC deterministic byte generator.
      *
      * @param string $algo
-     * @param \Afk11\Bitcoin\Buffer $entropy
-     * @param \Afk11\Bitcoin\Buffer $personalString
+     * @param \BitWasp\Bitcoin\Buffer $entropy
+     * @param \BitWasp\Bitcoin\Buffer $personalString
      */
     public function __construct($algo, Buffer $entropy, Buffer $personalString = null)
     {
@@ -47,8 +47,8 @@ class HmacDrbg implements RbgInterface
 
     /**
      * Initialize the DRBG with the given $entropy and $personalString
-     * @param \Afk11\Bitcoin\Buffer $entropy
-     * @param \Afk11\Bitcoin\Buffer $personalString
+     * @param \BitWasp\Bitcoin\Buffer $entropy
+     * @param \BitWasp\Bitcoin\Buffer $personalString
      * @return $this
      */
     public function initialize(Buffer $entropy, Buffer $personalString = null)
@@ -109,7 +109,7 @@ class HmacDrbg implements RbgInterface
     /**
      * Reseed the DRBG with new entropy, and reset the counter.
      *
-     * @param \Afk11\Bitcoin\Buffer $entropy
+     * @param \BitWasp\Bitcoin\Buffer $entropy
      */
     public function reseed(Buffer $entropy)
     {
@@ -131,7 +131,7 @@ class HmacDrbg implements RbgInterface
      * Load $numBytes bytes from the DRBG
      *
      * @param int $numNumBytes
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function bytes($numNumBytes)
     {

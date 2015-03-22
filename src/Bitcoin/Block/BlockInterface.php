@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Block;
+namespace BitWasp\Bitcoin\Block;
 
-use Afk11\Bitcoin\SerializableInterface;
-use Afk11\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\Transaction\TransactionCollection;
 
 interface BlockInterface extends SerializableInterface
 {

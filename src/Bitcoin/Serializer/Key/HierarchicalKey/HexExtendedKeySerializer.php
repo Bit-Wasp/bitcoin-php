@@ -1,15 +1,15 @@
 <?php
 
 
-namespace Afk11\Bitcoin\Serializer\Key\HierarchicalKey;
+namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
-use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
-use Afk11\Bitcoin\Key\PrivateKeyFactory;
-use Afk11\Bitcoin\Key\PublicKeyFactory;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Key\HierarchicalKey;
+use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Key\HierarchicalKey;
 use Mdanter\Ecc\GeneratorPoint;
 
 class HexExtendedKeySerializer
@@ -72,7 +72,7 @@ class HexExtendedKeySerializer
 
     /**
      * @param HierarchicalKey $key
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function serialize(HierarchicalKey $key)
     {

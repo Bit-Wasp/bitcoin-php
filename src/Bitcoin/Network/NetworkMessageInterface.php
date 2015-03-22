@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Network;
+namespace BitWasp\Bitcoin\Network;
 
-use Afk11\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\SerializableInterface;
 
 interface NetworkMessageInterface extends SerializableInterface
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Afk11\Bitcoin\Address;
+namespace BitWasp\Bitcoin\Address;
 
-use Afk11\Bitcoin\Base58;
-use Afk11\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 
 abstract class Address implements AddressInterface
 {

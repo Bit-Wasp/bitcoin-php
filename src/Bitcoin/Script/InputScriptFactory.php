@@ -1,14 +1,14 @@
 <?php
 
-namespace Afk11\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Script\Classifier\InputClassifier;
-use Afk11\Bitcoin\Signature\SignatureCollection;
-use Afk11\Bitcoin\Signature\SignatureInterface;
-use Afk11\Bitcoin\Key\PublicKeyInterface;
-use Afk11\Bitcoin\Signature\Signer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
+use BitWasp\Bitcoin\Signature\SignatureCollection;
+use BitWasp\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Signature\Signer;
 
 class InputScriptFactory
 {

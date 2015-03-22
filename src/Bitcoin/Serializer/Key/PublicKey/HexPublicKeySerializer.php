@@ -1,11 +1,11 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Key\PublicKey;
+namespace BitWasp\Bitcoin\Serializer\Key\PublicKey;
 
-use Afk11\Bitcoin\Buffer;
-use Afk11\Bitcoin\Key\PublicKey;
-use Afk11\Bitcoin\Key\PublicKeyInterface;
-use Afk11\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
 class HexPublicKeySerializer

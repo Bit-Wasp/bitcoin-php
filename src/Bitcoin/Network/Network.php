@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Network;
+namespace BitWasp\Bitcoin\Network;
 
-use Afk11\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Crypto\Hash;
 
 class Network implements NetworkInterface
 {

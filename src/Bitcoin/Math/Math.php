@@ -1,8 +1,8 @@
 <?php
 
-namespace Afk11\Bitcoin\Math;
+namespace BitWasp\Bitcoin\Math;
 
-use Afk11\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Buffer;
 use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\NumberTheory;

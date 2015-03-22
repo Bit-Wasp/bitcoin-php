@@ -2,10 +2,10 @@
 
 namespace Address;
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Key\PublicKeyFactory;
-use Afk11\Bitcoin\Network\NetworkInterface;
-use Afk11\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use Symfony\Component\Yaml\Yaml;
 
 class AddressTest extends \PHPUnit_Framework_TestCase

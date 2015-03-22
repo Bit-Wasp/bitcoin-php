@@ -1,13 +1,13 @@
 <?php
 
-namespace Afk11\Bitcoin\Serializer\Block;
+namespace BitWasp\Bitcoin\Serializer\Block;
 
-use Afk11\Bitcoin\Block\Block;
-use Afk11\Bitcoin\Exceptions\ParserOutOfRange;
-use Afk11\Bitcoin\Math\Math;
-use Afk11\Bitcoin\Parser;
-use Afk11\Bitcoin\Block\BlockInterface;
-use Afk11\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
+use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Block\BlockInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
 
 class HexBlockSerializer
 {
@@ -69,7 +69,7 @@ class HexBlockSerializer
 
     /**
      * @param BlockInterface $block
-     * @return \Afk11\Bitcoin\Buffer
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function serialize(BlockInterface $block)
     {
