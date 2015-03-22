@@ -48,7 +48,7 @@ interface TransactionInputInterface
     /**
      * @return TransactionOutputInterface
      */
-    public function getPrevOutput();
+    public function getOutputScript();
 
     /**
      * Check whether the txid is for a coinbase transaction

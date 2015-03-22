@@ -62,7 +62,7 @@ class TransactionBuilder
         $output = $tx->getOutputs()->getOutput($outputToSpend);
 
         $input = new TransactionInput($tx->getTransactionId(), $outputToSpend);
-        $input->setPrevOutput($output);
+        $input->setOutputScript($output->getScript());
 
         $this->transaction->getInputs()->addInput($input);
         $this->inputSigs[count($this->transaction->getInputs()) - 1] = new SignatureCollection();
@@ -142,17 +142,14 @@ class TransactionBuilder
 
         $input = $this->transaction->getInputs()->getInput($inputToSign);
         // Parse
-        $output = $input->getPrevOutput();
-        if ($output === null) {
-            throw new \RuntimeException("PrevOutput was not set for input $inputToSign");
-        }
+        $outputScript = $input->getOutputScript();
 
-        $prevOutType = new OutputClassifier($output->getScript());
-        $parse = $output->getScript()->getScriptParser()->parse();
+        $prevOutType = new OutputClassifier($outputScript);
+        $parse = $outputScript->getScriptParser()->parse();
         $signatureHash = $this->transaction->signatureHash();
 
         if ($prevOutType->isPayToPublicKeyHash() && $parse[2] == $privateKey->getPubKeyHash()) {
-            $hash = $signatureHash->calculate($output->getScript(), $inputToSign, $sigHashType);
+            $hash = $signatureHash->calculate($outputScript, $inputToSign, $sigHashType);
             $signature = $this->sign($privateKey, $hash);
             $script = ScriptFactory::scriptSig()->payToPubKeyHash($signature, $privateKey->getPublicKey());
         } else if ($prevOutType->isPayToScriptHash() && $parse[1] == $redeemScript->getScriptHash()) {

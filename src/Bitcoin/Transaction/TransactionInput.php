@@ -30,9 +30,9 @@ class TransactionInput implements TransactionInputInterface
     protected $script;
 
     /**
-     * @var TransactionOutputInterface
+     * @var ScriptInterface
      */
-    protected $prevOutput;
+    protected $outputScript;
 
     /**
      * @param string|null $txid
@@ -138,21 +138,24 @@ class TransactionInput implements TransactionInputInterface
     }
 
     /**
-     * @param TransactionOutput $output
+     * @param ScriptInterface $script
      * @return $this
      */
-    public function setPrevOutput(TransactionOutput $output)
+    public function setOutputScript(ScriptInterface $script)
     {
-        $this->prevOutput = $output;
+        $this->outputScript = $script;
         return $this;
     }
 
     /**
      * @return ScriptInterface
      */
-    public function getPrevOutput()
+    public function getOutputScript()
     {
-        return $this->prevOutput;
+        if ($this->outputScript === null) {
+            throw new \RuntimeException('Output script was not set');
+        }
+        return $this->outputScript;
     }
 
     /**
