@@ -18,7 +18,7 @@
         <mkdir dir="${project.basedir}/build/docs/code-coverage" />
         <exec executable="${project.basedir}/bin/phpunit" passthru="true">
             <arg value="-c" />
-            <arg path="${project.basedir}/build" />
+            <arg path="${project.basedir}" />
             <arg value="--debug" />
         </exec>
     </target>
