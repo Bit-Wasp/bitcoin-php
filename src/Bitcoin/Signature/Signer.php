@@ -110,7 +110,7 @@ class Signer implements SignerInterface
         }
 
         // if s < n/2
-        if ($this->lowSignatures && $this->math->cmp($s, $this->math->div($n, 2)) > 0) {
+        if ($this->math->cmp($s, $this->math->div($n, 2)) > 0) {
             $s = $this->math->sub($n, $s);
         }
 
