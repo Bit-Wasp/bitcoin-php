@@ -30,6 +30,8 @@ class HexExtendedKeySerializer
     private $generator;
 
     /**
+     * @param Math $math
+     * @param GeneratorPoint $generator
      * @param NetworkInterface $network
      * @throws \Exception
      */
