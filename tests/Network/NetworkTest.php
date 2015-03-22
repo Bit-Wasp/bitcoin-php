@@ -109,16 +109,6 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         return NetworkFactory::bitcoin();
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage No HD xpriv byte was set
-     */
-    public function testGetHDPrivByteException()
-    {
-        $this->network = new Network('00', '05', '80', true);
-        $this->network->getHDPrivByte();
-    }
-
     public function testFactoryPresets()
     {
         $p2sh = new ScriptHashAddress("3399bc19f2b20473d417e31472c92947b59f95f8");

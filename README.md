@@ -1,15 +1,18 @@
 
 ##Bitcoin
 =======
-[![Build Status](https://scrutinizer-ci.com/g/afk11/bitcoin/badges/build.png?b=master)](https://scrutinizer-ci.com/g/afk11/bitcoin/build-status/master)
-[![Code Coverage](https://scrutinizer-ci.com/g/afk11/bitcoin/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/afk11/bitcoin/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/afk11/bitcoin/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/afk11/bitcoin/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/build-status/master)
+[![Code Coverage](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/?branch=master)
  
-## Requirements
+## Requirements:
  * PHP 5.4+
  * Composer
  * ext-gmp
  * ext-mcrypt
+
+## Optional:
+ * [[secp256k1-php](https://github.com/Bit-Wasp/secp256k1-php)] - Install the secp256k1 PHP extension. Blazing speeds, but bleeding edge, beware.
 
 ##Installation
 You can install this library via Composer:
@@ -22,6 +25,7 @@ or
 ##Presently supported:
 
  - Blocks, block headers, basic mining, difficulty calculations
+ - P2SH, Multisignature scripts.
  - ECDSA key creation, public & private key types. 
  - Transactions
  - Signature creation & verification 
@@ -30,6 +34,7 @@ or
  - Script builder, parser
  - RPC bindings to Bitcoin Core's RPC, getting OOP responses :)
  - Easy serialization to binary representation of most classes
+ - SIGHASH types when creating transactions (not tested)
 
 ##Todo:
   - TransactionBuilder
@@ -39,6 +44,10 @@ or
   - P2P
   - EC Adapter to work with either phpecc or secp256k1-php
   
+## Implemented BIPs
+  - BIP0016
+  - BIP0032
+
 # Examples  
 ## Generate private keys
 ```
