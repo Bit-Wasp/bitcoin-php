@@ -1,5 +1,5 @@
 {
-  "name": "afk11/bitcoin",
+  "name": "bitwasp/bitcoin",
   "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
   "type": "library",
   "homepage": "https://github.com/afk11/bitcoin",
@@ -13,8 +13,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "Afk11\\Bitcoin\\": "src/Bitcoin/",
-      "Afk11\\Bitcoin\\Tests\\": "tests/"
+      "BitWasp\\Bitcoin\\": "src/Bitcoin/",
+      "BitWasp\\Bitcoin\\Tests\\": "tests/"
     }
   },
   "minimum-stability": "dev",
