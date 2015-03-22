@@ -41,12 +41,12 @@ interface TransactionInputInterface
 
     /**
      * @param ScriptInterface $script
-     * @return mixed
+     * @return $this
      */
     public function setScript(ScriptInterface $script);
 
     /**
-     * @return TransactionOutputInterface
+     * @return ScriptInterface $script
      */
     public function getOutputScript();
 

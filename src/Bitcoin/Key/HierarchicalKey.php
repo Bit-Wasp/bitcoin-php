@@ -421,6 +421,9 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     public function decodePath($path)
     {
         $pathPieces = explode("/", $path);
+        if (count($pathPieces) == 0) {
+            throw new \InvalidArgumentException('Invalid path passed to decodePath()');
+        }
         $newPath = array();
 
         foreach ($pathPieces as $c => $sequence) {

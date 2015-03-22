@@ -150,13 +150,26 @@ class HierarchicalKeyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * This tests that a network always must have the HD priv/pub bytes
      * @expectedException \Exception
+     */
+    public function testCreateWithInvalidNetworkHDBytes()
+    {
+        $network = new Network('ff', 'ff', 'ff');
+        $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
+        HierarchicalKeyFactory::fromExtended($key, $network);
+    }
+
+    /**
+     * This tests if the key being decoded has bytes which match the network.
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage  HD key magic bytes do not match network magic bytes
      */
     public function testCreateWithInvalidNetwork()
     {
-        $network = new Network('ff', 'ff', 'ff');
-        $network->setHDPrivByte('ffffffff')
-                ->setHDPubByte('ffffffff');
+        $network = NetworkFactory::create('ff','ff','ff')
+            ->setHDPrivByte('ffffffff')
+            ->setHDPubByte('ffffffff');
 
         $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
         HierarchicalKeyFactory::fromExtended($key, $network);

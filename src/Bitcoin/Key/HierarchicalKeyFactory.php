@@ -67,16 +67,16 @@ class HierarchicalKeyFactory
     }
 
     /**
-     * @param string           $extendedKey
+     * @param $extendedKey
      * @param NetworkInterface $network
-     * @param Math             $math
-     * @param GeneratorPoint   $generator
+     * @param Math $math
+     * @param GeneratorPoint $generator
      * @return HierarchicalKey
      */
     public static function fromExtended($extendedKey, NetworkInterface $network = null, Math $math = null, GeneratorPoint $generator = null)
     {
-        $network = $network ?: Bitcoin::getNetwork();
         $math = $math ?: Bitcoin::getMath();
+        $network = $network ?: Bitcoin::getNetwork();
         $generator = $generator ?: Bitcoin::getGenerator();
 
         $extSerializer = self::getSerializer($math, $generator, $network);
