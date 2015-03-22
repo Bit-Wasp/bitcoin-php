@@ -9,7 +9,7 @@ use Mdanter\Ecc\GeneratorPoint;
 class EcAdapterFactory
 {
     /**
-     * @var PhpEcc|Secp256k1
+     * @var EcAdapterInterface
      */
     private static $adapter;
 

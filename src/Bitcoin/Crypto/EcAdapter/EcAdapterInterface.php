@@ -16,7 +16,7 @@ interface EcAdapterInterface
      * @param PrivateKeyInterface $privateKey
      * @param Buffer $messageHash
      * @param RbgInterface $rbg
-     * @return mixed
+     * @return SignatureInterface
      */
     public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null);
 
@@ -24,35 +24,35 @@ interface EcAdapterInterface
      * @param PublicKeyInterface $publicKey
      * @param SignatureInterface $signature
      * @param Buffer $messageHash
-     * @return mixed
+     * @return bool
      */
     public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash);
 
     /**
      * @param PublicKeyInterface $publicKey
      * @param $scalar
-     * @return mixed
+     * @return PublicKeyInterface
      */
     public function publicKeyAdd(PublicKeyInterface $publicKey, $scalar);
 
     /**
      * @param PublicKeyInterface $publicKey
      * @param $scalar
-     * @return mixed
+     * @return PublicKeyInterface
      */
     public function publicKeyMul(PublicKeyInterface $publicKey, $scalar);
 
     /**
      * @param PrivateKeyInterface $publicKey
      * @param $scalar
-     * @return mixed
+     * @return PrivateKeyInterface
      */
     public function privateKeyAdd(PrivateKeyInterface $publicKey, $scalar);
 
     /**
      * @param PrivateKeyInterface $publicKey
      * @param $scalar
-     * @return mixed
+     * @return PrivateKeyInterface
      */
     public function privateKeyMul(PrivateKeyInterface $publicKey, $scalar);
 }

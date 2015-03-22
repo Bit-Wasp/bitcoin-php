@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -31,6 +33,11 @@ class Bitcoin
      * @var NetworkInterface
      */
     private static $network;
+
+    /**
+     * @var EcAdapterInterface
+     */
+    private static $ecAdapter;
 
     /**
      * @return Math
@@ -63,6 +70,27 @@ class Bitcoin
     public static function setGenerator(GeneratorPoint $generator)
     {
         self::$generator = $generator;
+    }
+
+    /**
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @return EcAdapterInterface
+     */
+    public static function getEcAdapter(Math $math = null, GeneratorPoint $generator = null)
+    {
+        return self::$ecAdapter ?: EcAdapterFactory::getAdapter(
+            ($math ?: self::getMath()),
+            ($generator ?: self::getGenerator())
+        );
+    }
+
+    /**
+     * @param EcAdapterInterface $adapter
+     */
+    public static function setEcAdapter(EcAdapterInterface $adapter)
+    {
+        self::$ecAdapter = $adapter;
     }
 
     /**
