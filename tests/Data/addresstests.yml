@@ -1,0 +1,53 @@
+test: addresses
+
+scriptHash:
+  -
+    script: 5241044da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126da0a0909f11998130c2d0e86a485f4e79ee466a183a476c432c68758ab9e630b21034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f312652ae
+    hash:
+    address: 3PtHjHgYUriunbjbSHwbAv14vW84JpqNTT
+  -
+    script: 5221029e3d7fd25bb7fdd0b436ae25d3eb28102b3eb87dc7f2106a9eec0c9af7cf87c321034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f312652ae
+    hash:
+    address: 3PUHgigznMRFRyJBaiVBbgMkDtdQvbCmU3
+  -
+    script: 5121029e3d7fd25bb7fdd0b436ae25d3eb28102b3eb87dc7f2106a9eec0c9af7cf87c321034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126210388a7bacc0ef2682dd7be3a76513d16c5bdaefc112abd88850fbef3ad96afd69753ae
+    hash:
+    address: 3LY4ZncvH35WpXNX5QHkHHSgTUqqsb2Leb
+  -
+    script: 5221029e3d7fd25bb7fdd0b436ae25d3eb28102b3eb87dc7f2106a9eec0c9af7cf87c321034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126210388a7bacc0ef2682dd7be3a76513d16c5bdaefc112abd88850fbef3ad96afd6974104688af5940d901048961c96da11074008e83e5dd6fd6bcd8b4a882ecdf011ddb4b418d28a62e6516a822843f564cd0fc002e34bcbd0ccb0fd5ec2f4ca2c952ba154ae
+    hash:
+    address: 3FRuhpwYaT7fyXQwv3sAKFdCadiBkgokHG
+
+pubKeyHash:
+  -
+    publickey: 044da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126da0a0909f11998130c2d0e86a485f4e79ee466a183a476c432c68758ab9e630b
+    hash: b4a5d3960471568c3883046eec3b41b4953d61a1
+    address: 1HUBHMij46Hae75JPdWjeZ5Q7KaL7EFRSD
+  -
+    publickey: 034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126
+    hash: 27c174814a244a65acebd30d74fa8d7237984729
+    address: 14dD6ygPi5WXdwwBTt1FBZK3aD8uDem1FY
+  -
+    publickey: 0388a7bacc0ef2682dd7be3a76513d16c5bdaefc112abd88850fbef3ad96afd697
+    hash: d5adafee36e35397ee7dadf844ceb075bdd8c58b
+    address: 1LUpzrtLpbXkZXnaGZ3ZpWnyF3WCjbPbq7
+  -
+    publickey: 0423542d61708e3fc48ba78fbe8fcc983ba94a520bc33f82b8e45e51dbc47af2726bcf181925eee1bdd868b109314f3ea92a6fc23d6b66057d3acfba04d6b08b58
+    hash: e8fdc3b4b312ee8725fab4937901752704ede7f4
+    address: 1NEwmNSC7w9nZeASngHCd43Bc5eC2FmXpn
+  -
+    publickey: 029e3d7fd25bb7fdd0b436ae25d3eb28102b3eb87dc7f2106a9eec0c9af7cf87c3
+    hash: a2808b455871186ebea5a7d6a00aef2313eb762f
+    address: 1FpETUP85TZ76pD7jyEzu2KroekPu2SkEs
+  -
+    publickey: 04dcce6a0ef36861a2263be3d23c96fafa795117ce0afd627a3a0d1e5edc03d32f6ad730a7c48d194f09e8d946b6048c3638acafd7cf9340de8f104b28cb6033b1
+    hash: 5b6b897dcd00f46f600c96ef31a9ba545e3da0a3
+    address: 19LPKGHhiD8agTCTZfX58y8rfmicqZKkmT
+  -
+    publickey: 037c9e97ba4f0e3b0e45b5ad27101b1793f33225097e3358fe25d3d4d9700ffc96
+    hash: 3ca496a7aa2cb22d25f5e7a16162228453560a4e
+    address: 16XeiKW7tHLN3wSEg6wUegjgDjn9P7Kgmr
+  -
+    publickey: 04688af5940d901048961c96da11074008e83e5dd6fd6bcd8b4a882ecdf011ddb4b418d28a62e6516a822843f564cd0fc002e34bcbd0ccb0fd5ec2f4ca2c952ba1
+    hash: 33b5ea4cee854383bb1ef23223af8544351dc148
+    address: 15iRPUaoGPkxAdsR9Pg7amifytRj7h1nJf

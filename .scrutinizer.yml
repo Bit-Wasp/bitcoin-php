@@ -1,0 +1,25 @@
+filter:
+    excluded_paths: [vendor/*, build/*, tests/*]
+
+before_commands:
+    - "composer install --prefer-source --no-dev"
+
+tools:
+    php_cpd: true
+    php_pdepend: true
+    php_analyzer: true
+    php_sim: true
+    php_changetracking: true
+    php_mess_detector: true
+    php_code_sniffer: true
+    sensiolabs_security_checker: true
+    php_code_coverage: true
+    php_pdepend:
+        excluded_dirs: [vendor, build, tests]
+    external_code_coverage:
+        timeout: 1800
+        runs: 1
+
+changetracking:
+    bug_patterns: ["\bfix(?:es|ed)?\b"]
+    feature_patterns: ["\badd(?:s|ed)?\b", "\bimplement(?:s|ed)?\b"]

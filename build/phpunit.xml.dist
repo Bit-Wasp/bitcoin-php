@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    bootstrap="../vendor/autoload.php"
+    colors="true">
+    <testsuites>
+        <testsuite name="All tests">
+            <directory>../tests/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>../src</directory>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="docs/code-coverage"/>
+        <log type="coverage-clover" target="docs/clover.xml"/>
+    </logging>
+</phpunit>

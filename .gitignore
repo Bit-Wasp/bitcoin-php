@@ -1,0 +1,10 @@
+test.php
+vendor
+bin/*
+.idea
+*~
+composer.lock
+build/docs/*
+build/logs/*
+build/cache/*
+build/cache/lint.cache

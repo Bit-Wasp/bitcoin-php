@@ -1,0 +1,20 @@
+{
+  "test":[
+    {
+      "data": "abcd",
+      "algo": "sha512",
+      "salt": "abcd",
+      "iterations": 25432,
+      "length": 128,
+      "result": "894576533fd8a2a3dec4f2f62b347cb461a43e22b25f6a121f93b69365764241aa397fcdddb48ad80b967ffad3884fc900d3c9d7ffc3193e9a0d9751ee0929cd0d451dafdb143372c9f0dda483cf9ff822d99e959ea7f264c6f973fc101b087cc886a55e94dae09eb2a0da2b261d4c763b3ec0ebe0f58a8ef08db6aada834498"
+    },
+    {
+      "data": "password",
+      "algo": "sha256",
+      "salt": "salt",
+      "iterations": 1,
+      "length": 20,
+      "result": "120fb6cffcf8b32c43e7225256c4f837a86548c9"
+    }
+  ]
+}

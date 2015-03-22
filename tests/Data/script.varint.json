@@ -1,0 +1,12 @@
+{
+    "test":[
+        {
+            "script": "76a914d971bdb71f73240137d6b461622eb8b4f364f30088ac",
+            "varint": "19"
+        },
+        {
+            "script": "4104e9a20f0c8f79dcab06a98e33a3ccf1264ad6921b7f6d69782872b753e1cb1399fdf24299f9683ad00ed904b9d88b79bed9b467df56ad7af44e33cd5091c62917ac",
+            "varint": "43"
+        }
+    ]
+}

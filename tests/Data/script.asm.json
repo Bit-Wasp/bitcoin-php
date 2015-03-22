@@ -1,0 +1,40 @@
+{
+    "test":[
+        {
+            "script": "76a914d971bdb71f73240137d6b461622eb8b4f364f30088ac",
+            "asm": "OP_DUP OP_HASH160 d971bdb71f73240137d6b461622eb8b4f364f300 OP_EQUALVERIFY OP_CHECKSIG"
+        },
+        {
+            "script": "4104e9a20f0c8f79dcab06a98e33a3ccf1264ad6921b7f6d69782872b753e1cb1399fdf24299f9683ad00ed904b9d88b79bed9b467df56ad7af44e33cd5091c62917ac",
+            "asm": "04e9a20f0c8f79dcab06a98e33a3ccf1264ad6921b7f6d69782872b753e1cb1399fdf24299f9683ad00ed904b9d88b79bed9b467df56ad7af44e33cd5091c62917 OP_CHECKSIG"
+        },
+        {
+            "script": "a9140f9947c2b0fdd82ef3153232ee23d5c0bed84a0287",
+            "asm": "OP_HASH160 0f9947c2b0fdd82ef3153232ee23d5c0bed84a02 OP_EQUAL"
+        },
+        {
+            "script": "2102fa2342a45d6bb57d3e0b69021cec1bae3e7eba706f11be6bdf96de31cf0783e0ac",
+            "asm": "02fa2342a45d6bb57d3e0b69021cec1bae3e7eba706f11be6bdf96de31cf0783e0 OP_CHECKSIG"
+        },
+        {
+            "script": "512102fa2342a45d6bb57d3e0b69021cec1bae3e7eba706f11be6bdf96de31cf0783e02102fa2342a45d6bb57d3e0b69021cec1bae3e7eba706f11be6bdf96de31cf0783e052ae",
+            "asm": "OP_1 02fa2342a45d6bb57d3e0b69021cec1bae3e7eba706f11be6bdf96de31cf0783e 02fa2342a45d6bb57d3e0b69021cec1bae3e7eba706f11be6bdf96de31cf0783e OP_2 OP_CHECKMULTISIG"
+        },
+        {
+            "script": "6a260f9947c2b0fdd82ef3153232ee23d5c0bed84a020f9947c2b0fdd82ef3153232ee23d5c0bed8",
+            "asm": "OP_RETURN 0f9947c2b0fdd82ef3153232ee23d5c0bed84a020f9947c2b0fdd82ef3153232ee23d5c0bed8"
+        },
+        {
+            "script": "76a90088ac",
+            "asm": "OP_DUP OP_HASH160 OP_0 OP_EQUALVERIFY OP_CHECKSIG"
+        },
+        {
+            "script": "6a280f9947c2b0fdd82ef3153232ee23d5c0bed84a020f9947c2b0fdd82ef3153232ee23d5c0bed84a02",
+            "asm": "OP_RETURN 0f9947c2b0fdd82ef3153232ee23d5c0bed84a020f9947c2b0fdd82ef3153232ee23d5c0bed84a02"
+        },
+        {
+            "script": "736372697074",
+            "asm": "OP_IFDUP OP_IF OP_2SWAP OP_VERIFY OP_2OVER OP_DEPTH"
+        }
+    ]
+}

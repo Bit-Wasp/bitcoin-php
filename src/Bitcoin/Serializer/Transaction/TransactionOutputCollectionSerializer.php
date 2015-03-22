@@ -1,0 +1,70 @@
+<?php
+
+namespace BitWasp\Bitcoin\Serializer\Transaction;
+
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+
+class TransactionOutputCollectionSerializer
+{
+    /**
+     * @var TransactionOutputSerializer
+     */
+    private $outputSerializer;
+
+    /**
+     * @param TransactionOutputSerializer $outputSerializer
+     */
+    public function __construct(TransactionOutputSerializer $outputSerializer)
+    {
+        $this->outputSerializer = $outputSerializer;
+    }
+
+    /**
+     * @param TransactionOutputCollection $outputs
+     * @return array
+     */
+    public function serialize(TransactionOutputCollection $outputs)
+    {
+        $outputArray = array();
+        foreach ($outputs->getOutputs() as $output) {
+            $outputArray[] = $this->outputSerializer->serialize($output);
+        }
+
+        return $outputArray;
+    }
+
+    /**
+     * @param Parser $parser
+     * @return TransactionOutputCollection
+     */
+    public function fromParser(Parser & $parser)
+    {
+        $outputs = new TransactionOutputCollection;
+        $outputs->addOutputs(
+            $parser->getArray(
+                function () use (&$parser) {
+                    $output = new \BitWasp\Bitcoin\Transaction\TransactionOutput();
+                    $output
+                        ->setValue($parser->readBytes(8, true)->serialize('int'))
+                        ->setScript(new Script($parser->getVarString()));
+                    return $output;
+                }
+            )
+        );
+
+        return $outputs;
+    }
+
+    /**
+     * @param $string
+     * @return TransactionOutputCollection
+     */
+    public function parse($string)
+    {
+        $parser = new Parser($string);
+        $outputs = $this->fromParser($parser);
+        return $outputs;
+    }
+}
