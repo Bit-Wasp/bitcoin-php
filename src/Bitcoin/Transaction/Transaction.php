@@ -168,28 +168,6 @@ class Transaction implements TransactionInterface
     }
 
     /**
-     * @param PrivateKeyInterface $privateKey
-     * @param TransactionOutputInterface $txOut
-     * @param $inputToSign
-     * @param RbgInterface $random
-     * @return Signature
-     * @throws \Exception
-     */
-    public function sign(PrivateKeyInterface $privateKey, TransactionOutputInterface $txOut, $inputToSign, RbgInterface $random = null)
-    {
-        $hash = $this->signatureHash()->calculate($txOut->getScript(), $inputToSign);
-
-        if (is_null($random)) {
-            $random = new Random();
-        }
-
-        $signer = new Signer(Bitcoin::getMath(), Bitcoin::getGenerator());
-        $sig = $signer->sign($privateKey, $hash, $random);
-
-        return $sig;
-    }
-
-    /**
      * @return SignatureHash
      */
     public function signatureHash()
