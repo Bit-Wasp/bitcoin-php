@@ -4,7 +4,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/afk11/bitcoin/badges/build.png?b=master)](https://scrutinizer-ci.com/g/afk11/bitcoin/build-status/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/afk11/bitcoin/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/afk11/bitcoin/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/afk11/bitcoin/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/afk11/bitcoin/?branch=master)
-
+ 
 ## Requirements
  * PHP 5.4+
  * Composer
