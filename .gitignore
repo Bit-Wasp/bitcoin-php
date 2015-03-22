@@ -5,6 +5,8 @@ bin/*
 *~
 composer.lock
 build/docs/*
+build/clover.xml
+build/code-coverage
 build/logs/*
 build/cache/*
 build/cache/lint.cache
