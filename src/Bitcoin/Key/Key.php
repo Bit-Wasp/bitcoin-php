@@ -4,8 +4,9 @@ namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Serializable;
 
-abstract class Key implements KeyInterface
+abstract class Key extends Serializable implements KeyInterface
 {
     /**
      * @return \BitWasp\Bitcoin\Address\ScriptHashAddress

@@ -116,6 +116,10 @@ class HexExtendedKeySerializer
             throw new ParserOutOfRange('Failed to extract extended key from parser');
         }
 
+        if ($bytes !== $this->network->getHDPubByte() && $bytes !== $this->network->getHDPrivByte()) {
+            throw new \InvalidArgumentException("HD key magic bytes do not match network magic bytes");
+        }
+
         $key = ($this->network->getHDPrivByte() == $bytes)
             ? PrivateKeyFactory::fromHex(substr($keyData, 2))->setCompressed(true)
             : PublicKeyFactory::fromHex($keyData);

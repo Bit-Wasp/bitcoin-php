@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Network\NetworkFactory;
 use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyTest extends \PHPUnit_Framework_TestCase
@@ -136,7 +137,7 @@ class PrivateKeyTest extends \PHPUnit_Framework_TestCase
     public function testGetWif()
     {
         $this->privateKey = new PrivateKey($this->math, $this->generator, $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141'));
-        $network = new Network('00', '05', '80');
+        $network = NetworkFactory::bitcoin();
         $this->assertSame($this->privateKey->toWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
 
         $this->privateKey->setCompressed(true);

@@ -2,10 +2,11 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
-use \BitWasp\Bitcoin\Buffer;
-use \BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
+use BitWasp\Bitcoin\Serializable;
 
-class Signature implements SignatureInterface
+class Signature extends Serializable implements SignatureInterface
 {
     /**
      * @var int

@@ -10,12 +10,13 @@ use \BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use \BitWasp\Bitcoin\Parser;
 use \BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use \BitWasp\Bitcoin\Signature\Signature;
 use \BitWasp\Bitcoin\Signature\SignatureHash;
 use BitWasp\Bitcoin\Signature\Signer;
 
-class Transaction implements TransactionInterface
+class Transaction extends Serializable implements TransactionInterface
 {
     /**
      * @var NetworkInterface
@@ -56,8 +57,7 @@ class Transaction implements TransactionInterface
      */
     public function getTransactionId()
     {
-        $hex  = pack("H*", $this->getBuffer());
-        $hash = Hash::sha256d($hex);
+        $hash = Hash::sha256d($this->getBuffer());
 
         $txid = new Parser();
         $txid = $txid

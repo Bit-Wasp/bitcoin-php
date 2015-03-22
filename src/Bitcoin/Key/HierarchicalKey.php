@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Key;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
@@ -15,7 +16,7 @@ use Mdanter\Ecc\GeneratorPoint;
 class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInterface
 {
     /**
-     * @var \Mdanter\Ecc\GeneratorPoint
+     * @var GeneratorPoint
      */
     protected $generator;
 
@@ -246,7 +247,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @return string
      * @throws \Exception
      */
-    public function toWif(NetworkInterface $network)
+    public function toWif(NetworkInterface $network = null)
     {
         return $this->getPrivateKey()->toWif($network);
     }
@@ -255,9 +256,10 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedKey(NetworkInterface $network)
+    public function toExtendedKey(NetworkInterface $network = null)
     {
-        $extendedSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($this->math, $this->generator, $network));
+        $network = $network ?: Bitcoin::getNetwork();
+        $extendedSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($this->math, $this->generator, $network));
         $extended = $extendedSerializer->serialize($this);
         return $extended;
     }
@@ -266,7 +268,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedPrivateKey(NetworkInterface $network)
+    public function toExtendedPrivateKey(NetworkInterface $network = null)
     {
         if (!$this->isPrivate()) {
             throw new \LogicException('Cannot create extended private key from public');
@@ -279,7 +281,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedPublicKey(NetworkInterface $network)
+    public function toExtendedPublicKey(NetworkInterface $network = null)
     {
         $clone = clone($this);
         return $clone->toPublic()->toExtendedKey($network);
@@ -325,8 +327,6 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      */
     public function deriveChild($sequence)
     {
-        // Generate offset
-
         $chainHex = str_pad($this->math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
 
         try {
@@ -344,9 +344,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
 
         } catch (InvalidPrivateKey $e) {
             // Invalid keys should trigger recursion.. 1:1^128
-            return $this->deriveChild(++$sequence);
-        } catch (\Exception $e) {
-            throw $e;
+            return $this->deriveChild($this->math->add($sequence, 1));
         }
 
         $key = new HierarchicalKey(
@@ -392,11 +390,29 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
             ->getBuffer();
     }
 
+    /**
+     * Decodes a BIP32 path into actual 32bit sequence numbers and derives the child key
+     *
+     * @param string $path
+     * @return HierarchicalKey
+     * @throws \Exception
+     */
+    public function derivePath($path)
+    {
+        $path = $this->decodePath($path);
+
+        $key = $this;
+        foreach (explode("/", $path) as $chunk) {
+            $key = $key->deriveChild($chunk);
+        }
+
+        return $key;
+    }
 
     /**
      * Decodes a BIP32 path into it's actual 32bit sequence numbers: ie, m/0/1'/2/3' -> m/0/2147483649/2/2147483651
      *
-     * @param $path
+     * @param string $path
      * @return string
      */
     public function decodePath($path)

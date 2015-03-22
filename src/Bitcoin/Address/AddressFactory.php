@@ -4,6 +4,9 @@ namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Key\KeyInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 
 class AddressFactory
 {
@@ -13,7 +16,7 @@ class AddressFactory
      */
     public static function fromKey(KeyInterface $key)
     {
-        $address = new PayToPubKeyHashAddress($key);
+        $address = new PayToPubKeyHashAddress($key->getPubKeyHash());
         return $address;
     }
 
@@ -23,7 +26,30 @@ class AddressFactory
      */
     public static function fromScript(ScriptInterface $script)
     {
-        $address = new ScriptHashAddress($script);
+        $address = new ScriptHashAddress($script->getScriptHash());
         return $address;
+    }
+
+    /**
+     * @param                  $address
+     * @param NetworkInterface $network
+     * @return ScriptHashAddress
+     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     */
+    public static function fromString($address, NetworkInterface $network = null)
+    {
+        $network = $network ?: Bitcoin::getNetwork();
+
+        $data = Base58::decodeCheck($address);
+
+        $prefixByte = substr($data, 0, 2);
+
+        if ($prefixByte === $network->getP2shByte()) {
+            return new ScriptHashAddress(substr($data, 2));
+        } else if ($prefixByte === $network->getAddressByte()) {
+            return new PayToPubKeyHashAddress(substr($data, 2));
+        } else {
+            throw new \InvalidArgumentException("Invalid prefix [{$prefixByte}]");
+        }
     }
 }

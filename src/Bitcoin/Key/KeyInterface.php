@@ -16,7 +16,7 @@ interface KeyInterface extends SerializableInterface
     /**
      * Return the hash of the public key.
      *
-     * @return mixed
+     * @return string
      */
     public function getPubKeyHash();
 
@@ -28,7 +28,7 @@ interface KeyInterface extends SerializableInterface
     public function isPrivate();
 
     /**
-     * @return mixed
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function getBuffer();
 }
