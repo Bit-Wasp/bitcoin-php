@@ -108,7 +108,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     {
         return NetworkFactory::bitcoin();
     }
-    
+
     public function testFactoryPresets()
     {
         $p2sh = new ScriptHashAddress("3399bc19f2b20473d417e31472c92947b59f95f8");
