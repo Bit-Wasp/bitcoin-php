@@ -11,23 +11,23 @@ use BitWasp\Bitcoin\Buffer;
 class Hash
 {
     /**
-     * Normalize data so it is always a
-     * @param $input
+     * Normalize data so it is always a string
+     * @param Buffer|string $data
      * @return string
      */
-    public static function normalize($input)
+    public static function normalize($data)
     {
-        if ($input instanceof Buffer) {
-            $input = $input->serialize();
+        if ($data instanceof Buffer) {
+            $data = $data->serialize();
         }
 
-        return $input;
+        return $data;
     }
 
     /**
      * Calculate Sha256(RipeMd160()) on the given data
      *
-     * @param $data
+     * @param Buffer|string $data
      * @param bool $binaryOutput
      * @return string
      */
@@ -43,7 +43,7 @@ class Hash
     /**
      * Perform SHA256
      *
-     * @param $data
+     * @param Buffer|string $data
      * @param bool $binaryOutput
      * @return string
      */
@@ -56,7 +56,7 @@ class Hash
     /**
      * Perform SHA256 twice
      *
-     * @param $data
+     * @param Buffer|string $data
      * @param bool $binaryOutput
      * @return string
      */
@@ -71,7 +71,7 @@ class Hash
     /**
      * RIPEMD160
      *
-     * @param $data
+     * @param Buffer|string $data
      * @param bool $binaryOutput
      * @return string
      */
@@ -84,7 +84,7 @@ class Hash
     /**
      * RIPEMD160 twice
      *
-     * @param $data
+     * @param Buffer|string $data
      * @param bool $binaryOutput
      * @return string
      */
@@ -99,7 +99,7 @@ class Hash
     /**
      * Calculate a SHA1 hash
      *
-     * @param $data
+     * @param Buffer|string $data
      * @param bool $binaryOutput
      * @return string
      */
@@ -114,7 +114,7 @@ class Hash
      * PBKDF2
      *
      * @param $algorithm
-     * @param $password
+     * @param Buffer|string $password
      * @param $salt
      * @param $count
      * @param $keyLength
@@ -150,7 +150,7 @@ class Hash
      * Do HMAC hashing on $data and $salt
      *
      * @param $algo
-     * @param $data
+     * @param Buffer|string $data
      * @param $salt
      * @param bool $rawOutput
      * @return string

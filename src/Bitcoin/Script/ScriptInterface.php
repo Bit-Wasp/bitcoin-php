@@ -7,12 +7,6 @@ use BitWasp\Bitcoin\Address\Address;
 
 interface ScriptInterface extends SerializableInterface
 {
-    const PAYTOPUBKEY = 'pubkey';
-    const PAYTOPUBKEYHASH = 'pubkeyhash';
-    const PAYTOSCRIPTHASH = 'scripthash';
-    const MULTISIG = 'multisig';
-    const UNKNOWN = 'unknown';
-    const NONSTANDARD = 'nonstandard';
 
     /**
      * @return mixed

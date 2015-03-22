@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Address\Address;
+use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
@@ -19,10 +19,10 @@ class OutputScriptFactory
     }
 
     /**
-     * @param Address $address
+     * @param AddressInterface $address
      * @return Script
      */
-    public function payToAddress(Address $address)
+    public function payToAddress(AddressInterface $address)
     {
         return ($address instanceof ScriptHashAddress
             ? ScriptFactory::create()

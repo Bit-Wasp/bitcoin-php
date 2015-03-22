@@ -6,16 +6,18 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 
-class TransactionInput implements TransactionInputInterface
+class TransactionInput extends Serializable implements TransactionInputInterface
 {
     /**
-     * @var
+     * @var string
      */
     protected $txid;
+
     /**
-     * @var
+     * @var int
      */
     protected $vout;
 

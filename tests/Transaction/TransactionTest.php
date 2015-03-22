@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
-use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
@@ -10,11 +9,6 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Network
-     */
-    protected $network;
-
     /**
      * @var Transaction
      */
@@ -27,7 +21,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->network = new Network('00', '05', '80');
         $this->txType = 'BitWasp\Bitcoin\Transaction\Transaction';
     }
 
@@ -152,6 +145,23 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $serialized = $tx->getBuffer()->serialize('hex');
         $this->assertSame($hex, $serialized);
     }
+
+    public function testFromHex2()
+    {
+        $hex = '0100000001c9a2d5381a059bbab241524d69e28b76c8083c5f46000d268ee2e52686061d5d01000000fdfe0000493046022100d231e144ad82f009eae982df1e44f407dad98aac614e970565bd632cd081388e022100d3c138566c2f67162f8f250b26ac928b104272a5efee75818a48d7004da7d18b0147304402201e4106936aaf8e2582402d59f95cb3fa69a72fd812042cce7a54c5cc81dd7e9c022079dac8f738c676abbf84f1ad21c215b7782296bdf45f1a41a2c69b52e3039d51014c695221024882ca54cd89c1f14aea2c843fa0109f6339bd4df166a12454d195fefb9e84922102e04b69fe7139498cd99ae410f07d781900357f0b3b1ccaf997b2c9b1e7c185a82103ea5042dd903e5d717682ec9a5071f1516bf2cd6096c31f49b0d6c25ad9326ad853aeffffffff02a0e7be040000000017a9143409969e2d14b4694eb1188028e615353740273c87a08601000000000017a9141d6fcb721f40cac5b0f53f7f4924f4f20aee9cb78700000000';
+        $tx = TransactionFactory::fromHex($hex);
+        $this->assertInstanceOf($this->txType, $tx);
+        $this->assertEquals(1, $tx->getVersion());
+        $this->assertEquals(0, $tx->getLocktime());
+        $this->assertEquals(1, count($tx->getInputs()));
+        $this->assertEquals(2, count($tx->getOutputs()));
+
+        $serialized = $tx->getBuffer()->serialize('hex');
+
+        $this->assertSame($hex, $serialized);
+
+        $this->assertEquals('a114b696661d740838d9cf811602efff7aad2abf087506830b37d5f2e43bc72d', $tx->getTransactionId());
+     }
 
     public function testSerialize()
     {

@@ -3,10 +3,12 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Key\KeyInterface;
 
 class ScriptFactory
 {
     /**
+     * @param Buffer|null $script
      * @return Script
      */
     public static function create(Buffer $script = null)
@@ -19,8 +21,16 @@ class ScriptFactory
      * @param \BitWasp\Bitcoin\Key\KeyInterface[] $keys
      * @return Script
      */
-    public static function multisig($m, array $keys = array())
+    public static function multisig($m, array $keys = array(), $sort = true)
     {
+        if ($sort) {
+            usort($keys, function (KeyInterface $a, KeyInterface $b) {
+                $av = (string)$a;
+                $bv = (string)$b;
+
+                return $av == $bv ? 0 : $av > $bv ? 1 : -1;
+            });
+        }
         return new RedeemScript($m, $keys);
     }
 
