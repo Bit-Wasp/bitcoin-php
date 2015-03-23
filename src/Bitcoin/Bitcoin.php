@@ -4,7 +4,9 @@ namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\MathAdapterInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -77,15 +79,14 @@ class Bitcoin
     public static function getNetwork()
     {
         if (is_null(self::$network)) {
-            $network = new Network('00', '05', '80');
-            $network
-                ->setHDPubByte('0488b21e')
-                ->setHDPrivByte('0488ade4')
-                ->setNetMagicBytes('d9b4bef9');
-
-            self::$network = $network;
+            self::$network = self::getDefaultNetwork();
         }
 
         return self::$network;
+    }
+
+    public static function getDefaultNetwork()
+    {
+        return NetworkFactory::bitcoin();
     }
 }

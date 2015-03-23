@@ -19,9 +19,9 @@ class TransactionInputSerializer
         $parser = new Parser();
         return $parser
             ->writeBytes(32, $input->getTransactionId(), true)
-            ->writeInt(4, $input->getVout())
+            ->writeInt(4, $input->getVout(), true)
             ->writeWithLength($input->getScript()->getBuffer())
-            ->writeInt(4, $input->getSequence())
+            ->writeInt(4, $input->getSequence(), true)
             ->getBuffer();
     }
 
@@ -34,9 +34,9 @@ class TransactionInputSerializer
     {
         return new TransactionInput(
             $parser->readBytes(32, true)->serialize('hex'),
-            $parser->readBytes(4)->serialize('int'),
+            $parser->readBytes(4, true)->serialize('int'),
             new Script($parser->getVarString()),
-            $parser->readBytes(4)->serialize('int')
+            $parser->readBytes(4, true)->serialize('int')
         );
     }
 

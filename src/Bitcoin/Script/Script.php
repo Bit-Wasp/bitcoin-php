@@ -7,8 +7,9 @@ use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Serializable;
 
-class Script implements ScriptInterface
+class Script extends Serializable implements ScriptInterface
 {
 
     /**

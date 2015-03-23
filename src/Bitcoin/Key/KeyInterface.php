@@ -16,7 +16,7 @@ interface KeyInterface extends SerializableInterface
     /**
      * Return the hash of the public key.
      *
-     * @return mixed
+     * @return string
      */
     public function getPubKeyHash();
 
