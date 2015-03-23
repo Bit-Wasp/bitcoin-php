@@ -3,12 +3,11 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
-use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKey extends Key implements PrivateKeyInterface
 {
@@ -16,16 +15,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
      * @var int|string
      */
     protected $secretMultiplier;
-
-    /**
-     * @var
-     */
-    private $math;
-
-    /**
-     * @var GeneratorPoint
-     */
-    private $generator;
 
     /**
      * @var bool
@@ -38,27 +27,28 @@ class PrivateKey extends Key implements PrivateKeyInterface
     protected $publicKey;
 
     /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @var EcAdapterInterface
+     */
+    private $ecAdapter;
+
+    /**
+     * @param EcAdapterInterface $ecAdapter
      * @param $int
      * @param bool $compressed
      * @throws InvalidPrivateKey
+     * @internal param Math $math
+     * @internal param GeneratorPoint $generator
      */
-    public function __construct(
-        Math $math,
-        GeneratorPoint $generator,
-        $int,
-        $compressed = false
-    ) {
+    public function __construct(EcAdapterInterface $ecAdapter, $int, $compressed = false)
+    {
 
         if (!self::isValidKey($int)) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
-        $this->math = $math;
-        $this->generator = $generator;
         $this->secretMultiplier = $int;
         $this->compressed = $compressed;
+        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -113,8 +103,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     public function getPublicKey()
     {
         if ($this->publicKey == null) {
-            $point = $this->generator->mul($this->getSecretMultiplier());
-            $this->publicKey = new PublicKey($this->math, $this->generator, $point, $this->compressed);
+            $this->publicKey = $this->ecAdapter->privateToPublic($this);
         }
 
         return $this->publicKey;
@@ -153,7 +142,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         $network = $network ?: Bitcoin::getNetwork();
 
-        $wifSerializer = new WifPrivateKeySerializer($this->math, new HexPrivateKeySerializer($this->math, $this->generator));
+        $wifSerializer = new WifPrivateKeySerializer($this->ecAdapter->getMath(), new HexPrivateKeySerializer($this->ecAdapter));
         $wif = $wifSerializer->serialize($network, $this);
         return $wif;
     }
@@ -163,8 +152,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function getBuffer()
     {
-        $hexSerializer = new HexPrivateKeySerializer($this->math, $this->generator);
-        $hex = $hexSerializer->serialize($this);
-        return $hex;
+        $hexSerializer = new HexPrivateKeySerializer($this->ecAdapter);
+        return $hexSerializer->serialize($this);
     }
 }

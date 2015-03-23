@@ -4,20 +4,33 @@ namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\Point;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class PointTest extends \PHPUnit_Framework_TestCase
+class PointTest extends AbstractTestCase
 {
     /**
      * @var Point
      */
     protected $point;
 
+    /**
+     * @var string
+     */
     protected $baseType = 'BitWasp\Bitcoin\Key\Point';
 
+    /**
+     * @var \BitWasp\Bitcoin\Math\Math
+     */
+    protected $math;
+
+    /**
+     * @var \Mdanter\Ecc\GeneratorPoint
+     */
     protected $generator;
 
     public function __construct()
     {
+        $this->math = Bitcoin::getMath();
         $this->generator = Bitcoin::getGenerator();
     }
 
@@ -28,13 +41,15 @@ class PointTest extends \PHPUnit_Framework_TestCase
 
     public function testCreatePoint()
     {
-        $this->point = new Point(
+
+        $point = new Point(
+            $this->math,
             $this->generator,
             '94075108042016923119479678483338406049382274483038030215794449747077048324075',
             '68068239036272628750825525318805297439390570305050728515552223656985804538350'
         );
 
-        $this->assertInstanceOf($this->baseType, $this->point);
+        $this->assertInstanceOf($this->baseType, $point);
     }
 
     /**
@@ -43,6 +58,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
     public function testCreatePointFail()
     {
         $this->point = new Point(
+            $this->math,
             $this->generator,
             '940751080420169231194796483338406049382274483038030215794449747077048324075',
             '68068239036272628750825525318805297439390570305050728515552223656985804538350'
@@ -54,6 +70,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
     public function testToString()
     {
         $this->point = new Point(
+            $this->math,
             $this->generator,
             '94075108042016923119479678483338406049382274483038030215794449747077048324075',
             '68068239036272628750825525318805297439390570305050728515552223656985804538350'
@@ -65,6 +82,7 @@ class PointTest extends \PHPUnit_Framework_TestCase
     public function testDefaultGetOrder()
     {
         $this->point = new Point(
+            $this->math,
             $this->generator,
             '94075108042016923119479678483338406049382274483038030215794449747077048324075',
             '68068239036272628750825525318805297439390570305050728515552223656985804538350'

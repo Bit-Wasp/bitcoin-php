@@ -2,49 +2,26 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
-
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
 use BitWasp\Bitcoin\Signature\SignatureHashInterface;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
-use Mdanter\Ecc\GeneratorPoint;
 
-class Secp256k1 implements EcAdapterInterface
+class Secp256k1 extends BaseEcAdapter
 {
-    /**
-     * @var Math
-     */
-    private $math;
-
-    /**
-     * @var GeneratorPoint
-     */
-    private $generator;
-
-    /**
-     * @param Math $math
-     * @param GeneratorPoint $G
-     */
-    public function __construct(Math $math, GeneratorPoint $G)
-    {
-        $this->math = $math;
-        $this->generator = $G;
-    }
-
     /**
      * @param $scalar
      * @return string
      */
     private function getBinaryScalar($scalar)
     {
-        return str_pad(hex2bin($this->math->decHex($scalar)), 32, chr(0), STR_PAD_LEFT);
+        return str_pad(hex2bin($this->getMath()->decHex($scalar)), 32, chr(0), STR_PAD_LEFT);
     }
 
     /**
@@ -54,7 +31,7 @@ class Secp256k1 implements EcAdapterInterface
      */
     private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newBinary)
     {
-        return PrivateKeyFactory::fromHex(bin2hex($newBinary), $oldPrivate->isCompressed(), $this->math, $this->generator);
+        return PrivateKeyFactory::fromHex(bin2hex($newBinary), $oldPrivate->isCompressed(), $this);
     }
 
     /**
@@ -64,7 +41,8 @@ class Secp256k1 implements EcAdapterInterface
      */
     private function getRelatedPublicKey(PublicKeyInterface $oldPublic, $newBinary)
     {
-        return PublicKeyFactory::fromHex(bin2hex($newBinary), $oldPublic->isCompressed(), $this->math, $this->generator);
+        $hex = bin2hex($newBinary);
+        return PublicKeyFactory::fromHex($hex, $this);
     }
 
     /**
@@ -82,14 +60,12 @@ class Secp256k1 implements EcAdapterInterface
         $signatureLength = 0;
 
         $ret = \secp256k1_ecdsa_sign($hashStr, $sigStr, $signatureLength, $privateStr);
-        if ($ret !== 0) {
+        if ($ret !== 1) {
             throw new \Exception('Secp256k1-php failed to sign data');
         }
         // Fix since secp256k1 doesn't know about hashtypes
         $sigStr .= SignatureHashInterface::SIGHASH_ALL;
-
-        $signature = SignatureFactory::fromHex($sigStr);
-        return $signature;
+        return SignatureFactory::fromHex(bin2hex($sigStr));
     }
 
     /**
@@ -103,20 +79,35 @@ class Secp256k1 implements EcAdapterInterface
         $publicStr = $publicKey->getBuffer()->getBinary();
         $sigStr = $signature->getBuffer()->getBinary();
         $hashStr = $messageHash->getBinary();
-
         $ret = \secp256k1_ecdsa_verify($hashStr, $sigStr, $publicStr);
-        return (bool)$ret;
+
+        return ($ret === 1)
+            ? true
+            : false;
     }
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $scalar
+     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @throws \Exception
+     */
+    public function privateToPublic(PrivateKeyInterface $privateKey)
+    {
+        // Make a fake public key from the generator, do scalar multiplication against privkey.
+        $fakePubKey = PublicKeyFactory::fromPoint($this->getGenerator(), $privateKey->isCompressed(), $this);
+        $privStr = $privateKey->getBuffer()->getInt();
+        return $this->publicKeyMul($fakePubKey, $privStr);
+    }
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
-    public function privateKeyMul(PrivateKeyInterface $privateKey, $scalar)
+    public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
     {
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
-        $scalarStr = $this->getBinaryScalar($scalar);
+        $scalarStr = $this->getBinaryScalar($integer);
 
         $ret = \secp256k1_ec_privkey_tweak_mul($privKey, $scalarStr);
         return $this->getRelatedPrivateKey($privateKey, $privKey);
@@ -124,13 +115,13 @@ class Secp256k1 implements EcAdapterInterface
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $scalar
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
-    public function privateKeyAdd(PrivateKeyInterface $privateKey, $scalar)
+    public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
     {
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
-        $scalarStr = $this->getBinaryScalar($scalar);
+        $scalarStr = $this->getBinaryScalar($integer);
 
         $ret = \secp256k1_ec_privkey_tweak_add($privKey, $scalarStr);
         return $this->getRelatedPrivateKey($privateKey, $privKey);
@@ -138,13 +129,13 @@ class Secp256k1 implements EcAdapterInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $scalar
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */
-    public function publicKeyAdd(PublicKeyInterface $publicKey, $scalar)
+    public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
-        $scalarStr = $this->getBinaryScalar($scalar);
+        $scalarStr = $this->getBinaryScalar($integer);
 
         $ret = \secp256k1_ec_pubkey_tweak_add($pubKey, $scalarStr);
         return $this->getRelatedPublicKey($publicKey, $pubKey);
@@ -152,16 +143,17 @@ class Secp256k1 implements EcAdapterInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $scalar
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */
-    public function publicKeyMul(PublicKeyInterface $publicKey, $scalar)
+    public function publicKeyMul(PublicKeyInterface $publicKey, $integer)
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
-        $scalarStr = $this->getBinaryScalar($scalar);
+        $pubkeyLen = strlen($pubKey);
+        $scalarStr = $this->getBinaryScalar($integer);
 
-        $ret = \secp256k1_ec_pubkey_tweak_mul($pubKey, $scalarStr);
+        $ret = \secp256k1_ec_pubkey_tweak_mul($pubKey, $pubkeyLen, $scalarStr);
+
         return $this->getRelatedPublicKey($publicKey, $pubKey);
     }
 }
-

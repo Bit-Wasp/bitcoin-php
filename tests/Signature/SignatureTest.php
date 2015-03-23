@@ -102,7 +102,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $s = '304402203bc90d68b698347ea1f4b51446a0725d177debe99736df2718a9bc82275a17c402200d250e0d75c1123d179d029680bd7e2a08a4917a7e3beff25b6dbdeadbe1598901';
 
         $this->assertTrue(Signature::isDERSignature(Buffer::hex($s)));
-        $sig      = SignatureFactory::fromHex($s);
+        $sig = SignatureFactory::fromHex($s);
         $this->assertTrue(Signature::isDERSignature($sig->getBuffer()));
         $this->assertSame($s, $sig->getBuffer()->serialize('hex'));
     }

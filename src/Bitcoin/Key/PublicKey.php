@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Key;
 
 use \BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use \BitWasp\Bitcoin\Math\Math;
 use \BitWasp\Bitcoin\Crypto\Hash;
 use \BitWasp\Bitcoin\Buffer;
@@ -13,9 +14,9 @@ use Mdanter\Ecc\GeneratorPoint;
 class PublicKey extends Key implements PublicKeyInterface
 {
     /**
-     * @var Math
+     * @var EcAdapterInterface
      */
-    protected $math;
+    protected $ecAdapter;
 
     /**
      * @var PointInterface
@@ -28,26 +29,19 @@ class PublicKey extends Key implements PublicKeyInterface
     protected $compressed;
 
     /**
-     * @var GeneratorPoint
-     */
-    private $generator;
-
-    /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface $ecAdapter
      * @param PointInterface $point
      * @param bool $compressed
+     * @internal param Math $math
      */
     public function __construct(
-        Math $math,
-        GeneratorPoint $generator,
+        EcAdapterInterface $ecAdapter,
         PointInterface $point,
         $compressed = false
     ) {
-        $this->math = $math;
         $this->point = $point;
         $this->compressed = $compressed;
-        $this->generator = $generator;
+        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -223,7 +217,7 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function getBuffer()
     {
-        $serializer = new HexPublicKeySerializer($this->math, $this->generator);
+        $serializer = new HexPublicKeySerializer($this->ecAdapter);
         $hex = $serializer->serialize($this);
         return $hex;
     }

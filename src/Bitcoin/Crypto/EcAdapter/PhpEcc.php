@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
-
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
@@ -10,33 +9,12 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
-use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\PointInterface;
 
-class PhpEcc implements EcAdapterInterface
+class PhpEcc extends BaseEcAdapter
 {
-    /**
-     * @var Math
-     */
-    private $math;
-
-    /**
-     * @var GeneratorPoint
-     */
-    private $generator;
-
-    /**
-     * @param Math $math
-     * @param GeneratorPoint $G
-     */
-    public function __construct(Math $math, GeneratorPoint $G)
-    {
-        $this->math = $math;
-        $this->generator = $G;
-    }
 
     /**
      * @param PrivateKeyInterface $privateKey
@@ -50,21 +28,24 @@ class PhpEcc implements EcAdapterInterface
         $rbg = $rbg ?: new Random();
         $randomK = $rbg->bytes(32);
 
-        $n       = $this->generator->getOrder();
-        $k       = $this->math->mod($randomK->serialize('int'), $n);
-        $r       = $this->generator->mul($k)->getX();
+        $math = $this->getMath();
+        $generator = $this->getGenerator();
+        $n = $generator->getOrder();
 
-        if ($this->math->cmp($r, 0) == 0) {
+        $k = $math->mod($randomK->serialize('int'), $n);
+        $r = $generator->mul($k)->getX();
+
+        if ($math->cmp($r, 0) == 0) {
             throw new \RuntimeException('Random number r = 0');
         }
 
-        $s = $this->math->mod(
-            $this->math->mul(
-                $this->math->inverseMod($k, $n),
-                $this->math->mod(
-                    $this->math->add(
+        $s = $math->mod(
+            $math->mul(
+                $math->inverseMod($k, $n),
+                $math->mod(
+                    $math->add(
                         $messageHash->serialize('int'),
-                        $this->math->mul(
+                        $math->mul(
                             $privateKey->getSecretMultiplier(),
                             $r
                         )
@@ -75,13 +56,13 @@ class PhpEcc implements EcAdapterInterface
             $n
         );
 
-        if ($this->math->cmp($s, 0) == 0) {
+        if ($math->cmp($s, 0) == 0) {
             throw new \RuntimeException('Signature s = 0');
         }
 
         // if s < n/2
-        if ($this->math->cmp($s, $this->math->div($n, 2)) > 0) {
-            $s = $this->math->sub($n, $s);
+        if ($math->cmp($s, $math->div($n, 2)) > 0) {
+            $s = $math->sub($n, $s);
         }
 
         return new Signature($r, $s);
@@ -95,26 +76,35 @@ class PhpEcc implements EcAdapterInterface
      */
     public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash)
     {
-        $n = $this->generator->getOrder();
-        $point = $publicKey->getPoint();
-        $r = $signature->getR();
-        $s = $signature->getS();
+        $n = $this->getGenerator()->getOrder();
+        $math = $this->getMath();
+        $generator = $this->getGenerator();
 
-        if ($this->math->cmp($r, 1) < 1 || $this->math->cmp($r, $this->math->sub($n, 1)) > 0) {
+        if ($math->cmp($signature->getR(), 1) < 1 || $math->cmp($signature->getR(), $math->sub($n, 1)) > 0) {
             return false;
         }
 
-        if ($this->math->cmp($s, 1) < 1 || $this->math->cmp($s, $this->math->sub($n, 1)) > 0) {
+        if ($math->cmp($signature->getS(), 1) < 1 || $math->cmp($signature->getS(), $math->sub($n, 1)) > 0) {
             return false;
         }
 
-        $c = $this->math->inverseMod($s, $n);
-        $u1 = $this->math->mod($this->math->mul($messageHash->serialize('int'), $c), $n);
-        $u2 = $this->math->mod($this->math->mul($r, $c), $n);
-        $xy = $this->generator->mul($u1)->add($point->mul($u2));
-        $v = $this->math->mod($xy->getX(), $n);
+        $c = $math->inverseMod($signature->getS(), $n);
+        $u1 = $math->mod($math->mul($messageHash->serialize('int'), $c), $n);
+        $u2 = $math->mod($math->mul($signature->getR(), $c), $n);
+        $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
+        $v = $math->mod($xy->getX(), $n);
 
-        return $this->math->cmp($v, $r) == 0;
+        return $math->cmp($v, $signature->getR()) == 0;
+    }
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @return \BitWasp\Bitcoin\Key\PublicKey
+     */
+    public function privateToPublic(PrivateKeyInterface $privateKey)
+    {
+        $point = $this->getGenerator()->mul($privateKey->getSecretMultiplier());
+        return PublicKeyFactory::fromPoint($point, $privateKey->isCompressed(), $this);
     }
 
     /**
@@ -124,7 +114,7 @@ class PhpEcc implements EcAdapterInterface
      */
     private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newSecret)
     {
-        return PrivateKeyFactory::fromInt($newSecret, $oldPrivate->isCompressed(), $this->math, $this->generator);
+        return PrivateKeyFactory::fromInt($newSecret, $oldPrivate->isCompressed(), $this);
     }
 
     /**
@@ -134,22 +124,23 @@ class PhpEcc implements EcAdapterInterface
      */
     private function getRelatedPublicKey(PublicKeyInterface $oldPublic, PointInterface $newPoint)
     {
-        return PublicKeyFactory::fromPoint($newPoint, $oldPublic->isCompressed(), $this->math, $this->generator);
+        return PublicKeyFactory::fromPoint($newPoint, $oldPublic->isCompressed(), $this);
     }
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $scalar
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
-    public function privateKeyAdd(PrivateKeyInterface $privateKey, $scalar)
+    public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
     {
-        $newSecret = $this->math->mod(
-            $this->math->add(
-                $scalar,
+        $math = $this->getMath();
+        $newSecret = $math->mod(
+            $math->add(
+                $integer,
                 $privateKey->getSecretMultiplier()
             ),
-            $this->generator->getOrder()
+            $this->getGenerator()->getOrder()
         );
 
         return $this->getRelatedPrivateKey($privateKey, $newSecret);
@@ -157,17 +148,18 @@ class PhpEcc implements EcAdapterInterface
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $scalar
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
-    public function privateKeyMul(PrivateKeyInterface $privateKey, $scalar)
+    public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
     {
-        $newSecret = $this->math->mod(
-            $this->math->mul(
-                $scalar,
+        $math = $this->getMath();
+        $newSecret = $math->mod(
+            $math->mul(
+                $integer,
                 $privateKey->getSecretMultiplier()
             ),
-            $this->generator->getOrder()
+            $this->getGenerator()->getOrder()
         );
 
         return $this->getRelatedPrivateKey($privateKey, $newSecret);
@@ -175,23 +167,23 @@ class PhpEcc implements EcAdapterInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $scalar
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */
-    public function publicKeyMul(PublicKeyInterface $publicKey, $scalar)
+    public function publicKeyMul(PublicKeyInterface $publicKey, $integer)
     {
-        $newPoint = $publicKey->getPoint()->mul($scalar);
+        $newPoint = $publicKey->getPoint()->mul($integer);
         return $this->getRelatedPublicKey($publicKey, $newPoint);
     }
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $scalar
+     * @param $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */
-    public function publicKeyAdd(PublicKeyInterface $publicKey, $scalar)
+    public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
     {
-        $newPoint = $publicKey->getPoint()->add($this->generator->mul($scalar));
+        $newPoint = $publicKey->getPoint()->add($this->getGenerator()->mul($integer));
         return $this->getRelatedPublicKey($publicKey, $newPoint);
     }
 }
