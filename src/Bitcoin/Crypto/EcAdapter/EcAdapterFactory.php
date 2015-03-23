@@ -24,11 +24,39 @@ class EcAdapterFactory
         }
 
         if (extension_loaded('secp256k1')) {
-            self::$adapter = new Secp256k1($math, $generator);
+            self::$adapter = self::getSecp256k1($math, $generator);
         } else {
-            self::$adapter = new PhpEcc($math, $generator);
+            self::$adapter = self::getPhpEcc($math, $generator);
         }
 
         return self::$adapter;
+    }
+
+    /**
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public static function setAdapter(EcAdapterInterface $ecAdapter)
+    {
+        self::$adapter = $ecAdapter;
+    }
+
+    /**
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @return PhpEcc
+     */
+    public static function getPhpEcc(Math $math, GeneratorPoint $generator)
+    {
+        return new PhpEcc($math, $generator);
+    }
+
+    /**
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     * @return Secp256k1
+     */
+    public static function getSecp256k1(Math $math, GeneratorPoint $generator)
+    {
+        return new Secp256k1($math, $generator);
     }
 }

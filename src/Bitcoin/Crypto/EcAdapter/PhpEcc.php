@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\Signature;
@@ -97,6 +98,48 @@ class PhpEcc extends BaseEcAdapter
         return $math->cmp($v, $signature->getR()) == 0;
     }
 
+    /**
+     * @param $privateKey
+     * @return bool
+     */
+    public function validatePrivateKey($privateKey)
+    {
+        $math = $this->getMath();
+        $secret = $math->hexDec($privateKey);
+        // Less than the order of the curve, and not zero
+        $withinRange = $math->cmp($secret, $this->getGenerator()->getOrder()) < 0;
+        $notZero = !($math->cmp($secret, '0') === 0);
+
+        return $withinRange && $notZero;
+    }
+
+    /**
+     * @param $publicKey
+     * @return bool
+     */
+    public function validatePublicKey($publicKey)
+    {
+        $math = $this->getMath();
+        $buffer = Buffer::hex($publicKey);
+        if (PublicKey::isCompressedOrUncompressed($buffer)) {
+            try {
+                $size = $buffer->getSize();
+                if ($size == 33) {
+                    $x = $math->hexDec(substr($publicKey, 2, 64));
+                    $y = $this->recoverYfromX($x, substr($publicKey, 0, 2));
+                } else {
+                    $x = $math->hexDec(substr($publicKey, 2, 64));
+                    $y = $math->hexDec(substr($publicKey, 66, 64));
+                }
+
+                $point = $this->getGenerator()->getCurve()->getPoint($x, $y);
+                return true;
+            } catch (\Exception $e) {
+            }
+        }
+
+        return false;
+    }
     /**
      * @param PrivateKeyInterface $privateKey
      * @return \BitWasp\Bitcoin\Key\PublicKey
