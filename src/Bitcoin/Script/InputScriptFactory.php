@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Signature\Signer;
+
 
 class InputScriptFactory
 {

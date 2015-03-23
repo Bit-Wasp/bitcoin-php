@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Crypto\Random;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Buffer;
-use Mdanter\Ecc\GeneratorPoint;
+
 
 class HmacDrbg implements RbgInterface
 {

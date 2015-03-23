@@ -2,13 +2,13 @@
 
 namespace BitWasp\Bitcoin\Block;
 
-use \BitWasp\Bitcoin\Bitcoin;
+
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
-use \BitWasp\Bitcoin\Parser;
-use \BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Parser;
+use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
-use \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 
 class MerkleRoot
 {
@@ -35,6 +35,7 @@ class MerkleRoot
     /**
      * Instantiate the class when given a block
      *
+     * @param Math $math
      * @param BlockInterface $block
      */
     public function __construct(Math $math, BlockInterface $block)

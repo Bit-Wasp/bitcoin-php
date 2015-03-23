@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
+
 
 class TransactionCollectionSerializer
 {

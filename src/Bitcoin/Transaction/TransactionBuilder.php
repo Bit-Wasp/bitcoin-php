@@ -170,6 +170,7 @@ class TransactionBuilder
     /**
      * @param PrivateKeyInterface $priv
      * @param RedeemScript $redeemScript
+     * @param int $sigHashType
      * @return $this
      */
     public function signWithKey(PrivateKeyInterface $priv, RedeemScript $redeemScript = null, $sigHashType = SignatureHashInterface::SIGHASH_ALL)

@@ -62,8 +62,9 @@ interface BlockHeaderInterface extends SerializableInterface
      * @return BlockHeaderInterface
      */
     public function setTimestamp($timestamp);
+
     /**
-     * @return string
+     * @return Buffer|null
      */
     public function getBits();
 

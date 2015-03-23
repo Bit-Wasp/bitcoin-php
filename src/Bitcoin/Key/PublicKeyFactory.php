@@ -35,8 +35,6 @@ class PublicKeyFactory
      * @param bool $compressed
      * @param EcAdapterInterface $ecAdapter
      * @return PublicKey
-     * @internal param Math $math
-     * @internal param GeneratorPoint $generator
      */
     public static function fromPoint(PointInterface $point, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {

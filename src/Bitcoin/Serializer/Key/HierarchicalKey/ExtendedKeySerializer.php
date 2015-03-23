@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
-use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Key\HierarchicalKey;
 

@@ -38,9 +38,6 @@ class Transaction extends Serializable implements TransactionInterface
      */
     protected $locktime;
 
-    /**
-     * @internal param NetworkInterface $network
-     */
     public function __construct()
     {
         $this->inputs = new TransactionInputCollection();

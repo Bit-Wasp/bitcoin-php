@@ -46,7 +46,7 @@ class NetworkMessageSerializer
     }
 
     /**
-     *
+     * @param Parser $parser
      */
     public function fromParser(Parser & $parser)
     {

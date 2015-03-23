@@ -88,6 +88,7 @@ class Bitcoind
      * @param $txid
      * @param bool $verbose
      * @return TransactionInterface
+     * @throws \Exception
      */
     public function getrawtransaction($txid, $verbose = false)
     {
@@ -104,6 +105,7 @@ class Bitcoind
 
     /**
      * @param TransactionInterface $transaction
+     * @param bool $allowExtremeFees
      * @return mixed
      */
     public function sendrawtransaction(TransactionInterface $transaction, $allowExtremeFees = false)

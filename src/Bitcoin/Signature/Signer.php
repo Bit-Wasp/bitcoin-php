@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Signature;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Key\PublicKey;
+
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\MathAdapterInterface;

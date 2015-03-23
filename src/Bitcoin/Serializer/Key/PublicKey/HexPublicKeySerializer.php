@@ -16,7 +16,6 @@ class HexPublicKeySerializer
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @internal param Math $math
      */
     public function __construct(EcAdapterInterface $ecAdapter)
     {

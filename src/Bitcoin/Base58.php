@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin;
 
-use \BitWasp\Bitcoin\Crypto\Hash;
-use \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 
 class Base58
 {

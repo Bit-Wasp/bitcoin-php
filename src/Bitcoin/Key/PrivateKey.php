@@ -36,8 +36,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
      * @param $int
      * @param bool $compressed
      * @throws InvalidPrivateKey
-     * @internal param Math $math
-     * @internal param GeneratorPoint $generator
      */
     public function __construct(EcAdapterInterface $ecAdapter, $int, $compressed = false)
     {

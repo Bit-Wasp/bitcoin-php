@@ -7,8 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
-use Mdanter\Ecc\GeneratorPoint;
+
 
 class HexPrivateKeySerializer
 {
@@ -18,8 +17,7 @@ class HexPrivateKeySerializer
     private $ecAdapter;
 
     /**
-     * @param Math $math
-     * @param GeneratorPoint $G
+     * @param EcAdapterInterface $ecAdapter
      */
     public function __construct(EcAdapterInterface $ecAdapter)
     {

@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Key;
 
-use \BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use \BitWasp\Bitcoin\Math\Math;
-use \BitWasp\Bitcoin\Crypto\Hash;
-use \BitWasp\Bitcoin\Buffer;
+
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
 use Mdanter\Ecc\PointInterface;
 use Mdanter\Ecc\GeneratorPoint;
@@ -32,7 +32,6 @@ class PublicKey extends Key implements PublicKeyInterface
      * @param EcAdapterInterface $ecAdapter
      * @param PointInterface $point
      * @param bool $compressed
-     * @internal param Math $math
      */
     public function __construct(
         EcAdapterInterface $ecAdapter,
