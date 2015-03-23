@@ -4,21 +4,20 @@ namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
-use Mdanter\Ecc\GeneratorPoint;
 
-class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInterface
+class HierarchicalKey
 {
     /**
-     * @var \Mdanter\Ecc\GeneratorPoint
+     * @var EcAdapterInterface
      */
-    protected $generator;
+    private $ecAdapter;
 
     /**
      * @var string
@@ -51,18 +50,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     protected $key;
 
     /**
-     * @var NetworkInterface
-     */
-    protected $network;
-
-    /**
-     * @var Math
-     */
-    protected $math;
-
-    /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface $ecAdapter
      * @param $depth
      * @param $parentFingerprint
      * @param $sequence
@@ -70,19 +58,18 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      * @param KeyInterface $key
      * @throws \Exception
      */
-    public function __construct(Math $math, GeneratorPoint $generator, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
+    public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
     {
         if (!$key->isCompressed()) {
             throw new \Exception('A HierarchicalKey must always be compressed');
         }
 
-        $this->math = $math;
-        $this->generator = $generator;
         $this->depth = $depth;
         $this->sequence = $sequence;
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
         $this->key = $key;
+        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -91,12 +78,13 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      */
     public function getHardenedSequence($sequence)
     {
-        $hardened = $this->math->hexDec('80000000');
-        if ($this->math->cmp($sequence, $hardened) >= 0) {
+        $math = $this->ecAdapter->getMath();
+        $hardened = $math->hexDec('80000000');
+        if ($math->cmp($sequence, $hardened) >= 0) {
             throw new \LogicException('Sequence is already for a hardened key');
         }
 
-        return $this->math->add($hardened, $sequence);
+        return $math->add($hardened, $sequence);
     }
 
     /**
@@ -141,7 +129,7 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      */
     public function getChildFingerprint()
     {
-        $fingerprint = $this->math->hexDec(substr($this->getPublicKey()->getPubKeyHash(), 0, 8));
+        $fingerprint = $this->ecAdapter->getMath()->hexDec(substr($this->getPublicKey()->getPubKeyHash(), 0, 8));
         return $fingerprint;
     }
 
@@ -154,25 +142,6 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     public function getChainCode()
     {
         return $this->chainCode;
-    }
-
-    /**
-     * Get the generator point for this curve
-     *
-     * @return \Mdanter\Ecc\GeneratorPoint
-     */
-    public function getGenerator()
-    {
-        return $this->generator;
-    }
-
-    /**
-     * @return int
-     * @throws \Exception
-     */
-    public function getSecretMultiplier()
-    {
-        return $this->getPrivateKey()->getSecretMultiplier();
     }
 
     /**
@@ -202,14 +171,6 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     }
 
     /**
-     * @return \Mdanter\Ecc\PointInterface
-     */
-    public function getPoint()
-    {
-        return $this->getPublicKey()->getPoint();
-    }
-
-    /**
      * @return HierarchicalKey
      */
     public function toPublic()
@@ -235,32 +196,13 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getPubKeyHash()
-    {
-        return $this->getPublicKey()->getPubKeyHash();
-    }
-
-    /**
-     * @param NetworkInterface $network
-     * @return string
-     * @throws \Exception
-     */
-    public function toWif(NetworkInterface $network = null)
-    {
-        return $this->getPrivateKey()->toWif($network);
-    }
-
-    /**
+     *
      * @param NetworkInterface $network
      * @return string
      */
     public function toExtendedKey(NetworkInterface $network = null)
     {
-        $network = $network ?: Bitcoin::getNetwork();
-
-        $extendedSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($this->math, $this->generator, $network));
+        $extendedSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($this->ecAdapter, $network));
         $extended = $extendedSerializer->serialize($this);
         return $extended;
     }
@@ -289,17 +231,6 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
     }
 
     /**
-     * Return whether the wif/address are compressed. For HD wallets
-     * this is always true
-     *
-     * @return bool
-     */
-    public function isCompressed()
-    {
-        return true;
-    }
-
-    /**
      * Return whether this is a private key
      *
      * @return bool
@@ -316,7 +247,8 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      */
     public function isHardened()
     {
-        return $this->math->cmp($this->getSequence(), $this->math->hexDec('80000000')) >= 0;
+        $math = $this->ecAdapter->getMath();
+        return $math->cmp($this->getSequence(), $math->hexDec('80000000')) >= 0;
     }
 
     /**
@@ -328,7 +260,8 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      */
     public function deriveChild($sequence)
     {
-        $chainHex = str_pad($this->math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
+        $math = $this->ecAdapter->getMath();
+        $chainHex = str_pad($math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
 
         try {
             // can be easily wrapped in a loop that recurses until
@@ -337,11 +270,13 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
             $hash = Hash::hmac('sha512', $data->serialize(), pack("H*", $chainHex));
 
             list ($offset, $chainHex) = array(
-                $this->math->hexDec(substr($hash, 0, 64)),
+                $math->hexDec(substr($hash, 0, 64)),
                 substr($hash, 64, 64),
             );
 
-            $key = KeyFactory::fromKeyAndOffset($this->key, $offset, $this->math, $this->generator);
+            $key = $this->isPrivate()
+                ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset)
+                : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset);
 
         } catch (InvalidPrivateKey $e) {
             // Invalid keys should trigger recursion.. 1:1^128
@@ -351,12 +286,11 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
         }
 
         $key = new HierarchicalKey(
-            $this->math,
-            $this->generator,
+            $this->ecAdapter,
             $this->getDepth() + 1,
             $this->getChildFingerprint(),
             $sequence,
-            $this->math->hexDec($chainHex),
+            $math->hexDec($chainHex),
             $key
         );
 
@@ -372,8 +306,9 @@ class HierarchicalKey extends Key implements PrivateKeyInterface, PublicKeyInter
      */
     public function getHmacSeed($sequence)
     {
+        $math = $this->ecAdapter->getMath();
         $parser   = new Parser();
-        $hardened = $this->math->cmp($sequence, $this->math->hexDec('80000000')) >= 0;
+        $hardened = $math->cmp($sequence, $math->hexDec('80000000')) >= 0;
 
         if ($hardened) {
             if ($this->isPrivate() === false) {

@@ -34,7 +34,7 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $key = $math->hexDec($test->privKey);
-            $privKey     = new PrivateKey($math, $generator, $key);
+            $privKey     = new PrivateKey(Bitcoin::getEcAdapter(), $key);
             $messageHash = Buffer::hex(Hash::sha256($test->message));
             $entropy     = new Buffer($privKey->getBuffer()->serialize() . $messageHash->serialize());
             $drbg        = new HmacDrbg($test->algorithm, $entropy);

@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 
 interface PrivateKeyInterface extends KeyInterface
 {
-
     /**
      * Return the decimal secret multiplier
      *

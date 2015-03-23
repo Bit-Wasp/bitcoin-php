@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;
 
@@ -16,7 +15,7 @@ class EcAdapterFactory
     /**
      * @param Math $math
      * @param GeneratorPoint $generator
-     * @return PhpEcc|Secp256k1
+     * @return EcAdapterInterface
      */
     public static function getAdapter(Math $math, GeneratorPoint $generator)
     {
