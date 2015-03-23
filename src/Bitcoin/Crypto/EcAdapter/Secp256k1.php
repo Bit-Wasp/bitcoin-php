@@ -73,6 +73,7 @@ class Secp256k1 extends BaseEcAdapter
      * @param SignatureInterface $signature
      * @param Buffer $messageHash
      * @return bool
+     * @throws \Exception
      */
     public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash)
     {
@@ -81,6 +82,30 @@ class Secp256k1 extends BaseEcAdapter
         $hashStr = $messageHash->getBinary();
         $ret = \secp256k1_ecdsa_verify($hashStr, $sigStr, $publicStr);
 
+        if ($ret === -1) {
+            throw new \Exception('Secp256k1 verify: Invalid public key');
+        } else if ($ret === -2) {
+            throw new \Exception('Secp256k1 verify: Invalid signature');
+        }
+
+        return ($ret === 1)
+            ? true
+            : false;
+    }
+
+    public function validatePrivateKey($privateKey)
+    {
+        $key = pack("H*", $privateKey);
+        $ret = \secp256k1_ec_seckey_verify($key);
+        return ($ret === 1)
+            ? true
+            : false;
+    }
+
+    public function validatePublicKey($publicKey)
+    {
+        $key = pack("H*", $publicKey);
+        $ret = \secp256k1_ec_pubkey_verify($key);
         return ($ret === 1)
             ? true
             : false;

@@ -46,6 +46,18 @@ interface EcAdapterInterface
     public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash);
 
     /**
+     * @param $privateKey
+     * @return bool
+     */
+    public function validatePrivateKey($privateKey);
+
+    /**
+     * @param $publicKey
+     * @return bool
+     */
+    public function validatePublicKey($publicKey);
+
+    /**
      * @param PrivateKeyInterface $privateKey
      * @return PublicKeyInterface
      */

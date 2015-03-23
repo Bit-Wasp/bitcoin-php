@@ -17,9 +17,13 @@ class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $generator = Bitcoin::getGenerator();
 
         $adapters = array(
-            [new Secp256k1($math, $generator)],
             [new PhpEcc($math, $generator)]
         );
+
+        if (extension_loaded('secp256k1')) {
+            $adapters[] = [new Secp256k1($math, $generator)];
+        }
+
         return $adapters;
     }
 }

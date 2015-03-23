@@ -62,6 +62,8 @@ class SignerTest extends AbstractTestCase
             $rHex = $this->math->dechex($sig->getR());
             $sHex = $this->math->decHex($sig->getS());
             $this->assertSame($test->expectedRSLow, $rHex.$sHex);
+
+            $this->assertTrue($ecAdapter->verify($privateKey->getPublicKey(), $sig, $messageHash));
         }
     }
 
