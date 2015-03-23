@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 
-
 class InputScriptFactory
 {
     /**

@@ -1,18 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 14/03/15
- * Time: 20:49
- */
 
 namespace BitWasp\Bitcoin\Script;
 
-
 use BitWasp\Bitcoin\Key\PublicKey;
-
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
-
 
 class RedeemScript extends Script
 {

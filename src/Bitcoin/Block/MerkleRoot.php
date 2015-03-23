@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Block;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Parser;

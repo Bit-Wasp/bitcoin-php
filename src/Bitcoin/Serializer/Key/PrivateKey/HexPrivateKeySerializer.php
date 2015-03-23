@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 
-
 class HexPrivateKeySerializer
 {
     /**

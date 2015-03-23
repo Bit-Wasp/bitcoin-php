@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Serializer\Transaction;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 
-
 class TransactionCollectionSerializer
 {
     /**
