@@ -202,7 +202,9 @@ class HierarchicalKey
      */
     public function toExtendedKey(NetworkInterface $network = null)
     {
-        $extendedSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($this->ecAdapter, $network));
+        $network = $network ?: Bitcoin::getNetwork();
+
+        $extendedSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($this->ecAdapter, $network));
         $extended = $extendedSerializer->serialize($this);
         return $extended;
     }
