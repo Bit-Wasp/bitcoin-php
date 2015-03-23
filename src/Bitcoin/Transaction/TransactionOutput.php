@@ -4,11 +4,12 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
 
-class TransactionOutput implements TransactionOutputInterface, SerializableInterface
+class TransactionOutput extends Serializable implements TransactionOutputInterface, SerializableInterface
 {
 
     /**

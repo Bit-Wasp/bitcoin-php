@@ -2,11 +2,12 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
-class TransactionCollection implements \Countable, SerializableInterface
+class TransactionCollection extends Serializable implements \Countable, SerializableInterface
 {
     private $transactions = [];
 

@@ -21,7 +21,7 @@ class HierarchicalKeyFactory
      */
     public static function getSerializer($math, $generator, $network)
     {
-        $extSerializer = new ExtendedKeySerializer($network, new HexExtendedKeySerializer($math, $generator, $network));
+        $extSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($math, $generator, $network));
         return $extSerializer;
     }
 
@@ -67,14 +67,16 @@ class HierarchicalKeyFactory
     }
 
     /**
-     * @param string $extendedKey
+     * @param $extendedKey
      * @param NetworkInterface $network
+     * @param Math $math
+     * @param GeneratorPoint $generator
      * @return HierarchicalKey
-     * @throws Base58ChecksumFailure
      */
-    public static function fromExtended($extendedKey, NetworkInterface $network, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromExtended($extendedKey, NetworkInterface $network = null, Math $math = null, GeneratorPoint $generator = null)
     {
         $math = $math ?: Bitcoin::getMath();
+        $network = $network ?: Bitcoin::getNetwork();
         $generator = $generator ?: Bitcoin::getGenerator();
 
         $extSerializer = self::getSerializer($math, $generator, $network);

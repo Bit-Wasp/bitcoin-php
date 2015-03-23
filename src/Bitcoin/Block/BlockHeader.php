@@ -5,9 +5,10 @@ namespace BitWasp\Bitcoin\Block;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 
-class BlockHeader implements BlockHeaderInterface
+class BlockHeader extends Serializable implements BlockHeaderInterface
 {
     /**
      * @var null|int

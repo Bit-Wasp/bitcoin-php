@@ -1,20 +1,20 @@
 <?php
 
 use Afk11\Bitcoin\Bitcoin;
+use Afk11\Bitcoin\Network\NetworkFactory;
 use Afk11\Bitcoin\Script\ScriptFactory;
 use Afk11\Bitcoin\Key\PrivateKeyFactory;
 use Afk11\Bitcoin\Rpc\RpcFactory;
 use Afk11\Bitcoin\Miner\Miner;
-use Afk11\Bitcoin\Network\Network;
 
 require __DIR__ . "/../vendor/autoload.php";
 
 // init network (TESTNET)
-$network = new Network('6f', 'c4', 'ef', true);
+Bitcoin::setNetwork(NetworkFactory::bitcoinTestnet());
 
 // generate a privatekey so we can received the BTC
 $privKey = PrivateKeyFactory::create(true);
-var_dump($privKey->toWif($network));
+var_dump($privKey->toWif());
 
 // get latest block from RPC
 $rpc = RpcFactory::bitcoind(
