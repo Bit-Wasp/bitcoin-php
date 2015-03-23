@@ -28,7 +28,7 @@ interface KeyInterface extends SerializableInterface
     public function isPrivate();
 
     /**
-     * @return mixed
+     * @return \BitWasp\Bitcoin\Buffer
      */
     public function getBuffer();
 }

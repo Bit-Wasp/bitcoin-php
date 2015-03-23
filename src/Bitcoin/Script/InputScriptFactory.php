@@ -41,7 +41,7 @@ class InputScriptFactory
      */
     public function multisigP2sh(RedeemScript $redeemScript, SignatureCollection $sigs, Buffer $hash)
     {
-        $signer = new Signer(Bitcoin::getMath(), Bitcoin::getGenerator());
+        $signer = Bitcoin::getEcAdapter();
         $linked = $signer->associateSigs($sigs, $hash, $redeemScript->getKeys());
         $script = ScriptFactory::create()->op('OP_0');
         foreach ($redeemScript->getKeys() as $key) {
