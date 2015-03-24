@@ -64,22 +64,25 @@ class Bitcoind
             ->setTimestamp($blockArray['time'])
             ->setMerkleRoot($blockArray['merkleroot'])
             ->setNonce($blockArray['nonce'])
-            ->setPrevBlock($blockArray['previousblockhash'])
+            ->setPrevBlock(@$blockArray['previousblockhash']) // only @ this because of genesis block
             ->setNextBlock(@$blockArray['nextblockhash']);
 
         // Establish batch query for loading transactions
-        $this->client->batch();
-        foreach ($blockArray['tx'] as $txid) {
-            $this->client->execute('getrawtransaction', array($txid));
-        }
-        $result = $this->client->send();
+        if (count($block['tx']) > 0) {
+            $this->client->batch();
+            foreach ($blockArray['tx'] as $txid) {
+                $this->client->execute('getrawtransaction', array($txid));
+            }
+            $result = $this->client->send();
 
-        // Build the transactions
-        $block->getTransactions()->addTransactions(
-            array_map(function ($value) {
-                return TransactionFactory::fromHex($value);
-            }, $result)
-        );
+            // Build the transactions
+            $block->getTransactions()->addTransactions(
+                array_map(function ($value) {
+                    return TransactionFactory::fromHex($value);
+                }, $result)
+            );
+
+        }
 
         return $block;
     }

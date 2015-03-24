@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
@@ -51,7 +52,7 @@ class HexPrivateKeySerializer
     public function parse($string)
     {
         $multiplier = $this->ecAdapter->getMath()->hexDec($string);
-        $privateKey = new PrivateKey($this->ecAdapter, $multiplier, false);
+        $privateKey = PrivateKeyFactory::fromInt($multiplier, false, $this->ecAdapter);
         return $privateKey;
     }
 }

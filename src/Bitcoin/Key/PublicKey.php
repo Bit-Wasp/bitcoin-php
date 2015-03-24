@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Key;
 
-
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Buffer;

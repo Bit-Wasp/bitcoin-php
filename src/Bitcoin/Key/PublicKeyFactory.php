@@ -22,15 +22,6 @@ class PublicKeyFactory
     }
 
     /**
-     * @param PrivateKeyInterface $privateKey
-     * @return PublicKeyInterface
-     */
-    public static function fromPrivateKey(PrivateKeyInterface $privateKey)
-    {
-        return $privateKey->getPublicKey();
-    }
-
-    /**
      * @param PointInterface $point
      * @param bool $compressed
      * @param EcAdapterInterface $ecAdapter

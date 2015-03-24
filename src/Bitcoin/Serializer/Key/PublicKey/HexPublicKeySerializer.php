@@ -48,7 +48,7 @@ class HexPublicKeySerializer
         if ($publicKey->isCompressed()) {
             $binary = pack(
                 "H2H64",
-                PublicKey::getCompressedPrefix($point),
+                $this->getCompressedPrefix($point),
                 str_pad($math->decHex($point->getX()), 64, '0', STR_PAD_LEFT)
             );
 
