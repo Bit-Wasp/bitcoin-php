@@ -17,12 +17,12 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     protected $txid;
 
     /**
-     * @var int
+     * @var string|int
      */
     protected $vout;
 
     /**
-     * @var int
+     * @var string|int
      */
     protected $sequence;
 
