@@ -18,7 +18,7 @@ use BitWasp\Bitcoin\Signature\SignatureHashInterface;
 class TransactionBuilder
 {
     /**
-     * @var Transaction
+     * @var TransactionInterface
      */
     private $transaction;
 
@@ -46,7 +46,8 @@ class TransactionBuilder
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
     {
         $this->transaction = $tx ?: TransactionFactory::create();
-        for ($i = 0; $i < $this->transaction->getInputs()->count(); $i++) {
+        $inputCount = $this->transaction->getInputs()->count();
+        for ($i = 0; $i < $inputCount; $i++) {
             $this->inputSigs[$i] = new SignatureCollection;
         }
         $this->ecAdapter = $ecAdapter;
