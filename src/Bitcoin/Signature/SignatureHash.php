@@ -49,7 +49,8 @@ class SignatureHash implements SignatureHashInterface
         }
 
         // Default SIGHASH_ALL procedure: null all input scripts
-        for ($i = 0; $i < count($inputs); $i++) {
+        $inputCount = count($inputs);
+        for ($i = 0; $i < $inputCount; $i++) {
             $inputs->getInput($i)->setScript(new Script());
         }
 
