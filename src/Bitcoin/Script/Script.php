@@ -30,7 +30,7 @@ class Script extends Serializable implements ScriptInterface
     public function __construct(Buffer $script = null)
     {
         if ($script instanceof Buffer) {
-            $this->script = $script->serialize();
+            $this->script = $script->getBinary();
         }
 
         $this->opcodes = new Opcodes;
