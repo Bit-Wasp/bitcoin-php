@@ -11,7 +11,7 @@ class Point extends EcPoint
     /**
      * Take X, Y, and a generator point, and we can get what we need!
      *
-     * @param Math $math,
+     * @param Math $math
      * @param GeneratorPoint $generator
      * @param int|string $x
      * @param int|string $y
