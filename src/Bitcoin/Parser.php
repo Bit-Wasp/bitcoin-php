@@ -66,7 +66,7 @@ class Parser
     /**
      * Flip byte order of this binary string
      *
-     * @param $hex
+     * @param string $hex
      * @return string
      */
     public static function flipBytes($hex)
