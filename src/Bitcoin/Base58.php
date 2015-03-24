@@ -60,11 +60,11 @@ class Base58
         }
 
         $original = $base58;
+        $strlen = strlen($base58);
         $return = '0';
         $math = Bitcoin::getMath();
-
-
-        for ($i = 0; $i < strlen($base58); $i++) {
+        
+        for ($i = 0; $i < $strlen; $i++) {
             $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
         }
 
