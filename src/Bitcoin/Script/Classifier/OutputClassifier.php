@@ -96,15 +96,15 @@ class OutputClassifier implements ScriptClassifierInterface
     public function classify()
     {
         if ($this->isPayToPublicKey()) {
-            return OutputClassifier::PAYTOPUBKEY;
+            return self::PAYTOPUBKEY;
         } elseif ($this->isPayToPublicKeyHash()) {
-            return OutputClassifier::PAYTOPUBKEYHASH;
+            return self::PAYTOPUBKEYHASH;
         } elseif ($this->isPayToScriptHash()) {
-            return OutputClassifier::PAYTOSCRIPTHASH;
+            return self::PAYTOSCRIPTHASH;
         } elseif ($this->isMultisig()) {
-            return OutputClassifier::MULTISIG;
+            return self::MULTISIG;
         }
 
-        return OutputClassifier::NONSTANDARD;
+        return self::NONSTANDARD;
     }
 }
