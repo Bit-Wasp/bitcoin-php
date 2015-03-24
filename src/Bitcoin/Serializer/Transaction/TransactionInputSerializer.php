@@ -34,7 +34,7 @@ class TransactionInputSerializer
     {
         return new TransactionInput(
             $parser->readBytes(32, true)->getHex(),
-            $parser->readBytes(4, true)->getHex(),
+            $parser->readBytes(4, true)->getInt(),
             new Script($parser->getVarString()),
             $parser->readBytes(4, true)->getInt()
         );
