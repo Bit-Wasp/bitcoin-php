@@ -137,6 +137,7 @@ class PhpEcc extends BaseEcAdapter
 
                 return true;
             } catch (\Exception $e) {
+                // Let the function finish and return false
             }
         }
 

@@ -3,10 +3,10 @@
 namespace {
     
     /**
-     * @param $msg32
-     * @param $signature
-     * @param $signatureLength
-     * @param $privateKey
+     * @param string $msg32
+     * @param string $signature
+     * @param integer $signatureLength
+     * @param string $privateKey
      * @return int
      */
     function secp256k1_ecdsa_sign($msg32, $signature, $signatureLength, $privateKey)
@@ -14,9 +14,9 @@ namespace {
     }
 
     /**
-     * @param $msg32
-     * @param $signature
-     * @param $publicKey
+     * @param string $msg32
+     * @param string $signature
+     * @param string $publicKey
      * @return int
      */
     function secp256k1_ecdsa_verify($msg32, $signature, $publicKey)
@@ -24,8 +24,8 @@ namespace {
     }
 
     /**
-     * @param $privateKey
-     * @param $tweak
+     * @param string $privateKey
+     * @param string $tweak
      * @return int
      */
     function secp256k1_ec_privkey_tweak_add($privateKey, $tweak)
@@ -33,8 +33,8 @@ namespace {
     }
 
     /**
-     * @param $privateKey
-     * @param $tweak
+     * @param string $privateKey
+     * @param string $tweak
      * @return int
      */
     function secp256k1_ec_privkey_tweak_mul($privateKey, $tweak)
@@ -42,8 +42,8 @@ namespace {
     }
 
     /**
-     * @param $publicKey
-     * @param $tweak
+     * @param string $publicKey
+     * @param string $tweak
      * @return int
      */
     function secp256k1_ec_pubkey_tweak_add($publicKey, $tweak)
@@ -51,11 +51,12 @@ namespace {
     }
 
     /**
-     * @param $publicKey
-     * @param $tweak
+     * @param string $publicKey
+     * @param string $pubkeyLen
+     * @param string $tweak
      * @return int
      */
-    function secp256k1_ec_pubkey_tweak_mul($publicKey, $tweak)
+    function secp256k1_ec_pubkey_tweak_mul($publicKey, $pubkeyLen, $tweak)
     {
     }
 }
