@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Signature\CompactSignature;
-use BitWasp\Bitcoin\Signature\Signature;
 use Mdanter\Ecc\GeneratorPoint;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;

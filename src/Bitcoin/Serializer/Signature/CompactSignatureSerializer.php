@@ -32,10 +32,7 @@ class CompactSignatureSerializer
     {
         $math = $this->math;
 
-        $val = $signature->getRecoveryId() + 27;
-        if ($signature->isCompressed()) {
-            $val += 4;
-        }
+        $val = $signature->getFlags();
 
         $parser = new Parser;
         $parser
