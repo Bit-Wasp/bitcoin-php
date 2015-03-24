@@ -91,7 +91,7 @@ class HmacDrbg implements RbgInterface
 
         $this->V = $this->hash($this->V);
 
-        if ($data) {
+        if ($data !== null) {
             $this->K = $this->hash(sprintf(
                 "%s%s%s",
                 $this->V,
