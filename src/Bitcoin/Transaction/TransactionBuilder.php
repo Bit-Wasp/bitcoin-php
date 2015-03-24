@@ -4,18 +4,16 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureHashInterface;
-use BitWasp\Bitcoin\Signature\Signer;
-use Mdanter\Ecc\GeneratorPoint;
 
 class TransactionBuilder
 {
@@ -33,21 +31,24 @@ class TransactionBuilder
      * @var SignatureCollection[]
      */
     private $inputSigs = [];
+    /**
+     * @var EcAdapterInterface
+     */
+    private $ecAdapter;
 
     /**
-     * @param Math $math
-     * @param GeneratorPoint $generatorPoint
+     * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
+     * @internal param Math $math
+     * @internal param GeneratorPoint $generatorPoint
      */
-    public function __construct(Math $math, GeneratorPoint $generatorPoint, TransactionInterface $tx = null)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
     {
         $this->transaction = $tx ?: TransactionFactory::create();
         for ($i = 0; $i < $this->transaction->getInputs()->count(); $i++) {
             $this->inputSigs[$i] = new SignatureCollection;
         }
-        $this->math = $math;
-        $this->generator = $generatorPoint;
-        $this->signer = new Signer($math, $generatorPoint);
+        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -120,9 +121,9 @@ class TransactionBuilder
     public function sign(PrivateKeyInterface $privKey, Buffer $hash)
     {
         $random = ($this->deterministicSignatures
-            ? new Rfc6979($this->math, $this->generator, $privKey, $hash, 'sha256')
+            ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
             : new Random());
-        return $this->signer->sign($privKey, $hash, $random);
+        return $this->ecAdapter->sign($privKey, $hash, $random);
     }
 
     /**
@@ -160,7 +161,7 @@ class TransactionBuilder
         }
 
         // Add and reserialize
-        if (isset($signature)) {
+        if (isset($script)) {
             $this->transaction->getInputs()->getInput($inputToSign)->setScript($script);
         }
 
