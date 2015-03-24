@@ -88,16 +88,16 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         }
 
         $math = $this->getMath();
-        $theory = $math->getNumberTheory();
         $curve = $this->generator->getCurve();
+        $prime = $curve->getPrime();
 
         try {
             // x ^ 3
-            $xCubed   = $math->powMod($xCoord, 3, $curve->getPrime());
+            $xCubed   = $math->powMod($xCoord, 3, $prime);
             $ySquared = $math->add($xCubed, $curve->getB());
 
             // Calculate first root
-            $root0 = $math->getNumberTheory()->squareRootModP($ySquared, $curve->getPrime());
+            $root0 = $math->getNumberTheory()->squareRootModP($ySquared, $prime);
 
             if ($root0 == null) {
                 throw new \RuntimeException('Unable to calculate sqrt mod p');
@@ -108,11 +108,11 @@ abstract class BaseEcAdapter implements EcAdapterInterface
             if ($prefix == PublicKey::KEY_COMPRESSED_EVEN) {
                 $yCoord = ($math->isEven($root0))
                     ? $root0
-                    : $math->sub($curve->getPrime(), $root0);
+                    : $math->sub($prime, $root0);
             } else {
                 $yCoord = (!$math->isEven($root0))
                     ? $root0
-                    : $math->sub($curve->getPrime(), $root0);
+                    : $math->sub($prime, $root0);
             }
         } catch (\Exception $e) {
             throw $e;
