@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
+use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class SignatureCollection implements \Countable
@@ -30,8 +31,10 @@ class SignatureCollection implements \Countable
 
         foreach ($parsed as $data) {
             try {
-                $signature = SignatureFactory::fromHex($data->serialize('hex'));
-                $this->add($signature);
+                if ($data instanceof Buffer) {
+                    $signature = SignatureFactory::fromHex($data->getHex());
+                    $this->addSignature($signature);
+                }
             } catch (\Exception $e) {
                 continue;
             }
