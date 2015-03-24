@@ -2,12 +2,16 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Signature\CompactSignature;
+use BitWasp\Bitcoin\Signature\Signature;
 use Mdanter\Ecc\GeneratorPoint;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Buffer;
+use Mdanter\Ecc\PointInterface;
 
 abstract class BaseEcAdapter implements EcAdapterInterface
 {
@@ -119,5 +123,42 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         }
 
         return $yCoord;
+    }
+
+    /**
+     * attempt to calculate the public key recovery param by trial and error
+     *
+     * @param                $r
+     * @param                $s
+     * @param                $e
+     * @param PointInterface $Q
+     * @return int
+     * @throws \Exception
+     */
+    public function calcPubKeyRecoveryParam($r, $s, Buffer $e, PointInterface $Q)
+    {
+        for ($i = 0; $i < 4; $i++) {
+            $test = new CompactSignature($r, $s, $e, $i);
+            if ($pubKey = $this->recoverCompact($test, $e)) {
+
+                if ($pubKey->getPoint()->getX() == $Q->getX() && $pubKey->getPoint()->getY() == $Q->getY()) {
+                    return $i;
+                }
+            }
+        }
+
+        throw new \Exception("Failed to find valid recovery factor");
+    }
+
+    /**
+     * @param CompactSignature $signature
+     * @param Buffer $messageHash
+     * @param PayToPubKeyHashAddress $address
+     * @return bool
+     */
+    public function verifyMessage(CompactSignature $signature, Buffer $messageHash, PayToPubKeyHashAddress $address)
+    {
+        $publicKey = $this->recoverCompact($signature, $messageHash);
+        return $publicKey->getAddress()->getHash() === $address->getHash();
     }
 }

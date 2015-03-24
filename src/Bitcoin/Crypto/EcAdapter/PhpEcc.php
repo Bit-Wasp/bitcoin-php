@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use Mdanter\Ecc\PointInterface;
@@ -67,6 +68,82 @@ class PhpEcc extends BaseEcAdapter
         }
 
         return new Signature($r, $s);
+    }
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param Buffer $messageHash
+     * @param RbgInterface $rbg
+     * @return CompactSignature
+     */
+    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    {
+        $rbg = $rbg ?: new Random();
+        $sign = $this->sign($privateKey, $messageHash, $rbg);
+
+        // calculate the recovery param
+        // there should be a way to get this when signing too, but idk how ...
+        $recoveryFlags = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey()->getPoint());
+        $compact = new CompactSignature($sign->getR(), $sign->getS(), $recoveryFlags, $privateKey->isCompressed());
+        return $compact;
+    }
+
+    /**
+     * @param CompactSignature $signature
+     * @param Buffer $messageHash
+     * @return PublicKey
+     * @throws \Exception
+     */
+    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    {
+        $math = $this->getMath();
+        $G = $this->getGenerator();
+
+        $isYEven = ($signature->getFlags() & 1) != 0;
+        $isSecondKey = ($signature->getFlags() & 2) != 0;
+        $curve = $G->getCurve();
+
+        // Precalculate (p + 1) / 4 where p is the field order
+        $p_over_four = $math->div($math->add($curve->getPrime(), 1), 4);
+
+        // 1.1 Compute x
+        if (!$isSecondKey) {
+            $x = $signature->getR();
+        } else {
+            $x = $math->add($signature->getR(), $G->getOrder());
+        }
+
+        // 1.3 Convert x to point
+        $alpha = $math->mod($math->add($math->add($math->pow($x, 3), $math->mul($curve->getA(), $x)), $curve->getB()), $curve->getPrime());
+        $beta = $math->powmod($alpha, $p_over_four, $curve->getPrime());
+
+        // If beta is even, but y isn't or vice versa, then convert it,
+        // otherwise we're done and y == beta.
+        if ($math->isEven($beta) == $isYEven) {
+            $y = $math->sub($curve->getPrime(), $beta);
+        } else {
+            $y = $beta;
+        }
+
+        // 1.4 Check that nR is at infinity (implicitly done in constructor)
+        $R = $G->getCurve()->getPoint($x, $y);
+
+        $point_negate = function (PointInterface $p) use ($math, $G) {
+            return $G->getCurve()->getPoint($p->getX(), $math->mul($p->getY(), -1));
+        };
+
+        // 1.6.1 Compute a candidate public key Q = r^-1 (sR - eG)
+        $rInv = $math->inverseMod($signature->getR(), $G->getOrder());
+        $eGNeg = $point_negate($G->mul($messageHash->getInt()));
+        $Q = $R->mul($signature->getS())->add($eGNeg)->mul($rInv);
+
+        // 1.6.2 Test Q as a public key
+        $Qk = new PublicKey($math, $G, $Q);
+        if ($this->verify($Qk, $signature, $messageHash)) {
+            return $Qk;
+        }
+
+        throw new \Exception('Unable to recover public key');
     }
 
     /**

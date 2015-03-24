@@ -36,4 +36,9 @@ interface PublicKeyInterface extends KeyInterface
      * @return \Mdanter\Ecc\PointInterface
      */
     public function getPoint();
+
+    /**
+     * @return \BitWasp\Bitcoin\Address\PayToPubKeyHashAddress
+     */
+    public function getAddress();
 }

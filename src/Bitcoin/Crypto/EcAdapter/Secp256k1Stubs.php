@@ -16,10 +16,32 @@ namespace {
     /**
      * @param string $msg32
      * @param string $signature
+     * @param string $privateKey
+     * @param integer $recid
+     * @return int
+     */
+    function secp256k1_ecdsa_sign_compact($msg32, $signature, $privateKey, $recid)
+    {
+    }
+
+    /**
+     * @param string $msg32
+     * @param string $signature
      * @param string $publicKey
      * @return int
      */
     function secp256k1_ecdsa_verify($msg32, $signature, $publicKey)
+    {
+    }
+
+    /**
+     * @param string $msg32
+     * @param string $signature
+     * @param string $pubkey
+     * @param int $recoveryId
+     * @return int
+     */
+    function secp256k1_ecdsa_recover_compact($msg32, $signature, $pubkey, $recoveryId)
     {
     }
 

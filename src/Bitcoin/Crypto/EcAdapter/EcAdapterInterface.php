@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
@@ -51,6 +52,21 @@ interface EcAdapterInterface
      * @return bool
      */
     public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash);
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param Buffer $messageHash
+     * @param RbgInterface $rbg
+     * @return CompactSignature
+     */
+    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null);
+
+    /**
+     * @param CompactSignature $compactSignature
+     * @param Buffer $messageHash
+     * @return PublicKeyInterface
+     */
+    public function recoverCompact(CompactSignature $compactSignature, Buffer $messageHash);
 
     /**
      * @param Buffer $privateKey

@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
 use BitWasp\Bitcoin\Signature\SignatureHashInterface;
@@ -66,6 +67,55 @@ class Secp256k1 extends BaseEcAdapter
         // Fix since secp256k1 doesn't know about hashtypes
         $sigStr .= SignatureHashInterface::SIGHASH_ALL;
         return SignatureFactory::fromHex(bin2hex($sigStr));
+    }
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param Buffer $messageHash
+     * @param RbgInterface $rbg
+     * @return CompactSignature
+     * @throws \Exception
+     */
+    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    {
+        $privateStr = $privateKey->getBuffer()->getBinary();
+        $hashStr = $messageHash->getBinary();
+        $sigStr = '';
+        $sigLen = 0;
+        $recid = 0;
+        $ret = \secp256k1_ecdsa_sign_compact($hashStr, $sigStr, $sigLen, $privateStr, $recid);
+
+        if ($ret === 1) {
+            $math = $this->getMath();
+            $r = $math->hexDec(bin2hex(substr($sigStr, 0, 32)));
+            $s = $math->hexDec(bin2hex(substr($sigStr, 32, 32)));
+
+            $recid = bindec($recid);
+            $sig = new CompactSignature($r, $s, $recid, $privateKey->isCompressed());
+            return $sig;
+        }
+
+        throw new \Exception('Unable to create compact signature');
+    }
+
+    /**
+     * @param CompactSignature $signature
+     * @param Buffer $messageHash
+     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @throws \Exception
+     */
+    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    {
+        $pubkey = '';
+        $recid = chr(($signature->getRecoveryId()));
+        $ret = \secp256k1_ecdsa_recover_compact($messageHash, $signature, $recid, $signature->isCompressed(), $pubkey);
+
+        if ($ret === 1) {
+            $publicKey = PublicKeyFactory::fromHex(bin2hex($pubkey));
+            return $publicKey;
+        }
+
+        throw new \Exception('Unable to recover public key from compact signature');
     }
 
     /**
