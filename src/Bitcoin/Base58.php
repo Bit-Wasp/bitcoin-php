@@ -41,7 +41,8 @@ class Base58
         $return = strrev($return);
 
         //leading zeros
-        for ($i = 0; $i < strlen($origHex) && substr($origHex, $i, 2) == "00"; $i += 2) {
+        $origLen = strlen($origHex);
+        for ($i = 0; $i < $origLen && substr($origHex, $i, 2) == "00"; $i += 2) {
             $return = "1" . $return;
         }
         return $return;
