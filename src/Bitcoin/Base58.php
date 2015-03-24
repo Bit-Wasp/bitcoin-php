@@ -63,14 +63,14 @@ class Base58
         $strlen = strlen($base58);
         $return = '0';
         $math = Bitcoin::getMath();
-        
+
         for ($i = 0; $i < $strlen; $i++) {
             $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
         }
 
         $hex = ($return == '0') ? '' : $math->decHex($return);
 
-        for ($i = 0; $i < strlen($original) && $original[$i] == "1"; $i++) {
+        for ($i = 0; $i < $strlen && $original[$i] == "1"; $i++) {
             $hex = "00" . $hex;
         }
 
