@@ -93,11 +93,11 @@ class HexExtendedKeySerializer
         try {
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) =
                 [
-                    $parser->readBytes(4)->serialize('hex'),
-                    $parser->readBytes(1)->serialize('int'),
-                    $parser->readBytes(4)->serialize('int'),
-                    $parser->readBytes(4)->serialize('int'),
-                    $parser->readBytes(32)->serialize('int'),
+                    $parser->readBytes(4)->getHex(),
+                    $parser->readBytes(1)->getInt(),
+                    $parser->readBytes(4)->getInt(),
+                    $parser->readBytes(4)->getInt(),
+                    $parser->readBytes(32)->getInt(),
                     $parser->readBytes(33)
                 ];
         } catch (ParserOutOfRange $e) {
@@ -106,7 +106,6 @@ class HexExtendedKeySerializer
 
         if ($bytes !== $this->network->getHDPubByte() && $bytes !== $this->network->getHDPrivByte()) {
             throw new \InvalidArgumentException("HD key magic bytes do not match network magic bytes");
-
         }
 
         $key = ($this->network->getHDPrivByte() == $bytes)

@@ -33,10 +33,10 @@ class TransactionInputSerializer
     public function fromParser(Parser & $parser)
     {
         return new TransactionInput(
-            $parser->readBytes(32, true)->serialize('hex'),
-            $parser->readBytes(4, true)->serialize('int'),
+            $parser->readBytes(32, true)->getHex(),
+            $parser->readBytes(4, true)->getHex(),
             new Script($parser->getVarString()),
-            $parser->readBytes(4, true)->serialize('int')
+            $parser->readBytes(4, true)->getInt()
         );
     }
 

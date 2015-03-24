@@ -19,7 +19,7 @@ class Hash
     public static function normalize($data)
     {
         if ($data instanceof Buffer) {
-            $data = $data->serialize();
+            $data = $data->getBinary();
         }
 
         return $data;

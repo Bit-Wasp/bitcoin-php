@@ -32,13 +32,13 @@ class NetworkMessageSerializer
     {
         $payload = $object->getBuffer();
         $payloadLength = $payload->getSize();
-        $checksum = new Buffer(substr(Hash::sha256d($object->getBuffer()->serialize(), true), 0, 4));
+        $checksum = new Buffer(substr(Hash::sha256d($payload->getBinary(), true), 0, 4));
 
         $parser = new Parser();
         $parser
             ->writeBytes(4, $this->network->getNetMagicBytes(), true)
             ->writeBytes(12, '')
-            ->writeInt(4, $object->getBuffer()->getSize())
+            ->writeInt(4, $payload->getSize())
             ->writeBytes(4, $checksum)
             ->writeBytes($payloadLength, $payload);
 

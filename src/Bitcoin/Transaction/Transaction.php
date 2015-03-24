@@ -55,7 +55,7 @@ class Transaction extends Serializable implements TransactionInterface
         $txid = $txid
             ->writeBytes(32, $hash, true)
             ->getBuffer()
-            ->serialize('hex');
+            ->getHex();
 
         return $txid;
     }

@@ -250,7 +250,7 @@ class HierarchicalKey
             // can be easily wrapped in a loop that recurses until
             // the desired key is created, without the other stuff.
             $data = $this->getHmacSeed($sequence);
-            $hash = Hash::hmac('sha512', $data->serialize(), pack("H*", $chainHex));
+            $hash = Hash::hmac('sha512', $data->getBinary(), pack("H*", $chainHex));
 
             list ($offset, $chainHex) = array(
                 $math->hexDec(substr($hash, 0, 64)),

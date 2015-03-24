@@ -78,7 +78,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function getScriptHash()
     {
-        $hex  = $this->getBuffer()->serialize('hex');
+        $hex  = $this->getBuffer()->getHex();
         $hash = Hash::sha256ripe160($hex, true);
 
         $buffer = new Buffer($hash);

@@ -96,7 +96,7 @@ class ScriptParser
 
     /**
      * @param $opCode
-     * @param Buffer|null $pushData
+     * @param string|null $pushData
      * @return bool
      */
     public function next(&$opCode, &$pushData = null)
@@ -166,7 +166,7 @@ class ScriptParser
         $array = array_map(
             function ($value) {
                 $r = ($value instanceof Buffer)
-                    ? $value->serialize('hex')
+                    ? $value->getHex()
                     : $value;
                 return $r;
             },

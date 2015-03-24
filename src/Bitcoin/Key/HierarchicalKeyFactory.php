@@ -31,7 +31,7 @@ class HierarchicalKeyFactory
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $buffer  = PrivateKeyFactory::create(true, $ecAdapter);
-        $private = self::fromEntropy($buffer->getBuffer()->serialize('hex'), $ecAdapter);
+        $private = self::fromEntropy($buffer->getBuffer()->getHex(), $ecAdapter);
         return $private;
     }
 

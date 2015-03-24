@@ -52,10 +52,10 @@ class TransactionSerializer
     public function fromParser(Parser & $parser)
     {
         return TransactionFactory::create()
-            ->setVersion($parser->readBytes(4, true)->serialize('int'))
+            ->setVersion($parser->readBytes(4, true)->getInt())
             ->setInputs($this->inputsSerializer->fromParser($parser))
             ->setOutputs($this->outputsSerializer->fromParser($parser))
-            ->setLockTime($parser->readBytes(4, true)->serialize('int'));
+            ->setLockTime($parser->readBytes(4, true)->getInt());
     }
 
     /**

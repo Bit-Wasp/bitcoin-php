@@ -53,7 +53,7 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function getPubKeyHash()
     {
-        $publicKey = $this->getBuffer()->serialize('hex');
+        $publicKey = $this->getBuffer()->getHex();
         $hash      = Hash::sha256ripe160($publicKey);
         return $hash;
     }
@@ -64,7 +64,7 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public static function isCompressedOrUncompressed(Buffer $publicKey)
     {
-        $vchPubKey = $publicKey->serialize();
+        $vchPubKey = $publicKey->getBinary();
         if ($publicKey->getSize() < 33) {
             return false;
         }
@@ -137,6 +137,6 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function __toString()
     {
-        return $this->getBuffer()->serialize('hex');
+        return $this->getBuffer()->getHex();
     }
 }

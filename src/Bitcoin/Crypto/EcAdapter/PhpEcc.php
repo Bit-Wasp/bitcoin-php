@@ -33,7 +33,7 @@ class PhpEcc extends BaseEcAdapter
         $generator = $this->getGenerator();
         $n = $generator->getOrder();
 
-        $k = $math->mod($randomK->serialize('int'), $n);
+        $k = $math->mod($randomK->getInt(), $n);
         $r = $generator->mul($k)->getX();
 
         if ($math->cmp($r, 0) == 0) {
@@ -45,7 +45,7 @@ class PhpEcc extends BaseEcAdapter
                 $math->inverseMod($k, $n),
                 $math->mod(
                     $math->add(
-                        $messageHash->serialize('int'),
+                        $messageHash->getInt(),
                         $math->mul(
                             $privateKey->getSecretMultiplier(),
                             $r
@@ -90,7 +90,7 @@ class PhpEcc extends BaseEcAdapter
         }
 
         $c = $math->inverseMod($signature->getS(), $n);
-        $u1 = $math->mod($math->mul($messageHash->serialize('int'), $c), $n);
+        $u1 = $math->mod($math->mul($messageHash->getInt(), $c), $n);
         $u2 = $math->mod($math->mul($signature->getR(), $c), $n);
         $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
         $v = $math->mod($xy->getX(), $n);

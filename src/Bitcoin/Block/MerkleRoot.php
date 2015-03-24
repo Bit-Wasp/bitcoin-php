@@ -106,7 +106,7 @@ class MerkleRoot
         $hash = $hash
             ->writeBytes(32, $buffer, true)
             ->getBuffer()
-            ->serialize('hex');
+            ->getHex();
 
         $this->setLastHash($hash);
         return $this->getLastHash();

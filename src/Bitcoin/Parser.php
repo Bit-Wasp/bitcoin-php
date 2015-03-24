@@ -24,7 +24,7 @@ class Parser
     /**
      * Instantiate class, optionally taking a given hex string or Buffer.
      *
-     * @param null $input
+     * @param string|Buffer|null $input
      * @throws \Exception
      */
     public function __construct($input = null)
@@ -114,7 +114,7 @@ class Parser
     {
         // Return the length encoded in this var int
         $byte   = $this->readBytes(1);
-        $int    = $byte->serialize('int');
+        $int    = $byte->getInt();
 
         if ($this->math->cmp($int, 0xfd) < 0) {
             return $byte;
@@ -138,7 +138,7 @@ class Parser
      */
     public function getVarString()
     {
-        $varInt = $this->getVarInt()->serialize('int');
+        $varInt = $this->getVarInt()->getInt();
         if ($this->math->cmp($varInt, 0) == 0) {
             return new Buffer();
         }
@@ -149,7 +149,7 @@ class Parser
     /**
      * Parse $bytes bytes from the string, and return the obtained buffer
      *
-     * @param $bytes
+     * @param integer $bytes
      * @param bool $flipBytes
      * @return Buffer
      * @throws \Exception
@@ -187,12 +187,12 @@ class Parser
     {
         // Create a new buffer, ensuring that were within the limit set by $bytes
         if ($data instanceof Buffer) {
-            $newBuffer = new Buffer($data->serialize(), $bytes);
+            $newBuffer = new Buffer($data->getBinary(), $bytes);
         } else {
             $newBuffer = Buffer::hex($data, $bytes);
         }
 
-        $data = $newBuffer->serialize();
+        $data = $newBuffer->getBinary();
 
         if ($flipBytes) {
             $data = $this->flipBytes($data);
@@ -213,7 +213,7 @@ class Parser
     public function writeWithLength(Buffer $buffer)
     {
         $varInt = self::numToVarInt($buffer->getSize());
-        $buffer = new Buffer($varInt->serialize() . $buffer->serialize());
+        $buffer = new Buffer($varInt->getBinary() . $buffer->getBinary());
         $this->writeBytes($buffer->getSize(), $buffer);
         return $this;
     }

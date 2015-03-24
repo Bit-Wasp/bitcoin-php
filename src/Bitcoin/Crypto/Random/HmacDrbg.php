@@ -57,7 +57,7 @@ class HmacDrbg implements RbgInterface
 
         $this->V    = str_pad('', $vlen, chr(0x01), STR_PAD_LEFT);
         $this->K    = str_pad('', $vlen, chr(0x00), STR_PAD_LEFT);
-        $seed       = $entropy->serialize() . $personalString ?: '';
+        $seed       = $entropy->getBinary() . $personalString ?: '';
 
         $this->update($seed);
         return $this;

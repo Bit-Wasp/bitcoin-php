@@ -32,7 +32,7 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        $script = $this->script->getBuffer()->serialize();
+        $script = $this->script->getBuffer()->getBinary();
 
         if (strlen($script) == 35 // Binary
             && strlen($this->evalScript[0]) == 33 * 2 // hex string
@@ -74,7 +74,7 @@ class OutputClassifier implements ScriptClassifierInterface
     public function isPayToScriptHash()
     {
         return (
-            strlen($this->script->getBuffer()->serialize()) == 23
+            strlen($this->script->getBuffer()->getBinary()) == 23
             && count($this->evalScript) == 3
             && $this->evalScript[0] == 'OP_HASH160'
             && (strlen($this->evalScript[1]) == 20 * 2)
