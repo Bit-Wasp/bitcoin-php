@@ -79,7 +79,7 @@ class HexPublicKeySerializer
         if (strlen($hex) == PublicKey::LENGTH_COMPRESSED) {
             $compressed = true;
             $xCoord = $math->hexDec(substr($hex, 2, 64));
-            $yCoord = $this->ecAdapter->recoverYfromX($xCoord, $byte, $generator);
+            $yCoord = $this->ecAdapter->recoverYfromX($xCoord, $byte);
 
         } elseif (strlen($hex) == PublicKey::LENGTH_UNCOMPRESSED) {
             $compressed = false;
