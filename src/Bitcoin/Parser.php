@@ -33,7 +33,7 @@ class Parser
             $input = Buffer::hex($input);
         }
 
-        $this->string = $input->serialize();
+        $this->string = $input->getBinary();
         $this->position = 0;
         $this->math = Bitcoin::getMath();
     }
