@@ -154,12 +154,18 @@ class TransactionBuilder
             $signature = $this->sign($privateKey, $hash);
             $script = ScriptFactory::scriptSig()
                 ->payToPubKeyHash($signature, $privateKey->getPublicKey());
-        } else if ($prevOutType->isPayToScriptHash() && $parse[1] == $redeemScript->getScriptHash()) {
-            $hash = $signatureHash->calculate($redeemScript, $inputToSign, $sigHashType);
-            $signature = $this->sign($privateKey, $hash);
-            $script = ScriptFactory::scriptSig()
-                ->multisigP2sh($redeemScript, new SignatureCollection(array($signature)), $hash);
-            // todo..
+        } else if ($prevOutType->isPayToScriptHash()) {
+            if ($redeemScript === null) {
+                throw new \Exception('Redeem script should be passed when signing a p2sh input');
+            }
+
+            if ($parse[1] == $redeemScript->getScriptHash()) {
+                $hash = $signatureHash->calculate($redeemScript, $inputToSign, $sigHashType);
+                $signature = $this->sign($privateKey, $hash);
+                $script = ScriptFactory::scriptSig()
+                    ->multisigP2sh($redeemScript, new SignatureCollection(array($signature)), $hash);
+                // todo..
+            }
         }
 
         // Add and reserialize
