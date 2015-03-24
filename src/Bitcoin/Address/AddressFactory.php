@@ -33,7 +33,7 @@ class AddressFactory
     /**
      * @param                  $address
      * @param NetworkInterface $network
-     * @return ScriptHashAddress
+     * @return AddressInterface
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public static function fromString($address, NetworkInterface $network = null)
