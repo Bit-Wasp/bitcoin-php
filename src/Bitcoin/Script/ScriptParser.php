@@ -35,7 +35,7 @@ class ScriptParser
     {
         $this->math = $math;
         $this->script = $script;
-        $this->scriptRaw = $script->getBuffer()->serialize();
+        $this->scriptRaw = $script->getBuffer()->getBinary();
         $this->ptr = 0;
     }
 
