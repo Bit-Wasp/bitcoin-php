@@ -75,8 +75,8 @@ class PublicKey extends Key implements PublicKeyInterface
                 return false;
             }
         } elseif (in_array($vchPubKey[0], array(
-            hex2bin(PublicKey::KEY_COMPRESSED_EVEN),
-            hex2bin(PublicKey::KEY_COMPRESSED_ODD)))) {
+            hex2bin(self::KEY_COMPRESSED_EVEN),
+            hex2bin(self::KEY_COMPRESSED_ODD)))) {
             if ($publicKey->getSize() != 33) {
                 return false;
             }
