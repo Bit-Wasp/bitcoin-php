@@ -31,6 +31,7 @@ class TransactionBuilder
      * @var SignatureCollection[]
      */
     private $inputSigs = [];
+
     /**
      * @var EcAdapterInterface
      */
@@ -142,7 +143,6 @@ class TransactionBuilder
     ) {
 
         $input = $this->transaction->getInputs()->getInput($inputToSign);
-        // Parse
         $outputScript = $input->getOutputScript();
 
         $prevOutType = new OutputClassifier($outputScript);
@@ -152,11 +152,13 @@ class TransactionBuilder
         if ($prevOutType->isPayToPublicKeyHash() && $parse[2] == $privateKey->getPubKeyHash()) {
             $hash = $signatureHash->calculate($outputScript, $inputToSign, $sigHashType);
             $signature = $this->sign($privateKey, $hash);
-            $script = ScriptFactory::scriptSig()->payToPubKeyHash($signature, $privateKey->getPublicKey());
+            $script = ScriptFactory::scriptSig()
+                ->payToPubKeyHash($signature, $privateKey->getPublicKey());
         } else if ($prevOutType->isPayToScriptHash() && $parse[1] == $redeemScript->getScriptHash()) {
             $hash = $signatureHash->calculate($redeemScript, $inputToSign, $sigHashType);
             $signature = $this->sign($privateKey, $hash);
-            $script = ScriptFactory::scriptSig()->multisigP2sh($redeemScript, new SignatureCollection(array($signature)), $hash);
+            $script = ScriptFactory::scriptSig()
+                ->multisigP2sh($redeemScript, new SignatureCollection(array($signature)), $hash);
             // todo..
         }
 
