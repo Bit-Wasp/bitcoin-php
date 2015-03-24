@@ -14,16 +14,18 @@ class PrivateKeyFactory
     /**
      * Generate a buffer containing a valid key
      *
+     * @param EcAdapterInterface|null $ecAdapter
      * @return \BitWasp\Bitcoin\Buffer
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public static function generateSecret()
+    public static function generateSecret(EcAdapterInterface $ecAdapter = null)
     {
         $random = new Random();
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
 
         do {
             $buffer = $random->bytes(32);
-        } while (!PrivateKey::isValidKey($buffer->serialize('int')));
+        } while (!$ecAdapter->validatePrivateKey($buffer));
 
         return $buffer;
     }
@@ -50,7 +52,7 @@ class PrivateKeyFactory
     {
         $secret = self::generateSecret();
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        return self::fromInt($secret->serialize('int'), $compressed, $ecAdapter);
+        return self::fromInt($secret->getInt(), $compressed, $ecAdapter);
     }
 
     /**

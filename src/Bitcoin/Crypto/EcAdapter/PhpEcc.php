@@ -99,13 +99,13 @@ class PhpEcc extends BaseEcAdapter
     }
 
     /**
-     * @param $privateKey
+     * @param Buffer $privateKey
      * @return bool
      */
-    public function validatePrivateKey($privateKey)
+    public function validatePrivateKey(Buffer $privateKey)
     {
         $math = $this->getMath();
-        $secret = $math->hexDec($privateKey);
+        $secret = $privateKey->getInt();
         // Less than the order of the curve, and not zero
         $withinRange = $math->cmp($secret, $this->getGenerator()->getOrder()) < 0;
         $notZero = !($math->cmp($secret, '0') === 0);
@@ -114,17 +114,16 @@ class PhpEcc extends BaseEcAdapter
     }
 
     /**
-     * @param $publicKey
+     * @param Buffer $publicKey
      * @return bool
      */
-    public function validatePublicKey($publicKey)
+    public function validatePublicKey(Buffer $publicKey)
     {
         $math = $this->getMath();
-        $buffer = Buffer::hex($publicKey);
-        if (PublicKey::isCompressedOrUncompressed($buffer)) {
+
+        if (PublicKey::isCompressedOrUncompressed($publicKey)) {
             try {
-                $size = $buffer->getSize();
-                if ($size == 33) {
+                if ($publicKey->getSize() == 33) {
                     $x = $math->hexDec(substr($publicKey, 2, 64));
                     $y = $this->recoverYfromX($x, substr($publicKey, 0, 2));
                 } else {
@@ -132,7 +131,10 @@ class PhpEcc extends BaseEcAdapter
                     $y = $math->hexDec(substr($publicKey, 66, 64));
                 }
 
-                $point = $this->getGenerator()->getCurve()->getPoint($x, $y);
+                $this->getGenerator()
+                    ->getCurve()
+                    ->getPoint($x, $y);
+
                 return true;
             } catch (\Exception $e) {
             }
@@ -140,6 +142,7 @@ class PhpEcc extends BaseEcAdapter
 
         return false;
     }
+
     /**
      * @param PrivateKeyInterface $privateKey
      * @return \BitWasp\Bitcoin\Key\PublicKey

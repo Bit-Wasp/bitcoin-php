@@ -64,12 +64,12 @@ class HierarchicalKey
             throw new \Exception('A HierarchicalKey must always be compressed');
         }
 
+        $this->ecAdapter = $ecAdapter;
         $this->depth = $depth;
         $this->sequence = $sequence;
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
         $this->key = $key;
-        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -183,56 +183,6 @@ class HierarchicalKey
     }
 
     /**
-     * @return Buffer
-     * @throws \Exception
-     */
-    public function getBuffer()
-    {
-        if ($this->isPrivate()) {
-            return $this->getPrivateKey()->getBuffer();
-        } else {
-            return $this->getPublicKey()->getBuffer();
-        }
-    }
-
-    /**
-     *
-     * @param NetworkInterface $network
-     * @return string
-     */
-    public function toExtendedKey(NetworkInterface $network = null)
-    {
-        $network = $network ?: Bitcoin::getNetwork();
-
-        $extendedSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($this->ecAdapter, $network));
-        $extended = $extendedSerializer->serialize($this);
-        return $extended;
-    }
-
-    /**
-     * @param NetworkInterface $network
-     * @return string
-     */
-    public function toExtendedPrivateKey(NetworkInterface $network = null)
-    {
-        if (!$this->isPrivate()) {
-            throw new \LogicException('Cannot create extended private key from public');
-        }
-
-        return $this->toExtendedKey($network);
-    }
-
-    /**
-     * @param NetworkInterface $network
-     * @return string
-     */
-    public function toExtendedPublicKey(NetworkInterface $network = null)
-    {
-        $clone = clone($this);
-        return $clone->toPublic()->toExtendedKey($network);
-    }
-
-    /**
      * Return whether this is a private key
      *
      * @return bool
@@ -251,6 +201,37 @@ class HierarchicalKey
     {
         $math = $this->ecAdapter->getMath();
         return $math->cmp($this->getSequence(), $math->hexDec('80000000')) >= 0;
+    }
+
+    /**
+     * Create a buffer containing data to be hashed hashed to yield the child offset
+     *
+     * @param Buffer $sequence
+     * @return Buffer
+     * @throws \Exception
+     */
+    public function getHmacSeed($sequence)
+    {
+        $math = $this->ecAdapter->getMath();
+        $parser = new Parser();
+        $hardened = $math->cmp($sequence, $math->hexDec('80000000')) >= 0;
+
+        if ($hardened) {
+            if ($this->isPrivate() === false) {
+                throw new \Exception("Can't derive a hardened key without the private key");
+            }
+
+            $parser
+                ->writeBytes(1, '00')
+                ->writeBytes(32, $this->getPrivateKey()->getBuffer());
+
+        } else {
+            $parser->writeBytes(33, $this->getPublicKey()->getBuffer());
+        }
+
+        return $parser
+            ->writeInt(4, $sequence)
+            ->getBuffer();
     }
 
     /**
@@ -297,37 +278,6 @@ class HierarchicalKey
         );
 
         return $key;
-    }
-
-    /**
-     * Create a buffer containing data to be hashed hashed to yield the child offset
-     *
-     * @param Buffer $sequence
-     * @return Buffer
-     * @throws \Exception
-     */
-    public function getHmacSeed($sequence)
-    {
-        $math = $this->ecAdapter->getMath();
-        $parser   = new Parser();
-        $hardened = $math->cmp($sequence, $math->hexDec('80000000')) >= 0;
-
-        if ($hardened) {
-            if ($this->isPrivate() === false) {
-                throw new \Exception("Can't derive a hardened key without the private key");
-            }
-
-            $parser
-                ->writeBytes(1, '00')
-                ->writeBytes(32, $this->getPrivateKey()->getBuffer());
-
-        } else {
-            $parser->writeBytes(33, $this->getPublicKey()->getBuffer());
-        }
-
-        return $parser
-            ->writeInt(4, $sequence)
-            ->getBuffer();
     }
 
     /**
@@ -381,5 +331,55 @@ class HierarchicalKey
 
         $path = implode("/", $newPath);
         return $path;
+    }
+
+    /**
+     * @return Buffer
+     * @throws \Exception
+     */
+    public function getBuffer()
+    {
+        if ($this->isPrivate()) {
+            return $this->getPrivateKey()->getBuffer();
+        } else {
+            return $this->getPublicKey()->getBuffer();
+        }
+    }
+
+    /**
+     *
+     * @param NetworkInterface $network
+     * @return string
+     */
+    public function toExtendedKey(NetworkInterface $network = null)
+    {
+        $network = $network ?: Bitcoin::getNetwork();
+
+        $extendedSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($this->ecAdapter, $network));
+        $extended = $extendedSerializer->serialize($this);
+        return $extended;
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     */
+    public function toExtendedPrivateKey(NetworkInterface $network = null)
+    {
+        if (!$this->isPrivate()) {
+            throw new \LogicException('Cannot create extended private key from public');
+        }
+
+        return $this->toExtendedKey($network);
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @return string
+     */
+    public function toExtendedPublicKey(NetworkInterface $network = null)
+    {
+        $clone = clone($this);
+        return $clone->toPublic()->toExtendedKey($network);
     }
 }

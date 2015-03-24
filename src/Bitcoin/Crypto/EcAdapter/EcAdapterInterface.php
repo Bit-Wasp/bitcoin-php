@@ -22,6 +22,13 @@ interface EcAdapterInterface
     public function getGenerator();
 
     /**
+     * @param integer $xCoord
+     * @param string $prefix
+     * @return integer
+     */
+    public function recoverYfromX($xCoord, $prefix);
+
+    /**
      * @param SignatureCollection $signatures
      * @param Buffer $messageHash
      * @param PublicKeyInterface[] $publicKeys
@@ -46,16 +53,16 @@ interface EcAdapterInterface
     public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash);
 
     /**
-     * @param $privateKey
+     * @param Buffer $privateKey
      * @return bool
      */
-    public function validatePrivateKey($privateKey);
+    public function validatePrivateKey(Buffer $privateKey);
 
     /**
-     * @param $publicKey
+     * @param Buffer $publicKey
      * @return bool
      */
-    public function validatePublicKey($publicKey);
+    public function validatePublicKey(Buffer $publicKey);
 
     /**
      * @param PrivateKeyInterface $privateKey

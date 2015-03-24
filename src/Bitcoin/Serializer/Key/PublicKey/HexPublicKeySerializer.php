@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use Mdanter\Ecc\PointInterface;
 
 class HexPublicKeySerializer
 {
@@ -20,6 +21,19 @@ class HexPublicKeySerializer
     public function __construct(EcAdapterInterface $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
+    }
+
+    /**
+     * Return the prefix for an address, based on the point.
+     *
+     * @param PointInterface $point
+     * @return string
+     */
+    public function getCompressedPrefix(PointInterface $point)
+    {
+        return $this->ecAdapter->getMath()->isEven($point->getY())
+            ? PublicKey::KEY_COMPRESSED_EVEN
+            : PublicKey::KEY_COMPRESSED_ODD;
     }
 
     /**
@@ -65,7 +79,7 @@ class HexPublicKeySerializer
         if (strlen($hex) == PublicKey::LENGTH_COMPRESSED) {
             $compressed = true;
             $xCoord = $math->hexDec(substr($hex, 2, 64));
-            $yCoord = PublicKey::recoverYfromX($xCoord, $byte, $generator);
+            $yCoord = $this->ecAdapter->recoverYfromX($xCoord, $byte, $generator);
 
         } elseif (strlen($hex) == PublicKey::LENGTH_UNCOMPRESSED) {
             $compressed = false;

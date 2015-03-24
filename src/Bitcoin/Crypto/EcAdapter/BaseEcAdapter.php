@@ -75,13 +75,19 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         return $linked;
     }
 
-    public function recoverYfromX($xCoord, $byte)
+    /**
+     * @param integer $xCoord
+     * @param string $prefix
+     * @return int|string
+     * @throws \Exception
+     */
+    public function recoverYfromX($xCoord, $prefix)
     {
-        if (!in_array($byte, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
+        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
         }
 
-        $math   = $this->getMath();
+        $math = $this->getMath();
         $theory = $math->getNumberTheory();
         $curve = $this->generator->getCurve();
 
@@ -91,7 +97,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
             $ySquared = $math->add($xCubed, $curve->getB());
 
             // Calculate first root
-            $root0 = $theory->squareRootModP($ySquared, $curve->getPrime());
+            $root0 = $math->getNumberTheory()->squareRootModP($ySquared, $curve->getPrime());
 
             if ($root0 == null) {
                 throw new \RuntimeException('Unable to calculate sqrt mod p');
@@ -99,7 +105,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
 
             // Depending on the byte, we expect the Y value to be even or odd.
             // We only calculate the second y root if it's needed.
-            if ($byte == PublicKey::KEY_COMPRESSED_EVEN) {
+            if ($prefix == PublicKey::KEY_COMPRESSED_EVEN) {
                 $yCoord = ($math->isEven($root0))
                     ? $root0
                     : $math->sub($curve->getPrime(), $root0);

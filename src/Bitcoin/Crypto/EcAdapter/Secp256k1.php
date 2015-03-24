@@ -93,19 +93,25 @@ class Secp256k1 extends BaseEcAdapter
             : false;
     }
 
-    public function validatePrivateKey($privateKey)
+    /**
+     * @param Buffer $privateKey
+     * @return bool
+     */
+    public function validatePrivateKey(Buffer $privateKey)
     {
-        $key = pack("H*", $privateKey);
-        $ret = \secp256k1_ec_seckey_verify($key);
+        $ret = \secp256k1_ec_seckey_verify($privateKey->getBinary());
         return ($ret === 1)
             ? true
             : false;
     }
 
-    public function validatePublicKey($publicKey)
+    /**
+     * @param Buffer $publicKey
+     * @return bool
+     */
+    public function validatePublicKey(Buffer $publicKey)
     {
-        $key = pack("H*", $publicKey);
-        $ret = \secp256k1_ec_pubkey_verify($key);
+        $ret = \secp256k1_ec_pubkey_verify($publicKey->getBinary());
         return ($ret === 1)
             ? true
             : false;

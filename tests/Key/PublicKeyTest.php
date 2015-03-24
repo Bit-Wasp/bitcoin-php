@@ -96,66 +96,6 @@ class PublicKeyTest extends AbstractTestCase
         $this->publicKey = PublicKeyFactory::fromHex($hex);
     }
 
-    public function testRecoverYfromX()
-    {
-        $f = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
-        $g = Bitcoin::getGenerator();
-        $json = json_decode($f);
-        foreach ($json->test as $test) {
-            $byte = substr($test->compressed, 0, 2);
-            $x    = Bitcoin::getMath()->hexDec(substr($test->compressed, 2, 64));
-            $realy= Bitcoin::getMath()->hexDec(substr($test->uncompressed, 66, 64));
-            $y    = PublicKey::recoverYfromX($x, $byte, $g);
-            $this->assertSame($realy, $y);
-        }
-    }
-
-    /**
-     * @expectedException \Exception
-     */
-    public function testRecoverYfromXException()
-    {
-        $x = 0;
-        PublicKey::recoverYfromX($x, '02', Bitcoin::getGenerator());
-    }
-
-    /**
-     * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
-     * @throws \Exception
-     */
-    public function testCompressKeys(EcAdapterInterface $ecAdapter)
-    {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
-        $json = json_decode($f);
-        foreach ($json->test as $test) {
-            $key        = PublicKeyFactory::fromHex($test->uncompressed, $ecAdapter);
-            $compressed = PublicKey::compress($key);
-            $this->assertSame($compressed, $test->compressed);
-        }
-    }
-
-    /**
-     * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
-     * @throws \Exception
-     */
-    public function testCompressPoint(EcAdapterInterface $ecAdapter)
-    {
-        $hex             = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
-        $this->publicKey = PublicKeyFactory::fromHex($hex, $ecAdapter);
-        $point           = $this->publicKey->getPoint();
-        $compressed      = PublicKey::compress($point);
-        $this->assertSame($hex, $compressed);
-    }
-
-    /**
-     * @expectedException \Exception
-     */
-    public function testCompressPointException()
-    {
-        PublicKey::compress('a');
-    }
 
     /**
      * @dataProvider getEcAdapters

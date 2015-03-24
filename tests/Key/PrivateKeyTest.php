@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Key;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKey;
-use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -49,38 +48,6 @@ class PrivateKeyTest extends AbstractTestCase
         $this->generator = Bitcoin::getGenerator();
     }
 
-    public function testIsValidKey()
-    {
-        // Keys must be < the order of the curve
-        // Order of secp256k1 - 1
-
-        $key1 = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140');
-        $this->assertTrue(PrivateKey::isValidKey($key1));
-
-        $key2 = $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141');
-        $this->assertTrue(PrivateKey::isValidKey($key2));
-
-        $key3 = $this->math->hexDec('8000000000000000000000000000000000000000000000000000000000000000');
-        $this->assertTrue(PrivateKey::isValidKey($key3));
-
-        $key4 = $this->math->hexDec('8000000000000000000000000000000000000000000000000000000000000001');
-        $this->assertTrue(PrivateKey::isValidKey($key4));
-
-    }
-
-    /**
-     * @depends testIsValidKey
-     */
-    public function testIsValidKeyFailure()
-    {
-        // Order of secp256k1
-        $order = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-        $this->assertFalse(PrivateKey::isValidKey($order));
-
-        $key1 = $this->math->hexDec('0000000000000000000000000000000000000000000000000000000000000000');
-        $this->assertFalse(PrivateKey::isValidKey($key1));
-    }
-
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
@@ -88,17 +55,17 @@ class PrivateKeyTest extends AbstractTestCase
     public function testCreatePrivateKey(EcAdapterInterface $ecAdapter)
     {
         $hex = '4141414141414141414141414141414141414141414141414141414141414141';
-        $key = $this->math->hexDec($hex);
-        $this->privateKey   = PrivateKeyFactory::fromInt($key, false, $ecAdapter);
+        $key = $ecAdapter->getMath()->hexDec($hex);
+        $privateKey   = PrivateKeyFactory::fromInt($key, false, $ecAdapter);
 
-        $this->assertInstanceOf($this->baseType, $this->privateKey);
-        $this->assertSame($this->privateKey->getBuffer()->serialize('hex'), '4141414141414141414141414141414141414141414141414141414141414141');
-        $this->assertFalse($this->privateKey->isCompressed());
-        $this->assertTrue($this->privateKey->isPrivate());
-        $this->assertInstanceOf($this->publicType, $this->privateKey->getPublicKey());
+        $this->assertInstanceOf($this->baseType, $privateKey);
+        $this->assertSame($privateKey->getBuffer()->getHex(), '4141414141414141414141414141414141414141414141414141414141414141');
+        $this->assertFalse($privateKey->isCompressed());
+        $this->assertTrue($privateKey->isPrivate());
+        $this->assertInstanceOf($this->publicType, $privateKey->getPublicKey());
         $this->assertSame(
             '04eec7245d6b7d2ccb30380bfbe2a3648cd7a942653f5aa340edcea1f2836866198bd9fc8678e246f23f40bfe8d928d3f37a51642aed1d5b471a1a0db4f71891ea',
-            $this->privateKey->getPublicKey()->getBuffer()->serialize('hex')
+            $privateKey->getPublicKey()->getBuffer()->getHex()
         );
     }
 
@@ -108,7 +75,7 @@ class PrivateKeyTest extends AbstractTestCase
     public function testCreatePrivateKeyFailure()
     {
         $dec = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-        $this->privateKey = new PrivateKey(Bitcoin::getEcAdapter(), $dec);
+        $this->privateKey = PrivateKeyFactory::fromInt($dec, Bitcoin::getEcAdapter());
     }
 
 
@@ -132,11 +99,12 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testSetCompressed(EcAdapterInterface $ecAdapter)
     {
-        $dec = $this->math->hexDec('4141414141414141414141414141414141414141414141414141414141414141');
-        $this->privateKey = PrivateKeyFactory::fromInt($dec, false, $ecAdapter);
-        $this->assertFalse($this->privateKey->isCompressed());
-        $this->privateKey = PrivateKeyFactory::fromInt($dec, true, $ecAdapter);
-        $this->assertTrue($this->privateKey->isCompressed());
+        $hex = '4141414141414141414141414141414141414141414141414141414141414141';
+        $privateKey = PrivateKeyFactory::fromHex($hex, false, $ecAdapter);
+        $this->assertFalse($privateKey->isCompressed());
+
+        $privateKey = PrivateKeyFactory::fromHex($hex, true, $ecAdapter);
+        $this->assertTrue($privateKey->isCompressed());
     }
 
     /**
@@ -145,11 +113,11 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testGenerateNewCompressed()
     {
-        $this->privateKey = PrivateKeyFactory::create(true);
-        $this->assertInstanceOf($this->baseType, $this->privateKey);
-        $this->assertTrue($this->privateKey->isCompressed());
-        $this->assertTrue($this->privateKey->isPrivate());
-        $this->assertInstanceOf($this->publicType, $this->privateKey->getPublicKey());
+        $privateKey = PrivateKeyFactory::create(true);
+        $this->assertInstanceOf($this->baseType, $privateKey);
+        $this->assertTrue($privateKey->isCompressed());
+        $this->assertTrue($privateKey->isPrivate());
+        $this->assertInstanceOf($this->publicType, $privateKey->getPublicKey());
     }
 
     /**
@@ -158,15 +126,15 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testGetWif(EcAdapterInterface $ecAdapter)
     {
-        $this->privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
+        $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
         $network = NetworkFactory::bitcoin();
 
-        $this->assertSame($this->privateKey->toWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
-        $this->assertSame($this->privateKey->toWif(), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
+        $this->assertSame($privateKey->toWif($network), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
+        $this->assertSame($privateKey->toWif(), '5JK2Rv7ZquC9J11AQZXXU7M9S17z193GPjsKPU3gSANJszAW3dU');
 
-        $this->privateKey->setCompressed(true);
-        $this->assertSame($this->privateKey->toWif($network), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
-        $this->assertSame($this->privateKey->toWif(), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
+        $privateKey->setCompressed(true);
+        $this->assertSame($privateKey->toWif($network), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
+        $this->assertSame($privateKey->toWif(), 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA');
     }
 
     /**
@@ -175,10 +143,10 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testGetPubKeyHash(EcAdapterInterface $ecAdapter)
     {
-        $this->privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
-        $this->assertSame('d00baafc1c7f120ab2ae0aa22160b516cfcf9cfe', $this->privateKey->getPubKeyHash());
-        $this->privateKey->setCompressed(true);
-        $this->assertSame('c53c82d3357f1f299330d585907b7c64b6b7a5f0', $this->privateKey->getPubKeyHash());
+        $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
+        $this->assertSame('d00baafc1c7f120ab2ae0aa22160b516cfcf9cfe', $privateKey->getPubKeyHash());
+        $privateKey->setCompressed(true);
+        $this->assertSame('c53c82d3357f1f299330d585907b7c64b6b7a5f0', $privateKey->getPubKeyHash());
     }
 
     /**
@@ -187,8 +155,8 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testSerialize(EcAdapterInterface $ecAdapter)
     {
-        $this->privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
-        $this->assertSame('4141414141414141414141414141414141414141414141414141414141414141', $this->privateKey->getBuffer()->serialize('hex'));
+        $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
+        $this->assertSame('4141414141414141414141414141414141414141414141414141414141414141', $privateKey->getBuffer()->getHex());
     }
 
     /**

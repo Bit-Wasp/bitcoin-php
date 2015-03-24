@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -19,7 +20,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * @var bool
      */
-    private $compressed;
+    protected $compressed;
 
     /**
      * @var PublicKey
@@ -29,7 +30,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * @var EcAdapterInterface
      */
-    private $ecAdapter;
+    protected $ecAdapter;
 
     /**
      * @param EcAdapterInterface $ecAdapter
@@ -39,32 +40,14 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function __construct(EcAdapterInterface $ecAdapter, $int, $compressed = false)
     {
-
-        if (!self::isValidKey($int)) {
+        $buffer = Buffer::hex($ecAdapter->getMath()->decHex($int));
+        if (false === $ecAdapter->validatePrivateKey($buffer)) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
         $this->secretMultiplier = $int;
         $this->compressed = $compressed;
         $this->ecAdapter = $ecAdapter;
-    }
-
-    /**
-     * Check if the $hex string is a valid key, ie, less than the order of the curve.
-     *
-     * @param $int
-     * @return bool
-     */
-    public static function isValidKey($int)
-    {
-        $math = Bitcoin::getMath();
-        $generator = Bitcoin::getGenerator();
-
-        // Less than the order of the curve, and not zero
-        $withinRange = $math->cmp($int, $generator->getOrder()) < 0;
-        $notZero = !($math->cmp($int, '0') === 0);
-
-        return $withinRange && $notZero;
     }
 
     /**
