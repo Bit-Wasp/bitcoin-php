@@ -99,10 +99,8 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function validatePrivateKey(Buffer $privateKey)
     {
-        $ret = \secp256k1_ec_seckey_verify($privateKey->getBinary());
-        return ($ret === 1)
-            ? true
-            : false;
+        $ret = (bool) \secp256k1_ec_seckey_verify($privateKey->getBinary());
+        return $ret;
     }
 
     /**
@@ -111,10 +109,8 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function validatePublicKey(Buffer $publicKey)
     {
-        $ret = \secp256k1_ec_pubkey_verify($publicKey->getBinary());
-        return ($ret === 1)
-            ? true
-            : false;
+        $ret = (bool) \secp256k1_ec_pubkey_verify($publicKey->getBinary());
+        return $ret;
     }
 
     /**
@@ -140,7 +136,10 @@ class Secp256k1 extends BaseEcAdapter
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
         $scalarStr = $this->getBinaryScalar($integer);
 
-        $ret = \secp256k1_ec_privkey_tweak_mul($privKey, $scalarStr);
+        $ret = (bool) \secp256k1_ec_privkey_tweak_mul($privKey, $scalarStr);
+        if ($ret === false) {
+            throw new \Exception('Secp256k1 privkey tweak mul: failed');
+        }
         return $this->getRelatedPrivateKey($privateKey, $privKey);
     }
 
@@ -148,13 +147,17 @@ class Secp256k1 extends BaseEcAdapter
      * @param PrivateKeyInterface $privateKey
      * @param $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @throws \Exception
      */
     public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
     {
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
         $scalarStr = $this->getBinaryScalar($integer);
 
-        $ret = \secp256k1_ec_privkey_tweak_add($privKey, $scalarStr);
+        $ret = (bool) \secp256k1_ec_privkey_tweak_add($privKey, $scalarStr);
+        if ($ret === false) {
+            throw new \Exception('Secp256k1 privkey tweak add: failed');
+        }
         return $this->getRelatedPrivateKey($privateKey, $privKey);
     }
 
@@ -162,13 +165,17 @@ class Secp256k1 extends BaseEcAdapter
      * @param PublicKeyInterface $publicKey
      * @param $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @throws \Exception
      */
     public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
         $scalarStr = $this->getBinaryScalar($integer);
 
-        $ret = \secp256k1_ec_pubkey_tweak_add($pubKey, $scalarStr);
+        $ret = (bool) \secp256k1_ec_pubkey_tweak_add($pubKey, $scalarStr);
+        if ($ret === false) {
+            throw new \Exception('Secp256k1 pubkey tweak add: failed');
+        }
         return $this->getRelatedPublicKey($publicKey, $pubKey);
     }
 
@@ -176,6 +183,7 @@ class Secp256k1 extends BaseEcAdapter
      * @param PublicKeyInterface $publicKey
      * @param $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @throws \Exception
      */
     public function publicKeyMul(PublicKeyInterface $publicKey, $integer)
     {
@@ -183,8 +191,10 @@ class Secp256k1 extends BaseEcAdapter
         $pubkeyLen = strlen($pubKey);
         $scalarStr = $this->getBinaryScalar($integer);
 
-        $ret = \secp256k1_ec_pubkey_tweak_mul($pubKey, $pubkeyLen, $scalarStr);
-
+        $ret = (bool) \secp256k1_ec_pubkey_tweak_mul($pubKey, $pubkeyLen, $scalarStr);
+        if ($ret === false) {
+            throw new \Exception('Secp256k1 pubkey tweak mul: failed');
+        }
         return $this->getRelatedPublicKey($publicKey, $pubKey);
     }
 }

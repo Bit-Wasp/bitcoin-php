@@ -59,4 +59,22 @@ namespace {
     function secp256k1_ec_pubkey_tweak_mul($publicKey, $pubkeyLen, $tweak)
     {
     }
+
+    /**
+     * @param $publicKey
+     * @return int
+     */
+    function secp256k1_ec_pubkey_verify($publicKey)
+    {
+
+    }
+
+    /**
+     * @param $secKey
+     * @return int
+     */
+    function secp256k1_ec_seckey_verify($secKey)
+    {
+
+    }
 }
