@@ -6,9 +6,10 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use Symfony\Component\Yaml\Yaml;
 
-class AddressTest extends \PHPUnit_Framework_TestCase
+class AddressTest extends AbstractTestCase
 {
 
     public function getVectors()

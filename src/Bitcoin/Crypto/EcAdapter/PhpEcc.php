@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
+use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
@@ -27,7 +28,7 @@ class PhpEcc extends BaseEcAdapter
      */
     public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
     {
-        $rbg = $rbg ?: new Random();
+        $rbg = $rbg ?: new Rfc6979($this->getMath(), $this->getGenerator(), $privateKey, $messageHash);
         $randomK = $rbg->bytes(32);
 
         $math = $this->getMath();
@@ -71,22 +72,51 @@ class PhpEcc extends BaseEcAdapter
     }
 
     /**
+     * attempt to calculate the public key recovery param by trial and error
+     *
+     * @param                $r
+     * @param                $s
+     * @param                $messageHash
+     * @param PointInterface $Q
+     * @return int
+     * @throws \Exception
+     */
+    public function calcPubKeyRecoveryParam($r, $s, Buffer $messageHash, PublicKeyInterface $publicKey)
+    {
+        $Q = $publicKey->getPoint();
+        for ($i = 0; $i < 4; $i++) {
+            try {
+                $test = new CompactSignature($r, $s, $i, $publicKey->isCompressed());
+                if ($pubKey = $this->recoverCompact($test, $messageHash)) {
+                    if ($pubKey->getPoint()->getX() == $Q->getX() && $pubKey->getPoint()->getY() == $Q->getY()) {
+                        return $i;
+                    }
+                }
+            } catch (\Exception $messageHash) {
+                echo " e thrown \n";
+                continue;
+            }
+        }
+
+        throw new \Exception("Failed to find valid recovery factor");
+    }
+
+    /**
      * @param PrivateKeyInterface $privateKey
      * @param Buffer $messageHash
      * @param RbgInterface $rbg
      * @return CompactSignature
      */
-    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    /*public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
     {
-        $rbg = $rbg ?: new Random();
         $sign = $this->sign($privateKey, $messageHash, $rbg);
 
         // calculate the recovery param
         // there should be a way to get this when signing too, but idk how ...
-        $recoveryFlags = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey()->getPoint());
+        $recoveryFlags = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey());
         $compact = new CompactSignature($sign->getR(), $sign->getS(), $recoveryFlags, $privateKey->isCompressed());
         return $compact;
-    }
+    }*/
 
     /**
      * @param CompactSignature $signature
@@ -94,13 +124,14 @@ class PhpEcc extends BaseEcAdapter
      * @return PublicKey
      * @throws \Exception
      */
-    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    /*public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
     {
+        echo "D: recoverCompact()\n";
         $math = $this->getMath();
         $G = $this->getGenerator();
 
-        $isYEven = ($signature->getFlags() & 1) != 0;
-        $isSecondKey = ($signature->getFlags() & 2) != 0;
+        $isYEven = $math->bitwiseAnd($signature->getRecoveryId(), 1) != 0;
+        $isSecondKey = $math->bitwiseAnd($signature->getRecoveryId(), 2) != 0;
         $curve = $G->getCurve();
 
         // Precalculate (p + 1) / 4 where p is the field order
@@ -138,13 +169,13 @@ class PhpEcc extends BaseEcAdapter
         $Q = $R->mul($signature->getS())->add($eGNeg)->mul($rInv);
 
         // 1.6.2 Test Q as a public key
-        $Qk = new PublicKey($math, $G, $Q);
-        if ($this->verify($Qk, $signature, $messageHash)) {
-            return $Qk;
+        $Qk = new PublicKey($this, $Q);
+        if ($this->verify($Qk, new Signature($signature->getR(), $signature->getS()), $messageHash)) {
+            return $Qk->setCompressed($signature->isCompressed());
         }
 
         throw new \Exception('Unable to recover public key');
-    }
+    }*/
 
     /**
      * @param PublicKeyInterface $publicKey

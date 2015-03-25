@@ -76,7 +76,7 @@ class Secp256k1 extends BaseEcAdapter
      * @return CompactSignature
      * @throws \Exception
      */
-    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    /*public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
     {
         $privateStr = $privateKey->getBuffer()->getBinary();
         $hashStr = $messageHash->getBinary();
@@ -90,13 +90,12 @@ class Secp256k1 extends BaseEcAdapter
             $r = $math->hexDec(bin2hex(substr($sigStr, 0, 32)));
             $s = $math->hexDec(bin2hex(substr($sigStr, 32, 32)));
 
-            $recid = bindec($recid);
             $sig = new CompactSignature($r, $s, $recid, $privateKey->isCompressed());
             return $sig;
         }
 
         throw new \Exception('Unable to create compact signature');
-    }
+    }*/
 
     /**
      * @param CompactSignature $signature
@@ -104,19 +103,23 @@ class Secp256k1 extends BaseEcAdapter
      * @return \BitWasp\Bitcoin\Key\PublicKey
      * @throws \Exception
      */
-    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    /*public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
     {
         $pubkey = '';
-        $recid = chr(($signature->getRecoveryId()));
-        $ret = \secp256k1_ecdsa_recover_compact($messageHash, $signature, $recid, $signature->isCompressed(), $pubkey);
+        $recid = $signature->getFlags();
+        $buf = $signature->getBuffer();
+        $sig = $buf->getBinary();
+        echo $buf->getHex()."\n";
+        //echo "Try to validate: (".$signature->getBuffer()->getSize() . " " . bin2hex($sigStr) . "\n";
+        $ret = \secp256k1_ecdsa_recover_compact($messageHash->getBinary(), $sig, $recid, $signature->isCompressed(), $pubkey);
 
         if ($ret === 1) {
             $publicKey = PublicKeyFactory::fromHex(bin2hex($pubkey));
-            return $publicKey;
+            return $publicKey->setCompressed($signature->isCompressed());
         }
 
         throw new \Exception('Unable to recover public key from compact signature');
-    }
+    }*/
 
     /**
      * @param PublicKeyInterface $publicKey

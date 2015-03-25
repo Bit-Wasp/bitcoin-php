@@ -44,10 +44,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
         if (false === $ecAdapter->validatePrivateKey($buffer)) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
-
-        $this->secretMultiplier = $int;
-        $this->compressed = $compressed;
         $this->ecAdapter = $ecAdapter;
+        $this->secretMultiplier = $int;
+        $this->setCompressed($compressed);
     }
 
     /**
@@ -73,7 +72,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function isCompressed()
     {
-        return $this->compressed;
+        return $this->compressed === true;
     }
 
     /**
@@ -110,7 +109,8 @@ class PrivateKey extends Key implements PrivateKeyInterface
     public function setCompressed($setting)
     {
         $this->compressed = $setting;
-        $this->getPublicKey()->setCompressed($setting);
+        $this->getPublicKey();
+        $this->publicKey->setCompressed($setting);
 
         return $this;
     }

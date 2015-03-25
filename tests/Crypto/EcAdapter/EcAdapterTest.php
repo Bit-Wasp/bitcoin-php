@@ -8,9 +8,12 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Signature\Signature;
+use Symfony\Component\Yaml\Yaml;
 
 class EcAdapterTest extends AbstractTestCase
 {
@@ -19,8 +22,72 @@ class EcAdapterTest extends AbstractTestCase
      */
     public $sigType = 'BitWasp\Bitcoin\Signature\Signature';
 
+    public function getPrivVectors()
+    {
+        $datasets = [];
+        $yaml = new Yaml();
 
-    //
+        $data = $yaml->parse(__DIR__ . '/../../Data/privateKeys.yml');
+        foreach ($data['vectors'] as $vector) {
+            foreach ($this->getEcAdapters() as $adapter) {
+                $datasets[] = [
+                    $adapter[0],
+                    $vector['priv'],
+                    $vector['public'],
+                    $vector['compressed']
+                ];
+            }
+        }
+
+        return $datasets;
+    }
+
+    /**
+     * @dataProvider getPrivVectors
+     */
+    public function testPrivateToPublic(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
+    {
+        $priv = PrivateKeyFactory::fromHex($privHex, false, $ec);
+        $this->assertSame($priv->getPublicKey()->getBuffer()->getHex(), $pubHex);
+        $this->assertSame($priv->getPublicKey()->setCompressed(true)->getBuffer()->getHex(), $compressedHex);
+    }
+
+    public function getCSVectors()
+    {
+        // create identical test vectors for secp256k1 and phpecc
+        // Note that signatures should mean the verifying party can recover the correct pubkey, so the effects of
+        // signing with a compressed/uncompressed key need to be tested (so that correct pubkey form is found, so the
+        // correct address can be found)
+
+        $vectors = [];
+        for ($i = 0; $i < 1; $i++) {
+            $priv = PrivateKeyFactory::create(false)->getBuffer()->getHex();
+            $message = Buffer::hex(Hash::sha256d($i));
+            foreach ($this->getEcAdapters() as $adapter) {
+                $vectors[] = [$adapter[0], PrivateKeyFactory::fromHex($priv, true, $adapter[0]), $message];
+                $vectors[] = [$adapter[0], PrivateKeyFactory::fromHex($priv, false, $adapter[0]), $message];
+            }
+        }
+        return $vectors;
+    }
+
+    /*/**
+     * @dataProvider getCSVectors
+     * @param EcAdapterInterface $ecAdapter
+     */
+    /*public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKey $private, Buffer $message)
+    {
+        $public = $private->getPublicKey();
+        echo "prv: " . (int)$private->isCompressed() . "\n";
+        echo "pub: " . (int)$public->isCompressed() . "\n";
+
+        $compact = $ecAdapter->signCompact($private, $message);
+        echo "evald: " . $compact->getBuffer() . "\n";
+        //$this->assertEquals($verify->getBuffer(), $public->getBuffer());
+        $this->assertTrue($ecAdapter->verifyMessage($compact, $message, $public->getAddress()));
+    }*/
+
+
     public function testRecoverYfromX()
     {
         $ecAdapter = Bitcoin::getEcAdapter();

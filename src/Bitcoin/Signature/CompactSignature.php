@@ -3,6 +3,9 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
+
 class CompactSignature
 {
     /**
@@ -55,7 +58,7 @@ class CompactSignature
 
     public function isCompressed()
     {
-        return $this->compressed;
+        return $this->compressed === true;
     }
 
     public function getFlags()
@@ -65,6 +68,7 @@ class CompactSignature
 
     public function getBuffer()
     {
-
+        $serializer = new CompactSignatureSerializer(Bitcoin::getMath());
+        return $serializer->serialize($this);
     }
 }
