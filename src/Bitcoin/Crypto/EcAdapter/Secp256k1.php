@@ -173,10 +173,17 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function privateToPublic(PrivateKeyInterface $privateKey)
     {
-        // Make a fake public key from the generator, do scalar multiplication against privkey.
-        $fakePubKey = PublicKeyFactory::fromPoint($this->getGenerator(), $privateKey->isCompressed(), $this);
-        $privStr = $privateKey->getBuffer()->getInt();
-        return $this->publicKeyMul($fakePubKey, $privStr);
+        $publicKey = '';
+        $publicKeyLen = 0;
+        $privateStr = $privateKey->getBuffer()->getBinary();
+        $ret = \secp256k1_ec_pubkey_create($publicKey, $publicKeyLen, $privateStr, (int)$privateKey->isCompressed());
+
+        if ($ret === 1) {
+            $public = PublicKeyFactory::fromHex(bin2hex($publicKey), $this);
+            return $public;
+        }
+
+        throw new \Exception('Unable to convert private to public key');
     }
 
     /**
