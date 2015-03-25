@@ -46,6 +46,17 @@ namespace {
     }
 
     /**
+     * @param $publicKey
+     * @param $publicKeyLen
+     * @param $secretKey
+     * @param $compressed
+     * @return int
+     */
+    function secp256k1_ec_pubkey_create($publicKey, $publicKeyLen, $secretKey, $compressed)
+    {
+    }
+
+    /**
      * @param string $privateKey
      * @param string $tweak
      * @return int
