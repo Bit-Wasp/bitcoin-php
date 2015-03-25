@@ -190,6 +190,7 @@ class Secp256k1 extends BaseEcAdapter
      * @param PrivateKeyInterface $privateKey
      * @param $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @throws \Exception
      */
     public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
     {
