@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Crypto\Hash;
 
 class NetworkMessageSerializer
 {
-
     /**
      * @var NetworkInterface
      */
@@ -37,7 +36,7 @@ class NetworkMessageSerializer
         $parser = new Parser();
         $parser
             ->writeBytes(4, $this->network->getNetMagicBytes(), true)
-            ->writeBytes(12, '')
+            ->writeBytes(12, $object->getNetworkCommand())
             ->writeInt(4, $payload->getSize())
             ->writeBytes(4, $checksum)
             ->writeBytes($payloadLength, $payload);
