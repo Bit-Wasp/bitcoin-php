@@ -40,9 +40,9 @@ class NetworkAddressTimestamp extends NetworkAddress
         $parser = new Parser();
         $parser
             ->writeInt(4, $this->getTimestamp(), true)
-            ->writeInt(8, $this->getServices(), true)
-            ->writeInt(16, $this->getIpBuffer())
-            ->writeInt(2, $this->getPort(), true);
+            ->writeBytes(8, $this->getServices(), true)
+            ->writeBytes(16, $this->getIpBuffer())
+            ->writeInt(2, $this->port);
 
         return $parser->getBuffer();
     }

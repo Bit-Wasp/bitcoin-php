@@ -30,7 +30,7 @@ class NetworkAddress extends Serializable
      */
     public function __construct(Buffer $services, $ip, $port)
     {
-        $this->services = $services->getInt();
+        $this->services = $services;
         $this->ip = $ip;
         $this->port = $port;
     }
@@ -64,8 +64,9 @@ class NetworkAddress extends Serializable
      */
     public function getIpBuffer()
     {
-        $ip_split = explode(".", $this->ip);
-        $hex = sprintf("%02x%02x%02x%02x", $ip_split[0], $ip_split[1], $ip_split[2], $ip_split[3]);
+        $hex = (string)dechex(ip2long($this->ip));
+        $hex = (strlen($hex) % 2 == 1) ? '0' . $hex : $hex;
+        $hex = '00000000000000000000'.'ffff' . $hex;
         $buffer = Buffer::hex($hex);
         return $buffer;
     }
@@ -77,9 +78,9 @@ class NetworkAddress extends Serializable
     {
         $parser = new Parser();
         $parser
-            ->writeInt(8, $this->services, true)
-            ->writeInt(16, $this->getIpBuffer())
-            ->writeInt(2, $this->port, true);
+            ->writeBytes(8, $this->services, true)
+            ->writeBytes(16, $this->getIpBuffer())
+            ->writeInt(2, $this->port);
 
         return $parser->getBuffer();
     }

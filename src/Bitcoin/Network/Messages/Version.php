@@ -97,6 +97,78 @@ class Version extends NetworkSerializable
     }
 
     /**
+     * @return Buffer|int|string
+     */
+    public function getNonce()
+    {
+        return $this->nonce;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getServices()
+    {
+        return $this->services;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getTimestamp()
+    {
+        return $this->timestamp;
+    }
+
+    /**
+     * @return NetworkAddress
+     */
+    public function getRecipientAddress()
+    {
+        return $this->addrRecv;
+    }
+
+    /**
+     * @return NetworkAddress
+     */
+    public function getSenderAddress()
+    {
+        return $this->addrFrom;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getUserAgent()
+    {
+        return $this->userAgent;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getStartHeight()
+    {
+        return $this->startHeight;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getRelay()
+    {
+        return $this->relay;
+    }
+
+    /**
      * @return VerAck
      */
     public function reply()
