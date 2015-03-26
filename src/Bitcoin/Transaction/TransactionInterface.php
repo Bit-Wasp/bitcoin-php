@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-use BitWasp\Bitcoin\Network\NetworkMessageInterface;
+use BitWasp\Bitcoin\SerializableInterface;
 
-interface TransactionInterface extends NetworkMessageInterface
+interface TransactionInterface extends SerializableInterface
 {
 
     const DEFAULT_VERSION = 1;

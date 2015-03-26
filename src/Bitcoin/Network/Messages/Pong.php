@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Parser;
 

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
@@ -53,5 +52,4 @@ class Alert
         $parser = new Parser($this->alert->getBuffer()->getBinary() . $this->signature->getBuffer()->getBinary());
         return $parser->getBuffer();
     }
-
 }

@@ -19,7 +19,7 @@ class Transaction extends Serializable implements TransactionInterface
     protected $network;
 
     /**
-     * @var
+     * @var int
      */
     protected $version;
 
@@ -38,6 +38,9 @@ class Transaction extends Serializable implements TransactionInterface
      */
     protected $locktime;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->inputs = new TransactionInputCollection();
@@ -45,7 +48,15 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @inheritdoc
+     * @return string
+     */
+    public function getNetworkCommand()
+    {
+        return 'tx';
+    }
+
+    /**
+     *
      */
     public function getTransactionId()
     {
