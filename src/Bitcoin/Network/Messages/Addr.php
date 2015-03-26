@@ -2,9 +2,10 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
+use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddressTimestamp;
-use BitWasp\Bitcoin\Parser;
+use InvalidArgumentException;
 
 class Addr extends NetworkSerializable
 {
@@ -31,6 +32,27 @@ class Addr extends NetworkSerializable
     public function getNetworkCommand()
     {
         return 'addr';
+    }
+
+    /**
+     * @return int
+     */
+    public function getAddresses()
+    {
+        return count($this->addresses);
+    }
+
+    /**
+     * @param $index
+     * @return NetworkAddressTimestamp
+     */
+    public function getAddress($index)
+    {
+        if (false === isset($this->addresses[$index])) {
+            throw new InvalidArgumentException('No address exists at this index');
+        }
+
+        return $this->addresses[$index];
     }
 
     /**

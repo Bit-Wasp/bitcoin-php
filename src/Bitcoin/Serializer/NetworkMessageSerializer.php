@@ -33,10 +33,11 @@ class NetworkMessageSerializer
         $payloadLength = $payload->getSize();
         $checksum = new Buffer(substr(Hash::sha256d($payload->getBinary(), true), 0, 4));
 
+        $command = str_pad(unpack("H*", $object->getNetworkCommand())[1], 24, '0', STR_PAD_RIGHT);
         $parser = new Parser();
         $parser
             ->writeBytes(4, $this->network->getNetMagicBytes(), true)
-            ->writeBytes(12, $object->getNetworkCommand())
+            ->writeBytes(12, $command)
             ->writeInt(4, $payload->getSize())
             ->writeBytes(4, $checksum)
             ->writeBytes($payloadLength, $payload);
