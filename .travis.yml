@@ -18,9 +18,9 @@ install:
         && cd ..
     - |
         git clone git://github.com/Bit-Wasp/secp256k1-php
-        cd secp256k1-php \
+        cd secp256k1-php/secp256k1 \
         && phpize && ./configure && make && sudo make install \
-        && cd ..
+        && cd ../..
     - composer update
 
 script:
