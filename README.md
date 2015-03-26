@@ -1,6 +1,8 @@
 
 ##Bitcoin
 =======
+
+[![Join the chat at https://gitter.im/Bit-Wasp/bitcoin-php](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Bit-Wasp/bitcoin-php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/build-status/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin/?branch=master)
