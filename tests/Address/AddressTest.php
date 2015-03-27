@@ -13,6 +13,9 @@ use Symfony\Component\Yaml\Yaml;
 class AddressTest extends AbstractTestCase
 {
 
+    /**
+     * @return array
+     */
     public function getVectors()
     {
         $datasets = [];
@@ -39,18 +42,6 @@ class AddressTest extends AbstractTestCase
         return $datasets;
     }
 
-    public function fromString()
-    {
-        $ad = '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy';
-        $network = Bitcoin::getNetwork();
-        $address = AddressFactory::fromString($ad, $network);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Address\PayToScriptHashAddress', $address);
-
-        $ad = '12iNxzdF6KFZ14UyRTYCRuptxkKSSVHzqF';
-        $addressP2PKH = AddressFactory::fromString($ad, $network);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Address\PayToPubKeyHashAddress', $address);
-    }
-
     /**
      * @dataProvider getVectors
      * @param $type
@@ -69,6 +60,20 @@ class AddressTest extends AbstractTestCase
             throw new \Exception('Unknown address type');
         }
 
-        $this->assertEquals($obj->getAddress($network), $address);
+        $fromString = AddressFactory::fromString($address);
+
+        $this->assertEquals($address, $obj->getAddress($network));
+        $this->assertEquals($address, (string)$obj);
+        $this->assertEquals($obj, $fromString);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddressFailswithBytes()
+    {
+        $add = 'LPjNgqp43ATwzMTJPM2SFoEYeyJV6pq6By';
+        $network = Bitcoin::getNetwork();
+        $address = AddressFactory::fromString($add, $network);
     }
 }
