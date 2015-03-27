@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Parser;
 use InvalidArgumentException;
 
-class GetData extends NetworkSerializable
+class GetData extends NetworkSerializable implements \Countable
 {
     /**
      * @var InventoryVector[]
@@ -32,6 +32,14 @@ class GetData extends NetworkSerializable
     public function getNetworkCommand()
     {
         return 'getdata';
+    }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->vectors);
     }
 
     /**
