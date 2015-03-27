@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddressTimestamp;
 use InvalidArgumentException;
 
-class Addr extends NetworkSerializable
+class Addr extends NetworkSerializable implements \Countable
 {
     /**
      * @var NetworkAddressTimestamp[]
@@ -37,9 +37,17 @@ class Addr extends NetworkSerializable
     /**
      * @return int
      */
-    public function getAddresses()
+    public function count()
     {
         return count($this->addresses);
+    }
+
+    /**
+     * @return int
+     */
+    public function getAddresses()
+    {
+        return $this->addresses;
     }
 
     /**
