@@ -82,7 +82,7 @@ class Secp256k1 extends BaseEcAdapter
         $sigStr = '';
         $sigLen = 0;
         $recid = 0;
-        $ret = \secp256k1_ecdsa_sign_compact($hashStr, $sigStr, $sigLen, $privateStr, $recid);
+        $ret = \secp256k1_ecdsa_sign_compact($hashStr, $privateStr, $sigStr, $recid);
 
         if ($ret === 1) {
             $math = $this->getMath();
@@ -188,6 +188,7 @@ class Secp256k1 extends BaseEcAdapter
      * @param PrivateKeyInterface $privateKey
      * @param $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @throws \Exception
      */
     public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
     {

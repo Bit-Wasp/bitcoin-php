@@ -4,9 +4,8 @@ namespace {
     
     /**
      * @param string $msg32
-     * @param string $signature
-     * @param integer $signatureLength
      * @param string $privateKey
+     * @param string $signature
      * @return int
      */
     function secp256k1_ecdsa_sign($msg32, $privateKey, $signature)
@@ -15,8 +14,8 @@ namespace {
 
     /**
      * @param string $msg32
-     * @param string $signature
      * @param string $privateKey
+     * @param string $signature
      * @param integer $recid
      * @return int
      */
@@ -41,15 +40,14 @@ namespace {
      * @param int $recoveryId
      * @return int
      */
-    function secp256k1_ecdsa_recover_compact($msg32, $signature, $pubkey, $recoveryId)
+    function secp256k1_ecdsa_recover_compact($msg32, $pubkey, $signature, $recoveryId)
     {
     }
 
     /**
-     * @param $publicKey
-     * @param $publicKeyLen
-     * @param $secretKey
-     * @param $compressed
+     * @param string $secretKey
+     * @param int $compressed
+     * @param string $publicKey
      * @return int
      */
     function secp256k1_ec_pubkey_create($secretKey, $compressed, $publicKey)
@@ -108,6 +106,5 @@ namespace {
      */
     function secp256k1_ec_seckey_verify($secKey)
     {
-
     }
 }

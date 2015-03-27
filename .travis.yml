@@ -6,12 +6,23 @@ php:
   - 5.6
   - hhvm
 
-before_script:
+before_install:
   - composer selfupdate
-  - composer install --prefer-source --dev
 
 install:
-  - composer install
+    - |
+        sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then \
+          git clone git://github.com/bitcoin/secp256k1.git libsecp256k1 \
+          && cd libsecp256k1 \
+          && ./autogen.sh && ./configure && make && sudo make install \
+          && cd ..; fi'
+    - |
+        sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then \
+          git clone git://github.com/Bit-Wasp/secp256k1-php \
+          && cd secp256k1-php/secp256k1 \
+          && phpize && ./configure && make && sudo make install \
+          && cd ../..; fi'
+    - composer update
 
 script:
   - php bin/phpunit --coverage-clover build/logs/clover.xml
@@ -25,3 +36,11 @@ after_script:
 
 matrix:
     fast_finish: true
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/75311bf6cc64a613a399
+    on_success: change  # options: [always|never|change] default: always
+    on_failure: always  # options: [always|never|change] default: always
+    on_start: false     # default: false
