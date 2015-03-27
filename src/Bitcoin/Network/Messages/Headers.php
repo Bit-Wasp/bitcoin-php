@@ -7,12 +7,12 @@ use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Parser;
 use InvalidArgumentException;
 
-class Headers extends NetworkSerializable
+class Headers extends NetworkSerializable implements \Countable
 {
     /**
      * @var BlockHeaderInterface[]
      */
-    protected $headers;
+    protected $headers = [];
 
     /**
      * @param BlockHeaderInterface[] $headers
@@ -40,6 +40,14 @@ class Headers extends NetworkSerializable
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->headers);
     }
 
     /**
