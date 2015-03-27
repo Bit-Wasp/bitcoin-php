@@ -12,14 +12,14 @@ before_script:
 
 install:
     - |
-        sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; \
+        sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then \
           git clone git://github.com/bitcoin/secp256k1.git libsecp256k1 \
           && cd libsecp256k1 \
           && ./autogen.sh && ./configure && make && sudo make install \
           && cd ..'
         fi
     - |
-        sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; \
+        sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then \
           git clone git://github.com/Bit-Wasp/secp256k1-php
           && cd secp256k1-php/secp256k1 \
           && phpize && ./configure && make && sudo make install \
