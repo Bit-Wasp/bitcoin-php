@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Network;
 
 use BitWasp\Bitcoin\SerializableInterface;
 
-interface NetworkMessageInterface extends SerializableInterface
+interface NetworkSerializableInterface extends SerializableInterface
 {
     /**
      * @return string

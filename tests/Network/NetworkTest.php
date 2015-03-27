@@ -76,6 +76,14 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('05', $this->network->getP2shByte());
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testGetNetBytesFailure(){
+        $this->network = new Network('00', '05', '80', true);
+        $this->network->getNetMagicBytes();
+    }
+
     public function testGetPrivByte()
     {
         $this->network = new Network('00', '05', '80', true);

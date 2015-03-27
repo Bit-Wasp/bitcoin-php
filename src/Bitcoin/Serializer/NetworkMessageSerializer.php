@@ -2,10 +2,10 @@
 
 namespace BitWasp\Bitcoin\Serializer;
 
+use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Network\NetworkMessageInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 
 class NetworkMessageSerializer
@@ -24,16 +24,16 @@ class NetworkMessageSerializer
     }
 
     /**
-     * @param NetworkMessageInterface $object
+     * @param NetworkMessage $object
      * @return Buffer
      */
-    public function serialize(NetworkMessageInterface $object)
+    public function serialize(NetworkMessage $object)
     {
-        $payload = $object->getBuffer();
+        $payload = $object->getPayload()->getBuffer();
         $payloadLength = $payload->getSize();
         $checksum = new Buffer(substr(Hash::sha256d($payload->getBinary(), true), 0, 4));
 
-        $command = str_pad(unpack("H*", $object->getNetworkCommand())[1], 24, '0', STR_PAD_RIGHT);
+        $command = str_pad(unpack("H*", $object->getCommand())[1], 24, '0', STR_PAD_RIGHT);
         $parser = new Parser();
         $parser
             ->writeBytes(4, $this->network->getNetMagicBytes(), true)
