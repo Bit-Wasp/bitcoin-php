@@ -28,6 +28,11 @@ class Pong extends NetworkSerializable
         return 'pong';
     }
 
+    public function getNonce()
+    {
+        return $this->nonce;
+    }
+
     /**
      * @return \BitWasp\Bitcoin\Buffer
      */

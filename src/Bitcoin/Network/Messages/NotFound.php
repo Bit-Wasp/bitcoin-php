@@ -34,6 +34,27 @@ class NotFound extends NetworkSerializable
     }
 
     /**
+     * @return \BitWasp\Bitcoin\Network\Structure\InventoryVector[]
+     */
+    public function getItems()
+    {
+        return $this->vectors;
+    }
+
+    /**
+     * @param $index
+     * @return InventoryVector
+     */
+    public function getItem($index)
+    {
+        if (false === isset($this->vectors[$index])) {
+            throw new \InvalidArgumentException('No item found at that index');
+        }
+
+        return $this->vectors[$index];
+    }
+
+    /**
      * @param InventoryVector $vector
      * @return $this
      */
