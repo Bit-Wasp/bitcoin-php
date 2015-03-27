@@ -9,7 +9,7 @@ namespace {
      * @param string $privateKey
      * @return int
      */
-    function secp256k1_ecdsa_sign($msg32, $signature, $signatureLength, $privateKey)
+    function secp256k1_ecdsa_sign($msg32, $privateKey, $signature)
     {
     }
 
@@ -20,7 +20,7 @@ namespace {
      * @param integer $recid
      * @return int
      */
-    function secp256k1_ecdsa_sign_compact($msg32, $signature, $privateKey, $recid)
+    function secp256k1_ecdsa_sign_compact($msg32, $privateKey, $recid, $signature)
     {
     }
 
@@ -30,7 +30,7 @@ namespace {
      * @param string $publicKey
      * @return int
      */
-    function secp256k1_ecdsa_verify($msg32, $signature, $publicKey)
+    function secp256k1_ecdsa_verify($msg32, $publicKey, $signature)
     {
     }
 
@@ -52,7 +52,7 @@ namespace {
      * @param $compressed
      * @return int
      */
-    function secp256k1_ec_pubkey_create($publicKey, $publicKeyLen, $secretKey, $compressed)
+    function secp256k1_ec_pubkey_create($secretKey, $compressed, $publicKey)
     {
     }
 

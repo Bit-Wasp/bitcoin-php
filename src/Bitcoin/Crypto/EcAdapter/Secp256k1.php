@@ -58,9 +58,8 @@ class Secp256k1 extends BaseEcAdapter
         $privateStr = $privateKey->getBuffer()->getBinary();
         $hashStr = $messageHash->getBinary();
         $sigStr = '';
-        $signatureLength = 0;
 
-        $ret = \secp256k1_ecdsa_sign($hashStr, $sigStr, $signatureLength, $privateStr);
+        $ret = \secp256k1_ecdsa_sign($hashStr, $privateStr, $sigStr);
         if ($ret !== 1) {
             throw new \Exception('Secp256k1-php failed to sign data');
         }
@@ -174,9 +173,8 @@ class Secp256k1 extends BaseEcAdapter
     public function privateToPublic(PrivateKeyInterface $privateKey)
     {
         $publicKey = '';
-        $publicKeyLen = 0;
         $privateStr = $privateKey->getBuffer()->getBinary();
-        $ret = \secp256k1_ec_pubkey_create($publicKey, $publicKeyLen, $privateStr, (int)$privateKey->isCompressed());
+        $ret = \secp256k1_ec_pubkey_create($privateStr, (int)$privateKey->isCompressed(), $publicKey);
 
         if ($ret === 1) {
             $public = PublicKeyFactory::fromHex(bin2hex($publicKey), $this);
