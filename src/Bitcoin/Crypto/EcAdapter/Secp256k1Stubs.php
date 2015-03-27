@@ -19,7 +19,7 @@ namespace {
      * @param integer $recid
      * @return int
      */
-    function secp256k1_ecdsa_sign_compact($msg32, $privateKey, $signature, $recid)
+    function secp256k1_ecdsa_sign_compact($msg32, $privateKey, $recid, $signature)git checkut
     {
     }
 

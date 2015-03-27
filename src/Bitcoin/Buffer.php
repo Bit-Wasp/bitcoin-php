@@ -56,6 +56,31 @@ class Buffer
     }
 
     /**
+     * @param $start
+     * @param null $end
+     * @return Buffer
+     * @throws \Exception
+     */
+    public function slice($start, $end = null)
+    {
+        $binary = $this->getBinary();
+        $length = strlen($binary);
+        if ($start > $length) {
+            throw new \Exception('Start exceeds buffer length');
+        }
+
+        if ($end = null) {
+            return new self(substr($binary, $start));
+        }
+
+        if ($end > $length) {
+            throw new \Exception('Length exceeds buffer length');
+        }
+
+        return new self(substr($binary, $start, $end));
+    }
+
+    /**
      * Get the size of the buffer to be returned, depending on the $type
      *
      * @param string|null $type
@@ -126,7 +151,6 @@ class Buffer
      */
     public function __toString()
     {
-        $unpack = unpack("H*", $this->buffer);
-        return $unpack[1];
+        return unpack("H*", $this->buffer)[1];
     }
 }

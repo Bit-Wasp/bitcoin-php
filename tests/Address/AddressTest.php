@@ -2,6 +2,7 @@
 
 namespace Address;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -12,6 +13,9 @@ use Symfony\Component\Yaml\Yaml;
 class AddressTest extends AbstractTestCase
 {
 
+    /**
+     * @return array
+     */
     public function getVectors()
     {
         $datasets = [];
@@ -56,6 +60,20 @@ class AddressTest extends AbstractTestCase
             throw new \Exception('Unknown address type');
         }
 
-        $this->assertEquals($obj->getAddress($network), $address);
+        $fromString = AddressFactory::fromString($address);
+
+        $this->assertEquals($address, $obj->getAddress($network));
+        $this->assertEquals($address, (string)$obj);
+        $this->assertEquals($obj, $fromString);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testAddressFailswithBytes()
+    {
+        $add = 'LPjNgqp43ATwzMTJPM2SFoEYeyJV6pq6By';
+        $network = Bitcoin::getNetwork();
+        $address = AddressFactory::fromString($add, $network);
     }
 }
