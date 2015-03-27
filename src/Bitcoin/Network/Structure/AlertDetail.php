@@ -62,12 +62,12 @@ class AlertDetail extends Serializable
     protected $priority;
 
     /**
-     * @var string
+     * @var Buffer
      */
     protected $comment;
 
     /**
-     * @var string
+     * @var Buffer
      */
     protected $statusBar;
 

@@ -44,17 +44,4 @@ class NetworkMessageSerializer
 
         return $parser->getBuffer();
     }
-
-    /**
-     * @param Parser $parser
-     */
-    public function fromParser(Parser & $parser)
-    {
-
-    }
-
-    public function parse($string)
-    {
-
-    }
 }

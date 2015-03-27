@@ -51,7 +51,7 @@ class Version extends NetworkSerializable
     protected $relay;
 
     /**
-     * @var Buffer
+     * @var integer|string
      */
     protected $nonce;
 

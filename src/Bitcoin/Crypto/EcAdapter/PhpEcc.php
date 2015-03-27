@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Buffer;
-use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -76,8 +75,8 @@ class PhpEcc extends BaseEcAdapter
      *
      * @param                $r
      * @param                $s
-     * @param                $messageHash
-     * @param PointInterface $Q
+     * @param Buffer $messageHash
+     * @param PublicKeyInterface $publicKey
      * @return int
      * @throws \Exception
      */

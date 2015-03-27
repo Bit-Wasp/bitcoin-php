@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Buffer;
 class Ping extends NetworkSerializable
 {
     /**
-     * @var Buffer
+     * @var integer|string
      */
     protected $nonce;
 
@@ -32,7 +32,7 @@ class Ping extends NetworkSerializable
     }
 
     /**
-     * @return Buffer
+     * @return integer|string
      */
     public function getNonce()
     {

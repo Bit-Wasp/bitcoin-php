@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Serializable;
 class NetworkAddress extends Serializable
 {
     /**
-     * @var int|string
+     * @var Buffer
      */
     protected $services;
 

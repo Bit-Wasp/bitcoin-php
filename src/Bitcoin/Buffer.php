@@ -69,7 +69,7 @@ class Buffer
             throw new \Exception('Start exceeds buffer length');
         }
 
-        if ($end = null) {
+        if ($end === null) {
             return new self(substr($binary, $start));
         }
 
@@ -77,7 +77,8 @@ class Buffer
             throw new \Exception('Length exceeds buffer length');
         }
 
-        return new self(substr($binary, $start, $end));
+        $binary = substr($binary, $start, $end);
+        return new self($binary);
     }
 
     /**

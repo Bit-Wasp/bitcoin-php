@@ -14,7 +14,6 @@ class PayToPubKeyHashAddress extends Address
     public function getPrefixByte(NetworkInterface $network = null)
     {
         $network = $network ?: Bitcoin::getNetwork();
-
         return $network->getAddressByte();
     }
 }
