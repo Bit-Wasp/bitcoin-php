@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Parser;
 class Pong extends NetworkSerializable
 {
     /**
-     * @var integer
+     * @var integer|string
      */
     protected $nonce;
 
