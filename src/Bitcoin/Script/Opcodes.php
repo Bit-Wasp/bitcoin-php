@@ -5,13 +5,6 @@ namespace BitWasp\Bitcoin\Script;
 class Opcodes
 {
     /**
-     *
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * @param $op
      */
     public function opExists($op)

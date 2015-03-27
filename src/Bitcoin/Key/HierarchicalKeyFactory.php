@@ -3,84 +3,66 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
-use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
-use Mdanter\Ecc\GeneratorPoint;
 
 class HierarchicalKeyFactory
 {
     /**
-     * @param Math $math
-     * @param $generator
+     * @param EcAdapterInterface|null $ecAdapter
      * @param NetworkInterface $network
      * @return ExtendedKeySerializer
      */
-    public static function getSerializer($math, $generator, $network)
+    public static function getSerializer(EcAdapterInterface $ecAdapter, $network)
     {
-        $extSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($math, $generator, $network));
+        $extSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($ecAdapter, $network));
         return $extSerializer;
     }
 
     /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface|null $ecAdapter
      * @return HierarchicalKey
      */
-    public static function generateMasterKey(Math $math = null, GeneratorPoint $generator = null)
+    public static function generateMasterKey(EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
-        $buffer  = PrivateKeyFactory::create(true, $math, $generator);
-        $private = self::fromEntropy($buffer->getBuffer()->serialize('hex'));
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $buffer  = PrivateKeyFactory::create(true, $ecAdapter);
+        $private = self::fromEntropy($buffer->getBuffer()->getHex(), $ecAdapter);
         return $private;
     }
 
     /**
      * @param string $entropy
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey
      */
-    public static function fromEntropy($entropy, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromEntropy($entropy, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $hash = Hash::hmac('sha512', pack("H*", $entropy), "Bitcoin seed");
-
-        $key = new HierarchicalKey(
-            $math,
-            $generator,
+        return new HierarchicalKey(
+            $ecAdapter,
             0,
             0,
             0,
-            $math->hexDec(substr($hash, 64, 64)),
-            PrivateKeyFactory::fromHex(substr($hash, 0, 64), true)
+            $ecAdapter->getMath()->hexDec(substr($hash, 64, 64)),
+            PrivateKeyFactory::fromHex(substr($hash, 0, 64), true, $ecAdapter)
         );
-
-        return $key;
     }
 
     /**
      * @param $extendedKey
      * @param NetworkInterface $network
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey
      */
-    public static function fromExtended($extendedKey, NetworkInterface $network = null, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromExtended($extendedKey, NetworkInterface $network, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $network = $network ?: Bitcoin::getNetwork();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
-        $extSerializer = self::getSerializer($math, $generator, $network);
-        $key = $extSerializer->parse($extendedKey);
-        return $key;
+        $extSerializer = self::getSerializer($ecAdapter ?: Bitcoin::getEcAdapter(), $network);
+        return $extSerializer->parse($extendedKey);
     }
 }

@@ -3,63 +3,47 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
-use Mdanter\Ecc\GeneratorPoint;
 use Mdanter\Ecc\PointInterface;
 
 class PublicKeyFactory
 {
-    public static function getSerializer($math, $generator)
-    {
-        $hexSerializer = new HexPublicKeySerializer($math, $generator);
-        return $hexSerializer;
-    }
-
     /**
-     * @param PrivateKeyInterface $privateKey
-     * @return PublicKeyInterface
+     * @param EcAdapterInterface $ecAdapter
+     * @return HexPublicKeySerializer
      */
-    public static function fromPrivateKey(PrivateKeyInterface $privateKey)
+    public static function getSerializer(EcAdapterInterface $ecAdapter = null)
     {
-        return $privateKey->getPublicKey();
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+
+        $hexSerializer = new HexPublicKeySerializer($ecAdapter);
+        return $hexSerializer;
     }
 
     /**
      * @param PointInterface $point
      * @param bool $compressed
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface $ecAdapter
      * @return PublicKey
      */
-    public static function fromPoint(
-        PointInterface $point,
-        $compressed = false,
-        Math $math = null,
-        GeneratorPoint $generator = null
-    ) {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
-        $publicKey = new PublicKey($math, $generator, $point, $compressed);
-        return $publicKey;
+    public static function fromPoint(PointInterface $point, $compressed = false, EcAdapterInterface $ecAdapter = null)
+    {
+        return new PublicKey(
+            $ecAdapter ?: Bitcoin::getEcAdapter(),
+            $point,
+            $compressed
+        );
     }
 
     /**
-     * @param $hex
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param string $hex
+     * @param EcAdapterInterface $ecAdapter
      * @return PublicKey
      * @throws \Exception
      */
-    public static function fromHex($hex, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromHex($hex, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
-        $serializer = self::getSerializer($math, $generator);
-        $publicKey = $serializer->parse($hex);
-
-        return $publicKey;
+        return self::getSerializer($ecAdapter)->parse($hex);
     }
 }

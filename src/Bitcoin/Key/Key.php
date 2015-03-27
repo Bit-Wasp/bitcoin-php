@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Serializable;
 abstract class Key extends Serializable implements KeyInterface
 {
     /**
-     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
+     * @return \BitWasp\Bitcoin\Address\PayToPubKeyHashAddress
      */
     public function getAddress()
     {

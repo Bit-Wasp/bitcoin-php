@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Signature\Signer;
 
 class InputScriptFactory
 {
@@ -41,7 +40,7 @@ class InputScriptFactory
      */
     public function multisigP2sh(RedeemScript $redeemScript, SignatureCollection $sigs, Buffer $hash)
     {
-        $signer = new Signer(Bitcoin::getMath(), Bitcoin::getGenerator());
+        $signer = Bitcoin::getEcAdapter();
         $linked = $signer->associateSigs($sigs, $hash, $redeemScript->getKeys());
         $script = ScriptFactory::create()->op('OP_0');
         foreach ($redeemScript->getKeys() as $key) {

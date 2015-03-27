@@ -32,7 +32,7 @@ interface ScriptClassifierInterface
     public function isMultisig();
 
     /**
-     * @return bool
+     * @return string
      */
     public function classify();
 }

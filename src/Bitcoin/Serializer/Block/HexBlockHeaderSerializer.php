@@ -32,12 +32,12 @@ class HexBlockHeaderSerializer
         $header = new BlockHeader();
         try {
             $header
-                ->setVersion($parser->readBytes(4, true)->serialize('int'))
+                ->setVersion($parser->readBytes(4, true)->getInt())
                 ->setPrevBlock($parser->readBytes(32, true))
                 ->setMerkleRoot($parser->readBytes(32, true))
-                ->setTimestamp($parser->readBytes(4, true)->serialize('int'))
+                ->setTimestamp($parser->readBytes(4, true)->getInt())
                 ->setBits($parser->readBytes(4, true))
-                ->setNonce($parser->readBytes(4, true)->serialize('int'));
+                ->setNonce($parser->readBytes(4, true)->getInt());
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }

@@ -98,7 +98,12 @@ class Block extends Serializable implements BlockInterface
      */
     public function getBuffer()
     {
-        $serializer = new HexBlockSerializer($this->math, new HexBlockHeaderSerializer(), new TransactionCollectionSerializer(new TransactionSerializer()));
+        $serializer = new HexBlockSerializer(
+            $this->math,
+            new HexBlockHeaderSerializer(),
+            new TransactionCollectionSerializer(new TransactionSerializer())
+        );
+
         $hex = $serializer->serialize($this);
         return $hex;
     }

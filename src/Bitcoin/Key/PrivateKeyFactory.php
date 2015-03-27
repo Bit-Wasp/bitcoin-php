@@ -3,28 +3,29 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
-use Mdanter\Ecc\GeneratorPoint;
 
 class PrivateKeyFactory
 {
     /**
      * Generate a buffer containing a valid key
      *
+     * @param EcAdapterInterface|null $ecAdapter
      * @return \BitWasp\Bitcoin\Buffer
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public static function generateSecret()
+    public static function generateSecret(EcAdapterInterface $ecAdapter = null)
     {
         $random = new Random();
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
 
         do {
             $buffer = $random->bytes(32);
-        } while (!PrivateKey::isValidKey($buffer->serialize('int')));
+        } while (!$ecAdapter->validatePrivateKey($buffer));
 
         return $buffer;
     }
@@ -32,67 +33,51 @@ class PrivateKeyFactory
     /**
      * @param $int
      * @param bool $compressed
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKey
      */
-    public static function fromInt($int, $compressed = false, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
-        $privateKey = new PrivateKey($math, $generator, $int, $compressed);
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $privateKey = new PrivateKey($ecAdapter, $int, $compressed);
         return $privateKey;
     }
 
     /**
      * @param bool $compressed
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKey
      */
-    public static function create($compressed = false, Math $math = null, GeneratorPoint $generator = null)
+    public static function create($compressed = false, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
         $secret = self::generateSecret();
-        return self::fromInt($secret->serialize('int'), $compressed, $math, $generator);
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        return self::fromInt($secret->getInt(), $compressed, $ecAdapter);
     }
 
     /**
      * @param $wif
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKey
      * @throws InvalidPrivateKey
      */
-    public static function fromWif($wif, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromWif($wif, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
-        $wifSerializer = new WifPrivateKeySerializer($math, new HexPrivateKeySerializer($math, $generator));
-        $privateKey = $wifSerializer->parse($wif);
-
-        return $privateKey;
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), new HexPrivateKeySerializer($ecAdapter));
+        return $wifSerializer->parse($wif);
     }
 
     /**
-     * @param $hex
+     * @param string $hex
      * @param bool $compressed
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKey
      */
-    public static function fromHex($hex, $compressed = false, Math $math = null, GeneratorPoint $generator = null)
+    public static function fromHex($hex, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $generator = $generator ?: Bitcoin::getGenerator();
-
-        $hexSerializer = new HexPrivateKeySerializer($math, $generator);
-        $privateKey = $hexSerializer->parse($hex)->setCompressed($compressed);
-
-        return $privateKey;
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $hexSerializer = new HexPrivateKeySerializer($ecAdapter);
+        return $hexSerializer->parse($hex)->setCompressed($compressed);
     }
 }

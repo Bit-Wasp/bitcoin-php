@@ -4,23 +4,21 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureHashInterface;
-use BitWasp\Bitcoin\Signature\Signer;
-use Mdanter\Ecc\GeneratorPoint;
 
 class TransactionBuilder
 {
     /**
-     * @var Transaction
+     * @var TransactionInterface
      */
     private $transaction;
 
@@ -35,19 +33,24 @@ class TransactionBuilder
     private $inputSigs = [];
 
     /**
-     * @param Math $math
-     * @param GeneratorPoint $generatorPoint
-     * @param TransactionInterface $tx
+     * @var EcAdapterInterface
      */
-    public function __construct(Math $math, GeneratorPoint $generatorPoint, TransactionInterface $tx = null)
+    private $ecAdapter;
+
+    /**
+     * @param EcAdapterInterface $ecAdapter
+     * @param TransactionInterface $tx
+     * @internal param Math $math
+     * @internal param GeneratorPoint $generatorPoint
+     */
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
     {
         $this->transaction = $tx ?: TransactionFactory::create();
-        for ($i = 0; $i < $this->transaction->getInputs()->count(); $i++) {
+        $inputCount = $this->transaction->getInputs()->count();
+        for ($i = 0; $i < $inputCount; $i++) {
             $this->inputSigs[$i] = new SignatureCollection;
         }
-        $this->math = $math;
-        $this->generator = $generatorPoint;
-        $this->signer = new Signer($math, $generatorPoint);
+        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -120,9 +123,9 @@ class TransactionBuilder
     public function sign(PrivateKeyInterface $privKey, Buffer $hash)
     {
         $random = ($this->deterministicSignatures
-            ? new Rfc6979($this->math, $this->generator, $privKey, $hash, 'sha256')
+            ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
             : new Random());
-        return $this->signer->sign($privKey, $hash, $random);
+        return $this->ecAdapter->sign($privKey, $hash, $random);
     }
 
     /**
@@ -141,7 +144,6 @@ class TransactionBuilder
     ) {
 
         $input = $this->transaction->getInputs()->getInput($inputToSign);
-        // Parse
         $outputScript = $input->getOutputScript();
 
         $prevOutType = new OutputClassifier($outputScript);
@@ -151,16 +153,24 @@ class TransactionBuilder
         if ($prevOutType->isPayToPublicKeyHash() && $parse[2] == $privateKey->getPubKeyHash()) {
             $hash = $signatureHash->calculate($outputScript, $inputToSign, $sigHashType);
             $signature = $this->sign($privateKey, $hash);
-            $script = ScriptFactory::scriptSig()->payToPubKeyHash($signature, $privateKey->getPublicKey());
-        } else if ($prevOutType->isPayToScriptHash() && $parse[1] == $redeemScript->getScriptHash()) {
-            $hash = $signatureHash->calculate($redeemScript, $inputToSign, $sigHashType);
-            $signature = $this->sign($privateKey, $hash);
-            $script = ScriptFactory::scriptSig()->multisigP2sh($redeemScript, new SignatureCollection(array($signature)), $hash);
-            // todo..
+            $script = ScriptFactory::scriptSig()
+                ->payToPubKeyHash($signature, $privateKey->getPublicKey());
+        } else if ($prevOutType->isPayToScriptHash()) {
+            if ($redeemScript === null) {
+                throw new \Exception('Redeem script should be passed when signing a p2sh input');
+            }
+
+            if ($parse[1] == $redeemScript->getScriptHash()) {
+                $hash = $signatureHash->calculate($redeemScript, $inputToSign, $sigHashType);
+                $signature = $this->sign($privateKey, $hash);
+                $script = ScriptFactory::scriptSig()
+                    ->multisigP2sh($redeemScript, new SignatureCollection(array($signature)), $hash);
+                // todo..
+            }
         }
 
         // Add and reserialize
-        if (isset($signature)) {
+        if (isset($script)) {
             $this->transaction->getInputs()->getInput($inputToSign)->setScript($script);
         }
 
@@ -170,6 +180,7 @@ class TransactionBuilder
     /**
      * @param PrivateKeyInterface $priv
      * @param RedeemScript $redeemScript
+     * @param int $sigHashType
      * @return $this
      */
     public function signWithKey(PrivateKeyInterface $priv, RedeemScript $redeemScript = null, $sigHashType = SignatureHashInterface::SIGHASH_ALL)

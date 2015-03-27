@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin;
 
-use \BitWasp\Bitcoin\Crypto\Hash;
-use \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 
 class Base58
 {
@@ -41,7 +41,8 @@ class Base58
         $return = strrev($return);
 
         //leading zeros
-        for ($i = 0; $i < strlen($origHex) && substr($origHex, $i, 2) == "00"; $i += 2) {
+        $origLen = strlen($origHex);
+        for ($i = 0; $i < $origLen && substr($origHex, $i, 2) == "00"; $i += 2) {
             $return = "1" . $return;
         }
         return $return;
@@ -60,17 +61,17 @@ class Base58
         }
 
         $original = $base58;
+        $strlen = strlen($base58);
         $return = '0';
         $math = Bitcoin::getMath();
 
-
-        for ($i = 0; $i < strlen($base58); $i++) {
+        for ($i = 0; $i < $strlen; $i++) {
             $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
         }
 
         $hex = ($return == '0') ? '' : $math->decHex($return);
 
-        for ($i = 0; $i < strlen($original) && $original[$i] == "1"; $i++) {
+        for ($i = 0; $i < $strlen && $original[$i] == "1"; $i++) {
             $hex = "00" . $hex;
         }
 

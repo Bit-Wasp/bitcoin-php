@@ -2,31 +2,39 @@
 
 namespace BitWasp\Bitcoin\Tests\Key;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class PublicKeyTest extends \PHPUnit_Framework_TestCase
+class PublicKeyTest extends AbstractTestCase
 {
     /**
      * @var PublicKey
      */
     protected $publicKey;
 
-    protected $publicType;
+    /**
+     * @var
+     */
+    protected $publicType = 'BitWasp\Bitcoin\Key\PublicKey';
 
     public function setUp()
     {
         $this->publicKey = null;
-        $this->publicType = 'BitWasp\Bitcoin\Key\PublicKey';
     }
 
-    public function testFromHex()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testFromHex(EcAdapterInterface $ecAdapter)
     {
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $this->publicKey = PublicKeyFactory::fromHex($test->compressed);
+            $this->publicKey = PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
             $this->assertSame($test->compressed, $this->publicKey->getBuffer()->serialize('hex'));
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
@@ -36,12 +44,16 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testFromHexUncompressed()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testFromHexUncompressed(EcAdapterInterface $ecAdapter)
     {
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $this->publicKey = PublicKeyFactory::fromHex($test->uncompressed);
+            $this->publicKey = PublicKeyFactory::fromHex($test->uncompressed, $ecAdapter);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
             $this->assertSame($test->uncompressed, $this->publicKey->getBuffer()->serialize('hex'));
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
@@ -53,12 +65,15 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     *
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      * @expectedException \Exception
      */
-    public function testFromHexInvalidLength()
+    public function testFromHexInvalidLength(EcAdapterInterface $ecAdapter)
     {
         $hex = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44febaa';
-        $this->publicKey = PublicKeyFactory::fromHex($hex);
+        $this->publicKey = PublicKeyFactory::fromHex($hex, $ecAdapter);
         $this->assertInstanceOf($this->publicType, $this->publicKey);
         $this->assertSame($hex, $this->publicKey->getBuffer()->serialize('hex'));
     }
@@ -81,87 +96,48 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
         $this->publicKey = PublicKeyFactory::fromHex($hex);
     }
 
-    public function testRecoverYfromX()
-    {
-        $f = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
-        $g = Bitcoin::getGenerator();
-        $json = json_decode($f);
-        foreach ($json->test as $test) {
-            $byte = substr($test->compressed, 0, 2);
-            $x    = Bitcoin::getMath()->hexDec(substr($test->compressed, 2, 64));
-            $realy= Bitcoin::getMath()->hexDec(substr($test->uncompressed, 66, 64));
-            $y    = PublicKey::recoverYfromX($x, $byte, $g);
-            $this->assertSame($realy, $y);
-        }
-
-    }
 
     /**
-     * @expectedException \Exception
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
-    public function testRecoverYfromXException()
-    {
-        $x = 0;
-        PublicKey::recoverYfromX($x, '02', Bitcoin::getGenerator());
-    }
-
-    public function testCompressKeys()
-    {
-        $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
-        $json = json_decode($f);
-        foreach ($json->test as $test) {
-            $key        = PublicKeyFactory::fromHex($test->uncompressed);
-            $compressed = PublicKey::compress($key);
-            $this->assertSame($compressed, $test->compressed);
-        }
-    }
-
-    public function testCompressPoint()
-    {
-        $hex             = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
-        $this->publicKey = PublicKeyFactory::fromHex($hex);
-        $point           = $this->publicKey->getPoint();
-        $compressed      = PublicKey::compress($point);
-        $this->assertSame($hex, $compressed);
-    }
-
-    /**
-     * @expectedException \Exception
-     */
-    public function testCompressPointException()
-    {
-        PublicKey::compress('a');
-    }
-
-    public function testPubKeyHash()
+    public function testPubKeyHash(EcAdapterInterface $ecAdapter)
     {
         $f    = file_get_contents(__DIR__.'/../Data/publickey.pubkeyhash.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $pubkey = PublicKeyFactory::fromHex($test->key);
-            $hash   = $pubkey->getPubKeyHash();
+            $pubkey = PublicKeyFactory::fromHex($test->key, $ecAdapter);
+            $hash = $pubkey->getPubKeyHash();
             $this->assertSame($hash, $test->hash);
         }
     }
 
-    public function testSetCompressed()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testSetCompressed(EcAdapterInterface $ecAdapter)
     {
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $pub = PublicKeyFactory::fromHex($test->uncompressed);
+            $pub = PublicKeyFactory::fromHex($test->uncompressed, $ecAdapter);
             $this->assertFalse($pub->isCompressed());
             $pub->setCompressed(true);
             $this->assertTrue($pub->isCompressed());
         }
     }
 
-    public function testSetUnCompressed()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testSetUnCompressed(EcAdapterInterface $ecAdapter)
     {
         $f    = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $pub = PublicKeyFactory::fromHex($test->compressed);
+            $pub = PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
             $this->assertTrue($pub->isCompressed());
             $pub->setCompressed(false);
             $this->assertFalse($pub->isCompressed());
@@ -185,6 +161,7 @@ class PublicKeyTest extends \PHPUnit_Framework_TestCase
             }
         }
     }
+
     /**
      * @expectedException \Exception
      */

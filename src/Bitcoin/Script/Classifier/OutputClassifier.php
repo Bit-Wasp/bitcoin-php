@@ -32,7 +32,7 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        $script = $this->script->getBuffer()->serialize();
+        $script = $this->script->getBuffer()->getBinary();
 
         if (strlen($script) == 35 // Binary
             && strlen($this->evalScript[0]) == 33 * 2 // hex string
@@ -74,7 +74,7 @@ class OutputClassifier implements ScriptClassifierInterface
     public function isPayToScriptHash()
     {
         return (
-            strlen($this->script->getBuffer()->serialize()) == 23
+            strlen($this->script->getBuffer()->getBinary()) == 23
             && count($this->evalScript) == 3
             && $this->evalScript[0] == 'OP_HASH160'
             && (strlen($this->evalScript[1]) == 20 * 2)
@@ -96,15 +96,15 @@ class OutputClassifier implements ScriptClassifierInterface
     public function classify()
     {
         if ($this->isPayToPublicKey()) {
-            return OutputClassifier::PAYTOPUBKEY;
+            return self::PAYTOPUBKEY;
         } elseif ($this->isPayToPublicKeyHash()) {
-            return OutputClassifier::PAYTOPUBKEYHASH;
+            return self::PAYTOPUBKEYHASH;
         } elseif ($this->isPayToScriptHash()) {
-            return OutputClassifier::PAYTOSCRIPTHASH;
+            return self::PAYTOSCRIPTHASH;
         } elseif ($this->isMultisig()) {
-            return OutputClassifier::MULTISIG;
+            return self::MULTISIG;
         }
 
-        return OutputClassifier::NONSTANDARD;
+        return self::NONSTANDARD;
     }
 }

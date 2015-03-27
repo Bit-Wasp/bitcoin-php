@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 class BlockFactory
 {
     /**
+     * @param Math $math
      * @return HexBlockSerializer
      */
     public static function getSerializer(Math $math = null)

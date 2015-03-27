@@ -13,7 +13,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 {
 
     /**
-     * @var \BitWasp\Bitcoin\Buffer
+     * @var string|int
      */
     protected $value;
 

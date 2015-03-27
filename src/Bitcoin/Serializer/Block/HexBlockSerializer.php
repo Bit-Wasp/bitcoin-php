@@ -27,6 +27,7 @@ class HexBlockSerializer
     protected $txColSerializer;
 
     /**
+     * @param Math $math
      * @param HexBlockHeaderSerializer $headerSerializer
      * @param TransactionCollectionSerializer $txColSerializer
      */

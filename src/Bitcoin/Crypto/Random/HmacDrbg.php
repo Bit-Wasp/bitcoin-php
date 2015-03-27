@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Crypto\Random;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Buffer;
-use Mdanter\Ecc\GeneratorPoint;
 
 class HmacDrbg implements RbgInterface
 {
@@ -58,7 +57,7 @@ class HmacDrbg implements RbgInterface
 
         $this->V    = str_pad('', $vlen, chr(0x01), STR_PAD_LEFT);
         $this->K    = str_pad('', $vlen, chr(0x00), STR_PAD_LEFT);
-        $seed       = $entropy->serialize() . $personalString ?: '';
+        $seed       = $entropy->getBinary() . $personalString ?: '';
 
         $this->update($seed);
         return $this;
@@ -92,7 +91,7 @@ class HmacDrbg implements RbgInterface
 
         $this->V = $this->hash($this->V);
 
-        if ($data) {
+        if ($data !== null) {
             $this->K = $this->hash(sprintf(
                 "%s%s%s",
                 $this->V,

@@ -3,32 +3,25 @@
 namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Buffer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
-use Mdanter\Ecc\GeneratorPoint;
 
 class HexPrivateKeySerializer
 {
     /**
-     * @var Math
+     * @var EcAdapterInterface
      */
-    private $math;
+    private $ecAdapter;
 
     /**
-     * @var GeneratorPoint
+     * @param EcAdapterInterface $ecAdapter
      */
-    private $generator;
-
-    /**
-     * @param Math $math
-     * @param GeneratorPoint $G
-     */
-    public function __construct(Math $math, GeneratorPoint $G)
+    public function __construct(EcAdapterInterface $ecAdapter)
     {
-        $this->math = $math;
-        $this->generator = $G;
+        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -38,7 +31,7 @@ class HexPrivateKeySerializer
     public function serialize(PrivateKeyInterface $privateKey)
     {
         $multiplier = $privateKey->getSecretMultiplier();
-        $hex = str_pad($this->math->decHex($multiplier), 64, '0', STR_PAD_LEFT);
+        $hex = str_pad($this->ecAdapter->getMath()->decHex($multiplier), 64, '0', STR_PAD_LEFT);
         $out = Buffer::hex($hex);
         return $out;
     }
@@ -58,8 +51,8 @@ class HexPrivateKeySerializer
      */
     public function parse($string)
     {
-        $multiplier = $this->math->hexDec($string);
-        $privateKey = new PrivateKey($this->math, $this->generator, $multiplier, false);
+        $multiplier = $this->ecAdapter->getMath()->hexDec($string);
+        $privateKey = PrivateKeyFactory::fromInt($multiplier, false, $this->ecAdapter);
         return $privateKey;
     }
 }

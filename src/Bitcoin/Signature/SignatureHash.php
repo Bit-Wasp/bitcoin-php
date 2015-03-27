@@ -49,7 +49,8 @@ class SignatureHash implements SignatureHashInterface
         }
 
         // Default SIGHASH_ALL procedure: null all input scripts
-        for ($i = 0; $i < count($inputs); $i++) {
+        $inputCount = count($inputs);
+        for ($i = 0; $i < $inputCount; $i++) {
             $inputs->getInput($i)->setScript(new Script());
         }
 
@@ -59,8 +60,8 @@ class SignatureHash implements SignatureHashInterface
             // Set outputs to empty vector, and set sequence number of inputs to 0.
 
             $copy->setOutputs(new TransactionOutputCollection());
-
-            for ($i = 0; $i < count($inputs); $i++) {
+            $inputCount = count($inputs);
+            for ($i = 0; $i < $inputCount; $i++) {
                 if ($i != $inputToSign) {
                     $inputs->getInput($i)->setSequence(0);
                 }
@@ -84,7 +85,8 @@ class SignatureHash implements SignatureHashInterface
             }
 
             // Let the others update at will
-            for ($i = 0; $i < count($outputs); $i++) {
+            $outputCount = count($outputs);
+            for ($i = 0; $i < $outputCount; $i++) {
                 if ($i != $inputToSign) {
                     $inputs->getInput($i)->setSequence(0);
                 }
@@ -101,7 +103,7 @@ class SignatureHash implements SignatureHashInterface
         $txParser = new Parser($copy->getBuffer());
         $txParser->writeInt(4, $sighashType, true);
 
-        $hash     = Hash::sha256d($txParser->getBuffer()->serialize());
+        $hash     = Hash::sha256d($txParser->getBuffer()->getBinary());
         $buffer   = Buffer::hex($hash);
 
         return $buffer;
