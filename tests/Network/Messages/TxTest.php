@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 27/03/15
- * Time: 01:07
- */
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
@@ -23,5 +17,6 @@ class TxTest extends AbstractTestCase
         $txMsg = new Tx($tx);
         $this->assertEquals('tx', $txMsg->getNetworkCommand());
         $this->assertEquals($tx, $txMsg->getTransaction());
+        $this->assertEquals($hex, $txMsg->getBuffer()->getHex());
     }
 }

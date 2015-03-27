@@ -9,6 +9,7 @@
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
 
+use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Network\Messages\MemPool;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -18,5 +19,6 @@ class MemPoolTest extends AbstractTestCase
     {
         $mem = new MemPool();
         $this->assertSame('mempool', $mem->getNetworkCommand());
+        $this->assertEquals(new Buffer(), $mem->getBuffer());
     }
 }

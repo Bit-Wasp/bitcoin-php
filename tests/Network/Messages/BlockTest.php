@@ -43,5 +43,8 @@ class BlockTest extends AbstractTestCase
         $block = new Block($newBlock);
         $this->assertEquals('block', $block->getNetworkCommand());
         $this->assertEquals($newBlock, $block->getBlock());
+        $this->assertEquals($newBlock->getHex(), $block->getHex());
     }
+
+
 }
