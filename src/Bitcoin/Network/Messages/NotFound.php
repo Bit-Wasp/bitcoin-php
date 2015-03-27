@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Parser;
 
-class NotFound extends NetworkSerializable
+class NotFound extends NetworkSerializable implements \Countable
 {
     /**
      * @var InventoryVector[]
@@ -31,6 +31,14 @@ class NotFound extends NetworkSerializable
     public function getNetworkCommand()
     {
         return 'notfound';
+    }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->vectors);
     }
 
     /**
