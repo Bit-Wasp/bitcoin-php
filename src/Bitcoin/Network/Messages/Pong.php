@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Parser;
 class Pong extends NetworkSerializable
 {
     /**
-     * @var \BitWasp\Bitcoin\Buffer
+     * @var integer
      */
     protected $nonce;
 
@@ -28,6 +28,9 @@ class Pong extends NetworkSerializable
         return 'pong';
     }
 
+    /**
+     * @return int
+     */
     public function getNonce()
     {
         return $this->nonce;
@@ -39,7 +42,7 @@ class Pong extends NetworkSerializable
     public function getBuffer()
     {
         $parser = new Parser();
-        $parser->writeBytes(8, $this->nonce);
+        $parser->writeInt(8, $this->nonce);
         return $parser->getBuffer();
     }
 }

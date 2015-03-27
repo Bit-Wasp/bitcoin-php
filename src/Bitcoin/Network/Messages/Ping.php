@@ -20,7 +20,7 @@ class Ping extends NetworkSerializable
     public function __construct()
     {
         $random = new Random();
-        $this->nonce = $random->bytes(8);
+        $this->nonce = Buffer::hex($random->bytes(8))->getInt();
     }
 
     /**
@@ -40,20 +40,12 @@ class Ping extends NetworkSerializable
     }
 
     /**
-     * @return Pong
-     */
-    public function reply()
-    {
-        return new Pong($this);
-    }
-
-    /**
      * @return Buffer
      */
     public function getBuffer()
     {
         $parser = new Parser();
-        $parser->writeBytes(8, $this->nonce);
+        $parser->writeInt(8, $this->nonce);
         return $parser->getBuffer();
     }
 }
