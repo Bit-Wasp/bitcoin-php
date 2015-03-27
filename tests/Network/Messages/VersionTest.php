@@ -33,7 +33,7 @@ class VersionTest extends AbstractTestCase
             $sender,
             $userAgent,
             $lastBlock,
-            1
+            true
         );
 
         $this->assertEquals('version', $version->getNetworkCommand());
@@ -44,5 +44,31 @@ class VersionTest extends AbstractTestCase
         $this->assertEquals($recipient, $version->getRecipientAddress());
         $this->assertEquals($services, $version->getServices());
         $this->assertEquals($lastBlock, $version->getStartHeight());
+        $this->assertInternalType('string', $version->getNonce());
+        $this->assertTrue($version->getRelay());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testVersionFails()
+    {
+        $v = '60002';
+        $services = Buffer::hex('0000000000000001');
+        $time = time();
+        $recipient = new NetworkAddress(Buffer::hex('1'), '10.0.0.1', '8332');
+        $sender = new NetworkAddress(Buffer::hex('1'), '10.0.0.2', '8332');
+        $userAgent = "/Satoshi:0.7.2/";
+        $lastBlock = 212672;
+        $version = new Version(
+            $v,
+            $services,
+            $time,
+            $recipient,
+            $sender,
+            $userAgent,
+            $lastBlock,
+            1
+        );
     }
 }

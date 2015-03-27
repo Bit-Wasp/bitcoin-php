@@ -84,6 +84,9 @@ class Version extends NetworkSerializable
         $this->addrFrom = $addrFrom;
         $this->userAgent = $userAgent;
         $this->startHeight = $startHeight;
+        if (! is_bool($relay)) {
+            throw new \InvalidArgumentException('Relay must be a boolean');
+        }
         $this->relay = $relay;
     }
 
@@ -169,14 +172,6 @@ class Version extends NetworkSerializable
     }
 
     /**
-     * @return VerAck
-     */
-    public function reply()
-    {
-        return new VerAck();
-    }
-
-    /**
      * @return Buffer
      */
     public function getBuffer()
@@ -191,7 +186,7 @@ class Version extends NetworkSerializable
             ->writeInt(8, $this->nonce, true)
             ->writeWithLength($this->userAgent)
             ->writeInt(4, $this->startHeight, true)
-            ->writeInt(1, $this->relay);
+            ->writeInt(1, (int)$this->relay);
 
         return $bytes->getBuffer();
     }
