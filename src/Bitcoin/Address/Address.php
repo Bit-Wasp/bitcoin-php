@@ -6,6 +6,10 @@ use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
+/**
+ * Abstract Class Address
+ * Used to store a hash, and a base58 encoded address
+ */
 abstract class Address implements AddressInterface
 {
     /**
@@ -13,11 +17,17 @@ abstract class Address implements AddressInterface
      */
     private $hash;
 
+    /**
+     * @param $hash
+     */
     public function __construct($hash)
     {
         $this->hash = (string)$hash;
     }
 
+    /**
+     * @return string
+     */
     public function getHash()
     {
         return $this->hash;
