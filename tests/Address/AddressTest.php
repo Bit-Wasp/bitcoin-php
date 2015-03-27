@@ -2,6 +2,7 @@
 
 namespace Address;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -36,6 +37,18 @@ class AddressTest extends AbstractTestCase
         }
 
         return $datasets;
+    }
+
+    public function fromString()
+    {
+        $ad = '3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy';
+        $network = Bitcoin::getNetwork();
+        $address = AddressFactory::fromString($ad, $network);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Address\PayToScriptHashAddress', $address);
+
+        $ad = '12iNxzdF6KFZ14UyRTYCRuptxkKSSVHzqF';
+        $addressP2PKH = AddressFactory::fromString($ad, $network);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Address\PayToPubKeyHashAddress', $address);
     }
 
     /**
