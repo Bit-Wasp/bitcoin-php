@@ -25,6 +25,7 @@ class Alert
     public function __construct(AlertDetail $alert, SignatureInterface $signature)
     {
         $this->alert = $alert;
+        $this->signature = $signature;
     }
 
     /**
