@@ -23,4 +23,19 @@ class InventoryVectorTest extends AbstractTestCase
 
         $this->assertEquals($buffer, $inv->getHash());
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidType(){
+        $inv = new InventoryVector(9, new Buffer('4141414141414141414141414141414141414141414141414141414141414141'));
+    }
+
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidLength(){
+        $inv = new InventoryVector(InventoryVector::MSG_TX, new Buffer('41414141414141414141414141414141414141414141414141414141414141'));
+    }
 }
