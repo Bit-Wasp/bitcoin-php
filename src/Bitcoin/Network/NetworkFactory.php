@@ -23,6 +23,10 @@ class NetworkFactory
         return new Network($address, $p2sh, $privateKey, $testnet);
     }
 
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
     public static function bitcoin()
     {
         $network = self::create('00', '05', '80')
@@ -33,6 +37,10 @@ class NetworkFactory
         return $network;
     }
 
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
     public static function bitcoinTestnet()
     {
         $network = self::create('6f', 'c4', 'ef', true)
@@ -43,6 +51,10 @@ class NetworkFactory
         return $network;
     }
 
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
     public static function litecoin()
     {
         $network = self::create('30', '05', 'b0')
@@ -53,6 +65,10 @@ class NetworkFactory
         return $network;
     }
 
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
     public static function viacoin()
     {
         $network = self::create('47', '21', 'c7')
@@ -64,6 +80,10 @@ class NetworkFactory
         return $network;
     }
 
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
     public static function viacoinTestnet()
     {
         $network = self::create('7f', 'c4', 'ff', true)

@@ -106,12 +106,17 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->network->isTestnet());
     }
 
-
+    /**
+     * @return \BitWasp\Bitcoin\Network\NetworkInterface
+     */
     private function getTestNetwork()
     {
         return NetworkFactory::bitcoinTestnet();
     }
 
+    /**
+     * @return \BitWasp\Bitcoin\Network\NetworkInterface
+     */
     private function getLiveNetwork()
     {
         return NetworkFactory::bitcoin();
@@ -175,9 +180,6 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("t7ZKfRypXUd7ByZGLLi5jX3AbD7KQvDj4a", $p2pk->getAddress(NetworkFactory::viacoinTestnet()));
     }
 
-    /**
-     * @depends testGetHDPrivByteException
-     */
     public function testGetHDPrivByte()
     {
         $this->network = new Network('00', '05', '80', true);
@@ -185,9 +187,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('0488B21E', $this->network->getHDPrivByte());
     }
 
-    /**
-     * @depends testGetHDPrivByteException
-     */
+
     public function testSetHDPrivByte()
     {
         $this->network = new Network('00', '05', '80', true);
@@ -204,9 +204,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->network = new Network('00', '05', '80', true);
         $this->network->getHDPubByte();
     }
-    /**
-     * @depends testGetHDPubByteException
-     */
+
     public function testGetHDPubByte()
     {
         $this->network = new Network('00', '05', '80', true);
@@ -214,9 +212,6 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('0488B21E', $this->network->getHDPubByte());
     }
 
-    /**
-     * @depends testGetHDPubByteException
-     */
     public function testSetHDPubByte()
     {
         $this->network = new Network('00', '05', '80', true);
