@@ -62,7 +62,7 @@ class PhpEcc extends BaseEcAdapter
             throw new \RuntimeException('Signature s = 0');
         }
 
-        // if s < n/2
+        // if s is less than half the curve order, invert s
         if ($math->cmp($s, $math->div($n, 2)) > 0) {
             $s = $math->sub($n, $s);
         }
@@ -92,7 +92,6 @@ class PhpEcc extends BaseEcAdapter
                     }
                 }
             } catch (\Exception $messageHash) {
-                echo " e thrown \n";
                 continue;
             }
         }
@@ -106,16 +105,16 @@ class PhpEcc extends BaseEcAdapter
      * @param RbgInterface $rbg
      * @return CompactSignature
      */
-    /*public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
     {
         $sign = $this->sign($privateKey, $messageHash, $rbg);
 
         // calculate the recovery param
         // there should be a way to get this when signing too, but idk how ...
-        $recoveryFlags = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey());
-        $compact = new CompactSignature($sign->getR(), $sign->getS(), $recoveryFlags, $privateKey->isCompressed());
+        $recid = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey());
+        $compact = new CompactSignature($sign->getR(), $sign->getS(), $recid, $privateKey->isCompressed());
         return $compact;
-    }*/
+    }
 
     /**
      * @param CompactSignature $signature
@@ -123,9 +122,8 @@ class PhpEcc extends BaseEcAdapter
      * @return PublicKey
      * @throws \Exception
      */
-    /*public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
     {
-        echo "D: recoverCompact()\n";
         $math = $this->getMath();
         $G = $this->getGenerator();
 
@@ -174,7 +172,7 @@ class PhpEcc extends BaseEcAdapter
         }
 
         throw new \Exception('Unable to recover public key');
-    }*/
+    }
 
     /**
      * @param PublicKeyInterface $publicKey
