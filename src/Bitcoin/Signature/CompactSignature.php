@@ -41,31 +41,49 @@ class CompactSignature
         $this->compressed = $compressed;
     }
 
+    /**
+     * @return int|string
+     */
     public function getR()
     {
         return $this->r;
     }
 
+    /**
+     * @return int|string
+     */
     public function getS()
     {
         return $this->s;
     }
 
+    /**
+     * @return int|string
+     */
     public function getRecoveryId()
     {
         return $this->recid;
     }
 
+    /**
+     * @return bool
+     */
     public function isCompressed()
     {
         return $this->compressed === true;
     }
 
+    /**
+     * @return int|string
+     */
     public function getFlags()
     {
         return $this->getRecoveryId() + 27 + ($this->isCompressed() ? 4 : 0);
     }
 
+    /**
+     * @return \BitWasp\Bitcoin\Buffer
+     */
     public function getBuffer()
     {
         $serializer = new CompactSignatureSerializer(Bitcoin::getMath());

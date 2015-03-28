@@ -62,7 +62,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
 
         foreach ($signatures->getSignatures() as $c => $signature) {
             foreach ($publicKeys as $key) {
-                $verify = $this->verify($key, $signature, $messageHash);
+                $verify = $this->verify($messageHash, $key, $signature);
                 if ($verify) {
                     $linked[$key->getPubKeyHash()] = $signature;
                     if (count($linked) == $sigCount) {
@@ -128,7 +128,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
      * @param PayToPubKeyHashAddress $address
      * @return bool
      */
-    public function verifyMessage(CompactSignature $signature, Buffer $messageHash, PayToPubKeyHashAddress $address)
+    public function verifyMessage(Buffer $messageHash, PayToPubKeyHashAddress $address, CompactSignature $signature)
     {
         $publicKey = $this->recoverCompact($signature, $messageHash);
         return ($publicKey->getAddress()->getHash() == $address->getHash());

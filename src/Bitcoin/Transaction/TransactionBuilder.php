@@ -125,7 +125,7 @@ class TransactionBuilder
         $random = ($this->deterministicSignatures
             ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
             : new Random());
-        return $this->ecAdapter->sign($privKey, $hash, $random);
+        return $this->ecAdapter->sign($hash, $privKey, $random);
     }
 
     /**

@@ -829,7 +829,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $sigHash = $this->transaction
                                 ->signatureHash()
                                 ->calculate($script, $this->inputToSign, $signature->getSighashType());
-                            $success   = $this->ecAdapter->verify($publicKey, $sigHash, $signature);
+                            $success   = $this->ecAdapter->verify($sigHash, $publicKey, $signature);
 
                             $this->mainStack->pop();
                             $this->mainStack->pop();

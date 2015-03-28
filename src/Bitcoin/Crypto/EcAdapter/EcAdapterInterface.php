@@ -44,7 +44,7 @@ interface EcAdapterInterface
      * @param RbgInterface $rbg
      * @return SignatureInterface
      */
-    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null);
+    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
 
     /**
      * @param PublicKeyInterface $publicKey
@@ -52,7 +52,7 @@ interface EcAdapterInterface
      * @param Buffer $messageHash
      * @return bool
      */
-    public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash);
+    public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature);
 
     /**
      * @param PrivateKeyInterface $privateKey
@@ -60,14 +60,14 @@ interface EcAdapterInterface
      * @param RbgInterface $rbg
      * @return CompactSignature
      */
-    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null);
+    public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
 
     /**
      * @param CompactSignature $compactSignature
      * @param Buffer $messageHash
      * @return PublicKeyInterface
      */
-    public function recoverCompact(CompactSignature $compactSignature, Buffer $messageHash);
+    public function recoverCompact(Buffer $messageHash, CompactSignature $compactSignature);
 
     /**
      * @param CompactSignature $compactSignature
@@ -75,7 +75,7 @@ interface EcAdapterInterface
      * @param PayToPubKeyHashAddress $address
      * @return bool
      */
-    public function verifyMessage(CompactSignature $compactSignature, Buffer $messageHash, PayToPubKeyHashAddress $address);
+    public function verifyMessage(Buffer $messageHash, PayToPubKeyHashAddress $address, CompactSignature $compactSignature);
 
     /**
      * @param Buffer $privateKey

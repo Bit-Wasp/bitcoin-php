@@ -111,7 +111,7 @@ class EcAdapterTest extends AbstractTestCase
             $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
 
             $k = new Rfc6979 ($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey, $messageHash);
-            $sig = $ecAdapter->sign($privateKey, $messageHash, $k);
+            $sig = $ecAdapter->sign($messageHash, $privateKey, $k);
 
             // K must be correct (from privatekey and message hash)
             $this->assertEquals(Buffer::hex($test->expectedK), $k->bytes(32));
@@ -121,7 +121,7 @@ class EcAdapterTest extends AbstractTestCase
             $sHex = $ecAdapter->getMath()->decHex($sig->getS());
             $this->assertSame($test->expectedRSLow, $rHex . $sHex);
 
-            $this->assertTrue($ecAdapter->verify($privateKey->getPublicKey(), $sig, $messageHash));
+            $this->assertTrue($ecAdapter->verify($messageHash, $privateKey->getPublicKey(), $sig));
         }
     }
 
@@ -144,11 +144,11 @@ class EcAdapterTest extends AbstractTestCase
 
         for ($i = 0; $i < 2; $i++) {
             $hash = $random->bytes(32);
-            $sig = $ecAdapter->sign($pk, $hash, new Random());
+            $sig = $ecAdapter->sign($hash, $pk, new Random());
 
             $this->assertInstanceOf($this->sigType, $sig);
             $this->assertTrue(Signature::isDERSignature($sig->getBuffer()));
-            $this->assertTrue($ecAdapter->verify($pk->getPublicKey(), $sig, $hash));
+            $this->assertTrue($ecAdapter->verify($hash, $pk->getPublicKey(), $sig));
         }
     }
 }

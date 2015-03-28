@@ -42,8 +42,8 @@ class CompactSignatureTest extends AbstractTestCase
     public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKey $private, Buffer $message)
     {
         $public = $private->getPublicKey();
-        $compact = $ecAdapter->signCompact($private, $message);
-        $recovered = $ecAdapter->recoverCompact($compact, $message);
+        $compact = $ecAdapter->signCompact($message, $private);
+        $recovered = $ecAdapter->recoverCompact($message, $compact);
 
         $this->assertEquals($recovered->getBuffer(), $public->getBuffer());
         $this->assertTrue($ecAdapter->verifyMessage($compact, $message, $public->getAddress()));
