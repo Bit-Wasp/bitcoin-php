@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
@@ -13,21 +13,10 @@ use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
-use BitWasp\Bitcoin\Signature\Signer;
-use Mdanter\Ecc\GeneratorPoint;
+
 
 class ScriptInterpreter implements ScriptInterpreterInterface
 {
-    /**
-     * @var Math
-     */
-    private $math;
-
-    /**
-     * @var GeneratorPoint
-     */
-    private $generator;
-
     /**
      * @var int|string
      */
@@ -85,15 +74,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     protected $constFalse;
 
     /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @var EcAdapterInterface
+     */
+    private $ecAdapter;
+
+    /**
+     * @param EcAdapterInterface $ecAdapter
      * @param Transaction $transaction
      * @param ScriptInterpreterFlags $flags
+     * @internal param Math $math
+     * @internal param GeneratorPoint $generator
      */
-    public function __construct(Math $math, GeneratorPoint $generator, Transaction $transaction, ScriptInterpreterFlags $flags = null)
+    public function __construct(EcAdapterInterface $ecAdapter, Transaction $transaction, ScriptInterpreterFlags $flags = null)
     {
-        $this->math = $math;
-        $this->generator = $generator;
+        $this->ecAdapter = $ecAdapter;
         $this->transaction = $transaction;
         $this->script = ScriptFactory::create();
         $this->flags = $flags ?: ScriptInterpreterFlags::defaults();
@@ -294,7 +288,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             if ($this->mainStack->size() == 0) {
                 throw new \Exception('Script err eval false');
             }
-
         }
 
         return true;
@@ -305,6 +298,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function run()
     {
+        $math = $this->ecAdapter->getMath();
         $opcodes = $this->script->getOpCodes();
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
@@ -531,7 +525,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_DEPTH'):
                             $num = $this->mainStack->size();
-                            $bin = pack("H*", $this->math->decHex($num));
+                            $bin = pack("H*", $math->decHex($num));
                             $this->mainStack->push($bin);
                             break;
 
@@ -613,7 +607,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             // Different types could be returned here
 
                             $vch = $this->mainStack->top(-1);
-                            $size = pack("H*", $this->math->decHex(strlen($vch)));
+                            $size = pack("H*", $math->decHex(strlen($vch)));
 
                             $this->mainStack->push($size);
                             break;
@@ -660,24 +654,24 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_1ADD'):
-                                    $num = $this->math->add($num, '1');
+                                    $num = $math->add($num, '1');
                                     break;
                                 case $opcodes->getOpByName('OP_1SUB'):
-                                    $num = $this->math->sub($num, '1');
+                                    $num = $math->sub($num, '1');
                                     break;
                                 case $opcodes->getOpByName('OP_NEGATE'):
-                                    $num = $this->math->sub(0, $num);
+                                    $num = $math->sub(0, $num);
                                     break;
                                 case $opcodes->getOpByName('OP_ABS'):
-                                    if ($this->math->cmp($num, '0') < 0) {
-                                        $num = $this->math->sub(0, $num);
+                                    if ($math->cmp($num, '0') < 0) {
+                                        $num = $math->sub(0, $num);
                                     }
                                     break;
                                 case $opcodes->getOpByName('OP_NOT'):
-                                    $num = ($this->math->cmp($num, '0') == 0);
+                                    $num = ($math->cmp($num, '0') == 0);
                                     break;
                                 case $opcodes->getOpByName('OP_0NOTEQUAL'):
-                                    $num = ($this->math->cmp($num, '0') !== 0);
+                                    $num = ($math->cmp($num, '0') !== 0);
                                     break;
                                 default:
                                     throw new \Exception('Invalid Opcode');
@@ -710,43 +704,43 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_ADD'):
-                                    $num = $this->math->add($num1, $num2);
+                                    $num = $math->add($num1, $num2);
                                     break;
                                 case $opcodes->getOpByName('OP_SUB'):
-                                    $num = $this->math->sub($num1, $num2);
+                                    $num = $math->sub($num1, $num2);
                                     break;
                                 case $opcodes->getOpByName('OP_BOOLAND'):
-                                    $num = ($this->math->cmp($num1, $_bn0) !== 0 && $this->math->cmp($num2, $_bn0) !== 0);
+                                    $num = ($math->cmp($num1, $_bn0) !== 0 && $math->cmp($num2, $_bn0) !== 0);
                                     break;
                                 case $opcodes->getOpByName('OP_BOOLOR'):
-                                    $num = ($this->math->cmp($num1, $_bn0) !== 0 || $this->math->cmp($num2, $_bn0) !== 0);
+                                    $num = ($math->cmp($num1, $_bn0) !== 0 || $math->cmp($num2, $_bn0) !== 0);
                                     break;
                                 case $opcodes->getOpByName('OP_NUMEQUAL'):
-                                    $num = ($this->math->cmp($num1, $num2) == 0);
+                                    $num = ($math->cmp($num1, $num2) == 0);
                                     break;
                                 case $opcodes->getOpByName('OP_NUMEQUALVERIFY'):
-                                    $num = ($this->math->cmp($num1, $num2) == 0);
+                                    $num = ($math->cmp($num1, $num2) == 0);
                                     break;
                                 case $opcodes->getOpByName('OP_NUMNOTEQUAL'):
-                                    $num = ($this->math->cmp($num1, $num2) !== 0);
+                                    $num = ($math->cmp($num1, $num2) !== 0);
                                     break;
                                 case $opcodes->getOpByName('OP_LESSTHAN'):
-                                    $num = ($this->math->cmp($num1, $num2) < 0);
+                                    $num = ($math->cmp($num1, $num2) < 0);
                                     break;
                                 case $opcodes->getOpByName('OP_GREATERTHAN'):
-                                    $num = ($this->math->cmp($num1, $num2) > 0);
+                                    $num = ($math->cmp($num1, $num2) > 0);
                                     break;
                                 case $opcodes->getOpByName('OP_LESSTHANOREQUAL'):
-                                    $num = ($this->math->cmp($num1, $num2) <= 0);
+                                    $num = ($math->cmp($num1, $num2) <= 0);
                                     break;
                                 case $opcodes->getOpByName('OP_GREATERTHANOREQUAL'):
-                                    $num = ($this->math->cmp($num1, $num2) >= 0);
+                                    $num = ($math->cmp($num1, $num2) >= 0);
                                     break;
                                 case $opcodes->getOpByName('OP_MIN'):
-                                    $num = ($this->math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
+                                    $num = ($math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
                                     break;
                                 case $opcodes->getOpByName('OP_MAX'):
-                                    $num = ($this->math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
+                                    $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                                     break;
                                 default:
                                     throw new \Exception('Invalid opcode in maths ops');
@@ -771,7 +765,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $num1 = $this->mainStack->top(-3);
                             $num2 = $this->mainStack->top(-2);
                             $num3 = $this->mainStack->top(-1);
-                            $value = ($this->math->cmp($num2, $num1) <= 0 && $this->math->cmp($num1, $num3) < 0);
+                            $value = ($math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0);
                             $this->mainStack->pop();
                             $this->mainStack->pop();
                             $this->mainStack->pop();
@@ -836,8 +830,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $sigHash = $this->transaction
                                 ->signatureHash()
                                 ->calculate($script, $this->inputToSign, $signature->getSighashType());
-                            $signer    = new Signer($this->math, $this->generator);
-                            $success   = $signer->verify($publicKey, $sigHash, $signature);
+                            $success   = $this->ecAdapter->verify($publicKey, $sigHash, $signature);
 
                             $this->mainStack->pop();
                             $this->mainStack->pop();

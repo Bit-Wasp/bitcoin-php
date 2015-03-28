@@ -2,37 +2,18 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-use \BitWasp\Bitcoin\Bitcoin;
-use \BitWasp\Bitcoin\Buffer;
-use \BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use \BitWasp\Bitcoin\Script\ScriptInterpreter;
-use \BitWasp\Bitcoin\Transaction\TransactionFactory;
-use \BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
+use BitWasp\Bitcoin\Script\ScriptInterpreter;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
 
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \BitWasp\Bitcoin\Math\Math
+     * @param $flagStr
+     * @return ScriptInterpreterFlags
      */
-    public $math;
-
-    /**
-     * @var \Mdanter\Ecc\GeneratorPoint
-     */
-    public $G;
-
-    public function __construct()
-    {
-        $this->math = Bitcoin::getMath();
-        $this->G = Bitcoin::getGenerator();
-    }
-
-    public function setUp()
-    {
-
-    }
-
     private function setFlags($flagStr)
     {
         $array = explode(",", $flagStr);
@@ -52,7 +33,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
         foreach ($json->test as $c => $test) {
             $flags = $this->setFlags($test->flags);
-            $i = new ScriptInterpreter($this->math, $this->G, TransactionFactory::create(), $flags);
+            $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), TransactionFactory::create(), $flags);
             $scriptSig = ScriptFactory::fromHex($test->scriptSig);
             $scriptPubKey = ScriptFactory::fromHex($test->scriptPubKey);
 
@@ -60,8 +41,6 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
             $testResult = $i->setScript($scriptPubKey)->run();
 
             $this->assertTrue($testResult, $test->result);
-
         }
     }
-
 }
