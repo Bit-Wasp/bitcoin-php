@@ -14,7 +14,6 @@ use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 
-
 class ScriptInterpreter implements ScriptInterpreterInterface
 {
     /**

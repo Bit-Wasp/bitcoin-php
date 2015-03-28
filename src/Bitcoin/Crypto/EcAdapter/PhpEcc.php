@@ -17,6 +17,34 @@ use Mdanter\Ecc\PointInterface;
 
 class PhpEcc extends BaseEcAdapter
 {
+    /**
+     * @param PublicKeyInterface $publicKey
+     * @param SignatureInterface $signature
+     * @param Buffer $messageHash
+     * @return bool
+     */
+    public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash)
+    {
+        $n = $this->getGenerator()->getOrder();
+        $math = $this->getMath();
+        $generator = $this->getGenerator();
+
+        if ($math->cmp($signature->getR(), 1) < 1 || $math->cmp($signature->getR(), $math->sub($n, 1)) > 0) {
+            return false;
+        }
+
+        if ($math->cmp($signature->getS(), 1) < 1 || $math->cmp($signature->getS(), $math->sub($n, 1)) > 0) {
+            return false;
+        }
+
+        $c = $math->inverseMod($signature->getS(), $n);
+        $u1 = $math->mod($math->mul($messageHash->getInt(), $c), $n);
+        $u2 = $math->mod($math->mul($signature->getR(), $c), $n);
+        $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
+        $v = $math->mod($xy->getX(), $n);
+
+        return $math->cmp($v, $signature->getR()) == 0;
+    }
 
     /**
      * @param PrivateKeyInterface $privateKey
@@ -68,52 +96,6 @@ class PhpEcc extends BaseEcAdapter
         }
 
         return new Signature($r, $s);
-    }
-
-    /**
-     * attempt to calculate the public key recovery param by trial and error
-     *
-     * @param                $r
-     * @param                $s
-     * @param Buffer $messageHash
-     * @param PublicKeyInterface $publicKey
-     * @return int
-     * @throws \Exception
-     */
-    public function calcPubKeyRecoveryParam($r, $s, Buffer $messageHash, PublicKeyInterface $publicKey)
-    {
-        $Q = $publicKey->getPoint();
-        for ($i = 0; $i < 4; $i++) {
-            try {
-                $test = new CompactSignature($r, $s, $i, $publicKey->isCompressed());
-                if ($pubKey = $this->recoverCompact($test, $messageHash)) {
-                    if ($pubKey->getPoint()->getX() == $Q->getX() && $pubKey->getPoint()->getY() == $Q->getY()) {
-                        return $i;
-                    }
-                }
-            } catch (\Exception $messageHash) {
-                continue;
-            }
-        }
-
-        throw new \Exception("Failed to find valid recovery factor");
-    }
-
-    /**
-     * @param PrivateKeyInterface $privateKey
-     * @param Buffer $messageHash
-     * @param RbgInterface $rbg
-     * @return CompactSignature
-     */
-    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
-    {
-        $sign = $this->sign($privateKey, $messageHash, $rbg);
-
-        // calculate the recovery param
-        // there should be a way to get this when signing too, but idk how ...
-        $recid = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey());
-        $compact = new CompactSignature($sign->getR(), $sign->getS(), $recid, $privateKey->isCompressed());
-        return $compact;
     }
 
     /**
@@ -175,32 +157,47 @@ class PhpEcc extends BaseEcAdapter
     }
 
     /**
-     * @param PublicKeyInterface $publicKey
-     * @param SignatureInterface $signature
+     * attempt to calculate the public key recovery param by trial and error
+     *
+     * @param                $r
+     * @param                $s
      * @param Buffer $messageHash
-     * @return bool
+     * @param PublicKeyInterface $publicKey
+     * @return int
+     * @throws \Exception
      */
-    public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash)
+    public function calcPubKeyRecoveryParam($r, $s, Buffer $messageHash, PublicKeyInterface $publicKey)
     {
-        $n = $this->getGenerator()->getOrder();
-        $math = $this->getMath();
-        $generator = $this->getGenerator();
-
-        if ($math->cmp($signature->getR(), 1) < 1 || $math->cmp($signature->getR(), $math->sub($n, 1)) > 0) {
-            return false;
+        $Q = $publicKey->getPoint();
+        for ($i = 0; $i < 4; $i++) {
+            try {
+                $test = new CompactSignature($r, $s, $i, $publicKey->isCompressed());
+                if ($this->recoverCompact($test, $messageHash)->getPoint()->equals($Q)) {
+                    return $i;
+                }
+            } catch (\Exception $messageHash) {
+                continue;
+            }
         }
 
-        if ($math->cmp($signature->getS(), 1) < 1 || $math->cmp($signature->getS(), $math->sub($n, 1)) > 0) {
-            return false;
-        }
+        throw new \Exception("Failed to find valid recovery factor");
+    }
 
-        $c = $math->inverseMod($signature->getS(), $n);
-        $u1 = $math->mod($math->mul($messageHash->getInt(), $c), $n);
-        $u2 = $math->mod($math->mul($signature->getR(), $c), $n);
-        $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
-        $v = $math->mod($xy->getX(), $n);
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param Buffer $messageHash
+     * @param RbgInterface $rbg
+     * @return CompactSignature
+     */
+    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    {
+        $sign = $this->sign($privateKey, $messageHash, $rbg);
 
-        return $math->cmp($v, $signature->getR()) == 0;
+        // calculate the recovery param
+        // there should be a way to get this when signing too, but idk how ...
+        $recid = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey());
+        $compact = new CompactSignature($sign->getR(), $sign->getS(), $recid, $privateKey->isCompressed());
+        return $compact;
     }
 
     /**
