@@ -75,12 +75,11 @@ class Secp256k1 extends BaseEcAdapter
      * @return CompactSignature
      * @throws \Exception
      */
-    /*public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
     {
         $privateStr = $privateKey->getBuffer()->getBinary();
         $hashStr = $messageHash->getBinary();
         $sigStr = '';
-        $sigLen = 0;
         $recid = 0;
         $ret = \secp256k1_ecdsa_sign_compact($hashStr, $privateStr, $sigStr, $recid);
 
@@ -94,7 +93,7 @@ class Secp256k1 extends BaseEcAdapter
         }
 
         throw new \Exception('Unable to create compact signature');
-    }*/
+    }
 
     /**
      * @param CompactSignature $signature
@@ -102,15 +101,13 @@ class Secp256k1 extends BaseEcAdapter
      * @return \BitWasp\Bitcoin\Key\PublicKey
      * @throws \Exception
      */
-    /*public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
     {
         $pubkey = '';
-        $recid = $signature->getFlags();
-        $buf = $signature->getBuffer();
-        $sig = $buf->getBinary();
-        echo $buf->getHex()."\n";
-        //echo "Try to validate: (".$signature->getBuffer()->getSize() . " " . bin2hex($sigStr) . "\n";
-        $ret = \secp256k1_ecdsa_recover_compact($messageHash->getBinary(), $sig, $recid, $signature->isCompressed(), $pubkey);
+        $recid = $signature->getRecoveryId();
+        $buf = $signature->getBuffer()->slice(1)->getBinary();
+
+        $ret = \secp256k1_ecdsa_recover_compact($messageHash->getBinary(), $buf, (int)$recid, (int)$signature->isCompressed(), $pubkey);
 
         if ($ret === 1) {
             $publicKey = PublicKeyFactory::fromHex(bin2hex($pubkey));
@@ -118,7 +115,7 @@ class Secp256k1 extends BaseEcAdapter
         }
 
         throw new \Exception('Unable to recover public key from compact signature');
-    }*/
+    }
 
     /**
      * @param PublicKeyInterface $publicKey
