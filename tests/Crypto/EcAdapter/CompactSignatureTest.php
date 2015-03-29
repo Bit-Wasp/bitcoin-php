@@ -46,6 +46,6 @@ class CompactSignatureTest extends AbstractTestCase
         $recovered = $ecAdapter->recoverCompact($message, $compact);
 
         $this->assertEquals($recovered->getBuffer(), $public->getBuffer());
-        $this->assertTrue($ecAdapter->verifyMessage($compact, $message, $public->getAddress()));
+        $this->assertTrue($ecAdapter->verifyMessage($message, $public->getAddress(), $compact));
     }
 }

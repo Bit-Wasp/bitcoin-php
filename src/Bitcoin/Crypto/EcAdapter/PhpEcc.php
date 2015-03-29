@@ -172,7 +172,7 @@ class PhpEcc extends BaseEcAdapter
         for ($i = 0; $i < 4; $i++) {
             try {
                 $test = new CompactSignature($r, $s, $i, $publicKey->isCompressed());
-                if ($this->recoverCompact($test, $messageHash)->getPoint()->equals($Q)) {
+                if ($this->recoverCompact($messageHash, $test)->getPoint()->equals($Q)) {
                     return $i;
                 }
             } catch (\Exception $messageHash) {

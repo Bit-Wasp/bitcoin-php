@@ -130,7 +130,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
      */
     public function verifyMessage(Buffer $messageHash, PayToPubKeyHashAddress $address, CompactSignature $signature)
     {
-        $publicKey = $this->recoverCompact($signature, $messageHash);
+        $publicKey = $this->recoverCompact($messageHash, $signature);
         return ($publicKey->getAddress()->getHash() == $address->getHash());
     }
 }
