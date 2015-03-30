@@ -36,5 +36,4 @@ interface PublicKeyInterface extends KeyInterface
      * @return \Mdanter\Ecc\PointInterface
      */
     public function getPoint();
-
 }
