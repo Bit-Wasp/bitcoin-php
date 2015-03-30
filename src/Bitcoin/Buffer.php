@@ -56,8 +56,8 @@ class Buffer
     }
 
     /**
-     * @param $start
-     * @param null $end
+     * @param integer $start
+     * @param integer|null $end
      * @return Buffer
      * @throws \Exception
      */

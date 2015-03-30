@@ -50,10 +50,10 @@ class HierarchicalKey
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param $depth
-     * @param $parentFingerprint
-     * @param $sequence
-     * @param $chainCode
+     * @param integer|string $depth
+     * @param integer|string $parentFingerprint
+     * @param integer|string $sequence
+     * @param integer|string $chainCode
      * @param KeyInterface $key
      * @throws \Exception
      */
