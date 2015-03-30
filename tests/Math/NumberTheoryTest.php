@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Tests\Math;
 
 use BitWasp\Bitcoin\Bitcoin;
-use Mdanter\Ecc\Math\Gmp;
 use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\NumberTheory;
 
 class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +17,10 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
      */
     protected $generator;
     protected $theory;
+
+    /**
+     * @var \BitWasp\Bitcoin\Math\Math
+     */
     protected $math;
 
     protected function setUp()
@@ -33,35 +37,31 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
         if (! file_exists($file_sqrt)) {
             $this->fail('Square root input data not found');
         }
+        $this->math = Bitcoin::getMath();
         $this->generator = Bitcoin::getGenerator();
         $this->compression_data = json_decode(file_get_contents($file_comp));
 
         $this->sqrt_data = json_decode(file_get_contents($file_sqrt));
-
     }
 
     /**
      * @expectedException \LogicException
      */
-    public function testSqrtDataWithNoRootsGmp()
+    public function testSqrtDataWithNoRoots()
     {
-        Bitcoin::setMath(new Gmp());
-        $this->theory = Bitcoin::getMath()->getNumberTheory();
+        $theory = $this->math->getNumberTheory();
 
         foreach ($this->sqrt_data->no_root as $r) {
-            $this->theory->squareRootModP($r->a, $r->p);
+            $theory->squareRootModP($r->a, $r->p);
         }
     }
 
-    public function testSqrtDataWithRootsGmp()
+    public function testSqrtDataWithRoots()
     {
-        Bitcoin::setMath(new Gmp());
-        $this->math = Bitcoin::getMath();
-        $this->theory = $this->math->getNumberTheory();
+        $theory = $this->math->getNumberTheory();
 
         foreach ($this->sqrt_data->has_root as $r) {
-            $root1 = $this->theory->squareRootModP($r->a, $r->p);
-            $root2 = $this->math->sub($r->p, $root1);
+            $root1 = $theory->squareRootModP($r->a, $r->p);
             $this->assertTrue(in_array($root1, $r->res));
             $this->assertTrue(in_array($root1, $r->res));
 
@@ -70,13 +70,14 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 
     public function testGmpCompressionConsistency()
     {
-        Bitcoin::setMath(new Gmp());
-        $this->math = Bitcoin::getMath();
-        $this->theory = $this->math->getNumberTheory();
-        $this->_doCompressionConsistence($this->theory);
+        $theory = $this->math->getNumberTheory();
+        $this->_doCompressionConsistence($theory);
     }
 
-    public function _doCompressionConsistence($theory)
+    /**
+     * @param NumberTheory $theory
+     */
+    public function _doCompressionConsistence(NumberTheory $theory)
     {
 
         foreach ($this->compression_data as $o) {
@@ -103,9 +104,6 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
                 $this->generator->getCurve()->getPrime()
             );
 
-            // y1 = other root = p - y0
-            $y1 = gmp_strval($this->math->sub($this->generator->getCurve()->getPrime(), $y0), 16);
-
             if ($y_byte == '02') {
                 $y_coordinate = ($this->math->mod($y0, 2) == '0')
                     ? gmp_strval(gmp_init($y0, 10), 16)
@@ -122,17 +120,16 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-
+    /**
+     *
+     */
     public function testGmpModFunction()
     {
-        Bitcoin::setMath(new Gmp());
-        $math = Bitcoin::getMath();
+        $math = $this->math;
 
         // $o->compressed, $o->decompressed public key.
         // Check that we can compress a key properly (tests $math->mod())
         foreach ($this->compression_data as $o) {
-            $prefix = substr($o->decompressed, 0, 2); // will be 04.
-
             // hex encoded (X,Y) coordinate of ECDSA public key.
             $x = substr($o->decompressed, 2, 64);
             $y = substr($o->decompressed, 66, 64);

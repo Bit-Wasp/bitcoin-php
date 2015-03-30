@@ -44,8 +44,11 @@ class Bitcoin
      */
     public static function getMath()
     {
-        $math = self::$math ?: new Math();
-        return $math;
+        if (null === self::$math) {
+            self::$math = new Math();
+        }
+
+        return self::$math;
     }
 
     /**
@@ -53,7 +56,7 @@ class Bitcoin
      */
     public static function setMath(MathAdapterInterface $adapter)
     {
-        self::$math = new Math($adapter);
+        self::$math = $adapter;
     }
 
     /**
