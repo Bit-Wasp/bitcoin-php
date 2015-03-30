@@ -24,22 +24,22 @@ class HierarchicalKey
     protected $bytes;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $depth;
 
     /**
-     * @var string
+     * @var int|string
      */
     protected $parentFingerprint;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $sequence;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $chainCode;
 
