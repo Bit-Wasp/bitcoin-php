@@ -260,8 +260,8 @@ class HierarchicalKey
             $sequence,
             $chain->getInt(),
             $this->isPrivate()
-                ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
-                : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt())
+            ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
+            : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt())
         );
     }
 
