@@ -244,28 +244,24 @@ class HierarchicalKey
     public function deriveChild($sequence)
     {
         $math = $this->ecAdapter->getMath();
-        $chainHex = str_pad($math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
+        $chain = Buffer::hex(str_pad($math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT));
 
         try {
-            // can be easily wrapped in a loop that recurses until
-            // the desired key is created, without the other stuff.
             $data = $this->getHmacSeed($sequence);
-            $hash = Hash::hmac('sha512', $data->getBinary(), pack("H*", $chainHex));
+            $hash = new Buffer(Hash::hmac('sha512', $data->getBinary(), $chain->getBinary(), true));
+            $offset = $hash->slice(0, 32);
+            $chain = $hash->slice(32);
 
-            list ($offset, $chainHex) = array(
-                $math->hexDec(substr($hash, 0, 64)),
-                substr($hash, 64, 64),
-            );
+            if (false === $this->ecAdapter->validatePrivateKey($offset)) {
+                throw new InvalidPrivateKey('Invalid offset - trigger next derivation');
+            }
 
             $key = $this->isPrivate()
-                ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset)
-                : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset);
+                ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
+                : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt());
 
         } catch (InvalidPrivateKey $e) {
-            // Invalid keys should trigger recursion.. 1:1^128
             return $this->deriveChild(++$sequence);
-        } catch (\Exception $e) {
-            throw $e;
         }
 
         $key = new HierarchicalKey(
@@ -273,7 +269,7 @@ class HierarchicalKey
             $this->getDepth() + 1,
             $this->getChildFingerprint(),
             $sequence,
-            $math->hexDec($chainHex),
+            $chain->getInt(),
             $key
         );
 
