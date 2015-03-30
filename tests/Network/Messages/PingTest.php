@@ -20,7 +20,7 @@ class PingTest extends AbstractTestCase
         $this->assertInternalType('string', $ping->getNonce());
         $this->assertEquals('ping', $ping->getNetworkCommand());
         $math = Bitcoin::getMath();
-        $this->assertEquals($math->decHex($ping->getNonce()), $ping->getBuffer()->getHex());
+        $this->assertEquals(str_pad($math->decHex($ping->getNonce()), 16, '0', STR_PAD_LEFT), $ping->getBuffer()->getHex());
 
     }
 }
