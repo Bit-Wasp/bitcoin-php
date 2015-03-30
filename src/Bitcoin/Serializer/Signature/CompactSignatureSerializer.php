@@ -30,15 +30,11 @@ class CompactSignatureSerializer
      */
     public function serialize(CompactSignature $signature)
     {
-        $math = $this->math;
-
-        $val = $signature->getFlags();
-
         $parser = new Parser;
         $parser
-            ->writeInt(1, $val)
-            ->writeBytes(32, $math->decHex($signature->getR()))
-            ->writeBytes(32, $math->decHex($signature->getS()));
+            ->writeInt(1, $signature->getFlags())
+            ->writeBytes(32, $this->math->decHex($signature->getR()))
+            ->writeBytes(32, $this->math->decHex($signature->getS()));
 
         return $parser->getBuffer();
     }
@@ -62,13 +58,13 @@ class CompactSignatureSerializer
                 throw new \InvalidArgumentException('invalid signature type');
             }
 
-            $isCompressed = ($recoveryFlags & 4) != 0;
-
+            $isCompressed = ($this->math->bitwiseAnd($recoveryFlags, 4) != 0);
+            $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
 
-        $signature = new CompactSignature($r, $s, $recoveryFlags, $isCompressed);
+        $signature = new CompactSignature($r, $s, $recoveryId, $isCompressed);
         return $signature;
     }
 

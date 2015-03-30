@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 
 class HierarchicalKey
 {
@@ -243,37 +242,27 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $math = $this->ecAdapter->getMath();
-        $chain = Buffer::hex(str_pad($math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT));
+        $chainHex = str_pad($this->ecAdapter->getMath()->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
+        $chain = Buffer::hex($chainHex);
 
-        try {
-            $data = $this->getHmacSeed($sequence);
-            $hash = new Buffer(Hash::hmac('sha512', $data->getBinary(), $chain->getBinary(), true));
-            $offset = $hash->slice(0, 32);
-            $chain = $hash->slice(32);
+        $hash = new Buffer(Hash::hmac('sha512', $this->getHmacSeed($sequence)->getBinary(), $chain->getBinary(), true));
+        $offset = $hash->slice(0, 32);
+        $chain = $hash->slice(32);
 
-            if (false === $this->ecAdapter->validatePrivateKey($offset)) {
-                throw new InvalidPrivateKey('Invalid offset - trigger next derivation');
-            }
-
-            $key = $this->isPrivate()
-                ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
-                : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt());
-
-        } catch (InvalidPrivateKey $e) {
-            return $this->deriveChild(++$sequence);
+        if (false === $this->ecAdapter->validatePrivateKey($offset)) {
+            return $this->deriveChild($sequence + 1);
         }
 
-        $key = new HierarchicalKey(
+        return new HierarchicalKey(
             $this->ecAdapter,
             $this->getDepth() + 1,
             $this->getChildFingerprint(),
             $sequence,
             $chain->getInt(),
-            $key
+            $this->isPrivate()
+                ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
+                : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt())
         );
-
-        return $key;
     }
 
     /**

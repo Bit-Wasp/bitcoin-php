@@ -7,6 +7,9 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class SignatureCollection implements \Countable
 {
+    /**
+     * @var SignatureInterface[]
+     */
     private $signatures = [];
 
     /**
