@@ -28,6 +28,11 @@ interface KeyInterface extends SerializableInterface
     public function isPrivate();
 
     /**
+     * @return \BitWasp\Bitcoin\Address\PayToPubKeyHashAddress
+     */
+    public function getAddress();
+
+    /**
      * @return \BitWasp\Bitcoin\Buffer
      */
     public function getBuffer();

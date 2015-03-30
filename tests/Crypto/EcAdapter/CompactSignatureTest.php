@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 
+use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKey;
@@ -24,7 +25,7 @@ class CompactSignatureTest extends AbstractTestCase
         // correct address can be found)
 
         $vectors = [];
-        for ($i = 0; $i < 1; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $priv = PrivateKeyFactory::create(false)->getHex();
             $message = Buffer::hex(Hash::sha256d($i));
             foreach ($this->getEcAdapters() as $adapter) {
@@ -32,6 +33,7 @@ class CompactSignatureTest extends AbstractTestCase
                 $vectors[] = [$adapter[0], PrivateKeyFactory::fromHex($priv, false, $adapter[0]), $message];
             }
         }
+
         return $vectors;
     }
 
@@ -41,11 +43,15 @@ class CompactSignatureTest extends AbstractTestCase
      */
     public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKey $private, Buffer $message)
     {
-        $public = $private->getPublicKey();
-        $compact = $ecAdapter->signCompact($private, $message);
-        $recovered = $ecAdapter->recoverCompact($compact, $message);
+        $pubKey = $private->getPublicKey();
+        $compact = $ecAdapter->signCompact($message, $private);
+        $recPubKey = $ecAdapter->recoverCompact($message, $compact);
 
-        $this->assertEquals($recovered->getBuffer(), $public->getBuffer());
-        $this->assertTrue($ecAdapter->verifyMessage($compact, $message, $public->getAddress()));
+        $this->assertEquals($recPubKey->getBuffer(), $pubKey->getBuffer());
+        $this->assertTrue($ecAdapter->verifyMessage($message, $pubKey->getAddress(), $compact));
+
+        $serializer = new CompactSignatureSerializer($ecAdapter->getMath());
+        $parsed = $serializer->parse($compact->getBuffer());
+        $this->assertEquals($compact, $parsed);
     }
 }

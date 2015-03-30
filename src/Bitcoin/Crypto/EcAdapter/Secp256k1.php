@@ -53,7 +53,7 @@ class Secp256k1 extends BaseEcAdapter
      * @return Signature
      * @throws \Exception
      */
-    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbgInterface = null)
+    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbgInterface = null)
     {
         $privateStr = $privateKey->getBuffer()->getBinary();
         $hashStr = $messageHash->getBinary();
@@ -75,7 +75,7 @@ class Secp256k1 extends BaseEcAdapter
      * @return CompactSignature
      * @throws \Exception
      */
-    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
         $privateStr = $privateKey->getBuffer()->getBinary();
         $hashStr = $messageHash->getBinary();
@@ -101,7 +101,7 @@ class Secp256k1 extends BaseEcAdapter
      * @return \BitWasp\Bitcoin\Key\PublicKey
      * @throws \Exception
      */
-    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    public function recoverCompact(Buffer $messageHash, CompactSignature $signature)
     {
         $pubkey = '';
         $recid = $signature->getRecoveryId();
@@ -118,13 +118,13 @@ class Secp256k1 extends BaseEcAdapter
     }
 
     /**
+     * @param Buffer $messageHash
      * @param PublicKeyInterface $publicKey
      * @param SignatureInterface $signature
-     * @param Buffer $messageHash
      * @return bool
      * @throws \Exception
      */
-    public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash)
+    public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
     {
         $publicStr = $publicKey->getBuffer()->getBinary();
         $sigStr = $signature->getBuffer()->getBinary();

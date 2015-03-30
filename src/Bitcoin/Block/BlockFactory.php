@@ -13,17 +13,6 @@ class BlockFactory
 {
     /**
      * @param Math $math
-     * @return HexBlockSerializer
-     */
-    public static function getSerializer(Math $math = null)
-    {
-        $math = $math ?: Bitcoin::getMath();
-        $serializer = new HexBlockSerializer($math, new HexBlockHeaderSerializer(), new TransactionCollectionSerializer(new TransactionSerializer()));
-        return $serializer;
-    }
-
-    /**
-     * @param Math $math
      * @return Block
      */
     public static function create(Math $math = null)
@@ -32,13 +21,15 @@ class BlockFactory
         $block = new Block($math);
         return $block;
     }
+
     /**
      * @param $string
      * @return Block
      */
-    public static function fromHex($string)
+    public static function fromHex($string, Math $math = null)
     {
-        $serializer = self::getSerializer();
+        $math = $math ?: Bitcoin::getMath();
+        $serializer = new HexBlockSerializer($math, new HexBlockHeaderSerializer(), new TransactionCollectionSerializer(new TransactionSerializer()));
         $block = $serializer->parse($string);
         return $block;
     }

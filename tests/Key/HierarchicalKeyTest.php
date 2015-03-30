@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\HierarchicalKeyFactory;
@@ -43,6 +44,10 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->network = NetworkFactory::bitcoin();
     }
 
+    /**
+     * @param HierarchicalKey $key
+     * @param $vectors
+     */
     private function compareToPrivVectors(HierarchicalKey $key, $vectors)
     {
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif($this->network));
@@ -64,6 +69,31 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $this->key = HierarchicalKeyFactory::generateMasterKey($ecAdapter);
         $this->assertInstanceOf($this->baseType, $this->key);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage A HierarchicalKey must always be compressed
+     */
+    public function testFailsWithUncompressed()
+    {
+        new HierarchicalKey(
+            Bitcoin::getEcAdapter(),
+            1,
+            1,
+            1,
+            1,
+            PrivateKeyFactory::create(false)
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDecodePathFailure()
+    {
+        $key = HierarchicalKeyFactory::generateMasterKey(Bitcoin::getEcAdapter());
+        $key->decodePath('');
     }
 
     /**

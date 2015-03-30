@@ -6,14 +6,6 @@ use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 
 class BlockHeaderFactory
 {
-    /**
-     * @return HexBlockHeaderSerializer
-     */
-    public static function getSerializer()
-    {
-        $serializer = new HexBlockHeaderSerializer();
-        return $serializer;
-    }
 
     /**
      * @param $string

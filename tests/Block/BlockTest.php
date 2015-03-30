@@ -6,13 +6,8 @@ namespace BitWasp\Bitcoin\Tests\Block;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Buffer;
-use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
-use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
@@ -22,11 +17,6 @@ class BlockTest extends \PHPUnit_Framework_TestCase
      * @var Block
      */
     protected $block;
-
-    /**
-     * @var Math
-     */
-    protected $math;
 
     /**
      * @var string
@@ -43,7 +33,9 @@ class BlockTest extends \PHPUnit_Framework_TestCase
      */
     protected $bufferType;
 
-
+    /**
+     *
+     */
     public function __construct()
     {
         $this->blockType = 'BitWasp\Bitcoin\Block\Block';
@@ -53,8 +45,8 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->math = Bitcoin::getMath();
-        $this->block = new Block($this->math);
+        $math = Bitcoin::getMath();
+        $this->block = BlockFactory::create($math);
     }
 
     public function testCreateBlock()
@@ -104,6 +96,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $this->block->setTransactions($txCollection);
 
         $merkle = $this->block->getMerkleRoot();
+        $this->assertEquals($tx->getTransactionId(), $merkle);
     }
 
     public function testFromParser()

@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Tests\Key;
 
+use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -60,6 +60,7 @@ class PublicKeyTest extends AbstractTestCase
             $this->assertSame($this->publicKey->getBuffer()->serialize('hex'), $test->uncompressed);
             $this->assertSame($this->publicKey->__toString(), $test->uncompressed);
             $this->assertFalse($this->publicKey->isCompressed());
+            $this->assertFalse($this->publicKey->isPrivate());
 
         }
     }
@@ -85,6 +86,22 @@ class PublicKeyTest extends AbstractTestCase
     {
         $hex = '01cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
         $this->publicKey = PublicKeyFactory::fromHex($hex);
+    }
+
+    public function testIsCompressedOrUncompressed()
+    {
+        $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('00')));
+        $this->assertTrue (PublicKey::isCompressedOrUncompressed(Buffer::hex('0400010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203')));
+        $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('0400010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900')));
+        $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('040001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304')));
+
+        $this->assertTrue (PublicKey::isCompressedOrUncompressed(Buffer::hex('020001020304050607080900010203040506070809000102030405060708090001')));
+        $this->assertTrue (PublicKey::isCompressedOrUncompressed(Buffer::hex('030001020304050607080900010203040506070809000102030405060708090001')));
+        $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('03000102030405060708090001020304050607080900010203040506070809000102')));
+        $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('0300010203040506070809000102030405060708090001020304050607080900')));
+
+        $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('050001020304050607080900010203040506070809000102030405060708090001')));
+
     }
 
     /**

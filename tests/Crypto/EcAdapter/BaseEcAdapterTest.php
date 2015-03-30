@@ -4,10 +4,40 @@ namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class BaseEcAdapterTest extends AbstractTestCase
 {
+    public function testSetAdapter()
+    {
+        $math = Bitcoin::getMath();
+        $g = Bitcoin::getGenerator();
+        $default = Bitcoin::getEcAdapter($math, $g);
+
+        // Bitcoin::getEcAdapter and EcAdapterFactory::getAdapter are the same
+        $defaultEc = EcAdapterFactory::getAdapter($math, $g);
+        $this->assertEquals($default, $defaultEc);
+
+        $phpecc =EcAdapterFactory::getPhpEcc($math, $g);
+        $secp = EcAdapterFactory::getSecp256k1($math, $g);
+
+        // Should check that the correct adapter was returned
+        $shouldBe = (extension_loaded('secp256k1')
+            ? $secp
+            : $phpecc);
+        $this->assertEquals($shouldBe, $defaultEc);
+
+        // Set as Secp256k1
+        $secp256k1 = EcAdapterFactory::getSecp256k1($math, $g);
+        EcAdapterFactory::setAdapter($secp256k1);
+        $this->assertEquals($secp256k1, EcAdapterFactory::getAdapter($math, $g));
+
+        // Set back to the 'default'
+        EcAdapterFactory::setAdapter($default);
+    }
+
+
     public function testRecoverYfromX()
     {
         $ecAdapter = Bitcoin::getEcAdapter();

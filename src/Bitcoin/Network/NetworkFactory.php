@@ -14,12 +14,6 @@ class NetworkFactory
      */
     public static function create($address, $p2sh, $privateKey, $testnet = false)
     {
-        foreach ([$address, $p2sh, $privateKey] as $byte) {
-            if (strlen($byte) !== 2 || preg_match('/^[0-9A-Fa-f]{2}_*/', $byte) === false) {
-                throw new \Exception('Network bytes must be two letters of hexadecimal (check padding?)');
-            }
-        }
-
         return new Network($address, $p2sh, $privateKey, $testnet);
     }
 

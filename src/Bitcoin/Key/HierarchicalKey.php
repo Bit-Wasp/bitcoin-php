@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 
 class HierarchicalKey
 {
@@ -25,22 +24,22 @@ class HierarchicalKey
     protected $bytes;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $depth;
 
     /**
-     * @var string
+     * @var int|string
      */
     protected $parentFingerprint;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $sequence;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $chainCode;
 
@@ -51,10 +50,10 @@ class HierarchicalKey
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param $depth
-     * @param $parentFingerprint
-     * @param $sequence
-     * @param $chainCode
+     * @param integer|string $depth
+     * @param integer|string $parentFingerprint
+     * @param integer|string $sequence
+     * @param integer|string $chainCode
      * @param KeyInterface $key
      * @throws \Exception
      */
@@ -243,41 +242,27 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $math = $this->ecAdapter->getMath();
-        $chainHex = str_pad($math->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
+        $chainHex = str_pad($this->ecAdapter->getMath()->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
+        $chain = Buffer::hex($chainHex);
 
-        try {
-            // can be easily wrapped in a loop that recurses until
-            // the desired key is created, without the other stuff.
-            $data = $this->getHmacSeed($sequence);
-            $hash = Hash::hmac('sha512', $data->getBinary(), pack("H*", $chainHex));
+        $hash = new Buffer(Hash::hmac('sha512', $this->getHmacSeed($sequence)->getBinary(), $chain->getBinary(), true));
+        $offset = $hash->slice(0, 32);
+        $chain = $hash->slice(32);
 
-            list ($offset, $chainHex) = array(
-                $math->hexDec(substr($hash, 0, 64)),
-                substr($hash, 64, 64),
-            );
-
-            $key = $this->isPrivate()
-                ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset)
-                : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset);
-
-        } catch (InvalidPrivateKey $e) {
-            // Invalid keys should trigger recursion.. 1:1^128
-            return $this->deriveChild(++$sequence);
-        } catch (\Exception $e) {
-            throw $e;
+        if (false === $this->ecAdapter->validatePrivateKey($offset)) {
+            return $this->deriveChild($sequence + 1);
         }
 
-        $key = new HierarchicalKey(
+        return new HierarchicalKey(
             $this->ecAdapter,
             $this->getDepth() + 1,
             $this->getChildFingerprint(),
             $sequence,
-            $math->hexDec($chainHex),
-            $key
+            $chain->getInt(),
+            $this->isPrivate()
+            ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
+            : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt())
         );
-
-        return $key;
     }
 
     /**
@@ -308,7 +293,7 @@ class HierarchicalKey
     public function decodePath($path)
     {
         $pathPieces = explode("/", $path);
-        if (count($pathPieces) == 0) {
+        if (strlen($path) == 0 || count($pathPieces) == 0) {
             throw new \InvalidArgumentException('Invalid path passed to decodePath()');
         }
         $newPath = array();

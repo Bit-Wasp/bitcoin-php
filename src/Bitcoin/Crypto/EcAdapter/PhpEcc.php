@@ -23,7 +23,7 @@ class PhpEcc extends BaseEcAdapter
      * @param Buffer $messageHash
      * @return bool
      */
-    public function verify(PublicKeyInterface $publicKey, SignatureInterface $signature, Buffer $messageHash)
+    public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
     {
         $n = $this->getGenerator()->getOrder();
         $math = $this->getMath();
@@ -53,7 +53,7 @@ class PhpEcc extends BaseEcAdapter
      * @return Signature
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function sign(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
         $rbg = $rbg ?: new Rfc6979($this->getMath(), $this->getGenerator(), $privateKey, $messageHash);
         $randomK = $rbg->bytes(32);
@@ -104,7 +104,7 @@ class PhpEcc extends BaseEcAdapter
      * @return PublicKey
      * @throws \Exception
      */
-    public function recoverCompact(CompactSignature $signature, Buffer $messageHash)
+    public function recoverCompact(Buffer $messageHash, CompactSignature $signature)
     {
         $math = $this->getMath();
         $G = $this->getGenerator();
@@ -149,7 +149,7 @@ class PhpEcc extends BaseEcAdapter
 
         // 1.6.2 Test Q as a public key
         $Qk = new PublicKey($this, $Q);
-        if ($this->verify($Qk, new Signature($signature->getR(), $signature->getS()), $messageHash)) {
+        if ($this->verify($messageHash, $Qk, new Signature($signature->getR(), $signature->getS()))) {
             return $Qk->setCompressed($signature->isCompressed());
         }
 
@@ -172,7 +172,7 @@ class PhpEcc extends BaseEcAdapter
         for ($i = 0; $i < 4; $i++) {
             try {
                 $test = new CompactSignature($r, $s, $i, $publicKey->isCompressed());
-                if ($this->recoverCompact($test, $messageHash)->getPoint()->equals($Q)) {
+                if ($this->recoverCompact($messageHash, $test)->getPoint()->equals($Q)) {
                     return $i;
                 }
             } catch (\Exception $messageHash) {
@@ -189,9 +189,9 @@ class PhpEcc extends BaseEcAdapter
      * @param RbgInterface $rbg
      * @return CompactSignature
      */
-    public function signCompact(PrivateKeyInterface $privateKey, Buffer $messageHash, RbgInterface $rbg = null)
+    public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
-        $sign = $this->sign($privateKey, $messageHash, $rbg);
+        $sign = $this->sign($messageHash, $privateKey, $rbg);
 
         // calculate the recovery param
         // there should be a way to get this when signing too, but idk how ...

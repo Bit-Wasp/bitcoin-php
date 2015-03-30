@@ -20,7 +20,7 @@ class AbstractTestCase extends \PHPUnit_Framework_TestCase
             [new PhpEcc($math, $generator)]
         ];
 
-        if (!defined('HHVM_VERSION') && extension_loaded('secp256k1')) {
+        if (getenv('TRAVIS_PHP_VERSION') !== 'hhvm' && extension_loaded('secp256k1')) {
             $adapters[] = [new Secp256k1($math, $generator)];
         }
 
