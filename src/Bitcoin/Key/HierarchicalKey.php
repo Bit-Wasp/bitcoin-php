@@ -293,7 +293,7 @@ class HierarchicalKey
     public function decodePath($path)
     {
         $pathPieces = explode("/", $path);
-        if (count($pathPieces) == 0) {
+        if (strlen($path) == 0 || count($pathPieces) == 0) {
             throw new \InvalidArgumentException('Invalid path passed to decodePath()');
         }
         $newPath = array();
