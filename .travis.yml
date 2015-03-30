@@ -25,7 +25,7 @@ install:
     - composer update
 
 script:
-  - php bin/phpunit --coverage-clover build/logs/clover.xml
+  - php -dextension=secp256k1.so bin/phpunit --coverage-clover build/logs/clover.xml
   - php bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
