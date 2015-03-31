@@ -2,12 +2,12 @@
 
 require_once "../vendor/autoload.php";
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Transaction\TransactionFactory;
-use Afk11\Bitcoin\Script\ScriptFactory;
-use Afk11\Bitcoin\Key\PrivateKeyFactory;
-use Afk11\Bitcoin\Key\PublicKeyFactory;
-use Afk11\Bitcoin\Rpc\RpcFactory;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Rpc\RpcFactory;
 
 $network = Bitcoin::getNetwork();
 $host = '127.0.0.1';

@@ -1,11 +1,11 @@
 <?php
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Network\NetworkFactory;
-use Afk11\Bitcoin\Script\ScriptFactory;
-use Afk11\Bitcoin\Key\PrivateKeyFactory;
-use Afk11\Bitcoin\Rpc\RpcFactory;
-use Afk11\Bitcoin\Miner\Miner;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Rpc\RpcFactory;
+use BitWasp\Bitcoin\Miner\Miner;
 
 require __DIR__ . "/../vendor/autoload.php";
 

@@ -1,9 +1,9 @@
 <?php
 
-use Afk11\Bitcoin\Bitcoin;
-use Afk11\Bitcoin\Address;
-use Afk11\Bitcoin\Key\PrivateKeyFactory;
-use Afk11\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Address;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Network\Network;
 
 require __DIR__ . "/../vendor/autoload.php";
 
