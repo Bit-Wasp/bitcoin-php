@@ -6,18 +6,12 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Signature\SignatureHash;
 
 class Transaction extends Serializable implements TransactionInterface
 {
-    /**
-     * @var NetworkInterface
-     */
-    protected $network;
-
     /**
      * @var int
      */
