@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
-
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates as X509CertificatesBuf;
 
@@ -53,7 +52,7 @@ class PaymentRequestSigner
                 throw new \InvalidArgumentException('Certificate file does not exist');
             }
 
-            if ('x509+sha256' == $type  AND !defined('OPENSSL_ALGO_SHA256')) {
+            if ('x509+sha256' == $type  and !defined('OPENSSL_ALGO_SHA256')) {
                 throw new \Exception('Server does not support x.509+SHA256');
             }
 
@@ -94,7 +93,7 @@ class PaymentRequestSigner
             $data = $request->serialize();
             $signature = '';
             $result = openssl_sign($data, $signature, $this->privateKey, $this->algoConst);
-            if ($signature === FALSE || $result == FALSE) {
+            if ($signature === false || $result == false) {
                 throw new \Exception('Error during signing: Unable to create signature');
             }
             $request->setSignature($signature);
@@ -122,10 +121,14 @@ class PaymentRequestSigner
         $matches = array();
 
         $nMatches = preg_match_all($pattern, $leafCertificate['extensions']['authorityInfoAccess'], $matches);
-        if ($nMatches == 0) return false;
+        if ($nMatches == 0) {
+            return false;
+        }
         foreach ($matches[1] as $url) {
             $parentCert = file_get_contents($url);
-            if ($parentCert && $this->parseCertificate($parentCert)) return $parentCert;
+            if ($parentCert && $this->parseCertificate($parentCert)) {
+                return $parentCert;
+            }
         }
         return false;
     }
@@ -156,7 +159,9 @@ class PaymentRequestSigner
     {
         $begin = "CERTIFICATE-----";
         $end = "-----END";
-        if (strpos($pem_data, $begin) === false) return $pem_data;
+        if (strpos($pem_data, $begin) === false) {
+            return $pem_data;
+        }
         $pem_data = substr($pem_data, strpos($pem_data, $begin) + strlen($begin));
         $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
         $der = base64_decode($pem_data);
@@ -172,7 +177,9 @@ class PaymentRequestSigner
         $result = array();
         $leaf = file_get_contents($leaf);
         $cert = $this->parseCertificate($leaf);
-        if ($cert === false) return false;
+        if ($cert === false) {
+            return false;
+        }
         $certData = self::pem2der($leaf);
 
         while ($cert !== false && !$this->isRoot($cert)) {

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-
 class PaymentDetails extends \DrSlump\Protobuf\Message
 {
 
@@ -167,7 +166,7 @@ class PaymentDetails extends \DrSlump\Protobuf\Message
      * @param int $idx
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output
      */
-    public function getOutputs($idx = NULL)
+    public function getOutputs($idx = null)
     {
         return $this->_get(2, $idx);
     }
@@ -178,7 +177,7 @@ class PaymentDetails extends \DrSlump\Protobuf\Message
      * @param \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails
      */
-    public function setOutputs(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value, $idx = NULL)
+    public function setOutputs(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value, $idx = null)
     {
         return $this->_set(2, $value, $idx);
     }

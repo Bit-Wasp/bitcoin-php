@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
-
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails as PaymentDetailsBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment as PaymentBuf;
@@ -63,8 +62,8 @@ class PaymentHandler
 
         // Check that regardless of the other outputs, that each specific output was paid.
         foreach ($this->getTransactions()->getTransactions() as $tx) {
-            foreach($tx->getOutputs()->getOutputs() as $txOut) {
-                foreach(array_keys($outputs) as $index) {
+            foreach ($tx->getOutputs()->getOutputs() as $txOut) {
+                foreach (array_keys($outputs) as $index) {
                     // Check the scripts/amounts match
                     if ($txOut->getScript()->getBinary() == $outputs[$index]->getScript()
                     && $txOut->getValue() == $outputs[$index]->getAmount()

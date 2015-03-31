@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-
-
 class PaymentACK extends \DrSlump\Protobuf\Message
 {
 

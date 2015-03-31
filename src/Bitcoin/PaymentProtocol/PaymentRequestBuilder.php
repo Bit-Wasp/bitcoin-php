@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
-
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output as OutputBuf;

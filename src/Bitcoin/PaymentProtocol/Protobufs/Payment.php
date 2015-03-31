@@ -8,8 +8,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-
-
 class Payment extends \DrSlump\Protobuf\Message
 {
 
@@ -140,7 +138,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * @param int $idx
      * @return string
      */
-    public function getTransactions($idx = NULL)
+    public function getTransactions($idx = null)
     {
         return $this->_get(2, $idx);
     }
@@ -151,7 +149,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * @param string $value
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
-    public function setTransactions($value, $idx = NULL)
+    public function setTransactions($value, $idx = null)
     {
         return $this->_set(2, $value, $idx);
     }
@@ -203,7 +201,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * @param int $idx
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output
      */
-    public function getRefundTo($idx = NULL)
+    public function getRefundTo($idx = null)
     {
         return $this->_get(3, $idx);
     }
@@ -214,7 +212,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * @param \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
-    public function setRefundTo(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value, $idx = NULL)
+    public function setRefundTo(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value, $idx = null)
     {
         return $this->_set(3, $value, $idx);
     }

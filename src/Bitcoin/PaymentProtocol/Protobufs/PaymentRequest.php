@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-
 class PaymentRequest extends \DrSlump\Protobuf\Message
 {
 

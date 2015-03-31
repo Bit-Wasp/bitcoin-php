@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-
 class X509Certificates extends \DrSlump\Protobuf\Message
 {
 
@@ -58,7 +57,7 @@ class X509Certificates extends \DrSlump\Protobuf\Message
      * @param int $idx
      * @return string
      */
-    public function getCertificate($idx = NULL)
+    public function getCertificate($idx = null)
     {
         return $this->_get(1, $idx);
     }
@@ -69,7 +68,7 @@ class X509Certificates extends \DrSlump\Protobuf\Message
      * @param string $value
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates
      */
-    public function setCertificate($value, $idx = NULL)
+    public function setCertificate($value, $idx = null)
     {
         return $this->_set(1, $value, $idx);
     }
