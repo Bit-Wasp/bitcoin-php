@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Payments\Protobufs;
+namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
 class Output extends \DrSlump\Protobuf\Message
 {
@@ -56,7 +56,7 @@ class Output extends \DrSlump\Protobuf\Message
     /**
      * Clear <amount> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Output
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output
      */
     public function clearAmount()
     {
@@ -77,7 +77,7 @@ class Output extends \DrSlump\Protobuf\Message
      * Set <amount> value
      *
      * @param int $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Output
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output
      */
     public function setAmount($value)
     {
@@ -97,7 +97,7 @@ class Output extends \DrSlump\Protobuf\Message
     /**
      * Clear <script> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Output
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output
      */
     public function clearScript()
     {
@@ -118,7 +118,7 @@ class Output extends \DrSlump\Protobuf\Message
      * Set <script> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Output
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output
      */
     public function setScript($value)
     {

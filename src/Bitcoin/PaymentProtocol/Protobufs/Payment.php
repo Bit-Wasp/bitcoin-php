@@ -6,7 +6,7 @@
  * Time: 05:20
  */
 
-namespace BitWasp\Bitcoin\Payments\Protobufs;
+namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
 
 
@@ -19,7 +19,7 @@ class Payment extends \DrSlump\Protobuf\Message
     /**  @var string[] */
     public $transactions = array();
 
-    /**  @var \BitWasp\Bitcoin\Payments\Protobufs\Output[] */
+    /**  @var \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output[] */
     public $refund_to = array();
 
     /**  @var string */
@@ -86,7 +86,7 @@ class Payment extends \DrSlump\Protobuf\Message
     /**
      * Clear <merchant_data> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function clearMerchantData()
     {
@@ -107,7 +107,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * Set <merchant_data> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function setMerchantData($value)
     {
@@ -127,7 +127,7 @@ class Payment extends \DrSlump\Protobuf\Message
     /**
      * Clear <transactions> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function clearTransactions()
     {
@@ -149,7 +149,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * Set <transactions> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function setTransactions($value, $idx = NULL)
     {
@@ -170,7 +170,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * Add a new element to <transactions>
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function addTransactions($value)
     {
@@ -190,7 +190,7 @@ class Payment extends \DrSlump\Protobuf\Message
     /**
      * Clear <refund_to> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function clearRefundTo()
     {
@@ -201,7 +201,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * Get <refund_to> value
      *
      * @param int $idx
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Output
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output
      */
     public function getRefundTo($idx = NULL)
     {
@@ -211,10 +211,10 @@ class Payment extends \DrSlump\Protobuf\Message
     /**
      * Set <refund_to> value
      *
-     * @param \BitWasp\Bitcoin\Payments\Protobufs\Output $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @param \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
-    public function setRefundTo(\BitWasp\Bitcoin\Payments\Protobufs\Output $value, $idx = NULL)
+    public function setRefundTo(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value, $idx = NULL)
     {
         return $this->_set(3, $value, $idx);
     }
@@ -222,7 +222,7 @@ class Payment extends \DrSlump\Protobuf\Message
     /**
      * Get all elements of <refund_to>
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Output[]
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output[]
      */
     public function getRefundToList()
     {
@@ -232,10 +232,10 @@ class Payment extends \DrSlump\Protobuf\Message
     /**
      * Add a new element to <refund_to>
      *
-     * @param \BitWasp\Bitcoin\Payments\Protobufs\Output $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @param \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
-    public function addRefundTo(\BitWasp\Bitcoin\Payments\Protobufs\Output $value)
+    public function addRefundTo(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value)
     {
         return $this->_add(3, $value);
     }
@@ -253,7 +253,7 @@ class Payment extends \DrSlump\Protobuf\Message
     /**
      * Clear <memo> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function clearMemo()
     {
@@ -274,7 +274,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * Set <memo> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function setMemo($value)
     {

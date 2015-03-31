@@ -1,13 +1,13 @@
 <?php
 
-namespace BitWasp\Bitcoin\Payments\Protobufs;
+namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
 
 
 class PaymentACK extends \DrSlump\Protobuf\Message
 {
 
-    /**  @var \BitWasp\Bitcoin\Payments\Protobufs\Payment */
+    /**  @var \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment */
     public $payment = null;
 
     /**  @var string */
@@ -58,7 +58,7 @@ class PaymentACK extends \DrSlump\Protobuf\Message
     /**
      * Clear <payment> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentACK
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentACK
      */
     public function clearPayment()
     {
@@ -68,7 +68,7 @@ class PaymentACK extends \DrSlump\Protobuf\Message
     /**
      * Get <payment> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\Payment
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function getPayment()
     {
@@ -78,10 +78,10 @@ class PaymentACK extends \DrSlump\Protobuf\Message
     /**
      * Set <payment> value
      *
-     * @param \BitWasp\Bitcoin\Payments\Protobufs\Payment $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentACK
+     * @param \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment $value
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentACK
      */
-    public function setPayment(\BitWasp\Bitcoin\Payments\Protobufs\Payment $value)
+    public function setPayment(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment $value)
     {
         return $this->_set(1, $value);
     }
@@ -99,7 +99,7 @@ class PaymentACK extends \DrSlump\Protobuf\Message
     /**
      * Clear <memo> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentACK
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentACK
      */
     public function clearMemo()
     {
@@ -120,7 +120,7 @@ class PaymentACK extends \DrSlump\Protobuf\Message
      * Set <memo> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentACK
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentACK
      */
     public function setMemo($value)
     {

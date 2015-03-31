@@ -1,10 +1,10 @@
 <?php
 
-namespace BitWasp\Bitcoin\Payments;
+namespace BitWasp\Bitcoin\PaymentProtocol;
 
 
-use BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest as PaymentRequestBuf;
-use BitWasp\Bitcoin\Payments\Protobufs\X509Certificates as X509CertificatesBuf;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates as X509CertificatesBuf;
 
 class PaymentRequestSigner
 {

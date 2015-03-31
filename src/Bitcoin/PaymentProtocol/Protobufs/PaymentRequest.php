@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Payments\Protobufs;
+namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
 
 class PaymentRequest extends \DrSlump\Protobuf\Message
@@ -91,7 +91,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
     /**
      * Clear <payment_details_version> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function clearPaymentDetailsVersion()
     {
@@ -112,7 +112,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
      * Set <payment_details_version> value
      *
      * @param int $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function setPaymentDetailsVersion($value)
     {
@@ -132,7 +132,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
     /**
      * Clear <pki_type> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function clearPkiType()
     {
@@ -153,7 +153,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
      * Set <pki_type> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function setPkiType($value)
     {
@@ -173,7 +173,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
     /**
      * Clear <pki_data> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function clearPkiData()
     {
@@ -194,7 +194,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
      * Set <pki_data> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function setPkiData($value)
     {
@@ -214,7 +214,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
     /**
      * Clear <serialized_payment_details> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function clearSerializedPaymentDetails()
     {
@@ -235,7 +235,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
      * Set <serialized_payment_details> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function setSerializedPaymentDetails($value)
     {
@@ -255,7 +255,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
     /**
      * Clear <signature> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function clearSignature()
     {
@@ -276,7 +276,7 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
      * Set <signature> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest
      */
     public function setSignature($value)
     {

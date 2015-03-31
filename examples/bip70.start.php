@@ -3,8 +3,8 @@
 require "../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\AddressFactory;
-use BitWasp\Bitcoin\Payments\PaymentRequestBuilder;
-use BitWasp\Bitcoin\Payments\PaymentRequestSigner;
+use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
+use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 

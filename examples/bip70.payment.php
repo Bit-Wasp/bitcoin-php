@@ -2,8 +2,8 @@
 
 require_once "../vendor/autoload.php";
 
-use \BitWasp\Bitcoin\Payments\PaymentHandler;
-use \BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest;
+use \BitWasp\Bitcoin\PaymentProtocol\PaymentHandler;
+use \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest;
 
 $time = $_GET['time'];
 $input = file_get_contents("php://input");

@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Payments\Protobufs;
+namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
 
 class X509Certificates extends \DrSlump\Protobuf\Message
@@ -45,7 +45,7 @@ class X509Certificates extends \DrSlump\Protobuf\Message
     /**
      * Clear <certificate> value
      *
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\X509Certificates
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates
      */
     public function clearCertificate()
     {
@@ -67,7 +67,7 @@ class X509Certificates extends \DrSlump\Protobuf\Message
      * Set <certificate> value
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\X509Certificates
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates
      */
     public function setCertificate($value, $idx = NULL)
     {
@@ -88,7 +88,7 @@ class X509Certificates extends \DrSlump\Protobuf\Message
      * Add a new element to <certificate>
      *
      * @param string $value
-     * @return \BitWasp\Bitcoin\Payments\Protobufs\X509Certificates
+     * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates
      */
     public function addCertificate($value)
     {

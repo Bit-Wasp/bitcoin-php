@@ -1,12 +1,12 @@
 <?php
 
-namespace BitWasp\Bitcoin\Payments;
+namespace BitWasp\Bitcoin\PaymentProtocol;
 
 
-use BitWasp\Bitcoin\Payments\Protobufs\PaymentRequest as PaymentRequestBuf;
-use BitWasp\Bitcoin\Payments\Protobufs\PaymentDetails as PaymentDetailsBuf;
-use BitWasp\Bitcoin\Payments\Protobufs\Payment as PaymentBuf;
-use BitWasp\Bitcoin\Payments\Protobufs\PaymentACK as PaymentACKBuf;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails as PaymentDetailsBuf;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment as PaymentBuf;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentACK as PaymentACKBuf;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
