@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
 
+use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output as OutputBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
@@ -113,11 +114,25 @@ class PaymentRequestBuilder
 
     /**
      * @param TransactionOutputInterface $txOutput
+     * @return $this
      */
     public function addOutput(TransactionOutputInterface $txOutput)
     {
         $output = $this->outputToBuf($txOutput);
         $this->details->addOutputs($output, $this->outputCount++);
+        return $this;
+    }
+
+    /**
+     * @param AddressInterface $address
+     * @param $value
+     * @return PaymentRequestBuilder
+     */
+    public function addAddressPayment(AddressInterface $address, $value)
+    {
+        $script = ScriptFactory::scriptPubKey()->payToAddress($address);
+        $output = new TransactionOutput($value, $script);
+        return $this->addOutput($output);
     }
 
     /**
@@ -161,5 +176,7 @@ class PaymentRequestBuilder
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Content-Length: ' . (string)strlen($data));
         echo $data;
+
+        return $this;
     }
 }
