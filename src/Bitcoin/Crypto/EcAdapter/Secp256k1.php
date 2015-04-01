@@ -55,14 +55,17 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbgInterface = null)
     {
-        $privateStr = $privateKey->getBuffer()->getBinary();
-        $hashStr = $messageHash->getBinary();
         $sigStr = '';
+        $ret = \secp256k1_ecdsa_sign(
+            $messageHash->getBinary(),
+            $privateKey->getBuffer()->getBinary(),
+            $sigStr
+        );
 
-        $ret = \secp256k1_ecdsa_sign($hashStr, $privateStr, $sigStr);
         if ($ret !== 1) {
             throw new \Exception('Secp256k1-php failed to sign data');
         }
+
         // Fix since secp256k1 doesn't know about hashtypes
         $sigStr .= SignatureHashInterface::SIGHASH_ALL;
         return SignatureFactory::fromHex(bin2hex($sigStr));
@@ -77,19 +80,24 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
-        $privateStr = $privateKey->getBuffer()->getBinary();
-        $hashStr = $messageHash->getBinary();
         $sigStr = '';
         $recid = 0;
-        $ret = \secp256k1_ecdsa_sign_compact($hashStr, $privateStr, $sigStr, $recid);
+        $ret = \secp256k1_ecdsa_sign_compact(
+            $messageHash->getBinary(),
+            $privateKey->getBuffer()->getBinary(),
+            $sigStr,
+            $recid
+        );
 
         if ($ret === 1) {
-            $math = $this->getMath();
-            $r = $math->hexDec(bin2hex(substr($sigStr, 0, 32)));
-            $s = $math->hexDec(bin2hex(substr($sigStr, 32, 32)));
+            $sigStr = new Buffer($sigStr);
 
-            $sig = new CompactSignature($r, $s, $recid, $privateKey->isCompressed());
-            return $sig;
+            return new CompactSignature(
+                $sigStr->slice(0, 32)->getInt(),
+                $sigStr->slice(32, 32)->getInt(),
+                $recid,
+                $privateKey->isCompressed()
+            );
         }
 
         throw new \Exception('Unable to create compact signature');
@@ -104,10 +112,13 @@ class Secp256k1 extends BaseEcAdapter
     public function recoverCompact(Buffer $messageHash, CompactSignature $signature)
     {
         $pubkey = '';
-        $recid = $signature->getRecoveryId();
-        $buf = $signature->getBuffer()->slice(1)->getBinary();
-
-        $ret = \secp256k1_ecdsa_recover_compact($messageHash->getBinary(), $buf, (int)$recid, (int)$signature->isCompressed(), $pubkey);
+        $ret = \secp256k1_ecdsa_recover_compact(
+            $messageHash->getBinary(),
+            $signature->getBuffer()->slice(1)->getBinary(),
+            (int)$signature->getRecoveryId(),
+            (int)$signature->isCompressed(),
+            $pubkey
+        );
 
         if ($ret === 1) {
             $publicKey = PublicKeyFactory::fromHex(bin2hex($pubkey));
@@ -126,10 +137,11 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
     {
-        $publicStr = $publicKey->getBuffer()->getBinary();
-        $sigStr = $signature->getBuffer()->getBinary();
-        $hashStr = $messageHash->getBinary();
-        $ret = \secp256k1_ecdsa_verify($hashStr, $sigStr, $publicStr);
+        $ret = \secp256k1_ecdsa_verify(
+            $messageHash->getBinary(),
+            $signature->getBuffer()->getBinary(),
+            $publicKey->getBuffer()->getBinary()
+        );
 
         if ($ret === -1) {
             throw new \Exception('Secp256k1 verify: Invalid public key');
@@ -170,8 +182,11 @@ class Secp256k1 extends BaseEcAdapter
     public function privateToPublic(PrivateKeyInterface $privateKey)
     {
         $publicKey = '';
-        $privateStr = $privateKey->getBuffer()->getBinary();
-        $ret = \secp256k1_ec_pubkey_create($privateStr, (int)$privateKey->isCompressed(), $publicKey);
+        $ret = \secp256k1_ec_pubkey_create(
+            $privateKey->getBuffer()->getBinary(),
+            (int)$privateKey->isCompressed(),
+            $publicKey
+        );
 
         if ($ret === 1) {
             $public = PublicKeyFactory::fromHex(bin2hex($publicKey), $this);
@@ -190,12 +205,15 @@ class Secp256k1 extends BaseEcAdapter
     public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
     {
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
-        $scalarStr = $this->getBinaryScalar($integer);
+        $ret = (bool) \secp256k1_ec_privkey_tweak_mul(
+            $privKey,
+            $this->getBinaryScalar($integer)
+        );
 
-        $ret = (bool) \secp256k1_ec_privkey_tweak_mul($privKey, $scalarStr);
         if ($ret === false) {
             throw new \Exception('Secp256k1 privkey tweak mul: failed');
         }
+
         return $this->getRelatedPrivateKey($privateKey, $privKey);
     }
 
@@ -208,12 +226,15 @@ class Secp256k1 extends BaseEcAdapter
     public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
     {
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
-        $scalarStr = $this->getBinaryScalar($integer);
+        $ret = (bool) \secp256k1_ec_privkey_tweak_add(
+            $privKey,
+            $this->getBinaryScalar($integer)
+        );
 
-        $ret = (bool) \secp256k1_ec_privkey_tweak_add($privKey, $scalarStr);
         if ($ret === false) {
             throw new \Exception('Secp256k1 privkey tweak add: failed');
         }
+
         return $this->getRelatedPrivateKey($privateKey, $privKey);
     }
 
@@ -226,12 +247,15 @@ class Secp256k1 extends BaseEcAdapter
     public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
-        $scalarStr = $this->getBinaryScalar($integer);
+        $ret = (bool) \secp256k1_ec_pubkey_tweak_add(
+            $pubKey,
+            $this->getBinaryScalar($integer)
+        );
 
-        $ret = (bool) \secp256k1_ec_pubkey_tweak_add($pubKey, $scalarStr);
         if ($ret === false) {
             throw new \Exception('Secp256k1 pubkey tweak add: failed');
         }
+
         return $this->getRelatedPublicKey($publicKey, $pubKey);
     }
 
@@ -245,12 +269,16 @@ class Secp256k1 extends BaseEcAdapter
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
         $pubkeyLen = strlen($pubKey);
-        $scalarStr = $this->getBinaryScalar($integer);
+        $ret = (bool) \secp256k1_ec_pubkey_tweak_mul(
+            $pubKey,
+            $pubkeyLen,
+            $this->getBinaryScalar($integer)
+        );
 
-        $ret = (bool) \secp256k1_ec_pubkey_tweak_mul($pubKey, $pubkeyLen, $scalarStr);
         if ($ret === false) {
             throw new \Exception('Secp256k1 pubkey tweak mul: failed');
         }
+
         return $this->getRelatedPublicKey($publicKey, $pubKey);
     }
 }
