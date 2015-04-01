@@ -3,19 +3,11 @@
 namespace BitWasp\Bitcoin\Tests\Util;
 
 use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Buffer;
 
 class Base58Test extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \BitWasp\Bitcoin\Base58
-     */
-    protected $base58;
-
-    public function setUp()
-    {
-        $this->base58 = new \BitWasp\Bitcoin\Base58();
-    }
-
+ 
     /**
      * Test results of encoding a hex string against test vectors
      */
@@ -25,18 +17,9 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
-            $hash = $this->base58->encode($test[0]);
+            $hash = Base58::encode(Buffer::hex($test[0]));
             $this->assertSame($test[1], $hash);
         }
-    }
-
-    /**
-     * Test that uneven length strings will throw an exception
-     * @expectedException \Exception
-     */
-    public function testEncodeWithException()
-    {
-        $hash = $this->base58->encode('41414141a');
     }
 
     /**
@@ -48,11 +31,11 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
-            $encoded = $this->base58->encode($test[0]);
+            $bs = Buffer::hex($test[0]);
+            $encoded = Base58::encode($bs);
             $this->assertSame($test[1], $encoded);
-
-            $back    = $this->base58->decode($encoded);
-            $this->assertSame($test[0], $back);
+            $decoded = Base58::decode($encoded)->getHex();
+            $this->assertSame($test[0], $decoded);
         }
     }
 
@@ -62,13 +45,10 @@ class Base58Test extends \PHPUnit_Framework_TestCase
      */
     public function testWeird()
     {
-        $str    = '00000000000000000000';
-        $encode = $this->base58->encode($str);
-        $decode = $this->base58->decode($encode);
-
-        $this->assertSame($encode, '1111111111');
-        $this->assertSame($decode, $str);
-
+        $bs = Buffer::hex('00000000000000000000');
+        $b58 = Base58::encode($bs);
+        $this->assertSame($b58, '1111111111');
+        $this->assertEquals($bs, Base58::decode($b58));
     }
 
     /**
@@ -81,10 +61,9 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         $json  = json_decode($f);
 
         foreach ($json->test as $test) {
-            $encoded = $this->base58->encodeCheck($test[0]);
-            $back    = $this->base58->decodeCheck($encoded);
-
-            $this->assertSame($test[0], $back);
+            $bs = Buffer::hex($test[0]);
+            $encoded = Base58::encodeCheck($bs);
+            $this->assertEquals($bs, Base58::decodeCheck($encoded));
         }
     }
 

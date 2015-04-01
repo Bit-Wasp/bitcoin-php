@@ -146,6 +146,26 @@ class Buffer
     }
 
     /**
+     * @param Buffer $buffer
+     * @return $this
+     */
+    public function append(Buffer $buffer)
+    {
+        $this->buffer = $this->buffer . $buffer->getBinary();
+        return $this;
+    }
+
+    /**
+     * @param Buffer $buffer
+     * @return $this
+     */
+    public function prepend(Buffer $buffer)
+    {
+        $this->buffer = $buffer->getBinary() . $this->buffer;
+        return $this;
+    }
+
+    /**
      * Print the contents of the buffer as a string
      *
      * @return string

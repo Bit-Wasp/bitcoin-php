@@ -42,12 +42,12 @@ class AddressFactory
 
         $data = Base58::decodeCheck($address);
 
-        $prefixByte = substr($data, 0, 2);
+        $prefixByte = $data->slice(0, 1)->getHex();
 
         if ($prefixByte === $network->getP2shByte()) {
-            return new ScriptHashAddress(substr($data, 2));
+            return new ScriptHashAddress($data->slice(1)->getHex());
         } else if ($prefixByte === $network->getAddressByte()) {
-            return new PayToPubKeyHashAddress(substr($data, 2));
+            return new PayToPubKeyHashAddress($data->slice(1)->getHex());
         } else {
             throw new \InvalidArgumentException("Invalid prefix [{$prefixByte}]");
         }

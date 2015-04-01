@@ -27,8 +27,7 @@ class ExtendedKeySerializer
     public function serialize(HierarchicalKey $key)
     {
         $bytes = $this->hexSerializer->serialize($key);
-        $base58 = Base58::encodeCheck($bytes);
-        return $base58;
+        return Base58::encodeCheck($bytes);
     }
 
     /**
@@ -41,7 +40,6 @@ class ExtendedKeySerializer
     public function parse($base58)
     {
         $payload = Base58::decodeCheck($base58);
-        $hierarchicalKey = $this->hexSerializer->parse($payload);
-        return $hierarchicalKey;
+        return $this->hexSerializer->parse($payload);
     }
 }
