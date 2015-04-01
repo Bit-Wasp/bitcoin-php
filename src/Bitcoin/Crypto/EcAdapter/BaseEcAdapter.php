@@ -157,5 +157,4 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         $publicKey = $this->recoverCompact($messageHash, $signature);
         return ($publicKey->getAddress()->getHash() == $address->getHash());
     }
-
 }

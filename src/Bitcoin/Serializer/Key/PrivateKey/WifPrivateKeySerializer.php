@@ -40,18 +40,13 @@ class WifPrivateKeySerializer
      */
     public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey)
     {
-        $hex = $this->hexSerializer->serialize($privateKey)->serialize('hex');
-
-        $payload = sprintf(
-            "%s%s%s",
-            $network->getPrivByte(),
-            $hex,
+        $payload = Buffer::hex(
+            $network->getPrivByte() .
+            $this->hexSerializer->serialize($privateKey)->serialize('hex') .
             ($privateKey->isCompressed() ? '01' : '')
         );
 
-        $wif = Base58::encodeCheck($payload);
-
-        return $wif;
+        return Base58::encodeCheck($payload);
     }
 
     /**
@@ -62,14 +57,13 @@ class WifPrivateKeySerializer
      */
     public function parse($wif)
     {
-        // [2 bytes, <either 32 or 33>, 4 bytes
-        $payload = Buffer::hex(Base58::decodeCheck($wif))->slice(1);
+        $payload = Base58::decodeCheck($wif)->slice(1);
         $size = $payload->getSize();
         if (!in_array($size, [32, 33])) {
             throw new InvalidPrivateKey("Private key should be always be 32 or 33 bytes (depending on if it's compressed)");
         }
 
-        return $this->hexSerializer->parse($payload->slice(0, 32)->getHex())
+        return $this->hexSerializer->parse($payload->slice(0, 32))
             ->setCompressed($size === 33);
     }
 }

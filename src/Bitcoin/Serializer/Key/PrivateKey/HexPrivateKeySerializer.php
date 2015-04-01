@@ -49,9 +49,9 @@ class HexPrivateKeySerializer
      * @param $string
      * @return PrivateKey
      */
-    public function parse($string)
+    public function parse(Buffer $string)
     {
-        $multiplier = $this->ecAdapter->getMath()->hexDec($string);
+        $multiplier = $string->getInt();
         $privateKey = PrivateKeyFactory::fromInt($multiplier, false, $this->ecAdapter);
         return $privateKey;
     }
