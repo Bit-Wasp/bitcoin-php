@@ -6,6 +6,7 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Parser;
 use Mdanter\Ecc\PointInterface;
 
 class HexPublicKeySerializer
@@ -24,16 +25,17 @@ class HexPublicKeySerializer
     }
 
     /**
-     * Return the prefix for an address, based on the point.
-     *
+     * @param $compressed
      * @param PointInterface $point
      * @return string
      */
-    public function getCompressedPrefix(PointInterface $point)
+    public function getPrefix($compressed, PointInterface $point)
     {
-        return $this->ecAdapter->getMath()->isEven($point->getY())
-            ? PublicKey::KEY_COMPRESSED_EVEN
-            : PublicKey::KEY_COMPRESSED_ODD;
+        return $compressed
+            ? $this->ecAdapter->getMath()->isEven($point->getY())
+                ? PublicKey::KEY_COMPRESSED_EVEN
+                : PublicKey::KEY_COMPRESSED_ODD
+            : PublicKey::KEY_UNCOMPRESSED;
     }
 
     /**
@@ -44,25 +46,17 @@ class HexPublicKeySerializer
     {
         $point = $publicKey->getPoint();
         $math = $this->ecAdapter->getMath();
+        $parser = new Parser();
+        $parser->writeBytes(1, $this->getPrefix($publicKey->isCompressed(), $point));
 
-        if ($publicKey->isCompressed()) {
-            $binary = pack(
-                "H2H64",
-                $this->getCompressedPrefix($point),
-                str_pad($math->decHex($point->getX()), 64, '0', STR_PAD_LEFT)
-            );
+        $publicKey->isCompressed()
+            ? $parser
+                ->writeBytes(32, str_pad($math->decHex($point->getX()), 64, '0', STR_PAD_LEFT))
+            : $parser
+                ->writeBytes(32, str_pad($math->decHex($point->getX()), 64, '0', STR_PAD_LEFT))
+                ->writeBytes(32, str_pad($math->decHex($point->getY()), 64, '0', STR_PAD_LEFT));
 
-        } else {
-            $binary = pack(
-                "H2H64H64",
-                PublicKey::KEY_UNCOMPRESSED,
-                str_pad($math->decHex($point->getX()), 64, '0', STR_PAD_LEFT),
-                str_pad($math->decHex($point->getY()), 64, '0', STR_PAD_LEFT)
-            );
-        }
-
-        $out = new Buffer($binary);
-        return $out;
+        return $parser->getBuffer();
     }
 
     /**
