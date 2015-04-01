@@ -133,4 +133,28 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         $publicKey = $this->recoverCompact($messageHash, $signature);
         return ($publicKey->getAddress()->getHash() == $address->getHash());
     }
+
+    /**
+     * @param Buffer $publicKey
+     * @return \Mdanter\Ecc\PointInterface
+     * @throws \Exception
+     */
+    public function publicKeyFromBuffer(Buffer $publicKey)
+    {
+        $size = $publicKey->getSize();
+
+        $compressed = $size == PublicKey::LENGTH_COMPRESSED;
+        $xCoord = $publicKey->slice(1, 32)->getInt();
+        $yCoord = $compressed
+            ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
+            : $publicKey->slice(33, 32)->getInt();
+
+        return new PublicKey(
+            $this,
+            $this->getGenerator()
+                ->getCurve()
+                ->getPoint($xCoord, $yCoord),
+            $compressed
+        );
+    }
 }
