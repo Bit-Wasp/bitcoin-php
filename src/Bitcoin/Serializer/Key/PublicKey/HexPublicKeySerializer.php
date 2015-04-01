@@ -73,25 +73,10 @@ class HexPublicKeySerializer
     public function parse($hex)
     {
         $hex = Buffer::hex($hex);
-        $size = $hex->getSize();
-
-        if (!in_array($size, [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED])) {
+        if (!in_array($hex->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED])) {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
-        $compressed = $size == PublicKey::LENGTH_COMPRESSED;
-        $xCoord = $hex->slice(1, 32)->getInt();
-        $yCoord = $compressed
-            ?  $this->ecAdapter->recoverYfromX($xCoord, $hex->slice(0, 1)->getHex())
-            :  $hex->slice(33, 32)->getInt();
-
-        return new PublicKey(
-            $this->ecAdapter,
-            $this->ecAdapter
-                ->getGenerator()
-                ->getCurve()
-                ->getPoint($xCoord, $yCoord),
-            $compressed
-        );
+        return $this->ecAdapter->publicKeyFromBuffer($hex);
     }
 }

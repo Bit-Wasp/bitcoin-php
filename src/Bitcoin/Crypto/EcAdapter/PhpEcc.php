@@ -215,28 +215,16 @@ class PhpEcc extends BaseEcAdapter
         return $withinRange && $notZero;
     }
 
+
     /**
      * @param Buffer $publicKey
      * @return bool
      */
     public function validatePublicKey(Buffer $publicKey)
     {
-        $math = $this->getMath();
-
         if (PublicKey::isCompressedOrUncompressed($publicKey)) {
             try {
-                if ($publicKey->getSize() == 33) {
-                    $x = $math->hexDec(substr($publicKey, 2, 64));
-                    $y = $this->recoverYfromX($x, substr($publicKey, 0, 2));
-                } else {
-                    $x = $math->hexDec(substr($publicKey, 2, 64));
-                    $y = $math->hexDec(substr($publicKey, 66, 64));
-                }
-
-                $this->getGenerator()
-                    ->getCurve()
-                    ->getPoint($x, $y);
-
+                $this->publicKeyFromBuffer($publicKey);
                 return true;
             } catch (\Exception $e) {
                 // Let the function finish and return false
