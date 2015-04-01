@@ -227,7 +227,7 @@ class Parser
     {
         $parser = new Parser(self::numToVarInt(count($serializable)));
         foreach ($serializable as $object) {
-            if (in_array('BitWasp\Bitcoin\SerializableInterface', class_implements($object))) {
+            if ($object instanceof SerializableInterface) {
                 $object = $object->getBuffer();
             }
 
