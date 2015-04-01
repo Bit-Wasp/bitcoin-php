@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-interface TransactionOutputInterface
+use BitWasp\Bitcoin\SerializableInterface;
+
+interface TransactionOutputInterface extends SerializableInterface
 {
     /**
      * Get the script for this transaction

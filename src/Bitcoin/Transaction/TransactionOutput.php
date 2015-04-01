@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
 
-class TransactionOutput extends Serializable implements TransactionOutputInterface, SerializableInterface
+class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
 
     /**

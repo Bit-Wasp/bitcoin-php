@@ -36,19 +36,19 @@ or
  - RPC bindings to Bitcoin Core's RPC, getting OOP responses :)
  - Easy serialization to binary representation of most classes
  - SIGHASH types when creating transactions (not tested)
+ - Payment Protocol (BIP70)
 
 ##Todo:
   - TransactionBuilder
   - Full script interpreter
-  - NetworkMessageSerializer (for network messages, blocks, tx's)
   - SPV
   - P2P
-  - EC Adapter to work with either phpecc or secp256k1-php
   
 ## Implemented BIPs
   - BIP0016
   - BIP0032
-
+  - BIP0070
+  
 # Examples  
 ## Generate private keys
 ```
@@ -73,4 +73,31 @@ $hash = $bitcoind->getbestblockhash();
 $block = $bitcoind->getblock($hash);
 $tx = $bitcoind->getTransactions()->getTransaction(10);
 echo $tx->getTransactionId();
+```
+
+## Create signed payment requests 
+```
+use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
+use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+
+$time = time();
+$amount = 10000;
+$destination = '18Ffckz8jsjU7YbhP9P44JMd33Hdkkojtc';
+$paymentUrl = 'http://192.168.0.223:81/bitcoin-php/examples/bip70.fetch.php?time=' . $time;
+
+// Create a signer for x509+sha256 - this requires a readable private key and certificate chain.
+// $signer = new PaymentRequestSigner('none');
+$signer = new PaymentRequestSigner('x509+sha256', '/var/www/git/paymentrequestold/.keys/ssl.key', '/var/www/git/paymentrequestold/.keys/ssl.pem');
+$builder = new PaymentRequestBuilder($signer, 'main', time());
+
+// PaymentRequests contain outputs that the wallet will fulfill
+$address = AddressFactory::fromString($destination);
+$builder->addAddressPayment($address, $amount);
+
+// Create the request, send it + headers
+$request = $builder->send();
+
 ```

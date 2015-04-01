@@ -68,7 +68,7 @@ class Bitcoind
             ->setNextBlock(@$blockArray['nextblockhash']);
 
         // Establish batch query for loading transactions
-        if (count($block['tx']) > 0) {
+        if (count($blockArray['tx']) > 0) {
             $this->client->batch();
             foreach ($blockArray['tx'] as $txid) {
                 $this->client->execute('getrawtransaction', array($txid));
