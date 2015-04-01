@@ -72,26 +72,26 @@ class HexPublicKeySerializer
      */
     public function parse($hex)
     {
-        $math = $this->ecAdapter->getMath();
-        $generator = $this->ecAdapter->getGenerator();
-        $byte = substr($hex, 0, 2);
+        $hex = Buffer::hex($hex);
+        $size = $hex->getSize();
 
-        if (strlen($hex) == PublicKey::LENGTH_COMPRESSED) {
-            $compressed = true;
-            $xCoord = $math->hexDec(substr($hex, 2, 64));
-            $yCoord = $this->ecAdapter->recoverYfromX($xCoord, $byte);
-
-        } elseif (strlen($hex) == PublicKey::LENGTH_UNCOMPRESSED) {
-            $compressed = false;
-            $xCoord = $math->hexDec(substr($hex, 2, 64));
-            $yCoord = $math->hexDec(substr($hex, 66, 64));
-
-        } else {
+        if (!in_array($size, [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED])) {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
-        $point = $generator->getCurve()->getPoint($xCoord, $yCoord);
+        $compressed = $size == PublicKey::LENGTH_COMPRESSED;
+        $xCoord = $hex->slice(1, 32)->getInt();
+        $yCoord = $compressed
+            ?  $this->ecAdapter->recoverYfromX($xCoord, $hex->slice(0, 1)->getHex())
+            :  $hex->slice(33, 32)->getInt();
 
-        return new PublicKey($this->ecAdapter, $point, $compressed);
+        return new PublicKey(
+            $this->ecAdapter,
+            $this->ecAdapter
+                ->getGenerator()
+                ->getCurve()
+                ->getPoint($xCoord, $yCoord),
+            $compressed
+        );
     }
 }

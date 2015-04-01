@@ -7,7 +7,7 @@ interface PublicKeyInterface extends KeyInterface
     /**
      * Length of an uncompressed key
      */
-    const LENGTH_UNCOMPRESSED = 130;
+    const LENGTH_UNCOMPRESSED = 65;
 
     /**
      * When key is uncompressed, this is the prefix.
@@ -17,7 +17,7 @@ interface PublicKeyInterface extends KeyInterface
     /**
      * Length of a compressed key
      */
-    const LENGTH_COMPRESSED = 66;
+    const LENGTH_COMPRESSED = 33;
     /**
      * When y coordinate is even, prepend x coordinate with this if
      * generating a public key
