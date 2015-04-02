@@ -7,7 +7,7 @@ use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockInterface;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
 class HexBlockSerializer
 {
@@ -22,20 +22,20 @@ class HexBlockSerializer
     protected $headerSerializer;
 
     /**
-     * @var TransactionCollectionSerializer
+     * @var TransactionSerializer
      */
-    protected $txColSerializer;
+    protected $txSerializer;
 
     /**
      * @param Math $math
      * @param HexBlockHeaderSerializer $headerSerializer
-     * @param TransactionCollectionSerializer $txColSerializer
+     * @param TransactionSerializer $txSerializer
      */
-    public function __construct(Math $math, HexBlockHeaderSerializer $headerSerializer, TransactionCollectionSerializer $txColSerializer)
+    public function __construct(Math $math, HexBlockHeaderSerializer $headerSerializer, TransactionSerializer $txSerializer)
     {
         $this->math = $math;
         $this->headerSerializer = $headerSerializer;
-        $this->txColSerializer = $txColSerializer;
+        $this->txSerializer = $txSerializer;
     }
 
     /**
@@ -48,7 +48,14 @@ class HexBlockSerializer
         try {
             $block = new Block($this->math);
             $block->setHeader($this->headerSerializer->fromParser($parser));
-            $block->setTransactions($this->txColSerializer->fromParser($parser));
+            $block->getTransactions()->addTransactions(
+                $parser->getArray(
+                    function () use (&$parser) {
+                        $transaction = $this->txSerializer->fromParser($parser);
+                        return $transaction;
+                    }
+                )
+            );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }
