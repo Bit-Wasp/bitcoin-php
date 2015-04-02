@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-class TransactionInputCollection implements \Countable
+use BitWasp\Bitcoin\Collection;
+
+class TransactionInputCollection extends Collection
 {
     private $inputs = [];
 
