@@ -103,9 +103,6 @@ class SignatureHash implements SignatureHashInterface
         $txParser = new Parser($copy->getBuffer());
         $txParser->writeInt(4, $sighashType, true);
 
-        $hash     = Hash::sha256d($txParser->getBuffer()->getBinary());
-        $buffer   = Buffer::hex($hash);
-
-        return $buffer;
+        return Hash::sha256d($txParser->getBuffer());
     }
 }

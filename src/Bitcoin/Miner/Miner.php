@@ -178,7 +178,7 @@ class Miner
                 $header->setNonce($nonce++);
 
                 $hash = (new Parser())
-                    ->writeBytes(32, Hash::sha256d($header->getBuffer()->getBinary()), true)
+                    ->writeBytes(32, Hash::sha256d($header->getBuffer()), true)
                     ->getBuffer();
 
                 if ($this->math->cmp($hash->getInt(), $target) <= 0) {

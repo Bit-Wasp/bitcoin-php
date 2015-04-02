@@ -108,7 +108,7 @@ class EcAdapterTest extends AbstractTestCase
         foreach ($json->test as $c => $test) {
             $privateKey = PrivateKeyFactory ::fromHex($test->privKey, false, $ecAdapter);
             $message = new Buffer($test->message);
-            $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
+            $messageHash = Hash::sha256($message);
 
             $k = new Rfc6979 ($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey, $messageHash);
             $sig = $ecAdapter->sign($messageHash, $privateKey, $k);

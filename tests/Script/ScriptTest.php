@@ -187,7 +187,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
         // Ensure scripthash is being reproduced
         $this->assertSame($script->getBuffer()->getHex(), '522102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb53ae');
-        $this->assertSame($script->getScriptHash()->getHex(), $rs->getScriptHash()->serialize('hex'));
+        $this->assertSame($script->getScriptHash()->getHex(), $rs->getScriptHash()->getHex());
 
         // Validate it's correct
         $this->assertSame($script->getScriptHash()->getHex(), 'f7c29c0c6d319e33c9250fca0cb61a500621d93e');

@@ -34,37 +34,30 @@ class Hash
      */
     public static function sha256ripe160(Buffer $data)
     {
-        $hash = self::sha256($data->getBinary(), true);
-        $hash = self::ripemd160($hash, true);
-        return new Buffer($hash);
+        return new Buffer(hash('ripemd160', hash('sha256', $data->getBinary(), true), true));
     }
 
     /**
      * Perform SHA256
      *
-     * @param Buffer|string $data
+     * @param Buffer $data
      * @param bool $binaryOutput
-     * @return string
+     * @return Buffer
      */
-    public static function sha256($data, $binaryOutput = false)
+    public static function sha256(Buffer $data)
     {
-        $hash = hash('sha256', $data, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('sha256', $data->getBinary(), true));
     }
 
     /**
      * Perform SHA256 twice
      *
-     * @param Buffer|string $data       Buffer or hex string
-     * @param bool $binaryOutput
-     * @return string
+     * @param Buffer $data       Buffer or hex string
+     * @return Buffer
      */
-    public static function sha256d($data, $binaryOutput = false)
+    public static function sha256d(Buffer $data)
     {
-        $data = self::normalize($data);
-        $hash = self::sha256($data, true);
-        $hash = self::sha256($hash, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('sha256', hash('sha256', $data->getBinary(), true), true));
     }
 
     /**

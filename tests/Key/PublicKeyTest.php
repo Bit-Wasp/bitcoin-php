@@ -123,9 +123,12 @@ class PublicKeyTest extends AbstractTestCase
         $f    = file_get_contents(__DIR__.'/../Data/publickey.pubkeyhash.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $pubkey = PublicKeyFactory::fromHex($test->key, $ecAdapter);
-            $hash = $pubkey->getPubKeyHash();
-            $this->assertSame($hash, $test->hash);
+            $this->assertSame(
+                $test->hash,
+                PublicKeyFactory::fromHex($test->key, $ecAdapter)
+                    ->getPubKeyHash()
+                    ->getHex()
+            );
         }
     }
 

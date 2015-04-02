@@ -7,7 +7,7 @@ use \BitWasp\Bitcoin\Bitcoin;
 use \BitWasp\Bitcoin\Buffer;
 use \BitWasp\Bitcoin\Crypto\Hash;
 use \BitWasp\Bitcoin\Crypto\Random\HmacDrbg;
-use \BitWasp\Bitcoin\Key\PrivateKey;
+use \BitWasp\Bitcoin\Key\PrivateKeyFactory;
 
 class HMACDRBGTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,11 +34,12 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $key = $math->hexDec($test->privKey);
-            $privKey     = new PrivateKey(Bitcoin::getEcAdapter(), $key);
-            $messageHash = Buffer::hex(Hash::sha256($test->message));
-            $entropy     = new Buffer($privKey->getBuffer()->serialize() . $messageHash->serialize());
-            $drbg        = new HmacDrbg($test->algorithm, $entropy);
-            $k           = $drbg->bytes(32);
+            $privKey = PrivateKeyFactory::fromInt($key, true, Bitcoin::getEcAdapter());
+            $msg32 = Hash::sha256(new Buffer($test->message));
+
+            $entropy = new Buffer($privKey->getBuffer()->serialize() . $msg32->serialize());
+            $drbg = new HmacDrbg($test->algorithm, $entropy);
+            $k = $drbg->bytes(32);
             $this->assertEquals(strtolower($test->expectedK), strtolower($k->serialize('hex')));
         }
     }
