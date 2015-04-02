@@ -19,15 +19,15 @@ abstract class Address implements AddressInterface
     private $hash;
 
     /**
-     * @param $hash
+     * @param Buffer $hash
      */
-    public function __construct($hash)
+    public function __construct(Buffer $hash)
     {
         $this->hash = (string)$hash;
     }
 
     /**
-     * @return string
+     * @return Buffer
      */
     public function getHash()
     {
