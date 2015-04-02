@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-
 class TransactionOutputCollection implements \Countable
 {
     /**

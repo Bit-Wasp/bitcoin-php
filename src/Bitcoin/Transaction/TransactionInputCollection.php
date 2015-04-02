@@ -84,5 +84,4 @@ class TransactionInputCollection implements \Countable
     {
         return new self(array_slice($this->inputs, $start, $length));
     }
-
 }
