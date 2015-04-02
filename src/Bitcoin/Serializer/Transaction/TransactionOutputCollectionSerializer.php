@@ -27,12 +27,11 @@ class TransactionOutputCollectionSerializer
      */
     public function serialize(TransactionOutputCollection $outputs)
     {
-        $outputArray = array();
-        foreach ($outputs->getOutputs() as $output) {
-            $outputArray[] = $this->outputSerializer->serialize($output);
-        }
+        $parser = new Parser();
 
-        return $outputArray;
+        return $parser
+            ->writeArray($outputs->getOutputs())
+            ->getBuffer();
     }
 
     /**

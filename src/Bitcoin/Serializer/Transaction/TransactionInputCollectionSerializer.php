@@ -27,13 +27,10 @@ class TransactionInputCollectionSerializer
      */
     public function serialize(TransactionInputCollection $inputs)
     {
-        $inputArray = array();
-
-        foreach ($inputs->getInputs() as $input) {
-            $inputArray[] = $this->inputSerializer->serialize($input);
-        }
-
-        return $inputArray;
+        $parser = new Parser();
+        return $parser
+            ->writeArray($inputs->getInputs())
+            ->getBuffer();
     }
 
     /**
