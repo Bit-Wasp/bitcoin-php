@@ -101,7 +101,7 @@ class Block extends Serializable implements BlockInterface
         $serializer = new HexBlockSerializer(
             $this->math,
             new HexBlockHeaderSerializer(),
-            new TransactionCollectionSerializer(new TransactionSerializer())
+            new TransactionSerializer()
         );
 
         $hex = $serializer->serialize($this);
