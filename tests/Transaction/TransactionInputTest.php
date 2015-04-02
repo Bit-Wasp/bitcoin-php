@@ -6,8 +6,8 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Parser;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Buffer;
 
 class TransactionInputTest extends \PHPUnit_Framework_TestCase
 {

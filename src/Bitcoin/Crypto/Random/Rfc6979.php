@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto\Random;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\GeneratorPoint;

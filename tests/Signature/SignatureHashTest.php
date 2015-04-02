@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Signature;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Signature\SignatureHash;

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 
 /**
  * Class Hash

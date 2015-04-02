@@ -3,9 +3,9 @@
 namespace BitWasp\Bitcoin\Serializer\Signature;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
-use BitWasp\Bitcoin\Parser;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
+use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 

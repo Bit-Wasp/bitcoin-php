@@ -2,10 +2,10 @@
 
 namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 

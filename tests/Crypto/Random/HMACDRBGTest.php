@@ -4,7 +4,7 @@
 namespace BitWasp\Bitcoin\Tests\Crypto\Random;
 
 use \BitWasp\Bitcoin\Bitcoin;
-use \BitWasp\Bitcoin\Buffer;
+use \BitWasp\Buffertools\Buffer;
 use \BitWasp\Bitcoin\Crypto\Hash;
 use \BitWasp\Bitcoin\Crypto\Random\HmacDrbg;
 use \BitWasp\Bitcoin\Key\PrivateKey;
@@ -22,7 +22,7 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInvalidAlgorithm()
     {
-        $drbg = new HmacDrbg('fake', \BitWasp\Bitcoin\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
+        $drbg = new HmacDrbg('fake', \BitWasp\Buffertools\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
     }
 
     public function testCreateHMACDRBG()

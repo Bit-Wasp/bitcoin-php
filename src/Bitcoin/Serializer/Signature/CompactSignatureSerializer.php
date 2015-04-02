@@ -2,10 +2,10 @@
 
 namespace BitWasp\Bitcoin\Serializer\Signature;
 
-use BitWasp\Bitcoin\Parser;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Signature\CompactSignature;
 
 class CompactSignatureSerializer

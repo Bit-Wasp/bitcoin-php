@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 

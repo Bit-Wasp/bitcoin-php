@@ -82,7 +82,7 @@ class CompactSignature
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer()
     {

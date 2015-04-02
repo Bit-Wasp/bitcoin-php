@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddressTimestamp;
 use InvalidArgumentException;

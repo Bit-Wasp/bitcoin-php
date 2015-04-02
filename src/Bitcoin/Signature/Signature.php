@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
 
@@ -93,7 +93,7 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer()
     {
@@ -103,7 +103,7 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @param \BitWasp\Bitcoin\Buffer $sig
+     * @param \BitWasp\Buffertools\Buffer $sig
      * @return bool
      * @throws SignatureNotCanonical
      */

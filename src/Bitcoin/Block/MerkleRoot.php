@@ -4,8 +4,8 @@ namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
-use BitWasp\Bitcoin\Parser;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
 

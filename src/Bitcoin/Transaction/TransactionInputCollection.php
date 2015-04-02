@@ -91,7 +91,7 @@ class TransactionInputCollection extends Serializable implements \Countable, Ser
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer()
     {

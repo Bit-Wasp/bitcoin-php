@@ -3,9 +3,9 @@
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
-use BitWasp\Bitcoin\Exceptions\ParserOutOfRange;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
 
@@ -70,7 +70,7 @@ class HexBlockSerializer
 
     /**
      * @param BlockInterface $block
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function serialize(BlockInterface $block)
     {

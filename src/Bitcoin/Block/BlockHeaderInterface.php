@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Block;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
 
 interface BlockHeaderInterface extends SerializableInterface

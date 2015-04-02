@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Serializer;
 
 use BitWasp\Bitcoin\Network\NetworkMessage;
-use BitWasp\Bitcoin\Parser;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
 class NetworkMessageSerializer

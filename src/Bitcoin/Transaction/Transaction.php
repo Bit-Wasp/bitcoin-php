@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Buffer;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;

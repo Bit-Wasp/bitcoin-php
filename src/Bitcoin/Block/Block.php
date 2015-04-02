@@ -94,7 +94,7 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer()
     {

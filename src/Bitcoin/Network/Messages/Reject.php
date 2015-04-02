@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 
 class Reject extends NetworkSerializable
 {

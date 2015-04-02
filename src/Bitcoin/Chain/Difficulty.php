@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 
 class Difficulty implements DifficultyInterface
 {
@@ -62,7 +62,7 @@ class Difficulty implements DifficultyInterface
     /**
      * Get the target from a compact int.
      *
-     * @param \BitWasp\Bitcoin\Buffer $bits
+     * @param \BitWasp\Buffertools\Buffer $bits
      * @return string
      */
     public function getTarget(Buffer $bits)

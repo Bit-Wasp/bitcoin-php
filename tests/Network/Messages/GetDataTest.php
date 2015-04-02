@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\GetData;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
