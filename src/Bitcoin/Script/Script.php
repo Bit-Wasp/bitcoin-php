@@ -78,11 +78,10 @@ class Script extends Serializable implements ScriptInterface
      */
     public function getScriptHash()
     {
-        $hex  = $this->getBuffer()->getHex();
-        $hash = Hash::sha256ripe160($hex, true);
+        $hex = $this->getBuffer();
+        $hash = Hash::sha256ripe160($hex);
 
-        $buffer = new Buffer($hash);
-        return $buffer;
+        return $hash;
     }
 
     /**
@@ -105,7 +104,7 @@ class Script extends Serializable implements ScriptInterface
      * @return $this
      * @throws \Exception
      */
-    public function push($data)
+    public function push(Buffer $data)
     {
         if (!$data instanceof Buffer) {
             $data = Buffer::hex($data);

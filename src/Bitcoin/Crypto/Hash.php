@@ -28,17 +28,15 @@ class Hash
     /**
      * Calculate Sha256(RipeMd160()) on the given data
      *
-     * @param Buffer|string $data
+     * @param Buffer $data
      * @param bool $binaryOutput
-     * @return string
+     * @return Buffer
      */
-    public static function sha256ripe160($data, $binaryOutput = false)
+    public static function sha256ripe160(Buffer $data)
     {
-        $data = self::normalize($data);
-        $data = pack("H*", $data); // hex2bin
-        $hash = self::sha256($data, true);
-        $hash = self::ripemd160($hash, $binaryOutput);
-        return $hash;
+        $hash = self::sha256($data->getBinary(), true);
+        $hash = self::ripemd160($hash, true);
+        return new Buffer($hash);
     }
 
     /**
@@ -135,7 +133,6 @@ class Hash
         if ($count <= 0 || $keyLength <= 0) {
             throw new \Exception('PBKDF2 ERROR: Invalid parameters.');
         }
-
 
         // The output length is in NIBBLES (4-bits) if $raw_output is false!
         if (!$rawOutput) {

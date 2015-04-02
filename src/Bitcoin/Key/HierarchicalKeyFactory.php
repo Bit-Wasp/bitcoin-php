@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -30,9 +31,8 @@ class HierarchicalKeyFactory
     public static function generateMasterKey(EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $buffer  = PrivateKeyFactory::create(true, $ecAdapter);
-        $private = self::fromEntropy($buffer->getBuffer()->getHex(), $ecAdapter);
-        return $private;
+        $buffer = PrivateKeyFactory::create(true, $ecAdapter);
+        return self::fromEntropy($buffer->getBuffer()->getHex(), $ecAdapter);
     }
 
     /**
@@ -43,14 +43,16 @@ class HierarchicalKeyFactory
     public static function fromEntropy($entropy, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $hash = Hash::hmac('sha512', pack("H*", $entropy), "Bitcoin seed");
+        $entropy = Buffer::hex($entropy);
+        $hash = new Buffer(Hash::hmac('sha512', $entropy->getBinary(), "Bitcoin seed", true));
+
         return new HierarchicalKey(
             $ecAdapter,
             0,
             0,
             0,
-            $ecAdapter->getMath()->hexDec(substr($hash, 64, 64)),
-            PrivateKeyFactory::fromHex(substr($hash, 0, 64), true, $ecAdapter)
+            $hash->slice(32, 32)->getInt(),
+            PrivateKeyFactory::fromHex($hash->slice(0, 32)->getHex(), true, $ecAdapter)
         );
     }
 

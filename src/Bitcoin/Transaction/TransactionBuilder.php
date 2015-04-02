@@ -150,7 +150,7 @@ class TransactionBuilder
         $parse = $outputScript->getScriptParser()->parse();
         $signatureHash = $this->transaction->signatureHash();
 
-        if ($prevOutType->isPayToPublicKeyHash() && $parse[2] == $privateKey->getPubKeyHash()) {
+        if ($prevOutType->isPayToPublicKeyHash() && $parse[2] == $privateKey->getPubKeyHash()->getHex()) {
             $hash = $signatureHash->calculate($outputScript, $inputToSign, $sigHashType);
             $signature = $this->sign($privateKey, $hash);
             $script = ScriptFactory::scriptSig()
@@ -160,7 +160,7 @@ class TransactionBuilder
                 throw new \Exception('Redeem script should be passed when signing a p2sh input');
             }
 
-            if ($parse[1] == $redeemScript->getScriptHash()) {
+            if ($parse[1] == $redeemScript->getScriptHash()->getHex()) {
                 $hash = $signatureHash->calculate($redeemScript, $inputToSign, $sigHashType);
                 $signature = $this->sign($privateKey, $hash);
                 $script = ScriptFactory::scriptSig()
