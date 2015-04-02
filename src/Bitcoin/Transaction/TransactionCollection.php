@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-class TransactionCollection implements \Countable
+use BitWasp\Bitcoin\Collection;
+
+class TransactionCollection extends Collection
 {
     private $transactions = [];
 

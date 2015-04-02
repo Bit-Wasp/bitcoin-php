@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-class TransactionOutputCollection implements \Countable
+use BitWasp\Bitcoin\Collection;
+
+class TransactionOutputCollection extends Collection
 {
     /**
      * @var TransactionOutput[]
