@@ -11,25 +11,9 @@ use BitWasp\Bitcoin\Buffer;
 class Hash
 {
     /**
-     * Normalize data so it is always a string
-     *
-     * @param Buffer $data
-     * @return string
-     */
-    public static function normalize($data)
-    {
-        if ($data instanceof Buffer) {
-            $data = $data->getBinary();
-        }
-
-        return $data;
-    }
-
-    /**
      * Calculate Sha256(RipeMd160()) on the given data
      *
      * @param Buffer $data
-     * @param bool $binaryOutput
      * @return Buffer
      */
     public static function sha256ripe160(Buffer $data)
@@ -41,7 +25,6 @@ class Hash
      * Perform SHA256
      *
      * @param Buffer $data
-     * @param bool $binaryOutput
      * @return Buffer
      */
     public static function sha256(Buffer $data)
