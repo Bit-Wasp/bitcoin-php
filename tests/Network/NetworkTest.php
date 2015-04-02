@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Buffer;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 
 class NetworkTest extends \PHPUnit_Framework_TestCase
@@ -119,8 +120,8 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
 
     public function testFactoryPresets()
     {
-        $p2sh = new ScriptHashAddress("3399bc19f2b20473d417e31472c92947b59f95f8");
-        $p2pk = new PayToPubKeyHashAddress("06f1b66ffe49df7fce684df16c62f59dc9adbd3f");
+        $p2sh = new ScriptHashAddress(Buffer::hex("3399bc19f2b20473d417e31472c92947b59f95f8"));
+        $p2pk = new PayToPubKeyHashAddress(Buffer::hex("06f1b66ffe49df7fce684df16c62f59dc9adbd3f"));
 
         $this->assertEquals(NetworkFactory::bitcoin()->getAddressByte(), '00');
         $this->assertEquals(NetworkFactory::bitcoin()->getP2shByte(), '05');

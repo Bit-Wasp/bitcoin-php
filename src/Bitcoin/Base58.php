@@ -85,9 +85,7 @@ class Base58
      */
     public static function checksum(Buffer $data)
     {
-        $hash = new Buffer(Hash::sha256d($data->getBinary(), true));
-
-        return $hash->slice(0, 4);
+        return Hash::sha256d($data)->slice(0, 4);
     }
 
     /**

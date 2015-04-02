@@ -44,8 +44,9 @@ class InputScriptFactory
         $linked = $signer->associateSigs($sigs, $hash, $redeemScript->getKeys());
         $script = ScriptFactory::create()->op('OP_0');
         foreach ($redeemScript->getKeys() as $key) {
-            if (isset($linked[$key->getPubKeyHash()])) {
-                $script->push($linked[$key->getPubKeyHash()]->getBuffer());
+            $keyHash = $key->getPubKeyHash()->getHex();
+            if (isset($linked[$keyHash])) {
+                $script->push($linked[$keyHash]->getBuffer());
             }
         }
         $script->push($redeemScript->getBuffer());

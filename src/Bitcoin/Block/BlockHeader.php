@@ -90,10 +90,11 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getBlockHash()
     {
-        $hash   = Buffer::hex(Hash::sha256d($this->getBuffer()->getBinary()));
         $parser = new Parser();
-        $parser->writeBytes(32, $hash, true);
-        return $parser->getBuffer()->getHex();
+        return $parser
+            ->writeBytes(32, Hash::sha256d($this->getBuffer()), true)
+            ->getBuffer()
+            ->getHex();
     }
 
     /**

@@ -128,8 +128,7 @@ class HierarchicalKey
      */
     public function getChildFingerprint()
     {
-        $fingerprint = $this->ecAdapter->getMath()->hexDec(substr($this->getPublicKey()->getPubKeyHash(), 0, 8));
-        return $fingerprint;
+        return $this->getPublicKey()->getPubKeyHash()->slice(0, 4)->getInt();
     }
 
     /**

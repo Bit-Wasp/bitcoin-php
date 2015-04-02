@@ -144,9 +144,9 @@ class PrivateKeyTest extends AbstractTestCase
     public function testGetPubKeyHash(EcAdapterInterface $ecAdapter)
     {
         $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
-        $this->assertSame('d00baafc1c7f120ab2ae0aa22160b516cfcf9cfe', $privateKey->getPubKeyHash());
+        $this->assertSame('d00baafc1c7f120ab2ae0aa22160b516cfcf9cfe', $privateKey->getPubKeyHash()->getHex());
         $privateKey->setCompressed(true);
-        $this->assertSame('c53c82d3357f1f299330d585907b7c64b6b7a5f0', $privateKey->getPubKeyHash());
+        $this->assertSame('c53c82d3357f1f299330d585907b7c64b6b7a5f0', $privateKey->getPubKeyHash()->getHex());
     }
 
     /**
