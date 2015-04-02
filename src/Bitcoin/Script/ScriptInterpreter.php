@@ -787,9 +787,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             ) ? 20 : 32;
 
                             if ($opcodes->isOp($opCode, 'OP_RIPEMD160')) {
-                                $hash = Hash::ripemd160($vch, true);
+                                $hash = Hash::ripemd160($vch);
                             } elseif ($opcodes->isOp($opCode, 'OP_SHA1')) {
-                                $hash = Hash::sha1($vch, true);
+                                $hash = Hash::sha1($vch);
                             } elseif ($opcodes->isOp($opCode, 'OP_SHA256')) {
                                 $hash = Hash::sha256($vch);
                             } elseif ($opcodes->isOp($opCode, 'OP_HASH160')) {
