@@ -10,22 +10,22 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 class TransactionSerializer
 {
     /**
-     * @var TransactionInputCollectionSerializer
+     * @var TransactionInputSerializer
      */
-    public $inputsSerializer;
+    public $inputSerializer;
 
     /**
-     * @var TransactionOutputCollectionSerializer
+     * @var TransactionOutputSerializer
      */
-    public $outputsSerializer;
+    public $outputSerializer;
 
     /**
      *
      */
     public function __construct()
     {
-        $this->inputsSerializer = new TransactionInputCollectionSerializer(new TransactionInputSerializer);
-        $this->outputsSerializer = new TransactionOutputCollectionSerializer(new TransactionOutputSerializer);
+        $this->inputSerializer = new TransactionInputSerializer;
+        $this->outputSerializer = new TransactionOutputSerializer;
     }
 
     /**
@@ -51,11 +51,23 @@ class TransactionSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        return TransactionFactory::create()
-            ->setVersion($parser->readBytes(4, true)->getInt())
-            ->setInputs($this->inputsSerializer->fromParser($parser))
-            ->setOutputs($this->outputsSerializer->fromParser($parser))
-            ->setLockTime($parser->readBytes(4, true)->getInt());
+        $tx = TransactionFactory::create()
+            ->setVersion($parser->readBytes(4, true)->getInt());
+
+        $tx->getInputs()->addInputs($parser->getArray(
+            function () use (&$parser) {
+                return $this->inputSerializer->fromParser($parser);
+            }
+        ));
+
+        $tx->getOutputs()->addOutputs($parser->getArray(
+            function () use (&$parser) {
+                return $this->outputSerializer->fromParser($parser);
+            }
+        ));
+
+        $tx->setLockTime($parser->readBytes(4, true)->getInt());
+        return $tx;
     }
 
     /**

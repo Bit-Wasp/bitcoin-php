@@ -22,19 +22,6 @@ class TransactionOutputCollectionSerializer
     }
 
     /**
-     * @param TransactionOutputCollection $outputs
-     * @return array
-     */
-    public function serialize(TransactionOutputCollection $outputs)
-    {
-        $parser = new Parser();
-
-        return $parser
-            ->writeArray($outputs->getOutputs())
-            ->getBuffer();
-    }
-
-    /**
      * @param Parser $parser
      * @return TransactionOutputCollection
      */
