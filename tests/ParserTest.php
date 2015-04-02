@@ -356,7 +356,7 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
         $array  = new TransactionCollection(array($transaction, $transaction));
         $parser = new Parser();
-        $parser->writeArray($array->getBuffer());
+        $parser->writeArray($array->getTransactions());
 
         $this->assertSame('010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $transaction->getBuffer()->serialize('hex'));
         $this->assertSame('02010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000010000000100000000000000000000000000000000000000000000000000000000000000000000000000ffffffff0101000000000000000000000000', $parser->getBuffer()->serialize('hex'));

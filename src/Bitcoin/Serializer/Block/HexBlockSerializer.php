@@ -76,8 +76,7 @@ class HexBlockSerializer
     {
         $header = $block->getHeader()->getBuffer();
         $parser = new Parser($header);
-        $serializedTxs = $this->txColSerializer->serialize($block->getTransactions());
-        $parser->writeArray($serializedTxs);
+        $parser->writeArray($block->getTransactions()->getTransactions());
         return $parser->getBuffer();
     }
 }

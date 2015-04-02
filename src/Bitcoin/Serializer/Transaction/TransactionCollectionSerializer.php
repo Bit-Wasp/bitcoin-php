@@ -26,11 +26,11 @@ class TransactionCollectionSerializer
      */
     public function serialize(TransactionCollection $transactions)
     {
-        $array = array();
-        foreach ($transactions->getTransactions() as $input) {
-            $array[] = $this->serializer->serialize($input);
-        }
-        return $array;
+        $parser = new Parser();
+
+        return $parser
+            ->writeArray($transactions->getTransactions())
+            ->getBuffer();
     }
 
     /**
