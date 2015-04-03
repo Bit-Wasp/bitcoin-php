@@ -49,9 +49,9 @@ class Hash
      * @param Buffer $data
      * @return Buffer
      */
-    public static function ripemd160($data)
+    public static function ripemd160(Buffer $data)
     {
-        return new Buffer(hash('ripemd160', $data, true));
+        return new Buffer(hash('ripemd160', $data->getBinary(), true));
     }
 
     /**
@@ -73,7 +73,7 @@ class Hash
      */
     public static function sha1(Buffer $data)
     {
-        return new Buffer(hash('sha1', $data, true));
+        return new Buffer(hash('sha1', $data->getBinary(), true));
     }
 
     /**
