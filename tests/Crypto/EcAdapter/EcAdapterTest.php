@@ -27,7 +27,7 @@ class EcAdapterTest extends AbstractTestCase
         $datasets = [];
         $yaml = new Yaml();
 
-        $data = $yaml->parse(__DIR__ . '/../../Data/privateKeys.yml');
+        $data = $yaml->parse(file_get_contents(__DIR__ . '/../../Data/privateKeys.yml'));
         foreach ($data['vectors'] as $vector) {
             foreach ($this->getEcAdapters() as $adapter) {
                 $datasets[] = [
