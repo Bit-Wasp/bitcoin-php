@@ -27,7 +27,7 @@ class CompactSignatureTest extends AbstractTestCase
         $vectors = [];
         for ($i = 0; $i < 2; $i++) {
             $priv = PrivateKeyFactory::create(false)->getHex();
-            $message = Buffer::hex(Hash::sha256d($i));
+            $message = Hash::sha256d(new Buffer($i));
             foreach ($this->getEcAdapters() as $adapter) {
                 $vectors[] = [$adapter[0], PrivateKeyFactory::fromHex($priv, true, $adapter[0]), $message];
                 $vectors[] = [$adapter[0], PrivateKeyFactory::fromHex($priv, false, $adapter[0]), $message];

@@ -27,7 +27,7 @@ class EcAdapterTest extends AbstractTestCase
         $datasets = [];
         $yaml = new Yaml();
 
-        $data = $yaml->parse(__DIR__ . '/../../Data/privateKeys.yml');
+        $data = $yaml->parse(file_get_contents(__DIR__ . '/../../Data/privateKeys.yml'));
         foreach ($data['vectors'] as $vector) {
             foreach ($this->getEcAdapters() as $adapter) {
                 $datasets[] = [
@@ -108,7 +108,7 @@ class EcAdapterTest extends AbstractTestCase
         foreach ($json->test as $c => $test) {
             $privateKey = PrivateKeyFactory ::fromHex($test->privKey, false, $ecAdapter);
             $message = new Buffer($test->message);
-            $messageHash = new Buffer(Hash::sha256($message->serialize(), true));
+            $messageHash = Hash::sha256($message);
 
             $k = new Rfc6979 ($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey, $messageHash);
             $sig = $ecAdapter->sign($messageHash, $privateKey, $k);

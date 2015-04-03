@@ -51,7 +51,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     {
         $script = $this->out->getScript();
         $this->assertInstanceOf($this->scriptType, $script);
-        $this->assertEmpty($script->getBuffer()->serialize());
+        $this->assertEmpty($script->getBuffer()->getBinary());
     }
 
     public function testSetScript()
@@ -96,7 +96,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $buffer = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
         $s = new TransactionOutputSerializer();
         $out = $s->parse($buffer);
-        $this->assertEquals($buffer, $out->getBuffer()->serialize('hex'));
+        $this->assertEquals($buffer, $out->getBuffer()->getHex());
     }
 
 };

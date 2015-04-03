@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 use BitWasp\Bitcoin\Key\PrivateKey;
@@ -39,18 +40,13 @@ class WifPrivateKeySerializer
      */
     public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey)
     {
-        $hex = $this->hexSerializer->serialize($privateKey)->serialize('hex');
-
-        $payload = sprintf(
-            "%s%s%s",
-            $network->getPrivByte(),
-            $hex,
+        $payload = Buffer::hex(
+            $network->getPrivByte() .
+            $this->hexSerializer->serialize($privateKey)->getHex() .
             ($privateKey->isCompressed() ? '01' : '')
         );
 
-        $wif = Base58::encodeCheck($payload);
-
-        return $wif;
+        return Base58::encodeCheck($payload);
     }
 
     /**
@@ -61,20 +57,13 @@ class WifPrivateKeySerializer
      */
     public function parse($wif)
     {
-        // [2 bytes, <either 32 or 33>, 4 bytes
-        $payload = Base58::decodeCheck($wif);
-
-        $hex = substr($payload, 2);
-        $hexLen = strlen($hex);
-
-        if ($hexLen !== 64 && $hexLen !== 66) {
+        $payload = Base58::decodeCheck($wif)->slice(1);
+        $size = $payload->getSize();
+        if (!in_array($size, [32, 33])) {
             throw new InvalidPrivateKey("Private key should be always be 32 or 33 bytes (depending on if it's compressed)");
         }
 
-        $key = substr($hex, 0, 64);
-        $private = $this->hexSerializer->parse($key);
-        $private->setCompressed(strlen($hex) === 66);
-
-        return $private;
+        return $this->hexSerializer->parse($payload->slice(0, 32))
+            ->setCompressed($size === 33);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Key;
 
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
 
 interface KeyInterface extends SerializableInterface
@@ -16,7 +17,7 @@ interface KeyInterface extends SerializableInterface
     /**
      * Return the hash of the public key.
      *
-     * @return string
+     * @return Buffer
      */
     public function getPubKeyHash();
 

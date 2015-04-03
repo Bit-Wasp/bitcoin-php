@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionCollectionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 
@@ -101,7 +100,7 @@ class Block extends Serializable implements BlockInterface
         $serializer = new HexBlockSerializer(
             $this->math,
             new HexBlockHeaderSerializer(),
-            new TransactionCollectionSerializer(new TransactionSerializer())
+            new TransactionSerializer()
         );
 
         $hex = $serializer->serialize($this);

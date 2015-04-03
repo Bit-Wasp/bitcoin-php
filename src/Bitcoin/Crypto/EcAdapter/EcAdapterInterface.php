@@ -24,6 +24,12 @@ interface EcAdapterInterface
     public function getGenerator();
 
     /**
+     * @param Buffer $publicKey
+     * @return \BitWasp\Bitcoin\Key\PublicKey
+     */
+    public function publicKeyFromBuffer(Buffer $publicKey);
+
+    /**
      * @param integer $xCoord
      * @param string $prefix
      * @return integer

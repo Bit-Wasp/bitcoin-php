@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
 /**
@@ -18,15 +19,15 @@ abstract class Address implements AddressInterface
     private $hash;
 
     /**
-     * @param $hash
+     * @param Buffer $hash
      */
-    public function __construct($hash)
+    public function __construct(Buffer $hash)
     {
         $this->hash = (string)$hash;
     }
 
     /**
-     * @return string
+     * @return Buffer
      */
     public function getHash()
     {
@@ -40,8 +41,8 @@ abstract class Address implements AddressInterface
     public function getAddress(NetworkInterface $network = null)
     {
         $network = $network ?: Bitcoin::getNetwork();
-
-        return Base58::encodeCheck($this->getPrefixByte($network) . $this->getHash());
+        $payload = Buffer::hex($this->getPrefixByte($network) . $this->getHash());
+        return Base58::encodeCheck($payload);
     }
 
     /**

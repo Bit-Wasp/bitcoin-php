@@ -2,13 +2,13 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputCollectionSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
+use BitWasp\Bitcoin\Collection;
 
-class TransactionOutputCollection extends Serializable implements \Countable, SerializableInterface
+class TransactionOutputCollection extends Collection
 {
+    /**
+     * @var TransactionOutput[]
+     */
     private $outputs = [];
 
     /**
@@ -88,15 +88,5 @@ class TransactionOutputCollection extends Serializable implements \Countable, Se
     public function slice($start, $length)
     {
         return new self(array_slice($this->outputs, $start, $length));
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Buffer
-     */
-    public function getBuffer()
-    {
-        $serializer = new TransactionOutputCollectionSerializer(new TransactionOutputSerializer());
-        $out = $serializer->serialize($this);
-        return $out;
     }
 }

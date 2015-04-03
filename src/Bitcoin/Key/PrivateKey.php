@@ -92,7 +92,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * Return the hash of the associated public key
      *
-     * @return string
+     * @return Buffer
      */
     public function getPubKeyHash()
     {

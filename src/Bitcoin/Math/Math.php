@@ -39,7 +39,7 @@ class Math extends \Mdanter\Ecc\Math\Gmp
      */
     public function unpackCompact(Buffer $bits)
     {
-        $bitStr = $bits->serialize();
+        $bitStr = $bits->getBinary();
 
         // Unpack and decode
         $sci    = array_map(

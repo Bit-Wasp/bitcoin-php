@@ -49,8 +49,8 @@ class CompactSignatureSerializer
         try {
             list ($byte, $r, $s) = [
                 $parser->readBytes(1)->getInt(),
-                $parser->readBytes(32)->serialize('int'),
-                $parser->readBytes(32)->serialize('int')
+                $parser->readBytes(32)->getInt(),
+                $parser->readBytes(32)->getInt()
             ];
 
             $recoveryFlags = $this->math->sub($byte, 27);

@@ -49,13 +49,11 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @return mixed|string
+     * @return Buffer
      */
     public function getPubKeyHash()
     {
-        $publicKey = $this->getBuffer()->getHex();
-        $hash      = Hash::sha256ripe160($publicKey);
-        return $hash;
+        return Hash::sha256ripe160($this->getBuffer());
     }
 
     /**

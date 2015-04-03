@@ -72,7 +72,7 @@ class MerkleRoot
     {
         $transactions = $this->block->getTransactions();
         $txCount      = count($transactions);
-        $hashFxn      = Network::getHashFunction(true);
+        $hashFxn      = Network::getHashFunction();
 
         if ($txCount == 0) {
             // TODO: Probably necessary. Should always have a coinbase at least.
@@ -80,8 +80,7 @@ class MerkleRoot
         }
 
         if ($txCount == 1) {
-            $hash = $hashFxn(hex2bin($transactions->getTransaction(0)->getBuffer()));
-            $buffer = new Buffer($hash);
+            $buffer = new Buffer($hashFxn($transactions->getTransaction(0)->getBinary()));
 
         } else {
             // Create a fixed size Merkle Tree
@@ -90,7 +89,7 @@ class MerkleRoot
             // Compute hash of each transaction
             $last = '';
             foreach ($transactions->getTransactions() as $i => $transaction) {
-                $last = pack("H*", $transaction->getBuffer());
+                $last = $transaction->getBinary();
                 $tree->set($i, $last);
             }
 

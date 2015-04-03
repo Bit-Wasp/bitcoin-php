@@ -32,8 +32,7 @@ class HexPrivateKeySerializer
     {
         $multiplier = $privateKey->getSecretMultiplier();
         $hex = str_pad($this->ecAdapter->getMath()->decHex($multiplier), 64, '0', STR_PAD_LEFT);
-        $out = Buffer::hex($hex);
-        return $out;
+        return Buffer::hex($hex);
     }
 
     /**
@@ -43,15 +42,15 @@ class HexPrivateKeySerializer
     public function fromParser(Parser & $parser)
     {
         $bytes = $parser->readBytes(32);
-        return $this->parse($bytes->serialize('hex'));
+        return $this->parse($bytes->getHex());
     }
     /**
      * @param $string
      * @return PrivateKey
      */
-    public function parse($string)
+    public function parse(Buffer $string)
     {
-        $multiplier = $this->ecAdapter->getMath()->hexDec($string);
+        $multiplier = $string->getInt();
         $privateKey = PrivateKeyFactory::fromInt($multiplier, false, $this->ecAdapter);
         return $privateKey;
     }

@@ -128,8 +128,7 @@ class HierarchicalKey
      */
     public function getChildFingerprint()
     {
-        $fingerprint = $this->ecAdapter->getMath()->hexDec(substr($this->getPublicKey()->getPubKeyHash(), 0, 8));
-        return $fingerprint;
+        return $this->getPublicKey()->getPubKeyHash()->slice(0, 4)->getInt();
     }
 
     /**
@@ -245,7 +244,7 @@ class HierarchicalKey
         $chainHex = str_pad($this->ecAdapter->getMath()->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
         $chain = Buffer::hex($chainHex);
 
-        $hash = new Buffer(Hash::hmac('sha512', $this->getHmacSeed($sequence)->getBinary(), $chain->getBinary(), true));
+        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain, true);
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
 

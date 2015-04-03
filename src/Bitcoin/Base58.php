@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Buffertools\Buffer;
 
 class Base58
 {
@@ -15,24 +16,22 @@ class Base58
     /**
      * Encode a given hex string in base58
      *
-     * @param $hex
+     * @param Buffer $binary
      * @return string
      * @throws \Exception
      */
-    public static function encode($hex)
+    public static function encode(Buffer $binary)
     {
-        if ($hex == '') {
+        $size = $binary->getSize();
+        if ($size == 0) {
             return '';
         }
 
         $math = Bitcoin::getMath();
 
-        if ($math->mod(strlen($hex), 2) !== '0') {
-            throw new \Exception('Data must be of even length');
-        }
-        $origHex = $hex;
+        $orig = $binary->getBinary();
+        $decimal = $binary->getInt();
 
-        $decimal = $math->hexDec($hex);
         $return = "";
         while ($math->cmp($decimal, 0) > 0) {
             list($decimal, $rem) = $math->divQr($decimal, 58);
@@ -41,10 +40,10 @@ class Base58
         $return = strrev($return);
 
         //leading zeros
-        $origLen = strlen($origHex);
-        for ($i = 0; $i < $origLen && substr($origHex, $i, 2) == "00"; $i += 2) {
+        for ($i = 0; $i < $size && substr($orig, $i, 1) == "\x00"; $i++) {
             $return = "1" . $return;
         }
+
         return $return;
     }
 
@@ -52,12 +51,12 @@ class Base58
      * Decode a base58 string
      *
      * @param $base58
-     * @return string
+     * @return Buffer
      */
     public static function decode($base58)
     {
         if (strlen($base58) == 0) {
-            return '';
+            return new Buffer();
         }
 
         $original = $base58;
@@ -75,41 +74,33 @@ class Base58
             $hex = "00" . $hex;
         }
 
-        if ($math->mod(strlen($hex), 2) !== '0') {
-            $hex = "0" . $hex;
-        }
-
-        return $hex;
+        $buffer = Buffer::hex($hex);
+        return $buffer;
     }
 
     /**
      * Calculate a checksum for the given data
      *
      * @param $data
-     * @return string
+     * @return Buffer
      */
-    public static function checksum($data)
+    public static function checksum(Buffer $data)
     {
-        $data = pack("H*", $data);
-        $hash = Hash::sha256d($data);
-        $checksum = substr($hash, 0, 8);
-
-        return $checksum;
+        return Hash::sha256d($data)->slice(0, 4);
     }
 
     /**
      * Decode a base58 checksum string and validate checksum
      *
      * @param $base58
-     * @return string
+     * @return Buffer
      * @throws Base58ChecksumFailure
      */
     public static function decodeCheck($base58)
     {
         $hex       = self::decode($base58);
-        $csVerify  = substr($hex, -8);
-        $data      = substr($hex, 0, -8);
-
+        $csVerify  = $hex->slice(-4);
+        $data      = $hex->slice(0, -4);
         $checksum  = self::checksum($data);
 
         if ($checksum != $csVerify) {
@@ -126,10 +117,10 @@ class Base58
      * @return string
      * @throws \Exception
      */
-    public static function encodeCheck($data)
+    public static function encodeCheck(Buffer $data)
     {
         $checksum = self::checksum($data);
-        $hex = $data . $checksum;
-        return self::encode($hex);
+        $data = Buffer::hex($data->getHex() . $checksum->getHex());
+        return self::encode($data);
     }
 }

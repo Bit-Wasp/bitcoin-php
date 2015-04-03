@@ -39,15 +39,13 @@ class AddressFactory
     public static function fromString($address, NetworkInterface $network = null)
     {
         $network = $network ?: Bitcoin::getNetwork();
-
         $data = Base58::decodeCheck($address);
-
-        $prefixByte = substr($data, 0, 2);
+        $prefixByte = $data->slice(0, 1)->getHex();
 
         if ($prefixByte === $network->getP2shByte()) {
-            return new ScriptHashAddress(substr($data, 2));
+            return new ScriptHashAddress($data->slice(1));
         } else if ($prefixByte === $network->getAddressByte()) {
-            return new PayToPubKeyHashAddress(substr($data, 2));
+            return new PayToPubKeyHashAddress($data->slice(1));
         } else {
             throw new \InvalidArgumentException("Invalid prefix [{$prefixByte}]");
         }

@@ -11,121 +11,84 @@ use BitWasp\Buffertools\Buffer;
 class Hash
 {
     /**
-     * Normalize data so it is always a string
-     *
-     * @param Buffer|string $data
-     * @return string
-     */
-    public static function normalize($data)
-    {
-        if ($data instanceof Buffer) {
-            $data = $data->getBinary();
-        }
-
-        return $data;
-    }
-
-    /**
      * Calculate Sha256(RipeMd160()) on the given data
      *
-     * @param Buffer|string $data
-     * @param bool $binaryOutput
-     * @return string
+     * @param Buffer $data
+     * @return Buffer
      */
-    public static function sha256ripe160($data, $binaryOutput = false)
+    public static function sha256ripe160(Buffer $data)
     {
-        $data = self::normalize($data);
-        $data = pack("H*", $data); // hex2bin
-        $hash = self::sha256($data, true);
-        $hash = self::ripemd160($hash, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('ripemd160', hash('sha256', $data->getBinary(), true), true));
     }
 
     /**
      * Perform SHA256
      *
-     * @param Buffer|string $data
-     * @param bool $binaryOutput
-     * @return string
+     * @param Buffer $data
+     * @return Buffer
      */
-    public static function sha256($data, $binaryOutput = false)
+    public static function sha256(Buffer $data)
     {
-        $hash = hash('sha256', $data, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('sha256', $data->getBinary(), true));
     }
 
     /**
      * Perform SHA256 twice
      *
-     * @param Buffer|string $data       Buffer or hex string
-     * @param bool $binaryOutput
-     * @return string
+     * @param Buffer $data
+     * @return Buffer
      */
-    public static function sha256d($data, $binaryOutput = false)
+    public static function sha256d(Buffer $data)
     {
-        $data = self::normalize($data);
-        $hash = self::sha256($data, true);
-        $hash = self::sha256($hash, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('sha256', hash('sha256', $data->getBinary(), true), true));
     }
 
     /**
      * RIPEMD160
      *
-     * @param Buffer|string $data
-     * @param bool $binaryOutput
-     * @return string
+     * @param Buffer $data
+     * @return Buffer
      */
-    public static function ripemd160($data, $binaryOutput = false)
+    public static function ripemd160($data)
     {
-        $hash = hash('ripemd160', $data, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('ripemd160', $data, true));
     }
 
     /**
      * RIPEMD160 twice
      *
-     * @param Buffer|string $data
-     * @param bool $binaryOutput
-     * @return string
+     * @param Buffer $data
+     * @return Buffer
      */
-    public static function ripemd160d($data, $binaryOutput = false)
+    public static function ripemd160d(Buffer $data)
     {
-        $data = self::normalize($data);
-        $hash = self::ripemd160($data, true);
-        $hash = self::ripemd160($hash, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('ripemd160', hash('ripemd160', $data->getBinary(), true), true));
     }
 
     /**
      * Calculate a SHA1 hash
      *
-     * @param Buffer|string $data
-     * @param bool $binaryOutput
-     * @return string
+     * @param Buffer $data
+     * @return Buffer
      */
-    public static function sha1($data, $binaryOutput = false)
+    public static function sha1(Buffer $data)
     {
-        $data = self::normalize($data);
-        $hash = hash('sha1', $data, $binaryOutput);
-        return $hash;
+        return new Buffer(hash('sha1', $data, true));
     }
 
     /**
      * PBKDF2
      *
-     * @param $algorithm
-     * @param Buffer|string $password
-     * @param $salt
-     * @param $count
-     * @param $keyLength
-     * @param bool $rawOutput
-     * @return mixed
+     * @param string $algorithm
+     * @param Buffer $password
+     * @param Buffer $salt
+     * @param integer $count
+     * @param integer $keyLength
+     * @return Buffer
      * @throws \Exception
      */
-    public static function pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput = false)
+    public static function pbkdf2($algorithm, Buffer $password, Buffer $salt, $count, $keyLength)
     {
-        $password   = self::normalize($password);
         $algorithm  = strtolower($algorithm);
 
         if (!in_array($algorithm, hash_algos(), true)) {
@@ -136,29 +99,19 @@ class Hash
             throw new \Exception('PBKDF2 ERROR: Invalid parameters.');
         }
 
-
-        // The output length is in NIBBLES (4-bits) if $raw_output is false!
-        if (!$rawOutput) {
-            $keyLength = $keyLength * 2;
-        }
-
-        $hash = \hash_pbkdf2($algorithm, $password, $salt, $count, $keyLength, $rawOutput);
-
-        return $hash;
+        return new Buffer(\hash_pbkdf2($algorithm, $password->getBinary(), $salt->getBinary(), $count, $keyLength, true));
     }
 
     /**
      * Do HMAC hashing on $data and $salt
      *
      * @param $algo
-     * @param Buffer|string $data
+     * @param Buffer $data
      * @param $salt
-     * @param bool $rawOutput
-     * @return string
+     * @return Buffer
      */
-    public static function hmac($algo, $data, $salt, $rawOutput = false)
+    public static function hmac($algo, Buffer $data, Buffer $salt)
     {
-        $data = self::normalize($data);
-        return hash_hmac($algo, $data, $salt, $rawOutput);
+        return new Buffer(hash_hmac($algo, $data->getBinary(), $salt->getBinary(), true));
     }
 }
