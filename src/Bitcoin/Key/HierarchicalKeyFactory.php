@@ -44,7 +44,7 @@ class HierarchicalKeyFactory
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $entropy = Buffer::hex($entropy);
-        $hash = new Buffer(Hash::hmac('sha512', $entropy->getBinary(), "Bitcoin seed", true));
+        $hash = Hash::hmac('sha512', $entropy, new Buffer("Bitcoin seed"), true);
 
         return new HierarchicalKey(
             $ecAdapter,

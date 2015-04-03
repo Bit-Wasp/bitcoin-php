@@ -42,7 +42,7 @@ class WifPrivateKeySerializer
     {
         $payload = Buffer::hex(
             $network->getPrivByte() .
-            $this->hexSerializer->serialize($privateKey)->serialize('hex') .
+            $this->hexSerializer->serialize($privateKey)->getHex() .
             ($privateKey->isCompressed() ? '01' : '')
         );
 
