@@ -23,7 +23,7 @@ abstract class Address implements AddressInterface
      */
     public function __construct(Buffer $hash)
     {
-        $this->hash = (string)$hash;
+        $this->hash = $hash->getHex();
     }
 
     /**
