@@ -141,7 +141,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(20, count($tx->getInputs()));
         $this->assertEquals(19, count($tx->getOutputs()));
 
-        $serialized = $tx->getBuffer()->serialize('hex');
+        $serialized = $tx->getBuffer()->getHex();
         $this->assertSame($hex, $serialized);
 
         $this->assertEquals('048254a713f83b2deaecc781c81959fa8816d47138c7eead06c162def42a3236', $tx->getTransactionId());
@@ -157,7 +157,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($tx->getInputs()));
         $this->assertEquals(2, count($tx->getOutputs()));
 
-        $serialized = $tx->getBuffer()->serialize('hex');
+        $serialized = $tx->getBuffer()->getHex();
 
         $this->assertSame($hex, $serialized);
 

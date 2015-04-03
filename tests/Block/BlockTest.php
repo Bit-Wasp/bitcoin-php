@@ -128,7 +128,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->serialize('hex'), $newBlock->getMerkleRoot());
+        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
     }
 
 
@@ -166,7 +166,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->serialize('hex'), $newBlock->getMerkleRoot());
+        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
     }*/
 
     public function testFromHex()
@@ -196,8 +196,8 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf($this->blockType, $newBlock);
 
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->serialize('hex'), $newBlock->getMerkleRoot());
-        $this->assertSame($blockHex, $newBlock->getBuffer()->serialize('hex'));
+        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
+        $this->assertSame($blockHex, $newBlock->getBuffer()->getHex());
     }
 
     public function testSerialize()
@@ -226,7 +226,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
             '00000000');
 
         $newBlock = BlockFactory::fromHex($blockHex);
-        $this->assertSame($blockHex, $newBlock->getBuffer()->serialize('hex'));
+        $this->assertSame($blockHex, $newBlock->getBuffer()->getHex());
 
     }
 }

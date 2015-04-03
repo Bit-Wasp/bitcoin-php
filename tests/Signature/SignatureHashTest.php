@@ -63,7 +63,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             $t = TransactionFactory::fromHex($test->tx);
             $h = $t->signatureHash()->calculate($script, 0);
 
-            $this->assertEquals($h->serialize('hex'), $test->sighash);
+            $this->assertEquals($h->getHex(), $test->sighash);
 
         }
     }

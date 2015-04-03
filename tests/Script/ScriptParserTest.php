@@ -77,7 +77,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertSame($parse[0], 'OP_HASH160');
         $this->assertInstanceOf('BitWasp\Bitcoin\Buffer', $parse[1]);
-        $this->assertSame($parse[1]->serialize(), $buf->serialize());
+        $this->assertSame($parse[1]->getBinary(), $buf->getBinary());
         $this->assertSame($parse[2], 'OP_EQUAL');
     }
 

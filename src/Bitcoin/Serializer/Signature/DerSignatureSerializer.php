@@ -77,14 +77,14 @@ class DerSignatureSerializer
         try {
             $parser->readBytes(1);
             $outer    = $parser->getVarString();
-            $sighash = $parser->readBytes(1)->serialize('int');
+            $sighash = $parser->readBytes(1)->getInt();
 
             $parse    = new Parser($outer);
             $parse->readBytes(1);
-            $r = $parse->getVarString()->serialize('int');
+            $r = $parse->getVarString()->getInt();
 
             $parse->readBytes(1);
-            $s = $parse->getVarString()->serialize('int');
+            $s = $parse->getVarString()->getInt();
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }

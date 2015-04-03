@@ -36,9 +36,9 @@ class PublicKeyTest extends AbstractTestCase
         foreach ($json->test as $test) {
             $this->publicKey = PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
-            $this->assertSame($test->compressed, $this->publicKey->getBuffer()->serialize('hex'));
+            $this->assertSame($test->compressed, $this->publicKey->getBuffer()->getHex());
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
-            $this->assertSame($this->publicKey->getBuffer()->serialize('hex'), $test->compressed);
+            $this->assertSame($this->publicKey->getBuffer()->getHex(), $test->compressed);
             $this->assertTrue($this->publicKey->isCompressed());
             $this->assertSame($this->publicKey->__toString(), $test->compressed);
         }
@@ -55,9 +55,9 @@ class PublicKeyTest extends AbstractTestCase
         foreach ($json->test as $test) {
             $this->publicKey = PublicKeyFactory::fromHex($test->uncompressed, $ecAdapter);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
-            $this->assertSame($test->uncompressed, $this->publicKey->getBuffer()->serialize('hex'));
+            $this->assertSame($test->uncompressed, $this->publicKey->getBuffer()->getHex());
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
-            $this->assertSame($this->publicKey->getBuffer()->serialize('hex'), $test->uncompressed);
+            $this->assertSame($this->publicKey->getBuffer()->getHex(), $test->uncompressed);
             $this->assertSame($this->publicKey->__toString(), $test->uncompressed);
             $this->assertFalse($this->publicKey->isCompressed());
             $this->assertFalse($this->publicKey->isPrivate());
@@ -76,7 +76,7 @@ class PublicKeyTest extends AbstractTestCase
         $hex = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44febaa';
         $this->publicKey = PublicKeyFactory::fromHex($hex, $ecAdapter);
         $this->assertInstanceOf($this->publicType, $this->publicKey);
-        $this->assertSame($hex, $this->publicKey->getBuffer()->serialize('hex'));
+        $this->assertSame($hex, $this->publicKey->getBuffer()->getHex());
     }
 
     /**
@@ -171,8 +171,8 @@ class PublicKeyTest extends AbstractTestCase
 
         foreach ($json->test as $test) {
             $pubkey = PublicKeyFactory::fromHex($test->compressed);
-            $hex    = $pubkey->getBuffer()->serialize('hex');
-            $bin    = $pubkey->getBuffer()->serialize();
+            $hex    = $pubkey->getBuffer()->getHex();
+            $bin    = $pubkey->getBuffer()->getBinary();
 
             for ($i = 0; $i < count($bin); $i++) {
                 $nHex = bin2hex(substr($bin, $i, 1));

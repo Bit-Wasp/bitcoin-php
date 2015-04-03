@@ -127,13 +127,13 @@ class Signature extends Serializable implements SignatureInterface
             }
         };
 
-        $bin = $sig->serialize();
-
-        if ($sig->getSize() < 9) {
+        $bin = $sig->getBinary();
+        $size = $sig->getSize();
+        if ($size < 9) {
             throw new SignatureNotCanonical('Signature too short');
         }
 
-        if ($sig->getSize() > 73) {
+        if ($size > 73) {
             throw new SignatureNotCanonical('Signature too long');
         }
 
@@ -141,19 +141,19 @@ class Signature extends Serializable implements SignatureInterface
             throw new SignatureNotCanonical('Signature has wrong type');
         }
 
-        if (ord($bin[1]) !== $sig->getSize() - 3) {
+        if (ord($bin[1]) !== $size - 3) {
             throw new SignatureNotCanonical('Signature has wrong length marker');
         }
 
         $lenR = ord($bin[3]);
         $startR = 4;
-        if (5 + $lenR >= $sig->getSize()) {
+        if (5 + $lenR >= $size) {
             throw new SignatureNotCanonical('Signature S length misplaced');
         }
 
         $lenS = ord($bin[5 + $lenR]);
         $startS = 4 + $lenR + 2;
-        if (($lenR + $lenS + 7) !== $sig->getSize()) {
+        if (($lenR + $lenS + 7) !== $size) {
             throw new SignatureNotCanonical('Signature R+S length mismatch');
         }
 
