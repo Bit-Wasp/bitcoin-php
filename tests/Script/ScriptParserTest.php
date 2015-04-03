@@ -109,7 +109,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $this->script = ScriptFactory::create();
         $this->script->op('OP_0');
         $parse = $this->script->getScriptParser()->parse();
-        $this->assertSame($parse[0]->serialize(), $null);
+        $this->assertSame($parse[0]->getBinary(), $null);
     }
 
     public function testParseScripts()

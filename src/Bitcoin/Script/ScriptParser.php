@@ -133,7 +133,9 @@ class ScriptParser
     }
 
     /**
-     * @return Buffer[]
+     * returns a mix of Buffer objects and strings
+     *
+     * @return Buffer[]|string[]
      */
     public function parse()
     {

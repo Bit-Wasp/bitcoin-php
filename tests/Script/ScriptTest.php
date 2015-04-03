@@ -166,7 +166,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
         $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pubkey);
         $parsed = $script->getScriptParser()->parse();
-        print_r($script);
         $this->assertSame('OP_DUP', $parsed[0]);
         $this->assertSame('OP_HASH160', $parsed[1]);
         $this->assertSame('f0cd7fab8e8f4b335931a77f114a46039068da59', $parsed[2]->getHex());
