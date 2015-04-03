@@ -31,8 +31,7 @@ class HexPrivateKeySerializer
     public function serialize(PrivateKeyInterface $privateKey)
     {
         $multiplier = $privateKey->getSecretMultiplier();
-        $hex = str_pad($this->ecAdapter->getMath()->decHex($multiplier), 64, '0', STR_PAD_LEFT);
-        return Buffer::hex($hex);
+        return Buffer::hex($this->ecAdapter->getMath()->decHex($multiplier), 32);
     }
 
     /**
