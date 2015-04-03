@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Buffertools\Buffer;
 
 class Base58
 {

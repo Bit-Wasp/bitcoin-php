@@ -6,7 +6,7 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 use Mdanter\Ecc\PointInterface;
 
 class HexPublicKeySerializer

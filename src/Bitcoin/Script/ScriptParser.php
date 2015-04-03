@@ -133,7 +133,7 @@ class ScriptParser
     }
 
     /**
-     * @return array
+     * @return Buffer[]
      */
     public function parse()
     {

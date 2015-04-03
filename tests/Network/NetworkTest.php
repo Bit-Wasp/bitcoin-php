@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 
 class NetworkTest extends \PHPUnit_Framework_TestCase

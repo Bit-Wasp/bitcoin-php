@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Util;
 
 use BitWasp\Bitcoin\Base58;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 
 class Base58Test extends \PHPUnit_Framework_TestCase
 {

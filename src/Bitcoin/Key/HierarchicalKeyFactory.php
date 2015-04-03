@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;

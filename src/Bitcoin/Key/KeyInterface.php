@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Key;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
 
 interface KeyInterface extends SerializableInterface

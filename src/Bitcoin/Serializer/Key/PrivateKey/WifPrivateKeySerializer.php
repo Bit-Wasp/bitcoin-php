@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 use BitWasp\Bitcoin\Key\PrivateKey;
