@@ -4,9 +4,10 @@
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
 
-class CompactSignature
+class CompactSignature extends Serializable
 {
     /**
      * @var int|string

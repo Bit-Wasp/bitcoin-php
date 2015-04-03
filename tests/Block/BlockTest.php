@@ -95,8 +95,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $txCollection = new TransactionCollection(array($tx));
         $this->block->setTransactions($txCollection);
 
-        $merkle = $this->block->getMerkleRoot();
-        $this->assertEquals($tx->getTransactionId(), $merkle);
+        $this->assertEquals($tx->getTransactionId(), $this->block->getMerkleRoot());
     }
 
     public function testFromParser()

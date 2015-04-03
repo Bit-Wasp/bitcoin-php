@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Chain;
 
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Chain\Difficulty;
 use BitWasp\Bitcoin\Bitcoin;
 
 class DifficultyTest extends \PHPUnit_Framework_TestCase
@@ -20,7 +21,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultLowestDifficulty()
     {
-        $difficulty = new \BitWasp\Bitcoin\Chain\Difficulty($this->math);
+        $difficulty = new Difficulty($this->math);
 
         $this->assertEquals($this->bits, $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
@@ -28,7 +29,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
 
     public function testLowestDifficulty()
     {
-        $difficulty = new \BitWasp\Bitcoin\Chain\Difficulty($this->math, $this->bits);
+        $difficulty = new Difficulty($this->math, $this->bits);
 
         $this->assertEquals($this->bits, $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
@@ -37,7 +38,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
     public function testSetLowestDifficulty()
     {
         $bits = Buffer::hex('1e123456');
-        $difficulty = new \BitWasp\Bitcoin\Chain\Difficulty($this->math, $bits);
+        $difficulty = new Difficulty($this->math, $bits);
         $this->assertEquals($bits, $difficulty->lowestBits());
     }
 
@@ -49,7 +50,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
         foreach ($json->test as $test) {
             $default = Buffer::hex($test->defaultBits);
             $bits = Buffer::hex($test->bits);
-            $difficulty = new \BitWasp\Bitcoin\Chain\Difficulty($this->math, $default);
+            $difficulty = new Difficulty($this->math, $default);
 
             $this->assertEquals($test->targetHash, $difficulty->getTargetHash($bits));
             $this->assertEquals($test->difficulty, $difficulty->getDifficulty($bits));

@@ -66,8 +66,8 @@ class HexExtendedKeySerializer
     public function serialize(HierarchicalKey $key)
     {
         list ($prefix, $data) = ($key->isPrivate())
-            ? [$this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->getBuffer()]
-            : [$this->network->getHDPubByte(), $key->getPublicKey()->getBuffer()];
+            ? [$this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->getHex()]
+            : [$this->network->getHDPubByte(), $key->getPublicKey()->getHex()];
 
         $bytes = new Parser();
         $bytes
@@ -110,8 +110,8 @@ class HexExtendedKeySerializer
         }
 
         $key = ($this->network->getHDPrivByte() == $bytes)
-            ? PrivateKeyFactory::fromHex(substr($keyData, 2), true, $this->ecAdapter)
-            : PublicKeyFactory::fromHex($keyData, $this->ecAdapter);
+            ? PrivateKeyFactory::fromHex($keyData->slice(1)->getHex(), true, $this->ecAdapter)
+            : PublicKeyFactory::fromHex($keyData->getHex(), $this->ecAdapter);
 
         $hd = new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
 

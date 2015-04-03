@@ -127,14 +127,4 @@ class PublicKey extends Key implements PublicKeyInterface
         $hex = $serializer->serialize($this);
         return $hex;
     }
-
-    /**
-     * Return the hex representation of the public key
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getBuffer()->getHex();
-    }
 }
