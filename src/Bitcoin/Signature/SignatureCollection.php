@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class SignatureCollection implements \Countable
@@ -115,7 +115,7 @@ class SignatureCollection implements \Countable
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer[]
+     * @return \BitWasp\Buffertools\Buffer[]
      */
     public function getBuffer()
     {

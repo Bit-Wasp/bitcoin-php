@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 
 class VerAck extends NetworkSerializable

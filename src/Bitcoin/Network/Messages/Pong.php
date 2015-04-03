@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 
 class Pong extends NetworkSerializable
 {
@@ -37,7 +37,7 @@ class Pong extends NetworkSerializable
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer()
     {

@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin;
 
-interface SerializableInterface
+use BitWasp\Buffertools\Buffer;
+
+interface SerializableInterface extends \BitWasp\Buffertools\SerializableInterface
 {
     /**
      * @return Buffer

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Bitcoin;
 
 class DifficultyTest extends \PHPUnit_Framework_TestCase

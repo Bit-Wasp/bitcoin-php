@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\BlockFactory;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
@@ -40,7 +40,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
     {
         $this->blockType = 'BitWasp\Bitcoin\Block\Block';
         $this->headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
+        $this->bufferType = 'BitWasp\Buffertools\Buffer';
     }
 
     public function setUp()

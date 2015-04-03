@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
 class TransactionFactory

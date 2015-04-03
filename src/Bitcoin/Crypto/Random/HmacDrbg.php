@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Crypto\Random;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 
 class HmacDrbg implements RbgInterface
 {
@@ -31,8 +31,8 @@ class HmacDrbg implements RbgInterface
      * Construct a HMAC deterministic byte generator.
      *
      * @param string $algo
-     * @param \BitWasp\Bitcoin\Buffer $entropy
-     * @param \BitWasp\Bitcoin\Buffer $personalString
+     * @param \BitWasp\Buffertools\Buffer $entropy
+     * @param \BitWasp\Buffertools\Buffer $personalString
      */
     public function __construct($algo, Buffer $entropy, Buffer $personalString = null)
     {
@@ -46,8 +46,8 @@ class HmacDrbg implements RbgInterface
 
     /**
      * Initialize the DRBG with the given $entropy and $personalString
-     * @param \BitWasp\Bitcoin\Buffer $entropy
-     * @param \BitWasp\Bitcoin\Buffer $personalString
+     * @param \BitWasp\Buffertools\Buffer $entropy
+     * @param \BitWasp\Buffertools\Buffer $personalString
      * @return $this
      */
     public function initialize(Buffer $entropy, Buffer $personalString = null)
@@ -108,7 +108,7 @@ class HmacDrbg implements RbgInterface
     /**
      * Reseed the DRBG with new entropy, and reset the counter.
      *
-     * @param \BitWasp\Bitcoin\Buffer $entropy
+     * @param \BitWasp\Buffertools\Buffer $entropy
      */
     public function reseed(Buffer $entropy)
     {
@@ -130,7 +130,7 @@ class HmacDrbg implements RbgInterface
      * Load $numBytes bytes from the DRBG
      *
      * @param int $numNumBytes
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function bytes($numNumBytes)
     {

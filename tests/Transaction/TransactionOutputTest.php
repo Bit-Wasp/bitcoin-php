@@ -5,8 +5,8 @@ namespace BitWasp\Bitcoin\Tests\Transaction;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Buffer;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Parser;
 
 class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,7 +26,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
     {
         $this->txOutType = 'BitWasp\Bitcoin\Transaction\TransactionOutput';
         $this->scriptType = 'BitWasp\Bitcoin\Script\Script';
-        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
+        $this->bufferType = 'BitWasp\Buffertools\Buffer';
     }
 
     public function setUp()

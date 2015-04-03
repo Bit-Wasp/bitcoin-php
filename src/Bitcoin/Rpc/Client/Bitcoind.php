@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Rpc\Client;
 
 use BitWasp\Bitcoin\Block\BlockFactory;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;

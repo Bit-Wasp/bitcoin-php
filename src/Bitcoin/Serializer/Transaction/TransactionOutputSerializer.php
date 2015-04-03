@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Bitcoin\Parser;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
@@ -26,7 +26,7 @@ class TransactionOutputSerializer
     /**
      * @param Parser $parser
      * @return TransactionOutput
-     * @throws \BitWasp\Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser & $parser)
     {
@@ -39,7 +39,7 @@ class TransactionOutputSerializer
     /**
      * @param $string
      * @return TransactionOutput
-     * @throws \BitWasp\Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function parse($string)
     {

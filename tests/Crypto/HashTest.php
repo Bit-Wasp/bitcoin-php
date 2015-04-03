@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Crypto;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 
 class HashTest extends \PHPUnit_Framework_TestCase
 {

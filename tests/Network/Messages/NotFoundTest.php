@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Network\Messages;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\NotFound;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

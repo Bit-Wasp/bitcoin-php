@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 
 use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 

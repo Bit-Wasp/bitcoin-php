@@ -6,7 +6,8 @@ use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 
 class ScriptTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +23,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->bufferType = 'BitWasp\Bitcoin\Buffer';
+        $this->bufferType = 'BitWasp\Buffertools\Buffer';
     }
 
     public function setUp()
@@ -219,8 +220,8 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         foreach ($json->test as $test) {
             $script = new Script(Buffer::hex($test->script));
 
-            $this->assertSame($script->getBuffer()->getVarInt()->serialize(), pack("H*", $test->varint));
-            $this->assertSame($script->getBuffer()->getVarInt()->serialize('hex'), $test->varint);
+            $this->assertSame(Buffertools::numToVarInt($script->getBuffer()->getSize())->serialize(), pack("H*", $test->varint));
+            $this->assertSame(Buffertools::numToVarInt($script->getBuffer()->getSize())->serialize('hex'), $test->varint);
         }
     }
 }

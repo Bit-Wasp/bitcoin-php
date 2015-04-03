@@ -54,7 +54,7 @@ class RedeemScript extends Script
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer|int
+     * @return \BitWasp\Buffertools\Buffer|int
      */
     public function getRequiredSigCount()
     {

@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 
 class NotFound extends NetworkSerializable implements \Countable
 {

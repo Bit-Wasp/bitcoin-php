@@ -33,7 +33,7 @@ interface KeyInterface extends SerializableInterface
     public function getAddress();
 
     /**
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer();
 }

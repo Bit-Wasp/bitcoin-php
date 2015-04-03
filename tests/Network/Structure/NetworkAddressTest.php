@@ -8,7 +8,7 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Structure;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddressTimestamp;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

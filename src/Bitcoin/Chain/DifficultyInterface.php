@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-use BitWasp\Bitcoin\Buffer;
+use BitWasp\Buffertools\Buffer;
 
 interface DifficultyInterface
 {

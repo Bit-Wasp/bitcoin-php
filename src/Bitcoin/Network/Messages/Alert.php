@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 class Alert
@@ -46,7 +46,7 @@ class Alert
 
     /**
      * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer()
     {

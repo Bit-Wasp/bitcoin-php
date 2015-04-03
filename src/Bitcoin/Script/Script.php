@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Buffer;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
@@ -74,7 +74,7 @@ class Script extends Serializable implements ScriptInterface
     /**
      * Return a buffer containing the hash of this script.
      *
-     * @return \BitWasp\Bitcoin\Buffer
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getScriptHash()
     {

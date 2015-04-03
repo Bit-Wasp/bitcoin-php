@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin\Block;
 
-use BitWasp\Bitcoin\Buffer;
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Bitcoin\Parser;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -46,7 +46,7 @@ class TransactionSerializer
     /**
      * @param Parser $parser
      * @return Transaction
-     * @throws \BitWasp\Bitcoin\Exceptions\ParserOutOfRange
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
     public function fromParser(Parser & $parser)
