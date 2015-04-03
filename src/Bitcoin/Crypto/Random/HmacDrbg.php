@@ -13,12 +13,12 @@ class HmacDrbg implements RbgInterface
     private $algorithm;
 
     /**
-     * @var string
+     * @var Buffer
      */
     private $K;
 
     /**
-     * @var string
+     * @var Buffer
      */
     private $V;
 
@@ -55,8 +55,8 @@ class HmacDrbg implements RbgInterface
         $hlen       = strlen(hash($this->getHashAlgorithm(), 1, true));
         $vlen       = 8 * ceil($hlen / 8);
 
-        $this->V    = str_pad('', $vlen, chr(0x01), STR_PAD_LEFT);
-        $this->K    = str_pad('', $vlen, chr(0x00), STR_PAD_LEFT);
+        $this->V    = new Buffer(str_pad('', $vlen, chr(0x01), STR_PAD_LEFT));
+        $this->K    = new Buffer(str_pad('', $vlen, chr(0x00), STR_PAD_LEFT));
         $seed       = $entropy->getBinary() . $personalString ?: '';
 
         $this->update($seed);
@@ -70,7 +70,7 @@ class HmacDrbg implements RbgInterface
      */
     public function hash($data)
     {
-        $hash = Hash::hmac($this->algorithm, $data, $this->K, true);
+        $hash = Hash::hmac($this->algorithm, new Buffer($data), $this->K, true);
         return $hash;
     }
 
@@ -84,22 +84,21 @@ class HmacDrbg implements RbgInterface
     {
         $this->K = $this->hash(sprintf(
             "%s%s%s",
-            $this->V,
+            $this->V->getBinary(),
             chr(0x00),
             $data ?: ''
         ));
-
-        $this->V = $this->hash($this->V);
+        $this->V = $this->hash($this->V->getBinary());
 
         if ($data !== null) {
             $this->K = $this->hash(sprintf(
                 "%s%s%s",
-                $this->V,
+                $this->V->getBinary(),
                 chr(0x01),
                 $data
             ));
 
-            $this->V = $this->hash($this->V);
+            $this->V = $this->hash($this->V->getBinary());
         }
 
         return $this;
@@ -137,9 +136,9 @@ class HmacDrbg implements RbgInterface
         $temp = "";
 
         // Build a string of $numBytes bytes from hashing the seeded DRBG
-        while (strlen($temp) < $numNumBytes) {
-            $this->V = $this->hash($this->V);
-            $temp   .= $this->V;
+        while (strlen($temp) < $numNumBytes * 2) {
+            $this->V = $this->hash($this->V->getBinary());
+            $temp   .= $this->V->getBinary();
         }
 
         $this->update(null);

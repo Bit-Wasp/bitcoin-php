@@ -22,14 +22,13 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateInvalidAlgorithm()
     {
-        $drbg = new HmacDrbg('fake', \BitWasp\Buffertools\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
+        new HmacDrbg('fake', \BitWasp\Buffertools\Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
     }
 
     public function testCreateHMACDRBG()
     {
         $f = file_get_contents(__DIR__.'/../../Data/hmacdrbg.json');
         $math = Bitcoin::getMath();
-        $generator = Bitcoin::getGenerator();
 
         $json = json_decode($f);
         foreach ($json->test as $test) {

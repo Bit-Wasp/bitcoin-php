@@ -107,7 +107,7 @@ class Hash
      *
      * @param $algo
      * @param Buffer $data
-     * @param Buffer $salt
+     * @param $salt
      * @return Buffer
      */
     public static function hmac($algo, Buffer $data, Buffer $salt)
