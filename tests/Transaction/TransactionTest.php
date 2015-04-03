@@ -178,4 +178,17 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $tx->toArray());
     }
 
+    public function testCoinbaseTx() {
+        $txId = "fcbe95cd172371d9c35569fbb441774d0fa1adcc2426eff500a4c00a4eb2b6c4";
+        $raw = "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff2703681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c0000000001ff702896000000001976a9142c30a6aaac6d96687291475d7d52f4b469f665a688ac00000000";
+
+        $tx = TransactionFactory::fromHex($raw);
+
+        $this->assertTrue($tx->getInputs()->getInput(0)->isCoinBase());
+        $this->assertEquals(0, $tx->getInputs()->getInput(0)->getSequence());
+        $this->assertEquals("03681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c", $tx->getInputs()->getInput(0)->getScript()->getHex());
+
+        $this->assertEquals($raw, $tx->getHex());
+        $this->assertEquals($txId, $tx->getTransactionId());
+    }
 }
