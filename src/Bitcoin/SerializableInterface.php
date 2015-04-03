@@ -25,9 +25,4 @@ interface SerializableInterface extends \BitWasp\Buffertools\SerializableInterfa
      * @return string
      */
     public function getInt();
-
-    /**
-     * @return string
-     */
-    public function __toString();
 }
