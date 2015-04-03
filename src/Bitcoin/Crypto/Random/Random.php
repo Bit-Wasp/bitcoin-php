@@ -21,6 +21,6 @@ class Random implements RbgInterface
             throw new RandomBytesFailure('Failed to generate random bytes');
         }
 
-        return new Buffer($random);
+        return new Buffer($random, $length);
     }
 }
