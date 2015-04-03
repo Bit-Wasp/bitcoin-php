@@ -81,8 +81,7 @@ class Difficulty implements DifficultyInterface
     public function getTargetHash(Buffer $bits)
     {
         $target = $this->getTarget($bits);
-        $target = str_pad($this->math->decHex($target), 64, '0', STR_PAD_LEFT);
-        return $target;
+        return Buffer::hex($this->math->decHex($target), 32)->getHex(); // let buffer pad it
     }
 
     /**

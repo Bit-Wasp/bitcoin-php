@@ -241,8 +241,7 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $chainHex = str_pad($this->ecAdapter->getMath()->decHex($this->getChainCode()), 64, '0', STR_PAD_LEFT);
-        $chain = Buffer::hex($chainHex);
+        $chain = Buffer::hex($this->ecAdapter->getMath()->decHex($this->getChainCode()), 32);
 
         $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain, true);
         $offset = $hash->slice(0, 32);

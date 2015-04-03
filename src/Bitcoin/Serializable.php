@@ -7,14 +7,6 @@ abstract class Serializable implements SerializableInterface
     /**
      * @return string
      */
-    public function __toString()
-    {
-        return $this->getHex();
-    }
-
-    /**
-     * @return string
-     */
     public function getHex()
     {
         return $this->getBuffer()->getHex();

@@ -51,10 +51,10 @@ class HexPublicKeySerializer
 
         $publicKey->isCompressed()
             ? $parser
-                ->writeBytes(32, str_pad($math->decHex($point->getX()), 64, '0', STR_PAD_LEFT))
+                ->writeBytes(32, $math->decHex($point->getX()))
             : $parser
-                ->writeBytes(32, str_pad($math->decHex($point->getX()), 64, '0', STR_PAD_LEFT))
-                ->writeBytes(32, str_pad($math->decHex($point->getY()), 64, '0', STR_PAD_LEFT));
+                ->writeBytes(32, $math->decHex($point->getX()))
+                ->writeBytes(32, $math->decHex($point->getY()));
 
         return $parser->getBuffer();
     }
