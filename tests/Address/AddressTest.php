@@ -61,9 +61,7 @@ class AddressTest extends AbstractTestCase
         }
 
         $fromString = AddressFactory::fromString($address);
-
         $this->assertEquals($address, $obj->getAddress($network));
-        $this->assertEquals($address, (string)$obj);
         $this->assertEquals($obj, $fromString);
     }
 
@@ -74,6 +72,6 @@ class AddressTest extends AbstractTestCase
     {
         $add = 'LPjNgqp43ATwzMTJPM2SFoEYeyJV6pq6By';
         $network = Bitcoin::getNetwork();
-        $address = AddressFactory::fromString($add, $network);
+        AddressFactory::fromString($add, $network);
     }
 }

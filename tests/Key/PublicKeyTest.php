@@ -40,7 +40,6 @@ class PublicKeyTest extends AbstractTestCase
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
             $this->assertSame($this->publicKey->getBuffer()->getHex(), $test->compressed);
             $this->assertTrue($this->publicKey->isCompressed());
-            $this->assertSame($this->publicKey->__toString(), $test->compressed);
         }
     }
 
@@ -58,7 +57,6 @@ class PublicKeyTest extends AbstractTestCase
             $this->assertSame($test->uncompressed, $this->publicKey->getBuffer()->getHex());
             $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
             $this->assertSame($this->publicKey->getBuffer()->getHex(), $test->uncompressed);
-            $this->assertSame($this->publicKey->__toString(), $test->uncompressed);
             $this->assertFalse($this->publicKey->isCompressed());
             $this->assertFalse($this->publicKey->isPrivate());
 
