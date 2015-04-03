@@ -134,7 +134,7 @@ class Script extends Serializable implements ScriptInterface
                 ->writeBytes($length, $data);
         }
 
-        $this->script .= $parsed->getBuffer()->serialize();
+        $this->script .= $parsed->getBuffer()->getBinary();
         return $this;
     }
 
@@ -161,7 +161,7 @@ class Script extends Serializable implements ScriptInterface
         $result = array_map(
             function ($value) {
                 return $value instanceof Buffer
-                    ? $value->serialize('hex')
+                    ? $value->getHex()
                     : $value;
             },
             $this->getScriptParser()->parse()
@@ -178,7 +178,7 @@ class Script extends Serializable implements ScriptInterface
     public function toArray()
     {
         return array(
-            'hex' => $this->getBuffer()->serialize('hex'),
+            'hex' => $this->getBuffer()->getHex(),
             'asm' => $this->getAsm()
         );
     }

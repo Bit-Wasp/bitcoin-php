@@ -70,7 +70,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
     {
         $this->sig = new Signature('56860522993476239843569407076292679822350064328987049204205911586688428093823', '75328468267675219166053001951181042681597800329127462438170420074748074627387');
         $this->assertInstanceOf($this->sigType, $this->sig);
-        $this->assertEquals('304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01', $this->sig->getBuffer()->serialize('hex'));
+        $this->assertEquals('304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01', $this->sig->getBuffer()->getHex());
     }
 
     public function testDefaultSighashType()
@@ -104,7 +104,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(Signature::isDERSignature(Buffer::hex($s)));
         $sig = SignatureFactory::fromHex($s);
         $this->assertTrue(Signature::isDERSignature($sig->getBuffer()));
-        $this->assertSame($s, $sig->getBuffer()->serialize('hex'));
+        $this->assertSame($s, $sig->getBuffer()->getHex());
     }
 
     public function testSignaturesConsistent()
@@ -113,7 +113,7 @@ class SignatureTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
         foreach ($json->test as $c => $test) {
             $sig  = SignatureFactory::fromHex($test);
-            $sd   = $sig->getBuffer()->serialize('hex');
+            $sd   = $sig->getBuffer()->getHex();
             $this->assertSame($test, $sd);
         }
     }

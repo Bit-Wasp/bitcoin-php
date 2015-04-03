@@ -2,10 +2,16 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
-class ScriptParserTest extends \PHPUnit_Framework_TestCase {
+class ScriptParserTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var ScriptInterface
+     */
+    private $script;
 
 
     public function getInvalidScripts()
@@ -51,6 +57,10 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @dataProvider getTestPushScripts
+     * @param $script
+     * @param $expectedOp
+     * @param $expectedPushData
+     * @param $result
      */
     public function testPush($script, $expectedOp, $expectedPushData, $result)
     {
@@ -76,8 +86,10 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase {
         $parse = $this->script->getScriptParser()->parse();
 
         $this->assertSame($parse[0], 'OP_HASH160');
+
         $this->assertInstanceOf('BitWasp\Buffertools\Buffer', $parse[1]);
-        $this->assertSame($parse[1]->serialize(), $buf->serialize());
+        $this->assertSame($parse[1]->getBinary(), $buf->getBinary());
+
         $this->assertSame($parse[2], 'OP_EQUAL');
     }
 

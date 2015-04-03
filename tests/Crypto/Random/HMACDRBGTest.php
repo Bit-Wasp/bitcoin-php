@@ -36,10 +36,10 @@ class HMACDRBGTest extends \PHPUnit_Framework_TestCase
             $privKey = PrivateKeyFactory::fromInt($key, true, Bitcoin::getEcAdapter());
             $msg32 = Hash::sha256(new Buffer($test->message));
 
-            $entropy = new Buffer($privKey->getBuffer()->serialize() . $msg32->serialize());
+            $entropy = new Buffer($privKey->getBuffer()->getBinary() . $msg32->getBinary());
             $drbg = new HmacDrbg($test->algorithm, $entropy);
             $k = $drbg->bytes(32);
-            $this->assertEquals(strtolower($test->expectedK), strtolower($k->serialize('hex')));
+            $this->assertEquals(strtolower($test->expectedK), strtolower($k->getHex()));
         }
     }
 }

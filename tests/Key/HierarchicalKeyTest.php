@@ -323,7 +323,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $key       = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
         $this->key = HierarchicalKeyFactory::fromExtended($key, $this->network, $ecAdapter);
-        $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $this->key->getPrivateKey()->getBuffer()->serialize('hex'));
+        $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $this->key->getPrivateKey()->getBuffer()->getHex());
     }
 
     /**
@@ -347,7 +347,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $key       = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $this->key = HierarchicalKeyFactory::fromExtended($key, $this->network, $ecAdapter);
-        $this->assertSame('02e399a713db445b33340034ee5f71cd782bd9bc78f6f3352ca640109fe24ca23a', $this->key->getPublicKey()->getBuffer()->serialize('hex'));
+        $this->assertSame('02e399a713db445b33340034ee5f71cd782bd9bc78f6f3352ca640109fe24ca23a', $this->key->getPublicKey()->getBuffer()->getHex());
     }
 
     /**

@@ -133,13 +133,13 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('1', $result->getVersion());
 
         $this->assertInstanceOf($this->bufferType, $result->getPrevBlock());
-        $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock()->serialize('hex'));
+        $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock()->getHex());
 
         $this->assertInstanceOf($this->bufferType, $result->getMerkleRoot());
-        $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->serialize('hex'));
+        $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->getHex());
 
         $this->assertInstanceOf($this->bufferType, $result->getBits());
-        $this->assertSame('1d00ffff', $result->getBits()->serialize('hex'));
+        $this->assertSame('1d00ffff', $result->getBits()->getHex());
 
         $this->assertSame('1231006505', $result->getTimestamp());
 
@@ -149,7 +149,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     public function testSerialize()
     {
         $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
-        $this->assertSame($this->getGenesisHex(), $result->getBuffer()->serialize('hex'));
+        $this->assertSame($this->getGenesisHex(), $result->getHex());
     }
 
     public function testGetBlockHash()

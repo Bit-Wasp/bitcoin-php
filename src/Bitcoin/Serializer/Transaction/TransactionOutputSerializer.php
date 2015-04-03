@@ -31,7 +31,7 @@ class TransactionOutputSerializer
     public function fromParser(Parser & $parser)
     {
         return new TransactionOutput(
-            $parser->readBytes(8, true)->serialize('int'),
+            $parser->readBytes(8, true)->getInt(),
             new Script($parser->getVarString())
         );
     }

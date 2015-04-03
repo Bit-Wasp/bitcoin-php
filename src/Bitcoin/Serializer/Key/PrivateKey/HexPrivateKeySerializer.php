@@ -42,7 +42,7 @@ class HexPrivateKeySerializer
     public function fromParser(Parser & $parser)
     {
         $bytes = $parser->readBytes(32);
-        return $this->parse($bytes->serialize('hex'));
+        return $this->parse($bytes->getHex());
     }
     /**
      * @param $string
