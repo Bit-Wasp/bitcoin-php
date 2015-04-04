@@ -29,7 +29,7 @@
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "*",
-    "bitwasp/buffertools": "*"
+    "bitwasp/buffertools": "0.0.3"
   },
   "require-dev": {
     "phpunit/phpunit": "~4.3.1",
