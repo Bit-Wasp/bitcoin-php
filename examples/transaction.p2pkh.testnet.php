@@ -1,6 +1,6 @@
 <?php
 
-require_once "../vendor/autoload.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
@@ -13,8 +13,8 @@ Bitcoin::setNetwork(\BitWasp\Bitcoin\Network\NetworkFactory::bitcoinTestnet());
 $network = Bitcoin::getNetwork();
 $host = '127.0.0.1';
 $port = '18332';
-$user = 'bitcoinrpc';
-$pass = 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi55QwWgN6Ng6';
+$user = getenv('BITCOINLIB_RPC_USER') ?: 'bitcoinrpc';
+$pass = getenv('BITCOINLIB_RPC_PASSWORD') ?: 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi55QwWgN6Ng6';
 
 $bitcoind = RpcFactory::bitcoind($host, $port, $user, $pass);
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once "../vendor/autoload.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -12,8 +12,8 @@ use BitWasp\Bitcoin\Rpc\RpcFactory;
 $network = Bitcoin::getNetwork();
 $host = '127.0.0.1';
 $port = '18332';
-$user = 'bitcoinrpc';
-$pass = 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi55QwWgN6Ng6';
+$user = getenv('BITCOINLIB_RPC_USER') ?: 'bitcoinrpc';
+$pass = getenv('BITCOINLIB_RPC_PASSWORD') ?: 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi55QwWgN6Ng6';
 
 // Address to fund this test
 $fundsKey = PrivateKeyFactory::fromWif('cQTqzY1hhC8u4aeFmqodENTnJvxgSk316PakYVgcFaHqAa4aCpwW');
