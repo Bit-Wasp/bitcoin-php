@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Classifier;
 
 use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class OutputClassifier implements ScriptClassifierInterface
@@ -87,7 +88,8 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isMultisig()
     {
-        return false;
+        // @TODO: hmm?
+        return $this->script instanceof RedeemScript;
     }
 
     /**
