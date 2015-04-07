@@ -25,6 +25,22 @@ class JsonRpcClient extends Client
     }
 
     /**
+     * Get a RPC call result
+     *
+     * @access public
+     * @param  array    $payload
+     * @return mixed
+     */
+    public function getResult(array $payload)
+    {
+        if (isset($payload['error']['code'])) {
+            $this->handleRpcErrors($payload['error']);
+        }
+
+        return isset($payload['result']) ? $payload['result'] : null;
+    }
+
+    /**
      * Throw an exception according the RPC error
      *
      * @access public

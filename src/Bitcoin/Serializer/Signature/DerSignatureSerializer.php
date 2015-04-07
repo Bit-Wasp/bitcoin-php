@@ -56,6 +56,7 @@ class DerSignatureSerializer
             ->writeBytes(1, '02')
             ->writeWithLength(new Buffer($sBin));
 
+        echo "writing sighashtype: ". $signature->getSigHashType()."\n";
         $outer = new Parser();
         $outer
             ->writeBytes(1, '30')
@@ -90,6 +91,7 @@ class DerSignatureSerializer
         }
 
         $signature = new Signature($r, $s, $sighash);
+        var_dump($r, $s, $sighash);
         return $signature;
     }
 

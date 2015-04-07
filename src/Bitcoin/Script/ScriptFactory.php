@@ -20,14 +20,14 @@ class ScriptFactory
      * @param                   $m
      * @param KeyInterface[]    $keys
      * @param bool              $sort
-     * @return Script
+     * @return RedeemScript
      */
     public static function multisig($m, array $keys = array(), $sort = true)
     {
         if ($sort) {
             usort($keys, function (KeyInterface $a, KeyInterface $b) {
-                $av = (string)$a;
-                $bv = (string)$b;
+                $av = $a->getBinary();
+                $bv = $b->getBinary();
 
                 return $av == $bv ? 0 : $av > $bv ? 1 : -1;
             });

@@ -16,7 +16,7 @@ interface AddressInterface
      * @param NetworkInterface $network
      * @return string
      */
-    public function getAddress(NetworkInterface $network);
+    public function getAddress(NetworkInterface $network = null);
 
     /**
      * @return string

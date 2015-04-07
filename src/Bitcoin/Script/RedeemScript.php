@@ -54,6 +54,14 @@ class RedeemScript extends Script
     }
 
     /**
+     * @return Script
+     */
+    public function getOutputScript()
+    {
+        return ScriptFactory::scriptPubKey()->payToScriptHash($this);
+    }
+
+    /**
      * @return \BitWasp\Buffertools\Buffer|int
      */
     public function getRequiredSigCount()

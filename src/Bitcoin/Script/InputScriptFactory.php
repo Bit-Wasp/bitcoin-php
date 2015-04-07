@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Transaction\TransactionSignature;
+use BitWasp\Bitcoin\Transaction\TransactionSignatureCollection;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
@@ -21,34 +23,48 @@ class InputScriptFactory
     }
 
     /**
-     * @param SignatureInterface $signature
+     * @param TransactionSignature $signature
      * @param PublicKeyInterface $publicKey
      * @return Script
      */
-    public function payToPubKeyHash(SignatureInterface $signature, PublicKeyInterface $publicKey)
+    public function payToPubKeyHash(TransactionSignature $signature, PublicKeyInterface $publicKey)
     {
-        return ScriptFactory::create()
+           return ScriptFactory::create()
             ->push($signature->getBuffer())
             ->push($publicKey->getBuffer());
     }
 
     /**
      * @param RedeemScript $redeemScript
-     * @param SignatureCollection $sigs
+     * @param TransactionSignatureCollection $sigs
      * @param Buffer $hash
      * @return array
      */
-    public function multisigP2sh(RedeemScript $redeemScript, SignatureCollection $sigs, Buffer $hash)
+    public function multisigP2sh(RedeemScript $redeemScript, TransactionSignatureCollection $sigs, Buffer $hash)
     {
         $signer = Bitcoin::getEcAdapter();
-        $linked = $signer->associateSigs($sigs, $hash, $redeemScript->getKeys());
+
+        // Extract signatures
+        $signatures = new SignatureCollection(array_map(
+            function (TransactionSignature $value) {
+                return $value->getSignature();
+            },
+            $sigs->getSignatures()
+        ));
+
+        // Associate signatures with public keys
+        $linked = $signer->associateSigs($signatures, $hash, $redeemScript->getKeys());
+
+        // Create the script
         $script = ScriptFactory::create()->op('OP_0');
         foreach ($redeemScript->getKeys() as $key) {
             $keyHash = $key->getPubKeyHash()->getHex();
             if (isset($linked[$keyHash])) {
-                $script->push($linked[$keyHash]->getBuffer());
+                $sig = array_shift($linked[$keyHash]);
+                $script->push($sig->getBuffer());
             }
         }
+
         $script->push($redeemScript->getBuffer());
 
         return $script;

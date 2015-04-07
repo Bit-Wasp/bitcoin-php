@@ -88,7 +88,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
             foreach ($publicKeys as $key) {
                 $verify = $this->verify($messageHash, $key, $signature);
                 if ($verify) {
-                    $linked[$key->getPubKeyHash()->getHex()] = $signature;
+                    $linked[$key->getPubKeyHash()->getHex()][] = $signature;
                     if (count($linked) == $sigCount) {
                         break 2;
                     } else {
