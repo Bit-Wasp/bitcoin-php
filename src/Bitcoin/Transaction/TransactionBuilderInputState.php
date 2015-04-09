@@ -2,8 +2,10 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Signature\SignatureHashInterface;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 /**
@@ -12,20 +14,27 @@ use BitWasp\Bitcoin\Signature\SignatureInterface;
  */
 class TransactionBuilderInputState
 {
-    /**
-     * @var null|string
-     */
-    private $hashType = null;
 
     /**
-     * @var null|ScriptInterface
+     * @var ScriptInterface
      */
-    private $previousOutputScript = null;
+    private $previousOutputScript;
 
     /**
-     * @var null|string
+     * @var string
      */
-    private $previousOutputClassifier = null;
+    private $previousOutputClassifier;
+
+    /**
+     * @var null|RedeemScript
+     */
+    private $redeemScript;
+
+    /**
+     * @var string
+     */
+    private $hashType;
+
 
     /**
      * @var PublicKeyInterface[]
@@ -38,18 +47,17 @@ class TransactionBuilderInputState
     private $scriptClassifier = null;
 
     /**
-     * @var null|RedeemScript
-     */
-    private $redeemScript = null;
-
-    /**
      * @var SignatureInterface[]
      */
     private $signatures = [];
 
-    public function __construct()
+    public function __construct(ScriptInterface $outputScript, RedeemScript $redeemScript = null, $hashType = SignatureHashInterface ::SIGHASH_ALL)
     {
-
+        $classifier = new OutputClassifier($outputScript);
+        $this->previousOutputClassifier = $classifier->classify();
+        $this->hashType = $hashType;
+        $this->redeemScript = $redeemScript;
+        $this->previousOutputScript = $outputScript;
     }
 
     public function setSigHashType($sigHashType)

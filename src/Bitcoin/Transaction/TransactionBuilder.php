@@ -289,16 +289,20 @@ class TransactionBuilder
         $sigHashType = SignatureHashInterface::SIGHASH_ALL
     ) {
 
-        $input = $this->transaction->getInputs()->getInput($inputToSign);
+        $this->transaction->getInputs()->getInput($inputToSign);
 
         if (!isset($this->inputStates[$inputToSign])) {
-            $inputState = new TransactionBuilderInputState(/* @TODO: maybe feed it some stuff in the constructor? */);
+            $inputState = new TransactionBuilderInputState(
+                $outputScript,
+                $redeemScript,
+                $sigHashType
+                /* @TODO: maybe feed it some stuff in the constructor? */
+            );
         } else {
             $inputState = $this->inputStates[$inputToSign];
         }
 
         if (!$inputState->hasEnoughInfo()) {
-            $inputState->setSigHashType($sigHashType);
 
             // must be p2sh if a redeemscript was given
             if ($redeemScript) {
@@ -326,12 +330,7 @@ class TransactionBuilder
                 }
 
                 $inputState->setPublicKeys($publicKeys);
-                $inputState->setRedeemScript($redeemScript);
                 $inputState->setScriptType($classifier->classify());
-
-
-
-                $prevOutType = $this->addClassification($inputToSign, $redeemScript)->getClassification($inputToSign);
 
             } else {
                 if ($inputState->getScriptType()) {
