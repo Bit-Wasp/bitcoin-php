@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
@@ -154,11 +153,10 @@ class TransactionBuilder
         $signatureHash = $this->transaction->signatureHash();
         $hash = $signatureHash->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType);
 
-        // Could this be done in TransactionBuilderInputState ? 
+        // Could this be done in TransactionBuilderInputState ?
         // for multisig we want signatures to be in the order of the publicKeys, so if it's not pre-filled OP_Os we're gonna do that now
         if ($inputState->getScriptType() == OutputClassifier::MULTISIG
             && count($inputState->getPublicKeys()) !== count($inputState->getSignatures())) {
-
             // this can be optimized by not checking against signatures we've already found
             $orderedSignatures = [];
             foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
@@ -198,8 +196,13 @@ class TransactionBuilder
         for ($i = 0; $i < $inCount; $i++) {
             // Call regenerateScript if inputState is set, otherwise defer to previous script.
             $caller = isset($this->inputStates[$i])
-                ? function ($i) { return $this->inputStates[$i]->regenerateScript(); }
-                : function ($i) { return $this->transaction->getInputs()->getInput($i)->getScript(); };
+                ? function ($i) {
+                    return $this->inputStates[$i]->regenerateScript();
+                }
+                : function ($i) {
+                    return $this->transaction->getInputs()->getInput($i)->getScript();
+
+                };
 
             $transaction->getInputs()->getInput($i)->setScript($caller($i));
         }

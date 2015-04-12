@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Signature\SignatureInterface;

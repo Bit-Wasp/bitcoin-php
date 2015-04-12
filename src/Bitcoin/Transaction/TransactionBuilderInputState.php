@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
@@ -239,8 +238,7 @@ class TransactionBuilderInputState
                         $hash = $key->getPubKeyHash()->getHex();
                         $this->setSignature($idx, isset($sigs[$hash])
                             ? array_shift($sigs[$hash])
-                            : null
-                        );
+                            : null);
                     }
                 }
 
