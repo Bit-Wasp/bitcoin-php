@@ -38,7 +38,7 @@ class InputScriptFactory
     /**
      * @param RedeemScript $redeemScript
      * @param Signature[] $signatures
-     * @return array
+     * @return Script
      */
     public function multisigP2sh(RedeemScript $redeemScript, $signatures)
     {
@@ -55,7 +55,7 @@ class InputScriptFactory
 
     /**
      * @param SignatureInterface $signature
-     * @return $this
+     * @return Script
      */
     public function payToPubKey(SignatureInterface $signature)
     {
