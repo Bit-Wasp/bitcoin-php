@@ -67,7 +67,10 @@ class TransactionBuilder
 
         $this->transaction
             ->getInputs()
-            ->addInput(new TransactionInput($tx->getTransactionId(), $outputToSpend));
+            ->addInput(new TransactionInput(
+                $tx->getTransactionId(),
+                $outputToSpend
+            ));
 
         return $this;
     }
@@ -82,10 +85,13 @@ class TransactionBuilder
     public function payToAddress(AddressInterface $address, $value)
     {
         // Create Script from address, then create an output.
-        $this->transaction->getOutputs()->addOutput(new TransactionOutput(
-            $value,
-            ScriptFactory::scriptPubKey()->payToAddress($address)
-        ));
+        $this->transaction
+            ->getOutputs()
+            ->addOutput(new TransactionOutput(
+                $value,
+                ScriptFactory::scriptPubKey()->payToAddress($address)
+            ));
+
         return $this;
     }
 
@@ -148,6 +154,7 @@ class TransactionBuilder
         $signatureHash = $this->transaction->signatureHash();
         $hash = $signatureHash->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType);
 
+        // Could this be done in TransactionBuilderInputState ? 
         // for multisig we want signatures to be in the order of the publicKeys, so if it's not pre-filled OP_Os we're gonna do that now
         if ($inputState->getScriptType() == OutputClassifier::MULTISIG
             && count($inputState->getPublicKeys()) !== count($inputState->getSignatures())) {
