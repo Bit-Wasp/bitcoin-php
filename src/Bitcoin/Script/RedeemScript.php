@@ -3,7 +3,9 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Buffertools\Buffer;
 
 class RedeemScript extends Script
 {
@@ -51,6 +53,26 @@ class RedeemScript extends Script
             ->op('OP_CHECKMULTISIG');
 
         $this->m = $m;
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @return RedeemScript
+     */
+    public static function fromScript(ScriptInterface $script)
+    {
+        $publicKeys = [];
+        $parse = $script->getScriptParser()->parse();
+        $m = $parse[0] - $script->getOpcodes()->getOpByName('OP_1');
+
+        foreach ($parse as $item) {
+            if (!$item instanceof Buffer) {
+                throw new \RuntimeException('Unable to load public key');
+            }
+            $publicKeys[] = PublicKeyFactory::fromHex($item->getHex());
+        }
+
+        return new self($m, $publicKeys);
     }
 
     /**
