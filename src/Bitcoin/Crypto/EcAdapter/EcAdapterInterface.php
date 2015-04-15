@@ -19,7 +19,7 @@ interface EcAdapterInterface
     public function getMath();
 
     /**
-     * @return \Mdanter\Ecc\GeneratorPoint
+     * @return \Mdanter\Ecc\Primitives\GeneratorPoint
      */
     public function getGenerator();
 

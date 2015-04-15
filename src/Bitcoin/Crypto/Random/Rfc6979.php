@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Crypto\Random;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
-use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class Rfc6979 implements RbgInterface
 {

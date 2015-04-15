@@ -33,7 +33,7 @@ interface PublicKeyInterface extends KeyInterface
     /**
      * Get public key point on the curve
      *
-     * @return \Mdanter\Ecc\PointInterface
+     * @return \Mdanter\Ecc\Primitives\PointInterface
      */
     public function getPoint();
 }

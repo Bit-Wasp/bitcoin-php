@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Math\Math;
-use Mdanter\Ecc\Point as EcPoint;
-use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\Primitives\Point as EcPoint;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class Point extends EcPoint
 {

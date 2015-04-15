@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Key;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
-use Mdanter\Ecc\PointInterface;
+use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKeyFactory
 {

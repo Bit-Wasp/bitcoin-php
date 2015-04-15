@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Signature\CompactSignature;
-use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Buffertools\Buffer;
@@ -51,7 +51,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
 
     /**
      * @param Buffer $publicKey
-     * @return \Mdanter\Ecc\PointInterface
+     * @return \Mdanter\Ecc\Primitives\PointInterface
      * @throws \Exception
      */
     public function publicKeyFromBuffer(Buffer $publicKey)
