@@ -5,13 +5,13 @@ namespace BitWasp\Bitcoin\Signature;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSignatureSerializer;
+use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 
 class TransactionSignatureFactory
 {
     /**
      * @param Math $math
-     * @return DerSignatureSerializer
+     * @return TransactionSignatureSerializer
      */
     public static function getSerializer(Math $math = null)
     {
@@ -23,7 +23,7 @@ class TransactionSignatureFactory
     /**
      * @param $string
      * @param Math $math
-     * @return Signature
+     * @return TransactionSignature
      */
     public static function fromHex($string, Math $math = null)
     {

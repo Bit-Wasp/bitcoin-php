@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Script;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
@@ -211,7 +212,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $result = true;
         if ($this->flags->verifyDERSignatures) {
-            $result &= Signature::isDERSignature($signature);
+            $result &= TransactionSignature::isDERSignature($signature);
         }
 
         return $result;

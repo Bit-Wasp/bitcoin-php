@@ -1,9 +1,7 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Transaction;
+namespace BitWasp\Bitcoin\Serializer\Signature;
 
-
-use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Parser;
 
@@ -42,7 +40,7 @@ class TransactionSignatureSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        $signature = $this->sigSerializer->fromParser($string);
+        $signature = $this->sigSerializer->fromParser($parser);
         $hashtype = $parser->readBytes(1)->getInt();
         return new TransactionSignature($signature, $hashtype);
     }

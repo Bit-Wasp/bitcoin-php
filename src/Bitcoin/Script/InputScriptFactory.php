@@ -2,13 +2,9 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Signature\Signature;
+
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Transaction\TransactionSignatureCollection;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
-use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 
