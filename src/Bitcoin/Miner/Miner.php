@@ -132,13 +132,8 @@ class Miner
 
         // Allow user supplied transactions
         if ($coinbaseTx == null) {
-            $input = new TransactionInput;
-            $input->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
-            $input->setVout(0xffffffff);
-
-            $output = new TransactionOutput;
-            $output->setScript($this->script);
-            $output->setValue(5000000000);
+            $input = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0xffffffff);
+            $output = new TransactionOutput(5000000000, $this->script);
 
             $coinbaseTx = TransactionFactory::create();
             $coinbaseTx->getInputs()->addInput($input);
