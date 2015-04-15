@@ -63,7 +63,8 @@ class OutputScriptFactory
             ->op('OP_DUP')
             ->op('OP_HASH160')
             ->push($public_key->getPubKeyHash())
-            ->op('OP_EQUALVERIFY');
+            ->op('OP_EQUALVERIFY')
+            ->op('OP_CHECKSIG');
     }
 
     /**
