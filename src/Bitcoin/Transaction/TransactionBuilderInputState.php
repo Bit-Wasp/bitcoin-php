@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
@@ -242,7 +241,7 @@ class TransactionBuilderInputState
                         if ($item instanceof Buffer) {
                             $sig = TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath());
                             $linked = $this->ecAdapter->associateSigs(
-                                new SignatureCollection([$sig]),
+                                [$sig],
                                 $tx
                                     ->signatureHash()
                                     ->calculate(

@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
-interface TransactionSignatureInterface
+use BitWasp\Bitcoin\SerializableInterface;
+
+interface TransactionSignatureInterface extends SerializableInterface
 {
     /**
      * @return SignatureInterface

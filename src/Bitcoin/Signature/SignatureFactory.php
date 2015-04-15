@@ -8,16 +8,6 @@ use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 
 class SignatureFactory
 {
-    /**
-     * @param Math $math
-     * @return DerSignatureSerializer
-     */
-    public static function getSerializer(Math $math = null)
-    {
-        $math = $math ?: Bitcoin::getMath();
-        $serializer = new DerSignatureSerializer($math);
-        return $serializer;
-    }
 
     /**
      * @param $string
@@ -26,7 +16,8 @@ class SignatureFactory
      */
     public static function fromHex($string, Math $math = null)
     {
-        $serializer = self::getSerializer($math);
+        $math = $math ?: Bitcoin::getMath();
+        $serializer = new DerSignatureSerializer($math);
         $signature = $serializer->parse($string);
         return $signature;
     }

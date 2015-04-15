@@ -4,11 +4,12 @@ namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
 
-class TransactionSignature implements TransactionSignatureInterface
+class TransactionSignature extends Serializable implements TransactionSignatureInterface
 {
     /**
      * @var SignatureInterface

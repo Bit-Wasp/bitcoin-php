@@ -62,7 +62,7 @@ class DerSignatureSerializer
             ->writeWithLength($inner->getBuffer());
 
         $serialized = $outer->getBuffer();
-        echo "DER: " . $serialized->getHex() . "\n";
+
         return $serialized;
     }
 

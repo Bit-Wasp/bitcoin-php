@@ -35,7 +35,7 @@ class SignatureCollection implements \Countable
         foreach ($parsed as $data) {
             try {
                 if ($data instanceof Buffer) {
-                    $signature = SignatureFactory::fromHex($data->getHex());
+                    $signature = TransactionSignatureFactory::fromHex($data->getHex());
                     $this->addSignature($signature);
                 }
             } catch (\Exception $e) {
@@ -48,21 +48,21 @@ class SignatureCollection implements \Countable
     /**
      * Adds an input to the collection.
      *
-     * @param SignatureInterface $input
+     * @param TransactionSignatureInterface $input
      */
-    public function addSignature(SignatureInterface $input)
+    public function addSignature(TransactionSignatureInterface $input)
     {
         $this->signatures[] = $input;
     }
 
     /**
-     * Adds a list of inputs to the collection.
+     * Adds a list of signatures to the collection.
      *
-     * @param SignatureInterface[] $inputs
+     * @param TransactionSignatureInterface[] $signatures
      */
-    public function addSignatures(array $inputs)
+    public function addSignatures(array $signatures)
     {
-        foreach ($inputs as $input) {
+        foreach ($signatures as $input) {
             $this->addSignature($input);
         }
     }
@@ -86,7 +86,7 @@ class SignatureCollection implements \Countable
     /**
      * Returns all the signatures in the collection.
      *
-     * @return SignatureInterface[]
+     * @return TransactionSignatureInterface[]
      */
     public function getSignatures()
     {
@@ -107,7 +107,7 @@ class SignatureCollection implements \Countable
      *
      * @param int $start
      * @param int $length
-     * @return \BitWasp\Bitcoin\Signature\SignatureCollection
+     * @return \BitWasp\Bitcoin\Signature\TransactionSignatureCollection
      */
     public function slice($start, $length)
     {
@@ -120,7 +120,7 @@ class SignatureCollection implements \Countable
     public function getBuffer()
     {
         return array_map(
-            function (SignatureInterface $signature) {
+            function (TransactionSignatureInterface $signature) {
                 return $signature->getBuffer();
             },
             $this->getSignatures()

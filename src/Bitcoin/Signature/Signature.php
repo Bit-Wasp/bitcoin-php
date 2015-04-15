@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 
 class Signature extends Serializable implements SignatureInterface
 {
@@ -53,7 +55,7 @@ class Signature extends Serializable implements SignatureInterface
      */
     public function getBuffer()
     {
-        $serializer = SignatureFactory::getSerializer();
+        $serializer = new DerSignatureSerializer(Bitcoin::getMath());
         $buffer = $serializer->serialize($this);
         return $buffer;
     }
