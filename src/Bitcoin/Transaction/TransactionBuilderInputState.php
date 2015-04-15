@@ -108,7 +108,7 @@ class TransactionBuilderInputState
     public function getRedeemScript()
     {
         if (null === $this->redeemScript) {
-            throw new \RuntimeException('This ');
+            throw new \RuntimeException('No redeem script was set');
         }
         return $this->redeemScript;
     }
