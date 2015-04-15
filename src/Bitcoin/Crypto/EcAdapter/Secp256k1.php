@@ -66,9 +66,6 @@ class Secp256k1 extends BaseEcAdapter
             throw new \Exception('Secp256k1-php failed to sign data');
         }
 
-        // todo; TransactionSignature::fromHex
-        // Fix since secp256k1 doesn't know about hashtypes
-        $sigStr .= chr(SignatureHashInterface::SIGHASH_ALL);
         return SignatureFactory::fromHex(bin2hex($sigStr));
     }
 

@@ -10,8 +10,9 @@ use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
-use BitWasp\Bitcoin\Signature\SignatureFactory;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
 
 /**
@@ -81,7 +82,9 @@ class TransactionBuilderInputState
         $this->redeemScript = $redeemScript;
         $this->prevOutScript = $outputScript;
         $this->publicKeys = $this->execForInputTypes(
-            function () { return []; },
+            function () {
+                return [];
+            },
             function () {
                 $chunks = $this->prevOutScript->getScriptParser()->parse();
                 return [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
@@ -192,7 +195,7 @@ class TransactionBuilderInputState
      * @param SignatureInterface $signature
      * @return $this
      */
-    public function setSignature($idx, SignatureInterface $signature)
+    public function setSignature($idx, TransactionSignature $signature)
     {
         $this->signatures[$idx] = $signature;
 
@@ -214,7 +217,7 @@ class TransactionBuilderInputState
             case OutputClassifier::PAYTOPUBKEYHASH:
                 // Supply signature and public key in scriptSig
                 if ($size == 2) {
-                    $this->setSignatures([SignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath())]);
+                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath())]);
                     $this->setPublicKeys([PublicKeyFactory::fromHex($parsed[1]->getHex(), $this->ecAdapter)]);
                 }
 
@@ -222,7 +225,7 @@ class TransactionBuilderInputState
             case OutputClassifier::PAYTOPUBKEY:
                 // Only has a signature in the scriptSig
                 if ($size == 1) {
-                    $this->setSignatures([SignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath())]);
+                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath())]);
                 }
 
                 break;
@@ -238,7 +241,7 @@ class TransactionBuilderInputState
                     // Extract Signatures (as buffers), then compile arrays of [pubkeyHash => signature]
                     foreach (array_slice($parsed, 1, -1) as $item) {
                         if ($item instanceof Buffer) {
-                            $sig = SignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath());
+                            $sig = TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath());
                             $linked = $this->ecAdapter->associateSigs(
                                 new SignatureCollection([$sig]),
                                 $tx
@@ -288,8 +291,8 @@ class TransactionBuilderInputState
                     : ScriptFactory::create();
             },
             function () use (&$signatures) {
-                return count($signatures) == 1
-                    ? ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $this->publicKeys[0])
+                return count($signatures) > 0
+                    ? ScriptFactory::scriptSig()->multisigP2sh($this->redeemScript, $this->signatures)
                     : ScriptFactory::create();
             }
         );
@@ -303,9 +306,15 @@ class TransactionBuilderInputState
     public function getRequiredSigCount()
     {
         return $this->execForInputTypes(
-            function () { return 1; },
-            function () { return 1; },
-            function () { return $this->redeemScript->getRequiredSigCount(); }
+            function () {
+                return 1;
+            },
+            function () {
+                return 1;
+            },
+            function () {
+                return $this->redeemScript->getRequiredSigCount();
+            }
         );
     }
 
@@ -323,12 +332,18 @@ class TransactionBuilderInputState
     public function isFullySigned()
     {
         $result = $this->execForInputTypes(
-            function () { return count($this->publicKeys) == 1; },
-            function () { return count($this->publicKeys) == 1; },
-            function () { return true; }
+            function () {
+                return count($this->publicKeys) == 1;
+            },
+            function () {
+                return count($this->publicKeys) == 1;
+            },
+            function () {
+                return true;
+            }
         );
 
-        $result &= count ($this->signatures) == $this->getRequiredSigCount();
+        $result &= count($this->signatures) == $this->getRequiredSigCount();
 
         return $result;
     }

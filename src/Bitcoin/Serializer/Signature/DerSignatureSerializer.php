@@ -56,15 +56,13 @@ class DerSignatureSerializer
             ->writeBytes(1, '02')
             ->writeWithLength(new Buffer($sBin));
 
-        echo "writing sighashtype: ". $signature->getSigHashType()."\n";
         $outer = new Parser();
         $outer
             ->writeBytes(1, '30')
-            ->writeWithLength($inner->getBuffer())
-            ->writeInt(1, $signature->getSighashType(), true);
+            ->writeWithLength($inner->getBuffer());
 
         $serialized = $outer->getBuffer();
-
+        echo "DER: " . $serialized->getHex() . "\n";
         return $serialized;
     }
 
@@ -78,7 +76,6 @@ class DerSignatureSerializer
         try {
             $parser->readBytes(1);
             $outer    = $parser->getVarString();
-            $sighash = $parser->readBytes(1)->getInt();
 
             $parse    = new Parser($outer);
             $parse->readBytes(1);
@@ -90,8 +87,7 @@ class DerSignatureSerializer
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
 
-        $signature = new Signature($r, $s, $sighash);
-        var_dump($r, $s, $sighash);
+        $signature = new Signature($r, $s);
         return $signature;
     }
 

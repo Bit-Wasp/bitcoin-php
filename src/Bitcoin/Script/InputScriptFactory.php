@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Signature\Signature;
-use BitWasp\Bitcoin\Transaction\TransactionSignature;
+use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\TransactionSignatureCollection;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
@@ -24,7 +24,7 @@ class InputScriptFactory
     }
 
     /**
-     * @param TransactionSignature $signature
+     * @param \BitWasp\Bitcoin\Signature\TransactionSignature $signature
      * @param PublicKeyInterface $publicKey
      * @return Script
      */
@@ -37,7 +37,7 @@ class InputScriptFactory
 
     /**
      * @param RedeemScript $redeemScript
-     * @param Signature[] $signatures
+     * @param TransactionSignature[] $signatures
      * @return Script
      */
     public function multisigP2sh(RedeemScript $redeemScript, $signatures)

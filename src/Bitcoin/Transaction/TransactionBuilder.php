@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output;
+use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
@@ -117,13 +119,13 @@ class TransactionBuilder
      * @param Buffer $hash
      * @return \BitWasp\Bitcoin\Signature\Signature
      */
-    public function sign(PrivateKeyInterface $privKey, Buffer $hash)
+    public function sign(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
     {
         $random = ($this->deterministicSignatures
             ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
             : new Random());
 
-        return $this->ecAdapter->sign($hash, $privKey, $random);
+        return new TransactionSignature($this->ecAdapter->sign($hash, $privKey, $random), $sigHashType);
     }
 
     /**
@@ -150,13 +152,17 @@ class TransactionBuilder
         }
 
         $inputState = $this->inputStates[$inputToSign];
+
+        if (in_array($inputState->getPrevOutType(), [OutputClassifier::PAYTOPUBKEY, OutputClassifier::PAYTOPUBKEYHASH])) {
+            $inputState->setPublicKeys([$privateKey->getPublicKey()]);
+        }
+
         $signatureHash = $this->transaction->signatureHash();
         $hash = $signatureHash->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType);
 
         // Could this be done in TransactionBuilderInputState ?
         // for multisig we want signatures to be in the order of the publicKeys, so if it's not pre-filled OP_Os we're gonna do that now
-        if ($inputState->getScriptType() == OutputClassifier::MULTISIG
-            && count($inputState->getPublicKeys()) !== count($inputState->getSignatures())) {
+        if ($inputState->getScriptType() == OutputClassifier::MULTISIG && count($inputState->getPublicKeys()) !== count($inputState->getSignatures())) {
             // this can be optimized by not checking against signatures we've already found
             $orderedSignatures = [];
             foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
@@ -178,7 +184,7 @@ class TransactionBuilder
         // loop over the publicKeys so we can figure out in which order our signature needs to appear
         foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
             if ($privateKey->getPublicKey()->getBinary() === $publicKey->getBinary()) {
-                $inputState->setSignature($idx, $this->sign($privateKey, $hash));
+                $inputState->setSignature($idx, $this->sign($privateKey, $hash, $sigHashType));
             }
         }
 

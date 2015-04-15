@@ -1,9 +1,10 @@
 <?php
 
-namespace BitWasp\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 class TransactionSignature
@@ -46,8 +47,7 @@ class TransactionSignature
 
     public function getBuffer()
     {
-        $sigSerializer = new DerSignatureSerializer(Bitcoin::getMath());
-
-        return $sigSerializer->serialize($this->getSignature());
+        $txSigSerializer = new TransactionSignatureSerializer(new DerSignatureSerializer(Bitcoin::getMath()));
+        return $txSigSerializer->serialize($this);
     }
 }
