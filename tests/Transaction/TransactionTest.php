@@ -78,11 +78,13 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddInput()
     {
-        $in = new TransactionInput();
+        $in = new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0);
         $this->transaction->getInputs()->addInput($in);
         $inputs = $this->transaction->getInputs();
         $this->assertSame(1, count($inputs));
         $this->assertSame($in, $inputs->getInput(0));
+        $return = $this->transaction->getInputs()->getInput(0);
+        $this->assertSame($in, $return);
     }
 
     /**
@@ -91,14 +93,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testGetInputException()
     {
         $this->transaction->getInputs()->getInput(0);
-    }
-
-    public function testGetInput()
-    {
-        $in = new TransactionInput();
-        $this->transaction->getInputs()->addInput($in);
-        $return = $this->transaction->getInputs()->getInput(0);
-        $this->assertSame($in, $return);
     }
 
     public function testGetOutputs()
@@ -113,6 +107,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $outputs = $this->transaction->getOutputs();
         $this->assertSame(1, count($outputs));
         $this->assertSame($out, $outputs->getOutput(0));
+        $return = $this->transaction->getOutputs()->getOutput(0);
+        $this->assertSame($out, $return);
     }
 
     /**
@@ -121,14 +117,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testGetOutputException()
     {
         $this->transaction->getOutputs()->getOutput(0);
-    }
-
-    public function testGetOutput()
-    {
-        $out = new TransactionOutput();
-        $this->transaction->getOutputs()->addOutput($out);
-        $return = $this->transaction->getOutputs()->getOutput(0);
-        $this->assertSame($out, $return);
     }
 
     public function testFromHex()
