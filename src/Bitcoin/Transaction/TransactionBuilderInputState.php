@@ -20,36 +20,35 @@ use BitWasp\Buffertools\Buffer;
  */
 class TransactionBuilderInputState
 {
-
-    /**
-     * @var ScriptInterface
-     */
-    private $previousOutputScript;
-
-    /**
-     * @var string
-     */
-    private $previousOutputClassifier;
-
     /**
      * @var null|RedeemScript
      */
     private $redeemScript;
 
     /**
-     * @var PublicKeyInterface[]
+     * @var ScriptInterface
      */
-    private $publicKeys = [];
+    private $prevOutScript;
+
+    /**
+     * @var string
+     */
+    private $prevOutType;
 
     /**
      * @var null|string
      */
-    private $scriptClassifier = null;
+    private $scriptType;
 
     /**
      * @var array
      */
     private $signatures = [];
+
+    /**
+     * @var PublicKeyInterface[]
+     */
+    private $publicKeys = [];
 
     /**
      * @var EcAdapterInterface
@@ -96,30 +95,55 @@ class TransactionBuilderInputState
                 break;
         }
 
-        $this->previousOutputClassifier = $outputType;
-        $this->previousOutputScript = $outputScript;
-        $this->scriptClassifier = $inputScriptType;
         $this->redeemScript = $redeemScript;
+        $this->prevOutScript = $outputScript;
+        $this->prevOutType = $outputType;
+        $this->scriptType = $inputScriptType;
         $this->publicKeys = $publicKeys;
-        $this->ecAdapter = $ecAdapter;
     }
 
-    public function getPreviousOutputScript()
+    /**
+     * @return RedeemScript|null
+     */
+    public function getRedeemScript()
     {
-        return $this->previousOutputScript;
+        if (null === $this->redeemScript) {
+            throw new \RuntimeException('This ');
+        }
+        return $this->redeemScript;
+    }
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getPrevOutScript()
+    {
+        return $this->prevOutScript;
     }
 
     /**
      * @TODO: could this just use $this->previousOutputScript ?
      * @todo: TK: either work I think - though calling isPayToScriptHash involves a computation instead of just comparing to OutputClassifier::PAYTOSCRIPTHASH
      *
-     * @return null
+     * @return string
      */
-    public function getPreviousOutputClassifier()
+    public function getPrevOutType()
     {
-        return $this->previousOutputClassifier;
+        return $this->prevOutType;
     }
 
+    /**
+     * @return string
+     */
+    public function getScriptType()
+    {
+        return $this->scriptType;
+    }
+
+    /**
+     * @param $publicKeys
+     * @return $this
+     */
     public function setPublicKeys($publicKeys)
     {
         $this->publicKeys = $publicKeys;
@@ -127,31 +151,12 @@ class TransactionBuilderInputState
         return $this;
     }
 
+    /**
+     * @return array|\BitWasp\Bitcoin\Key\PublicKeyInterface[]
+     */
     public function getPublicKeys()
     {
         return $this->publicKeys;
-    }
-
-    public function getRedeemScript()
-    {
-        return $this->redeemScript;
-    }
-
-    public function setScriptType($scriptClassifier)
-    {
-        $this->scriptClassifier = $scriptClassifier;
-
-        return $this;
-    }
-
-    public function getScriptType()
-    {
-        return $this->scriptClassifier;
-    }
-
-    public function getSignatures()
-    {
-        return $this->signatures;
     }
 
     /**
@@ -162,6 +167,14 @@ class TransactionBuilderInputState
     {
         $this->signatures = $signatures;
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSignatures()
+    {
+        return $this->signatures;
     }
 
     /**
@@ -221,7 +234,7 @@ class TransactionBuilderInputState
                                 $tx
                                     ->signatureHash()
                                     ->calculate(
-                                        $this->getPreviousOutputScript(),
+                                        $this->getPrevOutScript(),
                                         $inputToExtract,
                                         $sig->getSighashType()
                                     ),
@@ -283,7 +296,6 @@ class TransactionBuilderInputState
     public function hasEnoughInfo()
     {
         return count($this->publicKeys)
-            && $this->scriptClassifier
             && count($this->signatures);
     }
 }
