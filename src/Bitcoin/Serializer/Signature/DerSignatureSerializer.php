@@ -75,9 +75,9 @@ class DerSignatureSerializer
     {
         try {
             $parser->readBytes(1);
-            $outer    = $parser->getVarString();
+            $outer = $parser->getVarString();
 
-            $parse    = new Parser($outer);
+            $parse = new Parser($outer);
             $parse->readBytes(1);
             $r = $parse->getVarString()->getInt();
 

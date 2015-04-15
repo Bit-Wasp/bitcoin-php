@@ -10,8 +10,7 @@ use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\SignatureCollection;
-use BitWasp\Bitcoin\Signature\SignatureInterface;
-use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
 
@@ -173,7 +172,7 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @param SignatureInterface[] $signatures
+     * @param TransactionSignatureInterface[] $signatures
      * @return $this
      */
     public function setSignatures($signatures)
@@ -192,10 +191,10 @@ class TransactionBuilderInputState
 
     /**
      * @param integer $idx
-     * @param SignatureInterface $signature
+     * @param TransactionSignatureInterface $signature
      * @return $this
      */
-    public function setSignature($idx, TransactionSignature $signature)
+    public function setSignature($idx, TransactionSignatureInterface $signature)
     {
         $this->signatures[$idx] = $signature;
 
@@ -249,7 +248,7 @@ class TransactionBuilderInputState
                                     ->calculate(
                                         $this->getPrevOutScript(),
                                         $inputToExtract,
-                                        $sig->getSighashType()
+                                        $sig->getHashType()
                                     ),
                                 $this->getRedeemScript()->getKeys()
                             );

@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
-use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;

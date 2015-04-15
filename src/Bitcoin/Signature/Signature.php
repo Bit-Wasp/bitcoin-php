@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
 
 class Signature extends Serializable implements SignatureInterface
@@ -28,13 +26,10 @@ class Signature extends Serializable implements SignatureInterface
      * @param $s
      * @param int $sighashType
      */
-    public function __construct($r, $s, $sighashType = SignatureHashInterface::SIGHASH_ALL)
+    public function __construct($r, $s)
     {
-        $this
-            ->setR($r)
-            ->setS($s)
-
-            ->setSighashType($sighashType);
+        $this->r = $r;
+        $this->s = $s;
     }
 
     /**
@@ -46,51 +41,11 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @param $r
-     * @return $this
-     */
-    private function setR($r)
-    {
-        $this->r = $r;
-        return $this;
-    }
-
-    /**
      * @inheritdoc
      */
     public function getS()
     {
         return $this->s;
-    }
-
-    /**
-     * @param $s
-     * @return $this
-     */
-    private function setS($s)
-    {
-        $this->s = $s;
-        return $this;
-    }
-
-    /**
-     * Return the SIGHASH type for this signature
-     *
-     * @return int
-     */
-    public function getSighashType()
-    {
-        return $this->sighashType;
-    }
-
-    /**
-     * @param integer $hashtype
-     * @return $this
-     */
-    private function setSighashType($hashtype)
-    {
-        $this->sighashType = $hashtype;
-        return $this;
     }
 
     /**

@@ -9,25 +9,16 @@ use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 
 class TransactionSignatureFactory
 {
-    /**
-     * @param Math $math
-     * @return TransactionSignatureSerializer
-     */
-    public static function getSerializer(Math $math = null)
-    {
-        $math = $math ?: Bitcoin::getMath();
-        $serializer = new TransactionSignatureSerializer(new DerSignatureSerializer($math));
-        return $serializer;
-    }
 
     /**
      * @param $string
      * @param Math $math
-     * @return TransactionSignature
+     * @return TransactionSignatureInterface
      */
     public static function fromHex($string, Math $math = null)
     {
-        $serializer = self::getSerializer($math);
+        $math = $math ?: Bitcoin::getMath();
+        $serializer = new TransactionSignatureSerializer(new DerSignatureSerializer($math));
         $signature = $serializer->parse($string);
         return $signature;
     }

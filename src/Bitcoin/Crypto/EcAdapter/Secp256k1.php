@@ -11,7 +11,6 @@ use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
-use BitWasp\Bitcoin\Signature\SignatureHashInterface;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 class Secp256k1 extends BaseEcAdapter

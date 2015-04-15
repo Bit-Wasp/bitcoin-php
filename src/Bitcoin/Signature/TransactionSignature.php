@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
 
-class TransactionSignature
+class TransactionSignature implements TransactionSignatureInterface
 {
     /**
      * @var SignatureInterface
