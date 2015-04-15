@@ -60,46 +60,56 @@ class TransactionBuilderInputState
      * @param ScriptInterface $outputScript
      * @param RedeemScript $redeemScript
      */
-    public function __construct(EcAdapterInterface $ecAdapter, ScriptInterface $outputScript, RedeemScript $redeemScript = null)
-    {
+    public function __construct(
+        EcAdapterInterface $ecAdapter,
+        ScriptInterface $outputScript,
+        RedeemScript $redeemScript = null
+    ) {
         $classifier = new OutputClassifier($outputScript);
-        $inputScriptType = $outputType = $classifier->classify();
+        $this->scriptType = $this->prevOutType = $classifier->classify();
 
         // Reclassify if the output is P2SH, so we know how to sign it.
-        if ($inputScriptType == OutputClassifier::PAYTOSCRIPTHASH) {
+        if ($this->scriptType == OutputClassifier::PAYTOSCRIPTHASH) {
             if (null === $redeemScript) {
                 throw new \InvalidArgumentException('Redeem script is required when output is P2SH');
             }
             $rsClassifier = new OutputClassifier($redeemScript);
-            $inputScriptType = $rsClassifier->classify();
+            $this->scriptType = $rsClassifier->classify();
         }
 
         // Gather public keys from redeemScript / outputScript
-
-        $publicKeys = [];
-        switch ($inputScriptType) {
-            case OutputClassifier::PAYTOPUBKEYHASH:
-                break;
-            case OutputClassifier::PAYTOPUBKEY:
-                $chunks = $outputScript->getScriptParser()->parse();
-                $publicKeys[] = PublicKeyFactory::fromHex($chunks[0]->getHex(), $ecAdapter);
-                break;
-            case OutputClassifier::MULTISIG:
-                if (null === $redeemScript) {
-                    throw new \InvalidArgumentException('Redeem script is required when output is multisig');
-                }
-                $publicKeys = $redeemScript->getKeys();
-                break;
-            default:
-                throw new \InvalidArgumentException();
-                break;
-        }
-
         $this->redeemScript = $redeemScript;
         $this->prevOutScript = $outputScript;
-        $this->prevOutType = $outputType;
-        $this->scriptType = $inputScriptType;
-        $this->publicKeys = $publicKeys;
+        $this->publicKeys = $this->execForInputTypes(
+            function () { return []; },
+            function () {
+                $chunks = $this->prevOutScript->getScriptParser()->parse();
+                return [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
+            },
+            function () {
+                return $this->redeemScript->getKeys();
+            }
+        );
+    }
+
+    /**
+     * @param callable $forPayToPubKeyHash
+     * @param callable $forPayToPubKey
+     * @param callable $forMultisig
+     * @return mixed
+     */
+    private function execForInputTypes(callable $forPayToPubKeyHash, callable $forPayToPubKey, callable $forMultisig)
+    {
+        switch ($this->scriptType) {
+            case OutputClassifier::PAYTOPUBKEYHASH:
+                return $forPayToPubKeyHash();
+            case OutputClassifier::PAYTOPUBKEY:
+                return $forPayToPubKey();
+            case OutputClassifier::MULTISIG:
+                return $forMultisig();
+            default:
+                throw new \InvalidArgumentException('Unsupported script type');
+        }
     }
 
     /**
@@ -266,36 +276,60 @@ class TransactionBuilderInputState
     {
         // todo: this is worrisome, should have some way to fail and defer to the original script
         $signatures = array_filter($this->getSignatures());
-        switch ($this->getScriptType()) {
-            case OutputClassifier::PAYTOPUBKEYHASH:
-                $script = count($signatures) == 1
+        $script = $this->execForInputTypes(
+            function () use (&$signatures) {
+                return count($signatures) == 1
                     ? ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $this->publicKeys[0])
                     : ScriptFactory::create();
-                break;
-            case OutputClassifier::PAYTOPUBKEY:
-                $script = count($signatures) == 1
+            },
+            function () use (&$signatures) {
+                return count($signatures) == 1
                     ? ScriptFactory::scriptSig()->payToPubKey($signatures[0])
                     : ScriptFactory::create();
-                break;
-            case OutputClassifier::MULTISIG:
-                $script = count($signatures) > 0
-                    ? ScriptFactory::scriptSig()->multisigP2sh($this->redeemScript, $signatures)
+            },
+            function () use (&$signatures) {
+                return count($signatures) == 1
+                    ? ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $this->publicKeys[0])
                     : ScriptFactory::create();
-                break;
-            default:
-                $script = ScriptFactory::create();
-                break;
-        }
+            }
+        );
 
         return $script;
     }
 
     /**
+     * @return Buffer|bool|int
+     */
+    public function getRequiredSigCount()
+    {
+        return $this->execForInputTypes(
+            function () { return 1; },
+            function () { return 1; },
+            function () { return $this->redeemScript->getRequiredSigCount(); }
+        );
+    }
+
+    /**
+     * @return int
+     */
+    public function getSigCount()
+    {
+        return count($this->signatures);
+    }
+
+    /**
      * @return bool
      */
-    public function hasEnoughInfo()
+    public function isFullySigned()
     {
-        return count($this->publicKeys)
-            && count($this->signatures);
+        $result = $this->execForInputTypes(
+            function () { return count($this->publicKeys) == 1; },
+            function () { return count($this->publicKeys) == 1; },
+            function () { return true; }
+        );
+
+        $result &= count ($this->signatures) == $this->getRequiredSigCount();
+
+        return $result;
     }
 }

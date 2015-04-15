@@ -6,7 +6,6 @@ namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -17,6 +16,20 @@ use BitWasp\Bitcoin\Transaction\TransactionBuilderInputState;
 
 class TransactionBuilderInputStateTest extends AbstractTestCase
 {
+    public function getScripts()
+    {
+        $privateKey = PrivateKeyFactory::create();
+        $pkh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
+
+        $rs = $this->getRedeemScript();
+
+        return [
+            [$pkh, null, OutputClassifier::PAYTOPUBKEYHASH, 1],
+            [$rs->getOutputScript(), $rs, OutputClassifier::PAYTOSCRIPTHASH, 2],
+            [ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey()), null, OutputClassifier::PAYTOPUBKEY, 1]
+        ];
+    }
+
     private function getRedeemScript()
     {
         $script = ScriptFactory::multisig(2, [
@@ -44,6 +57,20 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
         return new TransactionBuilderInputState($ecAdapter, $script, $rs);
     }
 
+    /**
+     * @dataProvider getScripts
+     * @param ScriptInterface $script
+     * @param RedeemScript $rs
+     * @param string $outputType
+     */
+    public function testCreateFromScripts(ScriptInterface $script, RedeemScript $rs = null, $outputType, $nReqSig)
+    {
+        $state = $this->createState($script, $rs);
+        $this->assertEquals($outputType, $state->getPrevOutType());
+        $this->assertEquals($nReqSig, $state->getRequiredSigCount());
+        $this->assertEquals(0, $state->getSigCount());
+    }
+
     public function testCreateState()
     {
         $rs = $this->getRedeemScript();
@@ -67,7 +94,39 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
         $state->getRedeemScript();
     }
 
-    public function testGetEmptyPublicKeys(){
+    public function testGetEmptyValues()
+    {
+        $outputScript = $this->getOutputScript();
+        $state = $this->createState($outputScript);
+        $this->assertEquals(0, $state->getSigCount());
 
+        $this->assertInternalType('array', $state->getPublicKeys());
+        $this->assertEmpty($state->getPublicKeys());
+
+
+        $this->assertInternalType('array', $state->getSignatures());
+        $this->assertEmpty($state->getSignatures());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Redeem script is required when output is P2SH
+     */
+    public function testRedeemScriptPassedWhenRequired()
+    {
+        $rs = $this->getRedeemScript();
+        $script = $rs->getOutputScript();
+
+        $this->createState($script);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage
+     */
+    public function testNonStandardScriptFails()
+    {
+        $script = ScriptFactory::create()->push('abab');
+        $this->createState($script);
     }
 }
