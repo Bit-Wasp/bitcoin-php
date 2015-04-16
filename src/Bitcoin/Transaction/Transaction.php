@@ -20,37 +20,41 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @var TransactionInputCollection
      */
-    protected $inputs = null;
+    protected $inputs;
 
     /**
      * @var TransactionOutputCollection
      */
-    protected $outputs = null;
+    protected $outputs;
 
     /**
-     * @var
+     * @var int|string
      */
     protected $locktime;
 
     /**
-     *
+     * @param int $version
+     * @param string $locktime
+     * @param TransactionInputCollection $inputs
+     * @param TransactionOutputCollection $outputs
+     * @throws \Exception
      */
-    public function __construct()
-    {
-        $this->inputs = new TransactionInputCollection();
-        $this->outputs = new TransactionOutputCollection();
+    public function __construct(
+        $version = TransactionInterface::DEFAULT_VERSION,
+        TransactionInputCollection $inputs = null,
+        TransactionOutputCollection $outputs = null
+    ) {
+        if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
+            throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
+        }
+
+        $this->version = $version;
+        $this->inputs = $inputs ?: new TransactionInputCollection();
+        $this->outputs = $outputs ?: new TransactionOutputCollection();
     }
 
     /**
-     * @return string
-     */
-    public function getNetworkCommand()
-    {
-        return 'tx';
-    }
-
-    /**
-     *
+     * @return Parser|string
      */
     public function getTransactionId()
     {
@@ -75,23 +79,6 @@ class Transaction extends Serializable implements TransactionInterface
         }
 
         return $this->version;
-    }
-
-    /**
-     * Set the version of the transaction
-     *
-     * @param $version
-     * @return $this
-     * @throws \Exception
-     */
-    public function setVersion($version)
-    {
-        if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
-            throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
-        }
-
-        $this->version = $version;
-        return $this;
     }
 
     /**
@@ -137,7 +124,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * Get Lock Time
      *
-     * @return mixed
+     * @return int|string
      */
     public function getLockTime()
     {

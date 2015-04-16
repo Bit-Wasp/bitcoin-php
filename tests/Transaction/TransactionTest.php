@@ -2,8 +2,11 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
@@ -15,8 +18,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVersionEmpty()
     {
-        $tx = TransactionFactory::create();
-        $this->assertEquals(1, $tx->getVersion());
+        $tx = new Transaction();
+        $this->assertEquals(TransactionInterface::DEFAULT_VERSION, $tx->getVersion());
     }
 
     /**
@@ -24,9 +27,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetVersion()
     {
-        $tx = TransactionFactory::create();
-        $tx->setVersion(1);
-        $this->assertSame($tx->getVersion(), 1);
+        $tx = new Transaction(191);
+        $this->assertSame(191, $tx->getVersion());
     }
 
     /**
@@ -34,20 +36,19 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetVersionException()
     {
-        $tx = TransactionFactory::create();
-        $tx->setVersion(84294967297);
+        new Transaction(84294967297);
     }
 
     public function testGetLockTime()
     {
         // Default
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
         $this->assertSame('0', $tx->getLockTime());
     }
 
     public function testSetLockTime()
     {
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
         $tx->setLockTime('0');
         $this->assertSame('0', $tx->getLockTime());
     }
@@ -57,13 +58,13 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetLockTimeException()
     {
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
         $tx->setLockTime('4294967297');
     }
 
     public function testGetInputs()
     {
-        $tx = TransactionFactory::create();
+        $tx = new Transaction(1);
         $this->assertEmpty($tx->getInputs());
     }
 
@@ -71,7 +72,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     {
         $in = new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0);
 
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
         $tx->getInputs()->addInput($in);
         $inputs = $tx->getInputs();
         $this->assertSame(1, count($inputs));
@@ -85,21 +86,21 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetInputException()
     {
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
         $tx->getInputs()->getInput(0);
     }
 
     public function testGetOutputs()
     {
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
         $this->assertEmpty($tx->getOutputs());
     }
 
     public function testAddOutput()
     {
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
 
-        $out = new TransactionOutput();
+        $out = new TransactionOutput(1, new Script);
         $tx->getOutputs()->addOutput($out);
         $outputs = $tx->getOutputs();
         $this->assertSame(1, count($outputs));
@@ -113,7 +114,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOutputException()
     {
-        $tx = TransactionFactory::create();
+        $tx = new Transaction();
         $tx->getOutputs()->getOutput(0);
     }
 

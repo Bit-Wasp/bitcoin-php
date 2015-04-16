@@ -18,11 +18,17 @@ class TransactionFactory
     }
 
     /**
+     * @param int|null $version
+     * @param TransactionInputCollection|null $inputs
+     * @param TransactionOutputCollection|null $outputs
      * @return Transaction
      */
-    public static function create()
-    {
-        $transaction = new Transaction;
+    public static function create(
+        $version = null,
+        TransactionInputCollection $inputs = null,
+        TransactionOutputCollection $outputs = null
+    ) {
+        $transaction = new Transaction($version, $inputs, $outputs);
         return $transaction;
     }
 

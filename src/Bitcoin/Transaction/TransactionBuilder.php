@@ -49,7 +49,7 @@ class TransactionBuilder
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
     {
-        $this->transaction = $tx ?: TransactionFactory::create();
+        $this->transaction = $tx ?: new Transaction();
         $this->ecAdapter = $ecAdapter;
     }
 

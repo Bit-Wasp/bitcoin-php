@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class TransactionSerializer
@@ -51,8 +50,9 @@ class TransactionSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        $tx = TransactionFactory::create()
-            ->setVersion($parser->readBytes(4, true)->getInt());
+        $version = $parser->readBytes(4, true)->getInt();
+
+        $tx = new Transaction($version);
 
         $tx->getInputs()->addInputs($parser->getArray(
             function () use (&$parser) {

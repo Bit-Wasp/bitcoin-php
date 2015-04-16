@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\SerializableInterface;
 
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
@@ -28,12 +27,10 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      * @param ScriptInterface $script
      * @param int|string|null $value
      */
-    public function __construct($value = null, ScriptInterface $script = null)
+    public function __construct($value, ScriptInterface $script)
     {
-        if ($script !== null) {
-            $this->setScript($script);
-        }
         $this->value = $value;
+        $this->script = $script;
     }
 
     /**

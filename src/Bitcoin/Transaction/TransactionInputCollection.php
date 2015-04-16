@@ -6,6 +6,9 @@ use BitWasp\Bitcoin\Collection;
 
 class TransactionInputCollection extends Collection
 {
+    /**
+     * @var TransactionInputInterface[]
+     */
     private $inputs = [];
 
     /**
