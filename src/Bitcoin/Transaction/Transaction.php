@@ -45,6 +45,10 @@ class Transaction extends Serializable implements TransactionInterface
         TransactionInputCollection $inputs = null,
         TransactionOutputCollection $outputs = null
     ) {
+        if (!is_numeric($version)) {
+            throw new \InvalidArgumentException('Transaction version must be numeric');
+        }
+
         if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
             throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
