@@ -40,23 +40,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function getValue()
     {
-        if ($this->value == null) {
-            return '0';
-        }
-
         return $this->value;
-    }
-
-    /**
-     * Set the value of this output, in satoshis
-     *
-     * @param int|null $value
-     * @return $this
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
-        return $this;
     }
 
     /**
@@ -68,23 +52,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function getScript()
     {
-        if ($this->script == null) {
-            $this->script = new Script();
-        }
-
         return $this->script;
-    }
-
-    /**
-     * Set a Script
-     *
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
     }
 
     /**

@@ -53,7 +53,6 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $script = $script->op('OP_2')->op('OP_3');
 
         $out = new TransactionOutput(1, $script);
-        $out->setScript($script);
         $this->assertSame($script, $out->getScript());
     }
 
