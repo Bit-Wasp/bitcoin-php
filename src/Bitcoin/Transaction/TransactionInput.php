@@ -42,14 +42,12 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      * @param ScriptInterface|Buffer $script
      * @param int $sequence
      */
-    public function __construct($txid, $vout, ScriptInterface $script = null, $sequence = null)
+    public function __construct($txid, $vout, ScriptInterface $script = null, $sequence = self::DEFAULT_SEQUENCE)
     {
         $this->txid = $txid;
         $this->vout = $vout;
         $this->sequence = $sequence;
-        if ($script !== null) {
-            $this->setScript($script);
-        }
+        $this->script = $script ?: new Script();
     }
 
     /**
@@ -75,21 +73,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getSequence()
     {
-        if ($this->sequence == null) {
-            return self::DEFAULT_SEQUENCE;
-        }
-
         return $this->sequence;
-    }
-
-    /**
-     * @param $sequence
-     * @return $this
-     */
-    public function setSequence($sequence)
-    {
-        $this->sequence = $sequence;
-        return $this;
     }
 
     /**
@@ -101,9 +85,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getScript()
     {
-        if ($this->script == null) {
-            $this->script = new Script();
-        }
         return $this->script;
     }
 

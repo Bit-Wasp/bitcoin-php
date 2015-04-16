@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
@@ -58,15 +59,9 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTransactionId()
     {
-        $hash = Hash::sha256d($this->getBuffer());
+        $hash = bin2hex(Buffertools::flipBytes(Hash::sha256d($this->getBuffer())));
 
-        $txid = new Parser();
-        $txid = $txid
-            ->writeBytes(32, $hash, true)
-            ->getBuffer()
-            ->getHex();
-
-        return $txid;
+        return $hash;
     }
 
     /**
@@ -74,10 +69,6 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getVersion()
     {
-        if (is_null($this->version)) {
-            return TransactionInterface::DEFAULT_VERSION;
-        }
-
         return $this->version;
     }
 
