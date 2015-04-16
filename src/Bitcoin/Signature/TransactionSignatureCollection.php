@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
-
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
