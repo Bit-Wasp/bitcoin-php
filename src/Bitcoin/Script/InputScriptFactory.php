@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 
 class InputScriptFactory
 {
@@ -49,10 +50,10 @@ class InputScriptFactory
     }
 
     /**
-     * @param SignatureInterface $signature
+     * @param TransactionSignatureInterface $signature
      * @return Script
      */
-    public function payToPubKey(SignatureInterface $signature)
+    public function payToPubKey(TransactionSignatureInterface $signature)
     {
         return ScriptFactory::create()->push($signature->getBuffer());
     }
