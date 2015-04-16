@@ -2,10 +2,11 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
+
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-class SignatureCollection implements \Countable
+class TransactionSignatureCollection implements \Countable
 {
     /**
      * @var SignatureInterface[]
@@ -93,7 +94,7 @@ class SignatureCollection implements \Countable
         return $this->signatures;
     }
 
-    /**
+    /**+
      * (non-PHPdoc)
      * @see Countable::count()
      */
