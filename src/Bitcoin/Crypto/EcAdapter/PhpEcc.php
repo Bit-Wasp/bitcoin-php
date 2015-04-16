@@ -18,6 +18,14 @@ use Mdanter\Ecc\Primitives\PointInterface;
 class PhpEcc extends BaseEcAdapter
 {
     /**
+     * @return int
+     */
+    public function getAdapterName()
+    {
+        return self::PHPECC;
+    }
+
+    /**
      * @param PublicKeyInterface $publicKey
      * @param SignatureInterface $signature
      * @param Buffer $messageHash

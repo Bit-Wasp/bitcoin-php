@@ -12,6 +12,14 @@ use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 interface EcAdapterInterface
 {
+    const PHPECC = 0;
+    const SECP256K1 = 1;
+
+    /**
+     * @return string
+     */
+    public function getAdapterName();
+
     /**
      * @return \BitWasp\Bitcoin\Math\Math
      */

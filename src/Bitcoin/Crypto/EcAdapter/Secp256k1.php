@@ -16,6 +16,14 @@ use BitWasp\Bitcoin\Signature\SignatureInterface;
 class Secp256k1 extends BaseEcAdapter
 {
     /**
+     * @return int
+     */
+    public function getAdapterName()
+    {
+        return self::SECP256K1;
+    }
+
+    /**
      * @param $scalar
      * @return string
      */
