@@ -21,8 +21,8 @@ $bitcoind = RpcFactory::bitcoind($host, $port, $user, $pass);
 $privateKey = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d5');
 echo "[Key: " . $privateKey->toWif($network) . " Address " . $privateKey->getAddress()->getAddress($network) . "]\n";
 
-$myTx = $bitcoind->getrawtransaction('8f792f166bc5f3821515cb5dfff1a967f5acc3d162d1019283186fbf6b119bb5', true);
-$spendOutput = 1;
+$myTx = $bitcoind->getrawtransaction('4e8b531c0a9d3651c7cf449acd19d2b07d914990bcfabaa9bccc49af2abadee2', true);
+$spendOutput = 0;
 $recipient = AddressFactory::fromString('n1b2a9rFvuU9wBgBaoWngNvvMxRV94ke3x');
 echo "[Send to: " . $recipient->getAddress($network) . " \n";
 
@@ -31,6 +31,8 @@ $builder = TransactionFactory::builder()
     ->payToAddress($recipient, 40000);
 echo "setup stage\n";
 print_r($builder);
+
+
 
 echo "signing\n";
 $builder->signInputWithKey($privateKey, $myTx->getOutputs()->getOutput($spendOutput)->getScript(), 0);
