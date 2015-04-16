@@ -54,6 +54,26 @@ class TransactionBuilder
     }
 
     /**
+     * @param TransactionInputInterface $input
+     * @return $this
+     */
+    public function addInput(TransactionInputInterface $input)
+    {
+        $this->transaction->getInputs()->addInput($input);
+        return $this;
+    }
+
+    /**
+     * @param TransactionOutputInterface $output
+     * @return $this
+     */
+    public function addOutput(TransactionOutputInterface $output)
+    {
+        $this->transaction->getOutputs()->addOutput($output);
+        return $this;
+    }
+
+    /**
      * Create an input for this transaction spending $tx's output, $outputToSpend.
      *
      * @param TransactionInterface $tx
@@ -62,15 +82,12 @@ class TransactionBuilder
      */
     public function spendOutput(TransactionInterface $tx, $outputToSpend)
     {
-        // Check TransactionOutput exists
+        // Check TransactionOutput exists in $tx
         $tx->getOutputs()->getOutput($outputToSpend);
-
-        $this->transaction
-            ->getInputs()
-            ->addInput(new TransactionInput(
-                $tx->getTransactionId(),
-                $outputToSpend
-            ));
+        $this->addInput(new TransactionInput(
+            $tx->getTransactionId(),
+            $outputToSpend
+        ));
 
         return $this;
     }
@@ -85,12 +102,10 @@ class TransactionBuilder
     public function payToAddress(AddressInterface $address, $value)
     {
         // Create Script from address, then create an output.
-        $this->transaction
-            ->getOutputs()
-            ->addOutput(new TransactionOutput(
-                $value,
-                ScriptFactory::scriptPubKey()->payToAddress($address)
-            ));
+        $this->addOutput(new TransactionOutput(
+            $value,
+            ScriptFactory::scriptPubKey()->payToAddress($address)
+        ));
 
         return $this;
     }
@@ -116,15 +131,20 @@ class TransactionBuilder
     /**
      * @param PrivateKeyInterface $privKey
      * @param Buffer $hash
-     * @return \BitWasp\Bitcoin\Signature\Signature
+     * @return \BitWasp\Bitcoin\Signature\TransactionSignatureInterface
      */
     public function sign(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
     {
-        $random = ($this->deterministicSignatures
-            ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
-            : new Random());
-
-        return new TransactionSignature($this->ecAdapter->sign($hash, $privKey, $random), $sigHashType);
+        return new TransactionSignature(
+            $this->ecAdapter->sign(
+                $hash,
+                $privKey,
+                $this->deterministicSignatures
+                    ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
+                    : new Random()
+            ),
+            $sigHashType
+        );
     }
 
     /**
@@ -146,7 +166,12 @@ class TransactionBuilder
         $input = $this->transaction->getInputs()->getInput($inputToSign);
 
         if (!isset($this->inputStates[$inputToSign])) {
-            $this->inputStates[$inputToSign] = new TransactionBuilderInputState($this->ecAdapter, $outputScript, $redeemScript);
+            $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
+                $this->ecAdapter,
+                $outputScript,
+                $redeemScript
+            );
+
             $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign, $input->getScript());
         }
 
@@ -156,8 +181,7 @@ class TransactionBuilder
             $inputState->setPublicKeys([$privateKey->getPublicKey()]);
         }
 
-        $signatureHash = $this->transaction->signatureHash();
-        $hash = $signatureHash->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType);
+        $hash = $this->transaction->signatureHash()->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType);
 
         // Could this be done in TransactionBuilderInputState ?
         // for multisig we want signatures to be in the order of the publicKeys, so if it's not pre-filled OP_Os we're gonna do that now
@@ -206,7 +230,6 @@ class TransactionBuilder
                 }
                 : function ($i) {
                     return $this->transaction->getInputs()->getInput($i)->getScript();
-
                 };
 
             $transaction->getInputs()->getInput($i)->setScript($caller($i));
