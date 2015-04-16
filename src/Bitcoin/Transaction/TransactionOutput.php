@@ -36,7 +36,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     /**
      * Return the value of this output
      *
-     * @return int|null
+     * @return string|int
      */
     public function getValue()
     {
