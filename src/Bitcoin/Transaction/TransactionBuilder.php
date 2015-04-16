@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
@@ -115,6 +116,10 @@ class TransactionBuilder
      */
     public function useRandomSignatures()
     {
+        if ($this->ecAdapter->getAdapterName() == EcAdapterInterface::SECP256K1) {
+            throw new \RuntimeException('Secp256k1 extension does not yet support random signatures');
+        }
+
         $this->deterministicSignatures = false;
         return $this;
     }
@@ -140,15 +145,31 @@ class TransactionBuilder
                 $hash,
                 $privKey,
                 $this->deterministicSignatures
-                    ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
-                    : new Random()
+                ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
+                : new Random()
             ),
             $sigHashType
         );
     }
 
     /**
+     * @param $input
+     * @return TransactionBuilderInputState
+     * @throws BuilderNoInputState
+     */
+    public function getInputState($input)
+    {
+        $this->transaction->getInputs()->getInput($input);
+        if (!isset($this->inputStates[$input])) {
+            throw new BuilderNoInputState('State not found for this input');
+        }
+
+        return $this->inputStates[$input];
+    }
+
+    /**
      * @param PrivateKeyInterface $privateKey
+     * @param ScriptInterface $outputScript
      * @param $inputToSign
      * @param int $sigHashType
      * @param RedeemScript $redeemScript
@@ -165,7 +186,10 @@ class TransactionBuilder
 
         $input = $this->transaction->getInputs()->getInput($inputToSign);
 
-        if (!isset($this->inputStates[$inputToSign])) {
+        // By design, calling sign should be sufficient to create a TransactionBuilderInputState.
+        try {
+            $inputState = $this->getInputState($inputToSign);
+        } catch (BuilderNoInputState $e) {
             $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
                 $this->ecAdapter,
                 $outputScript,
@@ -173,11 +197,11 @@ class TransactionBuilder
             );
 
             $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign, $input->getScript());
+            $inputState = $this->inputStates[$inputToSign];
         }
 
-        $inputState = $this->inputStates[$inputToSign];
-
-        if (in_array($inputState->getPrevOutType(), [OutputClassifier::PAYTOPUBKEY, OutputClassifier::PAYTOPUBKEYHASH])) {
+        // If it's PayToPubkey / PayToPubkeyHash, TransactionBuilderInputState needs to know the public key.
+        if (in_array($inputState->getPrevOutType(), [OutputClassifier::PAYTOPUBKEYHASH])) {
             $inputState->setPublicKeys([$privateKey->getPublicKey()]);
         }
 
