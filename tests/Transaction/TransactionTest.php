@@ -110,6 +110,15 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Transaction version must be numeric
+     */
+    public function testInvalidVersion()
+    {
+        new Transaction(null);
+    }
+
+    /**
      * @expectedException \Exception
      */
     public function testGetOutputException()

@@ -77,17 +77,21 @@ class TransactionBuilderInputState
         }
 
         // Gather public keys from redeemScript / outputScript
+        $this->ecAdapter = $ecAdapter;
         $this->redeemScript = $redeemScript;
         $this->prevOutScript = $outputScript;
         $this->publicKeys = $this->execForInputTypes(
             function () {
+            // For pay to pub key hash - nothing useful in output script
                 return [];
             },
             function () {
+            // For pay to pub key - we can extract this from the output script
                 $chunks = $this->prevOutScript->getScriptParser()->parse();
                 return [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
             },
             function () {
+            // Multisig - refer to the redeemScript
                 return $this->redeemScript->getKeys();
             }
         );
@@ -114,13 +118,15 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @return RedeemScript|null
+     * @return RedeemScript
+     * @throws \RuntimeException
      */
     public function getRedeemScript()
     {
         if (null === $this->redeemScript) {
             throw new \RuntimeException('No redeem script was set');
         }
+
         return $this->redeemScript;
     }
 
@@ -321,7 +327,7 @@ class TransactionBuilderInputState
      */
     public function getSigCount()
     {
-        return count($this->signatures);
+        return count(array_filter($this->signatures));
     }
 
     /**
@@ -331,17 +337,17 @@ class TransactionBuilderInputState
     {
         $result = $this->execForInputTypes(
             function () {
-                return count($this->publicKeys) == 1;
+                return (count($this->publicKeys) == 1);
             },
             function () {
-                return count($this->publicKeys) == 1;
+                return (count($this->publicKeys) == 1);
             },
             function () {
                 return true;
             }
         );
 
-        $result &= count($this->signatures) == $this->getRequiredSigCount();
+        $result = $result && (count($this->signatures) == $this->getRequiredSigCount());
 
         return $result;
     }
