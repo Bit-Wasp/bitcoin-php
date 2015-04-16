@@ -28,6 +28,10 @@ class TransactionFactory
         TransactionInputCollection $inputs = null,
         TransactionOutputCollection $outputs = null
     ) {
+        if (null === $version) {
+            $version = TransactionInterface::DEFAULT_VERSION;
+        }
+
         $transaction = new Transaction($version, $inputs, $outputs);
         return $transaction;
     }
