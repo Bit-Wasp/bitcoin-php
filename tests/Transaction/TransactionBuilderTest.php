@@ -119,10 +119,6 @@ class TransactionBuilderTest extends AbstractTestCase
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Secp256k1 extension does not yet support random signatures
-     */
     public function testSecp256k1RefusesRandomSigs()
     {
         if (extension_loaded('secp256k1')) {
@@ -130,7 +126,12 @@ class TransactionBuilderTest extends AbstractTestCase
             $g = Bitcoin::getGenerator();
             $secp256k1 = EcAdapterFactory::getSecp256k1($math, $g);
             $builder = new TransactionBuilder($secp256k1);
-            $builder->useRandomSignatures();
+            try {
+                $builder->useRandomSignatures();
+                $this->fail('Exception was not thrown?');
+            } catch (\RuntimeException $e) {
+                $this->assertTrue($e);
+            }
         }
     }
 
