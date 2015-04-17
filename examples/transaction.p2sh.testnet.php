@@ -20,6 +20,8 @@ $pass = getenv('BITCOINLIB_RPC_PASSWORD') ?: 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi5
 Bitcoin::setNetwork(\BitWasp\Bitcoin\Network\NetworkFactory::bitcoinTestnet());
 
 $network = Bitcoin::getNetwork();
+$ecAdapter = Bitcoin::getEcAdapter();
+
 $bitcoind = RpcFactory::bitcoind($host, $port, $user, $pass);
 
 $privateKey1 = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d5', true);
@@ -42,7 +44,8 @@ $recipient = AddressFactory::fromString('n1b2a9rFvuU9wBgBaoWngNvvMxRV94ke3x');
 echo "[Send to: " . $recipient->getAddress($network) . " \n";
 
 // Prep work - importing from a tx will only bring container to contents of $new - no metadata
-$new = TransactionFactory::builder()
+$new = new \BitWasp\Bitcoin\Transaction\TransactionBuilder($ecAdapter);
+$new
     ->spendOutput($myTx, $spendOutput)
     ->payToAddress($recipient, 100000);
 

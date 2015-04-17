@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Rpc\RpcFactory;
 
 $network = Bitcoin::getNetwork();
+$ecAdapter = Bitcoin::getEcAdapter();
 $host = '127.0.0.1';
 $port = '18332';
 $user = getenv('BITCOINLIB_RPC_USER') ?: 'bitcoinrpc';
@@ -31,15 +32,13 @@ $recipient = \BitWasp\Bitcoin\Address\AddressFactory::fromString('n1b2a9rFvuU9wB
 
 // Begin
 
-
-
 $privateKey1 = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d5', true);
 $privateKey2 = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d6', true);
 $redeemScript = ScriptFactory::multisig(2, array($privateKey1->getPublicKey(), $privateKey2->getPublicKey()));
 
 // First, move money from fundsKey to the multisig address
-$new = TransactionFactory::builder()
-    ->spendOutput($myTx, $spendOutput)
+$new = new \BitWasp\Bitcoin\Transaction\TransactionBuilder($ecAdapter);
+$new->spendOutput($myTx, $spendOutput)
     ->payToAddress($redeemScript->getAddress(), 200000);
 
 echo "[Fund this address: $address]\n";
@@ -60,7 +59,8 @@ try {
 }
 
 echo "Now redeem from the multisig address, send to " . $recipient->getAddress() . "\n";
-$new = TransactionFactory::builder()
+$new = new \BitWasp\Bitcoin\Transaction\TransactionBuilder($ecAdapter);
+$new
     ->spendOutput($tx, 0)
     ->payToAddress($recipient, 50000);
 

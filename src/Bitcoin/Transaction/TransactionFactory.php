@@ -9,15 +9,6 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 class TransactionFactory
 {
     /**
-     * @return TransactionSerializer
-     */
-    public static function getSerializer()
-    {
-        $serializer = new TransactionSerializer;
-        return $serializer;
-    }
-
-    /**
      * @param int|null $version
      * @param TransactionInputCollection|null $inputs
      * @param TransactionOutputCollection|null $outputs
@@ -37,23 +28,12 @@ class TransactionFactory
     }
 
     /**
-     * @param TransactionInterface $tx
-     * @return TransactionBuilder
-     */
-    public static function builder(TransactionInterface $tx = null)
-    {
-        $tx = $tx ?: self::create();
-        $builder = new TransactionBuilder(Bitcoin::getEcAdapter(), $tx);
-        return $builder;
-    }
-
-    /**
      * @param $string
      * @return Transaction
      */
     public static function fromHex($string)
     {
-        $serializer = self::getSerializer();
+        $serializer = new TransactionSerializer;
         $hex = $serializer->parse($string);
         return $hex;
     }

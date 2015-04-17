@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -18,7 +17,6 @@ use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionBuilder;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 
@@ -27,7 +25,8 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testDefaultTransaction()
     {
         $tx = new Transaction();
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
 
         $this->assertEquals($tx, $builder->getTransaction());
     }
@@ -44,7 +43,8 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testCanAddInput()
     {
         $input = new TransactionInput('5a4ebf66822b0b2d56bd9dc64ece0bc38ee7844a23ff1d7320a88c5fdb2ad3e2', 0);
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $builder->addInput($input);
 
         $this->assertEquals($input, $builder->getTransaction()->getInputs()->getInput(0));
@@ -59,7 +59,8 @@ class TransactionBuilderTest extends AbstractTestCase
         $tx->getInputs()->addInput($input);
         $tx->getOutputs()->addOutput($output);
 
-        $builder = TransactionFactory::builder($tx);
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $this->assertEquals($tx, $builder->getTransaction());
         $this->assertEquals($input, $builder->getTransaction()->getInputs()->getInput(0));
         $this->assertEquals($output, $builder->getTransaction()->getOutputs()->getOutput(0));
@@ -76,7 +77,8 @@ class TransactionBuilderTest extends AbstractTestCase
 
         $txid = $tx->getTransactionId();
         $nOut = 0;
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($tx, $nOut);
         $this->assertEquals($txid, $builder->getTransaction()->getInputs()->getInput(0)->getTransactionId());
         $this->assertEquals($nOut, $builder->getTransaction()->getInputs()->getInput(0)->getVout());
@@ -101,7 +103,8 @@ class TransactionBuilderTest extends AbstractTestCase
     {
         $expectedScript = ScriptFactory::scriptPubKey()->payToAddress($address);
 
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $builder->payToAddress($address, 50);
 
         $this->assertEquals($expectedScript, $builder->getTransaction()->getOutputs()->getOutput(0)->getScript());
@@ -258,7 +261,8 @@ class TransactionBuilderTest extends AbstractTestCase
             $outputScript
         ));
 
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($spendTx, 0);
         $builder->signInputWithKey($privateKey, $outputScript, 0);
         $this->assertEquals(1, $builder->getInputState(0)->getRequiredSigCount());
@@ -283,7 +287,8 @@ class TransactionBuilderTest extends AbstractTestCase
             $outputScript
         ));
 
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($spendTx, 0);
         $builder->signInputWithKey($privateKey, $outputScript, 0);
         $this->assertEquals(1, $builder->getInputState(0)->getRequiredSigCount());
@@ -311,7 +316,8 @@ class TransactionBuilderTest extends AbstractTestCase
             $outputScript
         ));
 
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($spendTx, 0);
         $builder->signInputWithKey($pk1, $outputScript, 0, $redeemScript);
         $this->assertEquals(1, $builder->getInputState(0)->getSigCount());

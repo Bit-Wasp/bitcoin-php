@@ -8,9 +8,12 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Rpc\RpcFactory;
+use \BitWasp\Bitcoin\Transaction\TransactionBuilder;
 
 Bitcoin::setNetwork(\BitWasp\Bitcoin\Network\NetworkFactory::bitcoinTestnet());
 $network = Bitcoin::getNetwork();
+$ecAdapter = Bitcoin::getEcAdapter();
+
 $host = '127.0.0.1';
 $port = '18332';
 $user = getenv('BITCOINLIB_RPC_USER') ?: 'bitcoinrpc';
@@ -27,7 +30,8 @@ $spendOutput = 0;
 $recipient = AddressFactory::fromString('n1b2a9rFvuU9wBgBaoWngNvvMxRV94ke3x');
 echo "[Send to: " . $recipient->getAddress($network) . " \n";
 
-$builder = TransactionFactory::builder()
+$builder = new TransactionBuilder($ecAdapter);
+$builder
     ->spendOutput($myTx, $spendOutput)
     ->payToAddress($recipient, 40000);
 echo "setup stage\n";
