@@ -34,7 +34,8 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testCanAddOutput()
     {
         $output = new TransactionOutput(50, new Script());
-        $builder = TransactionFactory::builder();
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
         $builder->addOutput($output);
 
         $this->assertEquals($output, $builder->getTransaction()->getOutputs()->getOutput(0));
