@@ -226,7 +226,9 @@ class TransactionBuilderTest extends AbstractTestCase
             $redeemScript->getOutputScript()
         ));
 
-        $builder = TransactionFactory::builder()->spendOutput($spendTx, 0);
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
+        $builder->spendOutput($spendTx, 0);
 
         $reachedException = false;
         try {

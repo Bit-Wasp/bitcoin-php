@@ -45,9 +45,6 @@ class Transaction extends Serializable implements TransactionInterface
         TransactionInputCollection $inputs = null,
         TransactionOutputCollection $outputs = null
     ) {
-        if (null === $version) {
-            $version = TransactionInterface::DEFAULT_VERSION;
-        }
 
         if (!is_numeric($version)) {
             throw new \InvalidArgumentException('Transaction version must be numeric');
