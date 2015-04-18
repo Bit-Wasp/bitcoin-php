@@ -298,7 +298,7 @@ class TransactionBuilderInputState
             },
             function () use (&$signatures) {
                 return count($signatures) > 0
-                    ? ScriptFactory::scriptSig()->multisigP2sh($this->redeemScript, $this->signatures)
+                    ? ScriptFactory::scriptSig()->multisigP2sh($this->getRedeemScript(), $this->signatures)
                     : ScriptFactory::create();
             }
         );
