@@ -27,7 +27,7 @@ install:
           && cd secp256k1-php/secp256k1 \
           && phpize && ./configure && make && sudo make install \
           && cd ../..; fi'
-    - composer update
+    - composer update --prefer-source
 
 script:
   - php $EXT_SECP256K1 bin/phpunit --coverage-clover build/logs/clover.xml
@@ -49,7 +49,6 @@ matrix:
       ## exclude nightly + extension until the extension itself actually passes tests
       - php: nightly
         env: EXT_SECP256K1="-dextension=secp256k1.so"
-
 
 notifications:
   webhooks:

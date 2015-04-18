@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Signature\SignatureHash;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
@@ -80,19 +81,21 @@ class TransactionBuilderInputState
         $this->ecAdapter = $ecAdapter;
         $this->redeemScript = $redeemScript;
         $this->prevOutScript = $outputScript;
-        $this->publicKeys = $this->execForInputTypes(
+
+        // According to scriptType, extract public keys
+        $this->execForInputTypes(
             function () {
             // For pay to pub key hash - nothing useful in output script
-                return [];
+                $this->publicKeys = [];
             },
             function () {
             // For pay to pub key - we can extract this from the output script
                 $chunks = $this->prevOutScript->getScriptParser()->parse();
-                return [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
+                $this->publicKeys = [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
             },
             function () {
             // Multisig - refer to the redeemScript
-                return $this->redeemScript->getKeys();
+                $this->publicKeys = $this->redeemScript->getKeys();
             }
         );
     }
@@ -207,12 +210,12 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @param Transaction $tx
+     * @param TransactionInterface $tx
      * @param integer $inputToExtract
      * @param ScriptInterface $scriptSig
      * @throws \Exception
      */
-    public function extractSigs(Transaction $tx, $inputToExtract, ScriptInterface $scriptSig)
+    public function extractSigs(TransactionInterface $tx, $inputToExtract, ScriptInterface $scriptSig)
     {
         $parsed = $scriptSig->getScriptParser()->parse();
         $size = count($parsed);
@@ -246,15 +249,14 @@ class TransactionBuilderInputState
                     foreach (array_slice($parsed, 1, -1) as $item) {
                         if ($item instanceof Buffer) {
                             $sig = TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath());
+                            $sigHash = new SignatureHash($tx);
                             $linked = $this->ecAdapter->associateSigs(
                                 [$sig],
-                                $tx
-                                    ->signatureHash()
-                                    ->calculate(
-                                        $this->getPrevOutScript(),
-                                        $inputToExtract,
-                                        $sig->getHashType()
-                                    ),
+                                $sigHash->calculate(
+                                    $this->getPrevOutScript(),
+                                    $inputToExtract,
+                                    $sig->getHashType()
+                                ),
                                 $this->getRedeemScript()->getKeys()
                             );
 
@@ -296,7 +298,7 @@ class TransactionBuilderInputState
             },
             function () use (&$signatures) {
                 return count($signatures) > 0
-                    ? ScriptFactory::scriptSig()->multisigP2sh($this->redeemScript, $this->signatures)
+                    ? ScriptFactory::scriptSig()->multisigP2sh($this->getRedeemScript(), $this->signatures)
                     : ScriptFactory::create();
             }
         );
