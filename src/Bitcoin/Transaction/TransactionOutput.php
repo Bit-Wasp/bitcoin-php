@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\SerializableInterface;
 
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
@@ -28,38 +27,20 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      * @param ScriptInterface $script
      * @param int|string|null $value
      */
-    public function __construct($value = null, ScriptInterface $script = null)
+    public function __construct($value, ScriptInterface $script)
     {
-        if ($script !== null) {
-            $this->setScript($script);
-        }
         $this->value = $value;
+        $this->script = $script;
     }
 
     /**
      * Return the value of this output
      *
-     * @return int|null
+     * @return string|int
      */
     public function getValue()
     {
-        if ($this->value == null) {
-            return '0';
-        }
-
         return $this->value;
-    }
-
-    /**
-     * Set the value of this output, in satoshis
-     *
-     * @param int|null $value
-     * @return $this
-     */
-    public function setValue($value)
-    {
-        $this->value = $value;
-        return $this;
     }
 
     /**
@@ -71,23 +52,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function getScript()
     {
-        if ($this->script == null) {
-            $this->script = new Script();
-        }
-
         return $this->script;
-    }
-
-    /**
-     * Set a Script
-     *
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Script;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterpreter;
+use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
 
@@ -33,7 +34,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
         foreach ($json->test as $c => $test) {
             $flags = $this->setFlags($test->flags);
-            $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), TransactionFactory::create(), $flags);
+            $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), $flags);
             $scriptSig = ScriptFactory::fromHex($test->scriptSig);
             $scriptPubKey = ScriptFactory::fromHex($test->scriptPubKey);
 

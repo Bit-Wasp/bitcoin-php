@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Parser;
-use Mdanter\Ecc\PointInterface;
+use Mdanter\Ecc\Primitives\PointInterface;
 
 class HexPublicKeySerializer
 {
@@ -45,9 +45,9 @@ class HexPublicKeySerializer
     public function serialize(PublicKeyInterface $publicKey)
     {
         $point = $publicKey->getPoint();
-        $math = $this->ecAdapter->getMath();
         $parser = new Parser();
         $parser->writeBytes(1, $this->getPrefix($publicKey->isCompressed(), $point));
+        $math = $this->ecAdapter->getMath();
 
         $publicKey->isCompressed()
             ? $parser

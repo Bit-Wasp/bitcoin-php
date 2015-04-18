@@ -8,18 +8,25 @@ use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\CompactSignature;
-use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 interface EcAdapterInterface
 {
+    const PHPECC = 0;
+    const SECP256K1 = 1;
+
+    /**
+     * @return string
+     */
+    public function getAdapterName();
+
     /**
      * @return \BitWasp\Bitcoin\Math\Math
      */
     public function getMath();
 
     /**
-     * @return \Mdanter\Ecc\GeneratorPoint
+     * @return \Mdanter\Ecc\Primitives\GeneratorPoint
      */
     public function getGenerator();
 
@@ -37,12 +44,12 @@ interface EcAdapterInterface
     public function recoverYfromX($xCoord, $prefix);
 
     /**
-     * @param SignatureCollection $signatures
+     * @param array $signatures
      * @param Buffer $messageHash
      * @param PublicKeyInterface[] $publicKeys
      * @return SignatureInterface[]
      */
-    public function associateSigs(SignatureCollection $signatures, Buffer $messageHash, array $publicKeys);
+    public function associateSigs(array $signatures, Buffer $messageHash, array $publicKeys);
 
     /**
      * @param PrivateKeyInterface $privateKey

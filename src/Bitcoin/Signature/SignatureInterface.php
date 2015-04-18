@@ -19,10 +19,4 @@ interface SignatureInterface extends SerializableInterface
      * @return int
      */
     public function getS();
-
-    /**
-     * Return the sighash type
-     * @return int
-     */
-    public function getSigHashType();
 }

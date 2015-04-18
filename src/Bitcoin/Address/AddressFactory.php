@@ -31,7 +31,7 @@ class AddressFactory
     }
 
     /**
-     * @param                  $address
+     * @param string $address
      * @param NetworkInterface $network
      * @return AddressInterface
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure

@@ -42,14 +42,12 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      * @param ScriptInterface|Buffer $script
      * @param int $sequence
      */
-    public function __construct($txid = null, $vout = null, ScriptInterface $script = null, $sequence = null)
+    public function __construct($txid, $vout, ScriptInterface $script = null, $sequence = self::DEFAULT_SEQUENCE)
     {
         $this->txid = $txid;
         $this->vout = $vout;
         $this->sequence = $sequence;
-        if ($script !== null) {
-            $this->setScript($script);
-        }
+        $this->script = $script ?: new Script();
     }
 
     /**
@@ -63,16 +61,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @param $txid
-     * @return $this
-     */
-    public function setTransactionId($txid)
-    {
-        $this->txid = $txid;
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getVout()
@@ -81,35 +69,11 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @param $vout
-     * @return $this
-     */
-    public function setVout($vout)
-    {
-        $this->vout = $vout;
-        return $this;
-    }
-
-    /**
      * @return int
      */
     public function getSequence()
     {
-        if ($this->sequence == null) {
-            return self::DEFAULT_SEQUENCE;
-        }
-
         return $this->sequence;
-    }
-
-    /**
-     * @param $sequence
-     * @return $this
-     */
-    public function setSequence($sequence)
-    {
-        $this->sequence = $sequence;
-        return $this;
     }
 
     /**
@@ -121,9 +85,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getScript()
     {
-        if ($this->script == null) {
-            $this->script = new Script();
-        }
         return $this->script;
     }
 
@@ -137,27 +98,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     {
         $this->script = $script;
         return $this;
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setOutputScript(ScriptInterface $script)
-    {
-        $this->outputScript = $script;
-        return $this;
-    }
-
-    /**
-     * @return ScriptInterface
-     */
-    public function getOutputScript()
-    {
-        if ($this->outputScript === null) {
-            throw new \RuntimeException('Output script was not set');
-        }
-        return $this->outputScript;
     }
 
     /**

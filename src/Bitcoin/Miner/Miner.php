@@ -5,12 +5,12 @@ namespace BitWasp\Bitcoin\Miner;
 use BitWasp\Bitcoin\Chain\Difficulty;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -132,15 +132,10 @@ class Miner
 
         // Allow user supplied transactions
         if ($coinbaseTx == null) {
-            $input = new TransactionInput;
-            $input->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
-            $input->setVout(0xffffffff);
+            $input = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0xffffffff);
+            $output = new TransactionOutput(5000000000, $this->script);
 
-            $output = new TransactionOutput;
-            $output->setScript($this->script);
-            $output->setValue(5000000000);
-
-            $coinbaseTx = TransactionFactory::create();
+            $coinbaseTx = new Transaction();
             $coinbaseTx->getInputs()->addInput($input);
             $coinbaseTx->getOutputs()->addOutput($output);
         }

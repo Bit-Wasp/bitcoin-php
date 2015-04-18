@@ -11,11 +11,18 @@ use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
-use BitWasp\Bitcoin\Signature\SignatureHashInterface;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 class Secp256k1 extends BaseEcAdapter
 {
+    /**
+     * @return int
+     */
+    public function getAdapterName()
+    {
+        return self::SECP256K1;
+    }
+
     /**
      * @param $scalar
      * @return string
@@ -66,8 +73,6 @@ class Secp256k1 extends BaseEcAdapter
             throw new \Exception('Secp256k1-php failed to sign data');
         }
 
-        // Fix since secp256k1 doesn't know about hashtypes
-        $sigStr .= SignatureHashInterface::SIGHASH_ALL;
         return SignatureFactory::fromHex(bin2hex($sigStr));
     }
 

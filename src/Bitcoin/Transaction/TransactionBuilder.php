@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
+use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
@@ -12,9 +14,12 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Signature\SignatureCollection;
 use BitWasp\Bitcoin\Signature\SignatureHashInterface;
 
+/**
+ * Class TransactionBuilder
+ * @package BitWasp\Bitcoin\Transaction
+ */
 class TransactionBuilder
 {
     /**
@@ -28,9 +33,9 @@ class TransactionBuilder
     private $deterministicSignatures = true;
 
     /**
-     * @var SignatureCollection[]
+     * @var TransactionBuilderInputState[]
      */
-    private $inputSigs = [];
+    private $inputStates = [];
 
     /**
      * @var EcAdapterInterface
@@ -45,12 +50,28 @@ class TransactionBuilder
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
     {
-        $this->transaction = $tx ?: TransactionFactory::create();
-        $inputCount = $this->transaction->getInputs()->count();
-        for ($i = 0; $i < $inputCount; $i++) {
-            $this->inputSigs[$i] = new SignatureCollection;
-        }
+        $this->transaction = $tx ?: new Transaction();
         $this->ecAdapter = $ecAdapter;
+    }
+
+    /**
+     * @param TransactionInputInterface $input
+     * @return $this
+     */
+    public function addInput(TransactionInputInterface $input)
+    {
+        $this->transaction->getInputs()->addInput($input);
+        return $this;
+    }
+
+    /**
+     * @param TransactionOutputInterface $output
+     * @return $this
+     */
+    public function addOutput(TransactionOutputInterface $output)
+    {
+        $this->transaction->getOutputs()->addOutput($output);
+        return $this;
     }
 
     /**
@@ -62,39 +83,32 @@ class TransactionBuilder
      */
     public function spendOutput(TransactionInterface $tx, $outputToSpend)
     {
-        $output = $tx->getOutputs()->getOutput($outputToSpend);
+        // Check TransactionOutput exists in $tx
+        $tx->getOutputs()->getOutput($outputToSpend);
+        $this->addInput(new TransactionInput(
+            $tx->getTransactionId(),
+            $outputToSpend
+        ));
 
-        $input = new TransactionInput($tx->getTransactionId(), $outputToSpend);
-        $input->setOutputScript($output->getScript());
-
-        $this->transaction->getInputs()->addInput($input);
-        $this->inputSigs[count($this->transaction->getInputs()) - 1] = new SignatureCollection();
         return $this;
     }
 
     /**
      * Create an output paying $value to an Address.
+     *
      * @param AddressInterface $address
      * @param $value
      * @return $this
      */
     public function payToAddress(AddressInterface $address, $value)
     {
-        $script = ScriptFactory::scriptPubKey()->payToAddress($address);
-        $output = new TransactionOutput($value, $script);
-        $this->transaction->getOutputs()->addOutput($output);
+        // Create Script from address, then create an output.
+        $this->addOutput(new TransactionOutput(
+            $value,
+            ScriptFactory::scriptPubKey()->payToAddress($address)
+        ));
 
         return $this;
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @param $value
-     * @return TransactionBuilder
-     */
-    public function payToScriptHash(ScriptInterface $script, $value)
-    {
-        return $this->payToAddress($script->getAddress(), $value);
     }
 
     /**
@@ -102,6 +116,10 @@ class TransactionBuilder
      */
     public function useRandomSignatures()
     {
+        if ($this->ecAdapter->getAdapterName() == EcAdapterInterface::SECP256K1) {
+            throw new \RuntimeException('Secp256k1 extension does not yet support random signatures');
+        }
+
         $this->deterministicSignatures = false;
         return $this;
     }
@@ -118,18 +136,40 @@ class TransactionBuilder
     /**
      * @param PrivateKeyInterface $privKey
      * @param Buffer $hash
-     * @return \BitWasp\Bitcoin\Signature\Signature
+     * @return \BitWasp\Bitcoin\Signature\TransactionSignatureInterface
      */
-    public function sign(PrivateKeyInterface $privKey, Buffer $hash)
+    public function sign(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
     {
-        $random = ($this->deterministicSignatures
-            ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
-            : new Random());
-        return $this->ecAdapter->sign($hash, $privKey, $random);
+        return new TransactionSignature(
+            $this->ecAdapter->sign(
+                $hash,
+                $privKey,
+                $this->deterministicSignatures
+                ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
+                : new Random()
+            ),
+            $sigHashType
+        );
+    }
+
+    /**
+     * @param $input
+     * @return TransactionBuilderInputState
+     * @throws BuilderNoInputState
+     */
+    public function getInputState($input)
+    {
+        $this->transaction->getInputs()->getInput($input);
+        if (!isset($this->inputStates[$input])) {
+            throw new BuilderNoInputState('State not found for this input');
+        }
+
+        return $this->inputStates[$input];
     }
 
     /**
      * @param PrivateKeyInterface $privateKey
+     * @param ScriptInterface $outputScript
      * @param $inputToSign
      * @param int $sigHashType
      * @param RedeemScript $redeemScript
@@ -138,55 +178,61 @@ class TransactionBuilder
      */
     public function signInputWithKey(
         PrivateKeyInterface $privateKey,
+        ScriptInterface $outputScript,
         $inputToSign,
         RedeemScript $redeemScript = null,
         $sigHashType = SignatureHashInterface::SIGHASH_ALL
     ) {
 
         $input = $this->transaction->getInputs()->getInput($inputToSign);
-        $outputScript = $input->getOutputScript();
 
-        $prevOutType = new OutputClassifier($outputScript);
-        $parse = $outputScript->getScriptParser()->parse();
-        $signatureHash = $this->transaction->signatureHash();
+        // By design, calling sign should be sufficient to create a TransactionBuilderInputState.
+        try {
+            $inputState = $this->getInputState($inputToSign);
+        } catch (BuilderNoInputState $e) {
+            $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
+                $this->ecAdapter,
+                $outputScript,
+                $redeemScript
+            );
 
-        if ($prevOutType->isPayToPublicKeyHash() && $parse[2] == $privateKey->getPubKeyHash()->getHex()) {
-            $hash = $signatureHash->calculate($outputScript, $inputToSign, $sigHashType);
-            $signature = $this->sign($privateKey, $hash);
-            $script = ScriptFactory::scriptSig()
-                ->payToPubKeyHash($signature, $privateKey->getPublicKey());
-        } else if ($prevOutType->isPayToScriptHash()) {
-            if ($redeemScript === null) {
-                throw new \Exception('Redeem script should be passed when signing a p2sh input');
-            }
-
-            if ($parse[1] == $redeemScript->getScriptHash()->getHex()) {
-                $hash = $signatureHash->calculate($redeemScript, $inputToSign, $sigHashType);
-                $signature = $this->sign($privateKey, $hash);
-                $script = ScriptFactory::scriptSig()
-                    ->multisigP2sh($redeemScript, new SignatureCollection(array($signature)), $hash);
-                // todo..
-            }
+            $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign, $input->getScript());
+            $inputState = $this->inputStates[$inputToSign];
         }
 
-        // Add and reserialize
-        if (isset($script)) {
-            $this->transaction->getInputs()->getInput($inputToSign)->setScript($script);
+        // If it's PayToPubkey / PayToPubkeyHash, TransactionBuilderInputState needs to know the public key.
+        if (in_array($inputState->getPrevOutType(), [OutputClassifier::PAYTOPUBKEYHASH])) {
+            $inputState->setPublicKeys([$privateKey->getPublicKey()]);
         }
 
-        return $this;
-    }
+        $hash = $this->transaction->signatureHash()->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType);
 
-    /**
-     * @param PrivateKeyInterface $priv
-     * @param RedeemScript $redeemScript
-     * @param int $sigHashType
-     * @return $this
-     */
-    public function signWithKey(PrivateKeyInterface $priv, RedeemScript $redeemScript = null, $sigHashType = SignatureHashInterface::SIGHASH_ALL)
-    {
-        foreach ($this->transaction->getInputs()->getInputs() as $c => $input) {
-            $this->signInputWithKey($priv, $c, $redeemScript, $sigHashType);
+        // Could this be done in TransactionBuilderInputState ?
+        // for multisig we want signatures to be in the order of the publicKeys, so if it's not pre-filled OP_Os we're gonna do that now
+        if ($inputState->getScriptType() == OutputClassifier::MULTISIG && count($inputState->getPublicKeys()) !== count($inputState->getSignatures())) {
+            // this can be optimized by not checking against signatures we've already found
+            $orderedSignatures = [];
+            foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
+                $match = false;
+
+                foreach ($inputState->getSignatures() as $signature) {
+                    if ($this->ecAdapter->verify($hash, $publicKey, $signature)) {
+                        $match = $signature;
+                        break;
+                    }
+                }
+
+                $orderedSignatures[] = $match ?: null;
+            }
+
+            $inputState->setSignatures($orderedSignatures);
+        }
+
+        // loop over the publicKeys so we can figure out in which order our signature needs to appear
+        foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
+            if ($privateKey->getPublicKey()->getBinary() === $publicKey->getBinary()) {
+                $inputState->setSignature($idx, $this->sign($privateKey, $hash, $sigHashType));
+            }
         }
 
         return $this;
@@ -197,6 +243,22 @@ class TransactionBuilder
      */
     public function getTransaction()
     {
-        return $this->transaction;
+        $transaction = $this->transaction;
+        $inCount = count($transaction->getInputs());
+
+        for ($i = 0; $i < $inCount; $i++) {
+            // Call regenerateScript if inputState is set, otherwise defer to previous script.
+            $caller = isset($this->inputStates[$i])
+                ? function ($i) {
+                    return $this->inputStates[$i]->regenerateScript();
+                }
+                : function ($i) {
+                    return $this->transaction->getInputs()->getInput($i)->getScript();
+                };
+
+            $transaction->getInputs()->getInput($i)->setScript($caller($i));
+        }
+
+        return $transaction;
     }
 }

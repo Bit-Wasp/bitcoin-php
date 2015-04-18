@@ -59,8 +59,7 @@ class DerSignatureSerializer
         $outer = new Parser();
         $outer
             ->writeBytes(1, '30')
-            ->writeWithLength($inner->getBuffer())
-            ->writeInt(1, $signature->getSighashType(), true);
+            ->writeWithLength($inner->getBuffer());
 
         $serialized = $outer->getBuffer();
 
@@ -76,10 +75,9 @@ class DerSignatureSerializer
     {
         try {
             $parser->readBytes(1);
-            $outer    = $parser->getVarString();
-            $sighash = $parser->readBytes(1)->getInt();
+            $outer = $parser->getVarString();
 
-            $parse    = new Parser($outer);
+            $parse = new Parser($outer);
             $parse->readBytes(1);
             $r = $parse->getVarString()->getInt();
 
@@ -89,7 +87,7 @@ class DerSignatureSerializer
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
 
-        $signature = new Signature($r, $s, $sighash);
+        $signature = new Signature($r, $s);
         return $signature;
     }
 

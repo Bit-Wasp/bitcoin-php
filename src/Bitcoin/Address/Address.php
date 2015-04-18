@@ -27,7 +27,7 @@ abstract class Address implements AddressInterface
     }
 
     /**
-     * @return Buffer
+     * @return string
      */
     public function getHash()
     {
@@ -35,7 +35,7 @@ abstract class Address implements AddressInterface
     }
 
     /**
-     * @param NetworkInterface $network
+     * @param NetworkInterface|null $network
      * @return string
      */
     public function getAddress(NetworkInterface $network = null)

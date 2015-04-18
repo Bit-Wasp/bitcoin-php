@@ -9,11 +9,9 @@
     </testsuites>
 
     <filter>
-        <blacklist>
-            <directory>src/PaymentProtocol/Protobufs</directory>
-        </blacklist>
         <whitelist>
             <directory>src</directory>
+            <exclude>src/PaymentProtocol/Protobufs</exclude>
         </whitelist>
     </filter>
 

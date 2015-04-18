@@ -9,23 +9,23 @@ interface SignatureHashInterface
     /**
      * Default procedure: Sign ALL of the outputs.
      */
-    const SIGHASH_ALL = 0x1;
+    const SIGHASH_ALL = 1;
 
     /**
      * Sign NONE of the outputs, I don't care where the bitcoins go.
      */
-    const SIGHASH_NONE = 0x2;
+    const SIGHASH_NONE = 2;
 
     /**
      * Sign ONE of the outputs, I don't care where the others go.
      */
-    const SIGHASH_SINGLE = 0x3;
+    const SIGHASH_SINGLE = 3;
 
     /**
      * Let other people add inputs to this transaction paying X. I don't
      * care who else pays.
      */
-    const SIGHASH_ANYONECANPAY = 0x80;
+    const SIGHASH_ANYONECANPAY = 128;
 
     /**
      * Calculate the hash of the current transaction, when you are looking to

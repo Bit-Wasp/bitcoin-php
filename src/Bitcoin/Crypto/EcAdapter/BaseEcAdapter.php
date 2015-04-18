@@ -6,9 +6,7 @@ use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Signature\CompactSignature;
-use Mdanter\Ecc\GeneratorPoint;
-use BitWasp\Bitcoin\Signature\SignatureCollection;
-use BitWasp\Bitcoin\Signature\SignatureInterface;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 use BitWasp\Buffertools\Buffer;
 
 abstract class BaseEcAdapter implements EcAdapterInterface
@@ -51,7 +49,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
 
     /**
      * @param Buffer $publicKey
-     * @return \Mdanter\Ecc\PointInterface
+     * @return \Mdanter\Ecc\Primitives\PointInterface
      * @throws \Exception
      */
     public function publicKeyFromBuffer(Buffer $publicKey)
@@ -74,21 +72,21 @@ abstract class BaseEcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param SignatureCollection $signatures
+     * @param array $signatures
      * @param Buffer $messageHash
      * @param \BitWasp\Bitcoin\Key\PublicKeyInterface[] $publicKeys
-     * @return SignatureInterface[]
+     * @return array
      */
-    public function associateSigs(SignatureCollection $signatures, Buffer $messageHash, array $publicKeys)
+    public function associateSigs(array $signatures, Buffer $messageHash, array $publicKeys)
     {
         $sigCount = count($signatures);
         $linked = [];
 
-        foreach ($signatures->getSignatures() as $c => $signature) {
+        foreach ($signatures as $c => $signature) {
             foreach ($publicKeys as $key) {
                 $verify = $this->verify($messageHash, $key, $signature);
                 if ($verify) {
-                    $linked[$key->getPubKeyHash()->getHex()] = $signature;
+                    $linked[$key->getPubKeyHash()->getHex()][] = $signature;
                     if (count($linked) == $sigCount) {
                         break 2;
                     } else {

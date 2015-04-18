@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Math\Math;
-use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class EcAdapterFactory
 {

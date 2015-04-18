@@ -10,8 +10,8 @@ use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
 use Mdanter\Ecc\EccFactory;
-use Mdanter\Ecc\MathAdapterInterface;
-use Mdanter\Ecc\GeneratorPoint;
+use Mdanter\Ecc\Math\MathAdapterInterface;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 /**
  * Class Bitcoin

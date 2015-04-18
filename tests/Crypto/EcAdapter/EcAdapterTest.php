@@ -147,7 +147,6 @@ class EcAdapterTest extends AbstractTestCase
             $sig = $ecAdapter->sign($hash, $pk, new Random());
 
             $this->assertInstanceOf($this->sigType, $sig);
-            $this->assertTrue(Signature::isDERSignature($sig->getBuffer()));
             $this->assertTrue($ecAdapter->verify($hash, $pk->getPublicKey(), $sig));
         }
     }

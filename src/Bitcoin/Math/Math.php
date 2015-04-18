@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Math;
 
 use BitWasp\Buffertools\Buffer;
-use Mdanter\Ecc\NumberTheory;
+use Mdanter\Ecc\Math\NumberTheory;
 
 class Math extends \Mdanter\Ecc\Math\Gmp
 {

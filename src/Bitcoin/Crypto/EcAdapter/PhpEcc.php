@@ -13,10 +13,18 @@ use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
-use Mdanter\Ecc\PointInterface;
+use Mdanter\Ecc\Primitives\PointInterface;
 
 class PhpEcc extends BaseEcAdapter
 {
+    /**
+     * @return int
+     */
+    public function getAdapterName()
+    {
+        return self::PHPECC;
+    }
+
     /**
      * @param PublicKeyInterface $publicKey
      * @param SignatureInterface $signature

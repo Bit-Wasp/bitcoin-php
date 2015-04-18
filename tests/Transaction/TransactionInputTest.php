@@ -4,66 +4,29 @@ namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 
 class TransactionInputTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var string
+     */
+    private $baseType = 'BitWasp\Bitcoin\Transaction\TransactionInput';
 
     /**
-     * @var TransactionInput
+     * @var string
      */
-    protected $in;
-
-    protected $baseType;
-    protected $scriptType;
-
-    public function __construct()
-    {
-        $this->baseType = 'BitWasp\Bitcoin\Transaction\TransactionInput';
-        $this->scriptType = 'BitWasp\Bitcoin\Script\Script';
-    }
-
-    public function setUp()
-    {
-        $this->in = new TransactionInput();
-    }
-
-    public function testGetTransactionId()
-    {
-        $this->assertNull($this->in->getTransactionId());
-    }
-
-    public function testSetTransactionId()
-    {
-        $this->in->setTransactionId('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33');
-        $this->assertSame('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', $this->in->getTransactionId());
-    }
-
-    public function testGetVout()
-    {
-        $this->assertNull($this->in->getVout());
-    }
-
-    public function testSetVout()
-    {
-        $this->in->setVout(0);
-        $this->assertSame(0, $this->in->getVout());
-    }
+    private $scriptType = 'BitWasp\Bitcoin\Script\Script';
 
     public function testGetSequence()
     {
-        $this->assertSame(0xffffffff, $this->in->getSequence());
+        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0');
+        $this->assertSame(0xffffffff, $in->getSequence());
     }
 
     public function testConstructWithScript()
     {
-        $t = new TransactionInput();
-        $this->assertNull($t->getTransactionId());
-        $this->assertNull($t->getVout());
-        $this->assertNull($t->getTransactionId());
 
         $txid = '7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33';
         $vout = '0';
@@ -71,54 +34,34 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $script = new Script();
         $script->push($scriptBuf);
         $sequence = '0';
-        $t = new TransactionInput($txid);
+        $t = new TransactionInput($txid, $vout, $script, $sequence);
         $this->assertSame($txid, $t->getTransactionId());
-
-        $t = new TransactionInput(null, $vout);
         $this->assertSame($vout, $t->getVout());
-
-        $t = new TransactionInput(null, null, $script);
         $this->assertSame($script, $t->getScript());
-
-        $t = new TransactionInput(null, null, null, $sequence);
-        $this->assertSame('0', $t->getSequence());
-    }
-
-    public function testSetSequence()
-    {
-        $this->in->setSequence(10240);
-        $this->assertSame(10240, $this->in->getSequence());
+        $this->assertSame($sequence, $t->getSequence());
     }
 
     public function testGetScript()
     {
-        $script = $this->in->getScript();
+        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0');
+        $script = $in->getScript();
         $this->assertInstanceOf($this->scriptType, $script);
         $this->assertEmpty($script->getBuffer()->getBinary());
     }
 
     public function testIsCoinbase()
     {
-        $this->in = new TransactionInput();
-        $this->in->setTransactionId('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33');
-        $this->in->setVout('0');
-        $this->assertFalse($this->in->isCoinbase());
+        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0');
+        $this->assertFalse($in->isCoinbase());
 
-        $this->in = new TransactionInput();
-        $this->in->setTransactionId('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33');
-        $this->in->setVout(4294967295);
-        $this->assertFalse($this->in->isCoinbase());
+        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 4294967295);
+        $this->assertFalse($in->isCoinbase());
 
-        $this->in = new TransactionInput();
-        $this->in->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
-        $this->in->setVout(0);
-        $this->assertFalse($this->in->isCoinbase());
+        $in = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0);
+        $this->assertFalse($in->isCoinbase());
 
-        $this->in = new TransactionInput();
-        $this->in->setTransactionId('0000000000000000000000000000000000000000000000000000000000000000');
-        $this->in->setVout(4294967295);
-
-        $this->assertTrue($this->in->isCoinbase());
+        $in = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 4294967295);
+        $this->assertTrue($in->isCoinbase());
     }
 
     public function testFromParser()

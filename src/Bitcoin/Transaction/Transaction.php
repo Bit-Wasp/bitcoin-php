@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
@@ -20,49 +21,52 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @var TransactionInputCollection
      */
-    protected $inputs = null;
+    protected $inputs;
 
     /**
      * @var TransactionOutputCollection
      */
-    protected $outputs = null;
+    protected $outputs;
 
     /**
-     * @var
+     * @var int|string
      */
     protected $locktime;
 
     /**
-     *
+     * @param int $version
+     * @param string $locktime
+     * @param TransactionInputCollection $inputs
+     * @param TransactionOutputCollection $outputs
+     * @throws \Exception
      */
-    public function __construct()
-    {
-        $this->inputs = new TransactionInputCollection();
-        $this->outputs = new TransactionOutputCollection();
+    public function __construct(
+        $version = TransactionInterface::DEFAULT_VERSION,
+        TransactionInputCollection $inputs = null,
+        TransactionOutputCollection $outputs = null
+    ) {
+
+        if (!is_numeric($version)) {
+            throw new \InvalidArgumentException('Transaction version must be numeric');
+        }
+
+        if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
+            throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
+        }
+
+        $this->version = $version;
+        $this->inputs = $inputs ?: new TransactionInputCollection();
+        $this->outputs = $outputs ?: new TransactionOutputCollection();
     }
 
     /**
-     * @return string
-     */
-    public function getNetworkCommand()
-    {
-        return 'tx';
-    }
-
-    /**
-     *
+     * @return Parser|string
      */
     public function getTransactionId()
     {
-        $hash = Hash::sha256d($this->getBuffer());
+        $hash = bin2hex(Buffertools::flipBytes(Hash::sha256d($this->getBuffer())));
 
-        $txid = new Parser();
-        $txid = $txid
-            ->writeBytes(32, $hash, true)
-            ->getBuffer()
-            ->getHex();
-
-        return $txid;
+        return $hash;
     }
 
     /**
@@ -70,28 +74,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getVersion()
     {
-        if (is_null($this->version)) {
-            return TransactionInterface::DEFAULT_VERSION;
-        }
-
         return $this->version;
-    }
-
-    /**
-     * Set the version of the transaction
-     *
-     * @param $version
-     * @return $this
-     * @throws \Exception
-     */
-    public function setVersion($version)
-    {
-        if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
-            throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
-        }
-
-        $this->version = $version;
-        return $this;
     }
 
     /**
@@ -137,7 +120,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * Get Lock Time
      *
-     * @return mixed
+     * @return int|string
      */
     public function getLockTime()
     {

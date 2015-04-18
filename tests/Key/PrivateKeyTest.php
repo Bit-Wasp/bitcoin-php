@@ -59,6 +59,7 @@ class PrivateKeyTest extends AbstractTestCase
         $privateKey   = PrivateKeyFactory::fromInt($key, false, $ecAdapter);
 
         $this->assertInstanceOf($this->baseType, $privateKey);
+        $this->assertEquals($key, $privateKey->getInt());
         $this->assertSame($privateKey->getBuffer()->getHex(), '4141414141414141414141414141414141414141414141414141414141414141');
         $this->assertFalse($privateKey->isCompressed());
         $this->assertTrue($privateKey->isPrivate());
