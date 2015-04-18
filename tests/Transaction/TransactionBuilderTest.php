@@ -61,7 +61,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $tx->getOutputs()->addOutput($output);
 
         $ecAdapter = Bitcoin::getEcAdapter();
-        $builder = new TransactionBuilder($ecAdapter);
+        $builder = new TransactionBuilder($ecAdapter, $tx);
         $this->assertEquals($tx, $builder->getTransaction());
         $this->assertEquals($input, $builder->getTransaction()->getInputs()->getInput(0));
         $this->assertEquals($output, $builder->getTransaction()->getOutputs()->getOutput(0));
@@ -78,6 +78,7 @@ class TransactionBuilderTest extends AbstractTestCase
 
         $txid = $tx->getTransactionId();
         $nOut = 0;
+
         $ecAdapter = Bitcoin::getEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($tx, $nOut);
@@ -134,7 +135,7 @@ class TransactionBuilderTest extends AbstractTestCase
                 $builder->useRandomSignatures();
                 $this->fail('Exception was not thrown?');
             } catch (\RuntimeException $e) {
-                $this->assertTrue($e);
+                $this->assertTrue(!!$e);
             }
         }
     }
