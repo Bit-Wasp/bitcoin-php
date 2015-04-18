@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Signature\SignatureHash;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
@@ -209,12 +210,12 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @param Transaction $tx
+     * @param TransactionInterface $tx
      * @param integer $inputToExtract
      * @param ScriptInterface $scriptSig
      * @throws \Exception
      */
-    public function extractSigs(Transaction $tx, $inputToExtract, ScriptInterface $scriptSig)
+    public function extractSigs(TransactionInterface $tx, $inputToExtract, ScriptInterface $scriptSig)
     {
         $parsed = $scriptSig->getScriptParser()->parse();
         $size = count($parsed);
@@ -248,15 +249,14 @@ class TransactionBuilderInputState
                     foreach (array_slice($parsed, 1, -1) as $item) {
                         if ($item instanceof Buffer) {
                             $sig = TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath());
+                            $sigHash = new SignatureHash($tx);
                             $linked = $this->ecAdapter->associateSigs(
                                 [$sig],
-                                $tx
-                                    ->signatureHash()
-                                    ->calculate(
-                                        $this->getPrevOutScript(),
-                                        $inputToExtract,
-                                        $sig->getHashType()
-                                    ),
+                                $sigHash->calculate(
+                                    $this->getPrevOutScript(),
+                                    $inputToExtract,
+                                    $sig->getHashType()
+                                ),
                                 $this->getRedeemScript()->getKeys()
                             );
 
