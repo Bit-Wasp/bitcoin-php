@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
-
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;

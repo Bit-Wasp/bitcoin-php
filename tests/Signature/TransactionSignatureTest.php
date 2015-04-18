@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Signature;
 
-
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
@@ -58,5 +57,4 @@ class TransactionSignatureTest extends AbstractTestCase
             $this->assertSame($test, $sd);
         }
     }
-
 }

@@ -79,5 +79,4 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $in = $s->parse($hex);
         $this->assertEquals($hex, $in->getBuffer()->getHex());
     }
-
 }

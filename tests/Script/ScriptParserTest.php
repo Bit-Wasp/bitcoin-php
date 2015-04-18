@@ -23,8 +23,9 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         );
 
         $s = '';
-        for ($j = 1; $j < 250; $j++)
+        for ($j = 1; $j < 250; $j++) {
             $s .= '41';
+        }
         $start[] = ['4cff'.$s, 76, null, false];
 
         return $start;
@@ -33,13 +34,15 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
     public function getValidPushScripts()
     {
         $s = '';
-        for ($j = 1; $j < 256; $j++)
+        for ($j = 1; $j < 256; $j++) {
             $s .= '41';
+        }
         $s1 = '4cff'.$s;
 
         $t = '';
-        for ($j = 1; $j < 260; $j++)
+        for ($j = 1; $j < 260; $j++) {
             $t .= '41';
+        }
         $t1 = pack("cvH*", 0x4d, 260, $t);
 
         $start = [

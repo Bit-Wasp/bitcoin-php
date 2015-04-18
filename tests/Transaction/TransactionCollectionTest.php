@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
-
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
