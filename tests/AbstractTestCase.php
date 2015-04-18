@@ -19,12 +19,12 @@ class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
         if (getenv('TRAVIS_PHP_VERSION')) {
             if (strlen(getenv('EXT_SECP256K1')) == 0) {
-                $adapters[] = new PhpEcc($math, $generator);
+                $adapters[] = [new PhpEcc($math, $generator)];
             } else {
-                $adapters[] = new Secp256k1($math, $generator);
+                $adapters[] = [new Secp256k1($math, $generator)];
             }
         } else {
-            $adapters[] = new PhpEcc($math, $generator);
+            $adapters[] = [new PhpEcc($math, $generator)];
 
             if (extension_loaded('secp256k1')) {
                 $adapters[] = [new Secp256k1($math, $generator)];
