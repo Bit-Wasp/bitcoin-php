@@ -80,19 +80,21 @@ class TransactionBuilderInputState
         $this->ecAdapter = $ecAdapter;
         $this->redeemScript = $redeemScript;
         $this->prevOutScript = $outputScript;
-        $this->publicKeys = $this->execForInputTypes(
+
+        // According to scriptType, extract public keys
+        $this->execForInputTypes(
             function () {
             // For pay to pub key hash - nothing useful in output script
-                return [];
+                $this->publicKeys = [];
             },
             function () {
             // For pay to pub key - we can extract this from the output script
                 $chunks = $this->prevOutScript->getScriptParser()->parse();
-                return [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
+                $this->publicKeys = [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
             },
             function () {
             // Multisig - refer to the redeemScript
-                return $this->redeemScript->getKeys();
+                $this->publicKeys = $this->redeemScript->getKeys();
             }
         );
     }
