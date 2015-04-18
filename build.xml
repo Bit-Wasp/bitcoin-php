@@ -3,11 +3,33 @@
 <project name="bitcoin/package" default="build">
     <target name="build" depends="lint,phpunit,phpcs" />
 
+    <target name="clean"
+            unless="clean.done"
+            description="Cleanup build artifacts">
+        <delete dir="${project.basedir}/build/coverage"/>
+        <delete dir="${project.basedir}/build/cache"/>
+        <delete dir="${project.basedir}/build/logs"/>
+        <property name="clean.done" value="true"/>
+    </target>
+
+    <target name="prepare"
+            unless="prepare.done"
+            depends="clean"
+            description="Prepare for build">
+        <mkdir dir="${project.basedir}/build/coverage"/>
+        <mkdir dir="${project.basedir}/build/cache"/>
+        <mkdir dir="${project.basedir}/build/logs"/>
+        <property name="prepare.done" value="true"/>
+    </target>
+
     <target name="lint"
         description="Check the syntax of PHP files">
         <mkdir dir="${project.basedir}/build/cache" />
         <phplint cachefile="${project.basedir}/build/cache/phplint.cache">
             <fileset dir="${project.basedir}/src">
+                <include name="**/*.php"/>
+            </fileset>
+            <fileset dir="${project.basedir}/tests">
                 <include name="**/*.php"/>
             </fileset>
         </phplint>
@@ -23,8 +45,17 @@
         </exec>
     </target>
 
-    <target name="phpcs">
-        <exec command="${project.basedir}/bin/phpcbf ./src --standard=PSR1,PSR2 -n" passthru="true">
+    <target name="phpcs"
+            description="Find coding standard violations using PHP_CodeSniffer and print human readable output. Intended for usage on the command line before committing."
+            >
+        <exec command="${project.basedir}/bin/phpcs ./src ./tests --standard=PSR1,PSR2 -n" passthru="true">
+        </exec>
+    </target>
+
+    <target name="phpcbf"
+            description="Fix coding standard violations using PHP_CodeSniffer. Intended for usage on the command line before committing."
+            >
+        <exec command="${project.basedir}/bin/phpcbf ./src ./tests --standard=PSR1,PSR2 -n" passthru="true">
         </exec>
     </target>
 
