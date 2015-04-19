@@ -17,7 +17,7 @@ tools:
     php_pdepend:
         excluded_dirs: [vendor, build, tests]
     external_code_coverage:
-        timeout: 2800
+        timeout: 3600
         runs: 1
 
 changetracking:
