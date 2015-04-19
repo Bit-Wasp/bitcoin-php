@@ -35,7 +35,9 @@
         </phplint>
     </target>
 
-    <target name="phpunit">
+    <target name="phpunit"
+            description="Run test suite"
+            >
         <delete dir="${project.basedir}/build/docs/code-coverage" />
         <mkdir dir="${project.basedir}/build/docs/code-coverage" />
         <exec executable="${project.basedir}/bin/phpunit" passthru="true">
@@ -43,6 +45,16 @@
             <arg path="${project.basedir}" />
             <arg value="--debug" />
         </exec>
+    </target>
+
+    <target name="phpcpd"
+            unless="phpcpd.done"
+            description="Find duplicate code using PHPCPD and print human readable output. Intended for usage on the command line before committing.">
+        <exec executable="${project.basedir}/bin/phpcpd">
+            <arg path="${project.basedir}/src" />
+        </exec>
+
+        <property name="phpcpd.done" value="true"/>
     </target>
 
     <target name="phpcs"
