@@ -6,8 +6,10 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,6 +68,11 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     {
         $tx = new Transaction(1);
         $this->assertEmpty($tx->getInputs());
+
+        $inputs = new TransactionInputCollection([new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0)]);
+        $tx->setInputs($inputs);
+
+        $this->assertEquals(1, count($tx->getInputs()));
     }
 
     public function testAddInput()
@@ -94,6 +101,11 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     {
         $tx = new Transaction();
         $this->assertEmpty($tx->getOutputs());
+
+        $outputs = new TransactionOutputCollection([new TransactionOutput(50, new Script())]);
+        $tx->setOutputs($outputs);
+
+        $this->assertEquals(1, count($tx->getOutputs()));
     }
 
     public function testAddOutput()
