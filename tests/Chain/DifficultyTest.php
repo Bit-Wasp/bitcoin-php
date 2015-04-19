@@ -14,7 +14,8 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->math = Bitcoin::getMath();;
+        $this->math = Bitcoin::getMath();
+        ;
         $this->bits = Buffer::hex('1d00ffff');
         $this->targetHash = '00000000ffff0000000000000000000000000000000000000000000000000000';
     }

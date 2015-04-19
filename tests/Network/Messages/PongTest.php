@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Network\Messages\Ping;
 use BitWasp\Bitcoin\Network\Messages\Pong;

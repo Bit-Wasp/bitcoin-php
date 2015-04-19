@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -11,7 +10,6 @@ use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-
 
 class CompactSignatureTest extends AbstractTestCase
 {
