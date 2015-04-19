@@ -32,10 +32,7 @@
     "bitwasp/buffertools": "0.0.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.3.1",
-    "sebastian/phpcpd": "2.0.2",
-    "squizlabs/php_codesniffer": "2.3.0",
-    "satooshi/php-coveralls": "~0.6.1",
+    "bitwasp/testing-php": "0.0.1",
     "symfony/yaml": "~2.6"
   },
   "config": {
