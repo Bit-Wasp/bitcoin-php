@@ -25,7 +25,7 @@
     "ext-openssl": "*",
     "ext-mcrypt": "*",
     "mdanter/ecc": "dev-master",
-    "pleonasm/merkle-tree": "*",
+    "pleonasm/merkle-tree": "1.0.0",
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "*",
@@ -33,7 +33,7 @@
   },
   "require-dev": {
     "bitwasp/testing-php": "0.0.1",
-    "symfony/yaml": "~2.6"
+    "symfony/yaml": "2.6.6"
   },
   "config": {
     "bin-dir": "bin"
