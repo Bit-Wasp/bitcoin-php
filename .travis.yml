@@ -29,7 +29,7 @@ install:
           && cd ../..; fi'
     - |
         sh -c 'if [ ${TRAVIS_PHP_VERSION:0:3} == "nightly" ]; then \
-           pecl install xdebug
+           pecl install xdebug \
            ; fi'
     - composer update 
 
