@@ -4,6 +4,7 @@
 [![Build Status](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/build-status/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Bit-Wasp/bitcoin-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Bit-Wasp/bitcoin-php/?branch=master)
+[![Downloads](https://img.shields.io/hexpm/dt/plug.svg)]]
 [![Join the chat at https://gitter.im/Bit-Wasp/bitcoin-php](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Bit-Wasp/bitcoin-php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
  
 ## Requirements:
@@ -17,10 +18,12 @@
 
 ##Installation
 You can install this library via Composer:
-`composer require afk11/bitcoin`
+`composer require bitwasp/bitcoin-php`
 or 
 ```{
-    "require": "afk11\bitcoin"
+    "require": {
+      "bitwasp\bitcoin-php": "*",
+    }
 }```
 
 ##Presently supported:
@@ -53,7 +56,7 @@ or
 ## Generate private keys
 ```
  // Create private keys
- use Afk11\Bitcoin\Key\PrivateKeyFactory;
+ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
  
  $network = Bitcoin::GetNetwork();
  $private = PrivateKeyFactory:create(true);
@@ -65,7 +68,7 @@ or
 
 ## Explore the blockchain using OOP bindings to the RPC
 ```
-use Afk11\Bitcoin\Rpc\RpcFactory;
+use BitWasp\Bitcoin\Rpc\RpcFactory;
 
 $bitcoind = RpcFactory::bitcoind('127.0.0.1', 18332, 'bitcoinrpc', 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi55QwWgN6Ng6');
 

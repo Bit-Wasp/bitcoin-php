@@ -27,6 +27,11 @@ install:
           && cd secp256k1-php/secp256k1 \
           && phpize && ./configure && make && sudo make install \
           && cd ../..; fi'
+    - |
+        sh -c '
+        if [ "$TRAVIS_PHP_VERSION" = "nightly" ]; then \
+        echo hi \
+        ; fi'
     - composer update 
 
 script:
