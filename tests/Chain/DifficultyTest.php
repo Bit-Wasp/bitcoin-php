@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Chain;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Chain\Difficulty;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Chain\Difficulty;
 
 class DifficultyTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +13,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
     protected $bits;
 
     /**
-     * 
+     *
      */
     public function __construct()
     {
