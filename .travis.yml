@@ -28,7 +28,7 @@ install:
           && phpize && ./configure && make && sudo make install \
           && cd ../..; fi'
     - |
-        sh -c 'if [ ${TRAVIS_PHP_VERSION:0:3} == "nightly" ]; then \
+        sh -c 'if [[ ${TRAVIS_PHP_VERSION:0:3} == "nightly" ]]; then \
            pecl install xdebug \
            ; fi'
     - composer update 
