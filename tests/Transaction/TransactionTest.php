@@ -188,4 +188,18 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTransactionId());
     }
+
+    public function testOpReturnTx()
+    {
+        $txId = "9b831ef60919c42be1ede10fbe4c773a622144669f7dbaa7bb4452574a9263a2";
+        $raw = "0100000001aadf4be6d94e6028986a70432e97051174dc7ee0b7d0fd4241871a6f5a4c8978000000008a4730440220730f9b2fdd4e94cf0ead16767151e08fc178ae05cea0528583a993988b4360f3022010cbecd765dad96ba86f47df7f770914e6e07d12756b1c7ccc2d3262b68ecaf501410441b5e5365075fc3a3df8313abefdceb0a7f67f5253f96f7ea2cb5d952ac6537adad5e25ca9eef68a486c3c0fe4c87e9fe566b1849c9da03b02c686dfecee99c9ffffffff03f8380900000000001976a91463241d31675c1d761c734649cb3681e92bdf86ee88ac00000000000000000c6a0a6f6d000000468000002a22020000000000001976a91463241d2ef3fcfe30e496135d66c16e66f87b6a4788ac00000000";
+
+        $tx = TransactionFactory::fromHex($raw);
+
+        $this->assertEquals(3, $tx->getOutputs()->count());
+        $this->assertEquals("6a0a6f6d000000468000002a", $tx->getOutputs()->getOutput(1)->getScript()->getHex());
+
+        $this->assertEquals($raw, $tx->getHex());
+        $this->assertEquals($txId, $tx->getTransactionId());
+    }
 }
