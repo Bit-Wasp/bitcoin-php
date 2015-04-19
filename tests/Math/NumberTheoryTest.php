@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Tests\Math;
 
 use BitWasp\Bitcoin\Bitcoin;
-use Mdanter\Ecc\GeneratorPoint;
-use Mdanter\Ecc\NumberTheory;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
+use Mdanter\Ecc\Math\NumberTheory;
 
 class NumberTheoryTest extends \PHPUnit_Framework_TestCase
 {

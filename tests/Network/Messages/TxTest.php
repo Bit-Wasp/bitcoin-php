@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
-
 use BitWasp\Bitcoin\Network\Messages\Tx;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;

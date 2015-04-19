@@ -38,7 +38,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $this->assertSame($test->result, Hash::ripemd160(Buffer::hex($test->data))->getHex());
+            $this->assertSame($test->result, Hash::ripemd160(new Buffer($test->data))->getHex());
         }
     }
 
@@ -96,7 +96,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
         $f = file_get_contents(__DIR__.'/../Data/hash.sha1.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $this->assertSame($test->result, Hash::sha1(Buffer::hex($test->data))->getHex());
+            $this->assertSame($test->result, Hash::sha1(new Buffer($test->data))->getHex());
         }
     }
 }

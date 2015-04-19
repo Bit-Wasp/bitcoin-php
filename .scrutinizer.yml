@@ -17,8 +17,8 @@ tools:
     php_pdepend:
         excluded_dirs: [vendor, build, tests]
     external_code_coverage:
-        timeout: 1800
-        runs: 1
+        timeout: 4800
+        runs: 7
 
 changetracking:
     bug_patterns: ["\bfix(?:es|ed)?\b"]

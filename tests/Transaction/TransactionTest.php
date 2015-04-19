@@ -2,36 +2,24 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Transaction
-     */
-    protected $transaction;
-
-    /**
      * @var string
      */
-    protected $txType;
-
-    public function __construct()
-    {
-        $this->txType = 'BitWasp\Bitcoin\Transaction\Transaction';
-    }
-
-    public function setUp()
-    {
-        $this->transaction = TransactionFactory::create();
-    }
+    protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
 
     public function testGetVersionEmpty()
     {
-        $this->assertEquals(1, $this->transaction->getVersion());
+        $tx = new Transaction();
+        $this->assertEquals(TransactionInterface::DEFAULT_VERSION, $tx->getVersion());
     }
 
     /**
@@ -39,8 +27,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetVersion()
     {
-        $this->transaction->setVersion(1);
-        $this->assertSame($this->transaction->getVersion(), 1);
+        $tx = new Transaction(191);
+        $this->assertSame(191, $tx->getVersion());
     }
 
     /**
@@ -48,19 +36,21 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetVersionException()
     {
-        $this->transaction->setVersion(84294967297);
+        new Transaction(84294967297);
     }
 
     public function testGetLockTime()
     {
         // Default
-        $this->assertSame('0', $this->transaction->getLockTime());
+        $tx = new Transaction();
+        $this->assertSame('0', $tx->getLockTime());
     }
 
     public function testSetLockTime()
     {
-        $this->transaction->setLockTime('0');
-        $this->assertSame('0', $this->transaction->getLockTime());
+        $tx = new Transaction();
+        $tx->setLockTime('0');
+        $this->assertSame('0', $tx->getLockTime());
     }
 
     /**
@@ -68,21 +58,27 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetLockTimeException()
     {
-        $this->transaction->setLockTime('4294967297');
+        $tx = new Transaction();
+        $tx->setLockTime('4294967297');
     }
 
     public function testGetInputs()
     {
-        $this->assertEmpty($this->transaction->getInputs());
+        $tx = new Transaction(1);
+        $this->assertEmpty($tx->getInputs());
     }
 
     public function testAddInput()
     {
-        $in = new TransactionInput();
-        $this->transaction->getInputs()->addInput($in);
-        $inputs = $this->transaction->getInputs();
+        $in = new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0);
+
+        $tx = new Transaction();
+        $tx->getInputs()->addInput($in);
+        $inputs = $tx->getInputs();
         $this->assertSame(1, count($inputs));
         $this->assertSame($in, $inputs->getInput(0));
+        $return = $tx->getInputs()->getInput(0);
+        $this->assertSame($in, $return);
     }
 
     /**
@@ -90,29 +86,36 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetInputException()
     {
-        $this->transaction->getInputs()->getInput(0);
-    }
-
-    public function testGetInput()
-    {
-        $in = new TransactionInput();
-        $this->transaction->getInputs()->addInput($in);
-        $return = $this->transaction->getInputs()->getInput(0);
-        $this->assertSame($in, $return);
+        $tx = new Transaction();
+        $tx->getInputs()->getInput(0);
     }
 
     public function testGetOutputs()
     {
-        $this->assertEmpty($this->transaction->getOutputs());
+        $tx = new Transaction();
+        $this->assertEmpty($tx->getOutputs());
     }
 
     public function testAddOutput()
     {
-        $out = new TransactionOutput();
-        $this->transaction->getOutputs()->addOutput($out);
-        $outputs = $this->transaction->getOutputs();
+        $tx = new Transaction();
+
+        $out = new TransactionOutput(1, new Script);
+        $tx->getOutputs()->addOutput($out);
+        $outputs = $tx->getOutputs();
         $this->assertSame(1, count($outputs));
         $this->assertSame($out, $outputs->getOutput(0));
+        $return = $tx->getOutputs()->getOutput(0);
+        $this->assertSame($out, $return);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Transaction version must be numeric
+     */
+    public function testInvalidVersion()
+    {
+        new Transaction(null);
     }
 
     /**
@@ -120,15 +123,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOutputException()
     {
-        $this->transaction->getOutputs()->getOutput(0);
-    }
-
-    public function testGetOutput()
-    {
-        $out = new TransactionOutput();
-        $this->transaction->getOutputs()->addOutput($out);
-        $return = $this->transaction->getOutputs()->getOutput(0);
-        $this->assertSame($out, $return);
+        $tx = new Transaction();
+        $tx->getOutputs()->getOutput(0);
     }
 
     public function testFromHex()
@@ -178,7 +174,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $tx->toArray());
     }
 
-    public function testCoinbaseTx() {
+    public function testCoinbaseTx()
+    {
         $txId = "fcbe95cd172371d9c35569fbb441774d0fa1adcc2426eff500a4c00a4eb2b6c4";
         $raw = "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff2703681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c0000000001ff702896000000001976a9142c30a6aaac6d96687291475d7d52f4b469f665a688ac00000000";
 
@@ -187,6 +184,20 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($tx->getInputs()->getInput(0)->isCoinBase());
         $this->assertEquals(0, $tx->getInputs()->getInput(0)->getSequence());
         $this->assertEquals("03681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c", $tx->getInputs()->getInput(0)->getScript()->getHex());
+
+        $this->assertEquals($raw, $tx->getHex());
+        $this->assertEquals($txId, $tx->getTransactionId());
+    }
+
+    public function testOpReturnTx()
+    {
+        $txId = "9b831ef60919c42be1ede10fbe4c773a622144669f7dbaa7bb4452574a9263a2";
+        $raw = "0100000001aadf4be6d94e6028986a70432e97051174dc7ee0b7d0fd4241871a6f5a4c8978000000008a4730440220730f9b2fdd4e94cf0ead16767151e08fc178ae05cea0528583a993988b4360f3022010cbecd765dad96ba86f47df7f770914e6e07d12756b1c7ccc2d3262b68ecaf501410441b5e5365075fc3a3df8313abefdceb0a7f67f5253f96f7ea2cb5d952ac6537adad5e25ca9eef68a486c3c0fe4c87e9fe566b1849c9da03b02c686dfecee99c9ffffffff03f8380900000000001976a91463241d31675c1d761c734649cb3681e92bdf86ee88ac00000000000000000c6a0a6f6d000000468000002a22020000000000001976a91463241d2ef3fcfe30e496135d66c16e66f87b6a4788ac00000000";
+
+        $tx = TransactionFactory::fromHex($raw);
+
+        $this->assertEquals(3, $tx->getOutputs()->count());
+        $this->assertEquals("6a0a6f6d000000468000002a", $tx->getOutputs()->getOutput(1)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTransactionId());

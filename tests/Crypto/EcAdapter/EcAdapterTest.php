@@ -110,7 +110,7 @@ class EcAdapterTest extends AbstractTestCase
             $message = new Buffer($test->message);
             $messageHash = Hash::sha256($message);
 
-            $k = new Rfc6979 ($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey, $messageHash);
+            $k = new Rfc6979($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey, $messageHash);
             $sig = $ecAdapter->sign($messageHash, $privateKey, $k);
 
             // K must be correct (from privatekey and message hash)
@@ -147,7 +147,6 @@ class EcAdapterTest extends AbstractTestCase
             $sig = $ecAdapter->sign($hash, $pk, new Random());
 
             $this->assertInstanceOf($this->sigType, $sig);
-            $this->assertTrue(Signature::isDERSignature($sig->getBuffer()));
             $this->assertTrue($ecAdapter->verify($hash, $pk->getPublicKey(), $sig));
         }
     }

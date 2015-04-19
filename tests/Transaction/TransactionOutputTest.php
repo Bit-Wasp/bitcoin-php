@@ -11,45 +11,38 @@ use BitWasp\Buffertools\Parser;
 class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var TransactionOutput
+     * @var string
      */
-    protected $out;
-    protected $txOutType;
-    protected $scriptType;
-    protected $bufferType;
+    private $txOutType = 'BitWasp\Bitcoin\Transaction\TransactionOutput';
+    /**
+     * @var string
+     */
+    private $scriptType = 'BitWasp\Bitcoin\Script\Script';
+
     /**
      * @var TransactionOutputSerializer
      */
     protected $serializer;
 
-    public function __construct()
-    {
-        $this->txOutType = 'BitWasp\Bitcoin\Transaction\TransactionOutput';
-        $this->scriptType = 'BitWasp\Bitcoin\Script\Script';
-        $this->bufferType = 'BitWasp\Buffertools\Buffer';
-    }
-
     public function setUp()
     {
-        $this->out = new TransactionOutput();
+
         $this->serializer = new TransactionOutputSerializer();
     }
 
     public function testGetValueDefault()
     {
-        $this->assertSame('0', $this->out->getValue());
-    }
+        $out = new TransactionOutput('1', new Script());
+        $this->assertSame('1', $out->getValue());
 
-    public function testSetValue()
-    {
-        $this->out->setValue(1);
-        $this->assertSame(1, $this->out->getValue());
+        $out = new TransactionOutput(10901, new Script());
+        $this->assertSame(10901, $out->getValue());
     }
-
 
     public function testGetScript()
     {
-        $script = $this->out->getScript();
+        $out = new TransactionOutput(1, new Script());
+        $script = $out->getScript();
         $this->assertInstanceOf($this->scriptType, $script);
         $this->assertEmpty($script->getBuffer()->getBinary());
     }
@@ -59,35 +52,16 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $script = new Script();
         $script = $script->op('OP_2')->op('OP_3');
 
-        $this->out->setScript($script);
-        $this->assertSame($script, $this->out->getScript());
-    }
-
-    public function testConstructWithScript()
-    {
-        $t = new TransactionOutput();
-        $this->assertEquals('0', $t->getValue());
-        $this->assertEquals((new Script(new Buffer)), $t->getScript());
-
-        $scriptBuf = new Buffer('03010203');
-        $script = new Script();
-        $script->push($scriptBuf);
-        $value = 100000000;
-
-
-
-        $t = new TransactionOutput(null, $script);
-        $this->assertEquals($script, $t->getScript());
-
-        $t = new TransactionOutput($value, null);
-        $this->assertSame($value, $t->getValue());
+        $out = new TransactionOutput(1, $script);
+        $this->assertSame($script, $out->getScript());
     }
 
     public function testFromParser()
     {
         $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
         $parser = new Parser($buffer);
-        $out = $this->serializer->fromParser($parser);
+        $s = new TransactionOutputSerializer();
+        $out = $s->fromParser($parser);
         $this->assertInstanceOf($this->txOutType, $out);
     }
 
@@ -98,5 +72,4 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $out = $s->parse($buffer);
         $this->assertEquals($buffer, $out->getBuffer()->getHex());
     }
-
-};
+}

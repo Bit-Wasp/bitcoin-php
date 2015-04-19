@@ -95,8 +95,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $txCollection = new TransactionCollection(array($tx));
         $this->block->setTransactions($txCollection);
 
-        $merkle = $this->block->getMerkleRoot();
-        $this->assertEquals($tx->getTransactionId(), $merkle);
+        $this->assertEquals($tx->getTransactionId(), $this->block->getMerkleRoot());
     }
 
     public function testFromParser()
@@ -223,7 +222,8 @@ class BlockTest extends \PHPUnit_Framework_TestCase
             '00F2052A01000000'.
             '43'.
             '4104678AFDB0FE5548271967F1A67130B7105CD6A828E03909A67962E0EA1F61DEB649F6BC3F4CEF38C4F35504E51EC112DE5C384DF7BA0B8D578A4C702B6BF11D5FAC'.
-            '00000000');
+            '00000000'
+        );
 
         $newBlock = BlockFactory::fromHex($blockHex);
         $this->assertSame($blockHex, $newBlock->getBuffer()->getHex());

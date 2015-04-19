@@ -37,7 +37,7 @@ class PublicKeyTest extends AbstractTestCase
             $this->publicKey = PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
             $this->assertSame($test->compressed, $this->publicKey->getBuffer()->getHex());
-            $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
+            $this->assertInstanceOf('\Mdanter\Ecc\Primitives\PointInterface', $this->publicKey->getPoint());
             $this->assertSame($this->publicKey->getBuffer()->getHex(), $test->compressed);
             $this->assertTrue($this->publicKey->isCompressed());
         }
@@ -55,7 +55,7 @@ class PublicKeyTest extends AbstractTestCase
             $this->publicKey = PublicKeyFactory::fromHex($test->uncompressed, $ecAdapter);
             $this->assertInstanceOf($this->publicType, $this->publicKey);
             $this->assertSame($test->uncompressed, $this->publicKey->getBuffer()->getHex());
-            $this->assertInstanceOf('\Mdanter\Ecc\PointInterface', $this->publicKey->getPoint());
+            $this->assertInstanceOf('\Mdanter\Ecc\Primitives\PointInterface', $this->publicKey->getPoint());
             $this->assertSame($this->publicKey->getBuffer()->getHex(), $test->uncompressed);
             $this->assertFalse($this->publicKey->isCompressed());
             $this->assertFalse($this->publicKey->isPrivate());
@@ -89,12 +89,12 @@ class PublicKeyTest extends AbstractTestCase
     public function testIsCompressedOrUncompressed()
     {
         $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('00')));
-        $this->assertTrue (PublicKey::isCompressedOrUncompressed(Buffer::hex('0400010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203')));
+        $this->assertTrue(PublicKey::isCompressedOrUncompressed(Buffer::hex('0400010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203')));
         $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('0400010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900')));
         $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('040001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304')));
 
-        $this->assertTrue (PublicKey::isCompressedOrUncompressed(Buffer::hex('020001020304050607080900010203040506070809000102030405060708090001')));
-        $this->assertTrue (PublicKey::isCompressedOrUncompressed(Buffer::hex('030001020304050607080900010203040506070809000102030405060708090001')));
+        $this->assertTrue(PublicKey::isCompressedOrUncompressed(Buffer::hex('020001020304050607080900010203040506070809000102030405060708090001')));
+        $this->assertTrue(PublicKey::isCompressedOrUncompressed(Buffer::hex('030001020304050607080900010203040506070809000102030405060708090001')));
         $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('03000102030405060708090001020304050607080900010203040506070809000102')));
         $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('0300010203040506070809000102030405060708090001020304050607080900')));
 

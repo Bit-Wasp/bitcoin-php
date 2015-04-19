@@ -121,8 +121,7 @@ class HierarchicalKeyTest extends AbstractTestCase
             $this->compareToPrivVectors($master, $test->details);
 
             $key = clone($master);
-            foreach ($test->derivs as $childDeriv)
-            {
+            foreach ($test->derivs as $childDeriv) {
                 $path = $key->decodePath($childDeriv->path);
                 $key  = $key->deriveChild($path);
 
@@ -131,14 +130,16 @@ class HierarchicalKeyTest extends AbstractTestCase
         }
     }
 
-    public function testDecodePath() {
+    public function testDecodePath()
+    {
         // need to init a HierarchicalKey to be able to call the method :/
         $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU', $this->network);
 
         $this->assertEquals("2147483648/2147483649/444/2147526030", $key->decodePath("0'/1'/444/42382'"));
     }
 
-    public function testDerivePath() {
+    public function testDerivePath()
+    {
         $masterKey = HierarchicalKeyFactory::fromEntropy("000102030405060708090a0b0c0d0e0f");
         $this->assertEquals("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi", $masterKey->toExtendedKey());
 
@@ -213,7 +214,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testCreateWithInvalidNetwork()
     {
-        $network = NetworkFactory::create('ff','ff','ff')
+        $network = NetworkFactory::create('ff', 'ff', 'ff')
             ->setHDPrivByte('ffffffff')
             ->setHDPubByte('ffffffff');
 
@@ -360,5 +361,4 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->key = HierarchicalKeyFactory::fromExtended($k, $this->network, $ecAdapter);
         $this->key->deriveChild("2147483648");
     }
-
 }

@@ -4,7 +4,8 @@ namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Script\Opcodes;
 
-class OpcodesTest extends \PHPUnit_Framework_TestCase {
+class OpcodesTest extends \PHPUnit_Framework_TestCase
+{
 
     /**
      * @var Opcodes
@@ -40,5 +41,4 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase {
     {
         $val = $this->op->getOp(3);
     }
-
 }

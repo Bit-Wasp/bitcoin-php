@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
-
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\Version;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
@@ -42,7 +41,7 @@ class VersionTest extends AbstractTestCase
         $this->assertEquals($time, $version->getTimestamp());
         $this->assertEquals($sender, $version->getSenderAddress());
         $this->assertEquals($recipient, $version->getRecipientAddress());
-        $this->assertEquals($services, $version->getServices());
+        $this->assertEquals($services->getInt(), $version->getServices());
         $this->assertEquals($lastBlock, $version->getStartHeight());
         $this->assertInternalType('string', $version->getNonce());
         $this->assertTrue($version->getRelay());

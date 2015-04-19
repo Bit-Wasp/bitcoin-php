@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
-
 use BitWasp\Bitcoin\Block\BlockHeaderFactory;
 use BitWasp\Bitcoin\Network\Messages\Headers;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

@@ -13,7 +13,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "BitWasp\\Bitcoin\\": "src/Bitcoin/",
+      "BitWasp\\Bitcoin\\": "src/",
       "BitWasp\\Bitcoin\\Tests\\": "tests/"
     }
   },
@@ -25,17 +25,15 @@
     "ext-openssl": "*",
     "ext-mcrypt": "*",
     "mdanter/ecc": "dev-master",
-    "pleonasm/merkle-tree": "*",
+    "pleonasm/merkle-tree": "1.0.0",
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "*",
-    "bitwasp/buffertools": "0.0.2"
+    "bitwasp/buffertools": "0.0.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.3.1",
-    "squizlabs/php_codesniffer": "~2.0",
-    "satooshi/php-coveralls": "~0.6.1",
-    "symfony/yaml": "~2.6"
+    "bitwasp/testing-php": "0.0.1",
+    "symfony/yaml": "2.6.6"
   },
   "config": {
     "bin-dir": "bin"
