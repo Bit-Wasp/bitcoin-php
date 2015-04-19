@@ -3,7 +3,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -24,9 +23,9 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
         $rs = $this->getRedeemScript();
 
         return [
-            [$pkh, null, OutputClassifier::PAYTOPUBKEYHASH, 1],
-            [$rs->getOutputScript(), $rs, OutputClassifier::PAYTOSCRIPTHASH, 2],
-            [ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey()), null, OutputClassifier::PAYTOPUBKEY, 1]
+            [$pkh, OutputClassifier::PAYTOPUBKEYHASH, 1, null],
+            [$rs->getOutputScript(), OutputClassifier::PAYTOSCRIPTHASH, 2, $rs],
+            [ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey()), OutputClassifier::PAYTOPUBKEY, 1, null]
         ];
     }
 
@@ -63,7 +62,7 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      * @param RedeemScript $rs
      * @param string $outputType
      */
-    public function testCreateFromScripts(ScriptInterface $script, RedeemScript $rs = null, $outputType, $nReqSig)
+    public function testCreateFromScripts(ScriptInterface $script, $outputType, $nReqSig, RedeemScript $rs = null)
     {
         $state = $this->createState($script, $rs);
         $this->assertEquals($outputType, $state->getPrevOutType());

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
-
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Network\Messages\Block;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -45,6 +44,4 @@ class BlockTest extends AbstractTestCase
         $this->assertEquals($newBlock, $block->getBlock());
         $this->assertEquals($newBlock->getHex(), $block->getHex());
     }
-
-
 }

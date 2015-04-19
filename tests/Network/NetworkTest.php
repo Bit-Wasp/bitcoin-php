@@ -75,7 +75,8 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Exception
      */
-    public function testGetNetBytesFailure(){
+    public function testGetNetBytesFailure()
+    {
         $network = NetworkFactory::create('00', '05', '80', true);
         $network->getNetMagicBytes();
     }

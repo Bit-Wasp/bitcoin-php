@@ -72,5 +72,4 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $out = $s->parse($buffer);
         $this->assertEquals($buffer, $out->getBuffer()->getHex());
     }
-
-};
+}

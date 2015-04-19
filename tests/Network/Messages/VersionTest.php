@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
-
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\Version;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
