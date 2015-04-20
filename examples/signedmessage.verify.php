@@ -20,7 +20,6 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
 $ec = Bitcoin::getEcAdapter();
 
 $addr = \BitWasp\Bitcoin\Address\AddressFactory::fromString($address);
-
 $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(Bitcoin::getMath()));
 $signedMessage = $serializer->parse($sig);
 
