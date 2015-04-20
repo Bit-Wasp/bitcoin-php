@@ -167,8 +167,8 @@ class PhpEcc extends BaseEcAdapter
     /**
      * attempt to calculate the public key recovery param by trial and error
      *
-     * @param                $r
-     * @param                $s
+     * @param integer $r
+     * @param integer $s
      * @param Buffer $messageHash
      * @param PublicKeyInterface $publicKey
      * @return int
@@ -183,7 +183,7 @@ class PhpEcc extends BaseEcAdapter
                 if ($this->recoverCompact($messageHash, $test)->getPoint()->equals($Q)) {
                     return $i;
                 }
-            } catch (\Exception $messageHash) {
+            } catch (\Exception $e) {
                 continue;
             }
         }
