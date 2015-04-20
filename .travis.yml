@@ -27,8 +27,7 @@ install:
           && cd secp256k1-php/secp256k1 \
           && phpize && ./configure && make && sudo make install \
           && cd ../..; fi'
-    - echo "Build $TRAVIS_PHP_VERSION"
-    - composer update 
+    - composer update --prefer-source
 
 script:
   - php $EXT_SECP256K1 bin/phpunit --coverage-clover build/logs/clover.xml

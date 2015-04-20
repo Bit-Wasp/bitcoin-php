@@ -44,12 +44,4 @@ abstract class Address implements AddressInterface
         $payload = Buffer::hex($this->getPrefixByte($network) . $this->getHash());
         return Base58::encodeCheck($payload);
     }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getAddress();
-    }
 }
