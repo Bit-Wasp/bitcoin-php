@@ -66,7 +66,7 @@ class HmacDrbg implements RbgInterface
     /**
      * Return the hash of the given binary $data
      * @param string $data
-     * @return string
+     * @return Buffer
      */
     public function hash($data)
     {
