@@ -8,6 +8,11 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Secp256k1;
 
 class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
+    public function testNothing()
+    {
+
+    }
+
     /**
      * @return array
      */
