@@ -102,7 +102,7 @@ class PaymentRequestBuilder
 
     /**
      * @param OutputBuf $outBuf
-     * @return TransactionOutput
+     * @return TransactionOutputInterface
      */
     private function bufToOutput(OutputBuf $outBuf)
     {
@@ -137,7 +137,7 @@ class PaymentRequestBuilder
 
     /**
      * @param $index
-     * @return OutputBuf
+     * @return TransactionOutputInterface
      */
     public function getOutput($index)
     {
