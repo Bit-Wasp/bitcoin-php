@@ -45,7 +45,7 @@ class SignedMessageSerializer
 
     /**
      * @param $content
-     * @return array
+     * @return SignedMessage
      */
     public function parse($content)
     {
