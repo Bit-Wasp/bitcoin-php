@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
-
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;

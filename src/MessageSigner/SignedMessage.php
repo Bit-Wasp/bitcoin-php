@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\MessageSigner;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
 use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;

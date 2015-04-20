@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\MessageSigner;
 
-
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
