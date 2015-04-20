@@ -14,7 +14,7 @@ use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 class HierarchicalKeyFactory
 {
     /**
-     * @param EcAdapterInterface|null $ecAdapter
+     * @param EcAdapterInterface $ecAdapter
      * @param NetworkInterface $network
      * @return ExtendedKeySerializer
      */

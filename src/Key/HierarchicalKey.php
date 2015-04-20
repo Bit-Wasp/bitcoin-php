@@ -73,7 +73,7 @@ class HierarchicalKey
 
     /**
      * @param $sequence
-     * @return int|string
+     * @return string
      */
     public function getHardenedSequence($sequence)
     {
