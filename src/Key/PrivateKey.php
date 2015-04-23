@@ -50,6 +50,24 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
+     * @param int $tweak
+     * @return PrivateKeyInterface
+     */
+    public function tweakAdd($tweak)
+    {
+        return $this->ecAdapter->privateKeyAdd($this, $tweak);
+    }
+
+    /**
+     * @param int $tweak
+     * @return PrivateKeyInterface
+     */
+    public function tweakMul($tweak)
+    {
+        return $this->ecAdapter->privateKeyMul($this, $tweak);
+    }
+
+    /**
      * @return int
      */
     public function getSecretMultiplier()
