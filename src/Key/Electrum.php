@@ -55,11 +55,10 @@ class Electrum
     /**
      * @param $sequence
      * @param bool $change
+     * @return PrivateKeyInterface|PublicKeyInterface
      */
     public function deriveChild($sequence, $change = false)
     {
-        $key = $this->masterKey;
-
-        
+        return $this->masterKey->tweakAdd($this->getSequenceOffset($sequence, $change));
     }
 }
