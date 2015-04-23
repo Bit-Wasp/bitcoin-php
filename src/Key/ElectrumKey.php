@@ -3,12 +3,14 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Buffertools\Buffer;
 
-class Electrum
+class ElectrumKey
 {
+    /**
+     * @var EcAdapterInterface
+     */
     private $ecAdapter;
 
     /**
