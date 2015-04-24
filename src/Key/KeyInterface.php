@@ -37,4 +37,16 @@ interface KeyInterface extends SerializableInterface
      * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer();
+
+    /**
+     * @param integer $offset
+     * @return KeyInterface
+     */
+    public function tweakAdd($offset);
+
+    /**
+     * @param integer $offset
+     * @return KeyInterface
+     */
+    public function tweakMul($offset);
 }

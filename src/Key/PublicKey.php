@@ -57,6 +57,24 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
+     * @param int $tweak
+     * @return PublicKeyInterface
+     */
+    public function tweakAdd($tweak)
+    {
+        return $this->ecAdapter->publicKeyAdd($this, $tweak);
+    }
+
+    /**
+     * @param int $tweak
+     * @return PublicKeyInterface
+     */
+    public function tweakMul($tweak)
+    {
+        return $this->ecAdapter->publicKeyMul($this, $tweak);
+    }
+
+    /**
      * @param Buffer $publicKey
      * @return bool
      */

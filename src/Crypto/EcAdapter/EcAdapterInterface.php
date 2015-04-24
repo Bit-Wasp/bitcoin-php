@@ -110,29 +110,29 @@ interface EcAdapterInterface
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $integer
+     * @param integer $integer
      * @return PublicKeyInterface
      */
     public function publicKeyAdd(PublicKeyInterface $publicKey, $integer);
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $integer
+     * @param integer $integer
      * @return PublicKeyInterface
      */
     public function publicKeyMul(PublicKeyInterface $publicKey, $integer);
 
     /**
-     * @param PrivateKeyInterface $publicKey
-     * @param $integer
+     * @param PrivateKeyInterface $privateKey
+     * @param integer $integer
      * @return PrivateKeyInterface
      */
-    public function privateKeyAdd(PrivateKeyInterface $publicKey, $integer);
+    public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer);
 
     /**
-     * @param PrivateKeyInterface $publicKey
-     * @param $integer
+     * @param PrivateKeyInterface $privateKey
+     * @param integer $integer
      * @return PrivateKeyInterface
      */
-    public function privateKeyMul(PrivateKeyInterface $publicKey, $integer);
+    public function privateKeyMul(PrivateKeyInterface $privateKey, $integer);
 }
