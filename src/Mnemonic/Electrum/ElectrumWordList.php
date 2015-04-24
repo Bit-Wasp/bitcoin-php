@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Mnemonic\Electrum;
 
-
 use BitWasp\Bitcoin\Mnemonic\WordList;
 
 class ElectrumWordList extends WordList
@@ -263,7 +262,7 @@ class ElectrumWordList extends WordList
     public function getIndex($word)
     {
         // create a flipped word list to speed up the searching of words
-        if ($this->wordsFlipped === null) {
+        if ($this->wordsFlipped == null) {
             $this->wordsFlipped = array_flip($this->getWords());
         }
 

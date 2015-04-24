@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Mnemonic;
 
-
 interface WordListInterface
 {
     /**
@@ -21,5 +20,4 @@ interface WordListInterface
      * @return integer
      */
     public function getIndex($word);
-
 }

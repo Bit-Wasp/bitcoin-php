@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Mnemonic;
 
-
 abstract class WordList implements WordListInterface, \Countable
 {
     /**
