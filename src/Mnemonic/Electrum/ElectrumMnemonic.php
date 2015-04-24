@@ -23,14 +23,41 @@ class ElectrumMnemonic implements MnemonicInterface
         $this->wordList = new ElectrumWordList();
     }
 
+    /**
+     * @param Buffer $entropy
+     * @return array
+     * @throws \Exception
+     */
     public function entropyToWords(Buffer $entropy)
     {
+        $math = $this->ecAdapter->getMath();
+        $n = count($this->wordList);
+        $wordArray = [];
 
+        $chunks = $entropy->getSize() / 8;
+        for ($i = 0; $i < $chunks; $i++) {
+            $x = $entropy->slice(8*$i, 8)->getInt();
+            $index1 = $math->mod($x, $n);
+            $index2 = $math->add($math->div($x, $n), $index1);
+            $index3 = $math->add($math->div($math->div($x, $n), $n), $index1);
+
+            $wordArray += [
+                $this->wordList->getWord($index1),
+                $this->wordList->getWord($index2),
+                $this->wordList->getWord($index3)
+            ];
+        }
+
+        return $wordArray;
     }
 
+    /**
+     * @param Buffer $entropy
+     * @return string
+     */
     public function entropyToMnemonic(Buffer $entropy)
     {
-
+        return implode(" ", $this->entropyToWords($entropy));
     }
 
     /**
