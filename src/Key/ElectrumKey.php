@@ -25,6 +25,10 @@ class ElectrumKey
      */
     public function __construct(EcAdapterInterface $ecAdapter, KeyInterface $masterKey)
     {
+        if ($masterKey->isCompressed()) {
+            throw new \RuntimeException('Electrum keys are not compressed');
+        }
+
         $this->ecAdapter = $ecAdapter;
         $this->masterKey = $masterKey;
     }
