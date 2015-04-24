@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Key;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 
 class ElectrumKey
 {
@@ -29,6 +30,27 @@ class ElectrumKey
     }
 
     /**
+     * @return KeyInterface|PrivateKeyInterface|PublicKeyInterface
+     */
+    public function getMasterPrivateKey()
+    {
+        if ($this->masterKey->isPrivate()) {
+            return $this->masterKey;
+        }
+
+        throw new \RuntimeException("Cannot produce master private key from master public key");
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getMasterPrivateKeyBuf()
+    {
+        $private = $this->getMasterPrivateKey();
+        return $private->getBuffer();
+    }
+
+    /**
      * @return PublicKeyInterface
      */
     public function getMasterPublicKey()
@@ -41,17 +63,36 @@ class ElectrumKey
     }
 
     /**
+     * @return Buffer
+     */
+    public function getMasterPublicKeyBuf()
+    {
+        $math = $this->ecAdapter->getMath();
+        $point = $this->getMasterPublicKey()->getPoint();
+
+        return Buffertools::concat(
+            Buffer::hex($math->decHex($point->getX()), 32),
+            Buffer::hex($math->decHex($point->getY()), 32)
+        );
+    }
+
+    /**
      * @param $sequence
      * @param bool $change
      * @return int|string
      */
     public function getSequenceOffset($sequence, $change = false)
     {
-        $offsetBuf = new Buffer("$sequence:"
-            . ($change ? '1' : '0')
-            . $this->getMasterPublicKey()->getBinary());
-
-        return Hash::sha256d($offsetBuf)->getInt();
+        return Hash::sha256d(
+            new Buffer(
+                sprintf(
+                    "%s:%s:%s",
+                    $sequence,
+                    $change ? '1' : '0',
+                    $this->getMasterPublicKeyBuf()->getBinary()
+                )
+            )
+        )->getInt();
     }
 
     /**
