@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Secp256k1;
 use Mdanter\Ecc\EccFactory;
@@ -14,7 +15,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getEcAdapters()
     {
-        $math = new \BitWasp\Bitcoin\Math\Math;
+        $math = new Math;
         $generator = EccFactory::getSecgCurves()->generator256k1();
         $adapters = [];
 
