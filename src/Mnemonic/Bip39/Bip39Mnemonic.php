@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Mnemonic\BIP39;
 
-
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Mnemonic\MnemonicInterface;
@@ -18,7 +17,7 @@ class Bip39Mnemonic implements MnemonicInterface
     /**
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter, $optionalPassword = FALSE)
+    public function __construct(EcAdapterInterface $ecAdapter, $optionalPassword = false)
     {
         $this->ecAdapter = $ecAdapter;
         $this->wordList = new Bip39WordList();
@@ -40,7 +39,7 @@ class Bip39Mnemonic implements MnemonicInterface
         $bits = str_pad($entBits . $csBits, ($ENT + $CS), '0', STR_PAD_LEFT);
 
         $result = [];
-        foreach(str_split($bits, 11) as $bit) {
+        foreach (str_split($bits, 11) as $bit) {
             $idx = $math->baseConvert($bit, 2, 10);
             $result[] = $this->wordList->getWord($idx);
         }
