@@ -18,7 +18,7 @@ class Bip39Mnemonic implements MnemonicInterface
     /**
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter)
+    public function __construct(EcAdapterInterface $ecAdapter, $optionalPassword = FALSE)
     {
         $this->ecAdapter = $ecAdapter;
         $this->wordList = new Bip39WordList();
