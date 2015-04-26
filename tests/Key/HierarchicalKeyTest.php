@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Key\HierarchicalKey;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Buffertools\Buffer;
 
 class HierarchicalKeyTest extends AbstractTestCase
 {
@@ -102,7 +103,8 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testFromEntropy(EcAdapterInterface $ecAdapter)
     {
-        $this->key = HierarchicalKeyFactory::fromEntropy('4141414141414141414141414141414141414141414141414141414141414141', $ecAdapter);
+        $entropy = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
+        $this->key = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
         $this->assertInstanceOf($this->baseType, $this->key);
     }
 
@@ -117,7 +119,8 @@ class HierarchicalKeyTest extends AbstractTestCase
 
         $json = json_decode($f);
         foreach ($json->test as $testC => $test) {
-            $master = HierarchicalKeyFactory::fromEntropy($test->master, $ecAdapter);
+            $entropy = Buffer::hex($test->master);
+            $master = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
             $this->compareToPrivVectors($master, $test->details);
 
             $key = clone($master);
@@ -140,7 +143,8 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     public function testDerivePath()
     {
-        $masterKey = HierarchicalKeyFactory::fromEntropy("000102030405060708090a0b0c0d0e0f");
+        $entropy = Buffer::hex("000102030405060708090a0b0c0d0e0f");
+        $masterKey = HierarchicalKeyFactory::fromEntropy($entropy);
         $this->assertEquals("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi", $masterKey->toExtendedKey());
 
         $firstChildKey = $masterKey->derivePath("0");

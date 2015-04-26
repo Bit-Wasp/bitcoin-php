@@ -32,18 +32,17 @@ class HierarchicalKeyFactory
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $buffer = PrivateKeyFactory::create(true, $ecAdapter);
-        return self::fromEntropy($buffer->getBuffer()->getHex(), $ecAdapter);
+        return self::fromEntropy($buffer->getBuffer(), $ecAdapter);
     }
 
     /**
-     * @param string $entropy
+     * @param Buffer $entropy
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey
      */
-    public static function fromEntropy($entropy, EcAdapterInterface $ecAdapter = null)
+    public static function fromEntropy(Buffer $entropy, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $entropy = Buffer::hex($entropy);
         $hash = Hash::hmac('sha512', $entropy, new Buffer("Bitcoin seed"), true);
 
         return new HierarchicalKey(
