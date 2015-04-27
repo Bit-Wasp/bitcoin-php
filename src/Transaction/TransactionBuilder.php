@@ -2,19 +2,20 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
+
 use BitWasp\Bitcoin\Address\AddressInterface;
-use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
-use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
+use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\SignatureHashInterface;
+use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Buffertools\Buffer;
 
 class TransactionBuilder
 {

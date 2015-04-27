@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Signature\Signature;
 use Symfony\Component\Yaml\Yaml;
 
 class EcAdapterTest extends AbstractTestCase
