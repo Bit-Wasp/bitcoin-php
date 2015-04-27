@@ -20,7 +20,7 @@ class BlockFactory
         $block = new Block($math);
         return $block;
     }
-    
+
     /**
      * @param $string
      * @param Math $math
