@@ -109,27 +109,41 @@ class HierarchicalKeyTest extends AbstractTestCase
     }
 
     /**
-     * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
-     * @throws \Exception
+     * @return array
      */
-    public function testTestVectors(EcAdapterInterface $ecAdapter)
+    public function getBip32Vectors()
     {
         $f = file_get_contents(__DIR__ . '/../Data/bip32testvectors.json');
-
         $json = json_decode($f);
+
+        $results = [];
         foreach ($json->test as $testC => $test) {
             $entropy = Buffer::hex($test->master);
-            $master = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
-            $this->compareToPrivVectors($master, $test->details);
 
-            $key = clone($master);
-            foreach ($test->derivs as $childDeriv) {
-                $path = $key->decodePath($childDeriv->path);
-                $key  = $key->deriveChild($path);
-
-                $this->compareToPrivVectors($key, $childDeriv->details);
+            foreach ($this->getEcAdapters() as $adapter) {
+                $results[] = [$adapter[0], $entropy, $test->details, $test->derivs];
             }
+        }
+
+        return $results;
+    }
+
+    /**
+     * @dataProvider getBip32Vectors
+     * @param EcAdapterInterface $ecAdapter
+     * @param Buffer $entropy
+     * @param object $details
+     * @throws \Exception
+     */
+    public function testTestVectors(EcAdapterInterface $ecAdapter, Buffer $entropy, $details, $derivs)
+    {
+        $key = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
+        $this->compareToPrivVectors($key, $details);
+
+        foreach ($derivs as $childDeriv) {
+            $path = $key->decodePath($childDeriv->path);
+            $key  = $key->deriveChild($path);
+            $this->compareToPrivVectors($key, $childDeriv->details);
         }
     }
 
@@ -364,5 +378,15 @@ class HierarchicalKeyTest extends AbstractTestCase
         $k         = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
         $this->key = HierarchicalKeyFactory::fromExtended($k, $this->network, $ecAdapter);
         $this->key->deriveChild("2147483648");
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testHardenedSequenceFailure()
+    {
+        $key = HierarchicalKeyFactory::generateMasterKey();
+        // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
+        $key->getHardenedSequence($key->getHardenedSequence(0));
     }
 }
