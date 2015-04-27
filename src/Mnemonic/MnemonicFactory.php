@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39Mnemonic;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39WordListInterface;
 use BitWasp\Bitcoin\Mnemonic\Electrum\ElectrumMnemonic;
-use BitWasp\Bitcoin\Mnemonic\Electrum\Wordlist\ElectrumWordListInterface;
+use BitWasp\Bitcoin\Mnemonic\Electrum\ElectrumWordListInterface;
 
 class MnemonicFactory
 {
@@ -21,7 +21,7 @@ class MnemonicFactory
     {
         return new ElectrumMnemonic(
             $ecAdapter ?: Bitcoin::getEcAdapter(),
-            $wordList ?: new Electrum\Wordlist\EnglishWordlist()
+            $wordList ?: new \BitWasp\Bitcoin\Mnemonic\Electrum\Wordlist\EnglishWordList()
         );
     }
 
