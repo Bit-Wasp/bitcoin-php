@@ -68,8 +68,7 @@ class MessageSigner
                 $hash,
                 $privateKey,
                 new Rfc6979(
-                    $this->ecAdapter->getMath(),
-                    $this->ecAdapter->getGenerator(),
+                    $this->ecAdapter,
                     $privateKey,
                     $hash,
                     'sha256'

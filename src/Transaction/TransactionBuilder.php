@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
@@ -142,7 +141,12 @@ class TransactionBuilder
                 $hash,
                 $privKey,
                 $this->deterministicSignatures
-                ? new Rfc6979($this->ecAdapter->getMath(), $this->ecAdapter->getGenerator(), $privKey, $hash, 'sha256')
+                ? new Rfc6979(
+                    $this->ecAdapter,
+                    $privKey,
+                    $hash,
+                    'sha256'
+                )
                 : new Random()
             ),
             $sigHashType

@@ -63,7 +63,7 @@ class PhpEcc extends BaseEcAdapter
      */
     public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
-        $rbg = $rbg ?: new Rfc6979($this->getMath(), $this->getGenerator(), $privateKey, $messageHash);
+        $rbg = $rbg ?: new Rfc6979($this, $privateKey, $messageHash);
         $randomK = $rbg->bytes(32);
 
         $math = $this->getMath();
