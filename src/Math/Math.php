@@ -3,8 +3,9 @@
 namespace BitWasp\Bitcoin\Math;
 
 use BitWasp\Buffertools\Buffer;
+use \Mdanter\Ecc\Math\Gmp;
 
-class Math extends \Mdanter\Ecc\Math\Gmp
+class Math extends Gmp
 {
     /**
      * @param $integer
