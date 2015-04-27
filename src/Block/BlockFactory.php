@@ -20,9 +20,10 @@ class BlockFactory
         $block = new Block($math);
         return $block;
     }
-
+    
     /**
      * @param $string
+     * @param Math $math
      * @return Block
      */
     public static function fromHex($string, Math $math = null)

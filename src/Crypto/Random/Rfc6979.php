@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Crypto\Random;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\Crypto\Key\PrivateKey as MdPrivateKey;
@@ -22,8 +21,6 @@ class Rfc6979 extends HmacRandomNumberGenerator implements RbgInterface
      * @param PrivateKeyInterface $privateKey
      * @param Buffer $messageHash
      * @param string $algo
-     * @internal param Math $math
-     * @internal param GeneratorPoint $generator
      */
     public function __construct(
         EcAdapterInterface $ecAdapter,
