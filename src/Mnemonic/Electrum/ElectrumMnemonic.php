@@ -15,11 +15,12 @@ class ElectrumMnemonic implements MnemonicInterface
 
     /**
      * @param EcAdapterInterface $ecAdapter
+     * @param ElectrumWordListInterface $wordList
      */
-    public function __construct(EcAdapterInterface $ecAdapter)
+    public function __construct(EcAdapterInterface $ecAdapter, ElectrumWordListInterface $wordList)
     {
         $this->ecAdapter = $ecAdapter;
-        $this->wordList = new ElectrumWordList();
+        $this->wordList = $wordList;
     }
 
     /**
