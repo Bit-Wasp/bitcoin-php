@@ -16,10 +16,6 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\SignatureHashInterface;
 
-/**
- * Class TransactionBuilder
- * @package BitWasp\Bitcoin\Transaction
- */
 class TransactionBuilder
 {
     /**
