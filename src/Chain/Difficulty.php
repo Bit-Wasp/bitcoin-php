@@ -32,9 +32,8 @@ class Difficulty implements DifficultyInterface
     }
 
     /**
-     * Return the lowest 'bits' - for difficulty 1.
-     *
-     * @return Buffer
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::lowestBits()
      */
     public function lowestBits()
     {
@@ -47,9 +46,8 @@ class Difficulty implements DifficultyInterface
     }
 
     /**
-     * Get Max target - that of difficulty 1.
-     *
-     * @return int|string
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getMaxTarget()
      */
     public function getMaxTarget()
     {
@@ -60,23 +58,18 @@ class Difficulty implements DifficultyInterface
     }
 
     /**
-     * Get the target from a compact int.
-     *
-     * @param \BitWasp\Buffertools\Buffer $bits
-     * @return string
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getTarget()
      */
     public function getTarget(Buffer $bits)
     {
         $target = $this->math->getCompact($bits);
-
         return $target;
     }
 
     /**
-     * Get target hash from bits.
-     *
-     * @param Buffer $bits
-     * @return int|string
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getTargetHash()
      */
     public function getTargetHash(Buffer $bits)
     {
@@ -85,10 +78,8 @@ class Difficulty implements DifficultyInterface
     }
 
     /**
-     * Get the difficulty of the supplied bits relative to the lowest target.
-     *
-     * @param Buffer $bits
-     * @return float|number
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getDifficulty()
      */
     public function getDifficulty(Buffer $bits)
     {
