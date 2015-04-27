@@ -14,6 +14,11 @@ class ElectrumMnemonic implements MnemonicInterface
     private $ecAdapter;
 
     /**
+     * @var ElectrumWordListInterface
+     */
+    private $wordList;
+
+    /**
      * @param EcAdapterInterface $ecAdapter
      * @param ElectrumWordListInterface $wordList
      */

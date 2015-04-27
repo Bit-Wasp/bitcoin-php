@@ -15,6 +15,11 @@ class Bip39Mnemonic implements MnemonicInterface
     private $ecAdapter;
 
     /**
+     * @var Bip39WordListInterface
+     */
+    private $wordList;
+
+    /**
      * @param EcAdapterInterface $ecAdapter
      * @param Bip39WordListInterface $wordList
      */
