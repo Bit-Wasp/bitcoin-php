@@ -85,7 +85,7 @@ class Bip39Mnemonic implements MnemonicInterface
         $math = $this->ecAdapter->getMath();
         $words = explode(" ", $mnemonic);
 
-        if ($math->mod(count($words), 3) !== 0) {
+        if ($math->mod(count($words), 3) != 0) {
             throw new \InvalidArgumentException('Invalid mnemonic');
         }
 
@@ -103,8 +103,15 @@ class Bip39Mnemonic implements MnemonicInterface
         $csBits = substr($bits, -1 * $CS);
         $entBits = substr($bits, 0, -1 * $CS);
 
-        $entropy = new Buffer(pack("H*", $math->baseConvert($entBits, 2, 16)), $ENT / 8);
+        $binary = '';
+        $bitsInChar = 8;
+        for ($i = 0; $i < $ENT; $i += $bitsInChar){
+            // Extract 8 bits at a time, convert to hex, pad, and convert to binary.
+            $eBits = substr($entBits, $i, $bitsInChar);
+            $binary .= hex2bin(str_pad($math->baseConvert($eBits, 2, 16), 2, '0', STR_PAD_LEFT));
+        }
 
+        $entropy = new Buffer($binary);
         if ($csBits !== $this->calculateChecksum($entropy, $CS)) {
             throw new \InvalidArgumentException('Checksum does not match');
         }
