@@ -105,7 +105,7 @@ class Bip39Mnemonic implements MnemonicInterface
 
         $binary = '';
         $bitsInChar = 8;
-        for ($i = 0; $i < $ENT; $i += $bitsInChar){
+        for ($i = 0; $i < $ENT; $i += $bitsInChar) {
             // Extract 8 bits at a time, convert to hex, pad, and convert to binary.
             $eBits = substr($entBits, $i, $bitsInChar);
             $binary .= hex2bin(str_pad($math->baseConvert($eBits, 2, 16), 2, '0', STR_PAD_LEFT));

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist;
 
-
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39WordListInterface;
 use BitWasp\Bitcoin\Mnemonic\WordList;
 

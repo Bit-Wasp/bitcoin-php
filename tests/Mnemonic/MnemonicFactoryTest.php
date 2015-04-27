@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Mnemonic;
 
-
 use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
