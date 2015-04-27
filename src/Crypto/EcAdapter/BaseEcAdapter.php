@@ -2,10 +2,9 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
-use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Signature\CompactSignature;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use BitWasp\Buffertools\Buffer;
 
@@ -54,19 +53,19 @@ abstract class BaseEcAdapter implements EcAdapterInterface
      */
     public function publicKeyFromBuffer(Buffer $publicKey)
     {
-        $size = $publicKey->getSize();
-
-        $compressed = $size == PublicKey::LENGTH_COMPRESSED;
+        $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
         $xCoord = $publicKey->slice(1, 32)->getInt();
-        $yCoord = $compressed
-            ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
-            : $publicKey->slice(33, 32)->getInt();
 
         return new PublicKey(
             $this,
             $this->getGenerator()
                 ->getCurve()
-                ->getPoint($xCoord, $yCoord),
+                ->getPoint(
+                    $xCoord,
+                    $compressed
+                        ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
+                        : $publicKey->slice(33, 32)->getInt()
+                ),
             $compressed
         );
     }
@@ -115,33 +114,25 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         $curve = $this->getGenerator()->getCurve();
         $prime = $curve->getPrime();
 
-        try {
-            // x ^ 3
-            $xCubed = $math->powMod($xCoord, 3, $prime);
-            $ySquared = $math->add($xCubed, $curve->getB());
+        // x ^ 3
+        $xCubed = $math->powMod($xCoord, 3, $prime);
+        $ySquared = $math->add($xCubed, $curve->getB());
 
-            // Calculate first root
-            $root0 = $math->getNumberTheory()->squareRootModP($ySquared, $prime);
-            if ($root0 == null) {
-                throw new \RuntimeException('Unable to calculate sqrt mod p');
-            }
+        // Calculate first root
+        $root0 = $math->getNumberTheory()->squareRootModP($ySquared, $prime);
 
-            // Depending on the byte, we expect the Y value to be even or odd.
-            // We only calculate the second y root if it's needed.
-            if ($prefix == PublicKey::KEY_COMPRESSED_EVEN) {
-                $yCoord = ($math->isEven($root0))
-                    ? $root0
-                    : $math->sub($prime, $root0);
-            } else {
-                $yCoord = (!$math->isEven($root0))
-                    ? $root0
-                    : $math->sub($prime, $root0);
-            }
-        } catch (\Exception $e) {
-            throw $e;
+        // Depending on the byte, we expect the Y value to be even or odd.
+        // We only calculate the second y root if it's needed.
+        if ($prefix == PublicKey::KEY_COMPRESSED_EVEN) {
+            $yCoord = ($math->isEven($root0))
+                ? $root0
+                : $math->sub($prime, $root0);
+        } else {
+            $yCoord = (!$math->isEven($root0))
+                ? $root0
+                : $math->sub($prime, $root0);
         }
 
         return $yCoord;
     }
-
 }
