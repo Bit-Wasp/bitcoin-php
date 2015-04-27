@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Math;
 
-
 use Mdanter\Ecc\Math\MathAdapterInterface;
 
 class BinaryMath
