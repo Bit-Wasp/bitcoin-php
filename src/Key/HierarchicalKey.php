@@ -317,19 +317,6 @@ class HierarchicalKey
     }
 
     /**
-     * @return Buffer
-     * @throws \Exception
-     */
-    public function getBuffer()
-    {
-        if ($this->isPrivate()) {
-            return $this->getPrivateKey()->getBuffer();
-        } else {
-            return $this->getPublicKey()->getBuffer();
-        }
-    }
-
-    /**
      *
      * @param NetworkInterface $network
      * @return string
