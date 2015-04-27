@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Mnemonic\BIP39;
+namespace BitWasp\Bitcoin\Mnemonic\Bip39;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -16,11 +16,31 @@ class Bip39Mnemonic implements MnemonicInterface
 
     /**
      * @param EcAdapterInterface $ecAdapter
+     * @param Bip39WordListInterface $wordList
      */
-    public function __construct(EcAdapterInterface $ecAdapter, $optionalPassword = false)
+    public function __construct(EcAdapterInterface $ecAdapter, Bip39WordListInterface $wordList)
     {
         $this->ecAdapter = $ecAdapter;
-        $this->wordList = new Bip39WordList();
+        $this->wordList = $wordList;
+    }
+
+    /**
+     * @param Buffer $entropy
+     * @param integer $CSlen
+     * @return string
+     */
+    private function calculateChecksum(Buffer $entropy, $CSlen)
+    {
+        $entHash = Hash::sha256($entropy);
+        $math = $this->ecAdapter->getMath();
+
+        // Convert byte string to padded binary string of 0/1's.
+        $hashBits = str_pad($math->baseConvert($entHash->getHex(), 16, 2), 256, '0', STR_PAD_LEFT);
+
+        // Take $CSlen bits for the checksum
+        $checksumBits = substr($hashBits, 0, $CSlen);
+
+        return $checksumBits;
     }
 
     /**
@@ -34,8 +54,8 @@ class Bip39Mnemonic implements MnemonicInterface
         $ENT = $entropy->getSize() * 8;
         $CS = $ENT / 32;
 
+        $entBits = $math->baseConvert($entropy->getHex(), 16, 2);
         $csBits = $this->calculateChecksum($entropy, $CS);
-        $entBits = $math->baseConvert($entropy->getBinary(), 256, 2);
         $bits = str_pad($entBits . $csBits, ($ENT + $CS), '0', STR_PAD_LEFT);
 
         $result = [];
@@ -45,25 +65,6 @@ class Bip39Mnemonic implements MnemonicInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param Buffer $entropy
-     * @param integer $CSlen
-     * @return string
-     */
-    private function calculateChecksum(Buffer $entropy, $CSlen)
-    {
-        $entHash = Hash::sha256d($entropy);
-        $math = $this->ecAdapter->getMath();
-
-        // Convert byte string to padded binary string of 0/1's.
-        $hashBits = str_pad($math->baseConvert($entHash->getBinary(), 256, 2), 256, '0', STR_PAD_LEFT);
-
-        // Take $CSlen bits for the checksum
-        $checksumBits = substr($hashBits, 0, $CSlen);
-
-        return $checksumBits;
     }
 
     /**
@@ -102,7 +103,7 @@ class Bip39Mnemonic implements MnemonicInterface
         $csBits = substr($bits, -1 * $CS);
         $entBits = substr($bits, 0, -1 * $CS);
 
-        $entropy = new Buffer($math->baseConvert($entBits, 2, 256), $ENT / 8);
+        $entropy = new Buffer(pack("H*", $math->baseConvert($entBits, 2, 16)), $ENT / 8);
 
         if ($csBits !== $this->calculateChecksum($entropy, $CS)) {
             throw new \InvalidArgumentException('Checksum does not match');
