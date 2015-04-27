@@ -1,4 +1,3 @@
-
 <?php
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
