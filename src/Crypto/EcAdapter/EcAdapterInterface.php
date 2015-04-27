@@ -83,14 +83,6 @@ interface EcAdapterInterface
     public function recoverCompact(Buffer $messageHash, CompactSignature $compactSignature);
 
     /**
-     * @param CompactSignature $compactSignature
-     * @param Buffer $messageHash
-     * @param PayToPubKeyHashAddress $address
-     * @return bool
-     */
-    public function verifyMessage(Buffer $messageHash, PayToPubKeyHashAddress $address, CompactSignature $compactSignature);
-
-    /**
      * @param Buffer $privateKey
      * @return bool
      */

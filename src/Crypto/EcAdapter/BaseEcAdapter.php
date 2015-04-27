@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
-
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
@@ -63,8 +62,8 @@ abstract class BaseEcAdapter implements EcAdapterInterface
                 ->getPoint(
                     $xCoord,
                     $compressed
-                        ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
-                        : $publicKey->slice(33, 32)->getInt()
+                    ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
+                    : $publicKey->slice(33, 32)->getInt()
                 ),
             $compressed
         );
