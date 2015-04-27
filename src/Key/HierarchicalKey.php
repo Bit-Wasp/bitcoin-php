@@ -77,13 +77,13 @@ class HierarchicalKey
      */
     public function getHardenedSequence($sequence)
     {
-        $math = $this->ecAdapter->getMath();
-        $hardened = $math->hexDec('80000000');
-        if ($math->cmp($sequence, $hardened) >= 0) {
+        $bMath = $this->ecAdapter->getMath()->getBinaryMath();
+        if ($bMath->isNegative($sequence, 32)) {
             throw new \LogicException('Sequence is already for a hardened key');
         }
 
-        return $math->add($hardened, $sequence);
+        $prime = $bMath->makeNegative($sequence, 32);
+        return $prime;
     }
 
     /**
@@ -197,8 +197,8 @@ class HierarchicalKey
      */
     public function isHardened()
     {
-        $math = $this->ecAdapter->getMath();
-        return $math->cmp($this->getSequence(), $math->hexDec('80000000')) >= 0;
+        // (sequence >> 31) == 1 ?
+        return $this->ecAdapter->getMath()->getBinaryMath()->isNegative($this->sequence, 32);
     }
 
     /**
@@ -210,9 +210,8 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
-        $math = $this->ecAdapter->getMath();
         $parser = new Parser();
-        $hardened = $math->cmp($sequence, $math->hexDec('80000000')) >= 0;
+        $hardened = $this->ecAdapter->getMath()->getBinaryMath()->isNegative($sequence, 32);
 
         if ($hardened) {
             if ($this->isPrivate() === false) {
