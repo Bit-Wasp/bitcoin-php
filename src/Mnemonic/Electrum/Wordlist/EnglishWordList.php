@@ -1,10 +1,11 @@
 <?php
 
-namespace BitWasp\Bitcoin\Mnemonic\Electrum;
+namespace BitWasp\Bitcoin\Mnemonic\Electrum\Wordlist;
 
+use BitWasp\Bitcoin\Mnemonic\Electrum\ElectrumWordListInterface;
 use BitWasp\Bitcoin\Mnemonic\WordList;
 
-class ElectrumWordList extends WordList
+class EnglishWordList extends WordList implements ElectrumWordListInterface
 {
     /**
      * @var array

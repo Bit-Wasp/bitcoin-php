@@ -5,6 +5,9 @@ namespace BitWasp\Bitcoin\Key;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Mnemonic\Electrum\ElectrumMnemonic;
+use BitWasp\Bitcoin\Mnemonic\Electrum\ElectrumWordListInterface;
+use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
+use BitWasp\Bitcoin\Mnemonic\WordListInterface;
 use BitWasp\Buffertools\Buffer;
 
 class ElectrumKeyFactory
@@ -59,11 +62,12 @@ class ElectrumKeyFactory
      * @param EcAdapterInterface $ecAdapter
      * @return ElectrumKey
      */
-    public static function fromMnemonic($mnemonic, EcAdapterInterface $ecAdapter = null)
+    public static function fromMnemonic($mnemonic, ElectrumWordListInterface $wordList = null, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $mnemonicConverter = new ElectrumMnemonic($ecAdapter);
+        $mnemonicConverter = MnemonicFactory::electrum($wordList, $ecAdapter);
         $entropy = $mnemonicConverter->mnemonicToEntropy($mnemonic);
+
         return self::generateMasterKey($entropy, $ecAdapter);
     }
 
