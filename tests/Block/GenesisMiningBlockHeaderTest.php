@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Block;
 
-
 use BitWasp\Bitcoin\Block\GenesisMiningBlockHeader;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
