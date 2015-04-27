@@ -8,6 +8,14 @@ use \Mdanter\Ecc\Math\Gmp;
 class Math extends Gmp
 {
     /**
+     * @return BinaryMath
+     */
+    public function getBinaryMath()
+    {
+        return new BinaryMath($this);
+    }
+
+    /**
      * @param $integer
      * @return bool
      */
