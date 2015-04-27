@@ -3,17 +3,21 @@
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Bip39;
 
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39Mnemonic;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
-use BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\EnglishWordList;
+use BitWasp\Buffertools\Buffer;
 
 class Bip39SeedGeneratorTest extends AbstractBip39Case
 {
-    public function testMnemonicToSeed()
+    /**
+     * @dataProvider getBip39Vectors
+     */
+    public function testMnemonicToSeed(Bip39Mnemonic $bip39, Buffer $entropy, $mnemonic, Buffer $eSeed)
     {
-        $ec = Bitcoin::getEcAdapter();
-        $seedGenerator = new Bip39SeedGenerator(new Bip39Mnemonic($ec, new EnglishWordList()));
-
+        $password = 'TREZOR';
+        unset($entropy);
+        $seedGenerator = new Bip39SeedGenerator($bip39);
+        $seed = $seedGenerator->getSeed($mnemonic, $password);
+        $this->assertEquals($eSeed->getBinary(), $seed->getBinary());
     }
 }
