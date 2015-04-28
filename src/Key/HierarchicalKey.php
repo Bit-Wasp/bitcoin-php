@@ -204,7 +204,7 @@ class HierarchicalKey
     /**
      * Create a buffer containing data to be hashed hashed to yield the child offset
      *
-     * @param Buffer $sequence
+     * @param integer|string $sequence
      * @return Buffer
      * @throws \Exception
      */
