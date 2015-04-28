@@ -14,7 +14,7 @@ use BitWasp\Bitcoin\Signature\SignatureHash;
 class Transaction extends Serializable implements TransactionInterface
 {
     /**
-     * @var int
+     * @var int|string
      */
     protected $version;
 
@@ -34,8 +34,7 @@ class Transaction extends Serializable implements TransactionInterface
     protected $locktime;
 
     /**
-     * @param int $version
-     * @param string $locktime
+     * @param int|string $version
      * @param TransactionInputCollection $inputs
      * @param TransactionOutputCollection $outputs
      * @throws \Exception
