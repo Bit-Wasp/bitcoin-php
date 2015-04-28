@@ -57,7 +57,7 @@ class PaymentRequestSigner
             }
 
             $chain = $this->fetchChain($certFile);
-            if (count($chain) == 0) {
+            if (!is_array($chain) || count($chain) == 0) {
                 throw new \RuntimeException('Certificate file contains no certificates');
             }
 
@@ -93,7 +93,7 @@ class PaymentRequestSigner
             $data = $request->serialize();
             $signature = '';
             $result = openssl_sign($data, $signature, $this->privateKey, $this->algoConst);
-            if ($signature === false || $result == false) {
+            if ($signature === false || $result === false) {
                 throw new \Exception('Error during signing: Unable to create signature');
             }
             $request->setSignature($signature);
