@@ -675,7 +675,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     break;
                                 default:
                                     throw new \Exception('Invalid Opcode');
-                                break;
                             }
 
                             $this->mainStack->pop();
