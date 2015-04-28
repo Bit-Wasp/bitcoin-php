@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-
 use DrSlump\Protobuf;
 use DrSlump\Protobuf\Descriptor;
 use DrSlump\Protobuf\Field;
