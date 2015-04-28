@@ -132,24 +132,27 @@ class Miner
 
         // Allow user supplied transactions
         if ($coinbaseTx == null) {
-            $input = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0xffffffff);
-            $output = new TransactionOutput(5000000000, $this->script);
-
             $coinbaseTx = new Transaction();
-            $coinbaseTx->getInputs()->addInput($input);
-            $coinbaseTx->getOutputs()->addOutput($output);
+            $coinbaseTx->getInputs()->addInput(new TransactionInput(
+                '0000000000000000000000000000000000000000000000000000000000000000',
+                0xffffffff
+            ));
+            $coinbaseTx->getOutputs()->addOutput(new TransactionOutput(
+                5000000000,
+                $this->script
+            ));
         }
 
         $inputs = $coinbaseTx->getInputs();
         $header = new BlockHeader();
-        $block  = new Block($this->math);
-        $found  = false;
+        $block = new Block($this->math);
+        $found = false;
 
         $usingDiff = $this->lastBlockHeader->getBits();
-        $diff      = new Difficulty($this->math);
-        $target    = $diff->getTarget($usingDiff);
+        $diff = new Difficulty($this->math);
+        $target = $diff->getTarget($usingDiff);
 
-        while ($found == false) {
+        while (false === $found) {
             // Set coinbase script, and build Merkle tree & block header.
             $inputs->getInput(0)->setScript($this->getCoinbaseScriptBuf());
 
