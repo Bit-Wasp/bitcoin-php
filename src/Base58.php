@@ -40,7 +40,7 @@ class Base58
         $return = strrev($return);
 
         //leading zeros
-        for ($i = 0; $i < $size && substr($orig, $i, 1) == "\x00"; $i++) {
+        for ($i = 0; $i < $size && $orig[$i] == "\x00"; $i++) {
             $return = "1" . $return;
         }
 
@@ -98,10 +98,10 @@ class Base58
      */
     public static function decodeCheck($base58)
     {
-        $hex       = self::decode($base58);
-        $csVerify  = $hex->slice(-4);
-        $data      = $hex->slice(0, -4);
-        $checksum  = self::checksum($data);
+        $hex = self::decode($base58);
+        $csVerify = $hex->slice(-4);
+        $data = $hex->slice(0, -4);
+        $checksum = self::checksum($data);
 
         if ($checksum != $csVerify) {
             throw new Base58ChecksumFailure('Failed to verify checksum');
