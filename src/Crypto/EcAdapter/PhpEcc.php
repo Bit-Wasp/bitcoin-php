@@ -183,7 +183,7 @@ class PhpEcc extends BaseEcAdapter
                 if ($this->recoverCompact($messageHash, $test)->getPoint()->equals($Q)) {
                     return $i;
                 }
-            } catch (\Exception $messageHash) {
+            } catch (\Exception $e) {
                 continue;
             }
         }
