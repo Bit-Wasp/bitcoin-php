@@ -10,7 +10,7 @@ use BitWasp\Buffertools\Buffer;
 class RedeemScript extends Script
 {
     /**
-     * @var int
+     * @var int|string
      */
     private $m;
 
@@ -20,7 +20,7 @@ class RedeemScript extends Script
     private $keys = [];
 
     /**
-     * @param integer|string $m
+     * @param int|string $m
      * @param \BitWasp\Bitcoin\Key\PublicKeyInterface[] $keys
      */
     public function __construct($m, array $keys)
