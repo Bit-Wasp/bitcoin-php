@@ -92,8 +92,6 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isMultisig()
     {
-        // @TODO: hmm?
-        $opcodes = $this->script->getOpcodes();
         $count = count($this->evalScript);
         return (
             $count >= 2
