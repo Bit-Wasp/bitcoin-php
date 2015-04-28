@@ -44,11 +44,11 @@ class PaymentRequestSigner
         $this->certificates = new X509CertificatesBuf();
 
         if ($type !== 'none') {
-            if (false == file_exists($keyFile)) {
+            if (false === file_exists($keyFile)) {
                 throw new \InvalidArgumentException('Private key file does not exist');
             }
 
-            if (false == file_exists($certFile)) {
+            if (false === file_exists($certFile)) {
                 throw new \InvalidArgumentException('Certificate file does not exist');
             }
 
