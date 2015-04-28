@@ -59,7 +59,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Parser|string
+     * @return string
      */
     public function getTransactionId()
     {

@@ -9,10 +9,8 @@ use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Signature\SignatureFactory;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 
