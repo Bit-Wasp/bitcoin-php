@@ -56,7 +56,7 @@ class DifficultyTest extends \PHPUnit_Framework_TestCase
             $bits = Buffer::hex($test->bits);
             $difficulty = new Difficulty($this->math, $default);
 
-            $this->assertEquals($test->targetHash, $difficulty->getTargetHash($bits));
+            $this->assertEquals($test->targetHash, $difficulty->getTargetHash($bits)->getHex());
             $this->assertEquals($test->difficulty, $difficulty->getDifficulty($bits));
         }
     }
