@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Block\BlockHeaderFactory;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
@@ -165,8 +164,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     public function testFromParserFailure()
     {
         $genesisHeader = '0100000000000000000000003BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A29AB5F49FFFF001D1DAC2B7C';
-        $header = BlockHeaderFactory::fromHex($genesisHeader);
-
+        BlockHeaderFactory::fromHex($genesisHeader);
     }
 
     public function testFromHex()

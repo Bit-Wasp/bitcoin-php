@@ -105,9 +105,9 @@ class Hash
     /**
      * Do HMAC hashing on $data and $salt
      *
-     * @param $algo
+     * @param string $algo
      * @param Buffer $data
-     * @param $salt
+     * @param Buffer $salt
      * @return Buffer
      */
     public static function hmac($algo, Buffer $data, Buffer $salt)

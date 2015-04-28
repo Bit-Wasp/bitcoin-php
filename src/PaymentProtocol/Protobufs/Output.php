@@ -2,7 +2,12 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-class Output extends \DrSlump\Protobuf\Message
+use \DrSlump\Protobuf;
+use \DrSlump\Protobuf\Descriptor;
+use \DrSlump\Protobuf\Field;
+use \DrSlump\Protobuf\Message;
+
+class Output extends Message
 {
 
     /**  @var int */
@@ -17,23 +22,23 @@ class Output extends \DrSlump\Protobuf\Message
 
     public static function descriptor()
     {
-        $descriptor = new \DrSlump\Protobuf\Descriptor(__CLASS__, 'payments.Output');
+        $descriptor = new Descriptor(__CLASS__, 'payments.Output');
 
         // OPTIONAL UINT64 amount = 1
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 1;
         $f->name = "amount";
-        $f->type = \DrSlump\Protobuf::TYPE_UINT64;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_UINT64;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $f->default = 0;
         $descriptor->addField($f);
 
         // REQUIRED BYTES script = 2
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 2;
         $f->name = "script";
-        $f->type = \DrSlump\Protobuf::TYPE_BYTES;
-        $f->rule = \DrSlump\Protobuf::RULE_REQUIRED;
+        $f->type = Protobuf::TYPE_BYTES;
+        $f->rule = Protobuf::RULE_REQUIRED;
         $descriptor->addField($f);
 
         foreach (self::$__extensions as $cb) {

@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Serializer\NetworkMessageSerializer;
 abstract class NetworkSerializable extends Serializable implements NetworkSerializableInterface
 {
     /**
-     * @param NetworkInterface $network
+     * @param Network $network
      * @return NetworkMessage
      */
     public function getNetworkMessage(Network $network = null)

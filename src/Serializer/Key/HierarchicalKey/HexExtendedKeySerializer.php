@@ -92,15 +92,15 @@ class HexExtendedKeySerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) =
-                [
-                    $parser->readBytes(4)->getHex(),
-                    $parser->readBytes(1)->getInt(),
-                    $parser->readBytes(4)->getInt(),
-                    $parser->readBytes(4)->getInt(),
-                    $parser->readBytes(32)->getInt(),
-                    $parser->readBytes(33)
-                ];
+            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = [
+                $parser->readBytes(4)->getHex(),
+                $parser->readBytes(1)->getInt(),
+                $parser->readBytes(4)->getInt(),
+                $parser->readBytes(4)->getInt(),
+                $parser->readBytes(32)->getInt(),
+                $parser->readBytes(33)
+            ];
+
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
         }

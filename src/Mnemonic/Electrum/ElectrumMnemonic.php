@@ -79,8 +79,8 @@ class ElectrumMnemonic implements MnemonicInterface
         $thirdWordCount = count($words) / 3;
 
         for ($i = 0; $i < $thirdWordCount; $i++) {
-            $a = $math->mul(3, $i);
-            list ($word1, $word2, $word3) = array_slice($words, $a, 3);
+            list ($word1, $word2, $word3) = array_slice($words, $math->mul(3, $i), 3);
+
             $index1 = $wordList->getIndex($word1);
             $index2 = $wordList->getIndex($word2);
             $index3 = $wordList->getIndex($word3);
@@ -101,7 +101,8 @@ class ElectrumMnemonic implements MnemonicInterface
                     )
                 )
             );
-            $out .= $math->decHex($x);
+
+            $out .= str_pad($math->decHex($x), 8, '0', STR_PAD_LEFT);
         }
 
         return Buffer::hex($out);

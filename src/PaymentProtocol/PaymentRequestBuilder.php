@@ -118,7 +118,7 @@ class PaymentRequestBuilder
     public function addOutput(TransactionOutputInterface $txOutput)
     {
         $output = $this->outputToBuf($txOutput);
-        $this->details->addOutputs($output, $this->outputCount++);
+        $this->details->addOutputs($output);
         return $this;
     }
 

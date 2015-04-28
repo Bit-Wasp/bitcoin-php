@@ -41,16 +41,18 @@ class HexPrivateKeySerializer
     public function fromParser(Parser & $parser)
     {
         $bytes = $parser->readBytes(32);
-        return $this->parse($bytes->getHex());
+        $multiplier = $bytes->getInt();
+        $privateKey = PrivateKeyFactory::fromInt($multiplier, false, $this->ecAdapter);
+        return $privateKey;
     }
+
     /**
      * @param $string
      * @return PrivateKey
      */
     public function parse(Buffer $string)
     {
-        $multiplier = $string->getInt();
-        $privateKey = PrivateKeyFactory::fromInt($multiplier, false, $this->ecAdapter);
-        return $privateKey;
+        $parser = new Parser($string);
+        return $this->fromParser($parser);
     }
 }

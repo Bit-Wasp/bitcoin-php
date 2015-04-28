@@ -3,8 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
@@ -23,31 +22,33 @@ class SignedMessage extends AbstractTestCase
 hi
 -----BEGIN SIGNATURE-----
 IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
------END BITCOIN SIGNED MESSAGE-----'
+-----END BITCOIN SIGNED MESSAGE-----',
+                NetworkFactory::bitcoinTestnet()
             ];
     }
 
-    public function testParsesMessage()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testParsesMessage(EcAdapterInterface $ecAdapter)
     {
-        list ($message, $address, $content) = $this->sampleMessage();
-        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(Bitcoin::getMath()));
+        $math = $ecAdapter->getMath();
+
+        list ($message, $address, $content, $network) = $this->sampleMessage();
+        $address = AddressFactory::fromString($address, $network);
+
+        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer($math));
         $signed = $serializer->parse($content);
+        $signer = new MessageSigner($ecAdapter);
 
         $this->assertSame($message, $signed->getMessage());
         $this->assertSame('11884306385941066859834558634967777927278716082145975036347303871472774300855', $signed->getCompactSignature()->getR());
         $this->assertSame('38787429741286654786942380905403782954160859974631158035207591010286944440307', $signed->getCompactSignature()->getS());
         $this->assertSame(1, $signed->getCompactSignature()->getRecoveryId());
         $this->assertSame(true, $signed->getCompactSignature()->isCompressed());
-
         $this->assertSame($content, $signed->getBuffer()->getBinary());
-    }
 
-    public function testSignMessage()
-    {
-        $private = PrivateKeyFactory::create();
-        $message = 'hi';
-        $signer = new MessageSigner(Bitcoin::getEcAdapter());
-        $signed = $signer->sign($message, $private);
-        $this->assertTrue($signer->verify($signed, $private->getAddress()));
+        $this->assertTrue($signer->verify($signed, $address));
     }
 }

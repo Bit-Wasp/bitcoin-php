@@ -2,73 +2,49 @@
 
 namespace BitWasp\Bitcoin\Crypto\Random;
 
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
-use Mdanter\Ecc\Primitives\GeneratorPoint;
+use BitWasp\Buffertools\Buffer;
+use Mdanter\Ecc\Crypto\Key\PrivateKey as MdPrivateKey;
+use Mdanter\Ecc\Random\HmacRandomNumberGenerator;
 
 class Rfc6979 implements RbgInterface
 {
 
     /**
-     * @var HmacDrbg
+     * @var EcAdapterInterface
      */
-    protected $drbg;
+    private $ecAdapter;
 
     /**
-     * @var Math
+     * @var HmacRandomNumberGenerator
      */
-    protected $math;
+    private $hmac;
 
     /**
-     * @var GeneratorPoint
-     */
-    protected $generator;
-
-    /**
-     * @var Buffer
-     */
-    protected $k;
-
-    /**
-     * @param Math $math
-     * @param GeneratorPoint $generator
+     * @param EcAdapterInterface $ecAdapter
      * @param PrivateKeyInterface $privateKey
      * @param Buffer $messageHash
      * @param string $algo
      */
-    public function __construct(Math $math, GeneratorPoint $generator, PrivateKeyInterface $privateKey, Buffer $messageHash, $algo = 'sha256')
-    {
-        $this->math      = $math;
-        $this->generator = $generator;
-        $entropy         = new Buffer($privateKey->getBuffer()->getBinary() . $messageHash->getBinary());
-        $this->drbg      = new HmacDrbg($algo, $entropy);
+    public function __construct(
+        EcAdapterInterface $ecAdapter,
+        PrivateKeyInterface $privateKey,
+        Buffer $messageHash,
+        $algo = 'sha256'
+    ) {
+        $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey->getSecretMultiplier());
+        $this->ecAdapter = $ecAdapter;
+        $this->hmac = new HmacRandomNumberGenerator($ecAdapter->getMath(), $mdPk, $messageHash->getInt(), $algo);
     }
 
     /**
-     * Return a K value deterministically derived from the private key
-     * and data
-     *
-     * @param int $numBytes
+     * @param int $bytes
      * @return Buffer
      */
-    public function bytes($numBytes)
+    public function bytes($bytes)
     {
-        if (is_null($this->k)) {
-            while (true) {
-                $this->k = $this->drbg->bytes($numBytes);
-                $kInt = $this->k->getInt();
-
-                // Check k is between [1, ... Q]
-                if ($this->math->cmp(1, $kInt) <= 0 && $this->math->cmp($kInt, $this->generator->getOrder()) < 0) {
-                    break;
-                }
-
-                // Otherwise derive another and try again.
-                $this->drbg->update(null);
-            }
-        }
-
-        return $this->k;
+        $integer = $this->hmac->generate($this->ecAdapter->getGenerator()->getOrder());
+        return Buffer::hex($this->ecAdapter->getMath()->decHex($integer));
     }
 }

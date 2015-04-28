@@ -66,6 +66,7 @@ class X509Certificates extends \DrSlump\Protobuf\Message
      * Set <certificate> value
      *
      * @param string $value
+     * @param int $idx
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates
      */
     public function setCertificate($value, $idx = null)

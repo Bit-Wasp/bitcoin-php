@@ -178,7 +178,7 @@ class AlertDetail extends Serializable
     }
 
     /**
-     * @return Buffer|string
+     * @return Buffer
      */
     public function getComment()
     {
@@ -186,7 +186,7 @@ class AlertDetail extends Serializable
     }
 
     /**
-     * @return Buffer|string
+     * @return Buffer
      */
     public function getStatusBar()
     {
@@ -194,7 +194,7 @@ class AlertDetail extends Serializable
     }
 
     /**
-     * @return \integer[]
+     * @return integer[]
      */
     public function getSetCancel()
     {

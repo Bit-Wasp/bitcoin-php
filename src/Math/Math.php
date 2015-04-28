@@ -3,10 +3,18 @@
 namespace BitWasp\Bitcoin\Math;
 
 use BitWasp\Buffertools\Buffer;
-use Mdanter\Ecc\Math\NumberTheory;
+use \Mdanter\Ecc\Math\Gmp;
 
-class Math extends \Mdanter\Ecc\Math\Gmp
+class Math extends Gmp
 {
+    /**
+     * @return BinaryMath
+     */
+    public function getBinaryMath()
+    {
+        return new BinaryMath($this);
+    }
+
     /**
      * @param $integer
      * @return bool
@@ -42,7 +50,7 @@ class Math extends \Mdanter\Ecc\Math\Gmp
         $bitStr = $bits->getBinary();
 
         // Unpack and decode
-        $sci    = array_map(
+        $sci = array_map(
             function ($value) {
                 return $this->hexDec($value);
             },
@@ -63,20 +71,12 @@ class Math extends \Mdanter\Ecc\Math\Gmp
 
     /**
      * @param Buffer $bits
-     * @return mixed
+     * @return int|string
      */
     public function getCompact(Buffer $bits)
     {
         $compact = $this->unpackCompact($bits);
         $int = $this->mulCompact($compact['mul'], $compact['exp']);
         return $int;
-    }
-
-    /**
-     * @return NumberTheory
-     */
-    public function getNumberTheory()
-    {
-        return new NumberTheory($this);
     }
 }

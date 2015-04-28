@@ -43,7 +43,7 @@ class HierarchicalKeyFactory
     public static function fromEntropy(Buffer $entropy, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $hash = Hash::hmac('sha512', $entropy, new Buffer("Bitcoin seed"), true);
+        $hash = Hash::hmac('sha512', $entropy, new Buffer("Bitcoin seed"));
 
         return new HierarchicalKey(
             $ecAdapter,

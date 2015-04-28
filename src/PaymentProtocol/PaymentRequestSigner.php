@@ -44,11 +44,11 @@ class PaymentRequestSigner
         $this->certificates = new X509CertificatesBuf();
 
         if ($type !== 'none') {
-            if (false == file_exists($keyFile)) {
+            if (false === file_exists($keyFile)) {
                 throw new \InvalidArgumentException('Private key file does not exist');
             }
 
-            if (false == file_exists($certFile)) {
+            if (false === file_exists($certFile)) {
                 throw new \InvalidArgumentException('Certificate file does not exist');
             }
 
@@ -57,7 +57,7 @@ class PaymentRequestSigner
             }
 
             $chain = $this->fetchChain($certFile);
-            if (count($chain) == 0) {
+            if (!is_array($chain) || count($chain) == 0) {
                 throw new \RuntimeException('Certificate file contains no certificates');
             }
 
@@ -93,7 +93,7 @@ class PaymentRequestSigner
             $data = $request->serialize();
             $signature = '';
             $result = openssl_sign($data, $signature, $this->privateKey, $this->algoConst);
-            if ($signature === false || $result == false) {
+            if ($signature === false || $result === false) {
                 throw new \Exception('Error during signing: Unable to create signature');
             }
             $request->setSignature($signature);

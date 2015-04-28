@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Mnemonic;
 
-interface WordListInterface
+interface WordListInterface extends \Countable
 {
     /**
      * @return string[]

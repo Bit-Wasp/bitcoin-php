@@ -40,9 +40,9 @@ class SignatureHash implements SignatureHashInterface
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
-        $copy     = $this->transaction;
-        $inputs   = $copy->getInputs();
-        $outputs  = $copy->getOutputs();
+        $copy = $this->transaction;
+        $inputs = $copy->getInputs();
+        $outputs = $copy->getOutputs();
 
         if ($inputToSign > count($inputs)) {
             throw new \Exception('Input does not exist');

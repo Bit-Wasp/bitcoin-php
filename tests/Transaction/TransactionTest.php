@@ -38,7 +38,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetVersionException()
     {
-        new Transaction(84294967297);
+        new Transaction(4294967999);
     }
 
     public function testGetLockTime()

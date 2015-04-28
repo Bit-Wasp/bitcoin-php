@@ -28,7 +28,7 @@ class InventoryVectorTest extends AbstractTestCase
      */
     public function testInvalidType()
     {
-        $inv = new InventoryVector(9, new Buffer('4141414141414141414141414141414141414141414141414141414141414141'));
+        new InventoryVector(9, new Buffer('4141414141414141414141414141414141414141414141414141414141414141'));
     }
 
 
@@ -37,6 +37,6 @@ class InventoryVectorTest extends AbstractTestCase
      */
     public function testInvalidLength()
     {
-        $inv = new InventoryVector(InventoryVector::MSG_TX, new Buffer('41414141414141414141414141414141414141414141414141414141414141'));
+        new InventoryVector(InventoryVector::MSG_TX, new Buffer('41414141414141414141414141414141414141414141414141414141414141'));
     }
 }

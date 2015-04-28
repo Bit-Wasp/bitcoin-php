@@ -43,7 +43,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         for ($j = 1; $j < 260; $j++) {
             $t .= '41';
         }
-        $t1 = pack("cvH*", 0x4d, 260, $t);
+        //$t1 = pack("cvH*", 0x4d, 260, $t);
 
         $start = [
             ['0100', 1, chr(0), true],

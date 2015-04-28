@@ -6,12 +6,11 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Signature\SignatureFactory;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 
@@ -435,7 +434,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_RETURN'):
                             throw new \Exception('Error: OP_RETURN');
-                            break;
 
                         case $opcodes->getOpByName('OP_TOALTSTACK'):
                             if ($this->mainStack->size() < 1) {
@@ -675,7 +673,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     break;
                                 default:
                                     throw new \Exception('Invalid Opcode');
-                                break;
                             }
 
                             $this->mainStack->pop();
@@ -744,7 +741,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     break;
                                 default:
                                     throw new \Exception('Invalid opcode in maths ops');
-                                break;
                             }
                             $this->mainStack->pop();
                             $this->mainStack->pop();
@@ -823,14 +819,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 return false;
                             }
 
-                            $signature = SignatureFactory::fromHex($vchSig);
+                            $txSig = TransactionSignatureFactory::fromHex($vchSig);
                             $publicKey = PublicKeyFactory::fromHex($vchPubKey);
 
                             $script = ScriptFactory::create();
                             $sigHash = $this->transaction
                                 ->signatureHash()
-                                ->calculate($script, $this->inputToSign, $signature->getSighashType());
-                            $success   = $this->ecAdapter->verify($sigHash, $publicKey, $signature);
+                                ->calculate($script, $this->inputToSign, $txSig->getHashType());
+                            $success = $this->ecAdapter->verify($sigHash, $publicKey, $txSig->getSignature());
 
                             $this->mainStack->pop();
                             $this->mainStack->pop();

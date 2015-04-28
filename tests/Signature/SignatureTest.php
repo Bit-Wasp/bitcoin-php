@@ -2,9 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Signature;
 
-use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Signature\Signature;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
 
 /**

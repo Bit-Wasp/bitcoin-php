@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Signature\Signature;
 use Symfony\Component\Yaml\Yaml;
 
 class EcAdapterTest extends AbstractTestCase
@@ -110,7 +109,7 @@ class EcAdapterTest extends AbstractTestCase
             $message = new Buffer($test->message);
             $messageHash = Hash::sha256($message);
 
-            $k = new Rfc6979($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey, $messageHash);
+            $k = new Rfc6979($ecAdapter, $privateKey, $messageHash);
             $sig = $ecAdapter->sign($messageHash, $privateKey, $k);
 
             // K must be correct (from privatekey and message hash)

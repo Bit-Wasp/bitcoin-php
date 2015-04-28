@@ -13,6 +13,14 @@ class JapaneseWordList extends WordList implements Bip39WordListInterface
     private $wordsFlipped;
 
     /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->getWords());
+    }
+
+    /**
      * @return array
      */
     public function getWords()

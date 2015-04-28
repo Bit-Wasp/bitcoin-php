@@ -2,16 +2,8 @@
 
 namespace BitWasp\Bitcoin\Mnemonic;
 
-abstract class WordList implements WordListInterface, \Countable
+abstract class WordList implements WordListInterface
 {
-    /**
-     * @return int
-     */
-    public function count()
-    {
-        return count($this->getWords());
-    }
-
     /**
      * @param $index
      * @return mixed

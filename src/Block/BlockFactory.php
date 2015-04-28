@@ -23,6 +23,7 @@ class BlockFactory
 
     /**
      * @param $string
+     * @param Math $math
      * @return Block
      */
     public static function fromHex($string, Math $math = null)

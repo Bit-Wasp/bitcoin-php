@@ -59,6 +59,7 @@ class ElectrumKeyFactory
      * Provide an electrum mnemonic and derive the master key
      *
      * @param $mnemonic
+     * @param ElectrumWordListInterface $wordList
      * @param EcAdapterInterface $ecAdapter
      * @return ElectrumKey
      */
