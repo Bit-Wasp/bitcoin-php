@@ -19,14 +19,8 @@ class Signature extends Serializable implements SignatureInterface
     protected $s;
 
     /**
-     * @var int
-     */
-    protected $sighashType;
-
-    /**
      * @param $r
      * @param $s
-     * @param int $sighashType
      */
     public function __construct($r, $s)
     {
