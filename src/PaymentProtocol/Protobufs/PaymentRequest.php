@@ -2,7 +2,12 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-class PaymentRequest extends \DrSlump\Protobuf\Message
+use \DrSlump\Protobuf;
+use \DrSlump\Protobuf\Descriptor;
+use \DrSlump\Protobuf\Field;
+use \DrSlump\Protobuf\Message;
+
+class PaymentRequest extends Message
 {
 
     /**  @var int */
@@ -20,54 +25,53 @@ class PaymentRequest extends \DrSlump\Protobuf\Message
     /**  @var string */
     public $signature = null;
 
-
     /** @var \Closure[] */
     protected static $__extensions = array();
 
     public static function descriptor()
     {
-        $descriptor = new \DrSlump\Protobuf\Descriptor(__CLASS__, 'payments.PaymentRequest');
+        $descriptor = new Descriptor(__CLASS__, 'payments.PaymentRequest');
 
         // OPTIONAL UINT32 payment_details_version = 1
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 1;
         $f->name = "payment_details_version";
-        $f->type = \DrSlump\Protobuf::TYPE_UINT32;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_UINT32;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $f->default = 1;
         $descriptor->addField($f);
 
         // OPTIONAL STRING pki_type = 2
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 2;
         $f->name = "pki_type";
-        $f->type = \DrSlump\Protobuf::TYPE_STRING;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_STRING;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $f->default = "none";
         $descriptor->addField($f);
 
         // OPTIONAL BYTES pki_data = 3
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 3;
         $f->name = "pki_data";
-        $f->type = \DrSlump\Protobuf::TYPE_BYTES;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_BYTES;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
 
         // REQUIRED BYTES serialized_payment_details = 4
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 4;
         $f->name = "serialized_payment_details";
-        $f->type = \DrSlump\Protobuf::TYPE_BYTES;
-        $f->rule = \DrSlump\Protobuf::RULE_REQUIRED;
+        $f->type = Protobuf::TYPE_BYTES;
+        $f->rule = Protobuf::RULE_REQUIRED;
         $descriptor->addField($f);
 
         // OPTIONAL BYTES signature = 5
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 5;
         $f->name = "signature";
-        $f->type = \DrSlump\Protobuf::TYPE_BYTES;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_BYTES;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
 
         foreach (self::$__extensions as $cb) {

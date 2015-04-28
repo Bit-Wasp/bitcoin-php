@@ -30,9 +30,10 @@ class CompactSignature extends Serializable
     protected $compressed;
 
     /**
-     * @param $r
-     * @param $s
-     * @param $recid
+     * @param int|string $r
+     * @param int|string $s
+     * @param int|string $recid
+     * @param bool $compressed
      */
     public function __construct($r, $s, $recid, $compressed)
     {

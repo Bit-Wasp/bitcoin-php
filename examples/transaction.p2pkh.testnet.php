@@ -25,7 +25,7 @@ $privateKey = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183eb
 echo "[Key: " . $privateKey->toWif($network) . " Address " . $privateKey->getAddress()->getAddress($network) . "]\n";
 
 $myTx = $bitcoind->getrawtransaction('4e8b531c0a9d3651c7cf449acd19d2b07d914990bcfabaa9bccc49af2abadee2', true);
-echo "txhex: ". $myTx->getHex() . "\n";die();
+echo "txhex: ". $myTx->getHex() . "\n";
 $spendOutput = 0;
 $recipient = AddressFactory::fromString('n1b2a9rFvuU9wBgBaoWngNvvMxRV94ke3x');
 echo "[Send to: " . $recipient->getAddress($network) . " \n";

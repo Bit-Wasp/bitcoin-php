@@ -132,7 +132,8 @@ class TransactionBuilder
     /**
      * @param PrivateKeyInterface $privKey
      * @param Buffer $hash
-     * @return \BitWasp\Bitcoin\Signature\TransactionSignatureInterface
+     * @param $sigHashType
+     * @return TransactionSignature
      */
     public function sign(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
     {

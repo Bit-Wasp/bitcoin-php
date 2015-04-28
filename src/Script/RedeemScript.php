@@ -20,7 +20,7 @@ class RedeemScript extends Script
     private $keys = [];
 
     /**
-     * @param integer $m
+     * @param integer|string $m
      * @param \BitWasp\Bitcoin\Key\PublicKeyInterface[] $keys
      */
     public function __construct($m, array $keys)

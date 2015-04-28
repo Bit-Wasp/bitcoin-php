@@ -147,6 +147,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * Set <transactions> value
      *
      * @param string $value
+     * @param int $idx
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function setTransactions($value, $idx = null)
@@ -210,6 +211,7 @@ class Payment extends \DrSlump\Protobuf\Message
      * Set <refund_to> value
      *
      * @param \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value
+     * @param int $idx
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment
      */
     public function setRefundTo(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value, $idx = null)

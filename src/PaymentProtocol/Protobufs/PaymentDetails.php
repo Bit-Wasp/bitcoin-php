@@ -2,7 +2,13 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-class PaymentDetails extends \DrSlump\Protobuf\Message
+
+use DrSlump\Protobuf;
+use DrSlump\Protobuf\Descriptor;
+use DrSlump\Protobuf\Field;
+use \DrSlump\Protobuf\Message;
+
+class PaymentDetails extends Message
 {
 
     /**  @var string */
@@ -32,64 +38,64 @@ class PaymentDetails extends \DrSlump\Protobuf\Message
 
     public static function descriptor()
     {
-        $descriptor = new \DrSlump\Protobuf\Descriptor(__CLASS__, 'payments.PaymentDetails');
+        $descriptor = new Descriptor(__CLASS__, 'payments.PaymentDetails');
 
         // OPTIONAL STRING network = 1
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 1;
         $f->name = "network";
-        $f->type = \DrSlump\Protobuf::TYPE_STRING;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_STRING;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $f->default = "main";
         $descriptor->addField($f);
 
         // REPEATED MESSAGE outputs = 2
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 2;
         $f->name = "outputs";
-        $f->type = \DrSlump\Protobuf::TYPE_MESSAGE;
-        $f->rule = \DrSlump\Protobuf::RULE_REPEATED;
+        $f->type = Protobuf::TYPE_MESSAGE;
+        $f->rule = Protobuf::RULE_REPEATED;
         $f->reference = '\BitWasp\Bitcoin\Payments\Protobufs\Output';
         $descriptor->addField($f);
 
         // REQUIRED UINT64 time = 3
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 3;
         $f->name = "time";
-        $f->type = \DrSlump\Protobuf::TYPE_UINT64;
-        $f->rule = \DrSlump\Protobuf::RULE_REQUIRED;
+        $f->type = Protobuf::TYPE_UINT64;
+        $f->rule = Protobuf::RULE_REQUIRED;
         $descriptor->addField($f);
 
         // OPTIONAL UINT64 expires = 4
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 4;
         $f->name = "expires";
-        $f->type = \DrSlump\Protobuf::TYPE_UINT64;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_UINT64;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
 
         // OPTIONAL STRING memo = 5
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 5;
         $f->name = "memo";
-        $f->type = \DrSlump\Protobuf::TYPE_STRING;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_STRING;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
 
         // OPTIONAL STRING payment_url = 6
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 6;
         $f->name = "payment_url";
-        $f->type = \DrSlump\Protobuf::TYPE_STRING;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_STRING;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
 
         // OPTIONAL BYTES merchant_data = 7
-        $f = new \DrSlump\Protobuf\Field();
+        $f = new Field();
         $f->number = 7;
         $f->name = "merchant_data";
-        $f->type = \DrSlump\Protobuf::TYPE_BYTES;
-        $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
+        $f->type = Protobuf::TYPE_BYTES;
+        $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
 
         foreach (self::$__extensions as $cb) {
@@ -175,6 +181,7 @@ class PaymentDetails extends \DrSlump\Protobuf\Message
      * Set <outputs> value
      *
      * @param \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value
+     * @param int $idx
      * @return \BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails
      */
     public function setOutputs(\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output $value, $idx = null)
