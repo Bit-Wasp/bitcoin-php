@@ -77,6 +77,16 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
+     * @param int|string $sequence
+     * @return $this
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
      * Return an initialized script. Checks if already has a script
      * object. If not, returns script from scriptBuf (which can simply
      * be null).

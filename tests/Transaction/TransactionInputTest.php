@@ -23,6 +23,8 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
     {
         $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0');
         $this->assertSame(0xffffffff, $in->getSequence());
+        $in->setSequence(23);
+        $this->assertSame(23, $in->getSequence());
     }
 
     public function testConstructWithScript()
