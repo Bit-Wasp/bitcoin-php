@@ -3,8 +3,6 @@
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Script\ScriptStack;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 
 class ScriptStackTest extends \PHPUnit_Framework_TestCase
 {

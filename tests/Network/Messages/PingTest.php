@@ -14,7 +14,7 @@ class PingTest extends AbstractTestCase
     public function generateSet()
     {
         $set = [];
-        for ($i = 0; $i < 25; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $set[] = [new Ping()];
         }
         return $set;

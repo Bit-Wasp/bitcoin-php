@@ -50,7 +50,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $this->sighash = new SignatureHash($this->tx);
         //$o = new TransactionOutput();
         $script = new Script();
-        $h = $this->sighash->calculate($script, 99);
+        $this->sighash->calculate($script, 99);
     }
 
     public function testCalculateHash()

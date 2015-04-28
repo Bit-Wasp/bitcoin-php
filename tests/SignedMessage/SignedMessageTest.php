@@ -3,9 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
@@ -52,14 +50,5 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $this->assertSame($content, $signed->getBuffer()->getBinary());
 
         $this->assertTrue($signer->verify($signed, $address));
-    }
-
-    public function testSignMessage()
-    {
-        $private = PrivateKeyFactory::create();
-        $message = 'hi';
-        $signer = new MessageSigner(Bitcoin::getEcAdapter());
-        $signed = $signer->sign($message, $private);
-        $this->assertTrue($signer->verify($signed, $private->getAddress()));
     }
 }

@@ -24,7 +24,7 @@ class PointTest extends AbstractTestCase
     protected $math;
 
     /**
-     * @var \Mdanter\Ecc\GeneratorPoint
+     * @var \Mdanter\Ecc\Primitives\GeneratorPoint
      */
     protected $generator;
 

@@ -48,7 +48,6 @@ class CompactSignatureTest extends AbstractTestCase
      * @param EcAdapterInterface $ecAdapter
      * @param PrivateKey $private
      * @param string $message
-     * @param null $expectedSignature
      */
     public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKey $private, $message)
     {

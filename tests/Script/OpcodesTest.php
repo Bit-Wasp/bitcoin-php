@@ -39,6 +39,6 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOpCodeException()
     {
-        $val = $this->op->getOp(3);
+        $this->op->getOp(3);
     }
 }
