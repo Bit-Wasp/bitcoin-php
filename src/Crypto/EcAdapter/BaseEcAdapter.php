@@ -113,25 +113,23 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         $curve = $this->getGenerator()->getCurve();
         $prime = $curve->getPrime();
 
-        // x ^ 3
-        $xCubed = $math->powMod($xCoord, 3, $prime);
-        $ySquared = $math->add($xCubed, $curve->getB());
-
         // Calculate first root
-        $root0 = $math->getNumberTheory()->squareRootModP($ySquared, $prime);
+        $root0 = $math->getNumberTheory()->squareRootModP(
+            $math->add(
+                $math->powMod(
+                    $xCoord,
+                    3,
+                    $prime
+                ),
+                $curve->getB()
+            ),
+            $prime
+        );
 
         // Depending on the byte, we expect the Y value to be even or odd.
         // We only calculate the second y root if it's needed.
-        if ($prefix == PublicKey::KEY_COMPRESSED_EVEN) {
-            $yCoord = ($math->isEven($root0))
-                ? $root0
-                : $math->sub($prime, $root0);
-        } else {
-            $yCoord = (!$math->isEven($root0))
-                ? $root0
-                : $math->sub($prime, $root0);
-        }
-
-        return $yCoord;
+        return (($prefix == PublicKey::KEY_COMPRESSED_EVEN) == $math->isEven($root0))
+            ? $root0
+            : $math->sub($prime, $root0);
     }
 }
