@@ -102,7 +102,7 @@ class PaymentRequestBuilder
 
     /**
      * @param OutputBuf $outBuf
-     * @return TransactionOutput
+     * @return TransactionOutputInterface
      */
     private function bufToOutput(OutputBuf $outBuf)
     {
@@ -118,7 +118,8 @@ class PaymentRequestBuilder
     public function addOutput(TransactionOutputInterface $txOutput)
     {
         $output = $this->outputToBuf($txOutput);
-        $this->details->addOutputs($output, $this->outputCount++);
+        $this->details->addOutputs($output);
+        $this->outputCount++;
         return $this;
     }
 
@@ -136,7 +137,7 @@ class PaymentRequestBuilder
 
     /**
      * @param $index
-     * @return OutputBuf
+     * @return TransactionOutputInterface
      */
     public function getOutput($index)
     {

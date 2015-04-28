@@ -1,5 +1,5 @@
 filter:
-    excluded_paths: [vendor/*, build/*, tests/*, src/Bitcoin/Crypto/EcAdapter/Secp256k1Stubs.php, src/Bitcoin/Payments/Protobufs/*]
+    excluded_paths: [vendor/*, build/*, tests/*, src/Crypto/EcAdapter/Secp256k1Stubs.php, src/Payments/Protobufs/*]
 
 before_commands:
     - "composer install --prefer-source --no-dev"

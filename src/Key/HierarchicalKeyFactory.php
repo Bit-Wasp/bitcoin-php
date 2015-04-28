@@ -2,19 +2,19 @@
 
 namespace BitWasp\Bitcoin\Key;
 
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use BitWasp\Buffertools\Buffer;
 
 class HierarchicalKeyFactory
 {
     /**
-     * @param EcAdapterInterface|null $ecAdapter
+     * @param EcAdapterInterface $ecAdapter
      * @param NetworkInterface $network
      * @return ExtendedKeySerializer
      */

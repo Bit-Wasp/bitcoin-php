@@ -73,7 +73,7 @@ class HierarchicalKey
 
     /**
      * @param $sequence
-     * @return int|string
+     * @return string
      */
     public function getHardenedSequence($sequence)
     {
@@ -204,7 +204,7 @@ class HierarchicalKey
     /**
      * Create a buffer containing data to be hashed hashed to yield the child offset
      *
-     * @param Buffer $sequence
+     * @param int $sequence
      * @return Buffer
      * @throws \Exception
      */
@@ -243,7 +243,7 @@ class HierarchicalKey
     {
         $chain = Buffer::hex($this->ecAdapter->getMath()->decHex($this->getChainCode()), 32);
 
-        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain, true);
+        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain);
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
 

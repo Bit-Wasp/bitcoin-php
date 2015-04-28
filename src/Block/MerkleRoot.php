@@ -71,8 +71,10 @@ class MerkleRoot
     public function calculateHash()
     {
         $transactions = $this->block->getTransactions();
-        $txCount      = count($transactions);
-        $hashFxn      = Network::getHashFunction();
+        $txCount = $transactions->count();
+        $hashFxn = function ($value) {
+            return hash('sha256', hash('sha256', $value, true), true);
+        };
 
         if ($txCount == 0) {
             // TODO: Probably necessary. Should always have a coinbase at least.

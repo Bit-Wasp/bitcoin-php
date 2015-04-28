@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Network;
 
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\Hash;
 
 class Network implements NetworkInterface
 {
@@ -190,14 +188,4 @@ class Network implements NetworkInterface
         return $this->netMagicBytes;
     }
 
-    /**
-     * @param bool $binary
-     * @return \Closure
-     */
-    public static function getHashFunction()
-    {
-        return function ($value) {
-            return hash('sha256', hash('sha256', $value, true), true);
-        };
-    }
 }

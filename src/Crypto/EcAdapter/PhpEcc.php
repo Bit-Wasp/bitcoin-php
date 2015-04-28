@@ -167,8 +167,8 @@ class PhpEcc extends BaseEcAdapter
     /**
      * attempt to calculate the public key recovery param by trial and error
      *
-     * @param                $r
-     * @param                $s
+     * @param integer $r
+     * @param integer $s
      * @param Buffer $messageHash
      * @param PublicKeyInterface $publicKey
      * @return int
@@ -183,7 +183,7 @@ class PhpEcc extends BaseEcAdapter
                 if ($this->recoverCompact($messageHash, $test)->getPoint()->equals($Q)) {
                     return $i;
                 }
-            } catch (\Exception $messageHash) {
+            } catch (\Exception $e) {
                 continue;
             }
         }
@@ -254,7 +254,7 @@ class PhpEcc extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $oldPrivate
-     * @param $newSecret
+     * @param string $newSecret
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
     private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newSecret)
@@ -274,7 +274,7 @@ class PhpEcc extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $integer
+     * @param integer $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
     public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
@@ -293,7 +293,7 @@ class PhpEcc extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $integer
+     * @param integer $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
     public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
@@ -312,7 +312,7 @@ class PhpEcc extends BaseEcAdapter
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $integer
+     * @param integer $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */
     public function publicKeyMul(PublicKeyInterface $publicKey, $integer)
@@ -323,7 +323,7 @@ class PhpEcc extends BaseEcAdapter
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $integer
+     * @param integer $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */
     public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
