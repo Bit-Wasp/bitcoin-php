@@ -2,13 +2,12 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\Signature;
@@ -203,9 +202,12 @@ class PhpEcc extends BaseEcAdapter
 
         // calculate the recovery param
         // there should be a way to get this when signing too, but idk how ...
-        $recid = $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey());
-        $compact = new CompactSignature($sign->getR(), $sign->getS(), $recid, $privateKey->isCompressed());
-        return $compact;
+        return new CompactSignature(
+            $sign->getR(),
+            $sign->getS(),
+            $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey()),
+            $privateKey->isCompressed()
+        );
     }
 
     /**
@@ -248,8 +250,11 @@ class PhpEcc extends BaseEcAdapter
      */
     public function privateToPublic(PrivateKeyInterface $privateKey)
     {
-        $point = $this->getGenerator()->mul($privateKey->getSecretMultiplier());
-        return PublicKeyFactory::fromPoint($point, $privateKey->isCompressed(), $this);
+        return new PublicKey(
+            $this,
+            $this->getGenerator()->mul($privateKey->getSecretMultiplier()),
+            $privateKey->isCompressed()
+        );
     }
 
     /**
@@ -259,7 +264,11 @@ class PhpEcc extends BaseEcAdapter
      */
     private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newSecret)
     {
-        return PrivateKeyFactory::fromInt($newSecret, $oldPrivate->isCompressed(), $this);
+        return new PrivateKey(
+            $this,
+            $newSecret,
+            $oldPrivate->isCompressed()
+        );
     }
 
     /**
@@ -269,7 +278,11 @@ class PhpEcc extends BaseEcAdapter
      */
     private function getRelatedPublicKey(PublicKeyInterface $oldPublic, PointInterface $newPoint)
     {
-        return PublicKeyFactory::fromPoint($newPoint, $oldPublic->isCompressed(), $this);
+        return new PublicKey(
+            $this,
+            $newPoint,
+            $oldPublic->isCompressed()
+        );
     }
 
     /**
@@ -280,15 +293,16 @@ class PhpEcc extends BaseEcAdapter
     public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
     {
         $math = $this->getMath();
-        $newSecret = $math->mod(
-            $math->add(
-                $integer,
-                $privateKey->getSecretMultiplier()
-            ),
-            $this->getGenerator()->getOrder()
+        return $this->getRelatedPrivateKey(
+            $privateKey,
+            $math->mod(
+                $math->add(
+                    $integer,
+                    $privateKey->getSecretMultiplier()
+                ),
+                $this->getGenerator()->getOrder()
+            )
         );
-
-        return $this->getRelatedPrivateKey($privateKey, $newSecret);
     }
 
     /**
@@ -299,15 +313,17 @@ class PhpEcc extends BaseEcAdapter
     public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
     {
         $math = $this->getMath();
-        $newSecret = $math->mod(
-            $math->mul(
-                $integer,
-                $privateKey->getSecretMultiplier()
-            ),
-            $this->getGenerator()->getOrder()
-        );
 
-        return $this->getRelatedPrivateKey($privateKey, $newSecret);
+        return $this->getRelatedPrivateKey(
+            $privateKey,
+            $math->mod(
+                $math->mul(
+                    $integer,
+                    $privateKey->getSecretMultiplier()
+                ),
+                $this->getGenerator()->getOrder()
+            )
+        );
     }
 
     /**
@@ -328,7 +344,9 @@ class PhpEcc extends BaseEcAdapter
      */
     public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
     {
-        $newPoint = $publicKey->getPoint()->add($this->getGenerator()->mul($integer));
-        return $this->getRelatedPublicKey($publicKey, $newPoint);
+        return $this->getRelatedPublicKey(
+            $publicKey,
+            $publicKey->getPoint()->add($this->getGenerator()->mul($integer))
+        );
     }
 }
