@@ -8,13 +8,18 @@ use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\Crypto\Key\PrivateKey as MdPrivateKey;
 use Mdanter\Ecc\Random\HmacRandomNumberGenerator;
 
-class Rfc6979 extends HmacRandomNumberGenerator implements RbgInterface
+class Rfc6979 implements RbgInterface
 {
 
     /**
      * @var EcAdapterInterface
      */
     private $ecAdapter;
+
+    /**
+     * @var HmacRandomNumberGenerator
+     */
+    private $hmac;
 
     /**
      * @param EcAdapterInterface $ecAdapter
@@ -28,9 +33,9 @@ class Rfc6979 extends HmacRandomNumberGenerator implements RbgInterface
         Buffer $messageHash,
         $algo = 'sha256'
     ) {
-        $this->ecAdapter = $ecAdapter;
         $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey->getSecretMultiplier());
-        parent::__construct($ecAdapter->getMath(), $mdPk, $messageHash->getInt(), $algo);
+        $this->ecAdapter = $ecAdapter;
+        $this->hmac = new HmacRandomNumberGenerator($ecAdapter->getMath(), $mdPk, $messageHash->getInt(), $algo);
     }
 
     /**
@@ -39,7 +44,7 @@ class Rfc6979 extends HmacRandomNumberGenerator implements RbgInterface
      */
     public function bytes($bytes)
     {
-        $integer = $this->generate($this->ecAdapter->getGenerator()->getOrder());
+        $integer = $this->hmac->generate($this->ecAdapter->getGenerator()->getOrder());
         return Buffer::hex($this->ecAdapter->getMath()->decHex($integer));
     }
 }

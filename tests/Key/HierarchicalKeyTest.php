@@ -206,7 +206,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertInstanceOf($this->baseType, $key);
         $this->assertSame($key->toExtendedPublicKey($this->network), $xPub);
         $this->assertSame($key->toExtendedKey($this->network), $xPub);
-        $this->assertFalse($key->isPrivate());   
+        $this->assertFalse($key->isPrivate());
     }
 
     /**
