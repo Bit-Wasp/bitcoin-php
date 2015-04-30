@@ -197,7 +197,7 @@ class TransactionBuilder
                 $redeemScript
             );
 
-            $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign, $input->getScript());
+            $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign);
             $inputState = $this->inputStates[$inputToSign];
         }
 

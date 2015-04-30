@@ -14,10 +14,6 @@ use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
 
-/**
- * Class TransactionBuilder
- * @package BitWasp\Bitcoin\Transaction
- */
 class TransactionBuilderInputState
 {
     /**
@@ -211,12 +207,17 @@ class TransactionBuilderInputState
     /**
      * @param TransactionInterface $tx
      * @param integer $inputToExtract
-     * @param ScriptInterface $scriptSig
      * @throws \Exception
      */
-    public function extractSigs(TransactionInterface $tx, $inputToExtract, ScriptInterface $scriptSig)
+    public function extractSigs(TransactionInterface $tx, $inputToExtract)
     {
-        $parsed = $scriptSig->getScriptParser()->parse();
+        $parsed = $tx
+            ->getInputs()
+            ->getInput($inputToExtract)
+            ->getScript()
+            ->getScriptParser()
+            ->parse();
+
         $size = count($parsed);
 
         switch ($this->getScriptType()) {
