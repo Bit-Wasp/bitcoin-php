@@ -85,8 +85,8 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
     public function testParse()
     {
         $buf = Buffer::hex('0f9947c2b0fdd82ef3153232ee23d5c0bed84a02');
-        $this->script = ScriptFactory::create()->op('OP_HASH160')->push($buf)->op('OP_EQUAL');
-        $parse = $this->script->getScriptParser()->parse();
+        $script = ScriptFactory::create()->op('OP_HASH160')->push($buf)->op('OP_EQUAL');
+        $parse = $script->getScriptParser()->parse();
 
         $this->assertSame($parse[0], 'OP_HASH160');
 
@@ -102,16 +102,16 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseInvalidOp()
     {
-        $this->script = ScriptFactory::create(Buffer::hex('fa'));
-        $this->script->getScriptParser()->parse();
+        $script = ScriptFactory::create(Buffer::hex('fa'));
+        $script->getScriptParser()->parse();
     }
 
     public function testParseNullByte()
     {
         $null = chr(0x00);
-        $this->script = ScriptFactory::create();
-        $this->script->op('OP_0');
-        $parse = $this->script->getScriptParser()->parse();
+        $script = ScriptFactory::create();
+        $script->op('OP_0');
+        $parse = $script->getScriptParser()->parse();
         $this->assertSame($parse[0]->getBinary(), $null);
     }
 

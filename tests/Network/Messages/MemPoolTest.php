@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 27/03/15
- * Time: 01:20
- */
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 

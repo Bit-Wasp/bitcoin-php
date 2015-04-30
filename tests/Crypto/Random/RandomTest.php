@@ -9,11 +9,6 @@ class RandomTest extends \PHPUnit_Framework_TestCase
      */
     protected $bufferType = 'BitWasp\Buffertools\Buffer';
 
-    public function setUp()
-    {
-
-    }
-
     public function testBytes()
     {
         $random = new \BitWasp\Bitcoin\Crypto\Random\Random;

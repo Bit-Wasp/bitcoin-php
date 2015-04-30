@@ -43,7 +43,6 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function setUp()
     {
-        $this->privateKey = null;
         $this->math = Bitcoin::getMath();
         $this->generator = Bitcoin::getGenerator();
     }
@@ -56,7 +55,7 @@ class PrivateKeyTest extends AbstractTestCase
     {
         $hex = '4141414141414141414141414141414141414141414141414141414141414141';
         $key = $ecAdapter->getMath()->hexDec($hex);
-        $privateKey   = PrivateKeyFactory::fromInt($key, false, $ecAdapter);
+        $privateKey = PrivateKeyFactory::fromInt($key, false, $ecAdapter);
 
         $this->assertInstanceOf($this->baseType, $privateKey);
         $this->assertEquals($key, $privateKey->getInt());
@@ -76,9 +75,8 @@ class PrivateKeyTest extends AbstractTestCase
     public function testCreatePrivateKeyFailure()
     {
         $dec = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-        $this->privateKey = PrivateKeyFactory::fromInt($dec, Bitcoin::getEcAdapter());
+        PrivateKeyFactory::fromInt($dec, Bitcoin::getEcAdapter());
     }
-
 
     /**
      * @dataProvider getEcAdapters
@@ -86,13 +84,12 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testGenerateNewUncompressed(EcAdapterInterface $ecAdapter)
     {
-        $this->privateKey = PrivateKeyFactory::create(false, $ecAdapter);
-        $this->assertInstanceOf($this->baseType, $this->privateKey);
-        $this->assertFalse($this->privateKey->isCompressed());
-        $this->assertTrue($this->privateKey->isPrivate());
-        $this->assertInstanceOf($this->publicType, $this->privateKey->getPublicKey());
+        $privateKey = PrivateKeyFactory::create(false, $ecAdapter);
+        $this->assertInstanceOf($this->baseType, $privateKey);
+        $this->assertFalse($privateKey->isCompressed());
+        $this->assertTrue($privateKey->isPrivate());
+        $this->assertInstanceOf($this->publicType, $privateKey->getPublicKey());
     }
-
 
     /**
      * @dataProvider getEcAdapters
