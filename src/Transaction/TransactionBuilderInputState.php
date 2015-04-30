@@ -202,10 +202,9 @@ class TransactionBuilderInputState
      * @param TransactionSignatureInterface $signature
      * @return $this
      */
-    public function setSignature($idx, TransactionSignatureInterface $signature)
+    public function setSignature($idx, TransactionSignatureInterface $signature = null)
     {
         $this->signatures[$idx] = $signature;
-
         return $this;
     }
 
@@ -237,10 +236,13 @@ class TransactionBuilderInputState
 
                 break;
             case OutputClassifier::MULTISIG:
-                // Can't possibly be more than keyCount signatures, so restrict in this range
+                $keys = $this->getRedeemScript()->getKeys();
+                foreach ($keys as $idx => $key) {
+                    $this->setSignature($idx, null);
+                }
+
                 if ($size > 2 && $size < $this->getRedeemScript()->getKeyCount() + 2) {
                     $sigs = [];
-                    $keys = $this->getRedeemScript()->getKeys();
                     foreach ($keys as $key) {
                         $sigs[$key->getPubKeyHash()->getHex()] = [];
                     }
