@@ -13,14 +13,14 @@
  * ext-mcrypt
 
 ## Optional:
- * [[secp256k1-php](https://github.com/Bit-Wasp/secp256k1-php)] - Install the secp256k1 PHP extension. Blazing speeds, but bleeding edge, beware.
+ * [[secp256k1-php](https://github.com/Bit-Wasp/secp256k1-php)] - Install the secp256k1 PHP extension for blazing speeds.
 
 ##Installation
 You can install this library via Composer:
-`composer require afk11/bitcoin`
+`composer require bitwasp/bitcoin-php`
 or 
 ```{
-    "require": "afk11\bitcoin"
+    "require": "bitwasp/bitcoin-php"
 }```
 
 ##Presently supported:
@@ -39,21 +39,22 @@ or
  - Payment Protocol (BIP70)
 
 ##Todo:
-  - TransactionBuilder
   - Full script interpreter
   - SPV
   - P2P
   
 ## Implemented BIPs
+  - BIP0011
   - BIP0016
   - BIP0032
+  - BIP0039
   - BIP0070
   
 # Examples  
 ## Generate private keys
-```
+```php
  // Create private keys
- use Afk11\Bitcoin\Key\PrivateKeyFactory;
+ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
  
  $network = Bitcoin::GetNetwork();
  $private = PrivateKeyFactory:create(true);
@@ -64,8 +65,8 @@ or
 ```
 
 ## Explore the blockchain using OOP bindings to the RPC
-```
-use Afk11\Bitcoin\Rpc\RpcFactory;
+```php
+use BitWasp\Bitcoin\Rpc\RpcFactory;
 
 $bitcoind = RpcFactory::bitcoind('127.0.0.1', 18332, 'bitcoinrpc', 'BBpsLqmCCx7Vp8sRd5ygDxFkHZBgWLTTi55QwWgN6Ng6');
 
@@ -76,7 +77,7 @@ echo $tx->getTransactionId();
 ```
 
 ## Create signed payment requests 
-```
+```php
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
