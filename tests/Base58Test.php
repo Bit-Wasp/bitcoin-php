@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Util;
+namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Buffertools\Buffer;
@@ -13,7 +13,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
      */
     public function testEncode()
     {
-        $f    = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
+        $f = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
@@ -27,7 +27,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
      */
     public function testEncodeDecode()
     {
-        $f    = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
+        $f = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
         $json = json_decode($f);
 
         foreach ($json->test as $test) {
@@ -57,8 +57,8 @@ class Base58Test extends \PHPUnit_Framework_TestCase
      */
     public function testEncodeDecodeCheck()
     {
-        $f     = file_get_contents(__DIR__ . '/Data/base58.encodedecode.json');
-        $json  = json_decode($f);
+        $f = file_get_contents(__DIR__ . '/Data/base58.encodedecode.json');
+        $json = json_decode($f);
 
         foreach ($json->test as $test) {
             $bs = Buffer::hex($test[0]);
@@ -78,7 +78,7 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         // 12D2adLM3UKy4cH891ZFDkWmXmotrMoF <-- has typo, b replaced with c.
         //              ^
 
-        \BitWasp\Bitcoin\Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
+        Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
 
     }
 }
