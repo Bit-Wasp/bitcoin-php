@@ -97,6 +97,9 @@ class OutputClassifier implements ScriptClassifierInterface
     {
         $opCodes = $this->script->getOpcodes();
         $count = count($this->evalScript);
+        if ($count <= 3) {
+            return false;
+        }
         $mOp = $this->evalScript[0];
         $nOp = $this->evalScript[$count - 2];
         $lastOp = $this->evalScript[$count - 1];
