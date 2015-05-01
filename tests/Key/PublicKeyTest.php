@@ -206,6 +206,10 @@ class PublicKeyTest extends AbstractTestCase
         $pub->setCompressed('a');
     }
 
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
     public function testPublicKeyFromPoint(EcAdapterInterface $ecAdapter)
     {
         $point = new Point(
