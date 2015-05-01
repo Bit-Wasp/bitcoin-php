@@ -42,7 +42,7 @@ class OutputClassifier implements ScriptClassifierInterface
         if (strlen($script) == 35
             && $this->evalScript[0]->getSize() == 33
             && $this->evalScript[1] == 'OP_CHECKSIG'
-            && (in_array(ord($script[1]), array(PublicKey::KEY_COMPRESSED_EVEN, PublicKey::KEY_COMPRESSED_ODD)))
+            && in_array(ord($script[1]), array(PublicKey::KEY_COMPRESSED_EVEN, PublicKey::KEY_COMPRESSED_ODD))
         ) {
             return true;
         }
@@ -63,7 +63,7 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKeyHash()
     {
-        return (count($this->evalScript) == 5
+        return count($this->evalScript) == 5
             && is_string($this->evalScript[0])
             && $this->evalScript[0] == 'OP_DUP'
             && is_string($this->evalScript[1])
@@ -73,8 +73,7 @@ class OutputClassifier implements ScriptClassifierInterface
             && is_string($this->evalScript[3])
             && $this->evalScript[3] == 'OP_EQUALVERIFY'
             && is_string($this->evalScript[4])
-            && $this->evalScript[4] == 'OP_CHECKSIG'
-        );
+            && $this->evalScript[4] == 'OP_CHECKSIG';
     }
 
     /**
@@ -82,14 +81,13 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToScriptHash()
     {
-        return ($this->script->getBuffer()->getSize() == 23
+        return $this->script->getBuffer()->getSize() == 23
             && count($this->evalScript) == 3
             && is_string($this->evalScript[0]) && is_string($this->evalScript[2])
             && $this->evalScript[0] == 'OP_HASH160'
             && $this->evalScript[1] instanceof Buffer
             && $this->evalScript[1]->getSize() == 20
-            && $this->evalScript[2] == 'OP_EQUAL'
-        );
+            && $this->evalScript[2] == 'OP_EQUAL';
     }
 
     /**
@@ -112,14 +110,12 @@ class OutputClassifier implements ScriptClassifierInterface
             return $valid;
         };
 
-        return (
-            $count >= 2
+        return $count >= 2
             && is_string($mOp) && is_string($nOp) && is_string($lastOp)
             && $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
             && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
             && $this->evalScript[$count - 1] == 'OP_CHECKMULTISIG'
-            && $keysValid()
-        );
+            && $keysValid();
     }
 
     /**

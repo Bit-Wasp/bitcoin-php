@@ -37,11 +37,9 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        return (
-            count($this->evalScript) == 1
-            && ($this->evalScript[0] instanceof Buffer)
-            && ($this->evalScript[0]->getSize() <= self::MAXSIGLEN)
-        );
+        return count($this->evalScript) == 1
+            && $this->evalScript[0] instanceof Buffer
+            && $this->evalScript[0]->getSize() <= self::MAXSIGLEN;
     }
 
     /**
@@ -49,12 +47,10 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKeyHash()
     {
-        return (
-            count($this->evalScript) == 2
-            && ($this->evalScript[0] instanceof Buffer && $this->evalScript[1] instanceof Buffer)
-            && ($this->evalScript[0]->getSize() <= self::MAXSIGLEN)
-            && PublicKey::isCompressedOrUncompressed($this->evalScript[1])
-        );
+        return count($this->evalScript) == 2
+            && $this->evalScript[0] instanceof Buffer && $this->evalScript[1] instanceof Buffer
+            && $this->evalScript[0]->getSize() <= self::MAXSIGLEN
+            && PublicKey::isCompressedOrUncompressed($this->evalScript[1]);
     }
 
     /**
@@ -108,11 +104,9 @@ class InputClassifier implements ScriptClassifierInterface
             return $valid;
         };
 
-        return (
-            $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
+        return $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
             && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
-            && $keysValid()
-        );
+            && $keysValid();
     }
 
     /**
