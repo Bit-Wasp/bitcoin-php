@@ -102,3 +102,98 @@ $builder->addAddressPayment($address, $amount);
 $request = $builder->send();
 
 ```
+
+## Sign multi-signature transactions
+```php
+
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionBuilder;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+
+$ecAdapter = Bitcoin::getEcAdapter();
+
+// Two users independently create private keys.
+$pk1 = PrivateKeyFactory::fromHex('421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87');
+$pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb81e5aa0422402f048162');
+
+// They exchange public keys, and a multisignature address is made (sorted keys)
+$redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()], true);
+$outputScript = $redeemScript->getOutputScript();
+
+// The address is funded with a transaction (fake, for the purposes of this script).
+// You would do getrawtransaction normally
+$spendTx = new Transaction();
+$spendTx->getInputs()->addInput(new TransactionInput(
+    '4141414141414141414141414141414141414141414141414141414141414141',
+    0
+));
+$spendTx->getOutputs()->addOutput(new TransactionOutput(
+    50,
+    $outputScript
+));
+
+// One party wants to spend funds. He creates a transaction spending the funding tx to his address.
+$builder = new TransactionBuilder($ecAdapter);
+$builder->spendOutput($spendTx, 0)
+    ->payToAddress($pk1->getAddress(), 50)
+    ->signInputWithKey($pk1, $outputScript, 0, $redeemScript)
+    ->signInputWithKey($pk2, $outputScript, 0, $redeemScript);
+
+$rawTx = $builder->getTransaction()->getHex();
+
+echo "Fully signed transaction: " . $builder->getTransaction()->getHex() . "\n";
+
+```
+
+## Create/verify signed Bitcoin messages
+```php
+
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\MessageSigner\MessageSigner;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+
+$ec = Bitcoin::getEcAdapter();
+$privateKey = PrivateKeyFactory::create(true);
+
+$message = 'hi';
+
+$signer = new MessageSigner($ec);
+$signed = $signer->sign($message, $privateKey);
+
+echo sprintf("Signed by %s\n%s\n", $privateKey->getAddress()->getAddress(), $signed->getBuffer()->getBinary());
+
+if ($signer->verify($signed, $privateKey->getAddress())) {
+    echo "Signature verified!\n";
+} else {
+    echo "Failed to verify signature!\n";
+}
+
+```
+
+## Create/use BIP39 mnemonics
+```php
+
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
+use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
+
+// Generate a mnemonic
+$random = new Random();
+$entropy = $random->bytes(64);
+
+$bip39 = MnemonicFactory::bip39();
+$seedGenerator = new Bip39SeedGenerator($bip39);
+$mnemonic = $bip39->entropyToMnemonic($entropy);
+
+// Derive a seed from mnemonic/password
+$seed = $seedGenerator->getSeed($mnemonic, 'password');
+echo $seed->getHex() . "\n";
+
+$bip32 = \BitWasp\Bitcoin\Key\HierarchicalKeyFactory::fromEntropy($seed);
+
+```
