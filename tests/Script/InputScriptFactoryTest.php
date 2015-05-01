@@ -1,11 +1,11 @@
 <?php
 
-namespace Script;
-
+namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -27,6 +27,7 @@ class InputScriptFactoryTest extends AbstractTestCase
         $parsed = $script->getScriptParser()->parse();
         $this->assertSame($txSigHex, $parsed[0]->getHex());
         $this->assertEquals(1, count($parsed));
+        $this->assertEquals(InputClassifier::PAYTOPUBKEY, ScriptFactory::scriptSig()->classify($script)->classify());
     }
 
     public function testPayToPubKeyHash()
@@ -42,9 +43,10 @@ class InputScriptFactoryTest extends AbstractTestCase
         $this->assertSame($txSigHex, $parsed[0]->getHex());
         $this->assertSame($publicKeyHex, $parsed[1]->getHex());
         $this->assertEquals(2, count($parsed));
+        $this->assertEquals(InputClassifier::PAYTOPUBKEYHASH, ScriptFactory::scriptSig()->classify($script)->classify());
     }
 
-    public function testPayToScriptHash()
+    public function testPayToMultisig()
     {
         // Script::payToScriptHash should produce a ScriptHash type script, from a different script
         $private = PrivateKeyFactory::create();
@@ -56,8 +58,9 @@ class InputScriptFactoryTest extends AbstractTestCase
         $scriptHash = ScriptFactory::scriptSig()->multisigP2sh($script, $sigs);
         $parsed = $scriptHash->getScriptParser()->parse();
 
-        $this->assertSame('00',$parsed[0]->getHex());
+        $this->assertSame('00', $parsed[0]->getHex());
         $this->assertSame($sigHex, $parsed[1]->getHex());
         $this->assertSame($script->getHex(), $parsed[2]->getHex());
+        $this->assertEquals(InputClassifier::MULTISIG, ScriptFactory::scriptSig()->classify($scriptHash)->classify());
     }
 }
