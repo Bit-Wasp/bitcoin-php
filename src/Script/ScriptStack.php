@@ -98,9 +98,11 @@ class ScriptStack
      */
     public function insert($insertPosition, $value)
     {
-        $this->stack = array_slice($this->stack, 0, $insertPosition, true) +
-            array($value) +
-            array_slice($this->stack, $insertPosition, count($this->stack) - $insertPosition, true);
+        $this->stack = array_merge(
+            array_slice($this->stack, 0, $insertPosition, true),
+            array($value),
+            array_slice($this->stack, $insertPosition, count($this->stack) - $insertPosition, true)
+        );
 
         return $this;
     }

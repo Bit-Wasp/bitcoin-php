@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Script;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 
@@ -18,17 +19,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $bufferType;
-
-    public function __construct()
-    {
-        $this->bufferType = 'BitWasp\Buffertools\Buffer';
-    }
-
-    public function setUp()
-    {
-        $script = new Script();
-    }
+    protected $bufferType = 'BitWasp\Buffertools\Buffer';
 
     public function testGetOpCodes()
     {
@@ -153,26 +144,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $script->getScriptParser()->parse();
     }
 
-    public function testPayToPubKey()
-    {
-        $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::scriptPubKey()->payToPubKey($pubkey);
-        $parsed = $script->getScriptParser()->parse();
-        $this->assertSame('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb', $parsed[0]->getHex());
-        $this->assertSame('OP_CHECKSIG', $parsed[1]);
-    }
-
-    public function testPayToPubKeyHash()
-    {
-        $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pubkey);
-        $parsed = $script->getScriptParser()->parse();
-        $this->assertSame('OP_DUP', $parsed[0]);
-        $this->assertSame('OP_HASH160', $parsed[1]);
-        $this->assertSame('f0cd7fab8e8f4b335931a77f114a46039068da59', $parsed[2]->getHex());
-        $this->assertSame('OP_EQUALVERIFY', $parsed[3]);
-    }
-
     public function testGetScriptHash()
     {
         $script = new Script();
@@ -195,25 +166,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function testPayToScriptHash()
-    {
-        // Script::payToScriptHash should produce a ScriptHash type script, from a different script
-        $script = new Script();
-        $script
-            ->op('OP_2')
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
-
-        $scriptHash = ScriptFactory::scriptPubKey()->payToScriptHash($script);
-        $parsed = $scriptHash->getScriptParser()->parse();
-        $this->assertSame('OP_HASH160', $parsed[0]);
-        $this->assertSame('f7c29c0c6d319e33c9250fca0cb61a500621d93e', $parsed[1]->getHex());
-        $this->assertSame('OP_EQUAL', $parsed[2]);
-    }
-
     public function testGetVarInt()
     {
         $f = file_get_contents(__DIR__ . '/../Data/script.varint.json');
@@ -224,5 +176,23 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
             $this->assertSame(Buffertools::numToVarInt($script->getBuffer()->getSize())->getBinary(), pack("H*", $test->varint));
             $this->assertSame(Buffertools::numToVarInt($script->getBuffer()->getSize())->getHex(), $test->varint);
         }
+    }
+
+    public function getPushOnlyVectors()
+    {
+        return [
+            [ScriptFactory::create()->push(new Buffer()), true],
+            [ScriptFactory::create()->op('OP_1'), false]
+        ];
+    }
+
+    /**
+     * @dataProvider getPushOnlyVectors
+     * @param ScriptInterface $script
+     * @param $eResult
+     */
+    public function testIsPushOnly(ScriptInterface $script, $eResult)
+    {
+        $this->assertEquals($eResult, $script->isPushOnly());
     }
 }

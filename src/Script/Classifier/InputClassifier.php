@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Classifier;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Script;
@@ -20,6 +21,8 @@ class InputClassifier implements ScriptClassifierInterface
      */
     private $evalScript;
 
+    const MAXSIGLEN = 0x48;
+
     /**
      * @param ScriptInterface $script
      */
@@ -34,10 +37,9 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        return (
-            count($this->evalScript) == 1
-            && (strlen($this->evalScript) <= 0x47)
-        );
+        return count($this->evalScript) == 1
+            && $this->evalScript[0] instanceof Buffer
+            && $this->evalScript[0]->getSize() <= self::MAXSIGLEN;
     }
 
     /**
@@ -45,11 +47,10 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKeyHash()
     {
-        return (
-            count($this->evalScript) == 2
-            && (strlen($this->evalScript[0]) <= 0x47)
-            && PublicKey::isCompressedOrUncompressed(Buffer::hex($this->evalScript[1]))
-        );
+        return count($this->evalScript) == 2
+            && $this->evalScript[0] instanceof Buffer && $this->evalScript[1] instanceof Buffer
+            && $this->evalScript[0]->getSize() <= self::MAXSIGLEN
+            && PublicKey::isCompressedOrUncompressed($this->evalScript[1]);
     }
 
     /**
@@ -62,14 +63,15 @@ class InputClassifier implements ScriptClassifierInterface
         }
 
         $final = end($this->evalScript);
-        if (!$final) {
+        if (!$final || !$final instanceof Buffer) {
             return false;
         }
 
-        $script = new Script(Buffer::hex($final));
-        $type = new self($script);
-        // todo.......
-        return $type->classify() !== false;
+        $type = new self(new Script($final));
+        return false === in_array($type->classify(), [
+            self::UNKNOWN,
+            self::PAYTOSCRIPTHASH
+        ]);
     }
 
     /**
@@ -77,7 +79,31 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isMultisig()
     {
-        return false;
+        if (count($this->evalScript) < 3) {
+            return false;
+        }
+
+        $final = end($this->evalScript);
+        if (!$final || !$final instanceof Buffer) {
+            return false;
+        }
+
+        $script = new Script($final);
+        $parsed = $script->getScriptParser()->parse();
+        $count = count($parsed);
+        $opCodes = $script->getOpCodes();
+
+        $mOp = $parsed[0];
+        $nOp = $parsed[$count - 2];
+        $keys = array_slice($parsed, 1, -2);
+        $keysValid = true;
+        foreach ($keys as $key) {
+            $keysValid &= ($key instanceof Buffer) && PublicKey::isCompressedOrUncompressed($key);
+        }
+
+        return $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
+            && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
+            && $keysValid;
     }
 
     /**
@@ -89,10 +115,10 @@ class InputClassifier implements ScriptClassifierInterface
             return self::PAYTOPUBKEY;
         } elseif ($this->isPayToPublicKeyHash()) {
             return self::PAYTOPUBKEYHASH;
-        } elseif ($this->isPayToScriptHash()) {
-            return self::PAYTOSCRIPTHASH;
         } elseif ($this->isMultisig()) {
             return self::MULTISIG;
+        } elseif ($this->isPayToScriptHash()) {
+            return self::PAYTOSCRIPTHASH;
         }
 
         return self::UNKNOWN;

@@ -41,7 +41,7 @@ class RedeemScript extends Script
 
         $this->op($opM);
         foreach ($keys as $key) {
-            if (!$key instanceof PublicKey) {
+            if (!$key instanceof PublicKeyInterface) {
                 throw new \LogicException('Values in $keys[] must be a PublicKey');
             }
 
@@ -63,13 +63,17 @@ class RedeemScript extends Script
     {
         $publicKeys = [];
         $parse = $script->getScriptParser()->parse();
-        $m = $parse[0] - $script->getOpcodes()->getOpByName('OP_1');
-
-        foreach ($parse as $item) {
+        $opCodes = $script->getOpcodes();
+        $m = $opCodes->getOpByName($parse[0]) - $opCodes->getOpByName('OP_1') + 1 ;
+        foreach (array_slice($parse, 1, -2) as $item) {
             if (!$item instanceof Buffer) {
                 throw new \RuntimeException('Unable to load public key');
             }
             $publicKeys[] = PublicKeyFactory::fromHex($item->getHex());
+        }
+
+        if (count($publicKeys) == 0) {
+            throw new \LogicException('No public keys found in script');
         }
 
         return new self($m, $publicKeys);
@@ -113,7 +117,7 @@ class RedeemScript extends Script
     public function getKey($index)
     {
         if (!isset($this->keys[$index])) {
-            throw new \LogicException('No key at index ' . $index);
+            throw new \LogicException('No key at that index');
         }
 
         return $this->keys[$index];
