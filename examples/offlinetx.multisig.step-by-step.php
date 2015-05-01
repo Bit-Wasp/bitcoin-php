@@ -3,9 +3,7 @@
 require "../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
