@@ -74,6 +74,19 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, ScriptFactory::scriptPubKey()->classify($script)->classify());
     }
 
+    public function testClassifyMultisig()
+    {
+        $script = ScriptFactory::create()
+            ->op('OP_2')
+            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
+            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
+            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
+            ->op('OP_3')
+            ->op('OP_CHECKMULTISIG');
+
+        $this->assertEquals(OutputClassifier::MULTISIG, ScriptFactory::scriptPubKey()->classify($script)->classify());
+    }
+
     public function testPayToScriptHash()
     {
         // Script::payToScriptHash should produce a ScriptHash type script, from a different script
