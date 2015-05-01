@@ -43,6 +43,11 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getPrivVectors
+     * @param EcAdapterInterface $ec
+     * @param $privHex
+     * @param $pubHex
+     * @param $compressedHex
+     * @throws \Exception
      */
     public function testPrivateToPublic(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
     {
@@ -53,6 +58,7 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
     public function testIsValidKey(EcAdapterInterface $ecAdapter)
     {
@@ -84,6 +90,7 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
     public function testIsValidPublicKey(EcAdapterInterface $ecAdapter)
     {
@@ -129,24 +136,13 @@ class EcAdapterTest extends AbstractTestCase
      */
     public function testPrivateKeySign(EcAdapterInterface $ecAdapter)
     {
-        /**
-         * This looks enough times to try and catch some of the outliers..
-         * - Odd length hex strings need to be padded with one single '0' value,
-         *   which happens on occasion when converting from decimal to hex.
-         * - Padding also must be applied to prevent r and s from being negative.
-         * Signature lengths vary with a certain probability, but the most annoying
-         * thing while writing this test was cases where r / s were 31.5 bytes.
-         * Should be at least 100 to catch these, but it can take a while
-         */
         $random = new Random();
         $pk = PrivateKeyFactory::fromInt('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
 
-        for ($i = 0; $i < 2; $i++) {
-            $hash = $random->bytes(32);
-            $sig = $ecAdapter->sign($hash, $pk, new Random());
+        $hash = $random->bytes(32);
+        $sig = $ecAdapter->sign($hash, $pk, new Random());
 
-            $this->assertInstanceOf($this->sigType, $sig);
-            $this->assertTrue($ecAdapter->verify($hash, $pk->getPublicKey(), $sig));
-        }
+        $this->assertInstanceOf($this->sigType, $sig);
+        $this->assertTrue($ecAdapter->verify($hash, $pk->getPublicKey(), $sig));
     }
 }
