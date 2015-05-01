@@ -23,4 +23,13 @@ class TransactionCollectionTest extends AbstractTestCase
         $this->assertEquals(2, count($collection));
         $this->assertEquals(1, count($collection->slice(0, 1)));
     }
+
+    public function testGetTransaction()
+    {
+        $t = new Transaction();
+        $collection = new TransactionCollection([$t]);
+        $this->assertSame($t, $collection->getTransaction(0));
+
+        $this->assertEquals([$t], $collection->getTransactions());
+    }
 }
