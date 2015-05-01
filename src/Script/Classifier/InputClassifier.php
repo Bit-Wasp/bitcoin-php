@@ -69,8 +69,8 @@ class InputClassifier implements ScriptClassifierInterface
 
         $type = new self(new Script($final));
         return false === in_array($type->classify(), [
-            InputClassifier::UNKNOWN,
-            InputClassifier::PAYTOSCRIPTHASH
+            self::UNKNOWN,
+            self::PAYTOSCRIPTHASH
         ]);
     }
 
@@ -79,7 +79,7 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isMultisig()
     {
-        if (count($this->evalScript) == 0) {
+        if (count($this->evalScript) < 3) {
             return false;
         }
 
@@ -96,17 +96,14 @@ class InputClassifier implements ScriptClassifierInterface
         $mOp = $parsed[0];
         $nOp = $parsed[$count - 2];
         $keys = array_slice($parsed, 1, -2);
-        $keysValid = function () use ($keys) {
-            $valid = true;
-            foreach ($keys as $key) {
-                $valid &= ($key instanceof Buffer) && PublicKey::isCompressedOrUncompressed($key);
-            }
-            return $valid;
-        };
+        $keysValid = true;
+        foreach ($keys as $key) {
+            $keysValid &= ($key instanceof Buffer) && PublicKey::isCompressedOrUncompressed($key);
+        }
 
         return $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
             && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
-            && $keysValid();
+            && $keysValid;
     }
 
     /**
