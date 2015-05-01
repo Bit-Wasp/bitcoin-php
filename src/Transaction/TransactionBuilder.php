@@ -170,6 +170,25 @@ class TransactionBuilder
     }
 
     /**
+     * @param integer $inputToSign
+     * @param ScriptInterface $outputScript
+     * @param RedeemScript $redeemScript
+     * @return TransactionBuilderInputState
+     */
+    public function createInputState($inputToSign, $outputScript, $redeemScript)
+    {
+        $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
+            $this->ecAdapter,
+            $outputScript,
+            $redeemScript
+        );
+
+        $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign);
+
+        return $this->getInputState($inputToSign);
+    }
+
+    /**
      * @param PrivateKeyInterface $privateKey
      * @param ScriptInterface $outputScript
      * @param $inputToSign
@@ -185,20 +204,11 @@ class TransactionBuilder
         RedeemScript $redeemScript = null,
         $sigHashType = SignatureHashInterface::SIGHASH_ALL
     ) {
-        $input = $this->transaction->getInputs()->getInput($inputToSign);
-
-        // By design, calling sign should be sufficient to create a TransactionBuilderInputState.
+        // If the input state hasn't been set up, do so now.
         try {
             $inputState = $this->getInputState($inputToSign);
         } catch (BuilderNoInputState $e) {
-            $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
-                $this->ecAdapter,
-                $outputScript,
-                $redeemScript
-            );
-
-            $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign);
-            $inputState = $this->inputStates[$inputToSign];
+            $inputState = $this->createInputState($inputToSign, $outputScript, $redeemScript);
         }
 
         // If it's PayToPubkey / PayToPubkeyHash, TransactionBuilderInputState needs to know the public key.
