@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Key;
 
+use BitWasp\Bitcoin\Key\Point;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKey;
@@ -203,5 +204,18 @@ class PublicKeyTest extends AbstractTestCase
     {
         $pub = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
         $pub->setCompressed('a');
+    }
+
+    public function testPublicKeyFromPoint(EcAdapterInterface $ecAdapter)
+    {
+        $point = new Point(
+            $ecAdapter->getMath(),
+            $ecAdapter->getGenerator(),
+            '94075108042016923119479678483338406049382274483038030215794449747077048324075',
+            '68068239036272628750825525318805297439390570305050728515552223656985804538350'
+        );
+
+        $publicKey = PublicKeyFactory::fromPoint($point);
+        $this->assertSame($point, $publicKey->getPoint());
     }
 }
