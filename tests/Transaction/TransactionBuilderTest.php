@@ -396,6 +396,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $builder->createInputState(0, $outputScript);
         $this->assertEquals(1, $builder->getInputState(0)->getSigCount());
         $this->assertTrue($builder->getInputState(0)->isFullySigned());
+        $this->assertTrue($builder->isFullySigned());
     }
 
     public function testIncrementallySigningP2PKH()
@@ -437,6 +438,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $this->assertEquals(InputClassifier::PAYTOPUBKEYHASH, $is->getScriptType());
         $this->assertEquals(0, $is->getSigCount());
         $this->assertEquals(1, $is->getRequiredSigCount());
+        $this->assertFalse($is->isFullySigned());
 
         // Check input is correctly set up
         $i = $builder->getTransaction()->getInputs()->getInput(0);
@@ -457,6 +459,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $builder->createInputState(0, $outputScript);
         $this->assertEquals(1, $builder->getInputState(0)->getSigCount());
         $this->assertTrue($builder->getInputState(0)->isFullySigned());
+        $this->assertTrue($builder->isFullySigned());
     }
 
     public function testIncrementallySigningP2SHMultisig()
@@ -523,5 +526,6 @@ class TransactionBuilderTest extends AbstractTestCase
         $builder->createInputState(0, $outputScript, $redeemScript);
         $this->assertEquals(2, $builder->getInputState(0)->getSigCount());
         $this->assertTrue($builder->getInputState(0)->isFullySigned());
+        $this->assertTrue($builder->isFullySigned());
     }
 }
