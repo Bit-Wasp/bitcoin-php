@@ -100,7 +100,7 @@ class InputClassifier implements ScriptClassifierInterface
         $mOp = $parsed[0];
         $nOp = $parsed[$count - 2];
         $keys = array_slice($parsed, 1, -2);
-        $keysValid = function() use ($keys) {
+        $keysValid = function () use ($keys) {
             $valid = true;
             foreach ($keys as $key) {
                 $valid &= ($key instanceof Buffer) && PublicKey::isCompressedOrUncompressed($key);
