@@ -344,16 +344,16 @@ class TransactionBuilderInputState
         // First check that public keys are set up as required, then
         // Compare the number of signatures with the required sig count
         return $this->execForInputTypes(
-                function () {
+            function () {
                     return (count($this->publicKeys) == 1);
-                },
-                function () {
+            },
+            function () {
                     return (count($this->publicKeys) == 1);
-                },
-                function () {
+            },
+            function () {
                     return true;
-                }
-            ) && (count($this->signatures) == $this->getRequiredSigCount());
+            }
+        ) && (count($this->signatures) == $this->getRequiredSigCount());
 
     }
 }
