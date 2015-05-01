@@ -51,7 +51,7 @@ class NetworkMessage extends Serializable
     public function getChecksum()
     {
         $data = $this->getPayload()->getBuffer();
-        return Hash::sha256d($data, true)->slice(0, 4);
+        return Hash::sha256d($data)->slice(0, 4);
     }
 
     /**
