@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -43,5 +42,4 @@ class ScriptFactoryTest extends AbstractTestCase
         $this->assertInstanceOf('BitWasp\Bitcoin\Script\Script', $script);
         $this->assertEmpty($script->getBinary());
     }
-
 }
