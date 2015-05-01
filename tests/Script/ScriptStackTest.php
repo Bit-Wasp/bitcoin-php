@@ -105,4 +105,64 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($stack->top(-2), '44');
         $this->assertSame($stack->top(-3), '41');
     }
+
+    public function testInsert()
+    {
+        $stack = new ScriptStack;
+        $stack
+            ->push('41')
+            ->push('44')
+            ->push('99');
+
+        $stack->insert(0, 'de');
+
+        $this->assertEquals(4, $stack->size());
+        $this->assertSame($stack->top(-1), '99');
+        $this->assertSame($stack->top(-2), '44');
+        $this->assertSame($stack->top(-3), '41');
+        $this->assertSame($stack->top(-4), 'de');
+
+        $stack->insert(2, 'do');
+        $this->assertEquals('do', $stack->top(-3));
+
+    }
+
+    public function testEnd()
+    {
+        $stack = new ScriptStack;
+        $this->assertEquals(0, $stack->end());
+        $stack
+            ->push('41')
+            ->push('44');
+
+        $this->assertEquals(1, $stack->end());
+        $this->assertEquals(2, $stack->size());
+        $stack->push('fa');
+        $this->assertEquals(2, $stack->end());
+        $this->assertEquals(3, $stack->size());
+    }
+
+    public function testSwap()
+    {
+        $stack = new ScriptStack();
+        $stack->push('00')->push('11');
+
+        $this->assertEquals('11', $stack->top(-1));
+        $this->assertEquals('00', $stack->top(-2));
+
+        $stack->swap(-1, -2);
+        $this->assertEquals('00', $stack->top(-1));
+        $this->assertEquals('11', $stack->top(-2));
+
+        $stack->push('22');
+        $this->assertEquals('22', $stack->top(-1));
+        $this->assertEquals('00', $stack->top(-2));
+        $this->assertEquals('11', $stack->top(-3));
+
+        $stack->swap(-1, -2);
+        $this->assertEquals('00', $stack->top(-1));
+        $this->assertEquals('22', $stack->top(-2));
+        $this->assertEquals('11', $stack->top(-3));
+
+    }
 }
