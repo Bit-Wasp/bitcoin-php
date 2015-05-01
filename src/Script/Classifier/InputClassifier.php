@@ -109,8 +109,8 @@ class InputClassifier implements ScriptClassifierInterface
         };
 
         return (
-            $opCodes->cmp($mOp, 'OP_0') >= 0
-            && $opCodes->cmp($nOp, 'OP_16') <= 0
+            $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
+            && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
             && $keysValid()
         );
     }

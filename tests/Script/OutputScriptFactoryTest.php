@@ -1,6 +1,6 @@
 <?php
 
-namespace Script;
+namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -24,6 +24,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals($pk1->getAddress()->getHash(), $parsedScript[2]->getHex());
         $this->assertEquals('OP_EQUALVERIFY', $parsedScript[3]);
         $this->assertEquals('OP_CHECKSIG', $parsedScript[4]);
+        $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, ScriptFactory::scriptPubKey()->classify($p2pkhScript)->classify());
 
         $p2sh = ScriptFactory::multisig(1, [$pk1->getPublicKey()])->getAddress();
         $p2shScript = ScriptFactory::scriptPubKey()->payToAddress($p2sh);
@@ -31,16 +32,34 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals('OP_HASH160', $parsedScript[0]);
         $this->assertEquals($p2sh->getHash(), $parsedScript[1]->getHex());
         $this->assertEquals('OP_EQUAL', $parsedScript[2]);
+        $this->assertEquals(OutputClassifier::PAYTOSCRIPTHASH, ScriptFactory::scriptPubKey()->classify($p2shScript)->classify());
     }
-
 
     public function testPayToPubKey()
     {
-        $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::scriptPubKey()->payToPubKey($pubkey);
-        $parsed = $script->getScriptParser()->parse();
-        $this->assertSame('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb', $parsed[0]->getHex());
-        $this->assertSame('OP_CHECKSIG', $parsed[1]);
+        // Use loop to verify compressed & uncompressed pay to pubkey scripts
+        for ($i = 0; $i < 2; $i++) {
+            $compressed = $i % 2 == 0;
+            $privateKey = PrivateKeyFactory::create($compressed);
+            $pubkey = $privateKey->getPublicKey();
+
+            $script = ScriptFactory::scriptPubKey()->payToPubKey($pubkey);
+            $parsed = $script->getScriptParser()->parse();
+            $this->assertSame($pubkey->getHex(), $parsed[0]->getHex());
+            $this->assertSame('OP_CHECKSIG', $parsed[1]);
+
+            $this->assertEquals(OutputClassifier::PAYTOPUBKEY, ScriptFactory::scriptPubKey()->classify($script)->classify());
+        }
+    }
+
+    public function testPayToPubKeyInvalid()
+    {
+        $script = ScriptFactory::create();
+        $this->assertFalse(ScriptFactory::scriptPubKey()->classify($script)->isPayToPublicKey());
+
+        $script = ScriptFactory::create()
+            ->push(new Buffer());
+        $this->assertFalse(ScriptFactory::scriptPubKey()->classify($script)->isPayToPublicKey());
     }
 
     public function testPayToPubKeyHash()
@@ -52,15 +71,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertSame('OP_HASH160', $parsed[1]);
         $this->assertSame('f0cd7fab8e8f4b335931a77f114a46039068da59', $parsed[2]->getHex());
         $this->assertSame('OP_EQUALVERIFY', $parsed[3]);
-    }
-
-    public function testOutputClassify()
-    {
-        $ad = PrivateKeyFactory::create()->getPublicKey();
-        $p2pkh = ScriptFactory::scriptPubKey()->payToPubKeyHash($ad);
-        $classify = ScriptFactory::scriptPubKey()->classify($p2pkh);
-
-        $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, $classify->classify());
+        $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, ScriptFactory::scriptPubKey()->classify($script)->classify());
     }
 
     public function testPayToScriptHash()
@@ -80,5 +91,6 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertSame('OP_HASH160', $parsed[0]);
         $this->assertSame('f7c29c0c6d319e33c9250fca0cb61a500621d93e', $parsed[1]->getHex());
         $this->assertSame('OP_EQUAL', $parsed[2]);
+        $this->assertEquals(OutputClassifier::PAYTOSCRIPTHASH, ScriptFactory::scriptPubKey()->classify($scriptHash)->classify());
     }
 }
