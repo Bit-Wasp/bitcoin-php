@@ -153,25 +153,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $script->getScriptParser()->parse();
     }
 
-    public function testPayToPubKey()
-    {
-        $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::scriptPubKey()->payToPubKey($pubkey);
-        $parsed = $script->getScriptParser()->parse();
-        $this->assertSame('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb', $parsed[0]->getHex());
-        $this->assertSame('OP_CHECKSIG', $parsed[1]);
-    }
-
-    public function testPayToPubKeyHash()
-    {
-        $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pubkey);
-        $parsed = $script->getScriptParser()->parse();
-        $this->assertSame('OP_DUP', $parsed[0]);
-        $this->assertSame('OP_HASH160', $parsed[1]);
-        $this->assertSame('f0cd7fab8e8f4b335931a77f114a46039068da59', $parsed[2]->getHex());
-        $this->assertSame('OP_EQUALVERIFY', $parsed[3]);
-    }
 
     public function testGetScriptHash()
     {
@@ -193,25 +174,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         // Validate it's correct
         $this->assertSame($script->getScriptHash()->getHex(), 'f7c29c0c6d319e33c9250fca0cb61a500621d93e');
 
-    }
-
-    public function testPayToScriptHash()
-    {
-        // Script::payToScriptHash should produce a ScriptHash type script, from a different script
-        $script = new Script();
-        $script
-            ->op('OP_2')
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
-
-        $scriptHash = ScriptFactory::scriptPubKey()->payToScriptHash($script);
-        $parsed = $scriptHash->getScriptParser()->parse();
-        $this->assertSame('OP_HASH160', $parsed[0]);
-        $this->assertSame('f7c29c0c6d319e33c9250fca0cb61a500621d93e', $parsed[1]->getHex());
-        $this->assertSame('OP_EQUAL', $parsed[2]);
     }
 
     public function testGetVarInt()
