@@ -27,11 +27,11 @@ $outputScript = $redeemScript->getOutputScript();
 // The address is funded with a transaction (fake, for the purposes of this script).
 // You would do getrawtransaction normally
 $spendTx = new Transaction();
-$spendTx->getInputs(0)->addInput(new TransactionInput(
+$spendTx->getInputs()->addInput(new TransactionInput(
     '4141414141414141414141414141414141414141414141414141414141414141',
     0
 ));
-$spendTx->getOutputs(0)->addOutput(new TransactionOutput(
+$spendTx->getOutputs()->addOutput(new TransactionOutput(
     50,
     $outputScript
 ));
@@ -59,7 +59,7 @@ echo "Required signature count: " . $inputState->getRequiredSigCount() . "\n";
 echo "Current signatures: " . $inputState->getSigCount() . "\n\n";
 
 // The other party decodes the transaction, and continues to 'build' it.
-$builder = new TransactionBuilder($ecAdapter, TransactionFactory::fromHex($builder->getTransaction()->getHex()), $ecAdapter);
+$builder = new TransactionBuilder($ecAdapter, TransactionFactory::fromHex($builder->getTransaction()->getHex()));
 $builder->signInputWithKey($pk2, $outputScript, 0, $redeemScript);
 $inputState = $builder->getInputState(0);
 
