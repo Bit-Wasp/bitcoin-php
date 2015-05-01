@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Script;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 
@@ -18,17 +19,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $bufferType;
-
-    public function __construct()
-    {
-        $this->bufferType = 'BitWasp\Buffertools\Buffer';
-    }
-
-    public function setUp()
-    {
-        $script = new Script();
-    }
+    protected $bufferType = 'BitWasp\Buffertools\Buffer';
 
     public function testGetOpCodes()
     {
@@ -153,7 +144,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $script->getScriptParser()->parse();
     }
 
-
     public function testGetScriptHash()
     {
         $script = new Script();
@@ -186,5 +176,23 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
             $this->assertSame(Buffertools::numToVarInt($script->getBuffer()->getSize())->getBinary(), pack("H*", $test->varint));
             $this->assertSame(Buffertools::numToVarInt($script->getBuffer()->getSize())->getHex(), $test->varint);
         }
+    }
+
+    public function getPushOnlyVectors()
+    {
+        return [
+            [ScriptFactory::create()->push(new Buffer()), true],
+            [ScriptFactory::create()->op('OP_1'), false]
+        ];
+    }
+
+    /**
+     * @dataProvider getPushOnlyVectors
+     * @param ScriptInterface $script
+     * @param $eResult
+     */
+    public function testIsPushOnly(ScriptInterface $script, $eResult)
+    {
+        $this->assertEquals($eResult, $script->isPushOnly());
     }
 }
