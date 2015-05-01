@@ -170,6 +170,25 @@ class TransactionBuilder
     }
 
     /**
+     * @param integer $inputToSign
+     * @param ScriptInterface $outputScript
+     * @param RedeemScript $redeemScript
+     * @return TransactionBuilderInputState
+     */
+    public function createInputState($inputToSign, $outputScript, RedeemScript $redeemScript = null)
+    {
+        $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
+            $this->ecAdapter,
+            $outputScript,
+            $redeemScript
+        );
+
+        $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign);
+
+        return $this->getInputState($inputToSign);
+    }
+
+    /**
      * @param PrivateKeyInterface $privateKey
      * @param ScriptInterface $outputScript
      * @param $inputToSign
@@ -185,21 +204,11 @@ class TransactionBuilder
         RedeemScript $redeemScript = null,
         $sigHashType = SignatureHashInterface::SIGHASH_ALL
     ) {
-
-        $input = $this->transaction->getInputs()->getInput($inputToSign);
-
-        // By design, calling sign should be sufficient to create a TransactionBuilderInputState.
+        // If the input state hasn't been set up, do so now.
         try {
             $inputState = $this->getInputState($inputToSign);
         } catch (BuilderNoInputState $e) {
-            $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
-                $this->ecAdapter,
-                $outputScript,
-                $redeemScript
-            );
-
-            $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign, $input->getScript());
-            $inputState = $this->inputStates[$inputToSign];
+            $inputState = $this->createInputState($inputToSign, $outputScript, $redeemScript);
         }
 
         // If it's PayToPubkey / PayToPubkeyHash, TransactionBuilderInputState needs to know the public key.
@@ -207,33 +216,19 @@ class TransactionBuilder
             $inputState->setPublicKeys([$privateKey->getPublicKey()]);
         }
 
-        $hash = $this->transaction->signatureHash()->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType);
-
-        // Could this be done in TransactionBuilderInputState ?
-        // for multisig we want signatures to be in the order of the publicKeys, so if it's not pre-filled OP_Os we're gonna do that now
-        if ($inputState->getScriptType() == OutputClassifier::MULTISIG && count($inputState->getPublicKeys()) !== count($inputState->getSignatures())) {
-            // this can be optimized by not checking against signatures we've already found
-            $orderedSignatures = [];
-            foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
-                $match = false;
-
-                foreach ($inputState->getSignatures() as $signature) {
-                    if ($this->ecAdapter->verify($hash, $publicKey, $signature)) {
-                        $match = $signature;
-                        break;
-                    }
-                }
-
-                $orderedSignatures[] = $match ?: null;
-            }
-
-            $inputState->setSignatures($orderedSignatures);
-        }
-
-        // loop over the publicKeys so we can figure out in which order our signature needs to appear
+        // loop over the publicKeys to find the key to sign with
         foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
             if ($privateKey->getPublicKey()->getBinary() === $publicKey->getBinary()) {
-                $inputState->setSignature($idx, $this->sign($privateKey, $hash, $sigHashType));
+                $inputState->setSignature(
+                    $idx,
+                    $this->sign(
+                        $privateKey,
+                        $this->transaction
+                            ->signatureHash()
+                            ->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType),
+                        $sigHashType
+                    )
+                );
             }
         }
 

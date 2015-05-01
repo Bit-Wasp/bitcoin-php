@@ -27,36 +27,41 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->script = new Script();
+        $script = new Script();
     }
 
     public function testGetOpCodes()
     {
-        $opCodes = $this->script->getOpCodes();
+        $script = new Script();
+        $opCodes = $script->getOpCodes();
         $this->assertInstanceOf('BitWasp\Bitcoin\Script\Opcodes', $opCodes);
     }
 
     public function testDefaultSerializeBinary()
     {
-        $val = $this->script->getBuffer()->getBinary();
+        $script = new Script();
+        $val = $script->getBuffer()->getBinary();
         $this->assertEmpty($val);
     }
 
     public function testDefaultSerializeHex()
     {
-        $val = $this->script->getBuffer()->getHex();
+        $script = new Script();
+        $val = $script->getBuffer()->getHex();
         $this->assertEmpty($val);
     }
 
     public function testSerializeBinary()
     {
-        $val = $this->script->getBuffer()->getBinary();
+        $script = new Script();
+        $val = $script->getBuffer()->getBinary();
         $this->assertEmpty($val);
     }
 
     public function testSerializeHex()
     {
-        $val = $this->script->getBuffer()->getHex();
+        $script = new Script();
+        $val = $script->getBuffer()->getHex();
         $this->assertEmpty($val);
     }
 
@@ -77,8 +82,9 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $expected = '01' . $hex;
         $data = Buffer::hex($hex);
 
-        $this->script->push($data);
-        $out = $this->script->getBuffer()->getHex();
+        $script = new Script();
+        $script->push($data);
+        $out = $script->getBuffer()->getHex();
         $this->assertSame($expected, $out);
     }
 
@@ -86,20 +92,21 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     {
         $hash = '0f9947c2b0fdd82ef3153232ee23d5c0bed84a02';
         $buf  = Buffer::hex($hash);
-        $this->script->push($buf);
+        $script = new Script();
+        $script->push($buf);
 
-        $out = $this->script->getBuffer()->getHex();
-        $this->assertSame('14' . $hash, $out);
+        $this->assertSame('14' . $hash, $script->getBuffer()->getHex());
     }
 
     public function testOp()
     {
         $op = 'OP_HASH160';
-        $this->script->op($op);
+        $script = new Script();
+        $script->op($op);
 
-        $rOp = $this->script->getOpCodes()->getOpByName($op);
+        $rOp = $script->getOpCodes()->getOpByName($op);
         $expected = chr($rOp);
-        $this->assertSame($this->script->getBuffer()->getBinary(), $expected);
+        $this->assertSame($script->getBuffer()->getBinary(), $expected);
     }
 
     /**
@@ -109,16 +116,9 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     public function testOpFailure()
     {
         $op = 'OP_HASH666';
-        $this->script->op($op);
+        $script = new Script();
+        $script->op($op);
     }
-
-
-
-
-
-
-
-
 
     public function testPushdata1()
     {
@@ -126,11 +126,12 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
             '41414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141' .
             '4141414141414141414141414141414141414141414141414141414141414141'
         );
-        $this->script->push($data);
-        $script = $this->script->getBuffer()->getBinary();
-        $firstOpCode = ord($script[0]);
-        $this->assertSame($firstOpCode, $this->script->getOpCodes()->getOpByName('OP_PUSHDATA1'));
-        $this->script->getScriptParser()->parse();
+        $script = new Script();
+        $script->push($data);
+        $scriptBin = $script->getBuffer()->getBinary();
+        $firstOpCode = ord($scriptBin[0]);
+        $this->assertSame($firstOpCode, $script->getOpCodes()->getOpByName('OP_PUSHDATA1'));
+        $script->getScriptParser()->parse();
     }
 
     public function testPushdata2()
@@ -144,11 +145,12 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
             '41414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141414141'
         );
 
-        $this->script->push($data);
-        $script = $this->script->getBuffer()->getBinary();
-        $firstOpCode = ord($script[0]);
-        $this->assertSame($firstOpCode, $this->script->getOpCodes()->getOpByName('OP_PUSHDATA2'));
-        $this->script->getScriptParser()->parse();
+        $script = new Script();
+        $script->push($data);
+        $scriptBin = $script->getBuffer()->getBinary();
+        $firstOpCode = ord($scriptBin[0]);
+        $this->assertSame($firstOpCode, $script->getOpCodes()->getOpByName('OP_PUSHDATA2'));
+        $script->getScriptParser()->parse();
     }
 
     public function testPayToPubKey()

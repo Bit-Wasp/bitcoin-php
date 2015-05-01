@@ -36,7 +36,6 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function setUp()
     {
         $this->math = Bitcoin::getMath();
-        $this->key = null;
         $this->network = NetworkFactory::bitcoin();
     }
 
@@ -240,8 +239,8 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testCreateWithInvalidLength()
     {
-        $key       = 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA';
-        $this->key = HierarchicalKeyFactory::fromExtended($key, $this->network);
+        $key = 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA';
+        HierarchicalKeyFactory::fromExtended($key, $this->network);
     }
 
     /**
@@ -302,7 +301,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertFalse($key->isHardened());
 
-        $xPub       = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
+        $xPub = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertTrue($key->isHardened());
     }

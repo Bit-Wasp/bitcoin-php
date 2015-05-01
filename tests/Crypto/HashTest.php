@@ -7,11 +7,6 @@ use BitWasp\Buffertools\Buffer;
 
 class HashTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Hash
-     */
-    protected $hash;
-
     public function testSha256()
     {
         $f = file_get_contents(__DIR__.'/../Data/hash.sha256.json');

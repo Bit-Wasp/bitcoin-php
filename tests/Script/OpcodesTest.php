@@ -6,29 +6,20 @@ use BitWasp\Bitcoin\Script\Opcodes;
 
 class OpcodesTest extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * @var Opcodes
-     */
-    public $op;
-
-    public function setUp()
-    {
-        $this->op = new OpCodes;
-    }
-
     public function testGetOpByName()
     {
+        $op = new OpCodes;
         $expected = 0;
-        $val = $this->op->getOpByName('OP_0');
+        $val = $op->getOpByName('OP_0');
         $this->assertSame($expected, $val);
     }
 
     public function testGetOp()
     {
+        $op = new OpCodes;
         // Check getRegisteredOpCode returns the right operation
         $expected = 'OP_0';
-        $val = $this->op->getOp(0);
+        $val = $op->getOp(0);
 
         $this->assertSame($expected, $val);
     }
@@ -39,6 +30,7 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetOpCodeException()
     {
-        $this->op->getOp(3);
+        $op = new OpCodes;
+        $op->getOp(3);
     }
 }

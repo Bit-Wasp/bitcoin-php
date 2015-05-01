@@ -14,10 +14,6 @@ use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
 
-/**
- * Class TransactionBuilder
- * @package BitWasp\Bitcoin\Transaction
- */
 class TransactionBuilderInputState
 {
     /**
@@ -142,8 +138,6 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @TODO: could this just use $this->previousOutputScript ?
-     * @todo: TK: either work I think - though calling isPayToScriptHash involves a computation instead of just comparing to OutputClassifier::PAYTOSCRIPTHASH
      *
      * @return string
      */
@@ -202,22 +196,26 @@ class TransactionBuilderInputState
      * @param TransactionSignatureInterface $signature
      * @return $this
      */
-    public function setSignature($idx, TransactionSignatureInterface $signature)
+    public function setSignature($idx, TransactionSignatureInterface $signature = null)
     {
         $this->signatures[$idx] = $signature;
-
         return $this;
     }
 
     /**
      * @param TransactionInterface $tx
      * @param integer $inputToExtract
-     * @param ScriptInterface $scriptSig
      * @throws \Exception
      */
-    public function extractSigs(TransactionInterface $tx, $inputToExtract, ScriptInterface $scriptSig)
+    public function extractSigs(TransactionInterface $tx, $inputToExtract)
     {
-        $parsed = $scriptSig->getScriptParser()->parse();
+        $parsed = $tx
+            ->getInputs()
+            ->getInput($inputToExtract)
+            ->getScript()
+            ->getScriptParser()
+            ->parse();
+
         $size = count($parsed);
 
         switch ($this->getScriptType()) {
@@ -237,31 +235,37 @@ class TransactionBuilderInputState
 
                 break;
             case OutputClassifier::MULTISIG:
-                // Can't possibly be more than keyCount signatures, so restrict in this range
-                if ($size > 2 && $size < $this->getRedeemScript()->getKeyCount() + 2) {
+                $keys = $this->getRedeemScript()->getKeys();
+                foreach ($keys as $idx => $key) {
+                    $this->setSignature($idx, null);
+                }
+
+                if ($size > 2 && $size <= $this->getRedeemScript()->getKeyCount() + 2) {
                     $sigs = [];
-                    $keys = $this->getRedeemScript()->getKeys();
                     foreach ($keys as $key) {
                         $sigs[$key->getPubKeyHash()->getHex()] = [];
                     }
 
                     // Extract Signatures (as buffers), then compile arrays of [pubkeyHash => signature]
+                    $sigHash = new SignatureHash($tx);
+
                     foreach (array_slice($parsed, 1, -1) as $item) {
                         if ($item instanceof Buffer) {
-                            $sig = TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath());
-                            $sigHash = new SignatureHash($tx);
+                            $txSig = TransactionSignatureFactory::fromHex($item, $this->ecAdapter->getMath());
                             $linked = $this->ecAdapter->associateSigs(
-                                [$sig],
+                                [$txSig->getSignature()],
                                 $sigHash->calculate(
-                                    $this->getPrevOutScript(),
+                                    $this->getRedeemScript(),
                                     $inputToExtract,
-                                    $sig->getHashType()
+                                    $txSig->getHashType()
                                 ),
                                 $this->getRedeemScript()->getKeys()
                             );
 
-                            $key = array_keys($linked)[0];
-                            $sigs[$key] = array_merge($sigs[$key], $linked[$key]);
+                            if (count($linked)) {
+                                $key = array_keys($linked)[0];
+                                $sigs[$key] = array_merge($sigs[$key], [$txSig]);
+                            }
                         }
                     }
 
@@ -298,7 +302,7 @@ class TransactionBuilderInputState
             },
             function () use (&$signatures) {
                 return count($signatures) > 0
-                    ? ScriptFactory::scriptSig()->multisigP2sh($this->getRedeemScript(), $this->signatures)
+                    ? ScriptFactory::scriptSig()->multisigP2sh($this->getRedeemScript(), array_filter($this->signatures))
                     : ScriptFactory::create();
             }
         );
@@ -307,7 +311,7 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @return Buffer|bool|int
+     * @return int
      */
     public function getRequiredSigCount()
     {
@@ -337,20 +341,19 @@ class TransactionBuilderInputState
      */
     public function isFullySigned()
     {
-        $result = $this->execForInputTypes(
+        // First check that public keys are set up as required, then
+        // Compare the number of signatures with the required sig count
+        return $this->execForInputTypes(
             function () {
-                return (count($this->publicKeys) == 1);
+                    return (count($this->publicKeys) == 1);
             },
             function () {
-                return (count($this->publicKeys) == 1);
+                    return (count($this->publicKeys) == 1);
             },
             function () {
-                return true;
+                    return true;
             }
-        );
+        ) && (count($this->signatures) == $this->getRequiredSigCount());
 
-        $result = $result && (count($this->signatures) == $this->getRequiredSigCount());
-
-        return $result;
     }
 }

@@ -11,15 +11,6 @@ use Mdanter\Ecc\Math\Gmp;
 
 class BitcoinTest extends \PHPUnit_Framework_TestCase
 {
-    public function restore()
-    {
-
-
-    }
-    public function setUp()
-    {
-    }
-
     public function tearDown()
     {
         Bitcoin::setMath(new Math());

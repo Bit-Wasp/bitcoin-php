@@ -1,6 +1,6 @@
 <?php
 
-namespace Address;
+namespace BitWasp\Bitcoin\Tests\Address;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;

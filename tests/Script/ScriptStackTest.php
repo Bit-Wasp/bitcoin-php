@@ -6,53 +6,42 @@ use BitWasp\Bitcoin\Script\ScriptStack;
 
 class ScriptStackTest extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * @var ScriptStack
-     */
-    protected $stack;
-
-    public function setUp()
-    {
-        $this->stack = new ScriptStack;
-    }
-
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptStackException
      */
     public function testPopException()
     {
-        $this->stack->pop();
+        $stack = new ScriptStack;
+        $stack->pop();
     }
 
     public function testDump()
     {
-        $val = $this->stack->dump();
+        $stack = new ScriptStack;
+        $val = $stack->dump();
         $this->assertInternalType('array', $val);
         $this->assertEmpty($val);
     }
 
-    /**
-     * @depends testDump
-     */
     public function testSet()
     {
-        $this->stack->set(0, '41');
+        $stack = new ScriptStack;
+        $stack->set(0, '41');
 
-        $this->assertInternalType('array', $this->stack->dump());
-        $this->assertNotEmpty($this->stack->dump());
-        $this->assertTrue(count($this->stack->dump()) == 1);
+        $this->assertInternalType('array', $stack->dump());
+        $this->assertNotEmpty($stack->dump());
+        $this->assertTrue(count($stack->dump()) == 1);
 
         // Check specifics of what was set
-        $dump = $this->stack->dump();
+        $dump = $stack->dump();
         $this->assertTrue(isset($dump[0]));
         $this->assertSame($dump[0], '41');
 
-        $this->stack->set(1, '23');
-        $this->assertTrue(count($this->stack->dump()) == 2);
+        $stack->set(1, '23');
+        $this->assertTrue(count($stack->dump()) == 2);
 
         // Check a different value, ie, that the chosen index works
-        $dump = $this->stack->dump();
+        $dump = $stack->dump();
         $this->assertTrue(isset($dump[2]));
         $this->assertSame($dump[2], '23');
     }
@@ -62,11 +51,12 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
      */
     public function testPush()
     {
-        $this->stack->push('41');
+        $stack = new ScriptStack;
+        $stack->push('41');
 
-        $this->assertInternalType('array', $this->stack->dump());
-        $this->assertNotEmpty($this->stack->dump());
-        $this->assertTrue(count($this->stack->dump()) == 1);
+        $this->assertInternalType('array', $stack->dump());
+        $this->assertNotEmpty($stack->dump());
+        $this->assertTrue(count($stack->dump()) == 1);
     }
 
     /**
@@ -74,10 +64,11 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
      */
     public function testErase()
     {
-        $this->stack->push('41');
-        $this->stack->erase(-1);
-        $this->assertInternalType('array', $this->stack->dump());
-        $this->assertEmpty($this->stack->dump());
+        $stack = new ScriptStack;
+        $stack->push('41');
+        $stack->erase(-1);
+        $this->assertInternalType('array', $stack->dump());
+        $this->assertEmpty($stack->dump());
     }
 
     /**
@@ -85,30 +76,33 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
      */
     public function testEraseException()
     {
-        $this->stack->erase(0);
+        $stack = new ScriptStack;
+        $stack->erase(0);
     }
 
     public function testPop()
     {
-        $this->stack
+        $stack = new ScriptStack;
+        $stack
             ->push('41')
             ->push('44')
             ->push('99');
 
-        $this->assertSame($this->stack->pop(), '99');
-        $this->assertSame($this->stack->pop(), '44');
-        $this->assertSame($this->stack->pop(), '41');
+        $this->assertSame($stack->pop(), '99');
+        $this->assertSame($stack->pop(), '44');
+        $this->assertSame($stack->pop(), '41');
     }
 
     public function testTop()
     {
-        $this->stack
+        $stack = new ScriptStack;
+        $stack
             ->push('41')
             ->push('44')
             ->push('99');
 
-        $this->assertSame($this->stack->top(-1), '99');
-        $this->assertSame($this->stack->top(-2), '44');
-        $this->assertSame($this->stack->top(-3), '41');
+        $this->assertSame($stack->top(-1), '99');
+        $this->assertSame($stack->top(-2), '44');
+        $this->assertSame($stack->top(-3), '41');
     }
 }
