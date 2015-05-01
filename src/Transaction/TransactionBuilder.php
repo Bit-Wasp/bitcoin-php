@@ -175,7 +175,7 @@ class TransactionBuilder
      * @param RedeemScript $redeemScript
      * @return TransactionBuilderInputState
      */
-    public function createInputState($inputToSign, $outputScript, $redeemScript)
+    public function createInputState($inputToSign, $outputScript, RedeemScript $redeemScript = null)
     {
         $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
             $this->ecAdapter,
