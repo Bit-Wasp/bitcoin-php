@@ -46,7 +46,7 @@ class HexBlockHeaderSerializer
 
     /**
      * @param BlockHeaderInterface $header
-     * @return string
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function serialize(BlockHeaderInterface $header)
     {

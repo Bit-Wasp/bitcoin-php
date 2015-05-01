@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
