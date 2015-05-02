@@ -3,7 +3,7 @@
   "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
   "type": "library",
   "homepage": "https://github.com/bit-wasp/bitcoin-php",
-  "licence": "MIT",
+  "license": "Unlicence",
   "authors": [
     {
       "name": "Thomas Kerin",
@@ -30,8 +30,6 @@
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "*",
     "bitwasp/buffertools": "0.0.3"
-  },
-  "require-dev": {
     "bitwasp/testing-php": "0.0.1",
     "symfony/yaml": "2.6.6"
   },
