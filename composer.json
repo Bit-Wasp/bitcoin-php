@@ -29,7 +29,7 @@
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "*",
-    "bitwasp/buffertools": "0.0.3"
+    "bitwasp/buffertools": "0.0.3",
     "bitwasp/testing-php": "0.0.1",
     "symfony/yaml": "2.6.6"
   },
