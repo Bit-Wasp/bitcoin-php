@@ -15,7 +15,6 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionBuilder;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
-use BitWasp\Bitcoin\Transaction\TransactionBuilderInputState;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -23,7 +22,14 @@ use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 
 class TransactionBuilderTest extends AbstractTestCase
 {
+    /**
+     * @var string
+     */
     public $txBldrType = 'BitWasp\Bitcoin\Transaction\TransactionBuilder';
+
+    /**
+     * @var string
+     */
     public $txBldrStateType = 'BitWasp\Bitcoin\Transaction\TransactionBuilderInputState';
 
     public function testDefaultTransaction()
