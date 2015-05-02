@@ -245,17 +245,35 @@ class TransactionBuilder
 
         for ($i = 0; $i < $inCount; $i++) {
             // Call regenerateScript if inputState is set, otherwise defer to previous script.
-            $caller = isset($this->inputStates[$i])
-                ? function ($i) {
-                    return $this->inputStates[$i]->regenerateScript();
-                }
-                : function ($i) {
-                    return $this->transaction->getInputs()->getInput($i)->getScript();
-                };
+            try {
+                $script = $this->getInputState($i)->regenerateScript();
+            } catch (BuilderNoInputState $e) {
+                $script = $this->transaction->getInputs()->getInput($i)->getScript();
+            }
 
-            $transaction->getInputs()->getInput($i)->setScript($caller($i));
+            $transaction->getInputs()->getInput($i)->setScript($script);
         }
 
         return $transaction;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFullySigned()
+    {
+        $transaction = $this->transaction;
+        $inCount = count($transaction->getInputs());
+
+        $total = 0;
+        $signed = 0;
+        for ($i = 0; $i < $inCount; $i++) {
+            if (isset($this->inputStates[$i])) {
+                $total += $this->inputStates[$i]->getRequiredSigCount();
+                $signed += $this->inputStates[$i]->getSigCount();
+            }
+        }
+
+        return $signed == $total;
     }
 }
