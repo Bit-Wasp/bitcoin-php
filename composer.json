@@ -2,7 +2,7 @@
   "name": "bitwasp/bitcoin",
   "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
   "type": "library",
-  "homepage": "https://github.com/afk11/bitcoin",
+  "homepage": "https://github.com/bit-wasp/bitcoin-php",
   "licence": "MIT",
   "authors": [
     {
