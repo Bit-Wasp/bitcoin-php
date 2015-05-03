@@ -17,10 +17,10 @@
 
 ##Installation
 You can install this library via Composer:
-`composer require bitwasp/bitcoin-php`
+`composer require bitwasp/bitcoin`
 or 
 ```{
-    "require": "bitwasp/bitcoin-php"
+    "require": "bitwasp/bitcoin"
 }```
 
 ##Presently supported:
