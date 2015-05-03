@@ -42,4 +42,12 @@ interface DifficultyInterface
      * @return float
      */
     public function getDifficulty(Buffer $bits);
+
+    /**
+     * Get the work associated with a difficulty of $bits
+     *
+     * @param Buffer $bits
+     * @return int|string
+     */
+    public function getWork(Buffer $bits);
 }

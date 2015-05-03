@@ -95,4 +95,14 @@ class Difficulty implements DifficultyInterface
         
         return $intPart . '.' . $decPart;
     }
+
+    /**
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getWork()
+     */
+    public function getWork(Buffer $bits)
+    {
+        $work = bcdiv($this->math->pow(2, 256), $this->getTargetHash($bits)->getInt());
+        return $work;
+    }
 }
