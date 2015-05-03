@@ -12,12 +12,22 @@ class Locktime
     private $math;
 
     /**
+     * 0xffffffff
+     */
+    const INT_MAX = '4294967296';
+
+    /**
      * Maximum block height that can be used in locktime, as beyond
      * this is reserved for timestamp locktimes
      */
     const BLOCK_MAX = '500000000';
+
+    /**
+     * Maximum timestamp that can be encoded in locktime
+     * (TIME_MAX + BLOCK_MAX = INT_MAX)
+     */
+
     const TIME_MAX = '3794967296';
-    const INT_MAX = '4294967296';
 
     /**
      * @param Math $math
@@ -28,6 +38,7 @@ class Locktime
     }
 
     /**
+     * Convert a $timestamp to a locktime.
      * Max timestamp is 3794967296 - 04/04/2090 @ 5:34am (UTC)
      *
      * @param int|string $timestamp
@@ -45,6 +56,11 @@ class Locktime
     }
 
     /**
+     * Convert a lock time to the timestamp it's locked to.
+     * Throws an exception when:
+     *  - Lock time appears to be in the block locktime range ( < Locktime::BLOCK_MAX )
+     *  - When the lock time exceeds the max possible lock time ( > Locktime::INT_MAX )
+     *
      * @param int|string $lockTime
      * @return int|string
      * @throws \Exception
@@ -64,6 +80,9 @@ class Locktime
     }
 
     /**
+     * Convert $blockHeight to lock time. Doesn't convert anything really,
+     * but does check the bounds of the given block height.
+     *
      * @param int|string $blockHeight
      * @return int|string
      * @throws \Exception
@@ -78,6 +97,9 @@ class Locktime
     }
 
     /**
+     * Convert locktime to block height tx is locked to. Doesn't convert anything
+     * really, but does check the bounds of the supplied locktime.
+     *
      * @param int|string $lockTime
      * @return int|string
      * @throws \Exception
@@ -90,5 +112,4 @@ class Locktime
 
         return $lockTime;
     }
-
 }
