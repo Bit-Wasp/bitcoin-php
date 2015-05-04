@@ -125,6 +125,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $expectedSigAllTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006a47304402206abb0622b8b6ca83f1f4de84830cf38bf4615dc9e47a7dcdcc489905f26aa9cb02201d2d8a7815242b88e4cd66390ca46da802238f9b1395e0d118213d30dad38184012102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006b483045022100de13b42804f87a09bb46def12ab4608108d8c2db41db4bc09064f9c46fcf493102205e5c759ab7b2895c9b0447e56029f6895ff7bb20e0847c564a88a3cfcf080c4f012102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006b4830450221009100a3f5b30182d1cb0172792af6947b6d8d42badb0539f2c209aece5a0628f002200ae91702ca63347e344c85fcb536f30ee97b75cdf4900de534ed5e040e71a548012102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
         $expectedSigAllAnyonecanpayTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006b483045022100bd2829550e9b3a081747281029b5f5a96bbd83bb6a92fa2f8310f1bd0d53abc90220071b469417c55cdb3b04171fd7900d2768981b7ab011553d84d24ea85d277079812102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006a47304402206295e17c45c6356ffb20365b696bcbb869db7e8697f4b8a684098ee2bff85feb02202905c441abe39ec9c480749236b84fdd3ebd91ecd25b559136370aacfcf2815c812102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006b483045022100f58e7c98ac8412944d575bcdece0e5966d4018f05988b5b60b6f46b8cb7a543102201c5854d3361e29b58123f34218cec2c722f5ec7a08235ebd007ec637b07c193a812102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
         $expectedSigNoneTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006b483045022100e7f0a1ddd2c0b81e093e029b8a503afa27fe43549b0668d2141abf35eb3a63be022037f12d12cd50fc94a135f933406a8937557de9b9566a8841ff1548c1b6984531022102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006a473044022008451123ec2535dab545ade9d697519e63b28df5e311ea05e0ce28d39877a7c8022061ce5dbfb7ab478dd9e05b0acfd959ac3eb2641f61958f5d352f37621073d7c0022102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006a47304402205c001bcdfb35c70d8aa3bdbc75399afb72eb7cf1926ca7c1dfcddcb4d4d3e0f8022028992fffdcd4e9f34ab726f97c24157917641c2ef99361f588e3d4147d46eea5022102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
+        $expectedSigNoneAnyTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006a47304402204ed272952177aaa5a1b171c2ca5a7a3d300ffcd7e04b040c0baaa4e3561862a502207e65a5b8f99c8a632b186c8a60496a12bf3116f51909b7497413aefdc3be7bf6822102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006a47304402203ec365300cc67602f4cc5be027959d3667b48db34c6c87d267c94a7e210d5c1f02204843350311c0a9711cad1960b17ce9e323a1ce6f37deefc3ffe63082d480be92822102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006b48304502210084f86f905c36372eff9c54ccd509a519a3325bcace8abfeed7ed3f0d579979e902201ff330dd2402e5ca9989a8a294fa36d6cf3a093edb18d29c9d9644186a3efeb4822102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
         $expectedSigSingleTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006b483045022100e822f152bb15a1d623b91913cd0fb915e9f85a8dc6c26d51948208bbc0218e800220255f78549d9614c88eac9551429bc00224f22cdcb41a3af70d52138f7e98d333032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006a47304402206f37f79adeb86e0e2da679f79ff5c3ba206c6d35cd9a21433f0de34ee83ddbc00220118cabbac5d83b3aa4c2dc01b061e4b2fe83750d85a72ae6a1752300ee5d9aff032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006a473044022042ac843d220a56b3de05f24c85a63e71efa7e5fc7c2ec766a2ffae82a88572b0022051a816b317313ea8d90010a77c3e02d41da4a500e67e6a5347674f836f528d82032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
         $expectedSigSingleAnyoneTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006b483045022100d05a3b6cf2f0301000b0e45c09054f2c61570ce8798ebf571eef72da3b1c94a1022016d7ef3c133fa703bae2c75158ea08d335ac698506f99b3c369c37a9e8fc4beb832102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006b483045022100ee6bf07b051001dcbfa062692a40adddd070303286b714825b3fb4693dd8fcdb022056610885e5053e5d47f2be3433051305abe7978ead8f7cf2d0368947aff6b307832102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006b483045022100cfc930d5b5272d0220d9da98fabec97b9e66306f735efa837f43f6adc675cad902202f9dff76b8b9ec8f613d46094f17f64d875804292d8804aa59fd295b6fc1416b832102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
         $expectedSingleBugTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006b483045022100e822f152bb15a1d623b91913cd0fb915e9f85a8dc6c26d51948208bbc0218e800220255f78549d9614c88eac9551429bc00224f22cdcb41a3af70d52138f7e98d333032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006a47304402206f37f79adeb86e0e2da679f79ff5c3ba206c6d35cd9a21433f0de34ee83ddbc00220118cabbac5d83b3aa4c2dc01b061e4b2fe83750d85a72ae6a1752300ee5d9aff032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006a473044022019a2a3322dcdb0e0c25df9f03f264f2c88f43b3b648fec7a28cb85620393a9750220135ff3a6668c6d6c05f32069e47a1feda10979935af2470c97fcb388f96f9738032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff02204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac00000000';
@@ -138,9 +139,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             ->payToAddress($addr1, 20000)
             ->payToAddress($addr2, 30000)
             ->payToAddress($addr3, 50000);
-
         $unsigned = $builder->getTransaction();
-
         $this->assertEquals($expectedUnsignedTx, $unsigned->getHex());
 
         // Test signs sighash_all transaction properly
@@ -150,7 +149,6 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashAll)
             ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashAll)
             ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashAll);
-
         $this->assertEquals($expectedSigAllTx, $regularSigning->getTransaction()->getHex());
 
         // Test signs SIGHASH_ALL|ANYONECANPAY
@@ -160,20 +158,18 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $allAnyone )
             ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $allAnyone )
             ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $allAnyone );
-
         $this->assertEquals($expectedSigAllAnyonecanpayTx, $regularSigningAnyone->getTransaction()->getHex());
 
-        // Test signs sighash_single transaction properly
+        // Test signs SIGHASH_SINGLE transaction properly
         $sighashSingle = SignatureHashInterface::SIGHASH_SINGLE;
         $singleSigning = new TransactionBuilder($ecAdapter, $unsigned);
         $singleSigning
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashSingle)
             ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashSingle)
             ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashSingle);
-
         $this->assertEquals($expectedSigSingleTx, $singleSigning->getTransaction()->getHex());
 
-        // Test signs sighash_single where inputToSign >= count(outputs)
+        // Test signs SIGHASH_SINGLE where inputToSign >= count(outputs)
         $buggy = new Transaction(
             $unsigned->getVersion(),
             $unsigned->getInputs(),
@@ -185,7 +181,6 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashSingle)
             ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashSingle)
             ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashSingle);
-
         $this->assertEquals($expectedSingleBugTx, $singleSigningBug->getTransaction()->getHex());
 
         // Test handling of SIGHASH_SINGLE|SIGHASH_ANYONECANPAY
@@ -195,17 +190,26 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $singleAny )
             ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $singleAny )
             ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $singleAny );
-
         $this->assertEquals($expectedSigSingleAnyoneTx, $singleAnyone->getTransaction()->getHex());
 
-        // Test signs sighash_none transaction properly
+        // Test signs SIGHASH_NONE transaction properly
         $sighashNone = SignatureHashInterface::SIGHASH_NONE;
         $noneSigning = new TransactionBuilder($ecAdapter, $unsigned);
         $noneSigning
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashNone)
             ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashNone)
             ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashNone);
-
         $this->assertEquals($expectedSigNoneTx, $noneSigning->getTransaction()->getHex());
+
+
+        // Test signs SIGHASH_NONE transaction properly
+        $noneAny = $ecAdapter->getMath()->bitwiseXor(SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashNone);
+        $noneAnyone = new TransactionBuilder($ecAdapter, $unsigned);
+        $noneAnyone
+            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $noneAny)
+            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $noneAny)
+            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $noneAny);
+
+        $this->assertEquals($expectedSigNoneAnyTx, $noneAnyone->getTransaction()->getHex());
     }
 }
