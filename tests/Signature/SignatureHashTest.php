@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Signature\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionBuilder;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
@@ -86,7 +86,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $builder->payToAddress($priv->getAddress(), 15000000);
         $builder->payToAddress(\BitWasp\Bitcoin\Address\AddressFactory::fromString('moFRKYGsQWQfDPmRUNrzsGwqTzdBNyaKfe', $network), 10000000);
 
-        $single = \BitWasp\Bitcoin\Signature\SignatureHashInterface::SIGHASH_SINGLE;
+        $single = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_SINGLE;
         $builder->signInputWithKey($priv, $tx->getOutputs()->getOutput(1)->getScript(), 0, null, $single);
 
         $expected = '01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a010000006b483045022100dad4bd28448e626ecb1ade42a09c43559d50b61b57a06fac992a5ecdd73deb740220524082f83560e2df9afaa283c699dec4c5b01687484d73e7b280e5a506caf1c4032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff02c0e1e400000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac80969800000000001976a91454d0e925d5ee0ee26768a237067dee793d01a70688ac00000000';
@@ -143,7 +143,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedUnsignedTx, $unsigned->getHex());
 
         // Test signs sighash_all transaction properly
-        $sighashAll = SignatureHashInterface::SIGHASH_ALL;
+        $sighashAll = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ALL;
         $regularSigning = new TransactionBuilder($ecAdapter, $unsigned);
         $regularSigning
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashAll)
@@ -153,7 +153,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
 
         // Test signs SIGHASH_ALL|ANYONECANPAY
         $regularSigningAnyone = new TransactionBuilder($ecAdapter, $unsigned);
-        $allAnyone = $ecAdapter->getMath()->bitwiseXor(SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashAll);
+        $allAnyone = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashAll);
         $regularSigningAnyone
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $allAnyone )
             ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $allAnyone )
@@ -161,7 +161,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedSigAllAnyonecanpayTx, $regularSigningAnyone->getTransaction()->getHex());
 
         // Test signs SIGHASH_SINGLE transaction properly
-        $sighashSingle = SignatureHashInterface::SIGHASH_SINGLE;
+        $sighashSingle = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_SINGLE;
         $singleSigning = new TransactionBuilder($ecAdapter, $unsigned);
         $singleSigning
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashSingle)
@@ -184,7 +184,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedSingleBugTx, $singleSigningBug->getTransaction()->getHex());
 
         // Test handling of SIGHASH_SINGLE|SIGHASH_ANYONECANPAY
-        $singleAny = $ecAdapter->getMath()->bitwiseXor(SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashSingle);
+        $singleAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashSingle);
         $singleAnyone = new TransactionBuilder($ecAdapter, $unsigned);
         $singleAnyone
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $singleAny )
@@ -193,7 +193,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedSigSingleAnyoneTx, $singleAnyone->getTransaction()->getHex());
 
         // Test signs SIGHASH_NONE transaction properly
-        $sighashNone = SignatureHashInterface::SIGHASH_NONE;
+        $sighashNone = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_NONE;
         $noneSigning = new TransactionBuilder($ecAdapter, $unsigned);
         $noneSigning
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashNone)
@@ -203,7 +203,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
 
 
         // Test signs SIGHASH_NONE transaction properly
-        $noneAny = $ecAdapter->getMath()->bitwiseXor(SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashNone);
+        $noneAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashNone);
         $noneAnyone = new TransactionBuilder($ecAdapter, $unsigned);
         $noneAnyone
             ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $noneAny)
