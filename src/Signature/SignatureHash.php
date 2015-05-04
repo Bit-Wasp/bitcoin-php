@@ -62,7 +62,6 @@ class SignatureHash implements SignatureHashInterface
         $math = Bitcoin::getMath();
 
         if ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_NONE) {
-
             // Set outputs to empty vector, and set sequence number of inputs to 0.
             $copy->setOutputs(new TransactionOutputCollection());
 
