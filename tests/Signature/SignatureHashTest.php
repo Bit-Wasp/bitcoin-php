@@ -2,6 +2,13 @@
 
 namespace BitWasp\Bitcoin\Tests\Signature;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Signature\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\TransactionBuilder;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -59,5 +66,100 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($h->getHex(), $test->sighash);
 
         }
+    }
+
+    public function testSighashSingle()
+    {
+        $network = NetworkFactory::bitcoinTestnet();
+        $ecAdapter = Bitcoin::getEcAdapter();
+
+        //  bitcoin-cli -testnet=1 createrawtransaction '[{"txid":"2a61a399351922ab1e3b5d6f5f8fe0fcc6a3edbb7f267cc330ad2835d529fb2f", "vout":1}]' '{"mgnMnbj9HHgGkJ8sf9s7wPSQQe2uTrwkuK": 0.15, "moFRKYGsQWQfDPmRUNrzsGwqTzdBNyaKfe": 0.1}'
+        //  bitcoin-cli -testnet=1 signrawtransaction "01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a0100000000ffffffff02c0e1e400000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac809698000000000019
+
+        $spend = '0100000001e2deba2aaf49ccbca9bafabc9049917db0d219cd9a44cfc751369d0a1c538b4e010000006a47304402205f73e04abdc4687e12ded30916f747cee200e113158c85fda953344bdc02d43b02207b86e6b2862aca49b727afee0a6ff7d52795d19cae4d357419f31fd987ec7b220121034087874436d20c49f5afdf14f7cbf6b8c03f28629ef299e4cb454070d563e6e9feffffff028cb7d31b000000001976a9144df845f26149b78004fa15bd9afbe6a70895a1a488ac80c3c901000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac28fb0500';
+        $priv = PrivateKeyFactory::fromWif('cQnFidqYxEoi8xZz1hDtFRcEkzpXF5tbofpWbgWdEk9KHhAo7RxD', $ecAdapter, $network);
+
+        $tx = TransactionFactory::fromHex($spend);
+
+        $builder = new TransactionBuilder($ecAdapter);
+
+        $builder->spendOutput($tx, 1);
+        $builder->payToAddress($priv->getAddress(), 15000000);
+        $builder->payToAddress(\BitWasp\Bitcoin\Address\AddressFactory::fromString('moFRKYGsQWQfDPmRUNrzsGwqTzdBNyaKfe', $network), 10000000);
+
+        $single = \BitWasp\Bitcoin\Signature\SignatureHashInterface::SIGHASH_SINGLE;
+        $builder->signInputWithKey($priv, $tx->getOutputs()->getOutput(1)->getScript(), 0, null, $single);
+
+        $expected = '01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a010000006b483045022100dad4bd28448e626ecb1ade42a09c43559d50b61b57a06fac992a5ecdd73deb740220524082f83560e2df9afaa283c699dec4c5b01687484d73e7b280e5a506caf1c4032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff02c0e1e400000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac80969800000000001976a91454d0e925d5ee0ee26768a237067dee793d01a70688ac00000000';
+        //  bitcoin-cli -testnet=1 signrawtransaction "01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a0100000000ffffffff0140787d01000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac00000000" '[{"txid":"2a61a399351922ab1e3b5d6f5f8fe0fcc6a3edbb7f267cc330ad2835d529fb2f","vout":1,"scriptPubKey":"76a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac"}]' '["cQnFidqYxEoi8xZz1hDtFRcEkzpXF5tbofpWbgWdEk9KHhAo7RxD"]' SINGLE
+        $this->assertEquals($expected, $builder->getTransaction()->getHex());
+    }
+
+    public function testSigHashTypes()
+    {
+        $ecAdapter = Bitcoin::getEcAdapter();
+
+        // Send some inputs to this test address 12GQVYeAUGF1yBfFwatk7UE5YeSCb1J41p
+        $privateKey = PrivateKeyFactory::fromWif('KzRGFiqhXB7SyX6idHQkt77B8mX7adnujdg3VG47jdVK2x4wbUYg', $ecAdapter);
+
+        // 043f61697d1b48d69394879a3e94a2957a7d1a21a38df2ddd6de45a3b2f0b77d / 1
+        $tx1 = '0100000001652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05010000006a47304402202e96d42f625f6024eb4ca8d519ec002de45f3c4d931131706878162f200161f802204f7be25bf1f8584e9f157dfd90e0061cf5e17b8a25b170ad15d259d70c0bb1ad012103c704cbf34c686068287649687bd85c5bdd9f9917b1ea27dd12bdeb4a5bcd369affffffff0268804900000000001976a914a29e26543e3c2a1233005fe9f43a90fc0602881c88ac409c0000000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac00000000';
+        $tx1NOut = 1;
+        // 057ef664f0e1108f270729e53a62e4cb1a7480d9a87f543c6a1a785a1e492c65 / 0
+        $tx2 = '0100000001b9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35010000006a47304402200163ec246a23d42e66fa2ef7d4515a9b8d53e18dc62c2ce97950dca587465d0e0220138fc154238f9baebdd46cd5f9e17a4b8c3ba253dcd98807a66462f7feb72daa012102e7ecb15a814ea95ae932455f9efcfc0fa8d4d79f2ac8aff963fd7d5f93769190ffffffff02409c0000000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac90204a00000000001976a914eca1358918fab23f3a570030295a2091e8c56a6e88ac00000000';
+        $tx2NOut = 0;
+        // 35db95c66634c3497a277c1f08ed71a0cb53195ffecbf9798cdde4a30f27fab9 / 0
+        $tx3 = '0100000001fe7a2ef677030b877c493bbe53fa566a6830d864f2228e03ed4ec7ceb676deb7010000006b48304502210099e43b9afb19ef44cc207b33fb993a79297fc48308a996989de9703c898a99d602206ceca41218b44ffcc8c1956b0afb2fa41814cd832d99f48f67d57073aa3bc6930121030d800fa11cd76362554a9e8d355ada401c4669245f6268d8409e95be4f6dafb6ffffffff02409c0000000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888acb8c04a00000000001976a91466e6f04c9ff34e73a77600dca525d2a9437b14d488ac00000000';
+        $tx3NOut = 0;
+
+        // All tests will involve spending to these addresses
+        $addr1 = AddressFactory::fromString('1FUmHWNktw9mPqPdyA4DPGYX5kJo1emerT'); // 0.0002 / 20000 satoshis
+        $addr2 = AddressFactory::fromString('1PuVsHqAo3PUcuuuLRMsRvxUNWQGFrd87r'); // 0.0003 / 30000 satoshis
+        $addr3 = AddressFactory::fromString('1SNw3ViPq8nFgyrJFH15ahd89mYfCRYVq');  // 0.0005 / 50000 satoshis
+
+        $transaction1 = TransactionFactory::fromHex($tx1);
+        $transaction2 = TransactionFactory::fromHex($tx2);
+        $transaction3 = TransactionFactory::fromHex($tx3);
+
+        // bitcoin-cli createrawtransaction '[{"txid":"043f61697d1b48d69394879a3e94a2957a7d1a21a38df2ddd6de45a3b2f0b77d","vout":1},{"txid":"057ef664f0e1108f270729e53a62e4cb1a7480d9a87f543c6a1a785a1e492c65","vout":0},{"txid":"35db95c66634c3497a277c1f08ed71a0cb53195ffecbf9798cdde4a30f27fab9","vout":0}]' '{"1FUmHWNktw9mPqPdyA4DPGYX5kJo1emerT":0.0002,"1PuVsHqAo3PUcuuuLRMsRvxUNWQGFrd87r":0.0003,"1SNw3ViPq8nFgyrJFH15ahd89mYfCRYVq":0.0005}'
+        $expectedUnsignedTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f040100000000ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e050000000000ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db350000000000ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
+        $expectedSigAllTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006a47304402206abb0622b8b6ca83f1f4de84830cf38bf4615dc9e47a7dcdcc489905f26aa9cb02201d2d8a7815242b88e4cd66390ca46da802238f9b1395e0d118213d30dad38184012102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006b483045022100de13b42804f87a09bb46def12ab4608108d8c2db41db4bc09064f9c46fcf493102205e5c759ab7b2895c9b0447e56029f6895ff7bb20e0847c564a88a3cfcf080c4f012102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006b4830450221009100a3f5b30182d1cb0172792af6947b6d8d42badb0539f2c209aece5a0628f002200ae91702ca63347e344c85fcb536f30ee97b75cdf4900de534ed5e040e71a548012102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
+        $expectedSigNoneTx = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006b483045022100e7f0a1ddd2c0b81e093e029b8a503afa27fe43549b0668d2141abf35eb3a63be022037f12d12cd50fc94a135f933406a8937557de9b9566a8841ff1548c1b6984531022102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006a473044022008451123ec2535dab545ade9d697519e63b28df5e311ea05e0ce28d39877a7c8022061ce5dbfb7ab478dd9e05b0acfd959ac3eb2641f61958f5d352f37621073d7c0022102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffffb9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006a47304402205c001bcdfb35c70d8aa3bdbc75399afb72eb7cf1926ca7c1dfcddcb4d4d3e0f8022028992fffdcd4e9f34ab726f97c24157917641c2ef99361f588e3d4147d46eea5022102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff03204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
+
+        // Test builds unsigned transaction
+
+        $builder = new TransactionBuilder($ecAdapter);
+        $builder
+            ->spendOutput($transaction1, $tx1NOut)
+            ->spendOutput($transaction2, $tx2NOut)
+            ->spendOutput($transaction3, $tx3NOut)
+            ->payToAddress($addr1, 20000)
+            ->payToAddress($addr2, 30000)
+            ->payToAddress($addr3, 50000);
+
+        $unsigned = $builder->getTransaction();
+        $this->assertEquals($expectedUnsignedTx, $unsigned->getHex());
+
+        // Test signs sighash_all transaction properly
+
+        $sighashAll = SignatureHashInterface::SIGHASH_ALL;
+        $regularSigning = new TransactionBuilder($ecAdapter, $unsigned);
+        $regularSigning
+            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashAll)
+            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashAll)
+            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashAll);
+
+        $this->assertEquals($expectedSigAllTx, $regularSigning->getTransaction()->getHex());
+
+        // Test signs sighash_single transaction properly
+
+        $sighashNone = SignatureHashInterface::SIGHASH_NONE;
+        $noneSigning = new TransactionBuilder($ecAdapter, $unsigned);
+        $noneSigning
+            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashNone)
+            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashNone)
+            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashNone);
+
+        $this->assertEquals($expectedSigNoneTx, $noneSigning->getTransaction()->getHex());
     }
 }
