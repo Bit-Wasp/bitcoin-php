@@ -4,15 +4,10 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 
 class SignatureHash implements SignatureHashInterface
 {

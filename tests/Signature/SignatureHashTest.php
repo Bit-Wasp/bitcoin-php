@@ -155,9 +155,9 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $regularSigningAnyone = new TransactionBuilder($ecAdapter, $unsigned);
         $allAnyone = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashAll);
         $regularSigningAnyone
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $allAnyone )
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $allAnyone )
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $allAnyone );
+            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $allAnyone)
+            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $allAnyone)
+            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $allAnyone);
         $this->assertEquals($expectedSigAllAnyonecanpayTx, $regularSigningAnyone->getTransaction()->getHex());
 
         // Test signs SIGHASH_SINGLE transaction properly
@@ -187,9 +187,9 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $singleAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashSingle);
         $singleAnyone = new TransactionBuilder($ecAdapter, $unsigned);
         $singleAnyone
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $singleAny )
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $singleAny )
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $singleAny );
+            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $singleAny)
+            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $singleAny)
+            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $singleAny);
         $this->assertEquals($expectedSigSingleAnyoneTx, $singleAnyone->getTransaction()->getHex());
 
         // Test signs SIGHASH_NONE transaction properly
