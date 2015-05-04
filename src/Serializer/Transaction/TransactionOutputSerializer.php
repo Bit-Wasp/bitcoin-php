@@ -16,11 +16,11 @@ class TransactionOutputSerializer
      */
     public function serialize(TransactionOutputInterface $output)
     {
-        $parser = new Parser();
-        return $parser
-            ->writeInt(8, $output->getValue(), true)
-            ->writeWithLength($output->getScript()->getBuffer())
-            ->getBuffer();
+        $script = new Parser();
+        $script->writeWithLength($output->getScript()->getBuffer());
+
+        $parser = new Parser(new Buffer(pack("Q", (int)$output->getValue()) . $script->getBuffer()->getBinary()));
+        return $parser->getBuffer();
     }
 
     /**
