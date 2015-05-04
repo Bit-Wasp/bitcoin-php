@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
@@ -77,28 +78,28 @@ class SignatureHash implements SignatureHashInterface
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
-            if ($nOutput >= count($outputs)) {
-                return Buffer::hex('01');
+
+            if ($math->cmp($nOutput, count($outputs)) >= 0) {
+                return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000');
             }
 
             // Resize..
-            $outputs = $outputs->slice(0, $nOutput + 1);
+            $outputs = $outputs->slice(0, $nOutput + 1)->getOutputs();
 
             // Set to null
             for ($i = 0; $i < $nOutput; $i++) {
-                $outputs->getOutput($i)->setScript(new Script());
+                $outputs[$i] = new TransactionOutput(-1, new Script());
             }
 
-            // Let the others update at will
-            $outputCount = count($outputs);
-            for ($i = 0; $i < $outputCount; $i++) {
-                if ($i != $inputToSign) {
+            $copy->setOutputs(new TransactionOutputCollection($outputs));
+
+            // Let the others update at will. Set sequence of inputs we're not signing to 0.
+            $inputCount = count($inputs);
+            for ($i = 0; $i < $inputCount; $i++) {
+                if ($math->cmp($i, $inputToSign) != 0) {
                     $inputs->getInput($i)->setSequence(0);
                 }
             }
-
-            $copy->setOutputs($outputs);
-            $copy->setInputs($inputs);
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
