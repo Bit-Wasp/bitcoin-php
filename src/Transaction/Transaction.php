@@ -8,7 +8,7 @@ use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Signature\SignatureHash;
+use BitWasp\Bitcoin\Transaction\SignatureHash;
 
 class Transaction extends Serializable implements TransactionInterface
 {

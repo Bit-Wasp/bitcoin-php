@@ -11,7 +11,7 @@ use BitWasp\Bitcoin\Transaction\TransactionBuilder;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Signature\SignatureHash;
+use BitWasp\Bitcoin\Transaction\SignatureHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class SignatureHashTest extends \PHPUnit_Framework_TestCase
@@ -39,7 +39,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
     public function testCreateNew()
     {
         $sighash = new SignatureHash($this->tx);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Signature\SignatureHash', $sighash);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\SignatureHash', $sighash);
     }
 
     /**
@@ -48,7 +48,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
      */
     public function testFailsWithInvalidInputToSign()
     {
-        $sighash = new SignatureHash($this->tx);
+        $sighash = new \BitWasp\Bitcoin\Transaction\SignatureHash($this->tx);
         $sighash->calculate(new Script(), 99);
     }
 
