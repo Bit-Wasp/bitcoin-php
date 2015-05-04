@@ -32,11 +32,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     protected $script;
 
     /**
-     * @var ScriptInterface
-     */
-    protected $outputScript;
-
-    /**
      * @param string|null $txid
      * @param string|null $vout
      * @param ScriptInterface|Buffer $script
