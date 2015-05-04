@@ -177,17 +177,19 @@ class Transaction extends Serializable implements TransactionInterface
                         );
                     },
                     $this->getInputs()->getInputs()
-                )),
+                )
+            ),
             new TransactionOutputCollection(
-                array_map(
-                    function (TransactionOutputInterface $value) {
-                        return new TransactionOutput(
-                            $value->getValue(),
-                            clone $value->getScript()
-                        );
-                    },
-                    $this->getOutputs()->getOutputs()
-                )),
+                    array_map(
+                        function (TransactionOutputInterface $value) {
+                            return new TransactionOutput(
+                                $value->getValue(),
+                                clone $value->getScript()
+                            );
+                        },
+                        $this->getOutputs()->getOutputs()
+                    )
+                ),
             $this->getLockTime()
         );
     }
