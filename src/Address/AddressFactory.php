@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\KeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class AddressFactory
@@ -28,6 +29,25 @@ class AddressFactory
     {
         $address = new ScriptHashAddress($script->getScriptHash());
         return $address;
+    }
+
+    /**
+     * @param ScriptInterface $outputScript
+     * @return PayToPubKeyHashAddress|ScriptHashAddress
+     */
+    public static function fromOutputScript(ScriptInterface $outputScript)
+    {
+        $classifier = new OutputClassifier($outputScript);
+        $type = $classifier->classify();
+        $parsed = $outputScript->getScriptParser()->parse();
+
+        if ($type == OutputClassifier::PAYTOPUBKEYHASH) {
+            return new PayToPubKeyHashAddress($parsed[2]);
+        } else if ($type == OutputClassifier::PAYTOSCRIPTHASH) {
+            return new ScriptHashAddress($parsed[1]);
+        }
+
+        throw new \RuntimeException('Script type is not associated with an address');
     }
 
     /**
