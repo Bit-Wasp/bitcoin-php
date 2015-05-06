@@ -154,7 +154,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return SignatureHash
      */
-    public function signatureHash()
+    public function getSignatureHash()
     {
         return new SignatureHash($this);
     }

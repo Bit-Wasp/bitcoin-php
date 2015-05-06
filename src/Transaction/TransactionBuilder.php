@@ -224,7 +224,7 @@ class TransactionBuilder
                     $this->sign(
                         $privateKey,
                         $this->transaction
-                            ->signatureHash()
+                            ->getSignatureHash()
                             ->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType),
                         $sigHashType
                     )

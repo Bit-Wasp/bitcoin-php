@@ -41,8 +41,8 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     {
         $this->txid = $txid;
         $this->vout = $vout;
-        $this->sequence = $sequence;
         $this->script = $script ?: new Script();
+        $this->sequence = $sequence;
     }
 
     /**
