@@ -46,6 +46,19 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
+     * @return TransactionInput
+     */
+    public function __clone()
+    {
+        return new TransactionInput(
+            $this->txid,
+            $this->vout,
+            clone $this->script,
+            $this->sequence
+        );
+    }
+
+    /**
      * Return the transaction ID buffer
      *
      * @return mixed
