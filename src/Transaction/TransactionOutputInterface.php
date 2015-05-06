@@ -2,20 +2,28 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\SerializableInterface;
 
 interface TransactionOutputInterface extends SerializableInterface
 {
     /**
-     * Get the script for this transaction
+     * Get the value of this output
+     * @return int|string
+     */
+    public function getValue();
+
+    /**
+     * Get the script for this output
      *
-     * @return mixed
+     * @return ScriptInterface
      */
     public function getScript();
 
     /**
-     * Get the value of this output
-     * @return mixed
+     * Set the given script to the output. Required for SignatureHash
+     * @param ScriptInterface $script
+     * @return $this
      */
-    public function getValue();
+    public function setScript(ScriptInterface $script);
 }

@@ -55,4 +55,11 @@ interface TransactionInterface extends SerializableInterface
      * @return mixed
      */
     public function getLockTime();
+
+    /**
+     * Returns an exact clone of the current transaction
+     *
+     * @return Transaction
+     */
+    public function makeCopy();
 }

@@ -2,11 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
-use BitWasp\Buffertools\Buffer;
 
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
@@ -14,18 +12,18 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     /**
      * @var string|int
      */
-    protected $value;
+    private $value;
 
     /**
      * @var ScriptInterface
      */
-    protected $script;
+    private $script;
 
     /**
      * Initialize class
      *
+     * @param int|string $value
      * @param ScriptInterface $script
-     * @param int|string|null $value
      */
     public function __construct($value, ScriptInterface $script)
     {
@@ -34,9 +32,8 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * Return the value of this output
-     *
-     * @return string|int
+     * {@inheritdoc}
+     * @see TransactionOutputInterface::getValue()
      */
     public function getValue()
     {
@@ -44,11 +41,8 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * Return an initialized script. Checks if already has a script
-     * object. If not, returns script from scriptBuf (which can simply
-     * be null).
-     *
-     * @return ScriptInterface
+     * {@inheritdoc}
+     * @see TransactionOutputInterface::getScript()
      */
     public function getScript()
     {
@@ -56,7 +50,18 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * @return Buffer
+     * {@inheritdoc}
+     * @see TransactionOutputInterface::setScript()
+     */
+    public function setScript(ScriptInterface $script)
+    {
+        $this->script = $script;
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
      */
     public function getBuffer()
     {

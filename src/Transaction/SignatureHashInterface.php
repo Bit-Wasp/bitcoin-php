@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
@@ -23,7 +23,7 @@ interface SignatureHashInterface
 
     /**
      * Let other people add inputs to this transaction paying X. I don't
-     * care who else pays.
+     * care who else pays. (can be used with other sighash flags)
      */
     const SIGHASH_ANYONECANPAY = 128;
 

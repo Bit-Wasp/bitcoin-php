@@ -8,7 +8,7 @@ use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Signature\SignatureHash;
+use BitWasp\Bitcoin\Transaction\SignatureHash;
 
 class Transaction extends Serializable implements TransactionInterface
 {
@@ -36,16 +36,22 @@ class Transaction extends Serializable implements TransactionInterface
      * @param int|string $version
      * @param TransactionInputCollection $inputs
      * @param TransactionOutputCollection $outputs
+     * @param int|string $locktime
      * @throws \Exception
      */
     public function __construct(
         $version = TransactionInterface::DEFAULT_VERSION,
         TransactionInputCollection $inputs = null,
-        TransactionOutputCollection $outputs = null
+        TransactionOutputCollection $outputs = null,
+        $locktime = '0'
     ) {
 
         if (!is_numeric($version)) {
             throw new \InvalidArgumentException('Transaction version must be numeric');
+        }
+
+        if (!is_numeric($locktime)) {
+            throw new \InvalidArgumentException('Transaction locktime must be numeric');
         }
 
         if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
@@ -151,6 +157,41 @@ class Transaction extends Serializable implements TransactionInterface
     public function signatureHash()
     {
         return new SignatureHash($this);
+    }
+
+    /**
+     * @return Transaction
+     */
+    public function makeCopy()
+    {
+        return new Transaction(
+            $this->getVersion(),
+            new TransactionInputCollection(
+                array_map(
+                    function (TransactionInputInterface $value) {
+                        return new TransactionInput(
+                            $value->getTransactionId(),
+                            $value->getVout(),
+                            clone $value->getScript(),
+                            $value->getSequence()
+                        );
+                    },
+                    $this->getInputs()->getInputs()
+                )
+            ),
+            new TransactionOutputCollection(
+                array_map(
+                    function (TransactionOutputInterface $value) {
+                            return new TransactionOutput(
+                                $value->getValue(),
+                                clone $value->getScript()
+                            );
+                    },
+                    $this->getOutputs()->getOutputs()
+                )
+            ),
+            $this->getLockTime()
+        );
     }
 
     /**

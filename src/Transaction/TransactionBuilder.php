@@ -12,7 +12,7 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Signature\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Buffer;
 
