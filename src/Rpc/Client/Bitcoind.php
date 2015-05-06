@@ -23,9 +23,18 @@ class Bitcoind
         $this->client = $client;
     }
 
+    private function checkNotNull($result)
+    {
+        if (null === $result) {
+            throw new \Exception('Received no response from server');
+        }
+    }
+
     public function getinfo()
     {
         $info = $this->client->execute('getinfo');
+        $this->checkNotNull($info);
+
         return $info;
     }
 
@@ -96,9 +105,8 @@ class Bitcoind
     public function getrawtransaction($txid, $verbose = false)
     {
         $tx = $this->client->execute('getrawtransaction', array($txid));
-        if ($tx === false) {
-            throw new \Exception('FALSE from rpc?');
-        }
+        $this->checkNotNull($tx);
+
         if ($verbose) {
             $tx = TransactionFactory::fromHex($tx);
         }
