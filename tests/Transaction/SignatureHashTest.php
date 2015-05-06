@@ -60,7 +60,7 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
             $script = new Script(Buffer::hex($test->outScript));
 
             $t = TransactionFactory::fromHex($test->tx);
-            $h = $t->signatureHash()->calculate($script, 0);
+            $h = $t->getSignatureHash()->calculate($script, 0);
 
             $this->assertEquals($h->getHex(), $test->sighash);
 

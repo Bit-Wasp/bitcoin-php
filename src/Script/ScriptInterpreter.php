@@ -824,7 +824,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             $script = ScriptFactory::create();
                             $sigHash = $this->transaction
-                                ->signatureHash()
+                                ->getSignatureHash()
                                 ->calculate($script, $this->inputToSign, $txSig->getHashType());
                             $success = $this->ecAdapter->verify($sigHash, $publicKey, $txSig->getSignature());
 
