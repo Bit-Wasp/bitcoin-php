@@ -54,7 +54,6 @@ class SignatureHash implements SignatureHashInterface
         }
 
         $inputs->getInput($inputToSign)->setScript($txOutScript);
-
         $math = Bitcoin::getMath();
 
         if ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_NONE) {
