@@ -83,7 +83,7 @@ class SignatureHash implements SignatureHashInterface
 
             // Set to null
             for ($i = 0; $i < $nOutput; $i++) {
-                $outputs[$i] = new TransactionOutput($math->sub($math->pow(2, 64), 1), new Script());
+                $outputs[$i] = new TransactionOutput($math->getBinaryMath()->getTwosComplement(-1, 64), new Script());
             }
 
             $copy->setOutputs(new TransactionOutputCollection($outputs));

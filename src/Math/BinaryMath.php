@@ -47,4 +47,14 @@ class BinaryMath
     {
         return $this->math->bitwiseXor($this->math->leftShift(1, $this->fixSize($bitSize)), $integer);
     }
+
+    /**
+     * @param $integer
+     * @param $bitSize
+     * @return int|string
+     */
+    public function getTwosComplement($integer, $bitSize)
+    {
+        return $this->math->add($this->math->pow(2, $bitSize), $integer);
+    }
 }
