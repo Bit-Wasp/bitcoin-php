@@ -13,7 +13,11 @@
   ],
   "autoload": {
     "psr-4": {
-      "BitWasp\\Bitcoin\\": "src/",
+      "BitWasp\\Bitcoin\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
       "BitWasp\\Bitcoin\\Tests\\": "tests/"
     }
   },
@@ -29,7 +33,9 @@
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "*",
-    "bitwasp/buffertools": "0.0.3",
+    "bitwasp/buffertools": "0.0.3"
+  },
+  "require-dev": {
     "bitwasp/testing-php": "0.0.1",
     "symfony/yaml": "2.6.6"
   },
