@@ -34,10 +34,10 @@ script:
   - php bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
-after_success:
-  - php vendor/bin/coveralls
-  - wget https://scrutinizer-ci.com/ocular.phar
-  - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" || "$TRAVIS_PHP_VERSION" !== "7" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi;'
+after_script:		+after_success:
+   - php vendor/bin/coveralls		   - php vendor/bin/coveralls
+   - wget https://scrutinizer-ci.com/ocular.phar		   - wget https://scrutinizer-ci.com/ocular.phar
+   - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi;'
 
 matrix:
     fast_finish: true
