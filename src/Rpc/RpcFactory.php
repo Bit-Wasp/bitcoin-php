@@ -19,13 +19,8 @@ class RpcFactory
     public static function bitcoind($host, $port, $user, $password, $timeout = 5, $headers = array())
     {
         $jsonRPCclient = new JsonRpcClient($host, $port, $timeout, $headers);
+        $jsonRPCclient->authentication($user, $password);
 
-        if (!is_null($user) && !is_null($password)) {
-            $jsonRPCclient->authentication($user, $password);
-        }
-
-        $bitcoind = new Bitcoind($jsonRPCclient);
-
-        return $bitcoind;
+        return new Bitcoind($jsonRPCclient);
     }
 }

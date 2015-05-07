@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
@@ -50,5 +51,53 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $this->assertSame($content, $signed->getBuffer()->getBinary());
 
         $this->assertTrue($signer->verify($signed, $address));
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Message must begin with -----BEGIN BITCOIN SIGNED MESSAGE-----
+     */
+    public function testInvalidMessage1()
+    {
+        $invalid = '-----BEGIN SIGNED MESSAGE-----
+hi
+-----BEGIN SIGNATURE-----
+IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
+        -----END BITCOIN SIGNED MESSAGE-----';
+
+        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(new Math()));
+        $serializer->parse($invalid);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Message must end with -----END BITCOIN SIGNED MESSAGE-----
+     */
+    public function testInvalidMessage2()
+    {
+        $invalid = '-----BEGIN BITCOIN SIGNED MESSAGE-----
+hi
+-----BEGIN SIGNATURE-----
+IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
+        ';
+
+        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(new Math()));
+        $serializer->parse($invalid);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to find start of signature
+     */
+    public function testInvalidMessage3()
+    {
+        $invalid = '-----BEGIN BITCOIN SIGNED MESSAGE-----
+hi
+
+IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
+        -----END BITCOIN SIGNED MESSAGE-----';
+
+        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(new Math()));
+        $serializer->parse($invalid);
     }
 }
