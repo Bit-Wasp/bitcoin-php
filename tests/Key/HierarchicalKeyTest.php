@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
+use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bitcoin;
@@ -12,6 +14,7 @@ use BitWasp\Bitcoin\Key\HierarchicalKey;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
+use Mdanter\Ecc\EccFactory;
 
 class HierarchicalKeyTest extends AbstractTestCase
 {
@@ -29,6 +32,13 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @var string
      */
     protected $baseType = 'BitWasp\Bitcoin\Key\HierarchicalKey';
+
+    /**
+     * Used for testing skipped keys
+     * @var int
+     */
+    private $HK_run_count = 0;
+
 
     /**
      *
@@ -382,5 +392,66 @@ class HierarchicalKeyTest extends AbstractTestCase
         $key = HierarchicalKeyFactory::generateMasterKey();
         // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
         $key->getHardenedSequence($key->getHardenedSequence(0));
+    }
+
+    public function testSkipsInvalidKey()
+    {
+        $math = new Math();
+        $generator = EccFactory::getSecgCurves($math)->generator256k1();
+        $ec = new PhpEcc($math, $generator);
+        $privateKey = PrivateKeyFactory::create(true, $ec);
+
+        $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface')
+            ->setMethods([
+                'getMath',
+                'getAdapterName',
+                'getGenerator',
+                'publicKeyFromBuffer',
+                'recoverYfromX',
+                'associateSigs',
+                'sign',
+                'verify',
+                'signCompact',
+                'recoverCompact',
+                'validatePublicKey',
+                'privateToPublic',
+                'privateKeyAdd',
+                'privateKeyMul',
+                'publicKeyAdd',
+                'publicKeyMul',
+                'validatePrivateKey'
+            ])
+            ->getMock();
+
+        $mock->expects($this->any())
+            ->method('getMath')
+            ->willReturn($math);
+
+        $mock->expects($this->any())
+            ->method('privateKeyAdd')
+            ->willReturn(new PrivateKey($ec, $math->add($privateKey->getSecretMultiplier(), 1), true));
+
+        $mock->expects($this->atLeastOnce())
+            ->method('validatePrivateKey')
+            ->willReturnCallback(
+                function () {
+                    $return = true;
+                    if ($this->HK_run_count == 0) {
+                        $return = false;
+                    }
+                    $this->HK_run_count++;
+                    return $return;
+                }
+            );
+
+        $key = new HierarchicalKey($mock, 0, 0, 0, 0, $privateKey);
+
+        $this->assertEquals(0, $this->HK_run_count);
+        $expected = 0;
+        $child = $key->deriveChild($expected);
+        $this->assertNotEquals($expected, $child->getSequence());
+        $this->assertEquals(1, $child->getSequence());
+        $this->assertEquals(2, $this->HK_run_count);
+        $this->assertEquals($math->add($privateKey->getSecretMultiplier(), 1), $child->getPrivateKey()->getSecretMultiplier());
     }
 }
