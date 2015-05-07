@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Rpc;
 
-
 use BitWasp\Bitcoin\Rpc\RpcFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
