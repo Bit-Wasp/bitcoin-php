@@ -42,9 +42,13 @@ class AddressFactory
         $parsed = $outputScript->getScriptParser()->parse();
 
         if ($type == OutputClassifier::PAYTOPUBKEYHASH) {
-            return new PayToPubKeyHashAddress($parsed[2]);
+            /** @var \BitWasp\Buffertools\Buffer $hash */
+            $hash = $parsed[2];
+            return new PayToPubKeyHashAddress($hash);
         } else if ($type == OutputClassifier::PAYTOSCRIPTHASH) {
-            return new ScriptHashAddress($parsed[1]);
+            /** @var \BitWasp\Buffertools\Buffer $hash */
+            $hash = $parsed[1];
+            return new ScriptHashAddress($hash);
         }
 
         throw new \RuntimeException('Script type is not associated with an address');
