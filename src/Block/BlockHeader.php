@@ -11,14 +11,35 @@ use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 class BlockHeader extends Serializable implements BlockHeaderInterface
 {
     /**
-     * @var null|int
+     * @var int|string
      */
     protected $version;
 
     /**
-     * @var null|string
+     * @var string
      */
     protected $prevBlock;
+
+    /**
+     * @var string
+     */
+    protected $merkleRoot;
+
+    /**
+     * @var int
+     */
+    protected $timestamp;
+
+    /**
+     * @var Buffer
+     */
+    protected $bits;
+
+    /**
+     * @var int
+     */
+    protected $nonce;
+
 
     /**
      * @var null|string
@@ -26,35 +47,14 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     protected $nextBlock;
 
     /**
-     * @var null|string
+     * @param int|string $version
+     * @param string $prevBlock
+     * @param string $merkleRoot
+     * @param int|string $timestamp
+     * @param Buffer $bits
+     * @param int|string $nonce
      */
-    protected $merkleRoot;
-
-    /**
-     * @var null|int
-     */
-    protected $timestamp;
-
-    /**
-     * @var null|Buffer
-     */
-    protected $bits;
-
-    /**
-     * @var null|int
-     */
-    protected $nonce;
-
-    /**
-     * @param null $version
-     * @param null $prevBlock
-
-     * @param null $merkleRoot
-     * @param null $timestamp
-     * @param null $bits
-     * @param null $nonce
-     */
-    public function __construct($version, $prevBlock, $merkleRoot, $timestamp, $bits, $nonce)
+    public function __construct($version, $prevBlock, $merkleRoot, $timestamp, Buffer $bits, $nonce)
     {
         $this->version = $version;
         $this->prevBlock = $prevBlock;
@@ -147,6 +147,10 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getNextBlock()
     {
+        if (null == $this->nextBlock) {
+            throw new \RuntimeException('Next block not known');
+        }
+
         return $this->nextBlock;
     }
 
