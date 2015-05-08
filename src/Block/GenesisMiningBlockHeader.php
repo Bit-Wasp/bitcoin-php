@@ -4,6 +4,11 @@ namespace BitWasp\Bitcoin\Block;
 
 class GenesisMiningBlockHeader extends BlockHeader
 {
+    public function __construct()
+    {
+        
+    }
+
     /**
      * @return string
      */
