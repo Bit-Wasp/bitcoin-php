@@ -36,7 +36,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     protected $bits;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $nonce;
 
@@ -113,7 +113,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getNextBlock()
     {
-        if (null == $this->nextBlock) {
+        if (null === $this->nextBlock) {
             throw new \RuntimeException('Next block not known');
         }
 
