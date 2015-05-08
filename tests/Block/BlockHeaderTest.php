@@ -122,7 +122,14 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->getGenesisHex(), $result->getHex());
     }
 
-
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Block header version must be numeric
+     */
+    public function testInvalidVersion()
+    {
+        new BlockHeader(null, null, null, null, new Buffer(), null);
+    }
 
     public function testGetBlockHash()
     {
