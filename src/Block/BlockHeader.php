@@ -40,7 +40,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     protected $nonce;
 
-
     /**
      * @var null|string
      */
@@ -56,6 +55,10 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function __construct($version, $prevBlock, $merkleRoot, $timestamp, Buffer $bits, $nonce)
     {
+        if (!is_numeric($version)) {
+            throw new \InvalidArgumentException('Block header version must be numeric');
+        }
+
         $this->version = $version;
         $this->prevBlock = $prevBlock;
         $this->merkleRoot = $merkleRoot;
@@ -67,7 +70,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * Return the bits for this block
      *
-     * @return null|Buffer
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getBits()
      */
     public function getBits()
     {
@@ -75,7 +79,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * @return mixed
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getBlockHash()
      */
     public function getBlockHash()
     {
@@ -89,7 +94,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * Return the Merkle root from the header
      *
-     * @return null|string
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getMerkleRoot()
      */
     public function getMerkleRoot()
     {
@@ -99,7 +105,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * Return the previous blocks hash
      *
-     * @return null|string
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getPrevBlock()
      */
     public function getPrevBlock()
     {
@@ -107,9 +114,11 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Get the next block hash
+     * Get the next block hash. Cannot be required at constructor, not always known.
      *
-     * @return string
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getNextBlock()
+     * @throws \RuntimeException
      */
     public function getNextBlock()
     {
@@ -123,8 +132,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * Set the next block hash
      *
-     * @param $nextBlock
-     * @return $this
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::setNextBlock()
      */
     public function setNextBlock($nextBlock)
     {
@@ -136,7 +145,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      * Return the nonce from this block. This is the value which
      * is iterated while mining.
      *
-     * @return null|integer
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getNonce()
      */
     public function getNonce()
     {
@@ -146,8 +156,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * Set the nonce for this block
      *
-     * @param $nonce
-     * @return $this
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::setNonce()
      */
     public function setNonce($nonce)
     {
@@ -158,7 +168,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * Get the timestamp for this block
      *
-     * @return int
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getTimestamp()
      */
     public function getTimestamp()
     {
@@ -168,18 +179,17 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * Get the version for this block
      *
-     * @return int
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getVersion()
      */
     public function getVersion()
     {
-        if ($this->version === null) {
-            return BlockHeaderInterface::CURRENT_VERSION;
-        }
         return $this->version;
     }
 
     /**
-     * @return Buffer
+     * {@inheritdoc}
+     * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
     public function getBuffer()
     {
