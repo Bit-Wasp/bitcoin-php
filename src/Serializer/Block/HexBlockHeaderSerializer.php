@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
 class HexBlockHeaderSerializer
 {
-
     /**
      * @param $string
      * @return BlockHeader
