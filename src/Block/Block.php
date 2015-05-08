@@ -58,7 +58,7 @@ class Block extends Serializable implements BlockInterface
      */
     public function getMerkleRoot()
     {
-        $root = new MerkleRoot($this->math, $this);
+        $root = new MerkleRoot($this->math, $this->getTransactions());
         return $root->calculateHash();
     }
 

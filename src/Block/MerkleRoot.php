@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
@@ -12,9 +12,9 @@ use Pleo\Merkle\FixedSizeTree;
 class MerkleRoot
 {
     /**
-     * @var BlockInterface
+     * @var TransactionCollection
      */
-    protected $block;
+    protected $transactions;
 
     /**
      * @var Math
@@ -35,12 +35,12 @@ class MerkleRoot
      * Instantiate the class when given a block
      *
      * @param Math $math
-     * @param BlockInterface $block
+     * @param TransactionCollection $txCollection
      */
-    public function __construct(Math $math, BlockInterface $block)
+    public function __construct(Math $math, TransactionCollection $txCollection)
     {
         $this->math = $math;
-        $this->block = $block;
+        $this->transactions = $txCollection;
     }
 
     /**
@@ -70,11 +70,12 @@ class MerkleRoot
      */
     public function calculateHash()
     {
-        $transactions = $this->block->getTransactions();
-        $txCount = count($transactions);
+
         $hashFxn = function ($value) {
             return hash('sha256', hash('sha256', $value, true), true);
         };
+
+        $txCount = count($this->transactions);
 
         if ($txCount == 0) {
             // TODO: Probably necessary. Should always have a coinbase at least.
@@ -82,7 +83,7 @@ class MerkleRoot
         }
 
         if ($txCount == 1) {
-            $buffer = new Buffer($hashFxn($transactions->getTransaction(0)->getBinary()), 32);
+            $buffer = new Buffer($hashFxn($this->transactions->getTransaction(0)->getBinary()), 32);
 
         } else {
             // Create a fixed size Merkle Tree
@@ -90,7 +91,7 @@ class MerkleRoot
 
             // Compute hash of each transaction
             $last = '';
-            foreach ($transactions->getTransactions() as $i => $transaction) {
+            foreach ($this->transactions->getTransactions() as $i => $transaction) {
                 $last = $transaction->getBinary();
                 $tree->set($i, $last);
             }
