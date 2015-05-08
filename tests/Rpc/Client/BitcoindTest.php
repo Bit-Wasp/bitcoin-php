@@ -179,7 +179,7 @@ class BitcoindTest extends AbstractTestCase
 
         $txHex = '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000';
 
-        $json = $this->getMock($this->jsonRpcType, ['execute', 'send'], ['127.0.0.1', 19332]);
+        $json = $this->getMock($this->jsonRpcType, ['execute', 'send'], ['127.0.0.1', 8332]);
         $json->expects($this->atLeastOnce())
             ->method('execute')
             ->willReturnCallback(
