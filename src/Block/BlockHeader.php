@@ -75,16 +75,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * @param Buffer $bits
-     * @return $this
-     */
-    public function setBits(Buffer $bits)
-    {
-        $this->bits = $bits;
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getBlockHash()
@@ -107,18 +97,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Set the merkle root.
-     *
-     * @param $merkleRoot
-     * @return $this
-     */
-    public function setMerkleRoot($merkleRoot)
-    {
-        $this->merkleRoot = $merkleRoot;
-        return $this;
-    }
-
-    /**
      * Return the previous blocks hash
      *
      * @return null|string
@@ -126,18 +104,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     public function getPrevBlock()
     {
         return $this->prevBlock;
-    }
-
-    /**
-     * Set the previous blocks hash
-     *
-     * @param string $prevBlock
-     * @return $this
-     */
-    public function setPrevBlock($prevBlock)
-    {
-        $this->prevBlock = $prevBlock;
-        return $this;
     }
 
     /**
@@ -200,18 +166,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Set the timestamp for this block
-     *
-     * @param $timestamp
-     * @return $this
-     */
-    public function setTimestamp($timestamp)
-    {
-        $this->timestamp = $timestamp;
-        return $this;
-    }
-
-    /**
      * Get the version for this block
      *
      * @return int
@@ -222,18 +176,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
             return BlockHeaderInterface::CURRENT_VERSION;
         }
         return $this->version;
-    }
-
-    /**
-     * Set the version of this block
-     *
-     * @param $version
-     * @return BlockHeaderInterface
-     */
-    public function setVersion($version)
-    {
-        $this->version = $version;
-        return $this;
     }
 
     /**
