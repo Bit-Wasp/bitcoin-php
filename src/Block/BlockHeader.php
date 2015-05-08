@@ -13,37 +13,37 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * @var int|string
      */
-    protected $version;
+    private $version;
 
     /**
      * @var string
      */
-    protected $prevBlock;
+    private $prevBlock;
 
     /**
      * @var string
      */
-    protected $merkleRoot;
+    private $merkleRoot;
 
     /**
      * @var int|string
      */
-    protected $timestamp;
+    private $timestamp;
 
     /**
      * @var Buffer
      */
-    protected $bits;
+    private $bits;
 
     /**
      * @var int|string
      */
-    protected $nonce;
+    private $nonce;
 
     /**
      * @var null|string
      */
-    protected $nextBlock;
+    private $nextBlock;
 
     /**
      * @param int|string $version
