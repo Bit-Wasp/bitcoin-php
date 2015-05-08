@@ -58,8 +58,8 @@ class ElectrumKeyTest extends AbstractTestCase
     public function testCKD(EcAdapterInterface $ecAdapter, $mnemonic, $eSecExp, $eMPK, array $eAddrList = array())
     {
         $key = ElectrumKeyFactory::fromMnemonic($mnemonic, null, $ecAdapter);
-        $this->assertEquals($eSecExp, $key->getMasterPrivateKeyBuf()->getHex());
-        $this->assertEquals($eMPK, $key->getMasterPublicKeyBuf()->getHex());
+        $this->assertEquals($eSecExp, $key->getMasterPrivateKey()->getHex());
+        $this->assertEquals($eMPK, $key->getMPK()->getHex());
 
         foreach ($eAddrList as $vector) {
             list ($sequence, $eAddr) = $vector;
