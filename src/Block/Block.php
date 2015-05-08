@@ -14,25 +14,24 @@ class Block extends Serializable implements BlockInterface
     /**
      * @var Math
      */
-    protected $math;
+    private $math;
 
     /**
      * @var BlockHeaderInterface
      */
-    protected $header;
+    private $header;
 
     /**
      * @var TransactionCollection
      */
-    protected $transactions;
+    private $transactions;
 
     /**
-     * Instantiate class
      * @param Math $math
      * @param BlockHeaderInterface $header
      * @param TransactionCollection $transactions
      */
-    public function __construct(Math $math, BlockHeaderInterface $header = null, TransactionCollection $transactions = null)
+    public function __construct(Math $math, BlockHeaderInterface $header, TransactionCollection $transactions = null)
     {
         $this->math = $math;
         $this->header = $header;
@@ -40,10 +39,8 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
-     * Return the blocks header
-     * TODO: Perhaps these should only be instantiated from a full block?
-     *
-     * @return BlockHeaderInterface
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockInterface::getHeader()
      */
     public function getHeader()
     {
@@ -51,10 +48,9 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
-     * Calculate the merkle root of this block
-     *
-     * @return string
-     * @throws \Exception
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockInterface::getMerkleRoot()
+     * @throws \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      */
     public function getMerkleRoot()
     {
@@ -63,9 +59,8 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
-     * Return the array of transactions from this block
-     *
-     * @return TransactionCollection
+     * {@inheritdoc}
+     * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransactions()
      */
     public function getTransactions()
     {
@@ -83,7 +78,8 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * {@inheritdoc}
+     * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
     public function getBuffer()
     {
