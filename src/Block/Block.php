@@ -29,11 +29,13 @@ class Block extends Serializable implements BlockInterface
     /**
      * Instantiate class
      * @param Math $math
+     * @param BlockHeaderInterface $header
+     * @param TransactionCollection $transactions
      */
     public function __construct(Math $math, BlockHeaderInterface $header = null, TransactionCollection $transactions = null)
     {
         $this->math = $math;
-        $this->header = $header ?: new BlockHeader();
+        $this->header = $header;
         $this->transactions = $transactions ?: new TransactionCollection();
     }
 
@@ -46,18 +48,6 @@ class Block extends Serializable implements BlockInterface
     public function getHeader()
     {
         return $this->header;
-    }
-
-    /**
-     * Set the header for this block
-     *
-     * @param BlockHeaderInterface $header
-     * @return $this
-     */
-    public function setHeader(BlockHeaderInterface $header)
-    {
-        $this->header = $header;
-        return $this;
     }
 
     /**
