@@ -35,7 +35,6 @@ script:
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
 after_script:
-   - php vendor/bin/coveralls
    - wget https://scrutinizer-ci.com/ocular.phar
    - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi;'
 
