@@ -110,7 +110,6 @@ class BitcoindTest extends AbstractTestCase
         $results = $bitcoind->getblockhash($height);
 
         $this->assertEquals($hash, $results);
-        //
     }
 
     /**
@@ -132,6 +131,31 @@ class BitcoindTest extends AbstractTestCase
         $this->assertEquals($tx, $results);
     }
 
+    /**
+     * Get raw transaction with details - wrapper instantiates tx.
+     */
+    public function testMockGetRawTransactionVerbose()
+    {
+        $tx = '0100000001d307610c0d7ba6972bc1ba213ba766814213e63f99d443f93a87025de3649ae42f0200006b483045022100cfa227c903c88df20c2798ff48d53fed4b2a9c5e25f24a0dc63aba39a778773302206fb057829c7ecb62150a306c6c08c43cbbe58591ab2dd7430afd5d7591e25687012103ef3f4f6ba23280a262aa8ffb8743df57c97c21f38de09c76fa6fa1851a2c6540ffffffff01ef240000000000001976a9145eacfaa836d1806b13e9e42730d99c6b0914dcae88ac00000000';
+        $hash = '75bf3c64b181f92f0a5262e7c4ea315baa48b7dd3cf64c028a259a2c91064371';
+        $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
+        $json
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($tx);
+
+        $bitcoind = new Bitcoind($json);
+        $results = $bitcoind->getrawtransaction($hash, true);
+
+        $this->assertInstanceof('BitWasp\Bitcoin\Transaction\Transaction', $results);
+        $this->assertEquals($tx, $results->getHex());
+        $this->assertEquals($hash, $results->getTransactionId());
+    }
+
+    /**
+     * Mock a successful block request, which should return a Block object with
+     * all the necessary Transaction instances
+     */
     public function testMockGetBlock()
     {
         $rpc = json_decode('{
@@ -179,28 +203,6 @@ class BitcoindTest extends AbstractTestCase
         $this->assertEquals($hash, $block->getHeader()->getBlockHash());
         $this->assertEquals($txHex, $block->getTransactions()->getTransaction(0)->getHex());
     }
-
-    /**
-     * Get raw transaction with details - wrapper instantiates tx.
-     */
-    public function testMockGetRawTransactionVerbose()
-    {
-        $tx = '0100000001d307610c0d7ba6972bc1ba213ba766814213e63f99d443f93a87025de3649ae42f0200006b483045022100cfa227c903c88df20c2798ff48d53fed4b2a9c5e25f24a0dc63aba39a778773302206fb057829c7ecb62150a306c6c08c43cbbe58591ab2dd7430afd5d7591e25687012103ef3f4f6ba23280a262aa8ffb8743df57c97c21f38de09c76fa6fa1851a2c6540ffffffff01ef240000000000001976a9145eacfaa836d1806b13e9e42730d99c6b0914dcae88ac00000000';
-        $hash = '75bf3c64b181f92f0a5262e7c4ea315baa48b7dd3cf64c028a259a2c91064371';
-        $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
-        $json
-            ->expects($this->once())
-            ->method('execute')
-            ->willReturn($tx);
-
-        $bitcoind = new Bitcoind($json);
-        $results = $bitcoind->getrawtransaction($hash, true);
-
-        $this->assertInstanceof('BitWasp\Bitcoin\Transaction\Transaction', $results);
-        $this->assertEquals($tx, $results->getHex());
-        $this->assertEquals($hash, $results->getTransactionId());
-    }
-
 
     /**
      * Should take a TransactionInterface, return a hash.
