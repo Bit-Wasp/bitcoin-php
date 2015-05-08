@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
 class HexBlockHeaderSerializer
 {
-
     /**
      * @param $string
      * @return BlockHeader
@@ -28,15 +27,17 @@ class HexBlockHeaderSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        $header = new BlockHeader();
+
         try {
-            $header
-                ->setVersion($parser->readBytes(4, true)->getInt())
-                ->setPrevBlock($parser->readBytes(32, true))
-                ->setMerkleRoot($parser->readBytes(32, true))
-                ->setTimestamp($parser->readBytes(4, true)->getInt())
-                ->setBits($parser->readBytes(4, true))
-                ->setNonce($parser->readBytes(4, true)->getInt());
+            $header = new BlockHeader(
+                $parser->readBytes(4, true)->getInt(),
+                $parser->readBytes(32, true)->getHex(),
+                $parser->readBytes(32, true)->getHex(),
+                $parser->readBytes(4, true)->getInt(),
+                $parser->readBytes(4, true),
+                $parser->readBytes(4, true)->getInt()
+            );
+
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }

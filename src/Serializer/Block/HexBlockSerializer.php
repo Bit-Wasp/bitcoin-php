@@ -46,8 +46,11 @@ class HexBlockSerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            $block = new Block($this->math);
-            $block->setHeader($this->headerSerializer->fromParser($parser));
+            $block = new Block(
+                $this->math,
+                $this->headerSerializer->fromParser($parser)
+            );
+
             $block->getTransactions()->addTransactions(
                 $parser->getArray(
                     function () use (&$parser) {

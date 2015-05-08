@@ -10,82 +10,73 @@ interface BlockHeaderInterface extends SerializableInterface
     const CURRENT_VERSION = 2;
 
     /**
-     * @return int
+     * Return the version of this block.
+     *
+     * @return int|string
      */
     public function getVersion();
 
     /**
-     * @param $version
-     * @return BlockHeaderInterface
-     */
-    public function setVersion($version);
-
-    /**
+     * Return the previous blocks hash.
+     *
      * @return string
      */
     public function getPrevBlock();
 
     /**
-     * @param $prevBlock
-     * @return BlockHeaderInterface
-     */
-    public function setPrevBlock($prevBlock);
-    /**
+     * Return the next block hash. Note this may not always be set.
+     *
      * @return string
      */
     public function getNextBlock();
 
     /**
-     * @param $nextBlock
+     * Set next block, to the provided $nextBlock hash.
+     *
+     * @param string $nextBlock
      * @return BlockHeaderInterface
      */
     public function setNextBlock($nextBlock);
 
     /**
+     * Return the merkle root of the transactions in the block.
+     *
      * @return string
      */
     public function getMerkleRoot();
 
     /**
-     * @param $merkleRoot
-     * @return BlockHeaderInterface
-     */
-    public function setMerkleRoot($merkleRoot);
-
-    /**
+     * Get the timestamp of the block.
+     *
      * @return string
      */
     public function getTimestamp();
 
     /**
-     * @param $timestamp
-     * @return BlockHeaderInterface
-     */
-    public function setTimestamp($timestamp);
-
-    /**
-     * @return Buffer|null
+     * Return the buffer containing the short representation of the difficulty
+     *
+     * @return Buffer
      */
     public function getBits();
 
     /**
-     * @param Buffer $bits
-     * @return BlockHeaderInterface
-     */
-    public function setBits(Buffer $bits);
-
-    /**
+     * Return the nonce of the block header.
+     *
      * @return string
      */
     public function getNonce();
 
     /**
+     * Set the nonce of the block header. Used in mining.
+     *
      * @param $nonce
      * @return BlockHeaderInterface
      */
     public function setNonce($nonce);
 
     /**
+     * Calculate the hash of this header.
+     *
      * @return string
      */
     public function getBlockHash();

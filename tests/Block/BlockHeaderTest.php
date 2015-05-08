@@ -17,7 +17,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $headerType;
+    protected $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
 
     /**
      * @var string
@@ -26,7 +26,6 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function __construct()
     {
-        $this->headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
         $this->bufferType = 'BitWasp\Buffertools\Buffer';
     }
 
@@ -35,107 +34,79 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
         return '0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c';
     }
 
-    public function setUp()
+    public function testNewHeader()
     {
-        $this->header = new BlockHeader();
-    }
+        //old: public function __construct($version = null, $prevBlock = null, $nextBlock = null, $merkleRoot = null, $timestamp = null, $bits = null, $nonce = null)
+        $version = 2;
+        $prevBlock = '4141414141414141414141414141414141414141414141414141414141414141';
+        $merkleRoot = '4242424241414141414141414141414141414141414141414141414141414141';
+        $time ='191230123';
+        $bits = Buffer::hex('1d00ffff');
+        $nonce = '666';
 
-    public function testCreateHeader()
-    {
-        $this->assertInstanceOf($this->headerType, $this->header);
+        $header = new BlockHeader(
+            $version,
+            $prevBlock,
+            $merkleRoot,
+            $time,
+            $bits,
+            $nonce
+        );
+
+        $this->assertEquals($version, $header->getVersion());
+        $this->assertEquals($prevBlock, $header->getPrevBlock());
+        $this->assertEquals($merkleRoot, $header->getMerkleRoot());
+        $this->assertEquals($time, $header->getTimestamp());
+        $this->assertEquals($nonce, $header->getNonce());
+
+        $nextBlock = '8080808080808080808080808080808080808080808080808080808080808080';
+        $header->setNextBlock($nextBlock);
+
+        $this->assertEquals($nextBlock, $header->getNextBlock());
     }
 
     public function testGetVersionDefault()
     {
-        $this->assertEquals(BlockHeaderInterface::CURRENT_VERSION, $this->header->getVersion());
-    }
-
-    public function testSetVersion()
-    {
-        $this->header->setVersion('1');
-        $this->assertEquals('1', $this->header->getVersion());
-    }
-
-    public function testGetTimestamp()
-    {
-        $this->assertNull($this->header->getTimestamp());
-    }
-
-    public function testSetTimestamp()
-    {
-        $this->header->setTimestamp('1420158469');
-        $this->assertEquals('1420158469', $this->header->getTimestamp());
-    }
-
-    public function testGetNonce()
-    {
-        $this->assertNull($this->header->getNonce());
+        $header = new BlockHeader(BlockHeaderInterface::CURRENT_VERSION, null, null, null, new Buffer(), null);
+        $this->assertEquals(BlockHeaderInterface::CURRENT_VERSION, $header->getVersion());
     }
 
     public function testSetNonce()
     {
-        $this->header->setNonce('20229302');
-        $this->assertEquals('20229302', $this->header->getNonce());
+        $header = new BlockHeader(1, null, null, null, new Buffer(), '20229302');
+        $this->assertEquals('20229302', $header->getNonce());
+        $this->assertEquals('20229304', $header->setNonce('20229304')->getNonce());
     }
 
-    public function testGetPrevBlock()
-    {
-        $this->assertNull($this->header->getPrevBlock());
-    }
-
-    public function testSetPrevBlock()
-    {
-        $this->header->setPrevBlock('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f');
-        $this->assertEquals('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $this->header->getPrevBlock());
-    }
-
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Next block not known
+     */
     public function testGetNextBlock()
     {
-        $this->assertNull($this->header->getNextBlock());
+        $header = new BlockHeader(1, null, null, null, new Buffer(), null);
+        $this->assertNull($header->getNextBlock());
     }
 
     public function testSetNextBlock()
     {
-        $this->header->setNextBlock('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048');
-        $this->assertEquals('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048', $this->header->getNextBlock());
-    }
-
-    public function testGetMerkleRoot()
-    {
-        $this->assertNull($this->header->getMerkleRoot());
-    }
-
-    public function testSetMerkleRoot()
-    {
-        $this->header->setMerkleRoot('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b');
-        $this->assertEquals('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $this->header->getMerkleRoot());
-    }
-
-    public function testGetBits()
-    {
-        $this->assertNull($this->header->getBits());
-    }
-
-    public function testSetBits()
-    {
-        $bits = Buffer::hex('1effffff');
-        $this->header->setBits($bits);
-        $this->assertSame($bits, $this->header->getBits());
+        $header = new BlockHeader(1, null, null, null, new Buffer(), null);
+        $header->setNextBlock('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048');
+        $this->assertEquals('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048', $header->getNextBlock());
     }
 
     public function testFromParser()
     {
-
         $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
 
         $this->assertInstanceOf($this->headerType, $result);
         $this->assertSame('1', $result->getVersion());
 
-        $this->assertInstanceOf($this->bufferType, $result->getPrevBlock());
-        $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock()->getHex());
+        $this->assertInternalType('string', $result->getPrevBlock());
+        $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock());
 
-        $this->assertInstanceOf($this->bufferType, $result->getMerkleRoot());
-        $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->getHex());
+        $this->assertInternalType('string', $result->getMerkleRoot());
+        $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot());
 
         $this->assertInstanceOf($this->bufferType, $result->getBits());
         $this->assertSame('1d00ffff', $result->getBits()->getHex());
@@ -149,6 +120,15 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     {
         $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
         $this->assertSame($this->getGenesisHex(), $result->getHex());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Block header version must be numeric
+     */
+    public function testInvalidVersion()
+    {
+        new BlockHeader(null, null, null, null, new Buffer(), null);
     }
 
     public function testGetBlockHash()

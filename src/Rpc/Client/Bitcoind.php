@@ -2,7 +2,11 @@
 
 namespace BitWasp\Bitcoin\Rpc\Client;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Block\BlockHeader;
+use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
@@ -64,36 +68,46 @@ class Bitcoind
     public function getblock($blockhash)
     {
         $blockArray = $this->client->execute('getblock', array($blockhash, true));
-        $block = BlockFactory::create();
-
-        // Build block header
-        $block->getHeader()
-            ->setVersion($blockArray['version'])
-            ->setBits(Buffer::hex($blockArray['bits']))
-            ->setTimestamp($blockArray['time'])
-            ->setMerkleRoot($blockArray['merkleroot'])
-            ->setNonce($blockArray['nonce'])
-            ->setPrevBlock(@$blockArray['previousblockhash']) // only @ this because of genesis block
-            ->setNextBlock(@$blockArray['nextblockhash']);
+        $this->checkNotNull($blockArray);
 
         // Establish batch query for loading transactions
+        $txs = [];
         if (count($blockArray['tx']) > 0) {
             $this->client->batch();
             foreach ($blockArray['tx'] as $txid) {
                 $this->client->execute('getrawtransaction', array($txid));
             }
             $result = $this->client->send();
+            $this->checkNotNull($result);
 
             // Build the transactions
-            $block->getTransactions()->addTransactions(
-                array_map(function ($value) {
+            $txs = array_map(
+                function ($value) {
                     return TransactionFactory::fromHex($value);
-                }, $result)
+                },
+                $result
             );
-
         }
 
-        return $block;
+        // Build block header$
+        $header = new BlockHeader(
+            $blockArray['version'],
+            @$blockArray['previousblockhash'],
+            $blockArray['merkleroot'],
+            $blockArray['time'],
+            Buffer::hex($blockArray['bits']),
+            $blockArray['nonce']
+        );
+
+        if (isset($blockArray['nextblockhash'])) {
+            $header->setNextBlock($blockArray['nextblockhash']);
+        }
+
+        return new Block(
+            Bitcoin::getMath(),
+            $header,
+            new TransactionCollection($txs)
+        );
     }
 
     /**

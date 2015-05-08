@@ -11,6 +11,8 @@ class BitcoindTest extends AbstractTestCase
 {
     private $jsonRpcType = 'BitWasp\Bitcoin\JsonRpc\JsonRpcClient';
 
+    public $mockGetBlockCount = 0;
+
     /**
      * Test totally invalid details so the JsonRpcClient returns null.
      * @expectedException \Exception
@@ -108,7 +110,6 @@ class BitcoindTest extends AbstractTestCase
         $results = $bitcoind->getblockhash($height);
 
         $this->assertEquals($hash, $results);
-        //
     }
 
     /**
@@ -151,6 +152,57 @@ class BitcoindTest extends AbstractTestCase
         $this->assertEquals($hash, $results->getTransactionId());
     }
 
+    /**
+     * Mock a successful block request, which should return a Block object with
+     * all the necessary Transaction instances
+     */
+    public function testMockGetBlock()
+    {
+        $rpc = json_decode('{
+    "hash" : "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048",
+    "confirmations" : 355538,
+    "size" : 215,
+    "height" : 1,
+    "version" : 1,
+    "merkleroot" : "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098",
+    "tx" : [
+        "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098"
+    ],
+    "time" : 1231469665,
+    "nonce" : 2573394689,
+    "bits" : "1d00ffff",
+    "difficulty" : 1.00000000,
+    "chainwork" : "0000000000000000000000000000000000000000000000000000000200020002",
+    "previousblockhash" : "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
+    "nextblockhash" : "000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd"
+}', true);
+
+        $txHex = '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000';
+
+        $json = $this->getMock($this->jsonRpcType, ['execute', 'send'], ['127.0.0.1', 8332]);
+        $json->expects($this->atLeastOnce())
+            ->method('execute')
+            ->willReturnCallback(
+                function () use ($rpc, $txHex) {
+                    $re = ($this->mockGetBlockCount++ == 0)
+                        ? $rpc
+                        : array($txHex);
+
+                    return $re;
+                }
+            );
+
+        $json->expects($this->atLeastOnce())
+            ->method('send')
+            ->willReturn(array($txHex));
+
+        $bitcoind = new Bitcoind($json);
+        $hash = '00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048';
+        $block = $bitcoind->getblock('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048');
+
+        $this->assertEquals($hash, $block->getHeader()->getBlockHash());
+        $this->assertEquals($txHex, $block->getTransactions()->getTransaction(0)->getHex());
+    }
 
     /**
      * Should take a TransactionInterface, return a hash.

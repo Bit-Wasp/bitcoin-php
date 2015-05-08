@@ -11,26 +11,18 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 class BlockFactory
 {
     /**
-     * @param Math $math
-     * @return Block
-     */
-    public static function create(Math $math = null)
-    {
-        $math = $math ?: Bitcoin::getMath();
-        $block = new Block($math);
-        return $block;
-    }
-
-    /**
      * @param $string
      * @param Math $math
      * @return Block
      */
     public static function fromHex($string, Math $math = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $serializer = new HexBlockSerializer($math, new HexBlockHeaderSerializer(), new TransactionSerializer());
-        $block = $serializer->parse($string);
-        return $block;
+        $serializer = new HexBlockSerializer(
+            $math ?: Bitcoin::getMath(),
+            new HexBlockHeaderSerializer(),
+            new TransactionSerializer()
+        );
+
+        return $serializer->parse($string);
     }
 }
