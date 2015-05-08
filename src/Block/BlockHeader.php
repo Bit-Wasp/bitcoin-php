@@ -48,17 +48,16 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * @param null $version
      * @param null $prevBlock
-     * @param null $nextBlock
+
      * @param null $merkleRoot
      * @param null $timestamp
      * @param null $bits
      * @param null $nonce
      */
-    public function __construct($version = null, $prevBlock = null, $nextBlock = null, $merkleRoot = null, $timestamp = null, $bits = null, $nonce = null)
+    public function __construct($version, $prevBlock, $merkleRoot, $timestamp, $bits, $nonce)
     {
         $this->version = $version;
         $this->prevBlock = $prevBlock;
-        $this->nextBlock = $nextBlock;
         $this->merkleRoot = $merkleRoot;
         $this->timestamp = $timestamp;
         $this->bits = $bits;
