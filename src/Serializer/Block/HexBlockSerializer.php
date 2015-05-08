@@ -46,7 +46,6 @@ class HexBlockSerializer
     public function fromParser(Parser & $parser)
     {
         try {
-
             $block = new Block(
                 $this->math,
                 $this->headerSerializer->fromParser($parser)
