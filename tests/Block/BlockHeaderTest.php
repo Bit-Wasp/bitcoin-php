@@ -75,6 +75,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
     {
         $header = new BlockHeader(null, null, null, null, new Buffer(), '20229302');
         $this->assertEquals('20229302', $header->getNonce());
+        $this->assertEquals('20229304', $header->setNonce('20229304')->getNonce());
     }
 
     /**
@@ -120,6 +121,8 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
         $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
         $this->assertSame($this->getGenesisHex(), $result->getHex());
     }
+
+
 
     public function testGetBlockHash()
     {

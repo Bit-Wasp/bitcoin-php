@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
@@ -43,37 +44,32 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $this->bufferType = 'BitWasp\Buffertools\Buffer';
     }
 
-    public function setUp()
+    private function getBlockHeader()
     {
-        $math = Bitcoin::getMath();
-        $this->block = BlockFactory::create($math);
-    }
-
-    public function testCreateBlock()
-    {
-        $this->assertInstanceOf($this->blockType, $this->block);
-    }
-
-    public function testGetHeader()
-    {
-        $this->assertInstanceOf($this->headerType, $this->block->getHeader());
-    }
-
-    public function testGetTransactions()
-    {
-        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $this->block->getTransactions());
-        $this->assertEmpty($this->block->getTransactions());
+        return new BlockHeader(
+            3,
+            '00000000000000000de6926c80141b69e9a42025ac64b1513e138b8c69ca8df5',
+            '5058c1ce878af3efe8cc78493e7362d11d7fd4e4414f70669a86287556c3cbcd',
+            1431097669,
+            Buffer::hex('181713dd'),
+            1582016577
+        );
     }
 
     public function testSetHeader()
     {
-        $header = new BlockHeader();
-        $header
-            ->setTimestamp(time())
-            ->setBits(Buffer::hex('01abcdef'));
+        $header = $this->getBlockHeader();
+        $block = new Block(new Math(), $header);
+        $this->assertSame($header, $block->getHeader());
+    }
 
-        $this->block->setHeader($header);
-        $this->assertSame($header, $this->block->getHeader());
+    public function testGetTransactions()
+    {
+        $header = $this->getBlockHeader();
+        $block = new Block(new Math(), $header);
+
+        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $block->getTransactions());
+        $this->assertEmpty($block->getTransactions());
     }
 
     public function testSetTransactions()
@@ -82,9 +78,8 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $tx = TransactionFactory::fromHex($hex);
 
         $txCollection = new TransactionCollection(array($tx));
-        $this->block->setTransactions($txCollection);
-
-        $this->assertSame($txCollection, $this->block->getTransactions());
+        $block = new Block(new Math(), new BlockHeader(1, 1, 1, 1, new Buffer(), 1), $txCollection);
+        $this->assertSame($txCollection, $block->getTransactions());
     }
 
     public function testGetMerkleRoot1Tx()
@@ -93,9 +88,9 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $tx = TransactionFactory::fromHex($hex);
 
         $txCollection = new TransactionCollection(array($tx));
-        $this->block->setTransactions($txCollection);
+        $block = new Block(new Math(), new BlockHeader(1, 1, 1, 1, new Buffer(), 1), $txCollection);
 
-        $this->assertEquals($tx->getTransactionId(), $this->block->getMerkleRoot());
+        $this->assertEquals($tx->getTransactionId(), $block->getMerkleRoot());
     }
 
     public function testFromParser()
@@ -127,7 +122,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
+        $this->assertSame($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
     }
 
 
@@ -195,7 +190,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf($this->blockType, $newBlock);
 
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
+        $this->assertSame($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
         $this->assertSame($blockHex, $newBlock->getBuffer()->getHex());
     }
 
