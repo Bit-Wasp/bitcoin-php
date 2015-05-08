@@ -11,10 +11,6 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class MerkleRootTest extends AbstractTestCase
 {
-    /**
-     * @var string
-     */
-    public $rootType= 'BitWasp\Bitcoin\Block\MerkleRoot';
 
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
