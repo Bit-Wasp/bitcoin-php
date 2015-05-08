@@ -3,10 +3,12 @@
 namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\MerkleRoot;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Buffertools\Buffer;
 
 class MerkleRootTest extends \PHPUnit_Framework_TestCase
 {
@@ -52,35 +54,48 @@ class MerkleRootTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($tx->getTransactionId(), $merkle->calculateHash());
     }
 
+    /**
+     * @param array $hexes - a list of transaction hex strings
+     * @return array
+     */
+    private function getTransactionCollection(array $hexes)
+    {
+        $transactions = new TransactionCollection(array_map(
+            function ($value) {
+                return TransactionFactory::fromHex($value);
+            },
+            $hexes
+        ));
+        return $transactions;
+    }
+
     public function testWithOnlyEvenNumberOfTransactions()
     {
         $math = Bitcoin::getMath();
-        $hex1 = '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff070456720e1b017bffffffff0100f2052a010000004341048cb16dcb7db3dd9ebee9f677d487c6272a93841e73a96589ba214a0324798048794a9fafe9e8d761e77f3eba3d45b1618f25493eee1ac598bdef3951aaca0a63ac00000000';
-        $tx1 = TransactionFactory::fromHex($hex1);
-        $this->assertSame($hex1, $tx1->getBuffer()->getHex());
 
-        $hex2 = '01000000015132aa73be95888c4ceefd27c2be87df5c03e463afa0be4161e6740e85c9b154010000008b48304502202b69c4847d96f9d6fcdfeb3c277ab16471f45577236eafd15baa504a5655d1ae022100a40c1fcd609e360b98e5d48b58c1afcf7c308b799868b0c47e6b55c726e67125014104d4dfd5815e61e2496856326ea23443b1e6b2067ddb1e14f22c6b700e27043976a73f5d0312a332fc4c6a87513d296e54b12dedb635aa5f7cecfd3a891acdf0acffffffff0280509b1b050000001976a914669b317ee66d134446517794c81cd304e115609088ac00e40b54020000001976a9141a1487913d49504f3e7672868b35caf85b68940888ac00000000';
-        $tx2 = TransactionFactory::fromHex($hex2);
-        $this->assertSame($hex2, $tx2->getBuffer()->getHex());
+        $transactions = $this->getTransactionCollection([
+            '01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff070456720e1b017bffffffff0100f2052a010000004341048cb16dcb7db3dd9ebee9f677d487c6272a93841e73a96589ba214a0324798048794a9fafe9e8d761e77f3eba3d45b1618f25493eee1ac598bdef3951aaca0a63ac00000000',
+            '01000000015132aa73be95888c4ceefd27c2be87df5c03e463afa0be4161e6740e85c9b154010000008b48304502202b69c4847d96f9d6fcdfeb3c277ab16471f45577236eafd15baa504a5655d1ae022100a40c1fcd609e360b98e5d48b58c1afcf7c308b799868b0c47e6b55c726e67125014104d4dfd5815e61e2496856326ea23443b1e6b2067ddb1e14f22c6b700e27043976a73f5d0312a332fc4c6a87513d296e54b12dedb635aa5f7cecfd3a891acdf0acffffffff0280509b1b050000001976a914669b317ee66d134446517794c81cd304e115609088ac00e40b54020000001976a9141a1487913d49504f3e7672868b35caf85b68940888ac00000000'
+        ]);
 
-        $block = new Block($math);
-        $block->setTransactions(new TransactionCollection(array($tx1, $tx2)));
+        $block = new Block($math,
+            new BlockHeader(null, null, null, null, new Buffer(), null),
+            $transactions
+        );
         
         $this->assertSame('e22e7f473e3c50e2a5eab4ee1bc1bd8bb6d21a5485542ccebbda9282bb75491f', $block->getMerkleRoot());
+
     }
 
     public function testWithOnlyOddNumberOfTransactions()
     {
         $math = Bitcoin::getMath();
-        $transactions = new TransactionCollection(array_map(
-            function ($value) {
-                return TransactionFactory::fromHex($value);
-            },
-            array('01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff070456720e1b014dffffffff0100f2052a01000000434104e42b336370edbe2ba4c82a4239cecb5584416b5d844c25c58644700fa37512f300294fc802ed0a8525e83c583986ef58bd0fd259318506e600accd9ea39c8a7aac00000000','01000000016d00d07023106a1f15d8e0bebd2340945fe14f48525764952f7698e25dee8f6c000000008b483045022070145ad92706c5525c304e40d307bfe919ea13fb13b3f1d1449cba8cfc97018d022100ecf96a9a3d9b840c2fc944150200e0ba3c79d725b15dece47fd3529bb83e88040141040dc92273d787c973be5649047ef7241c0faa77f5968056630e46fc4e7bdf7d06886c23bf67d42c62ee8274758cfc1906313cb324e1b1b12aabe0b6785a17138affffffff02c05961240b0000001976a9140dcee4bebdccd55fbcc7bdd63a11215667ce868088ac404b4c00000000001976a9141d5cf706fe85aecfdb2b0536fe2682b2e93f8ecf88ac00000000','0100000001e5d7950689c9376d387b280bf1b0145a2dbdd2708f8c40e9e74ee1e65b389855000000004948304502205ef4bfb3e3551f0477c8ad5609690220c58a7de8b9cbd1d0f5730929e366d548022100dc968d62db776912ec3ab1a64640a31559cfdddb9eed4706224be9bfe058d46401ffffffff0100f2052a010000001976a914f74a2698d94e41a97a8ad2e96fd858f9db05559f88ac00000000')
-        ));
+        $transactions = $this->getTransactionCollection(['01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff070456720e1b014dffffffff0100f2052a01000000434104e42b336370edbe2ba4c82a4239cecb5584416b5d844c25c58644700fa37512f300294fc802ed0a8525e83c583986ef58bd0fd259318506e600accd9ea39c8a7aac00000000','01000000016d00d07023106a1f15d8e0bebd2340945fe14f48525764952f7698e25dee8f6c000000008b483045022070145ad92706c5525c304e40d307bfe919ea13fb13b3f1d1449cba8cfc97018d022100ecf96a9a3d9b840c2fc944150200e0ba3c79d725b15dece47fd3529bb83e88040141040dc92273d787c973be5649047ef7241c0faa77f5968056630e46fc4e7bdf7d06886c23bf67d42c62ee8274758cfc1906313cb324e1b1b12aabe0b6785a17138affffffff02c05961240b0000001976a9140dcee4bebdccd55fbcc7bdd63a11215667ce868088ac404b4c00000000001976a9141d5cf706fe85aecfdb2b0536fe2682b2e93f8ecf88ac00000000','0100000001e5d7950689c9376d387b280bf1b0145a2dbdd2708f8c40e9e74ee1e65b389855000000004948304502205ef4bfb3e3551f0477c8ad5609690220c58a7de8b9cbd1d0f5730929e366d548022100dc968d62db776912ec3ab1a64640a31559cfdddb9eed4706224be9bfe058d46401ffffffff0100f2052a010000001976a914f74a2698d94e41a97a8ad2e96fd858f9db05559f88ac00000000']);
 
-        $block = new Block($math);
-        $block->setTransactions($transactions);
+        $block = new Block($math,
+            new BlockHeader(null, null, null, null, new Buffer(), null),
+            $transactions
+        );
         $this->assertSame('cb59c3f584d7fd3d391b56674c00830d0c33c164a44ab25df88ba8547c6355cb', $block->getMerkleRoot());
 
     }
