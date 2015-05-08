@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Transaction\TransactionCollection;
 
 class BlockFactory
 {

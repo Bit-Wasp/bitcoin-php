@@ -26,7 +26,7 @@ interface BlockInterface extends SerializableInterface
 
     /**
      * Return the TransactionCollection from the block.
-     * 
+     *
      * @return TransactionCollection
      */
     public function getTransactions();
