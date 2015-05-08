@@ -67,13 +67,13 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetVersionDefault()
     {
-        $header = new BlockHeader(null, null, null, null, new Buffer(), null);
+        $header = new BlockHeader(BlockHeaderInterface::CURRENT_VERSION, null, null, null, new Buffer(), null);
         $this->assertEquals(BlockHeaderInterface::CURRENT_VERSION, $header->getVersion());
     }
 
     public function testSetNonce()
     {
-        $header = new BlockHeader(null, null, null, null, new Buffer(), '20229302');
+        $header = new BlockHeader(1, null, null, null, new Buffer(), '20229302');
         $this->assertEquals('20229302', $header->getNonce());
         $this->assertEquals('20229304', $header->setNonce('20229304')->getNonce());
     }
@@ -84,13 +84,13 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetNextBlock()
     {
-        $header = new BlockHeader(null, null, null, null, new Buffer(), null);
+        $header = new BlockHeader(1, null, null, null, new Buffer(), null);
         $this->assertNull($header->getNextBlock());
     }
 
     public function testSetNextBlock()
     {
-        $header = new BlockHeader(null, null, null, null, new Buffer(), null);
+        $header = new BlockHeader(1, null, null, null, new Buffer(), null);
         $header->setNextBlock('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048');
         $this->assertEquals('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048', $header->getNextBlock());
     }
