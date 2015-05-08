@@ -68,6 +68,7 @@ class Bitcoind
     public function getblock($blockhash)
     {
         $blockArray = $this->client->execute('getblock', array($blockhash, true));
+        $this->checkNotNull($blockArray);
 
         // Establish batch query for loading transactions
         $txs = [];
@@ -77,6 +78,7 @@ class Bitcoind
                 $this->client->execute('getrawtransaction', array($txid));
             }
             $result = $this->client->send();
+            $this->checkNotNull($result);
 
             // Build the transactions
             $txs = array_map(
