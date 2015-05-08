@@ -144,8 +144,6 @@ class Miner
         }
 
         $inputs = $coinbaseTx->getInputs();
-        $header = new BlockHeader();
-        $block = new Block($this->math);
         $found = false;
 
         $usingDiff = $this->lastBlockHeader->getBits();
@@ -156,35 +154,35 @@ class Miner
             // Set coinbase script, and build Merkle tree & block header.
             $inputs->getInput(0)->setScript($this->getCoinbaseScriptBuf());
 
-            $transactions = array_merge(array($coinbaseTx), $this->transactions->getTransactions());
-            $block->setTransactions(new TransactionCollection($transactions));
+            $transactions = new TransactionCollection(array_merge(array($coinbaseTx), $this->transactions->getTransactions()));
 
-            $merkleRoot = new MerkleRoot($this->math, $block);
+            $merkleRoot = new MerkleRoot($this->math, $transactions);
             $merkleHash = $merkleRoot->calculateHash();
 
-            $header
-                ->setVersion($this->version)
-                ->setPrevBlock($this->lastBlockHeader->getBlockHash())
-                ->setMerkleRoot($merkleHash)
-                ->setTimestamp($this->timestamp)
-                ->setBits($usingDiff);
+            $header = new BlockHeader(
+                $this->version,
+                $this->lastBlockHeader->getBlockHash(),
+                $merkleHash,
+                $this->timestamp,
+                $usingDiff,
+                '0'
+            );
 
             $t = microtime(true);
 
             // Loop through all nonces (up to 2^32). Restart after modifying extranonce.
-            while ($this->math->cmp($nonce, $maxNonce) <= 0) {
-                $header->setNonce($nonce++);
-
+            while ($this->math->cmp($header->getNonce(), $maxNonce) <= 0) {
+                $header->setNonce($this->math->add($header->getNonce(), '1'));
                 $hash = (new Parser())
                     ->writeBytes(32, Hash::sha256d($header->getBuffer()), true)
                     ->getBuffer();
 
                 if ($this->math->cmp($hash->getInt(), $target) <= 0) {
-                    $found = true;
-                    break;
+                    $block = new Block($this->math, $header, $transactions);
+                    return $block;
                 }
 
-                if ($this->report && $nonce % 100000 === 0) {
+                if ($this->report && $this->math->cmp($this->math->mod($header->getNonce(), 100000), '0') == 0) {
                     $time = microtime(true) - $t;
                     $khash = $nonce / $time / 1000;
 
@@ -196,8 +194,5 @@ class Miner
             $this->extraNonce++;
             $nonce = '0';
         }
-
-        $block->setHeader($header);
-        return $block;
     }
 }
