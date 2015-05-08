@@ -26,7 +26,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     protected $merkleRoot;
 
     /**
-     * @var int
+     * @var int|string
      */
     protected $timestamp;
 
