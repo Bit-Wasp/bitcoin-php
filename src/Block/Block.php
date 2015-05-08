@@ -68,16 +68,6 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
-     * @param TransactionCollection $collection
-     * @return $this
-     */
-    public function setTransactions(TransactionCollection $collection)
-    {
-        $this->transactions = $collection;
-        return $this;
-    }
-
-    /**
      * {@inheritdoc}
      * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
