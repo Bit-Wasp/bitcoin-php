@@ -70,14 +70,13 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
         $header = new BlockHeader(null, null, null, null, new Buffer(), null);
         $this->assertEquals(BlockHeaderInterface::CURRENT_VERSION, $header->getVersion());
     }
-/*
+
     public function testSetNonce()
     {
-        $header = new BlockHeader();
-        $header->setNonce('20229302');
+        $header = new BlockHeader(null, null, null, null, new Buffer(), '20229302');
         $this->assertEquals('20229302', $header->getNonce());
     }
-*/
+
     /**
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Next block not known
@@ -102,11 +101,11 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf($this->headerType, $result);
         $this->assertSame('1', $result->getVersion());
 
-        $this->assertInstanceOf($this->bufferType, $result->getPrevBlock());
-        $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock()->getHex());
+        $this->assertInternalType('string', $result->getPrevBlock());
+        $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock());
 
-        $this->assertInstanceOf($this->bufferType, $result->getMerkleRoot());
-        $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->getHex());
+        $this->assertInternalType('string', $result->getMerkleRoot());
+        $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot());
 
         $this->assertInstanceOf($this->bufferType, $result->getBits());
         $this->assertSame('1d00ffff', $result->getBits()->getHex());
