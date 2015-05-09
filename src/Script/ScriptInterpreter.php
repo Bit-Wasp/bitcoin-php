@@ -397,7 +397,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     throw new \Exception('Unbalanced conditional');
                                 }
                                 // todo
-                                $buffer = $this->mainStack->pop(-1);
+                                $buffer = $this->mainStack->pop();
                                 $value = $this->castToBool($buffer);
                                 if ($opcodes->isOp($opCode, 'OP_NOTIF')) {
                                     $value = !$value;
