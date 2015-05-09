@@ -225,7 +225,6 @@ class PhpEcc extends BaseEcAdapter
         return $withinRange && $notZero;
     }
 
-
     /**
      * @param Buffer $publicKey
      * @return bool
