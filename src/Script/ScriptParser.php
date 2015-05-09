@@ -96,7 +96,7 @@ class ScriptParser
 
     /**
      * @param $opCode
-     * @param string|null $pushData
+     * @param Buffer $pushData
      * @return bool
      */
     public function next(&$opCode, &$pushData = null)
