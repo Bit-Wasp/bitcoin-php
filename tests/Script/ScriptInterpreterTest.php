@@ -37,8 +37,8 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     {
         $ec = Bitcoin::getEcAdapter();
 
-        $hex = '0101';
-        $pubHex = '8d010288';
+        $hex = '01010101';
+        $pubHex = '9c010188';
         $scriptSig = new Script(Buffer::hex($hex));
         $scriptPubKey = new Script(Buffer::hex($pubHex));
 

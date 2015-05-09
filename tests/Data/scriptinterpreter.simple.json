@@ -545,6 +545,146 @@
       "result": true,
       "flags": "verifyScriptEncoding",
       "desc": "01 OP_2MUL 02 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "93",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_ADD"
+    },
+    {
+      "scriptSig": "01010101",
+      "scriptPubKey": "9374010188010288",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 1 OP_ADD OP_DEPTH 01 OP_EQUALVERIFY 02 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "94",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_SUB"
+    },
+    {
+      "scriptSig": "01010101",
+      "scriptPubKey": "9474010188010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 1 OP_SUB OP_DEPTH 01 OP_EQUALVERIFY 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "9c",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_NUMEQUAL"
+    },
+    {
+      "scriptSig": "01010101",
+      "scriptPubKey": "9c010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 1 OP_NUMEQUAL 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "9d",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_NUMEQUALVERIFY"
+    },
+    {
+      "scriptSig": "01010101",
+      "scriptPubKey": "9d",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 1 OP_NUMEQUAL 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "01010100",
+      "scriptPubKey": "9d",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 0 OP_NUMEQUAL 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "01010100",
+      "scriptPubKey": "a4010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 0 OP_MAX 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "01010100",
+      "scriptPubKey": "a3010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 0 OP_MIN 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "01010100",
+      "scriptPubKey": "9e010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "1 0 OP_NUMNOTEQUAL 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "012e0111",
+      "scriptPubKey": "9f010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 17 OP_LESSTHAN 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "012e0111",
+      "scriptPubKey": "a0010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 17 OP_GREATERTHAN 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0111012e",
+      "scriptPubKey": "9f010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 17 OP_LESSTHAN 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0111012e",
+      "scriptPubKey": "a0010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 17 OP_GREATERTHAN 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0111012e",
+      "scriptPubKey": "a1010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 17 OP_LESSTHANEQUALTO 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "012e0111",
+      "scriptPubKey": "a2010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 17 OP_GREATERTHANEQUALTO 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "012e012e",
+      "scriptPubKey": "a2010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 46 OP_GREATERTHANEQUALTO 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "012e012e",
+      "scriptPubKey": "a1010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "46 46 OP_LESSTHANEQUALTO 01 OP_EQUALVERIFY"
     }
   ]
 }

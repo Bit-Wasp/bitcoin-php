@@ -711,13 +711,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation (greater than)');
                             }
-                            $num1 = $this->mainStack->top(-2);
-                            $num2 = $this->mainStack->top(-1);
+                            $num1 = $this->mainStack->top(-2)->getInt();
+                            $num2 = $this->mainStack->top(-1)->getInt();
                             $_bn0 = '0';
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_ADD'):
-                                    $num = $math->add($num1->getInt(), $num2->getInt());
+                                    $num = $math->add($num1, $num2);
                                     break;
                                 case $opcodes->getOpByName('OP_SUB'):
                                     $num = $math->sub($num1, $num2);
@@ -755,12 +755,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 case $opcodes->getOpByName('OP_MAX'):
                                     $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                                     break;
-                                default:
-                                    throw new \Exception('Invalid opcode in maths ops');
                             }
                             $this->mainStack->pop();
                             $this->mainStack->pop();
-                            $this->mainStack->push($num);
+                            $buffer = Buffer::hex($math->decHex($num));
+                            $this->mainStack->push($buffer);
                             if ($opcodes->isOp($opCode, 'OP_NUMEQUALVERIFY')) {
                                 if ($this->castToBool($this->mainStack->top(-1))) {
                                     $this->mainStack->pop();
