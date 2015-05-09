@@ -166,7 +166,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     {
         if ($value instanceof Buffer) {
             // Since we're using buffers, lets try ensuring the contents are not 0.
-            return (Bitcoin::getMath()->cmp($value->getInt(), 0) !== 0);
+            return ($this->ecAdapter->getMath()->cmp($value->getInt(), 0) !== 0);
         }
 
         if ($value) {
@@ -323,10 +323,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             while ($parser->next($opCode, $pushData) === true) {
                 $fExec = !$checkFExec();
 
+                // If pushdata was written to,
                 if ($pushData instanceof Buffer && $pushData->getSize() > $this->flags->maxElementSize) {
                     throw new \Exception('Error - push size');
                 }
 
+                // OP_RESERVED should not count towards opCount
                 if ($this->script->getOpcodes()->cmp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
                     throw new \Exception('Error - Script Op Count');
                 }
@@ -337,8 +339,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     }
                 }
 
-
                 if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
+                    // In range of a pushdata opcode
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
                     }
@@ -511,8 +513,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($this->mainStack->size() < 4) {
                                 throw new \Exception('Invalid stack operation OP_2SWAP');
                             }
-                            $this->mainStack->swap(-4, -2);
                             $this->mainStack->swap(-3, -1);
+                            $this->mainStack->swap(-4, -2);
+
                             break;
 
                         case $opcodes->getOpByName('OP_IFDUP'):
@@ -566,14 +569,17 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operationOP_PICK');
                             }
-                            $n = $this->mainStack->top(-1);
+                            $n = $this->mainStack->top(-1)->getInt();
                             $this->mainStack->pop();
-                            if ($n < 0 || $n >= $this->mainStack->size()) {
+                            echo " $n < 0?  or:  $n >= " . $this->mainStack->size() . "\n";
+                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, $this->mainStack->size()) >= 0) {
                                 throw new \Exception('Invalid stack operation OP_PICK');
                             }
-                            $vch = $this->mainStack->top(0 - $n - 1);
+
+                            $pos = $math->sub($math->sub(0, $n), 1);//$math->sub($n, 1));
+                            $vch = $this->mainStack->top($pos);
                             if ($opcodes->isOp($opCode, 'OP_ROLL')) {
-                                $this->mainStack->erase($this->mainStack->end() - $n - 1);
+                                $this->mainStack->erase($pos);
                             }
                             $this->mainStack->push($vch);
                             break;

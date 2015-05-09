@@ -31,15 +31,15 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     {
         $ec = Bitcoin::getEcAdapter();
 
-        $hex = '01010102';
-        $pubHex = '7774010188';
+        $hex = '010001010102';
+        $pubHex = '01017a010188010288010088';
         $scriptSig = new Script(Buffer::hex($hex));
         $scriptPubKey = new Script(Buffer::hex($pubHex));
 
         $f = new ScriptInterpreterFlags();
         $i = new ScriptInterpreter($ec, new Transaction(), $f);
-        $i->setScript($scriptSig)->run();
 
+        $i->setScript($scriptSig)->run();
         $r = $i->setScript($scriptPubKey)->run();
 
         $this->assertTrue($r);
@@ -85,6 +85,5 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $testResult = $i->setScript($scriptPubKey)->run();
 
         $this->assertEquals($result, $testResult, $description);
-    }
-
+    }/**/
 }

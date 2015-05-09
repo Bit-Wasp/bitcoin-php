@@ -363,6 +363,76 @@
       "result": true,
       "flags": "verifyScriptEncoding",
       "desc": "01 02 OP_OVER OP_DEPTH 03 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "7c",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_SWAP"
+    },
+    {
+      "scriptSig": "01010102",
+      "scriptPubKey": "7c010188010288",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_SWAP 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0101010201030104",
+      "scriptPubKey": "72010288010188010488010388",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 03 04 OP_2SWAP 03 OP_EQUALVERIFY 04 OP_EQUALVERIFY 01 OP_EQUALVERIFY 02 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "72",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_2SWAP"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "7b",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_ROT"
+    },
+    {
+      "scriptSig": "010101020103",
+      "scriptPubKey": "7b010188010388010288",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 03 OP_ROT"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "79",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_PICK"
+    },
+    {
+      "scriptSig": "010001010102",
+      "scriptPubKey": "010379",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 01 02 <3> OP_PICK"
+    },
+    {
+      "scriptSig": "010001010102",
+      "scriptPubKey": "010279010088010288010188010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 01 02 <2> OP_PICK 00 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "010001010102",
+      "scriptPubKey": "01017a010188010288010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 01 02 <0> OP_ROLL 02 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY OP_DEPTH 00 OP_EQUALVERIFY"
     }
   ]
 }
