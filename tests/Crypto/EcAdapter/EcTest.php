@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
-
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
 use BitWasp\Bitcoin\Key\PrivateKey;
@@ -13,7 +12,7 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;
 
-class EcTests extends AbstractTestCase
+class EcTest extends AbstractTestCase
 {
 
     /**
