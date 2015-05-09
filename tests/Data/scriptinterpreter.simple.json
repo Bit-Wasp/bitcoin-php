@@ -64,11 +64,25 @@
       "desc": "1 1 OP_VERIFY"
     },
     {
-      "scriptSig": "0000",
+      "scriptSig": "",
+      "scriptPubKey": "63",
+      "result": false ,
+      "flags": "verifyP2SH,verifyStrictEncoding",
+      "desc": "OP_IF"
+    },
+    {
+      "scriptSig": "0100",
       "scriptPubKey": "635067010168",
       "result": true,
-      "flags": "verifyP2SH,verifyStrictEncoding",
+      "flags": "verifyP2SH,verifyStrictEncoding,checkDisabledOpcodes",
       "desc": "0 IF OP_RESERVED OP_ENDIF 1 OP_ENDIF"
+    },
+    {
+      "scriptSig": "0101",
+      "scriptPubKey": "645067010168",
+      "result": true,
+      "flags": "verifyP2SH,verifyStrictEncoding,checkDisabledOpcodes",
+      "desc": "1 OP_NOTIF 1 OP_ENDIF OP_RESERVED OP_ENDIF"
     },
     {
       "scriptSig": "",
@@ -146,6 +160,119 @@
       "result": false,
       "flags": "verifyP2SH,verifyStrictEncoding",
       "desc": "OP_DUP"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "4c03414141",
+      "result": false,
+      "flags": "verifyMinimalPushdata",
+      "desc": "excessive push"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "0102010295",
+      "result": false,
+      "flags": "checkDisabledOpcodes",
+      "desc": "disabled opcode OP_MUL"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "b0",
+      "result": false,
+      "flags": "discourageUpgradableNOPS",
+      "desc": "discourage upgradable NOPs"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "b0",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "upgradable nop without discourage flag"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "6a",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_RETURN causes script to fail"
+    },
+    {
+      "scriptSig": "010001006d",
+      "scriptPubKey": "74010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 00 OP_2DROP - OP_DEPTH 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "01006d",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 OP_2DROP"
+    },
+    {
+      "scriptSig": "010001006e",
+      "scriptPubKey": "74010488",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 00 OP_2DUP OP_DEPTH 04 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "010101026e",
+      "scriptPubKey": "010288010188010288010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_2DUP 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "01006e",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 OP_2DUP"
+    },
+    {
+      "scriptSig": "0100010001006f",
+      "scriptPubKey": "74010688",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 00 00 OP_3DUP OP_DEPTH 06 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0101010201036f",
+      "scriptPubKey": "010388010288010188010388010288010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 03 OP_3DUP 03 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY 03 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "01006f",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 OP_3DUP"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "69",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_VERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "010169",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 OP_VERIFY"
+    }
+  ,
+    {
+      "scriptSig": "",
+      "scriptPubKey": "010069",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 OP_VERIFY"
     }
   ]
 }
