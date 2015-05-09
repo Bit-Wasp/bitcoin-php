@@ -5,9 +5,15 @@ namespace BitWasp\Bitcoin\Script;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyDerSig;
+use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyP2sh;
+use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifySigPushOnly;
+use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyStrictEnc;
+use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
+use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -208,7 +214,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @param Buffer $signature
      * @return bool
-     * @throws \BitWasp\Bitcoin\Exceptions\SignatureNotCanonical
+     * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyDerSig
      */
     public function checkSignatureEncoding(Buffer $signature)
     {
@@ -218,7 +224,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $result = true;
         if ($this->flags->verifyDERSignatures) {
-            $result &= TransactionSignature::isDERSignature($signature);
+            try {
+                $result = TransactionSignature::isDERSignature($signature);
+            } catch (SignatureNotCanonical $e) {
+                throw new VerifyDerSig('Signature with incorrect encoding');
+            }
         }
 
         return $result;
@@ -232,7 +242,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
         if ($this->flags->verifyStrictEncoding && !PublicKey::isCompressedOrUncompressed($publicKey)) {
-            throw new \Exception('Invalid public key type');
+            throw new VerifyStrictEnc('Public key with incorrect encoding');
         }
 
         return true;
@@ -286,13 +296,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         if ($this->flags->verifyP2SH && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) { // todo
-                throw new \Exception('P2SH script must be push only');
+                throw new VerifySigPushOnly('P2SH script must be push only');
             }
 
             $this->mainStack = $stackCopy;
 
             if ($this->mainStack->size() == 0) {
-                throw new \Exception('Script err eval false');
+                throw new VerifyP2sh('Stack cannot be empty during p2sh');
             }
         }
 
@@ -308,6 +318,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $opcodes = $this->script->getOpCodes();
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
+        $_bn0 = Buffer::hex('00');
+        $_bn1 = Buffer::hex('01');
 
         $checkFExec = function () {
             $c = 0;
@@ -713,7 +725,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $num1 = $this->mainStack->top(-2)->getInt();
                             $num2 = $this->mainStack->top(-1)->getInt();
-                            $_bn0 = '0';
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_ADD'):
@@ -723,10 +734,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $num = $math->sub($num1, $num2);
                                     break;
                                 case $opcodes->getOpByName('OP_BOOLAND'):
-                                    $num = ($math->cmp($num1, $_bn0) !== 0 && $math->cmp($num2, $_bn0) !== 0);
+                                    $num = ($math->cmp($num1, $_bn0->getInt()) !== 0 && $math->cmp($num2, $_bn0->getInt()) !== 0);
                                     break;
                                 case $opcodes->getOpByName('OP_BOOLOR'):
-                                    $num = ($math->cmp($num1, $_bn0) !== 0 || $math->cmp($num2, $_bn0) !== 0);
+                                    $num = ($math->cmp($num1, $_bn0->getInt()) !== 0 || $math->cmp($num2, $_bn0->getInt()) !== 0);
                                     break;
                                 case $opcodes->getOpByName('OP_NUMEQUAL'):
                                     $num = ($math->cmp($num1, $num2) == 0);
@@ -773,14 +784,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($this->mainStack->size() < 3) {
                                 throw new \Exception('Invalid stack operation');
                             }
-                            $num1 = $this->mainStack->top(-3);
-                            $num2 = $this->mainStack->top(-2);
-                            $num3 = $this->mainStack->top(-1);
+                            $num1 = $this->mainStack->top(-3)->getInt();
+                            $num2 = $this->mainStack->top(-2)->getInt();
+                            $num3 = $this->mainStack->top(-1)->getInt();
+
                             $value = ($math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0);
                             $this->mainStack->pop();
                             $this->mainStack->pop();
                             $this->mainStack->pop();
-                            $this->mainStack->push($value ? true : false);
+                            $this->mainStack->push($value ? $_bn1 : $_bn0);
                             break;
 
                         case $opcodes->getOpByName('OP_RIPEMD160'):
@@ -830,9 +842,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $vchPubKey = $this->mainStack->top(-1);
                             $vchSig = $this->mainStack->top(-2);
 
-                            if (!$this->checkSignatureEncoding($vchSig) || !$this->checkPublicKeyEncoding($vchPubKey)) {
-                                return false;
-                            }
+                            $this->checkSignatureEncoding($vchSig);
+                            $this->checkPublicKeyEncoding($vchSig);
 
                             $txSig = TransactionSignatureFactory::fromHex($vchSig);
                             $publicKey = PublicKeyFactory::fromHex($vchPubKey->getHex());
