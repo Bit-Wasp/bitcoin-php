@@ -458,8 +458,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation OP_TOALTSTACK');
                             }
                             $this->altStack->push($this->mainStack->pop());
-                            //$this->altStack->push($this->mainStack->top(-1));
-                            //$this->mainStack->pop();
                             break;
 
                         case $opcodes->getOpByName('OP_FROMALTSTACK'):
