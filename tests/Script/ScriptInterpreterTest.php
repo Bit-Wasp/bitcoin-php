@@ -31,15 +31,16 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     {
         $ec = Bitcoin::getEcAdapter();
 
-        $hex = '01007676768888';
+        $hex = '01006e';
         $buffer = Buffer::hex($hex);
         $script = new Script($buffer);
 
         $f = new ScriptInterpreterFlags();
+        $f->verifyMinimalPushdata = true;
         $i = new ScriptInterpreter($ec, new Transaction(), $f);
         $i->setScript($script);
 
-        $this->assertTrue($i->run());
+        $this->assertFalse($i->run());
     }
 
     public function getScripts()
@@ -56,6 +57,14 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
                 $flags, $scriptSig, $scriptPubKey, $test->result, $test->desc
             ];
         }
+
+        $vectors[] = [
+            $flags,
+            new Script(),
+            ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../Data/10010bytes.hex"))),
+            false,
+            'fails with >10000 bytes'
+        ];
         return $vectors;
     }
 
@@ -68,9 +77,10 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     public function testScript(ScriptInterpreterFlags $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result, $description)
     {
         $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), $flags);
+
         $i->setScript($scriptSig)->run();
         $testResult = $i->setScript($scriptPubKey)->run();
-        var_dump($scriptPubKey->getScriptParser()->getHumanReadable());
+
         $this->assertEquals($result, $testResult, $description);
     }
 
