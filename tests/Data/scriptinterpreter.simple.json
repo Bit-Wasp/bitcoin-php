@@ -265,14 +265,104 @@
       "result": true,
       "flags": "verifyScriptEncoding",
       "desc": "01 OP_VERIFY"
-    }
-  ,
+    },
     {
       "scriptSig": "",
       "scriptPubKey": "010069",
       "result": false,
       "flags": "verifyScriptEncoding",
       "desc": "00 OP_VERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "67",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_ELSE"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "68",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_ENDIF"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "010075",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 OP_DROP"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "75",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_DROP"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "77",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_NIP"
+    },
+    {
+      "scriptSig": "01010102",
+      "scriptPubKey": "7774010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_NIP OP_DEPTH 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "01010102",
+      "scriptPubKey": "77010288",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_NIP 02 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "78",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_2OVER"
+    },
+    {
+      "scriptSig": "01010102",
+      "scriptPubKey": "780101880288010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_OVER 01 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "01010102",
+      "scriptPubKey": "7874010388",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_OVER OP_DEPTH 03 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "70",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_2OVER"
+    },
+    {
+      "scriptSig": "0101010201030104",
+      "scriptPubKey": "7001028801018804880103880288010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 03 04 OP_2OVER 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY 04 OP_EQUALVERIFY 03 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0101010201030104",
+      "scriptPubKey": "7074010688",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_OVER OP_DEPTH 03 OP_EQUALVERIFY"
     }
   ]
 }

@@ -31,16 +31,19 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     {
         $ec = Bitcoin::getEcAdapter();
 
-        $hex = '01006e';
-        $buffer = Buffer::hex($hex);
-        $script = new Script($buffer);
+        $hex = '01010102';
+        $pubHex = '7774010188';
+        $scriptSig = new Script(Buffer::hex($hex));
+        $scriptPubKey = new Script(Buffer::hex($pubHex));
 
         $f = new ScriptInterpreterFlags();
-        $f->verifyMinimalPushdata = true;
         $i = new ScriptInterpreter($ec, new Transaction(), $f);
-        $i->setScript($script);
+        $i->setScript($scriptSig)->run();
 
-        $this->assertFalse($i->run());
+        $r = $i->setScript($scriptPubKey)->run();
+
+        $this->assertTrue($r);
+
     }
 
     public function getScripts()

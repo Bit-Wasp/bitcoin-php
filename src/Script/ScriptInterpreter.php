@@ -408,8 +408,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($this->vfExecStack->size() == 0) {
                                 throw new \Exception('Unbalanced conditional');
                             }
-                            // $this->vfExecStack->back() = ! $this->vfExecStack->back()
-                            // todo
+                            $this->vfExecStack->set($this->vfExecStack->end() - 1, !$this->vfExecStack->end());
                             break;
 
                         case $opcodes->getOpByName('OP_ENDIF'):
@@ -551,7 +550,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($this->mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_NIP');
                             }
-                            $this->mainStack->erase($this->mainStack->end() - 2);
+                            $this->mainStack->erase(-2);
                             break;
 
                         case $opcodes->getOpByName('OP_OVER'):
@@ -624,6 +623,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $vch1 = $this->mainStack->top(-2);
                             $vch2 = $this->mainStack->top(-1);
 
+                            echo " (".$vch1->getHex() . " === " . $vch2->getHex() . ") \n";
                             $equal = ($vch1->getBinary() === $vch2->getBinary());
 
                             // OP_NOTEQUAL is disabled
