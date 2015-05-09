@@ -270,7 +270,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             $stackCopy = $this->mainStack;
         }
 
-        if (!$this->setScript($scriptSig)->run()) {
+        if (!$this->setScript($scriptPubKey)->run()) {
             return false;
         }
 
@@ -503,8 +503,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $string1 = $this->mainStack->top(-6);
                             $string2 = $this->mainStack->top(-5);
-                            $this->mainStack->erase($this->mainStack->size() - 6);
-                            $this->mainStack->erase($this->mainStack->size() - 4);
+                            $this->mainStack->erase(-6);
+                            $this->mainStack->erase(-5);
                             $this->mainStack->push($string1);
                             $this->mainStack->push($string2);
                             break;
@@ -519,6 +519,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $opcodes->getOpByName('OP_IFDUP'):
+                            // If top value not zero, duplicate it.
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_IFDUP');
                             }
@@ -608,14 +609,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $opcodes->getOpByName('OP_SIZE'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_SIZE');
                             }
-                            // todo
-                            // Different types could be returned here
-
+                            // todo: Int sizes?
                             $vch = $this->mainStack->top(-1);
-                            $size = pack("H*", $math->decHex(strlen($vch)));
+                            $size = Buffer::hex($math->decHex($vch->getSize()));
 
                             $this->mainStack->push($size);
                             break;
@@ -652,6 +651,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_1ADD'):
                         case $opcodes->getOpByName('OP_1SUB'):
+                        case $opcodes->getOpByName('OP_2MUL'):
                         case $opcodes->getOpByName('OP_NEGATE'):
                         case $opcodes->getOpByName('OP_ABS'):
                         case $opcodes->getOpByName('OP_NOT'):
@@ -659,14 +659,17 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation 1ADD');
                             }
-                            $num = $this->mainStack->top(-1);
+                            $num = $this->mainStack->top(-1)->getInt();
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_1ADD'):
-                                    $num = $math->add($num->getInt(), '1');
+                                    $num = $math->add($num, '1');
                                     break;
                                 case $opcodes->getOpByName('OP_1SUB'):
                                     $num = $math->sub($num, '1');
+                                    break;
+                                case $opcodes->getOpByName('OP_2MUL'):
+                                    $num = $math->mul(2, $num);
                                     break;
                                 case $opcodes->getOpByName('OP_NEGATE'):
                                     $num = $math->sub(0, $num);
@@ -687,7 +690,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
 
                             $this->mainStack->pop();
-                            $this->mainStack->push($num);
+
+                            $buffer = Buffer::hex($math->decHex($num));
+                            $this->mainStack->push($buffer);
                             break;
 
                         case $opcodes->getOpByName('OP_ADD'):
@@ -831,7 +836,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
 
                             $txSig = TransactionSignatureFactory::fromHex($vchSig);
-                            $publicKey = PublicKeyFactory::fromHex($vchPubKey);
+                            $publicKey = PublicKeyFactory::fromHex($vchPubKey->getHex());
 
                             $script = ScriptFactory::create();
                             $sigHash = $this->transaction
@@ -853,7 +858,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             break;
                     }
+                    //echo "Opcode: ". $opcodes->getOp($opCode) . "\n";
+                    //echo "Pushdata: ". ($pushData ? $pushData->getHex() : '') . "\n";
+
                 }
+                //print_r($this->mainStack);
             }
 
             return true;
@@ -868,6 +877,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         } catch (\Exception $e) {
             echo "Exception\n";
             echo " - " . $e->getMessage() . "\n";
+            //echo $e->getTraceAsString(). "\n";
             return false;
         }
     }

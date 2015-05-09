@@ -365,6 +365,20 @@
       "desc": "01 02 OP_OVER OP_DEPTH 03 OP_EQUALVERIFY"
     },
     {
+      "scriptSig": "01010102",
+      "scriptPubKey": "7d74010388010188010288010188",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 OP_TUCK OP_DEPTH 03 OP_EQUALVERIFY 01 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "7d",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_TUCK"
+    },
+    {
       "scriptSig": "",
       "scriptPubKey": "7c",
       "result": false,
@@ -433,6 +447,104 @@
       "result": true,
       "flags": "verifyScriptEncoding",
       "desc": "00 01 02 <0> OP_ROLL 02 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY OP_DEPTH 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "82",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_SIZE"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "03010203820103880301020388",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "010203 OP_SIZE 03 OP_EQUALVERIFY 010203 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "73",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_IFDUP"
+    },
+    {
+      "scriptSig": "0101",
+      "scriptPubKey": "7374010288010188010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 OP_IFDUP OP_DEPTH 02 OP_EQUALVERIFY "
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "71",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_2ROT"
+    },
+    {
+      "scriptSig": "010101020103010401050106",
+      "scriptPubKey": "71010288010188010688010588010488010388",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 02 03 04 05 06 OP_2ROT 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY 06 OP_EQUALVERIFY 05  OP_EQUALVERIFY 04  OP_EQUALVERIFY 03 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "6b",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_TOALTSTACK"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "6c",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_TOALTSTACK"
+    },
+    {
+      "scriptSig": "0100",
+      "scriptPubKey": "6b74010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 OP_TOALTSTACK OP_DEPTH 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0100",
+      "scriptPubKey": "6b740100886c74010188010088",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "00 OP_TOALTSTACK OP_DEPTH 00 OP_EQUALVERIFY OP_FROMALTSTACK OP_DEPTH 01 OP_EQUALVERIFY 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "",
+      "scriptPubKey": "8b",
+      "result": false,
+      "flags": "verifyScriptEncoding",
+      "desc": "OP_1ADD"
+    },
+    {
+      "scriptSig": "0101",
+      "scriptPubKey": "8b010288",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 OP_1ADD 02 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0102",
+      "scriptPubKey": "8c010188",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 OP_1SUB 00 OP_EQUALVERIFY"
+    },
+    {
+      "scriptSig": "0101",
+      "scriptPubKey": "8d010288",
+      "result": true,
+      "flags": "verifyScriptEncoding",
+      "desc": "01 OP_2MUL 02 OP_EQUALVERIFY"
     }
   ]
 }
