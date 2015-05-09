@@ -276,7 +276,6 @@ class Secp256k1 extends BaseEcAdapter
         $pubkeyLen = strlen($pubKey);
         $ret = (bool) \secp256k1_ec_pubkey_tweak_mul(
             $pubKey,
-            $pubkeyLen,
             $this->getBinaryScalar($integer)
         );
 
