@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -163,6 +164,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function castToBool($value)
     {
+        if ($value instanceof Buffer) {
+            // Since we're using buffers, lets try ensuring the contents are not 0.
+            return (Bitcoin::getMath()->cmp($value->getInt(), 0) !== 0);
+        }
+
         if ($value) {
             return true;
         }
@@ -172,20 +178,21 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     /**
      * @param $opCode
-     * @param string $pushData
+     * @param Buffer $pushData
      * @return bool
      * @throws \Exception
      */
-    public function checkMinimalPush($opCode, $pushData)
+    public function checkMinimalPush($opCode, Buffer $pushData)
     {
-        $pushSize = strlen($pushData);
+        $pushSize = $pushData->getSize();
         $opcodes = $this->script->getOpCodes();
+        $binary = $pushData->getBinary();
 
         if ($pushSize == 0) {
             return $opcodes->isOp($opCode, 'OP_0');
-        } elseif ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
-            return $opCode == $opcodes->getOpByName('OP_1') + (ord($pushData[0]) - 1);
-        } elseif ($pushSize == 1 && ord($pushData) == 0x81) {
+        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && $binary[0] <= 16) {
+            return $opCode == $opcodes->getOpByName('OP_1') + (ord($binary[0]) - 1);
+        } elseif ($pushSize == 1 && ord($binary) == 0x81) {
             return $opcodes->isOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
             return $opCode == $pushSize;
@@ -320,7 +327,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     throw new \Exception('Error - push size');
                 }
 
-                if ($this->script->getOpcodes()->isOp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
+                if ($this->script->getOpcodes()->cmp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
                     throw new \Exception('Error - Script Op Count');
                 }
 
@@ -388,12 +395,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     throw new \Exception('Unbalanced conditional');
                                 }
                                 // todo
-                                $string = $this->mainStack->top(-1);
-                                $value = $this->castToBool($value);
+                                $buffer = $this->mainStack->pop(-1);
+                                $value = $this->castToBool($buffer);
                                 if ($opcodes->isOp($opCode, 'OP_NOTIF')) {
                                     $value = !$value;
                                 }
-                                $this->mainStack->pop();
                             }
                             $this->vfExecStack->push($value);
                             break;
@@ -539,7 +545,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $vch = $this->mainStack->top(-1);
                             $this->mainStack->push($vch);
-                            print_r($this->mainStack);
                             break;
 
                         case $opcodes->getOpByName('OP_NIP'):
@@ -619,11 +624,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $vch1 = $this->mainStack->top(-2);
                             $vch2 = $this->mainStack->top(-1);
 
-
-                            //echo "VH 1 - " . $vch1->getHex() . "\n";
-                            $a = $vch1 instanceof Buffer ? $vch1->getHex() : $vch1;
-                            $b = $vch2 instanceof Buffer ? $vch2->getHex() : $vch2;
-                            echo " [ A : $a \n   B : $b\n ] \n";
                             $equal = ($vch1->getBinary() === $vch2->getBinary());
 
                             // OP_NOTEQUAL is disabled
@@ -706,7 +706,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_ADD'):
-                                    var_dump($num1, $num2);
                                     $num = $math->add($num1->getInt(), $num2->getInt());
                                     break;
                                 case $opcodes->getOpByName('OP_SUB'):
@@ -863,7 +862,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         } catch (\Exception $e) {
             echo "Exception\n";
             echo " - " . $e->getMessage() . "\n";
-            echo " - " . $this->script->getScriptParser()->getHumanReadable() . "\n";
+            //echo " - " . $this->script->getScriptParser()->getHumanReadable() . "\n";
             return false;
         }
     }
