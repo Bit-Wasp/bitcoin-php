@@ -862,7 +862,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         } catch (\Exception $e) {
             echo "Exception\n";
             echo " - " . $e->getMessage() . "\n";
-            //echo " - " . $this->script->getScriptParser()->getHumanReadable() . "\n";
             return false;
         }
     }
