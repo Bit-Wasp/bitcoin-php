@@ -125,7 +125,7 @@ class ScriptParser
                 return false;
             }
 
-            $pushData = substr($this->scriptRaw, $this->ptr, $size);
+            $pushData = new Buffer(substr($this->scriptRaw, $this->ptr, $size), $size);
             $this->ptr += $size;
         }
 
@@ -148,7 +148,7 @@ class ScriptParser
             if ($opCode < 1) {
                 $push = Buffer::hex('00');
             } elseif ($opCode <= 78) {
-                $push = new Buffer($pushData);
+                $push = $pushData;
             } else {
                 // None of these are pushdatas, so just an opcode
                 $push = $this->script->getOpcodes()->getOp($opCode);

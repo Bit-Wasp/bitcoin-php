@@ -314,11 +314,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         try {
             while ($parser->next($opCode, $pushData) === true) {
-                $opCode = null;
-                $pushData = null;
                 $fExec = !$checkFExec();
 
-                if (strlen($pushData) > $this->flags->maxElementSize) {
+                if ($pushData instanceof Buffer && $pushData->getSize() > $this->flags->maxElementSize) {
                     throw new \Exception('Error - push size');
                 }
 
@@ -332,7 +330,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     }
                 }
 
-                if ($fExec && $opCode >= 0 && $opcodes->isOp($opCode, 'OP_PUSHDATA4') <= 0) {
+
+                if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new \Exception('Minimal pushdata required');
                     }
@@ -523,7 +522,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_DEPTH'):
                             $num = $this->mainStack->size();
-                            $bin = pack("H*", $math->decHex($num));
+                            $bin = Buffer::hex($math->decHex($num));
                             $this->mainStack->push($bin);
                             break;
 
@@ -540,6 +539,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $vch = $this->mainStack->top(-1);
                             $this->mainStack->push($vch);
+                            print_r($this->mainStack);
                             break;
 
                         case $opcodes->getOpByName('OP_NIP'):
@@ -619,7 +619,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $vch1 = $this->mainStack->top(-2);
                             $vch2 = $this->mainStack->top(-1);
 
-                            $equal = $vch1 === $vch2;
+
+                            //echo "VH 1 - " . $vch1->getHex() . "\n";
+                            $a = $vch1 instanceof Buffer ? $vch1->getHex() : $vch1;
+                            $b = $vch2 instanceof Buffer ? $vch2->getHex() : $vch2;
+                            echo " [ A : $a \n   B : $b\n ] \n";
+                            $equal = ($vch1->getBinary() === $vch2->getBinary());
 
                             // OP_NOTEQUAL is disabled
                             //if ($this->isOp($opCode, 'OP_NOTEQUAL')) {
@@ -652,7 +657,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_1ADD'):
-                                    $num = $math->add($num, '1');
+                                    $num = $math->add($num->getInt(), '1');
                                     break;
                                 case $opcodes->getOpByName('OP_1SUB'):
                                     $num = $math->sub($num, '1');
@@ -701,7 +706,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_ADD'):
-                                    $num = $math->add($num1, $num2);
+                                    var_dump($num1, $num2);
+                                    $num = $math->add($num1->getInt(), $num2->getInt());
                                     break;
                                 case $opcodes->getOpByName('OP_SUB'):
                                     $num = $math->sub($num1, $num2);
@@ -855,7 +861,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return false;
 
         } catch (\Exception $e) {
-            echo "E: " . $e->getMessage() . "\n";
+            echo "Exception\n";
+            echo " - " . $e->getMessage() . "\n";
+            echo " - " . $this->script->getScriptParser()->getHumanReadable() . "\n";
             return false;
         }
     }
