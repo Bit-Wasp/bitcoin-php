@@ -1,7 +1,17 @@
 <?php
 
 namespace {
-    
+
+    /**
+     * @param string $msg32
+     * @param string $signature
+     * @param string $publicKey
+     * @return int
+     */
+    function secp256k1_ecdsa_verify($msg32, $signature, $publicKey)
+    {
+    }
+
     /**
      * @param string $msg32
      * @param string $privateKey
@@ -16,31 +26,22 @@ namespace {
      * @param string $msg32
      * @param string $privateKey
      * @param string $signature
-     * @param integer $recid
+     * @param int $recid
      * @return int
      */
-    function secp256k1_ecdsa_sign_compact($msg32, $privateKey, $recid, $signature)
+    function secp256k1_ecdsa_sign_compact($msg32, $privateKey, $signature, $recid)
     {
     }
 
     /**
      * @param string $msg32
      * @param string $signature
+     * @param int $recoveryId
+     * @param int $compressed
      * @param string $publicKey
      * @return int
      */
-    function secp256k1_ecdsa_verify($msg32, $publicKey, $signature)
-    {
-    }
-
-    /**
-     * @param string $msg32
-     * @param string $signature
-     * @param string $pubkey
-     * @param int $recoveryId
-     * @return int
-     */
-    function secp256k1_ecdsa_recover_compact($msg32, $pubkey, $signature, $recoveryId)
+    function secp256k1_ecdsa_recover_compact($msg32, $signature, $recoveryId, $compressed, $publicKey)
     {
     }
 
@@ -83,11 +84,11 @@ namespace {
 
     /**
      * @param string $publicKey
-     * @param string $pubkeyLen
+     * @param string $publicKeyLength
      * @param string $tweak
      * @return int
      */
-    function secp256k1_ec_pubkey_tweak_mul($publicKey, $pubkeyLen, $tweak)
+    function secp256k1_ec_pubkey_tweak_mul($publicKey, $publicKeyLength, $tweak)
     {
     }
 
