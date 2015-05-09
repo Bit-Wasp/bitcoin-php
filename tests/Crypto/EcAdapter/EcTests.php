@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
 use BitWasp\Bitcoin\Key\PrivateKey;
@@ -13,22 +12,37 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;
-use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class EcTests extends AbstractTestCase
 {
 
+    /**
+     * @param EcAdapterInterface $ecAdapterInterface
+     * @return PrivateKey
+     */
     public function getFirstPrivateKey(EcAdapterInterface $ecAdapterInterface)
     {
         return new PrivateKey($ecAdapterInterface, 1);
     }
 
+    /**
+     * @param PrivateKeyInterface $private
+     * @param $add
+     * @param EcAdapterInterface $ec
+     * @return int|string
+     */
     public function addModN(PrivateKeyInterface $private, $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
         return $math->mod($math->add($private->getSecretMultiplier(), $add), $ec->getGenerator()->getOrder());
     }
 
+    /**
+     * @param PrivateKeyInterface $private
+     * @param $add
+     * @param EcAdapterInterface $ec
+     * @return string
+     */
     public function mulModN(PrivateKeyInterface $private, $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
