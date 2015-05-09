@@ -584,7 +584,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $n = $this->mainStack->top(-1)->getInt();
                             $this->mainStack->pop();
-                            echo " $n < 0?  or:  $n >= " . $this->mainStack->size() . "\n";
                             if ($math->cmp($n, 0) < 0 || $math->cmp($n, $this->mainStack->size()) >= 0) {
                                 throw new \Exception('Invalid stack operation OP_PICK');
                             }
@@ -640,7 +639,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $vch1 = $this->mainStack->top(-2);
                             $vch2 = $this->mainStack->top(-1);
 
-                            echo " (".$vch1->getHex() . " === " . $vch2->getHex() . ") \n";
                             $equal = ($vch1->getBinary() === $vch2->getBinary());
 
                             // OP_NOTEQUAL is disabled
@@ -852,6 +850,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $sigHash = $this->transaction
                                 ->getSignatureHash()
                                 ->calculate($script, $this->inputToSign, $txSig->getHashType());
+
                             $success = $this->ecAdapter->verify($sigHash, $publicKey, $txSig->getSignature());
 
                             $this->mainStack->pop();
@@ -877,12 +876,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            echo "$$ SCRIPT RUNTIEM ERROR $$\n";
+            //echo "$$ SCRIPT RUNTIEM ERROR $$\n";
             return false;
-            
+
         } catch (\Exception $e) {
-            echo "Exception\n";
-            echo " - " . $e->getMessage() . "\n";
+            //echo "Exception\n";
+            //echo " - " . $e->getMessage() . "\n";
             //echo $e->getTraceAsString(). "\n";
             return false;
         }
