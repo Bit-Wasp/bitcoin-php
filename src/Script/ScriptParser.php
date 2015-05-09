@@ -99,7 +99,7 @@ class ScriptParser
      * @param Buffer $pushData
      * @return bool
      */
-    public function next(&$opCode, &$pushData = null)
+    public function next(&$opCode, &$pushData)
     {
         $opcodes = $this->script->getOpcodes();
         $opCode = $opcodes->getOpByName('OP_INVALIDOPCODE');
