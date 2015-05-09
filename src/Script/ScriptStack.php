@@ -71,7 +71,8 @@ class ScriptStack
             throw new ScriptStackException('No value in this location');
         }
 
-        unset($this->stack[$index]);
+        $this->stack = array_merge(array_slice($this->stack, 0, $index), array_slice($this->stack, $index + 1));
+
         return $this;
     }
 
