@@ -879,11 +879,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         } catch (ScriptRuntimeException $e) {
             echo "$$ SCRIPT RUNTIEM ERROR $$\n";
             return false;
-
-        } catch (ScriptStackException $e) {
-            echo "$$ SCRIPT STACK ERROR $$\n";
-            return false;
-
+            
         } catch (\Exception $e) {
             echo "Exception\n";
             echo " - " . $e->getMessage() . "\n";
