@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyDerSig;
@@ -13,12 +12,10 @@ use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
-use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 
 class ScriptInterpreter implements ScriptInterpreterInterface
@@ -693,8 +690,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 case $opcodes->getOpByName('OP_0NOTEQUAL'):
                                     $num = ($math->cmp($num, '0') !== 0);
                                     break;
-                                default:
-                                    throw new \Exception('Invalid Opcode');
                             }
 
                             $this->mainStack->pop();
