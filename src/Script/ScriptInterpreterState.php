@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-
 class ScriptInterpreterState
 {
     /**
