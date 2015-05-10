@@ -4,10 +4,6 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyDerSig;
-use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyP2sh;
-use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifySigPushOnly;
-use BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyStrictEnc;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
@@ -211,7 +207,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     /**
      * @param Buffer $signature
      * @return bool
-     * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntime\VerifyDerSig
+     * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      */
     public function checkSignatureEncoding(Buffer $signature)
     {
@@ -224,7 +220,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             try {
                 $result = TransactionSignature::isDERSignature($signature);
             } catch (SignatureNotCanonical $e) {
-                throw new VerifyDerSig('Signature with incorrect encoding');
+                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
             }
         }
 
@@ -239,7 +235,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
         if ($this->flags->verifyStrictEncoding && !PublicKey::isCompressedOrUncompressed($publicKey)) {
-            throw new VerifyStrictEnc('Public key with incorrect encoding');
+            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
         return true;
@@ -293,13 +289,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         if ($this->flags->verifyP2SH && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) { // todo
-                throw new VerifySigPushOnly('P2SH script must be push only');
+                throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH script must be push only');
             }
 
             $this->mainStack = $stackCopy;
 
             if ($this->mainStack->size() == 0) {
-                throw new VerifyP2sh('Stack cannot be empty during p2sh');
+                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_P2SH, 'Stack cannot be empty during p2sh');
             }
         }
 
@@ -351,7 +347,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
                     // In range of a pushdata opcode
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
-                        throw new \Exception('Minimal pushdata required');
+                        throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
                     $this->mainStack->push($pushData);
 
@@ -449,7 +445,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_RETURN'):
                             throw new \Exception('Error: OP_RETURN');
-
                         case $opcodes->getOpByName('OP_TOALTSTACK'):
                             if ($this->mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_TOALTSTACK');
@@ -522,7 +517,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             $this->mainStack->swap(-3, -1);
                             $this->mainStack->swap(-4, -2);
-
                             break;
 
                         case $opcodes->getOpByName('OP_IFDUP'):
@@ -575,7 +569,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $opcodes->getOpByName('OP_PICK'):
                         case $opcodes->getOpByName('OP_ROLL'):
                             if ($this->mainStack->size() < 2) {
-                                throw new \Exception('Invalid stack operationOP_PICK');
+                                throw new \Exception('Invalid stack operation OP_PICK');
                             }
                             $n = $this->mainStack->top(-1)->getInt();
                             $this->mainStack->pop();
@@ -583,7 +577,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation OP_PICK');
                             }
 
-                            $pos = $math->sub($math->sub(0, $n), 1);//$math->sub($n, 1));
+                            $pos = $math->sub($math->sub(0, $n), 1);
                             $vch = $this->mainStack->top($pos);
                             if ($opcodes->isOp($opCode, 'OP_ROLL')) {
                                 $this->mainStack->erase($pos);
@@ -758,6 +752,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                                     break;
                             }
+
+
                             $this->mainStack->pop();
                             $this->mainStack->pop();
                             $buffer = Buffer::hex($math->decHex($num));
