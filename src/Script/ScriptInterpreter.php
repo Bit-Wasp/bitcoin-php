@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
@@ -11,7 +12,6 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 
 class ScriptInterpreter implements ScriptInterpreterInterface
@@ -30,21 +30,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @var Transaction
      */
     private $transaction;
-
-    /**
-     * @var ScriptStack
-     */
-    public $mainStack;
-
-    /**
-     * @var ScriptStack
-     */
-    protected $altStack;
-
-    /**
-     * @var ScriptStack
-     */
-    protected $vfExecStack;
 
     /**
      * Position of OP_CODESEPARATOR, for calculating SigHash
@@ -78,6 +63,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     private $ecAdapter;
 
     /**
+     * @var ScriptInterpreterState
+     */
+    private $state;
+
+    /**
      * @param EcAdapterInterface $ecAdapter
      * @param Transaction $transaction
      * @param ScriptInterpreterFlags $flags
@@ -90,10 +80,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $this->transaction = $transaction;
         $this->script = ScriptFactory::create();
         $this->flags = $flags ?: ScriptInterpreterFlags::defaults();
-
-        $this->mainStack = ScriptFactory::stack();
-        $this->altStack = ScriptFactory::stack();
-        $this->vfExecStack = ScriptFactory::stack();
+        $this->state = new ScriptInterpreterState();
 
         $this->constTrue = pack("H*", '01');
         $this->constFalse = pack("H*", '00');
@@ -161,8 +148,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param $value
      * @return bool
      */
-    public function castToBool($value)
+    public function castToBool(Buffer $value)
     {
+        if ($value instanceof Buffer) {
+            // Since we're using buffers, lets try ensuring the contents are not 0.
+            return ($this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0);
+        }
+
         if ($value) {
             return true;
         }
@@ -172,20 +164,21 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     /**
      * @param $opCode
-     * @param string $pushData
+     * @param Buffer $pushData
      * @return bool
      * @throws \Exception
      */
-    public function checkMinimalPush($opCode, $pushData)
+    public function checkMinimalPush($opCode, Buffer $pushData)
     {
-        $pushSize = strlen($pushData);
+        $pushSize = $pushData->getSize();
         $opcodes = $this->script->getOpCodes();
+        $binary = $pushData->getBinary();
 
         if ($pushSize == 0) {
             return $opcodes->isOp($opCode, 'OP_0');
-        } elseif ($pushSize == 1 && ord($pushData[0]) >= 1 && $pushData[0] <= 16) {
-            return $opCode == $opcodes->getOpByName('OP_1') + (ord($pushData[0]) - 1);
-        } elseif ($pushSize == 1 && ord($pushData) == 0x81) {
+        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && $binary[0] <= 16) {
+            return $opCode == $opcodes->getOpByName('OP_1') + (ord($binary[0]) - 1);
+        } elseif ($pushSize == 1 && ord($binary) == 0x81) {
             return $opcodes->isOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
             return $opCode == $pushSize;
@@ -200,35 +193,38 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     /**
      * @param Buffer $signature
-     * @return bool
-     * @throws \BitWasp\Bitcoin\Exceptions\SignatureNotCanonical
+     * @return $this
+     * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      */
     public function checkSignatureEncoding(Buffer $signature)
     {
         if ($signature->getSize() == 0) {
-            return true;
+            return $this;
         }
 
-        $result = true;
         if ($this->flags->verifyDERSignatures) {
-            $result &= TransactionSignature::isDERSignature($signature);
+            try {
+                TransactionSignature::isDERSignature($signature);
+            } catch (SignatureNotCanonical $e) {
+                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
+            }
         }
 
-        return $result;
+        return $this;
     }
 
     /**
      * @param Buffer $publicKey
-     * @return bool
+     * @return $this
      * @throws \Exception
      */
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
         if ($this->flags->verifyStrictEncoding && !PublicKey::isCompressedOrUncompressed($publicKey)) {
-            throw new \Exception('Invalid public key type');
+            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -258,20 +254,21 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return false;
         }
 
+        $mainStack = $this->state->getMainStack();
         $stackCopy = ScriptFactory::stack();
         if ($this->flags->verifyP2SH) {
-            $stackCopy = $this->mainStack;
+            $stackCopy = $this->state->getMainStack();
         }
 
-        if (!$this->setScript($scriptSig)->run()) {
+        if (!$this->setScript($scriptPubKey)->run()) {
             return false;
         }
 
-        if ($this->mainStack->size() == 0) {
+        if ($mainStack->size() == 0) {
             throw new \Exception('Script err eval false');
         }
 
-        if ($this->castToBool($this->mainStack->top(-1)) === false) {
+        if (false === $this->castToBool($mainStack->top(-1))) {
             throw new \Exception('Script err eval false literally');
         }
 
@@ -279,13 +276,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         if ($this->flags->verifyP2SH && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) { // todo
-                throw new \Exception('P2SH script must be push only');
+                throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH script must be push only');
             }
 
-            $this->mainStack = $stackCopy;
+            $mainStack = $stackCopy;
 
-            if ($this->mainStack->size() == 0) {
-                throw new \Exception('Script err eval false');
+            if ($mainStack->size() == 0) {
+                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_P2SH, 'Stack cannot be empty during p2sh');
             }
         }
 
@@ -299,13 +296,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     {
         $math = $this->ecAdapter->getMath();
         $opcodes = $this->script->getOpCodes();
+
+        $mainStack = $this->state->getMainStack();
+        $altStack = $this->state->getAltStack();
+        $vfStack = $this->state->getVfStack();
+
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
+        $_bn0 = Buffer::hex('00');
+        $_bn1 = Buffer::hex('01');
 
-        $checkFExec = function () {
+        $checkFExec = function () use (&$vfStack) {
             $c = 0;
-            for ($i = 0, $len = $this->vfExecStack->end(); $i < $len; $i++) {
-                if ($this->vfExecStack->top(0 - $len - $i) == true) {
+            for ($i = 0, $len = $vfStack->end(); $i < $len; $i++) {
+                if ($vfStack->top(0 - $len - $i) == true) {
                     $c++;
                 }
             }
@@ -314,15 +318,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         try {
             while ($parser->next($opCode, $pushData) === true) {
-                $opCode = null;
-                $pushData = null;
                 $fExec = !$checkFExec();
 
-                if (strlen($pushData) > $this->flags->maxElementSize) {
+                // If pushdata was written to,
+                if ($pushData instanceof Buffer && $pushData->getSize() > $this->flags->maxElementSize) {
                     throw new \Exception('Error - push size');
                 }
 
-                if ($this->script->getOpcodes()->isOp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
+                // OP_RESERVED should not count towards opCount
+                if ($this->script->getOpcodes()->cmp($opCode, 'OP_16') > 0 && ++$this->opCount > 201) {
                     throw new \Exception('Error - Script Op Count');
                 }
 
@@ -332,11 +336,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     }
                 }
 
-                if ($fExec && $opCode >= 0 && $opcodes->isOp($opCode, 'OP_PUSHDATA4') <= 0) {
+                if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
+                    // In range of a pushdata opcode
                     if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
-                        throw new \Exception('Minimal pushdata required');
+                        throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
-                    $this->mainStack->push($pushData);
+                    $mainStack->push($pushData);
 
                 } elseif ($fExec || ($opcodes->isOp($opCode, 'OP_IF') <= 0 && $opcodes->isOp($opCode, 'OP_ENDIF'))) {
                     switch ($opCode)
@@ -359,7 +364,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $opcodes->getOpByName('OP_15'):
                         case $opcodes->getOpByName('OP_16'):
                             $num = $opCode - ($opcodes->getOpByName('OP_1') - 1);
-                            $this->mainStack->push($num);
+                            $mainStack->push($num);
                             break;
 
                         case $opcodes->getOpByName('OP_NOP'):
@@ -385,30 +390,28 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             // <expression> if [statements] [else [statements]] endif
                             $value = false;
                             if ($fExec) {
-                                if ($this->mainStack->size() < 1) {
+                                if ($mainStack->size() < 1) {
                                     throw new \Exception('Unbalanced conditional');
                                 }
                                 // todo
-                                $string = $this->mainStack->top(-1);
-                                $value = $this->castToBool($value);
+                                $buffer = $mainStack->pop();
+                                $value = $this->castToBool($buffer);
                                 if ($opcodes->isOp($opCode, 'OP_NOTIF')) {
                                     $value = !$value;
                                 }
-                                $this->mainStack->pop();
                             }
-                            $this->vfExecStack->push($value);
+                            $vfStack->push($value);
                             break;
 
                         case $opcodes->getOpByName('OP_ELSE'):
-                            if ($this->vfExecStack->size() == 0) {
+                            if ($vfStack->size() == 0) {
                                 throw new \Exception('Unbalanced conditional');
                             }
-                            // $this->vfExecStack->back() = ! $this->vfExecStack->back()
-                            // todo
+                            $vfStack->set($vfStack->end() - 1, !$vfStack->end());
                             break;
 
                         case $opcodes->getOpByName('OP_ENDIF'):
-                            if ($this->vfExecStack->size() == 0) {
+                            if ($vfStack->size() == 0) {
                                 throw new \Exception('Unbalanced conditional');
                             }
                             // vfExecStack->popBack()
@@ -416,12 +419,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $opcodes->getOpByName('OP_VERIFY'):
-                            if ($this->mainStack->size() < 1) {
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation');
                             }
-                            $value = $this->castToBool($this->mainStack->top(-1));
+                            $value = $this->castToBool($mainStack->top(-1));
                             if ($value) {
-                                $this->mainStack->pop();
+                                $mainStack->pop();
                             } else {
                                 throw new \Exception('Error: verify');
                             }
@@ -434,205 +437,203 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_RETURN'):
                             throw new \Exception('Error: OP_RETURN');
-
                         case $opcodes->getOpByName('OP_TOALTSTACK'):
-                            if ($this->mainStack->size() < 1) {
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_TOALTSTACK');
                             }
-                            $this->altStack->push($this->mainStack->pop());
-                            //$this->altStack->push($this->mainStack->top(-1));
-                            //$this->mainStack->pop();
+                            $altStack->push($mainStack->pop());
                             break;
 
                         case $opcodes->getOpByName('OP_FROMALTSTACK'):
-                            if ($this->altStack->size() < 1) {
+                            if ($altStack->size() < 1) {
                                 throw new \Exception('Invalid alt-stack operation OP_FROMALTSTACK');
                             }
-                            $this->mainStack->push($this->altStack->pop());
+                            $mainStack->push($altStack->pop());
                             break;
 
                         case $opcodes->getOpByName('OP_2DROP'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_2DROP');
                             }
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
                             break;
 
                         case $opcodes->getOpByName('OP_2DUP'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_2DUP');
                             }
-                            $string1 = $this->mainStack->top(-2);
-                            $string2 = $this->mainStack->top(-1);
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
+                            $string1 = $mainStack->top(-2);
+                            $string2 = $mainStack->top(-1);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
                             break;
 
                         case $opcodes->getOpByName('OP_3DUP'):
-                            if ($this->mainStack->size() < 3) {
+                            if ($mainStack->size() < 3) {
                                 throw new \Exception('Invalid stack operation OP_3DUP');
                             }
-                            $string1 = $this->mainStack->top(-3);
-                            $string2 = $this->mainStack->top(-2);
-                            $string3 = $this->mainStack->top(-1);
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
-                            $this->mainStack->push($string3);
+                            $string1 = $mainStack->top(-3);
+                            $string2 = $mainStack->top(-2);
+                            $string3 = $mainStack->top(-1);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
+                            $mainStack->push($string3);
                             break;
 
                         case $opcodes->getOpByName('OP_2OVER'):
-                            if ($this->mainStack->size() < 4) {
+                            if ($mainStack->size() < 4) {
                                 throw new \Exception('Invalid stack operation OP_2OVER');
                             }
-                            $string1 = $this->mainStack->top(-4);
-                            $string2 = $this->mainStack->top(-3);
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
+                            $string1 = $mainStack->top(-4);
+                            $string2 = $mainStack->top(-3);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
                             break;
 
                         case $opcodes->getOpByName('OP_2ROT'):
-                            if ($this->mainStack->size() < 6) {
+                            if ($mainStack->size() < 6) {
                                 throw new \Exception('Invalid stack operation OP_2ROT');
                             }
-                            $string1 = $this->mainStack->top(-6);
-                            $string2 = $this->mainStack->top(-5);
-                            $this->mainStack->erase($this->mainStack->size() - 6);
-                            $this->mainStack->erase($this->mainStack->size() - 4);
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
+                            $string1 = $mainStack->top(-6);
+                            $string2 = $mainStack->top(-5);
+                            $mainStack->erase(-6);
+                            $mainStack->erase(-5);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
                             break;
 
                         case $opcodes->getOpByName('OP_2SWAP'):
-                            if ($this->mainStack->size() < 4) {
+                            if ($mainStack->size() < 4) {
                                 throw new \Exception('Invalid stack operation OP_2SWAP');
                             }
-                            $this->mainStack->swap(-4, -2);
-                            $this->mainStack->swap(-3, -1);
+                            $mainStack->swap(-3, -1);
+                            $mainStack->swap(-4, -2);
                             break;
 
                         case $opcodes->getOpByName('OP_IFDUP'):
-                            if ($this->mainStack->size() < 1) {
+                            // If top value not zero, duplicate it.
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_IFDUP');
                             }
-                            $vch = $this->mainStack->top(-1);
+                            $vch = $mainStack->top(-1);
                             if ($this->castToBool($vch)) {
-                                $this->mainStack->push($vch);
+                                $mainStack->push($vch);
                             }
                             break;
 
                         case $opcodes->getOpByName('OP_DEPTH'):
-                            $num = $this->mainStack->size();
-                            $bin = pack("H*", $math->decHex($num));
-                            $this->mainStack->push($bin);
+                            $num = $mainStack->size();
+                            $bin = Buffer::hex($math->decHex($num));
+                            $mainStack->push($bin);
                             break;
 
                         case $opcodes->getOpByName('OP_DROP'):
-                            if ($this->mainStack->size() < 1) {
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_DROP');
                             }
-                            $this->mainStack->pop();
+                            $mainStack->pop();
                             break;
 
                         case $opcodes->getOpByName('OP_DUP'):
-                            if ($this->mainStack->size() < 1) {
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_DUP');
                             }
-                            $vch = $this->mainStack->top(-1);
-                            $this->mainStack->push($vch);
+                            $vch = $mainStack->top(-1);
+                            $mainStack->push($vch);
                             break;
 
                         case $opcodes->getOpByName('OP_NIP'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_NIP');
                             }
-                            $this->mainStack->erase($this->mainStack->end() - 2);
+                            $mainStack->erase(-2);
                             break;
 
                         case $opcodes->getOpByName('OP_OVER'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_OVER');
                             }
-                            $vch = $this->mainStack->top(-2);
-                            $this->mainStack->push($vch);
+                            $vch = $mainStack->top(-2);
+                            $mainStack->push($vch);
                             break;
 
                         case $opcodes->getOpByName('OP_PICK'):
                         case $opcodes->getOpByName('OP_ROLL'):
-                            if ($this->mainStack->size() < 2) {
-                                throw new \Exception('Invalid stack operationOP_PICK');
-                            }
-                            $n = $this->mainStack->top(-1);
-                            $this->mainStack->pop();
-                            if ($n < 0 || $n >= $this->mainStack->size()) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_PICK');
                             }
-                            $vch = $this->mainStack->top(0 - $n - 1);
-                            if ($opcodes->isOp($opCode, 'OP_ROLL')) {
-                                $this->mainStack->erase($this->mainStack->end() - $n - 1);
+                            $n = $mainStack->top(-1)->getInt();
+                            $mainStack->pop();
+                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, $mainStack->size()) >= 0) {
+                                throw new \Exception('Invalid stack operation OP_PICK');
                             }
-                            $this->mainStack->push($vch);
+
+                            $pos = $math->sub($math->sub(0, $n), 1);
+                            $vch = $mainStack->top($pos);
+                            if ($opcodes->isOp($opCode, 'OP_ROLL')) {
+                                $mainStack->erase($pos);
+                            }
+                            $mainStack->push($vch);
                             break;
 
                         case $opcodes->getOpByName('OP_ROT'):
-                            if ($this->mainStack->size() < 3) {
+                            if ($mainStack->size() < 3) {
                                 throw new \Exception('Invalid stack operation OP_ROT');
                             }
-                            $this->mainStack->swap(-3, -2);
-                            $this->mainStack->swap(-2, -1);
+                            $mainStack->swap(-3, -2);
+                            $mainStack->swap(-2, -1);
                             break;
 
                         case $opcodes->getOpByName('OP_SWAP'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_SWAP');
                             }
-                            $this->mainStack->swap(-2, -1);
+                            $mainStack->swap(-2, -1);
                             break;
 
                         case $opcodes->getOpByName('OP_TUCK'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_TUCK');
                             }
-                            $vch = $this->mainStack->top(-1);
-                            $this->mainStack->insert($this->mainStack->end() - 2, $vch);
+                            $vch = $mainStack->top(-1);
+                            $mainStack->insert($mainStack->end() - 2, $vch);
                             break;
 
                         case $opcodes->getOpByName('OP_SIZE'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation OP_SIZE');
                             }
-                            // todo
-                            // Different types could be returned here
+                            // todo: Int sizes?
+                            $vch = $mainStack->top(-1);
+                            $size = Buffer::hex($math->decHex($vch->getSize()));
 
-                            $vch = $this->mainStack->top(-1);
-                            $size = pack("H*", $math->decHex(strlen($vch)));
-
-                            $this->mainStack->push($size);
+                            $mainStack->push($size);
                             break;
 
                         case $opcodes->getOpByName('OP_EQUAL'):
                         case $opcodes->getOpByName('OP_EQUALVERIFY'):
                         //case $this->isOp($opCode, 'OP_NOTEQUAL'): // use OP_NUMNOTEQUAL
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation OP_EQUAL');
                             }
-                            $vch1 = $this->mainStack->top(-2);
-                            $vch2 = $this->mainStack->top(-1);
+                            $vch1 = $mainStack->top(-2);
+                            $vch2 = $mainStack->top(-1);
 
-                            $equal = $vch1 === $vch2;
+                            $equal = ($vch1->getBinary() === $vch2->getBinary());
 
                             // OP_NOTEQUAL is disabled
                             //if ($this->isOp($opCode, 'OP_NOTEQUAL')) {
                             //    $equal = !$equal;
                             //}
 
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->push(($equal ? true : false));
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push(($equal ? true : false));
 
                             if ($opcodes->isOp($opCode, 'OP_EQUALVERIFY')) {
                                 if ($equal) {
-                                    $this->mainStack->pop();
+                                    $mainStack->pop();
                                 } else {
                                     throw new \Exception('Error EQUALVERIFY');
                                 }
@@ -641,14 +642,15 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_1ADD'):
                         case $opcodes->getOpByName('OP_1SUB'):
+                        case $opcodes->getOpByName('OP_2MUL'):
                         case $opcodes->getOpByName('OP_NEGATE'):
                         case $opcodes->getOpByName('OP_ABS'):
                         case $opcodes->getOpByName('OP_NOT'):
                         case $opcodes->getOpByName('OP_0NOTEQUAL'):
-                            if ($this->mainStack->size() < 1) {
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation 1ADD');
                             }
-                            $num = $this->mainStack->top(-1);
+                            $num = $mainStack->top(-1)->getInt();
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_1ADD'):
@@ -656,6 +658,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     break;
                                 case $opcodes->getOpByName('OP_1SUB'):
                                     $num = $math->sub($num, '1');
+                                    break;
+                                case $opcodes->getOpByName('OP_2MUL'):
+                                    $num = $math->mul(2, $num);
                                     break;
                                 case $opcodes->getOpByName('OP_NEGATE'):
                                     $num = $math->sub(0, $num);
@@ -672,11 +677,13 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $num = ($math->cmp($num, '0') !== 0);
                                     break;
                                 default:
-                                    throw new \Exception('Invalid Opcode');
+                                    throw new \Exception('Opcode not found');
                             }
 
-                            $this->mainStack->pop();
-                            $this->mainStack->push($num);
+                            $mainStack->pop();
+
+                            $buffer = Buffer::hex($math->decHex($num));
+                            $mainStack->push($buffer);
                             break;
 
                         case $opcodes->getOpByName('OP_ADD'):
@@ -692,12 +699,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $opcodes->getOpByName('OP_GREATERTHANOREQUAL'):
                         case $opcodes->getOpByName('OP_MIN'):
                         case $opcodes->getOpByName('OP_MAX'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation (greater than)');
                             }
-                            $num1 = $this->mainStack->top(-2);
-                            $num2 = $this->mainStack->top(-1);
-                            $_bn0 = '0';
+                            $num1 = $mainStack->top(-2)->getInt();
+                            $num2 = $mainStack->top(-1)->getInt();
 
                             switch ($opCode) {
                                 case $opcodes->getOpByName('OP_ADD'):
@@ -707,10 +713,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $num = $math->sub($num1, $num2);
                                     break;
                                 case $opcodes->getOpByName('OP_BOOLAND'):
-                                    $num = ($math->cmp($num1, $_bn0) !== 0 && $math->cmp($num2, $_bn0) !== 0);
+                                    $num = ($math->cmp($num1, $_bn0->getInt()) !== 0 && $math->cmp($num2, $_bn0->getInt()) !== 0);
                                     break;
                                 case $opcodes->getOpByName('OP_BOOLOR'):
-                                    $num = ($math->cmp($num1, $_bn0) !== 0 || $math->cmp($num2, $_bn0) !== 0);
+                                    $num = ($math->cmp($num1, $_bn0->getInt()) !== 0 || $math->cmp($num2, $_bn0->getInt()) !== 0);
                                     break;
                                 case $opcodes->getOpByName('OP_NUMEQUAL'):
                                     $num = ($math->cmp($num1, $num2) == 0);
@@ -740,14 +746,17 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                                     break;
                                 default:
-                                    throw new \Exception('Invalid opcode in maths ops');
+                                    throw new \Exception('Opcode not found');
                             }
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->push($num);
+
+
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $buffer = Buffer::hex($math->decHex($num));
+                            $mainStack->push($buffer);
                             if ($opcodes->isOp($opCode, 'OP_NUMEQUALVERIFY')) {
-                                if ($this->castToBool($this->mainStack->top(-1))) {
-                                    $this->mainStack->pop();
+                                if ($this->castToBool($mainStack->top(-1))) {
+                                    $mainStack->pop();
                                 } else {
                                     throw new \Exception('NUM EQUAL VERIFY error');
                                 }
@@ -755,17 +764,18 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $opcodes->getOpByName('OP_WITHIN'):
-                            if ($this->mainStack->size() < 3) {
+                            if ($mainStack->size() < 3) {
                                 throw new \Exception('Invalid stack operation');
                             }
-                            $num1 = $this->mainStack->top(-3);
-                            $num2 = $this->mainStack->top(-2);
-                            $num3 = $this->mainStack->top(-1);
+                            $num1 = $mainStack->top(-3)->getInt();
+                            $num2 = $mainStack->top(-2)->getInt();
+                            $num3 = $mainStack->top(-1)->getInt();
+
                             $value = ($math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0);
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->push($value ? true : false);
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push($value ? $_bn1 : $_bn0);
                             break;
 
                         case $opcodes->getOpByName('OP_RIPEMD160'):
@@ -773,16 +783,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $opcodes->getOpByName('OP_SHA256'):
                         case $opcodes->getOpByName('OP_HASH160'):
                         case $opcodes->getOpByName('OP_HASH256'):
-                            if ($this->mainStack->size() < 1) {
+                            if ($mainStack->size() < 1) {
                                 throw new \Exception('Invalid stack operation');
                             }
-                            $vch = $this->mainStack->top(-1);
-                            $hashLen = (
-                                $opcodes->isOp($opCode, 'OP_RIPEMD160')
-                                || $opcodes->isOp($opCode, 'OP_SHA1')
-                                || $opcodes->isOp($opCode, 'OP_HASH160')
-                            ) ? 20 : 32;
-
+                            $vch = $mainStack->top(-1);
                             if ($opcodes->isOp($opCode, 'OP_RIPEMD160')) {
                                 $hash = Hash::ripemd160($vch);
                             } elseif ($opcodes->isOp($opCode, 'OP_SHA1')) {
@@ -793,14 +797,16 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 $hash = Hash::sha256ripe160($vch);
                             } elseif ($opcodes->isOp($opCode, 'OP_HASH256')) {
                                 $hash = Hash::sha256d($vch);
+                            } else {
+                                throw new \Exception('Opcode not found');
                             }
 
-                            $this->mainStack->pop();
-                            $this->mainStack->push($hash);
+                            $mainStack->pop();
+                            $mainStack->push($hash);
                             break;
 
                         case $opcodes->getOpByName('OP_CODESEPARATOR'):
-                            if ($this->mainStack->size() < 4) {
+                            if ($mainStack->size() < 4) {
                                 throw new \Exception('Invalid stack operation');
                             }
                             $this->hashStartPos = $parser->getPosition();
@@ -808,54 +814,59 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                         case $opcodes->getOpByName('OP_CHECKSIG'):
                         case $opcodes->getOpByName('OP_CHECKSIGVERIFY'):
-                            if ($this->mainStack->size() < 2) {
+                            if ($mainStack->size() < 2) {
                                 throw new \Exception('Invalid stack operation');
                             }
 
-                            $vchPubKey = $this->mainStack->top(-1);
-                            $vchSig = $this->mainStack->top(-2);
+                            $vchPubKey = $mainStack->top(-1);
+                            $vchSig = $mainStack->top(-2);
 
-                            if (!$this->checkSignatureEncoding($vchSig) || !$this->checkPublicKeyEncoding($vchPubKey)) {
-                                return false;
-                            }
+                            $this
+                                ->checkSignatureEncoding($vchSig)
+                                ->checkPublicKeyEncoding($vchSig);
 
                             $txSig = TransactionSignatureFactory::fromHex($vchSig);
-                            $publicKey = PublicKeyFactory::fromHex($vchPubKey);
+                            $publicKey = PublicKeyFactory::fromHex($vchPubKey->getHex());
 
                             $script = ScriptFactory::create();
                             $sigHash = $this->transaction
                                 ->getSignatureHash()
                                 ->calculate($script, $this->inputToSign, $txSig->getHashType());
+
                             $success = $this->ecAdapter->verify($sigHash, $publicKey, $txSig->getSignature());
 
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->push($success ? $this->constTrue : $this->constFalse);
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push($success ? $_bn1 : $_bn0);
 
                             if ($opcodes->isOp($opCode, 'OP_CHECKSIGVERIFY')) {
                                 if ($success) {
-                                    $this->mainStack->pop();
+                                    $mainStack->pop();
                                 } else {
                                     throw new \Exception('Checksig verify');
                                 }
                             }
 
                             break;
+                        default:
+                            throw new \Exception('Opcode not found');
                     }
+                    //echo "Opcode: ". $opcodes->getOp($opCode) . "\n";
+                    //echo "Pushdata: ". ($pushData ? $pushData->getHex() : '') . "\n";
+
                 }
+                //print_r($mainStack);
             }
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            echo "$$ SCRIPT RUNTIEM ERROR $$\n";
-            return false;
-
-        } catch (ScriptStackException $e) {
-            echo "$$ SCRIPT STACK ERROR $$\n";
+            //echo "$$ SCRIPT RUNTIEM ERROR $$\n";
             return false;
 
         } catch (\Exception $e) {
-            echo "E: " . $e->getMessage() . "\n";
+            //echo "Exception\n";
+            //echo " - " . $e->getMessage() . "\n";
+            //echo $e->getTraceAsString(). "\n";
             return false;
         }
     }

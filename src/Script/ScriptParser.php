@@ -78,8 +78,8 @@ class ScriptParser
     }
 
     /**
-     * @param $format
-     * @param $strSize
+     * @param string $format
+     * @param integer $strSize
      * @return array|bool
      */
     private function unpackSize($format, $strSize)
@@ -96,10 +96,10 @@ class ScriptParser
 
     /**
      * @param $opCode
-     * @param string|null $pushData
+     * @param Buffer $pushData
      * @return bool
      */
-    public function next(&$opCode, &$pushData = null)
+    public function next(&$opCode, &$pushData)
     {
         $opcodes = $this->script->getOpcodes();
         $opCode = $opcodes->getOpByName('OP_INVALIDOPCODE');
@@ -125,7 +125,7 @@ class ScriptParser
                 return false;
             }
 
-            $pushData = substr($this->scriptRaw, $this->ptr, $size);
+            $pushData = new Buffer(substr($this->scriptRaw, $this->ptr, $size), $size);
             $this->ptr += $size;
         }
 
@@ -141,17 +141,14 @@ class ScriptParser
     {
         $data = array();
 
-        $opCode = null;
-        $pushData = null;
-
         while ($this->next($opCode, $pushData)) {
             if ($opCode < 1) {
                 $push = Buffer::hex('00');
             } elseif ($opCode <= 78) {
-                $push = new Buffer($pushData);
+                $push = $pushData;
             } else {
                 // None of these are pushdatas, so just an opcode
-                $push = $this->script->getOpcodes()->getOp($opCode);
+                $push = $this->script->getOpCodes()->getOp($opCode);
             }
 
             $data[] = $push;
