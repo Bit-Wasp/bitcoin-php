@@ -80,27 +80,6 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         return $vectors;
     }
 
-    public function testOpChecksig()
-    {
-        $flags = new ScriptInterpreterFlags();
-        $ec = Bitcoin::getEcAdapter();
-        $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ec);
-        $outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
-
-        $fake = new TransactionBuilder($ec);
-        $fake->payToAddress($privateKey->getAddress(), 1);
-
-        $spend = new TransactionBuilder($ec);
-
-        $spend->spendOutput($fake->getTransaction(), 0);
-        $spend->signInputWithKey($privateKey, $outputScript, 0);
-        $spendTx = $spend->getTransaction();
-        $scriptSig = $spendTx->getInputs()->getInput(0)->getScript();
-
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), $spendTx, $flags);
-        $this->assertTrue($i->verify($scriptSig, $outputScript, 0));
-
-    }
 
     /**
      * @dataProvider getScripts

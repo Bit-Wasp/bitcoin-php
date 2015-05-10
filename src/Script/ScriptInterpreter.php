@@ -148,11 +148,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param $value
      * @return bool
      */
-    public function castToBool($value)
+    public function castToBool(Buffer $value)
     {
         if ($value instanceof Buffer) {
             // Since we're using buffers, lets try ensuring the contents are not 0.
-            return ($this->ecAdapter->getMath()->cmp($value->getInt(), 0) !== 0);
+            return ($this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0);
         }
 
         if ($value) {
@@ -193,7 +193,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
     /**
      * @param Buffer $signature
-     * @return bool
+     * @return $this
      * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      */
     public function checkSignatureEncoding(Buffer $signature)
@@ -202,21 +202,20 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return true;
         }
 
-        $result = true;
         if ($this->flags->verifyDERSignatures) {
             try {
-                $result = TransactionSignature::isDERSignature($signature);
+                TransactionSignature::isDERSignature($signature);
             } catch (SignatureNotCanonical $e) {
                 throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
             }
         }
 
-        return $result;
+        return $this;
     }
 
     /**
      * @param Buffer $publicKey
-     * @return bool
+     * @return $this
      * @throws \Exception
      */
     public function checkPublicKeyEncoding(Buffer $publicKey)
@@ -225,7 +224,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -269,7 +268,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             throw new \Exception('Script err eval false');
         }
 
-        if ($this->castToBool($mainStack->top(-1)) === false) {
+        if (false === $this->castToBool($mainStack->top(-1))) {
             throw new \Exception('Script err eval false literally');
         }
 
@@ -822,8 +821,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $vchPubKey = $mainStack->top(-1);
                             $vchSig = $mainStack->top(-2);
 
-                            $this->checkSignatureEncoding($vchSig);
-                            $this->checkPublicKeyEncoding($vchSig);
+                            $this
+                                ->checkSignatureEncoding($vchSig)
+                                ->checkPublicKeyEncoding($vchSig);
 
                             $txSig = TransactionSignatureFactory::fromHex($vchSig);
                             $publicKey = PublicKeyFactory::fromHex($vchPubKey->getHex());
@@ -837,7 +837,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push($success ? $this->constTrue : $this->constFalse);
+                            $mainStack->push($success ? $_bn1 : $_bn0);
 
                             if ($opcodes->isOp($opCode, 'OP_CHECKSIGVERIFY')) {
                                 if ($success) {
