@@ -199,7 +199,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function checkSignatureEncoding(Buffer $signature)
     {
         if ($signature->getSize() == 0) {
-            return true;
+            return $this;
         }
 
         if ($this->flags->verifyDERSignatures) {
@@ -676,6 +676,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 case $opcodes->getOpByName('OP_0NOTEQUAL'):
                                     $num = ($math->cmp($num, '0') !== 0);
                                     break;
+                                default:
+                                    throw new \Exception('Opcode not found');
                             }
 
                             $mainStack->pop();
@@ -743,6 +745,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 case $opcodes->getOpByName('OP_MAX'):
                                     $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                                     break;
+                                default:
+                                    throw new \Exception('Opcode not found');
                             }
 
 
@@ -799,6 +803,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 $hash = Hash::sha256ripe160($vch);
                             } elseif ($opcodes->isOp($opCode, 'OP_HASH256')) {
                                 $hash = Hash::sha256d($vch);
+                            } else {
+                                throw new \Exception('Opcode not found');
                             }
 
                             $mainStack->pop();
@@ -848,6 +854,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
 
                             break;
+                        default:
+                            throw new \Exception('Opcode not found');
                     }
                     //echo "Opcode: ". $opcodes->getOp($opCode) . "\n";
                     //echo "Pushdata: ". ($pushData ? $pushData->getHex() : '') . "\n";
