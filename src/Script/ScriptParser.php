@@ -141,9 +141,6 @@ class ScriptParser
     {
         $data = array();
 
-        $opCode = null;
-        $pushData = null;
-
         while ($this->next($opCode, $pushData)) {
             if ($opCode < 1) {
                 $push = Buffer::hex('00');
@@ -151,7 +148,7 @@ class ScriptParser
                 $push = $pushData;
             } else {
                 // None of these are pushdatas, so just an opcode
-                $push = $this->script->getOpcodes()->getOp($opCode);
+                $push = $this->script->getOpCodes()->getOp($opCode);
             }
 
             $data[] = $push;
