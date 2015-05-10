@@ -78,8 +78,8 @@ class ScriptParser
     }
 
     /**
-     * @param $format
-     * @param $strSize
+     * @param string $format
+     * @param integer $strSize
      * @return array|bool
      */
     private function unpackSize($format, $strSize)
