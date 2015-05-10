@@ -787,12 +787,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation');
                             }
                             $vch = $mainStack->top(-1);
-                            $hashLen = (
-                                $opcodes->isOp($opCode, 'OP_RIPEMD160')
-                                || $opcodes->isOp($opCode, 'OP_SHA1')
-                                || $opcodes->isOp($opCode, 'OP_HASH160')
-                            ) ? 20 : 32;
-
                             if ($opcodes->isOp($opCode, 'OP_RIPEMD160')) {
                                 $hash = Hash::ripemd160($vch);
                             } elseif ($opcodes->isOp($opCode, 'OP_SHA1')) {
