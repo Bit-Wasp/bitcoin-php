@@ -72,7 +72,7 @@ class AddressFactory
 
         if ($prefixByte === $network->getP2shByte()) {
             return new ScriptHashAddress($data->slice(1));
-        } else if ($prefixByte === $network->getAddressByte() && $data->getSize() < 30) {
+        } else if ($prefixByte === $network->getAddressByte() && $data->getSize() < 50) {
             return new PayToPubKeyHashAddress($data->slice(1));
         } else if ($prefixByte === $network->getAddressByte()) {
             return new PayToPubKeyAddress($data->slice(1));
