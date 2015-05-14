@@ -78,8 +78,8 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function getAddress(NetworkInterface $network = null)
     {
-      $address = AddressFactory::fromOutputScript($this->getScript());
-      return $address;
+        $address = AddressFactory::fromOutputScript($this->getScript());
+        return $address;
     }
 
     /**
@@ -88,7 +88,11 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function getAddressString(NetworkInterface $network = null)
     {
-      return $this->getAddress($network)->getAddress();
+        try {
+            return $this->getAddress($network)->getAddress();
+        } catch (\RuntimeException $e) {
+            return "";
+        }
     }
 
 }

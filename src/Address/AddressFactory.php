@@ -33,7 +33,7 @@ class AddressFactory
 
     /**
      * @param ScriptInterface $outputScript
-     * @return PayToPubKeyHashAddress|ScriptHashAddress
+     * @return PayToPubKeyAddress|PayToPubKeyHashAddress|ScriptHashAddress
      */
     public static function fromOutputScript(ScriptInterface $outputScript)
     {
