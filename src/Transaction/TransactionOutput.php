@@ -94,5 +94,4 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
             return "";
         }
     }
-
 }
