@@ -55,7 +55,7 @@ class AddressFactory
             return new PayToPubKeyAddress($hash);
         }
 
-        throw new \RuntimeException('Script type '.$type.' is not associated with an address');
+        throw new \RuntimeException('Script type is not associated with an address');
     }
 
     /**
