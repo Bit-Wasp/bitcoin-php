@@ -72,8 +72,10 @@ class AddressFactory
 
         if ($prefixByte === $network->getP2shByte()) {
             return new ScriptHashAddress($data->slice(1));
-        } else if ($prefixByte === $network->getAddressByte()) {
+        } else if ($prefixByte === $network->getAddressByte() && $data->getSize() < 30) {
             return new PayToPubKeyHashAddress($data->slice(1));
+        } else if ($prefixByte === $network->getAddressByte()) {
+            return new PayToPubKeyAddress($data->slice(1));
         } else {
             throw new \InvalidArgumentException("Invalid prefix [{$prefixByte}]");
         }
