@@ -27,6 +27,10 @@ class Bitcoind
         $this->client = $client;
     }
 
+    /**
+     * @param string $result
+     * @throws \Exception
+     */
     private function checkNotNull($result)
     {
         if (null === $result) {
@@ -34,6 +38,10 @@ class Bitcoind
         }
     }
 
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
     public function getinfo()
     {
         $info = $this->client->execute('getinfo');
