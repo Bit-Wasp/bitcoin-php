@@ -42,11 +42,11 @@ class Bitcoind
      * @return mixed
      * @throws \Exception
      */
+
     public function getinfo()
     {
         $info = $this->client->execute('getinfo');
         $this->checkNotNull($info);
-
         return $info;
     }
 
@@ -60,8 +60,8 @@ class Bitcoind
     }
 
     /**
-     * @param $blockHeight
-     * @return mixed
+     * @param int|string $blockHeight
+     * @return string
      */
     public function getblockhash($blockHeight)
     {
@@ -70,7 +70,7 @@ class Bitcoind
     }
 
     /**
-     * @param $blockhash
+     * @param string $blockhash
      * @return \BitWasp\Bitcoin\Block\Block
      */
     public function getblock($blockhash)
@@ -119,7 +119,7 @@ class Bitcoind
     }
 
     /**
-     * @param $txid
+     * @param string $txid
      * @param bool $verbose
      * @return TransactionInterface
      * @throws \Exception
@@ -139,7 +139,7 @@ class Bitcoind
     /**
      * @param TransactionInterface $transaction
      * @param bool $allowExtremeFees
-     * @return mixed
+     * @return string
      */
     public function sendrawtransaction(TransactionInterface $transaction, $allowExtremeFees = false)
     {
