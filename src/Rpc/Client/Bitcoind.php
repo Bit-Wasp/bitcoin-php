@@ -4,8 +4,10 @@ namespace BitWasp\Bitcoin\Rpc\Client;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\Block;
-use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Block\BlockHeader;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
@@ -17,7 +19,7 @@ class Bitcoind
     /**
      * @var JsonRpcClient
      */
-    protected $client;
+    private $client;
 
     /**
      * @param JsonRpcClient $client
@@ -39,10 +41,9 @@ class Bitcoind
     }
 
     /**
-     * @return mixed
+     * @return array
      * @throws \Exception
      */
-
     public function getinfo()
     {
         $info = $this->client->execute('getinfo');
@@ -51,7 +52,7 @@ class Bitcoind
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getbestblockhash()
     {
@@ -65,7 +66,7 @@ class Bitcoind
      */
     public function getblockhash($blockHeight)
     {
-        $hash = $this->client->execute('getblockhash', array($blockHeight));
+        $hash = $this->client->execute('getblockhash', [$blockHeight]);
         return $hash;
     }
 
@@ -75,7 +76,7 @@ class Bitcoind
      */
     public function getblock($blockhash)
     {
-        $blockArray = $this->client->execute('getblock', array($blockhash, true));
+        $blockArray = $this->client->execute('getblock', [$blockhash, true]);
         $this->checkNotNull($blockArray);
 
         // Establish batch query for loading transactions
@@ -97,10 +98,10 @@ class Bitcoind
             );
         }
 
-        // Build block header$
+        // Build block header
         $header = new BlockHeader(
             $blockArray['version'],
-            @$blockArray['previousblockhash'],
+            @$blockArray['previousblockhash'], // @ for genesis block.
             $blockArray['merkleroot'],
             $blockArray['time'],
             Buffer::hex($blockArray['bits']),
@@ -126,7 +127,7 @@ class Bitcoind
      */
     public function getrawtransaction($txid, $verbose = false)
     {
-        $tx = $this->client->execute('getrawtransaction', array($txid));
+        $tx = $this->client->execute('getrawtransaction', [$txid]);
         $this->checkNotNull($tx);
 
         if ($verbose) {
@@ -137,14 +138,60 @@ class Bitcoind
     }
 
     /**
+     * @param $inputs
+     * @param $outputs
+     * @return mixed
+     * @throws \Exception
+     */
+    public function createrawtransaction($inputs, $outputs)
+    {
+        $tx = $this->client->execute('createrawtransaction', [$inputs, $outputs]);
+        $this->checkNotNull($tx);
+        return $tx;
+    }
+
+    /**
+     * @param TransactionInterface $tx
+     * @param array $inputs
+     * @param array $privateKeys
+     * @param int $sighash
+     * @param NetworkInterface $network
+     * @return \BitWasp\Bitcoin\Transaction\Transaction
+     * @throws \Exception
+     */
+    public function signrawtransaction(
+        TransactionInterface $tx,
+        array $inputs = [],
+        array $privateKeys = [],
+        $sighash = SignatureHashInterface::SIGHASH_ALL,
+        NetworkInterface $network = null
+    ) {
+
+        $tx = $this->client->execute('signrawtransaction', [
+            $tx->getHex(),
+            $inputs,
+            array_map(
+                function (PrivateKeyInterface $privateKey) use ($network) {
+                    return $privateKey->toWif($network);
+                },
+                $privateKeys
+            ),
+            $sighash
+        ]);
+
+        $this->checkNotNull($tx);
+        return TransactionFactory::fromHex($tx['tx']);
+    }
+
+    /**
      * @param TransactionInterface $transaction
      * @param bool $allowExtremeFees
      * @return string
      */
     public function sendrawtransaction(TransactionInterface $transaction, $allowExtremeFees = false)
     {
-        $hex = $transaction->getBuffer()->getHex();
-        $send = $this->client->execute('sendrawtransaction', array($hex, $allowExtremeFees));
+        $send = $this->client->execute('sendrawtransaction', [$transaction->getHex(), $allowExtremeFees]);
+        $this->checkNotNull($send);
         return $send;
     }
 }
