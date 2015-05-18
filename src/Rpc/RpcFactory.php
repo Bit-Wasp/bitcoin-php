@@ -46,7 +46,7 @@ class RpcFactory
         );
 
         $client = $clientFactory->create($host, $port, $timeout);
-        
+
         return new ElectrumServer($client);
     }
 }

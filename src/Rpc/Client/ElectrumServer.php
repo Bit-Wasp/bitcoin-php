@@ -19,7 +19,7 @@ class ElectrumServer
      */
     public function __construct(Client $client)
     {
-        $this->cleint = $client;
+        $this->client = $client;
     }
 
     public function transactionBroadcast(TransactionInterface $transaction)
