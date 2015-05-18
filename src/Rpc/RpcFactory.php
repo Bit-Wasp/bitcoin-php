@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Rpc;
 
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
+use BitWasp\Stratum\Request\RequestFactory;
+use BitWasp\Stratum\Factory;
 use BitWasp\Bitcoin\Rpc\Client\Bitcoind;
 
 class RpcFactory
@@ -22,5 +24,19 @@ class RpcFactory
         $jsonRPCclient->authentication($user, $password);
 
         return new Bitcoind($jsonRPCclient);
+    }
+
+    public static function electrum(\React\EventLoop\LoopInterface $loop, $host, $port, $timeout = 5)
+    {
+        // Initialize react event loop, resolver, and connector
+        $connector = new \React\SocketClient\Connector(
+            $loop,
+            (new \React\Dns\Resolver\Factory())->create('8.8.8.8', $loop)
+        );
+
+        $request = new RequestFactory;
+        $clientFactory = new Factory($loop, $connector, $request);
+        $stratum = $clientFactory->create($host, $port);
+
     }
 }
