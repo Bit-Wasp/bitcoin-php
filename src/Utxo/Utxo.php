@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Utxo;
 
-
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 class Utxo
