@@ -7,17 +7,18 @@ use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
+use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
+
 
 class Bitcoind
 {
