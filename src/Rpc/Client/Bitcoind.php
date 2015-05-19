@@ -62,6 +62,15 @@ class Bitcoind
     }
 
     /**
+     * @return int
+     */
+    public function getblockcount()
+    {
+        $count = $this->client->execute('getbestblockhash');
+        return $count;
+    }
+
+    /**
      * @return string
      */
     public function getbestblockhash()
