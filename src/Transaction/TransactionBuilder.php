@@ -12,8 +12,8 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 
 class TransactionBuilder
@@ -68,6 +68,14 @@ class TransactionBuilder
     {
         $this->transaction->getOutputs()->addOutput($output);
         return $this;
+    }
+
+    public function spendUtxo(Utxo $utxo)
+    {
+        $this->addInput(new TransactionInput(
+            $utxo->getTransactionId(),
+            $utxo->getVout()
+        ));
     }
 
     /**
