@@ -2,13 +2,18 @@
 
 namespace BitWasp\Bitcoin\Rpc\Client;
 
+use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
@@ -27,6 +32,11 @@ class Bitcoind
     public function __construct(JsonRpcClient $client)
     {
         $this->client = $client;
+    }
+
+    public function getRpcClient()
+    {
+        return $this->client;
     }
 
     /**
@@ -193,5 +203,45 @@ class Bitcoind
         $send = $this->client->execute('sendrawtransaction', [$transaction->getHex(), $allowExtremeFees]);
         $this->checkNotNull($send);
         return $send;
+    }
+
+    /**
+     * @param int $minConfirms
+     * @param int $maxConfirms
+     * @param array $addresses
+     * @param NetworkInterface $network
+     * @return array
+     */
+    public function listunspent($minConfirms = 1, $maxConfirms = 9999999, array $addresses = [], NetworkInterface $network = null)
+    {
+        $amount = new Amount();
+
+        $results = $this->client->execute(
+            'listunspent',
+            [
+                $minConfirms,
+                $maxConfirms,
+                array_map(
+                    function (AddressInterface $address) use ($network) {
+                        return $address->getAddress($network);
+                    },
+                    $addresses
+                )
+            ]
+        );
+
+        return array_map(
+            function (array $value) use ($amount) {
+                return new Utxo(
+                    $value['txid'],
+                    $value['vout'],
+                    new TransactionOutput(
+                        $amount->toSatoshis($value['amount']),
+                        new Script(Buffer::hex($value['scriptPubKey']))
+                    )
+                );
+            },
+            $results
+        );
     }
 }
