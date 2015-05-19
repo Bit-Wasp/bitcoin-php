@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Rpc;
 
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Rpc\Client\ElectrumServer;
 use BitWasp\Stratum\Request\RequestFactory;
 use BitWasp\Stratum\Factory;
@@ -28,13 +29,14 @@ class RpcFactory
     }
 
     /**
+     * @param Math $math
      * @param \React\EventLoop\LoopInterface $loop
      * @param $host
      * @param $port
      * @param int $timeout
-     * @return \BitWasp\Stratum\Client
+     * @return ElectrumServer
      */
-    public static function electrum(\React\EventLoop\LoopInterface $loop, $host, $port, $timeout = 5)
+    public static function electrum(Math $math, \React\EventLoop\LoopInterface $loop, $host, $port, $timeout = 5)
     {
         $clientFactory = new Factory(
             $loop,
@@ -47,6 +49,6 @@ class RpcFactory
 
         $client = $clientFactory->create($host, $port, $timeout);
 
-        return new ElectrumServer($client);
+        return new ElectrumServer($math, $client);
     }
 }
