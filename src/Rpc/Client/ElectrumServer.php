@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Rpc\Client;
 
-
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;

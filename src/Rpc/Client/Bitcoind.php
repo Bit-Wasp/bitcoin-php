@@ -19,7 +19,6 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 
-
 class Bitcoind
 {
     /**
