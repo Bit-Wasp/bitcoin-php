@@ -63,34 +63,27 @@ class ArithmeticOperation
         }
         $num = $mainStack->top(-1)->getInt();
         $opCodes = $this->opCodes;
+        $opName = $opCodes->getOp($opCode);
+
         $math = $this->math;
 
-        switch ($opCode) {
-            case $opCodes->getOpByName('OP_1ADD'):
-                $num = $math->add($num, '1');
-                break;
-            case $opCodes->getOpByName('OP_1SUB'):
-                $num = $math->sub($num, '1');
-                break;
-            case $opCodes->getOpByName('OP_2MUL'):
-                $num = $math->mul(2, $num);
-                break;
-            case $opCodes->getOpByName('OP_NEGATE'):
+        if ($opName == 'OP_1ADD') {
+            $num = $math->add($num, '1');
+        } elseif ($opName == 'OP_1SUB') {
+            $num = $math->sub($num, '1');
+        } elseif ($opName == 'OP_2MUL') {
+            $num = $math->mul(2, $num);
+        } elseif ($opName == 'OP_NEGATE') {
+            $num = $math->sub(0, $num);
+        } elseif ($opName == 'OP_ABS') {
+            if ($math->cmp($num, '0') < 0) {
                 $num = $math->sub(0, $num);
-                break;
-            case $opCodes->getOpByName('OP_ABS'):
-                if ($math->cmp($num, '0') < 0) {
-                    $num = $math->sub(0, $num);
-                }
-                break;
-            case $opCodes->getOpByName('OP_NOT'):
-                $num = ($math->cmp($num, '0') == 0);
-                break;
-            case $opCodes->getOpByName('OP_0NOTEQUAL'):
-                $num = ($math->cmp($num, '0') !== 0);
-                break;
-            default:
-                throw new \Exception('Opcode not found');
+            }
+        } elseif ($opName == 'OP_NOT') {
+            $num = ($math->cmp($num, '0') == 0);
+        } else {
+            // is OP_0NOTEQUAL
+            $num = ($math->cmp($num, '0') !== 0);
         }
 
         $mainStack->pop();
@@ -115,54 +108,37 @@ class ArithmeticOperation
         $num2 = $mainStack->top(-1)->getInt();
 
         $opCodes = $this->opCodes;
+        $opName = $opCodes->getOp($opCode);
         $math = $this->math;
         $castToBool = $this->castToBool;
 
-        switch ($opCode) {
-            case $opCodes->getOpByName('OP_ADD'):
-                $num = $math->add($num1, $num2);
-                break;
-            case $opCodes->getOpByName('OP_SUB'):
-                $num = $math->sub($num1, $num2);
-                break;
-
-            /* OP_MUL, OP_DIV, OP_MOD, OP_LSHIFT, OP_RSHIFT would go here but are disbled */
-
-            case $opCodes->getOpByName('OP_BOOLAND'):
-                $num = ($math->cmp($num1, $this->_bn0->getInt()) !== 0 && $math->cmp($num2, $this->_bn0->getInt()) !== 0);
-                break;
-            case $opCodes->getOpByName('OP_BOOLOR'):
-                $num = ($math->cmp($num1, $this->_bn0->getInt()) !== 0 || $math->cmp($num2, $this->_bn0->getInt()) !== 0);
-                break;
-            case $opCodes->getOpByName('OP_NUMEQUAL'):
-                $num = ($math->cmp($num1, $num2) == 0);
-                break;
-            case $opCodes->getOpByName('OP_NUMEQUALVERIFY'):
-                $num = ($math->cmp($num1, $num2) == 0);
-                break;
-            case $opCodes->getOpByName('OP_NUMNOTEQUAL'):
-                $num = ($math->cmp($num1, $num2) !== 0);
-                break;
-            case $opCodes->getOpByName('OP_LESSTHAN'):
-                $num = ($math->cmp($num1, $num2) < 0);
-                break;
-            case $opCodes->getOpByName('OP_GREATERTHAN'):
-                $num = ($math->cmp($num1, $num2) > 0);
-                break;
-            case $opCodes->getOpByName('OP_LESSTHANOREQUAL'):
-                $num = ($math->cmp($num1, $num2) <= 0);
-                break;
-            case $opCodes->getOpByName('OP_GREATERTHANOREQUAL'):
-                $num = ($math->cmp($num1, $num2) >= 0);
-                break;
-            case $opCodes->getOpByName('OP_MIN'):
-                $num = ($math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
-                break;
-            case $opCodes->getOpByName('OP_MAX'):
-                $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
-                break;
-            default:
-                throw new \Exception('Opcode not found');
+        if ($opName == 'OP_ADD') {
+            $num = $math->add($num1, $num2);
+        } elseif ($opName == 'OP_SUB') {
+            $num = $math->sub($num1, $num2);
+        } elseif ($opName == 'OP_BOOLAND') {
+            $num = $math->cmp($num1, $this->_bn0->getInt()) !== 0 && $math->cmp($num2, $this->_bn0->getInt()) !== 0;
+        } elseif ($opName == 'OP_BOOLOR') {
+            $num = $math->cmp($num1, $this->_bn0->getInt()) !== 0 || $math->cmp($num2, $this->_bn0->getInt()) !== 0;
+        } elseif ($opName == 'OP_NUMEQUAL') {
+            $num = $math->cmp($num1, $num2) == 0;
+        } elseif ($opName == 'OP_NUMEQUALVERIFY') {
+            $num = $math->cmp($num1, $num2) == 0;
+        } elseif ($opName == 'OP_NUMNOTEQUAL') {
+            $num = $math->cmp($num1, $num2) !== 0;
+        } elseif ($opName == 'OP_LESSTHAN') {
+            $num = $math->cmp($num1, $num2) < 0;
+        } elseif ($opName == 'OP_GREATERTHAN') {
+            $num = $math->cmp($num1, $num2) > 0;
+        } elseif ($opName == 'OP_LESSTHANOREQUAL') {
+            $num = $math->cmp($num1, $num2) <= 0;
+        } elseif ($opName == 'OP_GREATERTHANOREQUAL') {
+            $num = $math->cmp($num1, $num2) >= 0;
+        } elseif ($opName == 'OP_MIN') {
+            $num = ($math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
+        } else {
+            // is OP_MAX
+            $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
         }
 
         $mainStack->pop();
