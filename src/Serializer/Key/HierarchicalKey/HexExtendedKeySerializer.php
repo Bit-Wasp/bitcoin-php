@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Key\HierarchicalKey;
@@ -54,18 +53,15 @@ class HexExtendedKeySerializer
             : [$this->network->getHDPubByte(), $key->getPublicKey()->getHex()];
 
         $bytes = new Parser();
-        $bytes
+
+        return $bytes
             ->writeBytes(4, $prefix)
             ->writeInt(1, $key->getDepth())
             ->writeInt(4, $key->getFingerprint())
             ->writeInt(4, $key->getSequence())
             ->writeInt(32, $key->getChainCode())
-            ->writeBytes(33, $data);
-
-        $hex = $bytes
+            ->writeBytes(33, $data)
             ->getBuffer();
-
-        return $hex;
     }
 
     /**
@@ -76,7 +72,7 @@ class HexExtendedKeySerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = [
+            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode) = [
                 $parser->readBytes(4)->getHex(),
                 $parser->readBytes(1)->getInt(),
                 $parser->readBytes(4)->getInt(),
@@ -84,6 +80,9 @@ class HexExtendedKeySerializer
                 $parser->readBytes(32)->getInt(),
                 $parser->readBytes(33)
             ];
+
+            /** @var Buffer $keyData */
+            $keyData = $parser->readBytes(33);
 
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
@@ -97,9 +96,7 @@ class HexExtendedKeySerializer
             ? PrivateKeyFactory::fromHex($keyData->slice(1)->getHex(), true, $this->ecAdapter)
             : PublicKeyFactory::fromHex($keyData->getHex(), $this->ecAdapter);
 
-        $hd = new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
-
-        return $hd;
+        return new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
     }
 
     /**
