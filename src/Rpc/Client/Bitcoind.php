@@ -185,7 +185,6 @@ class Bitcoind
         $sighash = SignatureHashInterface::SIGHASH_ALL,
         NetworkInterface $network = null
     ) {
-
         $tx = $this->client->execute('signrawtransaction', [
             $tx->getHex(),
             $inputs,
@@ -199,7 +198,7 @@ class Bitcoind
         ]);
 
         $this->checkNotNull($tx);
-        return TransactionFactory::fromHex($tx['tx']);
+        return TransactionFactory::fromHex($tx['hex']);
     }
 
     /**
