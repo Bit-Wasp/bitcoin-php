@@ -179,6 +179,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         return true;
     }
 
+    /**
+     * @param Buffer $signature
+     * @return bool
+     */
     public function isValidSignatureEncoding(Buffer $signature)
     {
         try {
@@ -189,6 +193,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
     }
 
+    /**
+     * @param Buffer $signature
+     * @return bool
+     * @throws ScriptRuntimeException
+     * @throws \Exception
+     */
     public function isLowDerSignature(Buffer $signature)
     {
         if (!$this->isValidSignatureEncoding($signature)) {
@@ -479,6 +489,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
                             break;
 
+                        // Arithmetic operations
                         case $opcodes->cmp($opCode, 'OP_1ADD') >= 0 && $opcodes->cmp($opCode, 'OP_WITHIN') <= 0:
                             $arithmetic = new ArithmeticOperation(
                                 $opcodes,
@@ -492,8 +503,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $arithmetic->op($opCode, $mainStack);
                             break;
 
-                        case $opcodes->cmp($opCode, 'OP_RIPEMD160') >= 0
-                            && $opcodes->cmp($opCode, 'OP_HASH256') <= 0:
+                        // Hash operations
+                        case $opcodes->cmp($opCode, 'OP_RIPEMD160') >= 0 && $opcodes->cmp($opCode, 'OP_HASH256') <= 0:
                             $hash = new HashOperation($opcodes);
                             $hash->op($opCode, $mainStack);
                             break;
