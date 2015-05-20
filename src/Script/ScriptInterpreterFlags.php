@@ -90,7 +90,7 @@ class ScriptInterpreterFlags
     {
         return new self(
             self::VERIFY_P2SH | self::VERIFY_STRICTENC | self::VERIFY_DERSIG |
-            self::VERIFY_LOW_S | self::VERIFY_NULL_DUMMY | self:: VERIFY_SIGPUSHONLY |
+            self::VERIFY_LOW_S | self::VERIFY_NULL_DUMMY | self::VERIFY_SIGPUSHONLY |
             self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS | self::VERIFY_CLEAN_STACK,
             true
         );
