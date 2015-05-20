@@ -24,7 +24,7 @@ class Secp256k1 extends BaseEcAdapter
     }
 
     /**
-     * @param $scalar
+     * @param int|string $scalar
      * @return string
      */
     private function getBinaryScalar($scalar)
@@ -34,7 +34,7 @@ class Secp256k1 extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $oldPrivate
-     * @param $newBinary
+     * @param string $newBinary
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      */
     private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newBinary)
@@ -44,7 +44,7 @@ class Secp256k1 extends BaseEcAdapter
 
     /**
      * @param PublicKeyInterface $oldPublic
-     * @param $newBinary
+     * @param string $newBinary
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */
     private function getRelatedPublicKey(PublicKeyInterface $oldPublic, $newBinary)
@@ -203,7 +203,7 @@ class Secp256k1 extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $integer
+     * @param int|string $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      * @throws \Exception
      */
@@ -224,7 +224,7 @@ class Secp256k1 extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param $integer
+     * @param int|string $integer
      * @return \BitWasp\Bitcoin\Key\PrivateKey
      * @throws \Exception
      */
@@ -245,7 +245,7 @@ class Secp256k1 extends BaseEcAdapter
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $integer
+     * @param int|string $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      * @throws \Exception
      */
@@ -266,14 +266,13 @@ class Secp256k1 extends BaseEcAdapter
 
     /**
      * @param PublicKeyInterface $publicKey
-     * @param $integer
+     * @param int|string $integer
      * @return \BitWasp\Bitcoin\Key\PublicKey
      * @throws \Exception
      */
     public function publicKeyMul(PublicKeyInterface $publicKey, $integer)
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
-        $pubkeyLen = strlen($pubKey);
         $ret = (bool) \secp256k1_ec_pubkey_tweak_mul(
             $pubKey,
             $this->getBinaryScalar($integer)
