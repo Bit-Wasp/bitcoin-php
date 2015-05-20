@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
+use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -174,6 +175,54 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         return true;
     }
 
+    public function isValidSignatureEncoding(Buffer $signature)
+    {
+        try {
+            TransactionSignature::isDERSignature($signature);
+            return true;
+        } catch (SignatureNotCanonical $e) {
+            return false;
+        }
+    }
+
+    public function isLowDerSignature(Buffer $signature)
+    {
+        if (!$this->isValidSignatureEncoding($signature)) {
+            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
+        }
+
+        $binary = $signature->getBinary();
+        $nLenR = ord($binary[3]);
+        $nLenS = ord($binary[5 + $nLenR]);
+        $s = $signature->slice(6 + $nLenR, $nLenS)->getInt();
+
+        return $this->ecAdapter->validateSignatureElement($s, true);
+    }
+
+    /**
+     * Determine whether the sighash byte appended to the signature encodes
+     * a valid sighash type.
+     *
+     * @param Buffer $signature
+     * @return bool
+     */
+    public function isDefinedHashtypeSignature(Buffer $signature)
+    {
+        if ($signature->getSize() === 0) {
+            return false;
+        }
+
+        $binary = $signature->getBinary();
+        $nHashType = ord(substr($binary, -1)) & (~(SignatureHashInterface::SIGHASH_ANYONECANPAY));
+
+        $math = $this->ecAdapter->getMath();
+        if ($math->cmp($nHashType, SignatureHashInterface::SIGHASH_ALL) < 0 || $math->cmp($nHashType, SignatureHashInterface::SIGHASH_SINGLE) < 0) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @param Buffer $signature
      * @return $this
@@ -185,12 +234,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return $this;
         }
 
-        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_DERSIG)) {
-            try {
-                TransactionSignature::isDERSignature($signature);
-            } catch (SignatureNotCanonical $e) {
-                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
-            }
+        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_DERSIG | ScriptInterpreterFlags::VERIFY_LOW_S | ScriptInterpreterFlags::VERIFY_STRICTENC) && !$this->isValidSignatureEncoding($signature)) {
+            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
+        } else if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_LOW_S) && !$this->isLowDerSignature($signature)) {
+            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_LOW_S, 'Signature s element was not low');
+        } else if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_STRICTENC) && !$this->isDefinedHashtypeSignature($signature)) {
+            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Signature with invalid hashtype');
         }
 
         return $this;
@@ -362,7 +411,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $opcodes->getOpByName('OP_NOP9'):
                         case $opcodes->getOpByName('OP_NOP10'):
                             if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
-                                throw new \Exception('Upgradable NOPS found - this is discouraged');
+                                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOPS found - this is discouraged');
                             }
                             break;
 
@@ -829,25 +878,19 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             }
 
                             break;
+
                         default:
                             throw new \Exception('Opcode not found');
                     }
-                    //echo "Opcode: ". $opcodes->getOp($opCode) . "\n";
-                    //echo "Pushdata: ". ($pushData ? $pushData->getHex() : '') . "\n";
 
                 }
-                //print_r($mainStack);
             }
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            //echo "$$ SCRIPT RUNTIEM ERROR $$\n";
+            // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
-
         } catch (\Exception $e) {
-            //echo "Exception\n";
-            //echo " - " . $e->getMessage() . "\n";
-            //echo $e->getTraceAsString(). "\n";
             return false;
         }
     }
