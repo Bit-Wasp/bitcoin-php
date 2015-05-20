@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-
 class ScriptInterpreterFlags
 {
     const VERIFY_NONE = 0;

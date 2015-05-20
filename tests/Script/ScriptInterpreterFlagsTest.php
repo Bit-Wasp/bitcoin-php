@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-
 use BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
