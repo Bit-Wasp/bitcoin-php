@@ -77,8 +77,7 @@ class HexExtendedKeySerializer
                 $parser->readBytes(1)->getInt(),
                 $parser->readBytes(4)->getInt(),
                 $parser->readBytes(4)->getInt(),
-                $parser->readBytes(32)->getInt(),
-                $parser->readBytes(33)
+                $parser->readBytes(32)->getInt()
             ];
 
             /** @var Buffer $keyData */
