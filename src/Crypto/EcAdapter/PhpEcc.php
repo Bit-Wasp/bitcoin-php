@@ -216,13 +216,7 @@ class PhpEcc extends BaseEcAdapter
      */
     public function validatePrivateKey(Buffer $privateKey)
     {
-        $math = $this->getMath();
-        $secret = $privateKey->getInt();
-        // Less than the order of the curve, and not zero
-        $withinRange = $math->cmp($secret, $this->getGenerator()->getOrder()) < 0;
-        $notZero = !($math->cmp($secret, '0') === 0);
-
-        return $withinRange && $notZero;
+        return $this->checkInt($privateKey->getInt(), $this->getGenerator()->getOrder());
     }
 
     /**
