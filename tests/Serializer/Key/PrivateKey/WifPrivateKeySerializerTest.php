@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Serializer\Key\PrivateKey;
 
-
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
