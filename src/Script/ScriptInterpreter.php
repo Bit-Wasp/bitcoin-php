@@ -202,7 +202,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return $this;
         }
 
-        if ($this->flags->verifyDERSignatures) {
+        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_DERSIG)) {
             try {
                 TransactionSignature::isDERSignature($signature);
             } catch (SignatureNotCanonical $e) {
@@ -220,7 +220,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
-        if ($this->flags->verifyStrictEncoding && !PublicKey::isCompressedOrUncompressed($publicKey)) {
+        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
             throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
@@ -297,6 +297,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $math = $this->ecAdapter->getMath();
         $opcodes = $this->script->getOpCodes();
 
+        $flags = $this->flags;
         $mainStack = $this->state->getMainStack();
         $altStack = $this->state->getAltStack();
         $vfStack = $this->state->getVfStack();
@@ -321,7 +322,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 $fExec = !$checkFExec();
 
                 // If pushdata was written to,
-                if ($pushData instanceof Buffer && $pushData->getSize() > $this->flags->maxElementSize) {
+                if ($pushData instanceof Buffer && $pushData->getSize() > $flags->getMaxElementSize()) {
                     throw new \Exception('Error - push size');
                 }
 
@@ -330,7 +331,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     throw new \Exception('Error - Script Op Count');
                 }
 
-                if ($this->flags->checkDisabledOpcodes) {
+                if ($flags->checkDisabledOpcodes()) {
                     if ($this->isDisabledOp($opCode)) {
                         throw new \Exception('Disabled Opcode');
                     }
@@ -338,7 +339,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                 if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
                     // In range of a pushdata opcode
-                    if ($this->flags->verifyMinimalPushdata && !$this->checkMinimalPush($opCode, $pushData)) {
+                    if ($flags->checkFlag(ScriptInterpreterFlags::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
                     $mainStack->push($pushData);
@@ -380,7 +381,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $opcodes->getOpByName('OP_NOP8'):
                         case $opcodes->getOpByName('OP_NOP9'):
                         case $opcodes->getOpByName('OP_NOP10'):
-                            if ($this->flags->discourageUpgradableNOPS) {
+                            if ($flags->checkFlag(ScriptInterpreterFlags::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
                                 throw new \Exception('Upgradable NOPS found - this is discouraged');
                             }
                             break;
