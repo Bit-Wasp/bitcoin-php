@@ -79,7 +79,7 @@ class ScriptInterpreterFlags
      * @param $flags
      * @return int
      */
-    public function checkFlag($flags)
+    public function checkFlags($flags)
     {
         return $this->flags & $flags;
     }

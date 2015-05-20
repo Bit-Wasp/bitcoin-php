@@ -202,7 +202,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return $this;
         }
 
-        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_DERSIG)) {
+        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_DERSIG)) {
             try {
                 TransactionSignature::isDERSignature($signature);
             } catch (SignatureNotCanonical $e) {
@@ -220,7 +220,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
-        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
+        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
             throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
@@ -256,7 +256,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $mainStack = $this->state->getMainStack();
         $stackCopy = new ScriptStack;
-        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_P2SH)) {
+        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_P2SH)) {
             $stackCopy = $this->state->getMainStack();
         }
 
@@ -274,7 +274,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $verifier = new OutputClassifier($scriptPubKey);
 
-        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
+        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) { // todo
                 throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH script must be push only');
             }
@@ -339,7 +339,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                 if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
                     // In range of a pushdata opcode
-                    if ($flags->checkFlag(ScriptInterpreterFlags::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
+                    if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
                     $mainStack->push($pushData);
@@ -381,7 +381,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         case $opcodes->getOpByName('OP_NOP8'):
                         case $opcodes->getOpByName('OP_NOP9'):
                         case $opcodes->getOpByName('OP_NOP10'):
-                            if ($flags->checkFlag(ScriptInterpreterFlags::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                            if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
                                 throw new \Exception('Upgradable NOPS found - this is discouraged');
                             }
                             break;
