@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
-
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 

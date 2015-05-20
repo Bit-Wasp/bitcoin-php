@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
@@ -175,7 +174,7 @@ class StackOperation
             $mainStack->push($string1);
             $mainStack->push($string2);
             return;
-        }  else if ($opName == 'OP_2ROT') {
+        } else if ($opName == 'OP_2ROT') {
             if ($mainStack->size() < 6) {
                 throw new \Exception('Invalid stack operation OP_2ROT');
             }

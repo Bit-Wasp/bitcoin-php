@@ -415,7 +415,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 $opcodes,
                                 function (Buffer $buffer) {
                                     return $this->castToBool($buffer);
-                                });
+                                }
+                            );
 
                             $flowControl->op($opCode, $mainStack, $vfStack, $fExec);
                             break;
@@ -616,7 +617,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation');
                             }
 
-                            if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_NULL_DUMMY) && $mainStack->top(-1)->size()){
+                            if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_NULL_DUMMY) && $mainStack->top(-1)->size()) {
                                 throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
                             }
 
