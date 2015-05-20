@@ -198,7 +198,7 @@ class ArithmeticOperation
             $num2 = $mainStack->top(-2)->getInt();
             $num3 = $mainStack->top(-1)->getInt();
 
-            $value = ($math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0);
+            $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
             $mainStack->pop();
             $mainStack->pop();
             $mainStack->pop();
