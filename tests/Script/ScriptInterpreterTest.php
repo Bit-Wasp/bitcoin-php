@@ -22,7 +22,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $array = explode(",", $flagStr);
         $int = 0;
         foreach ($array as $activeFlag) {
-            $f = constant('ScriptInterpreterFlags::'.$activeFlag);
+            $f = constant('\BitWasp\Bitcoin\Script\ScriptInterpreterFlags::'.$activeFlag);
             $int |= $f;
         }
 
