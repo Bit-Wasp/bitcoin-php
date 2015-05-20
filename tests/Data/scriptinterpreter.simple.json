@@ -165,13 +165,14 @@
       "scriptSig": "",
       "scriptPubKey": "4c03414141",
       "result": false,
-      "flags": "verifyMinimalPushdata",
+      "flags": "VERIFY_MINIMALDATA",
       "desc": "excessive push"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0102010295",
       "result": false,
+      "checkDisabled": true,
       "flags": "checkDisabledOpcodes",
       "desc": "disabled opcode OP_MUL"
     },
@@ -179,7 +180,7 @@
       "scriptSig": "",
       "scriptPubKey": "b0",
       "result": false,
-      "flags": "discourageUpgradableNOPS",
+      "flags": "VERIFY_DISCOURAGE_UPGRADABLE_NOPS",
       "desc": "discourage upgradable NOPs"
     },
     {
@@ -753,7 +754,7 @@
       "scriptSig": "01010100",
       "scriptPubKey": "9b010188",
       "result": true,
-      "flags": "verifyStriptEncoding",
+      "flags": "VERIFY_STRICTENC",
       "desc": "01 00 OP_BOOLOR 01 OP_EQUALVERIFY"
     },
     {
