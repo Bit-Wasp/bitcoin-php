@@ -256,7 +256,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $mainStack = $this->state->getMainStack();
         $stackCopy = new ScriptStack;
-        if ($this->flags->verifyP2SH) {
+        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_P2SH)) {
             $stackCopy = $this->state->getMainStack();
         }
 
@@ -274,7 +274,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $verifier = new OutputClassifier($scriptPubKey);
 
-        if ($this->flags->verifyP2SH && $verifier->isPayToScriptHash()) {
+        if ($this->flags->checkFlag(ScriptInterpreterFlags::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) { // todo
                 throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH script must be push only');
             }
