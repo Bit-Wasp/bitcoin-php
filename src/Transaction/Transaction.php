@@ -61,6 +61,7 @@ class Transaction extends Serializable implements TransactionInterface
         $this->version = $version;
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
+        $this->locktime = $locktime;
     }
 
     /**

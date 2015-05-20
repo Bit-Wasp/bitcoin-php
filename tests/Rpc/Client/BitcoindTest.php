@@ -2,10 +2,21 @@
 
 namespace BitWasp\Bitcoin\Tests\Rpc\Client;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Rpc\Client\Bitcoind;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Utxo\Utxo;
+use BitWasp\Buffertools\Buffer;
 
 class BitcoindTest extends AbstractTestCase
 {
@@ -23,6 +34,13 @@ class BitcoindTest extends AbstractTestCase
         $json = new JsonRpcClient("127.0.0.1", 30929);
         $bitcoind = new Bitcoind($json);
         $bitcoind->getinfo();
+    }
+
+    public function testGetRpcClient()
+    {
+        $json = new JsonRpcClient("127.0.0.1", 30929);
+        $bitcoind = new Bitcoind($json);
+        $this->assertEquals($json, $bitcoind->getRpcClient());
     }
 
     /**
@@ -91,6 +109,23 @@ class BitcoindTest extends AbstractTestCase
 
         $this->assertEquals($hash, $results);
         //000000007bc154e0fa7ea32218a72fe2c1bb9f86cf8c9ebf9a715ed27fdb229a
+    }
+
+    /**
+     * Get a block count should return an integer
+     */
+    public function testMockGetBlockCount()
+    {
+        $count = '409524';
+        $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
+        $json
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($count);
+
+        $bitcoind = new Bitcoind($json);
+        $results = $bitcoind->getblockcount();
+        $this->assertEquals($count, $results);
     }
 
     /**
@@ -204,6 +239,42 @@ class BitcoindTest extends AbstractTestCase
         $this->assertEquals($txHex, $block->getTransactions()->getTransaction(0)->getHex());
     }
 
+    public function testCreateRawTransaction()
+    {
+        $inputs = [[
+                'txid' => '4141414141414141414141414141414141414141414141414141414141414141',
+                'vout' => 0
+            ]
+        ];
+
+        $outputs = [[
+            '15HwMfmBPLgwrwp4cyDMpnR5V4SNUB3Pip' => '1'
+        ]];
+
+        $i = [
+            new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0)
+        ];
+        $o = [
+            new TransactionOutput(Amount::COIN, new Script(Buffer::hex('76a9142f14886d6dde16d37e8149f603b18c879f486c5388ac')))
+        ];
+
+        $t = TransactionFactory::create(
+            null,
+            new TransactionInputCollection($i),
+            new TransactionOutputCollection($o)
+        );
+
+        $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
+        $json->expects($this->atLeastOnce())
+            ->method('execute')
+            ->willReturn($t);
+
+        $bitcoind = new Bitcoind($json);
+        $tx = $bitcoind->createrawtransaction($inputs, $outputs);
+
+        $this->assertEquals('010000000141414141414141414141414141414141414141414141414141414141414141410000000000ffffffff0100e1f505000000001976a9142f14886d6dde16d37e8149f603b18c879f486c5388ac00000000', $tx->getHex());
+    }
+
     /**
      * Should take a TransactionInterface, return a hash.
      */
@@ -224,5 +295,69 @@ class BitcoindTest extends AbstractTestCase
         $results = $bitcoind->sendrawtransaction($transaction, true);
 
         $this->assertEquals($hash, $results);
+    }
+
+    public function testListUnspent()
+    {
+        $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
+        $json->expects($this->atLeastOnce())
+            ->method('execute')
+            ->willReturn(json_decode('[{
+        "txid" : "f0802077ad259c7e49257b55851943292235e330e3287a88589f9b2d2c8adb24",
+        "vout" : 0,
+        "address" : "1Cemh3cKQm6q9qCzgBAgguv17w4dsLNvSH",
+        "account" : "",
+        "scriptPubKey" : "76a9147fce14745de0888d51abd04ed10a6cca57157c6588ac",
+        "amount" : 0.01000000,
+        "confirmations" : 21,
+        "spendable" : true
+    }]', true));
+
+        $bitcoind = new Bitcoind($json);
+        $unspent = $bitcoind->listunspent(0, 100, [AddressFactory::fromString('1Cemh3cKQm6q9qCzgBAgguv17w4dsLNvSH')]);
+
+        $expected = new Utxo(
+            'f0802077ad259c7e49257b55851943292235e330e3287a88589f9b2d2c8adb24',
+            0,
+            new TransactionOutput(
+                1000000,
+                new Script(Buffer::hex('76a9147fce14745de0888d51abd04ed10a6cca57157c6588ac'))
+            )
+        );
+
+        $this->assertEquals(1, count($unspent));
+        $this->assertEquals($expected, $unspent[0]);
+    }
+
+    public function testSignRawTransaction()
+    {
+        $wif = 'Ky8RfHnFPRDnGARbLE111N5fRgHhQuDkVGqr5iBSonKuN5V2e2HS';
+        $priv = PrivateKeyFactory::fromWif($wif);
+
+        $txid = '4f00a317a1c3ec76a87dc1f223d9317ff7520ca3838331ab0c57ff56937ffd7d';
+        $vout = 1;
+        $i = new TransactionInput($txid, $vout);
+        $o = new TransactionOutput('9794466', ScriptFactory::scriptPubKey()->payToAddress(AddressFactory::fromString('1BvGQa7QHK3M4t2DXKePrKEpLRisM8eVys')));
+
+        $t = TransactionFactory::create(null, new TransactionInputCollection([$i]), new TransactionOutputCollection([$o]));
+
+        $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
+        $json->expects($this->atLeastOnce())
+            ->method('execute')
+            ->willReturn(json_decode('{
+    "hex" : "01000000017dfd7f9356ff570cab318383a30c52f77f31d923f2c17da876ecc3a117a3004f010000006a473044022067fae0180dc75d4e4713502d80d915e912f73f84d41a7e56c0cedc0ef6b12bd7022048fab8f21508e6e7a4221047cf2afa5e63abfc96a1e8a028c37b9734b38140970121027431c86d5f701959a92c5c47bce58e2db85b377a263ede522cd7aaa77f1384a4ffffffff0182de0e00000000001976a91477c42a179e7f74bc5851ea7b0e326f430418625b88ac00000000",
+    "complete" : true
+}', true));
+
+        $inputs = [[
+            'txid' => $txid,
+            'vout' => $vout,
+            'scriptPubKey' => $o->getScript()->getHex()
+        ]];
+
+        $bitcoind = new Bitcoind($json);
+        $tx = $bitcoind->signrawtransaction($t, $inputs, [$priv]);
+        $this->assertEquals(TransactionFactory::fromHex('01000000017dfd7f9356ff570cab318383a30c52f77f31d923f2c17da876ecc3a117a3004f010000006a473044022067fae0180dc75d4e4713502d80d915e912f73f84d41a7e56c0cedc0ef6b12bd7022048fab8f21508e6e7a4221047cf2afa5e63abfc96a1e8a028c37b9734b38140970121027431c86d5f701959a92c5c47bce58e2db85b377a263ede522cd7aaa77f1384a4ffffffff0182de0e00000000001976a91477c42a179e7f74bc5851ea7b0e326f430418625b88ac00000000'), $tx);
+
     }
 }

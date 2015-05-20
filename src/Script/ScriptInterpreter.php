@@ -255,7 +255,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
 
         $mainStack = $this->state->getMainStack();
-        $stackCopy = ScriptFactory::stack();
+        $stackCopy = new ScriptStack;
         if ($this->flags->verifyP2SH) {
             $stackCopy = $this->state->getMainStack();
         }

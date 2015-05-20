@@ -59,12 +59,4 @@ class ScriptFactory
     {
         return self::create(Buffer::hex($string));
     }
-
-    /**
-     * @return ScriptStack
-     */
-    public static function stack()
-    {
-        return new ScriptStack();
-    }
 }
