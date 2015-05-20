@@ -49,8 +49,7 @@ class Secp256k1 extends BaseEcAdapter
      */
     private function getRelatedPublicKey(PublicKeyInterface $oldPublic, $newBinary)
     {
-        $hex = bin2hex($newBinary);
-        return PublicKeyFactory::fromHex($hex, $this)->setCompressed($oldPublic->isCompressed());
+        return PublicKeyFactory::fromHex(bin2hex($newBinary), $this)->setCompressed($oldPublic->isCompressed());
     }
 
     /**
