@@ -98,7 +98,7 @@ class PhpEcc extends BaseEcAdapter
         }
 
         // if s is less than half the curve order, invert s
-        if ($math->cmp($s, $math->div($n, 2)) > 0) {
+        if (!$this->validateSignatureElement($s, true)) {
             $s = $math->sub($n, $s);
         }
 

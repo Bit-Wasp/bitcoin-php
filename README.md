@@ -50,6 +50,7 @@ or
   - BIP0016
   - BIP0032
   - BIP0039
+  - BIP0066
   - BIP0070
   
 # Examples  

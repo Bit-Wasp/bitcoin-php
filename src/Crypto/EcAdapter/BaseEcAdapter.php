@@ -76,7 +76,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
         return $this->checkInt(
             $element,
             $half
-            ? $this->getGenerator()->getOrder()
+            ? $this->halfOrder()
             : $this->getGenerator()->getOrder()
         );
     }
