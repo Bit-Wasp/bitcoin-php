@@ -584,8 +584,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
-                                $sig = $mainStack->pop(0 - $isig);
-                                $pubkey = $mainStack->pop(0 - $ikey);
+
+                                $sig = $mainStack->top(0 - $isig);
+                                $pubkey = $mainStack->top(0 - $ikey);
+                                $mainStack->erase(0 - $isig);
+                                $mainStack->erase(0 - $ikey);
 
                                 $this
                                     ->checkSignatureEncoding($sig)
@@ -615,7 +618,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             // Ensure all signatures and keys are removed, regardless of outcome.
                             while ($i-- > 1) {
-                                $mainStack->pop(0 - $i);
+                                $mainStack->erase(0 - $i);
                             }
 
                             // A bug causes CHECKMULTISIG to consume one extra argument
