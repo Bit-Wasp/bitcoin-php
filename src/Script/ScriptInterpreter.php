@@ -571,7 +571,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
-
                                 $sig = $mainStack->top(0 - $isig);
                                 $pubkey = $mainStack->top(0 - $ikey);
                                 $mainStack->erase(0 - $isig);
