@@ -73,7 +73,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendUtxo($utxo);
 
-        $input = $builder->getTransaction()->getInputs()->getInput(1);
+        $input = $builder->getTransaction()->getInputs()->getInput(0);
 
         $this->assertEquals($txid, $input->getTransactionId());
         $this->assertEquals($vout, $input->getVout());
