@@ -21,12 +21,18 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     {
         $array = explode(",", $flagStr);
         $int = 0;
+        $checkdisabled = false;
         foreach ($array as $activeFlag) {
+            if ($activeFlag == 'checkDisabledOpcodes') {
+                $checkdisabled = true;
+                continue;
+            }
+
             $f = constant('\BitWasp\Bitcoin\Script\ScriptInterpreterFlags::'.$activeFlag);
             $int |= $f;
         }
 
-        return new ScriptInterpreterFlags($int);
+        return new ScriptInterpreterFlags($int, $checkdisabled);
     }
 
     public function testS()
