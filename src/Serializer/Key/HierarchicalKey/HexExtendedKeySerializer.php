@@ -44,22 +44,6 @@ class HexExtendedKeySerializer
     }
 
     /**
-     * @return Math
-     */
-    public function getEcAdapter()
-    {
-        return $this->ecAdapter;
-    }
-
-    /**
-     * @return NetworkInterface
-     */
-    public function getNetwork()
-    {
-        return $this->network;
-    }
-
-    /**
      * @param HierarchicalKey $key
      * @return \BitWasp\Buffertools\Buffer
      */
