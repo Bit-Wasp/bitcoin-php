@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Utxo;
 
-
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;

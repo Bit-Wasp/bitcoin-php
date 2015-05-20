@@ -258,7 +258,8 @@ class BitcoindTest extends AbstractTestCase
             new TransactionOutput(Amount::COIN, new Script(Buffer::hex('76a9142f14886d6dde16d37e8149f603b18c879f486c5388ac')))
         ];
 
-        $t = TransactionFactory::create(null,
+        $t = TransactionFactory::create(
+            null,
             new TransactionInputCollection($i),
             new TransactionOutputCollection($o)
         );
