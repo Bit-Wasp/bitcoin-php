@@ -112,15 +112,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
-     * @param $opCodeStr
-     * @return bool
-     */
-    public function isDisabledOpByName($opCodeStr)
-    {
-        return in_array($opCodeStr, $this->getDisabledOpcodes());
-    }
-
-    /**
      * @param $op
      * @return bool
      */
@@ -150,16 +141,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function castToBool(Buffer $value)
     {
-        if ($value instanceof Buffer) {
-            // Since we're using buffers, lets try ensuring the contents are not 0.
-            return ($this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0);
-        }
-
-        if ($value) {
-            return true;
-        }
-
-        return false;
+        // Since we're using buffers, lets try ensuring the contents are not 0.
+        return $this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0;
     }
 
     /**
@@ -231,11 +214,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      * @param ScriptInterface $script
      * @return $this
      */
-    public function setScript(ScriptInterface $script = null)
+    public function setScript(ScriptInterface $script)
     {
-        if ($script == null) {
-            $script = ScriptFactory::create();
-        }
         $this->script = $script;
         return $this;
     }
