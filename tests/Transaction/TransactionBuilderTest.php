@@ -19,6 +19,7 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Utxo\Utxo;
 
 class TransactionBuilderTest extends AbstractTestCase
 {
@@ -54,11 +55,28 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testCanAddInput()
     {
         $input = new TransactionInput('5a4ebf66822b0b2d56bd9dc64ece0bc38ee7844a23ff1d7320a88c5fdb2ad3e2', 0);
+
         $ecAdapter = Bitcoin::getEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->addInput($input);
 
         $this->assertEquals($input, $builder->getTransaction()->getInputs()->getInput(0));
+    }
+
+    public function testSpendUtxo()
+    {
+        $txid = '5a4ebf66822b0b2d56bd9dc64ece0bc38ee7844a23ff1d7320a88c5fdb2ad3e2';
+        $vout = 0;
+        $utxo = new Utxo($txid, $vout, new TransactionOutput(1, new Script()));
+
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $builder = new TransactionBuilder($ecAdapter);
+        $builder->spendUtxo($utxo);
+
+        $input = $builder->getTransaction()->getInputs()->getInput(0);
+
+        $this->assertEquals($txid, $input->getTransactionId());
+        $this->assertEquals($vout, $input->getVout());
     }
 
     public function testTakesTransactionAsArgument()

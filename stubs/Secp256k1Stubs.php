@@ -88,7 +88,7 @@ namespace {
      * @param string $tweak
      * @return int
      */
-    function secp256k1_ec_pubkey_tweak_mul($publicKey, $publicKeyLength, $tweak)
+    function secp256k1_ec_pubkey_tweak_mul($publicKey, $tweak)
     {
     }
 

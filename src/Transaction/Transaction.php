@@ -8,7 +8,6 @@ use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Transaction\SignatureHash;
 
 class Transaction extends Serializable implements TransactionInterface
 {
@@ -129,10 +128,6 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getLockTime()
     {
-        if ($this->locktime === null) {
-            return '0';
-        }
-
         return $this->locktime;
     }
 
@@ -192,37 +187,6 @@ class Transaction extends Serializable implements TransactionInterface
                 )
             ),
             $this->getLockTime()
-        );
-    }
-
-    /**
-     * Return the transaction in the format of an array compatible with bitcoind.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        $inputs = array_map(function (TransactionInputInterface $input) {
-            return array(
-                'txid' => $input->getTransactionId(),
-                'vout' => $input->getVout(),
-                'scriptSig' => $input->getScript()->toArray()
-            );
-        }, $this->getInputs()->getInputs());
-
-        $outputs = array_map(function (TransactionOutputInterface $output) {
-            return array(
-                'value' => $output->getValue(),
-                'scriptPubKey' => $output->getScript()->toArray()
-            );
-        }, $this->getOutputs()->getOutputs());
-
-        return array(
-            'txid' => $this->getTransactionId(),
-            'version' => $this->getVersion(),
-            'locktime' => $this->getLockTime(),
-            'vin' => $inputs,
-            'vout' => $outputs
         );
     }
 

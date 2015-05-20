@@ -3,18 +3,12 @@
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptInterpreter;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
-use BitWasp\Bitcoin\Transaction\TransactionBuilder;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 use BitWasp\Buffertools\Buffer;
 
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
@@ -26,11 +20,19 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     private function setFlags($flagStr)
     {
         $array = explode(",", $flagStr);
-        $flags = new ScriptInterpreterFlags();
+        $int = 0;
+        $checkdisabled = false;
         foreach ($array as $activeFlag) {
-            $flags->$activeFlag = true;
+            if ($activeFlag == 'checkDisabledOpcodes') {
+                $checkdisabled = true;
+                continue;
+            }
+
+            $f = constant('\BitWasp\Bitcoin\Script\ScriptInterpreterFlags::'.$activeFlag);
+            $int |= $f;
         }
-        return $flags;
+
+        return new ScriptInterpreterFlags($int, $checkdisabled);
     }
 
     public function testS()
@@ -42,7 +44,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $scriptSig = new Script(Buffer::hex($hex));
         $scriptPubKey = new Script(Buffer::hex($pubHex));
 
-        $f = new ScriptInterpreterFlags();
+        $f = new ScriptInterpreterFlags(0);
         $i = new ScriptInterpreter($ec, new Transaction(), $f);
 
         $i->setScript($scriptSig)->run();
@@ -67,7 +69,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
             ];
         }
 
-        $flags = new ScriptInterpreterFlags();
+        $flags = new ScriptInterpreterFlags(0);
         $vectors[] = [
             $flags,
             new Script(),

@@ -31,6 +31,25 @@ interface EcAdapterInterface
     public function getGenerator();
 
     /**
+     * @return int|string
+     */
+    public function halfOrder();
+
+    /**
+     * @param int|string $int
+     * @param int|string $max
+     * @return bool
+     */
+    public function checkInt($int, $max);
+
+    /**
+     * @param int $element
+     * @param bool $half
+     * @return bool
+     */
+    public function validateSignatureElement($element, $half);
+
+    /**
      * @param Buffer $publicKey
      * @return \BitWasp\Bitcoin\Key\PublicKey
      */

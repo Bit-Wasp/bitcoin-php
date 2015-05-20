@@ -4,55 +4,130 @@ namespace BitWasp\Bitcoin\Script;
 
 class ScriptInterpreterFlags
 {
-
     const VERIFY_NONE = 0;
-    // 1 << 0
+
+    // Evaluate P2SH subscripts (softfork safe, BIP16).
     const VERIFY_P2SH = 1;
 
-    // 1 << 1
+    // Passing a non-strict-DER signature or one with undefined hashtype to a checksig operation causes script failure.
+    // Evaluating a pubkey that is not (0x04 + 64 bytes) or (0x02 or 0x03 + 32 bytes) by checksig causes script failure.
+    // (softfork safe, but not used or intended as a consensus rule).
     const VERIFY_STRICTENC = 2;
 
-    // 1 < 2
+    // Passing a non-strict-DER signature to a checksig operation causes script failure (softfork safe, BIP62 rule 1)
     const VERIFY_DERSIG = 4;
 
+    // Passing a non-strict-DER signature or one with S > order/2 to a checksig operation causes script failure
+    // (softfork safe, BIP62 rule 5).
     const VERIFY_LOW_S = 8;
 
+    // verify dummy stack item consumed by CHECKMULTISIG is of zero-length (softfork safe, BIP62 rule 7).
     const VERIFY_NULL_DUMMY = 16;
+
+    // Using a non-push operator in the scriptSig causes script failure (softfork safe, BIP62 rule 2).
     const VERIFY_SIGPUSHONLY = 32;
+
+    // Require minimal encodings for all push operations (OP_0... OP_16, OP_1NEGATE where possible, direct
+    // pushes up to 75 bytes, OP_PUSHDATA up to 255 bytes, OP_PUSHDATA2 for anything larger). Evaluating
+    // any other push causes the script to fail (BIP62 rule 3).
+    // In addition, whenever a stack element is interpreted as a number, it must be of minimal length (BIP62 rule 4).
+    // (softfork safe)
     const VERIFY_MINIMALDATA = 64;
-    const VERIFY_DISCOURAGE_UPGARDABLE_NOPS = 128;
 
-    // consensus derived
-    public $verifyP2SH = false;
-    public $verifyStrictEncoding = false;
-    public $verifyDERSignatures = false;
-    public $verifyLowS = false;
-    public $verifySigPushonly = false;
-    public $verifyMinimalPushdata = false;
-    public $discourageUpgradableNOPS = false;
+    // Discourage use of NOPs reserved for upgrades (NOP1-10)
+    //
+    // Provided so that nodes can avoid accepting or mining transactions
+    // containing executed NOP's whose meaning may change after a soft-fork,
+    // thus rendering the script invalid; with this flag set executing
+    // discouraged NOPs fails the script. This verification flag will never be
+    // a mandatory flag applied to scripts in a block. NOPs that are not
+    // executed, e.g.  within an unexecuted IF ENDIF block, are *not* rejected.
+    const VERIFY_DISCOURAGE_UPGRADABLE_NOPS = 128;
 
-    // globals
-    public $maxBytes = 10000;
-    public $maxElementSize = 520;
-    public $checkDisabledOpcodes = false;
+    // Require that only a single stack element remains after evaluation. This changes the success criterion from
+    // "At least one stack element must remain, and when interpreted as a boolean, it must be true" to
+    // "Exactly one stack element must remain, and when interpreted as a boolean, it must be true".
+    // (softfork safe, BIP62 rule 6)
+    // Note: CLEANSTACK should never be used without P2SH.
+    const VERIFY_CLEAN_STACK = 256;
 
-    public function __construct()
+    /**
+     * @var int
+     */
+    private $flags;
+
+    /**
+     * @var int
+     */
+    private $maxBytes = 10000;
+
+    /**
+     * @var int
+     */
+    private $maxElementSize = 520;
+
+    /**
+     * @var bool
+     */
+    private $checkDisabledOpcodes = false;
+
+    /**
+     * @param $flags
+     * @param bool $checkDisabledOpcodes
+     */
+    public function __construct($flags, $checkDisabledOpcodes = false)
     {
+        if (!is_bool($checkDisabledOpcodes)) {
+            throw new \InvalidArgumentException('CheckDisabledOpcodes must be a boolean');
+        }
 
+        $this->flags = $flags;
+        $this->checkDisabledOpcodes = $checkDisabledOpcodes;
     }
 
+    /**
+     * @return int
+     */
+    public function getMaxBytes()
+    {
+        return $this->maxBytes;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxElementSize()
+    {
+        return $this->maxElementSize;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkDisabledOpcodes()
+    {
+        return $this->checkDisabledOpcodes;
+    }
+
+    /**
+     * @param $flags
+     * @return int
+     */
+    public function checkFlags($flags)
+    {
+        return (bool) ($this->flags & $flags);
+    }
+
+    /**
+     * @return ScriptInterpreterFlags
+     */
     public static function defaults()
     {
-        $flags = new self();
-        // Set up present settings
-        $flags->discourageUpgradableNOPS = true;
-        $flags->checkDisabledOpcodes     = true;
-        $flags->verifyLowS               = true;
-        $flags->verifySigPushonly        = true;
-        $flags->verifyMinimalPushdata    = true;
-        $flags->verifyDERSignatures      = true;
-        $flags->verifyStrictEncoding     = true;
-        $flags->verifyP2SH               = true;
-        return $flags;
+        return new self(
+            self::VERIFY_P2SH | self::VERIFY_STRICTENC | self::VERIFY_DERSIG |
+            self::VERIFY_LOW_S | self::VERIFY_NULL_DUMMY | self::VERIFY_SIGPUSHONLY |
+            self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS | self::VERIFY_CLEAN_STACK,
+            true
+        );
     }
 }

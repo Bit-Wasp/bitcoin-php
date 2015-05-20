@@ -46,6 +46,42 @@ abstract class BaseEcAdapter implements EcAdapterInterface
     }
 
     /**
+     * @return string
+     */
+    public function halfOrder()
+    {
+        return $this->getMath()->rightShift($this->getGenerator()->getOrder(), 1);
+    }
+
+    /**
+     * @param int|string $int
+     * @param int|string $max
+     * @return bool
+     */
+    public function checkInt($int, $max)
+    {
+        $math = $this->getMath();
+
+        return $math->cmp($int, $max) < 0
+        && $math->cmp($int, 0) !== 0;
+    }
+
+    /**
+     * @param $element
+     * @param bool $half
+     * @return bool
+     */
+    public function validateSignatureElement($element, $half = false)
+    {
+        return $this->checkInt(
+            $element,
+            $half
+            ? $this->halfOrder()
+            : $this->getGenerator()->getOrder()
+        );
+    }
+
+    /**
      * @param Buffer $publicKey
      * @return \Mdanter\Ecc\Primitives\PointInterface
      * @throws \Exception
