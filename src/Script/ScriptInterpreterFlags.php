@@ -80,7 +80,7 @@ class ScriptInterpreterFlags
      */
     public function checkFlags($flags)
     {
-        return $this->flags & $flags;
+        return (bool) ($this->flags & $flags);
     }
 
     /**
