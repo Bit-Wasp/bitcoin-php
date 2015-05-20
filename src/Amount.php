@@ -10,7 +10,7 @@ class Amount
      * @param int|string $satoshis
      * @return double
      */
-    public function toBTC($satoshis)
+    public function toBtc($satoshis)
     {
         return bcdiv((string)$satoshis, self::COIN, 8);
     }
