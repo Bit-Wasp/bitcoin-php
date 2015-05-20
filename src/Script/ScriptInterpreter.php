@@ -92,6 +92,16 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
+     * @param ScriptInterface $script
+     * @return $this
+     */
+    public function setScript(ScriptInterface $script)
+    {
+        $this->script = $script;
+        return $this;
+    }
+
+    /**
      * @return string[]
      */
     public function getDisabledOpcodes()
@@ -126,19 +136,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
-     * @param $op
-     * @return bool
-     */
-    public function isPushOp($op)
-    {
-        if (is_numeric($op)) {
-            return ($op > 0 && $op <= 96);
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * Cast the value to a boolean
      *
      * @param $value
@@ -148,35 +145,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     {
         // Since we're using buffers, lets try ensuring the contents are not 0.
         return $this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0;
-    }
-
-    /**
-     * @param $opCode
-     * @param Buffer $pushData
-     * @return bool
-     * @throws \Exception
-     */
-    public function checkMinimalPush($opCode, Buffer $pushData)
-    {
-        $pushSize = $pushData->getSize();
-        $opcodes = $this->script->getOpCodes();
-        $binary = $pushData->getBinary();
-
-        if ($pushSize == 0) {
-            return $opcodes->isOp($opCode, 'OP_0');
-        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && $binary[0] <= 16) {
-            return $opCode == $opcodes->getOpByName('OP_1') + (ord($binary[0]) - 1);
-        } elseif ($pushSize == 1 && ord($binary) == 0x81) {
-            return $opcodes->isOp($opCode, 'OP_1NEGATE');
-        } elseif ($pushSize <= 75) {
-            return $opCode == $pushSize;
-        } elseif ($pushSize <= 255) {
-            return $opcodes->isOp($opCode, 'OP_PUSHDATA1');
-        } elseif ($pushSize <= 65535) {
-            return $opcodes->isOp($opCode, 'OP_PUSHDATA2');
-        }
-
-        return true;
     }
 
     /**
@@ -274,6 +242,35 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     }
 
     /**
+     * @param $opCode
+     * @param Buffer $pushData
+     * @return bool
+     * @throws \Exception
+     */
+    public function checkMinimalPush($opCode, Buffer $pushData)
+    {
+        $pushSize = $pushData->getSize();
+        $opcodes = $this->script->getOpCodes();
+        $binary = $pushData->getBinary();
+
+        if ($pushSize == 0) {
+            return $opcodes->isOp($opCode, 'OP_0');
+        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && $binary[0] <= 16) {
+            return $opCode == $opcodes->getOpByName('OP_1') + (ord($binary[0]) - 1);
+        } elseif ($pushSize == 1 && ord($binary) == 0x81) {
+            return $opcodes->isOp($opCode, 'OP_1NEGATE');
+        } elseif ($pushSize <= 75) {
+            return $opCode == $pushSize;
+        } elseif ($pushSize <= 255) {
+            return $opcodes->isOp($opCode, 'OP_PUSHDATA1');
+        } elseif ($pushSize <= 65535) {
+            return $opcodes->isOp($opCode, 'OP_PUSHDATA2');
+        }
+
+        return true;
+    }
+
+    /**
      * @return $this
      * @throws \Exception
      */
@@ -283,16 +280,6 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             throw new \Exception('Error: Script op code count');
         }
 
-        return $this;
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
         return $this;
     }
 
