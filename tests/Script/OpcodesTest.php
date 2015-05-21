@@ -53,5 +53,4 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($op->isOp(0xae, 'OP_CHECKMULTISIG'));
         $this->assertFalse($op->isOp(0xad, 'OP_CHECKMULTISIG'));
     }
-
 }

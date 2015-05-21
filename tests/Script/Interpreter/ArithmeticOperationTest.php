@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\ArithmeticOperation;
 use BitWasp\Bitcoin\Script\Interpreter\HashOperation;
@@ -20,7 +19,8 @@ class ArithmeticOperationTest extends AbstractTestCase
     public function testOpCodeNotFound()
     {
         // 101 is not in the right range, should fail.
-        $operation = new ArithmeticOperation(new Opcodes(), new Math(), function () {}, new Buffer(), new Buffer());
+        $operation = new ArithmeticOperation(new Opcodes(), new Math(), function () {
+        }, new Buffer(), new Buffer());
         $stack = new ScriptStack();
         $stack->push(new Buffer());
         $operation->op(101, $stack);

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Classifier;
 
-
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Script\Script;

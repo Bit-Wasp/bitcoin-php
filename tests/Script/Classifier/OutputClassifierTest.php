@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Classifier;
 
-
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

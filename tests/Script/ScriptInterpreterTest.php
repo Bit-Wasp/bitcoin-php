@@ -356,6 +356,16 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($i->verify($true, $false, 0));
     }
 
+    public function testP2shwithEmptyStack()
+    {
+        $p2sh = new Script();
+        $output = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
+        $scriptSig = new Script();
+
+        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_P2SH));
+        $this->assertFalse($i->verify($scriptSig, $output, 0));
+    }
+
     public function testInvalidPayToScriptHash()
     {
         $p2sh = new Script();

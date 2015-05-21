@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
-
 use BitWasp\Bitcoin\Script\Interpreter\PushIntOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;

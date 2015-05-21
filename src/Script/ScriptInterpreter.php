@@ -283,7 +283,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         return $this;
     }
 
-    private function checkSig(ScriptInterface $script, Buffer $sigBuf, Buffer $keyBuf) {
+    private function checkSig(ScriptInterface $script, Buffer $sigBuf, Buffer $keyBuf)
+    {
         $this
             ->checkSignatureEncoding($sigBuf)
             ->checkPublicKeyEncoding($keyBuf);
@@ -608,7 +609,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 }
                             }
 
-                            while($i-- > 1) {
+                            while ($i-- > 1) {
                                 $mainStack->pop();
                             }
 
