@@ -353,7 +353,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $checkFExec = function () use (&$vfStack) {
             $c = 0;
-            for ($i = 0, $len = $vfStack->end(); $i < $len; $i++) {
+            $len = $vfStack->end();
+            for ($i = 0; $i < $len; $i++) {
                 if ($vfStack->top(0 - $len - $i) == true) {
                     $c++;
                 }
@@ -516,10 +517,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $txSig = TransactionSignatureFactory::fromHex($vchSig);
                             $publicKey = PublicKeyFactory::fromHex($vchPubKey->getHex());
 
-                            $script = ScriptFactory::create();
+                            $scriptCode = new Script($this->script->getBuffer()->slice($this->hashStartPos));
                             $sigHash = $this->transaction
                                 ->getSignatureHash()
-                                ->calculate($script, $this->inputToSign, $txSig->getHashType());
+                                ->calculate($scriptCode, $this->inputToSign, $txSig->getHashType());
 
                             $success = $this->ecAdapter->verify($sigHash, $publicKey, $txSig->getSignature());
 
