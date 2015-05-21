@@ -70,12 +70,18 @@ class TransactionBuilder
         return $this;
     }
 
+    /**
+     * @param Utxo $utxo
+     * @return $this
+     */
     public function spendUtxo(Utxo $utxo)
     {
         $this->addInput(new TransactionInput(
             $utxo->getTransactionId(),
             $utxo->getVout()
         ));
+
+        return $this;
     }
 
     /**
