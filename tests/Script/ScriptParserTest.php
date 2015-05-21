@@ -98,7 +98,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Opcode '250' not found
+     * @expectedExceptionMessage Opcode not found
      */
     public function testParseInvalidOp()
     {

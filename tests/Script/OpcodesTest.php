@@ -14,6 +14,16 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $val);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Opcode by that name not found
+     */
+    public function testGetOpByNameFail()
+    {
+        $op = new Opcodes();
+        $op->opNameExists('OP_DEADBEEF');
+    }
+
     public function testGetOp()
     {
         $op = new OpCodes;
@@ -25,12 +35,23 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @depends testGetOp
-     * @expectedException \Exception
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Opcode not found
      */
     public function testGetOpCodeException()
     {
         $op = new OpCodes;
         $op->getOp(3);
     }
+
+    /**
+     *
+     */
+    public function testIsOp()
+    {
+        $op = new Opcodes();
+        $this->assertTrue($op->isOp(0xae, 'OP_CHECKMULTISIG'));
+        $this->assertFalse($op->isOp(0xad, 'OP_CHECKMULTISIG'));
+    }
+
 }
