@@ -37,6 +37,24 @@ class ScriptInterpreterState
     /**
      * @return ScriptStack
      */
+    public function cloneMainStack()
+    {
+        return clone $this->mainStack;
+    }
+
+    /**
+     * @param ScriptStack $mainStack
+     * @return $this
+     */
+    public function restoreMainStack(ScriptStack $mainStack)
+    {
+        $this->mainStack = $mainStack;
+        return $this;
+    }
+
+    /**
+     * @return ScriptStack
+     */
     public function getMainStack()
     {
         return $this->mainStack;
