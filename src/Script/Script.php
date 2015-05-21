@@ -104,12 +104,8 @@ class Script extends Serializable implements ScriptInterface
      * @return $this
      * @throws \Exception
      */
-    public function push($data)
+    public function push(Buffer $data)
     {
-        if (!$data instanceof Buffer) {
-            $data = Buffer::hex($data);
-        }
-
         $length = $data->getSize();
         $parsed = new Parser();
 
