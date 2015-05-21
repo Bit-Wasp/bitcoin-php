@@ -26,6 +26,24 @@ class InputClassifierTest extends AbstractTestCase
 
         $classifier = new InputClassifier($scriptSig);
         $this->assertTrue($classifier->isPayToScriptHash());
+        $this->assertEquals(InputClassifier::PAYTOSCRIPTHASH, $classifier->classify());
+    }
 
+    public function testIsPayToScriptHashFail()
+    {
+        $privateKey = PrivateKeyFactory::create();
+        $p2sh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
+
+        $classifier = new InputClassifier($p2sh);
+        $this->assertFalse($classifier->isPayToScriptHash());
+    }
+
+    public function testIsMultisigFail()
+    {
+        $privateKey = PrivateKeyFactory::create();
+        $p2sh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
+
+        $classifier = new InputClassifier($p2sh);
+        $this->assertFalse($classifier->isMultisig());
     }
 }
