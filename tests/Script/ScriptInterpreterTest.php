@@ -3,13 +3,23 @@
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptInterpreter;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
+use BitWasp\Bitcoin\Transaction\TransactionBuilder;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
+use Mdanter\Ecc\EccFactory;
 
 class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,23 +45,76 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         return new ScriptInterpreterFlags($int, $checkdisabled);
     }
 
-    public function testS()
+    /**
+     * Construct general test vectors to exercise Checksig operators.
+     * Given an output script (limited to those signable by TransactionBuilder), RedeemScript if required,
+     * and private key, the tests can attempt to spend a fake transaction. the scriptSig it produces should
+     * return true against the given outputScript/redeemScript
+     *
+     * @return array
+     */
+    public function ChecksigVectors()
     {
-        $ec = Bitcoin::getEcAdapter();
+        $ec = EcAdapterFactory::getAdapter(new Math(), EccFactory::getSecgCurves()->generator256k1());
+        $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ec);
 
-        $hex = '01010101';
-        $pubHex = '9c010188';
-        $scriptSig = new Script(Buffer::hex($hex));
-        $scriptPubKey = new Script(Buffer::hex($pubHex));
+        $standard = ScriptInterpreterFlags::defaults();
+        $vectors = [];
 
-        $f = new ScriptInterpreterFlags(0);
-        $i = new ScriptInterpreter($ec, new Transaction(), $f);
+        // Pay to pubkey hash that succeeds
+        $s0 = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
+        $vectors[] = [
+            true,
+            $ec,
+            $standard, // flags
+            $privateKey,        // privKey
+            $s0,
+            null,               // redeemscript,
+        ];
 
-        $i->setScript($scriptSig)->run();
-        $r = $i->setScript($scriptPubKey)->run();
+        // Pay to pubkey that succeeds
+        $s1 = ScriptFactory::create()->push($privateKey->getPublicKey()->getBuffer())->op('OP_CHECKSIG');
+        $vectors[] = [
+            true,
+            $ec,
+            $standard, // flags
+            $privateKey,        // privKey
+            $s1,
+            null,               // redeemscript
+        ];
 
-        $this->assertTrue($r);
+        $rs = ScriptFactory::multisig(1, [$privateKey->getPublicKey()]);
+        $vectors[] = [
+            true,
+            $ec,
+            $standard,
+            $privateKey,
+            $rs->getOutputScript(),
+            $rs,
+        ];
 
+        return $vectors;
+    }
+
+    /**
+     * @dataProvider ChecksigVectors
+     */
+    public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, ScriptInterpreterFlags $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, RedeemScript $rs = null)
+    {
+        // Create a fake tx to spend - an output script we supposedly can spend.
+        $fake = new TransactionBuilder($ec);
+        $fake->addOutput(new TransactionOutput(1, $outputScript));
+
+        // Here is where
+        $spend = new TransactionBuilder($ec);
+        $spend->spendOutput($fake->getTransaction(), 0);
+        $spend->signInputWithKey($privateKey, $outputScript, 0, $rs);
+
+        $spendTx = $spend->getTransaction();
+        $scriptSig = $spendTx->getInputs()->getInput(0)->getScript();
+
+        $i = new ScriptInterpreter($ec, $spendTx, $flags);
+        $this->assertEquals($eVerifyResult, $i->verify($scriptSig, $outputScript, 0));
     }
 
     public function getScripts()
