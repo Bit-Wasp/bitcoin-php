@@ -322,25 +322,27 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
 
         if ($mainStack->size() == 0) {
-            throw new \Exception('Script err eval false');
+            throw new \Exception('Script stack empty after evaluation');
         }
 
         if (false === $this->castToBool($mainStack->top(-1))) {
-            throw new \Exception('Script err eval false literally');
+            throw new \Exception('Script evaluated to false');
         }
 
         $verifier = new OutputClassifier($scriptPubKey);
 
         if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
-            if (!$scriptSig->isPushOnly()) { // todo
-                throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH script must be push only');
+            if (!$scriptSig->isPushOnly()) {
+                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH scriptSig must be push only');
             }
 
+            // Restore mainStack to how it was after evaluating scriptSig
             $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
             if ($mainStack->size() == 0) {
                 throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_P2SH, 'Stack cannot be empty during p2sh');
             }
 
+            // Load redeemscript as the scriptPubKey
             $scriptPubKey = new Script($mainStack->top(-1));
             $mainStack->pop();
             if (!$this->setScript($scriptPubKey)->run()) {
