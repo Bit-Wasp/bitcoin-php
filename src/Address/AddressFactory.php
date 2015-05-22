@@ -74,4 +74,22 @@ class AddressFactory
             throw new \InvalidArgumentException("Invalid prefix [{$prefixByte}]");
         }
     }
+
+    /**
+     * @param ScriptInterface $script
+     * @return String
+     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     */
+    public static function getAssociatedAddress(ScriptInterface $script)
+    {
+        $classifier = new OutputClassifier($script);
+        try {
+            $addr = $classifier->isPayToPubKey()
+            ? PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress()
+            : AddressFactory::fromOutputScript($script)
+        } catch (\Exception $e) {
+            throw new \RuntimeException('No address associated with this script type');
+        }
+        return $addr;
+    }
 }
