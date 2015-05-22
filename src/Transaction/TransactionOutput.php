@@ -6,6 +6,8 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
+
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
 
@@ -68,5 +70,28 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
         $serializer = new TransactionOutputSerializer();
         $out = $serializer->serialize($this);
         return $out;
+    }
+
+    /**
+     * @param NetworkInterface|null $network
+     * @return Address
+     */
+    public function getAddress(NetworkInterface $network = null)
+    {
+        $address = AddressFactory::fromOutputScript($this->getScript());
+        return $address;
+    }
+
+    /**
+     * @param NetworkInterface|null $network
+     * @return string
+     */
+    public function getAddressString(NetworkInterface $network = null)
+    {
+        try {
+            return $this->getAddress($network)->getAddress();
+        } catch (\RuntimeException $e) {
+            return "";
+        }
     }
 }
