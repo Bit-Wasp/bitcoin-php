@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionBuilderInputState;
+use BitWasp\Buffertools\Buffer;
 
 class TransactionBuilderInputStateTest extends AbstractTestCase
 {
@@ -125,7 +126,7 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      */
     public function testNonStandardScriptFails()
     {
-        $script = ScriptFactory::create()->push('abab');
+        $script = ScriptFactory::create()->push(new Buffer('abab'));
         $this->createState($script);
     }
 }

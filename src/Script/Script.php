@@ -104,12 +104,8 @@ class Script extends Serializable implements ScriptInterface
      * @return $this
      * @throws \Exception
      */
-    public function push($data)
+    public function push(Buffer $data)
     {
-        if (!$data instanceof Buffer) {
-            $data = Buffer::hex($data);
-        }
-
         $length = $data->getSize();
         $parsed = new Parser();
 
@@ -148,38 +144,5 @@ class Script extends Serializable implements ScriptInterface
             $pushOnly &= $entity instanceof Buffer;
         }
         return $pushOnly;
-    }
-
-    /**
-     * Return a human readable representation of the Script Opcodes, and data being
-     * pushed to the stack
-     *
-     * @return string
-     */
-    public function getAsm()
-    {
-        $result = array_map(
-            function ($value) {
-                return $value instanceof Buffer
-                    ? $value->getHex()
-                    : $value;
-            },
-            $this->getScriptParser()->parse()
-        );
-
-        return implode(" ", $result);
-    }
-
-    /**
-     * Return the object as an array
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return array(
-            'hex' => $this->getBuffer()->getHex(),
-            'asm' => $this->getAsm()
-        );
     }
 }

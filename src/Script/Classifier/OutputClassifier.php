@@ -136,6 +136,6 @@ class OutputClassifier implements ScriptClassifierInterface
             return self::MULTISIG;
         }
 
-        return self::NONSTANDARD;
+        return self::UNKNOWN;
     }
 }

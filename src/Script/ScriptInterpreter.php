@@ -198,7 +198,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $nHashType = ord(substr($binary, -1)) & (~(SignatureHashInterface::SIGHASH_ANYONECANPAY));
 
         $math = $this->ecAdapter->getMath();
-        if ($math->cmp($nHashType, SignatureHashInterface::SIGHASH_ALL) < 0 || $math->cmp($nHashType, SignatureHashInterface::SIGHASH_SINGLE) < 0) {
+        if ($math->cmp($nHashType, SignatureHashInterface::SIGHASH_ALL) < 0 || $math->cmp($nHashType, SignatureHashInterface::SIGHASH_SINGLE) > 0) {
             return false;
         }
 
@@ -250,14 +250,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function checkMinimalPush($opCode, Buffer $pushData)
     {
         $pushSize = $pushData->getSize();
-        $opcodes = $this->script->getOpCodes();
         $binary = $pushData->getBinary();
 
+        $opcodes = $this->script->getOpCodes();
         if ($pushSize == 0) {
             return $opcodes->isOp($opCode, 'OP_0');
-        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && $binary[0] <= 16) {
+        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && ord($binary[0]) <= 16) {
             return $opCode == $opcodes->getOpByName('OP_1') + (ord($binary[0]) - 1);
-        } elseif ($pushSize == 1 && ord($binary) == 0x81) {
+        } elseif ($pushSize == 1 && ord($binary[0]) == 0x81) {
             return $opcodes->isOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
             return $opCode == $pushSize;
@@ -283,6 +283,21 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         return $this;
     }
 
+    private function checkSig(ScriptInterface $script, Buffer $sigBuf, Buffer $keyBuf)
+    {
+        $this
+            ->checkSignatureEncoding($sigBuf)
+            ->checkPublicKeyEncoding($keyBuf);
+
+        $txSignature = TransactionSignatureFactory::fromHex($sigBuf->getHex());
+        $publicKey = PublicKeyFactory::fromHex($keyBuf->getHex());
+        $sigHash = $this->transaction
+            ->getSignatureHash()
+            ->calculate($script, $this->inputToSign, $txSignature->getHashType());
+
+        return $this->ecAdapter->verify($sigHash, $publicKey, $txSignature->getSignature());
+    }
+
     /**
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
@@ -300,7 +315,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $mainStack = $this->state->getMainStack();
         $stackCopy = new ScriptStack;
         if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_P2SH)) {
-            $stackCopy = $this->state->getMainStack();
+            $stackCopy = $this->state->cloneMainStack();
         }
 
         if (!$this->setScript($scriptPubKey)->run()) {
@@ -308,24 +323,31 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
 
         if ($mainStack->size() == 0) {
-            throw new \Exception('Script err eval false');
+            throw new \Exception('Script stack empty after evaluation');
         }
 
         if (false === $this->castToBool($mainStack->top(-1))) {
-            throw new \Exception('Script err eval false literally');
+            throw new \Exception('Script evaluated to false');
         }
 
         $verifier = new OutputClassifier($scriptPubKey);
 
         if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
-            if (!$scriptSig->isPushOnly()) { // todo
-                throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH script must be push only');
+            if (!$scriptSig->isPushOnly()) {
+                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH scriptSig must be push only');
             }
 
-            $mainStack = $stackCopy;
-
+            // Restore mainStack to how it was after evaluating scriptSig
+            $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
             if ($mainStack->size() == 0) {
                 throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_P2SH, 'Stack cannot be empty during p2sh');
+            }
+
+            // Load redeemscript as the scriptPubKey
+            $scriptPubKey = new Script($mainStack->top(-1));
+            $mainStack->pop();
+            if (!$this->setScript($scriptPubKey)->run()) {
+                return false;
             }
         }
 
@@ -353,7 +375,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $checkFExec = function () use (&$vfStack) {
             $c = 0;
-            for ($i = 0, $len = $vfStack->end(); $i < $len; $i++) {
+            $len = $vfStack->end();
+            for ($i = 0; $i < $len; $i++) {
                 if ($vfStack->top(0 - $len - $i) == true) {
                     $c++;
                 }
@@ -387,7 +410,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                         throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
                     $mainStack->push($pushData);
-
+                    //echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || ($opcodes->isOp($opCode, 'OP_IF') <= 0 && $opcodes->isOp($opCode, 'OP_ENDIF'))) {
                     switch ($opCode)
                     {
@@ -465,7 +488,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push(($equal ? true : false));
+                            $mainStack->push(($equal ? $_bn1 : $_bn0));
 
                             if ($opcodes->isOp($opCode, 'OP_EQUALVERIFY')) {
                                 if ($equal) {
@@ -509,19 +532,9 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             $vchPubKey = $mainStack->top(-1);
                             $vchSig = $mainStack->top(-2);
 
-                            $this
-                                ->checkSignatureEncoding($vchSig)
-                                ->checkPublicKeyEncoding($vchSig);
+                            $scriptCode = new Script($this->script->getBuffer()->slice($this->hashStartPos));
 
-                            $txSig = TransactionSignatureFactory::fromHex($vchSig);
-                            $publicKey = PublicKeyFactory::fromHex($vchPubKey->getHex());
-
-                            $script = ScriptFactory::create();
-                            $sigHash = $this->transaction
-                                ->getSignatureHash()
-                                ->calculate($script, $this->inputToSign, $txSig->getHashType());
-
-                            $success = $this->ecAdapter->verify($sigHash, $publicKey, $txSig->getSignature());
+                            $success = $this->checkSig($scriptCode, $vchSig, $vchPubKey);
 
                             $mainStack->pop();
                             $mainStack->pop();
@@ -537,7 +550,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                             break;
 
-                        case $opcodes->getOpByName('OP_CHECKMULTISIGCHECKSIG'):
+                        case $opcodes->getOpByName('OP_CHECKMULTISIG'):
                         case $opcodes->getOpByName('OP_CHECKMULTISIGVERIFY'):
                             $i = 1;
                             if ($mainStack->size() < $i) {
@@ -549,50 +562,44 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
                                 throw new \Exception('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
-
                             $this->opCount += $keyCount;
                             $this->checkOpcodeCount();
 
+                            // Extract positions of the keys, and signatures, from the stack.
                             $ikey = ++$i;
                             $i += $keyCount;
-
                             if ($mainStack->size() < $i) {
                                 throw new \Exception('Invalid stack operation');
                             }
-
-                            $sigCount = $mainStack->top($i)->getInt();
+                            $sigCount = $mainStack->top(-$i)->getInt();
                             if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
                                 throw new \Exception('Invalid Signature count');
                             }
                             $isig = ++$i;
                             $i += $sigCount;
 
+                            // Extract the script since the last OP_CODESEPARATOR
                             $scriptCode = new Script($this->script->getBuffer()->slice($this->hashStartPos));
 
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
-                                $sig = $mainStack->top(0 - $isig);
-                                $pubkey = $mainStack->top(0 - $ikey);
-                                $mainStack->erase(0 - $isig);
-                                $mainStack->erase(0 - $ikey);
+                                // Fetch the signature and public key
+                                $sig = $mainStack->top(-$isig);
+                                $pubkey = $mainStack->top(-$ikey);
 
-                                $this
-                                    ->checkSignatureEncoding($sig)
-                                    ->checkPublicKeyEncoding($pubkey);
+                                // Erase the signature and public key.
+                                $mainStack->erase(-$isig);
+                                $mainStack->erase(-$ikey);
 
-                                $txSignature = TransactionSignatureFactory::fromHex($sig->getHex());
-                                $publicKey = PublicKeyFactory::fromHex($pubkey->getHex());
-                                $sigHash = $this->transaction
-                                    ->getSignatureHash()
-                                    ->calculate($scriptCode, $this->inputToSign, $txSignature->getHashType());
+                                // Decrement $i, since we are consuming stack values.
+                                $i -= 2;
 
-                                $fOk = $this->ecAdapter->verify($sigHash, $publicKey, $txSignature->getSignature());
-                                if ($fOk) {
+                                if ($this->checksig($scriptCode, $sig, $pubkey)) {
                                     $isig++;
                                     $sigCount--;
                                 }
                                 $ikey++;
-                                $keyCount++;
+                                $keyCount--;
 
                                 // If there are more signatures left than keys left,
                                 // then too many signatures have failed. Exit early,
@@ -602,9 +609,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 }
                             }
 
-                            // Ensure all signatures and keys are removed, regardless of outcome.
                             while ($i-- > 1) {
-                                $mainStack->erase(0 - $i);
+                                $mainStack->pop();
                             }
 
                             // A bug causes CHECKMULTISIG to consume one extra argument
@@ -617,7 +623,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation');
                             }
 
-                            if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_NULL_DUMMY) && $mainStack->top(-1)->size()) {
+                            if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_NULL_DUMMY) && $mainStack->top(-1)->getSize()) {
                                 throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
                             }
 
@@ -631,8 +637,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                     throw new \Exception('OP_CHECKMULTISIG verify');
                                 }
                             }
-
                             break;
+
                         default:
                             throw new \Exception('Opcode not found');
                     }
@@ -640,6 +646,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     if ($mainStack->size() + $altStack->size() > 1000) {
                         throw new \Exception('Invalid stack size, exceeds 1000');
                     }
+                    //echo " - [". $opcodes->getOp($opCode) . "]\n";
                 }
             }
 
@@ -649,11 +656,11 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            echo "\n Runtime: " . $e->getMessage() . "\n";
+            //echo "\n Runtime: " . $e->getMessage() . "\n";
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            echo "\n General: " . $e->getMessage() . "\n";
+            //echo "\n General: " . $e->getMessage() . "\n";
             return false;
         }
     }

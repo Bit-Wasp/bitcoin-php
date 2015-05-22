@@ -10,7 +10,7 @@ class Opcodes
     public function opExists($op)
     {
         if (!isset($this->getOps()[$op])) {
-            throw new \RuntimeException("Opcode '$op' not found");
+            throw new \RuntimeException("Opcode not found");
         }
     }
 
@@ -20,7 +20,7 @@ class Opcodes
     public function opNameExists($name)
     {
         if (!isset($this->getOpsByName()[$name])) {
-            throw new \RuntimeException("Opcode by name '$name' not found");
+            throw new \RuntimeException("Opcode by that name not found");
         }
     }
 
@@ -63,13 +63,7 @@ class Opcodes
      */
     public function isOp($op, $opCodeStr)
     {
-        try {
-            $match = ($op === $this->getOpByName($opCodeStr));
-        } catch (\Exception $e) {
-            $match = false;
-        }
-
-        return $match;
+        return $op === $this->getOpByName($opCodeStr);
     }
 
     /**

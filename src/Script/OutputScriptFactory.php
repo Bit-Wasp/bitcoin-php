@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Buffertools\Buffer;
 
 class OutputScriptFactory
 {
@@ -27,12 +28,12 @@ class OutputScriptFactory
         return ($address instanceof ScriptHashAddress
             ? ScriptFactory::create()
                 ->op('OP_HASH160')
-                ->push($address->getHash())
+                ->push(Buffer::hex($address->getHash()))
                 ->op('OP_EQUAL')
             : ScriptFactory::create()
                 ->op('OP_DUP')
                 ->op('OP_HASH160')
-                ->push($address->getHash())
+                ->push(Buffer::hex($address->getHash()))
                 ->op('OP_EQUALVERIFY')
                 ->op('OP_CHECKSIG'));
 
