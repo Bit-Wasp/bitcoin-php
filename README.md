@@ -34,16 +34,20 @@ or
  - Signature creation & verification 
  - Deterministic signatures (RFC6979)
  - BIP32 deterministic algorithms
- - Script builder, parser
+ - Script builder for common input/output types, parser, interpreter.
  - RPC bindings to Bitcoin Core's RPC, getting OOP responses :)
  - Easy serialization to binary representation of most classes
  - SIGHASH types when creating transactions (not tested)
  - Payment Protocol (BIP70)
 
+##Known Issues:
+The script interpreter has a modest set of test vectors, but these are mostly positive tests, that don't really exercise many of the edge cases. While it works, it's not bug-for-bug compatible yet. 
+
 ##Todo:
-  - Full script interpreter
   - SPV
   - P2P
+  - Wishlist: 
+     - libbitcoinconsensus as an extension, and an adapter similar to EcAdapter to allow switching between this + the pure PHP code. 
   
 ## Implemented BIPs
   - BIP0011
