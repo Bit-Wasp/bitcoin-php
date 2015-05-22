@@ -250,14 +250,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function checkMinimalPush($opCode, Buffer $pushData)
     {
         $pushSize = $pushData->getSize();
-        $opcodes = $this->script->getOpCodes();
         $binary = $pushData->getBinary();
 
+        $opcodes = $this->script->getOpCodes();
         if ($pushSize == 0) {
             return $opcodes->isOp($opCode, 'OP_0');
-        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && $binary[0] <= 16) {
+        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && ord($binary[0]) <= 16) {
             return $opCode == $opcodes->getOpByName('OP_1') + (ord($binary[0]) - 1);
-        } elseif ($pushSize == 1 && ord($binary) == 0x81) {
+        } elseif ($pushSize == 1 && ord($binary[0]) == 0x81) {
             return $opcodes->isOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
             return $opCode == $pushSize;

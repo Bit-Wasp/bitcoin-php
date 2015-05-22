@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -396,5 +397,41 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
         $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_P2SH));
         $i->verify($scriptSig, $scriptPubKey, 0);
+    }
+
+    public function testCheckMinimalPush()
+    {
+        $opcodes = new Opcodes();
+        $valid = [
+            [0, Buffer::hex('')],
+            [81, Buffer::hex('01')],
+            [79, Buffer::hex('81')],
+            [5, Buffer::hex('0102030405')],
+            [0x4c, Buffer::hex('', 76)],
+            [0x4c, Buffer::hex('', 78)],
+            [0x4c, Buffer::hex('', 255)],
+            [0x4d, Buffer::hex('', 256)],
+            [0x4d, Buffer::hex('', 65535)],
+            [0x4e, Buffer::hex('', 65536)],
+        ];
+
+        $invalid = [
+            [0x81, Buffer::hex('')],
+            [01, Buffer::hex('0102030405')],
+            [0x4d, Buffer::hex('', 74)],
+            [0x4e, Buffer::hex('', 255)],
+            [0x4d, Buffer::hex('', 255)]
+        ];
+
+        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_P2SH));
+        foreach ($valid as $t) {
+            list ($opcode, $buffer) = $t;
+            $this->assertTrue($i->checkMinimalPush($opcode, $buffer));
+        }
+
+        foreach ($invalid as $t) {
+            list ($opcode, $buffer) = $t;
+            $this->assertFalse($i->checkMinimalPush($opcode, $buffer));
+        }
     }
 }
