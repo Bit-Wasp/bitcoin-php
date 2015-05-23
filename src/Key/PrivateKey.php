@@ -15,22 +15,22 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * @var int|string
      */
-    protected $secretMultiplier;
+    private $secretMultiplier;
 
     /**
      * @var bool
      */
-    protected $compressed;
+    private $compressed;
 
     /**
      * @var PublicKey
      */
-    protected $publicKey;
+    private $publicKey;
 
     /**
      * @var EcAdapterInterface
      */
-    protected $ecAdapter;
+    private $ecAdapter;
 
     /**
      * @param EcAdapterInterface $ecAdapter

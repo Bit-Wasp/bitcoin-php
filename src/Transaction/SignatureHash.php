@@ -14,7 +14,7 @@ class SignatureHash implements SignatureHashInterface
     /**
      * @var TransactionInterface
      */
-    protected $transaction;
+    private $transaction;
 
     /**
      * @param TransactionInterface $transaction

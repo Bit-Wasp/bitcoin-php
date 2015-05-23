@@ -10,7 +10,7 @@ class Pong extends NetworkSerializable
     /**
      * @var integer|string
      */
-    protected $nonce;
+    private $nonce;
 
     /**
      * @param Ping $ping

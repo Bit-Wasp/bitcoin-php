@@ -11,12 +11,12 @@ class Signature extends Serializable implements SignatureInterface
     /**
      * @var int
      */
-    protected $r;
+    private $r;
 
     /**
      * @var int
      */
-    protected $s;
+    private $s;
 
     /**
      * @param $r

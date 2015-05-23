@@ -11,17 +11,17 @@ class NetworkAddress extends Serializable
     /**
      * @var Buffer
      */
-    protected $services;
+    private $services;
 
     /**
      * @var string
      */
-    protected $ip;
+    private $ip;
 
     /**
      * @var int|string
      */
-    protected $port;
+    private $port;
 
     /**
      * @param Buffer $services

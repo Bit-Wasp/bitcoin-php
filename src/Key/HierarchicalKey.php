@@ -21,32 +21,32 @@ class HierarchicalKey
     /**
      * @var string
      */
-    protected $bytes;
+    private $bytes;
 
     /**
      * @var int|string
      */
-    protected $depth;
+    private $depth;
 
     /**
      * @var int|string
      */
-    protected $parentFingerprint;
+    private $parentFingerprint;
 
     /**
      * @var int|string
      */
-    protected $sequence;
+    private $sequence;
 
     /**
      * @var int|string
      */
-    protected $chainCode;
+    private $chainCode;
 
     /**
      * @var KeyInterface
      */
-    protected $key;
+    private $key;
 
     /**
      * @param EcAdapterInterface $ecAdapter

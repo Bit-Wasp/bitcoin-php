@@ -12,64 +12,64 @@ class AlertDetail extends Serializable
     /**
      * @var int
      */
-    protected $version;
+    private $version;
 
     /**
      * Timestamp
      * @var int
      */
-    protected $relayUntil;
+    private $relayUntil;
 
     /**
      * timestamp
      * @var int
      */
-    protected $expiration;
+    private $expiration;
 
     /**
      * @var int
      */
-    protected $id;
+    private $id;
 
     /**
      * @var int
      */
-    protected $cancel;
+    private $cancel;
 
     /**
      * @var int
      */
-    protected $setCancel;
+    private $setCancel;
 
     /**
      * @var int
      */
-    protected $minVer;
+    private $minVer;
 
     /**
      * @var int
      */
-    protected $maxVer;
+    private $maxVer;
 
     /**
      * @var array[]
      */
-    protected $setSubVer;
+    private $setSubVer;
 
     /**
      * @var int
      */
-    protected $priority;
+    private $priority;
 
     /**
      * @var Buffer
      */
-    protected $comment;
+    private $comment;
 
     /**
      * @var Buffer
      */
-    protected $statusBar;
+    private $statusBar;
 
     /**
      * @param int $version

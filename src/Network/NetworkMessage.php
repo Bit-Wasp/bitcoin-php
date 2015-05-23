@@ -12,12 +12,12 @@ class NetworkMessage extends Serializable
     /**
      * @var NetworkInterface
      */
-    protected $network;
+    private $network;
 
     /**
      * @var NetworkSerializableInterface
      */
-    protected $payload;
+    private $payload;
 
     /**
      * @param NetworkInterface $network

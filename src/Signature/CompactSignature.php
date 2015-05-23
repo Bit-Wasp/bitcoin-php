@@ -12,22 +12,22 @@ class CompactSignature extends Serializable
     /**
      * @var int|string
      */
-    protected $r;
+    private $r;
 
     /**
      * @var int|string
      */
-    protected $s;
+    private $s;
 
     /**
      * @var int|string
      */
-    protected $recid;
+    private $recid;
 
     /**
      * @var bool
      */
-    protected $compressed;
+    private $compressed;
 
     /**
      * @param int|string $r

@@ -14,12 +14,12 @@ class Difficulty implements DifficultyInterface
     /**
      * @var Buffer
      */
-    protected $lowestBits;
+    private $lowestBits;
 
     /**
      * @var Math
      */
-    protected $math;
+    private $math;
 
     /**
      * @param Math $math

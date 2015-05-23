@@ -20,22 +20,22 @@ class Reject extends NetworkSerializable
     /**
      * @var Buffer
      */
-    protected $message;
+    private $message;
 
     /**
      * @var int
      */
-    protected $ccode;
+    private $ccode;
 
     /**
      * @var Buffer
      */
-    protected $reason;
+    private $reason;
 
     /**
      * @var Buffer
      */
-    protected $data;
+    private $data;
 
     /**
      * @param Buffer $message

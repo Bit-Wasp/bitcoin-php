@@ -14,17 +14,17 @@ class HexBlockSerializer
     /**
      * @var Math
      */
-    protected $math;
+    private $math;
 
     /**
      * @var HexBlockHeaderSerializer
      */
-    protected $headerSerializer;
+    private $headerSerializer;
 
     /**
      * @var TransactionSerializer
      */
-    protected $txSerializer;
+    private $txSerializer;
 
     /**
      * @param Math $math

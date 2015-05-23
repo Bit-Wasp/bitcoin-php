@@ -10,37 +10,37 @@ class Network implements NetworkInterface
     /**
      * @var string
      */
-    protected $addressByte;
+    private $addressByte;
 
     /**
      * @var string
      */
-    protected $privByte;
+    private $privByte;
 
     /**
      * @var string
      */
-    protected $p2shByte;
+    private $p2shByte;
 
     /**
      * @var bool
      */
-    protected $testnet;
+    private $testnet;
 
     /**
      * @var null|string
      */
-    protected $xpubByte;
+    private $xpubByte;
 
     /**
      * @var null|string
      */
-    protected $xprivByte;
+    private $xprivByte;
 
     /**
      * @var string
      */
-    protected $netMagicBytes;
+    private $netMagicBytes;
 
     /**
      * Load basic data, throw exception if it's not provided

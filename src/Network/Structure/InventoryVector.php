@@ -16,12 +16,12 @@ class InventoryVector extends Serializable
     /**
      * @var int
      */
-    protected $type;
+    private $type;
 
     /**
      * @var Buffer
      */
-    protected $hash;
+    private $hash;
 
     /**
      * @param $type
