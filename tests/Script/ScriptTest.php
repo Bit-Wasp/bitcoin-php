@@ -2,20 +2,15 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
+use BitWasp\Buffertools\Parser;
 
 class ScriptTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Script
-     */
-    protected $script;
-
     /**
      * @var string
      */
@@ -26,6 +21,22 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $script = new Script();
         $opCodes = $script->getOpCodes();
         $this->assertInstanceOf('BitWasp\Bitcoin\Script\Opcodes', $opCodes);
+    }
+
+    public function testPushdata4()
+    {
+        // Create a buffer with a fixed length, in the pushdata4 range.
+        $eLen = 65536;
+        $buffer = new Buffer('', $eLen);
+
+        $script = new Script();
+        $script->push($buffer);
+
+        $parse = new Parser($script->getBuffer());
+        $op = $parse->readBytes(1)->getInt();
+        $this->assertEquals($script->getOpcodes()->getOpByName('OP_PUSHDATA4'), $op);
+        $this->assertEquals($eLen, $parse->readBytes(4, true)->getInt());
+        $this->assertEquals($buffer->getBinary(), ($script->getScriptParser()->parse()[0]->getBinary()));
     }
 
     public function testDefaultSerializeBinary()

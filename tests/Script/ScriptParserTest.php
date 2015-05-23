@@ -68,11 +68,12 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
     public function testPush($script, $expectedOp, $expectedPushData, $result)
     {
         $parser = ScriptFactory::fromHex($script)->getScriptParser();
-        $opCode = null;
-        $pushdata = null;
+
         $this->assertEquals($result, $parser->next($opCode, $pushdata));
         $this->assertSame($expectedOp, $opCode);
-        //$this->assertSame($expectedPushData, $pushdata->getHex());
+        if ($pushdata instanceof Buffer) {
+            $this->assertSame($expectedPushData, $pushdata->getBinary());
+        }
     }
 
     public function testDefaultParse()

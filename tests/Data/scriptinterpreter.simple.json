@@ -74,14 +74,14 @@
       "scriptSig": "0100",
       "scriptPubKey": "635067010168",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC,checkDisabledOpcodes",
+      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
       "desc": "0 IF OP_RESERVED OP_ENDIF 1 OP_ENDIF"
     },
     {
       "scriptSig": "0101",
       "scriptPubKey": "645067010168",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC,checkDisabledOpcodes",
+      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
       "desc": "1 OP_NOTIF 1 OP_ENDIF OP_RESERVED OP_ENDIF"
     },
     {
@@ -172,8 +172,7 @@
       "scriptSig": "",
       "scriptPubKey": "0102010295",
       "result": false,
-      "checkDisabled": true,
-      "flags": "checkDisabledOpcodes",
+      "flags": "VERIFY_STRICTENC",
       "desc": "disabled opcode OP_MUL"
     },
     {
@@ -543,7 +542,7 @@
     {
       "scriptSig": "0101",
       "scriptPubKey": "8d010288",
-      "result": true,
+      "result": false,
       "flags": "VERIFY_STRICTENC",
       "desc": "01 OP_2MUL 02 OP_EQUALVERIFY"
     },

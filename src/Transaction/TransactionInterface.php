@@ -57,6 +57,11 @@ interface TransactionInterface extends SerializableInterface
     public function getLockTime();
 
     /**
+     * @return SignatureHash
+     */
+    public function getSignatureHash();
+
+    /**
      * Returns an exact clone of the current transaction
      *
      * @return Transaction

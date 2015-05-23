@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Native;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
@@ -8,17 +8,18 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterFactory;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\ScriptInterpreter;
+use BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter;
+use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Script\ScriptInterpreterFlags;
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Transaction\TransactionBuilder;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;
 
@@ -26,7 +27,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param $flagStr
-     * @return ScriptInterpreterFlags
+     * @return Flags
      */
     private function setFlags($flagStr)
     {
@@ -34,16 +35,25 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $int = 0;
         $checkdisabled = false;
         foreach ($array as $activeFlag) {
-            if ($activeFlag == 'checkDisabledOpcodes') {
-                $checkdisabled = true;
-                continue;
-            }
-
-            $f = constant('\BitWasp\Bitcoin\Script\ScriptInterpreterFlags::'.$activeFlag);
+            $f = constant('\BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::'.$activeFlag);
             $int |= $f;
         }
 
-        return new ScriptInterpreterFlags($int, $checkdisabled);
+        return new Flags($int, $checkdisabled);
+    }
+
+    public function testGetStackState()
+    {
+        $i = new NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(0));
+        $testStack = new ScriptStack();
+        $testStack->push('a');
+
+        $this->assertEquals(0, $i->getStackState()->getMainStack()->size());
+        $this->assertEquals(0, $i->getStackState()->getAltStack()->size());
+        $this->assertEquals(0, $i->getStackState()->getAltStack()->size());
+        $i->getStackState()->restoreMainStack($testStack);
+        $this->assertEquals($testStack, $i->getStackState()->getMainStack());
+
     }
 
     /**
@@ -52,13 +62,13 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsLowDERFailsWithIncorrectEncoding()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(0));
         $i->isLowDerSignature(new Buffer('abcd'));
     }
 
     public function testReturnsFalseWithNoSig()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(0));
         $this->assertFalse($i->isDefinedHashtypeSignature(new Buffer()));
     }
 
@@ -79,7 +89,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
             255
         ];
 
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(0));
         foreach ($valid as $t) {
             $t = new Buffer(chr($t));
             $this->assertTrue($i->isDefinedHashtypeSignature($t));
@@ -97,7 +107,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSignatureEncodingInvalidHashtype()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(SCriptInterpreterFlags::VERIFY_STRICTENC));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(InterpreterInterface::VERIFY_STRICTENC));
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e891');
 
         $i->checkSignatureEncoding($buffer);
@@ -106,7 +116,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckSignatureSafeWhenFlagNotSet()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(0));
         $buffer = new Buffer('obviously incorrect.....?');
         try {
             $i->checkSignatureEncoding($buffer);
@@ -122,14 +132,14 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSignatureEncodingLowS()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_LOW_S));
+        $i = new NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(InterpreterInterface::VERIFY_LOW_S));
         $buffer = Buffer::hex('30450220377bf4cab9bbdb219f1b0cca56f4a39fbf787d6fa9d04e248101d498de991d30022100b8e0c72dfab9a0d88eb2703c62e0e57ab2cb906e8f156b7641c2f0e24b8bba2b01');
         $i->checkSignatureEncoding($buffer);
     }
 
     public function testCheckEmptySignatureSafeWhenFlagNotSet()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(0));
         $buffer = new Buffer('');
         try {
             $i->checkSignatureEncoding($buffer);
@@ -145,14 +155,14 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSignatureEncodingWhenFlagSet()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(SCriptInterpreterFlags::VERIFY_DERSIG));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(InterpreterInterface::VERIFY_DERSIG));
         $buffer = new Buffer('obviously incorrect.....?');
         $i->checkSignatureEncoding($buffer);
     }
 
     public function testCheckSignatureEncodingWhenLowSFlagSet()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(SCriptInterpreterFlags::VERIFY_LOW_S));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(InterpreterInterface::VERIFY_LOW_S));
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e801');
         try {
             $i->checkSignatureEncoding($buffer);
@@ -164,7 +174,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckSignatureEncodingWhenStrictEncFlagSet()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(SCriptInterpreterFlags::VERIFY_STRICTENC));
+        $i = new NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(InterpreterInterface::VERIFY_STRICTENC));
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e801');
         try {
             $i->checkSignatureEncoding($buffer);
@@ -176,7 +186,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testCheckPublicKeyEncoding()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(SCriptInterpreterFlags::VERIFY_STRICTENC));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(InterpreterInterface::VERIFY_STRICTENC));
         $pubkey = Buffer::hex('045e9392308b08d0d663961463b6cd056a66b757a2ced9dde197c21362360237f231b80ea66315898969f5c079f0ba3fc1c0661ed8c853ad15043f22f2b7779c95');
         try {
             $i->checkPublicKeyEncoding($pubkey);
@@ -192,7 +202,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
      */
     public function testCheckPublicKeyEncodingFail()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new ScriptInterpreterFlags(SCriptInterpreterFlags::VERIFY_STRICTENC));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(\BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_STRICTENC));
         $pubkey = Buffer::hex('045e9392308b08d0d663961463b6cd056a66b757a2ced9dde197c21362360237f231b80ea66315898969f5c079f0ba3fc1c0661ed8c853ad15043f22b7779c95');
         $i->checkPublicKeyEncoding($pubkey);
     }
@@ -210,7 +220,9 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $ec = EcAdapterFactory::getAdapter(new Math(), EccFactory::getSecgCurves()->generator256k1());
         $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ec);
 
-        $standard = ScriptInterpreterFlags::defaults();
+        $interpreterFactory = new InterpreterFactory();
+        $standard = $interpreterFactory->defaultFlags();
+
         $vectors = [];
 
         // Pay to pubkey hash that succeeds
@@ -251,7 +263,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider ChecksigVectors
      */
-    public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, ScriptInterpreterFlags $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, RedeemScript $rs = null)
+    public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, Flags $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, RedeemScript $rs = null)
     {
         // Create a fake tx to spend - an output script we supposedly can spend.
         $fake = new TransactionBuilder($ec);
@@ -265,13 +277,13 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $spendTx = $spend->getTransaction();
         $scriptSig = $spendTx->getInputs()->getInput(0)->getScript();
 
-        $i = new ScriptInterpreter($ec, $spendTx, $flags);
+        $i = new NativeInterpreter($ec, $spendTx, $flags);
         $this->assertEquals($eVerifyResult, $i->verify($scriptSig, $outputScript, 0));
     }
 
     public function getScripts()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/scriptinterpreter.simple.json');
+        $f = file_get_contents(__DIR__ . '/../../../Data/scriptinterpreter.simple.json');
         $json = json_decode($f);
 
         $vectors = [];
@@ -284,11 +296,11 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
             ];
         }
 
-        $flags = new ScriptInterpreterFlags(0);
+        $flags = new Flags(0);
         $vectors[] = [
             $flags,
-            new Script(),
-            ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../Data/10010bytes.hex"))),
+            new Script(new Buffer()),
+            ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../../../Data/10010bytes.hex"))),
             false,
             'fails with >10000 bytes',
             new Transaction
@@ -300,13 +312,13 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getScripts
-     * @param ScriptInterpreterFlags $flags
+     * @param Flags $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      */
-    public function testScript(ScriptInterpreterFlags $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result, $description, $tx)
+    public function testScript(Flags $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result, $description, $tx)
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), $tx, $flags);
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), $tx, $flags);
 
         $i->setScript($scriptSig)->run();
         $testResult = $i->setScript($scriptPubKey)->run();
@@ -317,7 +329,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyOnScriptSigFail()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(0));
         $script = new Script();
         $script->op('OP_RETURN');
 
@@ -326,34 +338,26 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyOnScriptPubKeyFail()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(0));
         $true = new Script(Buffer::hex('0101'));
         $false = new Script();
         $false->op('OP_RETURN');
         $this->assertFalse($i->verify($true, $false, 0));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Script stack empty after evaluation
-     */
     public function testVerifyEmptyAfterExec()
     {
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(0));
         $empty = new Script();
-        $i->verify($empty, $empty, 0);
+        $this->assertFalse($i->verify($empty, $empty, 0));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Script evaluated to false
-     */
     public function testVerifyNotFalse()
     {
         $true = new Script(Buffer::hex('0101'));
         $false = new Script(Buffer::hex('0100'));
 
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(0));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(0));
         $this->assertFalse($i->verify($true, $false, 0));
     }
 
@@ -363,7 +367,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $output = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
         $scriptSig = new Script();
 
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_P2SH));
+        $i = new NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(InterpreterInterface::VERIFY_P2SH));
         $this->assertFalse($i->verify($scriptSig, $output, 0));
     }
 
@@ -377,14 +381,11 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $scriptSig = new Script();
         $scriptSig->op('OP_0')->push($p2sh->getBuffer());
 
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_P2SH));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(InterpreterInterface::VERIFY_P2SH));
         $this->assertFalse($i->verify($scriptSig, $scriptPubKey, 0));
     }
 
-    /**
-     * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
-     * @expectedExceptionMessage P2SH scriptSig must be push only
-     */
+
     public function testVerifyScriptsigMustBePushOnly()
     {
         $p2sh = new Script();
@@ -395,13 +396,12 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
 
         $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
 
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_P2SH));
-        $i->verify($scriptSig, $scriptPubKey, 0);
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(InterpreterInterface::VERIFY_P2SH));
+        $this->assertFalse($i->verify($scriptSig, $scriptPubKey, 0));
     }
 
     public function testCheckMinimalPush()
     {
-        $opcodes = new Opcodes();
         $valid = [
             [0, Buffer::hex('')],
             [81, Buffer::hex('01')],
@@ -423,7 +423,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
             [0x4d, Buffer::hex('', 255)]
         ];
 
-        $i = new ScriptInterpreter(Bitcoin::getEcAdapter(), new Transaction, new ScriptInterpreterFlags(ScriptInterpreterFlags::VERIFY_P2SH));
+        $i = new \BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(InterpreterInterface::VERIFY_P2SH));
         foreach ($valid as $t) {
             list ($opcode, $buffer) = $t;
             $this->assertTrue($i->checkMinimalPush($opcode, $buffer));

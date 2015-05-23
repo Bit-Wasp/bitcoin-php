@@ -15,12 +15,12 @@ class Script extends Serializable implements ScriptInterface
     /**
      * @var Opcodes
      */
-    public $opcodes;
+    private $opcodes;
 
     /**
      * @var null|string
      */
-    protected $script = null;
+    private $script;
 
     /**
      * Initialize container
@@ -29,10 +29,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function __construct(Buffer $script = null)
     {
-        if ($script instanceof Buffer) {
-            $this->script = $script->getBinary();
-        }
-
+        $this->script = $script instanceof Buffer ? $script->getBinary() : '';
         $this->opcodes = new Opcodes;
     }
 

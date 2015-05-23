@@ -13,7 +13,7 @@ class ScriptFactory
      */
     public static function create(Buffer $script = null)
     {
-        return new Script($script);
+        return new Script($script ?: new Buffer());
     }
 
     /**

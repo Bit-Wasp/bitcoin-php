@@ -1,9 +1,9 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
+namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Native;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Script\Interpreter\StackOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Native\StackOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
