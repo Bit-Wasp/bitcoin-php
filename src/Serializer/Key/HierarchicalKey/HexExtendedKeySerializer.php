@@ -84,7 +84,6 @@ class HexExtendedKeySerializer
     {
         try {
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->getTemplate()->parse($parser);
-            var_dump($bytes->getHex(), $this->network->getHDPubByte(), $this->network->getHDPrivByte());
             $bytes = $bytes->getHex();
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
