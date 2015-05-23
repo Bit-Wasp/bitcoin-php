@@ -84,9 +84,9 @@ class AddressFactory
     {
         $classifier = new OutputClassifier($script);
         try {
-            $addr = $classifier->isPayToPubKey()
+            $addr = $classifier->isPayToPublicKey()
             ? PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress()
-            : AddressFactory::fromOutputScript($script)
+            : AddressFactory::fromOutputScript($script);
         } catch (\Exception $e) {
             throw new \RuntimeException('No address associated with this script type');
         }
