@@ -90,7 +90,7 @@ class AddressFactory
         try {
             $address = $classifier->isPayToPublicKey()
                 ? PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress()
-                : AddressFactory::fromOutputScript($script);
+                : self::fromOutputScript($script);
             return Base58::encodeCheck(Buffer::hex($network->getAddressByte() . $address->getHash()));
         } catch (\Exception $e) {
             throw new \RuntimeException('No address associated with this script type');
