@@ -7,6 +7,7 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Signature\CompactSignature;
+use BitWasp\Buffertools\TemplateFactory;
 
 class CompactSignatureSerializer
 {
@@ -25,18 +26,28 @@ class CompactSignatureSerializer
     }
 
     /**
+     * @return \BitWasp\Buffertools\Template
+     */
+    private function getTemplate()
+    {
+        return (new TemplateFactory())
+            ->uint8()
+            ->uint256()
+            ->uint256()
+            ->getTemplate();
+    }
+
+    /**
      * @param CompactSignature $signature
      * @return Buffer
      */
     public function serialize(CompactSignature $signature)
     {
-        $parser = new Parser;
-        $parser
-            ->writeInt(1, $signature->getFlags())
-            ->writeBytes(32, $this->math->decHex($signature->getR()))
-            ->writeBytes(32, $this->math->decHex($signature->getS()));
-
-        return $parser->getBuffer();
+        return $this->getTemplate()->write([
+            $signature->getFlags(),
+            $signature->getR(),
+            $signature->getS()
+        ]);
     }
 
     /**
@@ -47,11 +58,7 @@ class CompactSignatureSerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            list ($byte, $r, $s) = [
-                $parser->readBytes(1)->getInt(),
-                $parser->readBytes(32)->getInt(),
-                $parser->readBytes(32)->getInt()
-            ];
+            list ($byte, $r, $s) = $this->getTemplate()->parse($parser);
 
             $recoveryFlags = $this->math->sub($byte, 27);
             if ($recoveryFlags < 0 || $recoveryFlags > 7) {

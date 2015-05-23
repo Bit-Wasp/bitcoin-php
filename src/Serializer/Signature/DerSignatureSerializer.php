@@ -8,6 +8,8 @@ use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Buffertools\Template;
+use BitWasp\Buffertools\TemplateFactory;
 
 class DerSignatureSerializer
 {
@@ -23,6 +25,30 @@ class DerSignatureSerializer
     public function __construct(Math $math)
     {
         $this->math = $math;
+    }
+
+    /**
+     * @return Template
+     */
+    private function getInnerTemplate()
+    {
+        return (new TemplateFactory())
+            ->uint8()
+            ->varstring()
+            ->uint8()
+            ->varstring()
+            ->getTemplate();
+    }
+
+    /**
+     * @return Template
+     */
+    private function getOuterTemplate()
+    {
+        return (new TemplateFactory())
+            ->uint8()
+            ->varstring()
+            ->getTemplate();
     }
 
     /**
@@ -49,21 +75,15 @@ class DerSignatureSerializer
             $sBin = pack('H*', '00') . $sBin;
         }
 
-        $inner = new Parser();
-        $inner
-            ->writeBytes(1, '02')
-            ->writeWithLength(new Buffer($rBin))
-            ->writeBytes(1, '02')
-            ->writeWithLength(new Buffer($sBin));
-
-        $outer = new Parser();
-        $outer
-            ->writeBytes(1, '30')
-            ->writeWithLength($inner->getBuffer());
-
-        $serialized = $outer->getBuffer();
-
-        return $serialized;
+        return $this->getOuterTemplate()->write([
+            0x30,
+            $this->getInnerTemplate()->write([
+                0x02,
+                new Buffer($rBin),
+                0x02,
+                new Buffer($sBin)
+            ])
+        ]);
     }
 
     /**
@@ -74,21 +94,12 @@ class DerSignatureSerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            $parser->readBytes(1);
-            $outer = $parser->getVarString();
-
-            $parse = new Parser($outer);
-            $parse->readBytes(1);
-            $r = $parse->getVarString()->getInt();
-
-            $parse->readBytes(1);
-            $s = $parse->getVarString()->getInt();
+            list ($prefix, $inner) = $this->getOuterTemplate()->parse($parser);
+            list ($prefix, $r, $prefix, $s) = $this->getInnerTemplate()->parse(new Parser($inner));
+            return new Signature($r->getInt(), $s->getInt());
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
-
-        $signature = new Signature($r, $s);
-        return $signature;
     }
 
     /**

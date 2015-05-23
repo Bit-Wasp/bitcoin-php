@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Key\HierarchicalKey;
+use BitWasp\Buffertools\TemplateFactory;
 
 class HexExtendedKeySerializer
 {
@@ -42,6 +43,18 @@ class HexExtendedKeySerializer
         $this->ecAdapter = $ecAdapter;
     }
 
+    public function getTemplate()
+    {
+        return (new TemplateFactory())
+            ->bytestring(4)
+            ->uint8()
+            ->uint32()
+            ->uint32()
+            ->uint256()
+            ->bytestring(33)
+            ->getTemplate();
+    }
+
     /**
      * @param HierarchicalKey $key
      * @return \BitWasp\Buffertools\Buffer
@@ -52,16 +65,14 @@ class HexExtendedKeySerializer
             ? [$this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->getHex()]
             : [$this->network->getHDPubByte(), $key->getPublicKey()->getHex()];
 
-        $bytes = new Parser();
-
-        return $bytes
-            ->writeBytes(4, $prefix)
-            ->writeInt(1, $key->getDepth())
-            ->writeInt(4, $key->getFingerprint())
-            ->writeInt(4, $key->getSequence())
-            ->writeInt(32, $key->getChainCode())
-            ->writeBytes(33, $data)
-            ->getBuffer();
+        return $this->getTemplate()->write([
+            Buffer::hex($prefix, 4),
+            $key->getDepth(),
+            $key->getFingerprint(),
+            $key->getSequence(),
+            $key->getChainCode(),
+            Buffer::hex($data, 33)
+        ]);
     }
 
     /**
@@ -72,17 +83,9 @@ class HexExtendedKeySerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode) = [
-                $parser->readBytes(4)->getHex(),
-                $parser->readBytes(1)->getInt(),
-                $parser->readBytes(4)->getInt(),
-                $parser->readBytes(4)->getInt(),
-                $parser->readBytes(32)->getInt()
-            ];
-
-            /** @var Buffer $keyData */
-            $keyData = $parser->readBytes(33);
-
+            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->getTemplate()->parse($parser);
+            var_dump($bytes->getHex(), $this->network->getHDPubByte(), $this->network->getHDPrivByte());
+            $bytes = $bytes->getHex();
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
         }

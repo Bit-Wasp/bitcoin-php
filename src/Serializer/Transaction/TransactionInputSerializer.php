@@ -7,22 +7,37 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
+use BitWasp\Buffertools\TemplateFactory;
 
 class TransactionInputSerializer
 {
+    /**
+     * @return \BitWasp\Buffertools\Template
+     */
+    private function getTemplate()
+    {
+        return (new TemplateFactory())
+            ->bytestringle(32)
+            ->uint32le()
+            ->varstring()
+            ->uint32le()
+            ->getTemplate();
+    }
+
     /**
      * @param TransactionInputInterface $input
      * @return Buffer
      */
     public function serialize(TransactionInputInterface $input)
     {
-        $parser = new Parser();
-        return $parser
-            ->writeBytes(32, $input->getTransactionId(), true)
-            ->writeInt(4, $input->getVout(), true)
-            ->writeWithLength($input->getScript()->getBuffer())
-            ->writeInt(4, $input->getSequence(), true)
-            ->getBuffer();
+        return $this
+            ->getTemplate()
+            ->write([
+                Buffer::hex($input->getTransactionId()),
+                $input->getVout(),
+                $input->getScript()->getBuffer(),
+                $input->getSequence()
+            ]);
     }
 
     /**
@@ -32,11 +47,20 @@ class TransactionInputSerializer
      */
     public function fromParser(Parser & $parser)
     {
+        $parse = $this->getTemplate()->parse($parser);
+        /** @var Buffer $txidBuf */
+        $txidBuf = $parse[0];
+        /** @var int|string $vout */
+        $vout = $parse[1];
+        /** @var Buffer $scriptBuf */
+        $scriptBuf = $parse[2];
+        /** @var int|string $vout */
+        $sequence = $parse[3];
         return new TransactionInput(
-            $parser->readBytes(32, true)->getHex(),
-            $parser->readBytes(4, true)->getInt(),
-            new Script($parser->getVarString()),
-            $parser->readBytes(4, true)->getInt()
+            $txidBuf->getHex(),
+            $vout,
+            new Script($scriptBuf),
+            $sequence
         );
     }
 
@@ -48,7 +72,6 @@ class TransactionInputSerializer
     public function parse($string)
     {
         $parser = new Parser($string);
-        $input = $this->fromParser($parser);
-        return $input;
+        return $this->fromParser($parser);
     }
 }

@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\Transaction;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Buffertools\TemplateFactory;
 
 class TransactionSerializer
 {
@@ -28,18 +29,34 @@ class TransactionSerializer
     }
 
     /**
+     * @return \BitWasp\Buffertools\Template
+     */
+    private function getTemplate()
+    {
+        return (new TemplateFactory())
+            ->uint32le()
+            ->vector(function (Parser & $parser) {
+                return $this->inputSerializer->fromParser($parser);
+            })
+            ->vector(function (Parser &$parser) {
+                return $this->outputSerializer->fromParser($parser);
+            })
+            ->uint32le()
+            ->getTemplate();
+    }
+
+    /**
      * @param TransactionInterface $transaction
      * @return string
      */
     public function serialize(TransactionInterface $transaction)
     {
-        $parser = new Parser();
-        return $parser
-            ->writeInt(4, $transaction->getVersion(), true)
-            ->writeArray($transaction->getInputs()->getInputs())
-            ->writeArray($transaction->getOutputs()->getOutputs())
-            ->writeInt(4, $transaction->getLockTime(), true)
-            ->getBuffer();
+        return $this->getTemplate()->write([
+            $transaction->getVersion(),
+            $transaction->getInputs()->getInputs(),
+            $transaction->getOutputs()->getOutputs(),
+            $transaction->getLockTime()
+        ]);
     }
 
     /**
@@ -50,23 +67,15 @@ class TransactionSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        $version = $parser->readBytes(4, true)->getInt();
+        $parse = $this->getTemplate()->parse($parser);
+        $version = $parse[0];
+        $txIns = $parse[1];
+        $txOuts = $parse[2];
+        $locktime = $parse[3];
+        $tx = new Transaction($version, null, null, $locktime);
+        $tx->getInputs()->addInputs($txIns);
+        $tx->getOutputs()->addOutputs($txOuts);
 
-        $tx = new Transaction($version);
-
-        $tx->getInputs()->addInputs($parser->getArray(
-            function () use (&$parser) {
-                return $this->inputSerializer->fromParser($parser);
-            }
-        ));
-
-        $tx->getOutputs()->addOutputs($parser->getArray(
-            function () use (&$parser) {
-                return $this->outputSerializer->fromParser($parser);
-            }
-        ));
-
-        $tx->setLockTime($parser->readBytes(4, true)->getInt());
         return $tx;
     }
 
