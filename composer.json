@@ -33,7 +33,7 @@
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "*",
-    "bitwasp/buffertools": "0.1.2",
+    "bitwasp/buffertools": "~0.1",
     "bitwasp/stratum": "v0.1.0"
   },
   "require-dev": {
