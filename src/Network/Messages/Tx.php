@@ -10,7 +10,7 @@ class Tx extends NetworkSerializable
     /**
      * @var TransactionInterface
      */
-    protected $transaction;
+    private $transaction;
 
     /**
      * @param TransactionInterface $tx

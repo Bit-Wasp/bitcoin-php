@@ -10,7 +10,7 @@ class Block extends NetworkSerializable
     /**
      * @var BlockInterface
      */
-    protected $block;
+    private $block;
 
     /**
      * @param BlockInterface $block

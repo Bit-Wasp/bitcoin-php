@@ -10,22 +10,22 @@ class PaymentRequestSigner
     /**
      * @var string
      */
-    protected $type;
+    private $type;
 
     /**
      * @var int
      */
-    protected $algoConst;
+    private $algoConst;
 
     /**
      * @var X509CertificatesBuf
      */
-    protected $certificates;
+    private $certificates;
 
     /**
      * @var
      */
-    protected $privateKey;
+    private $privateKey;
 
     /**
      * @param string $type

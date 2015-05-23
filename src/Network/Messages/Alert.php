@@ -11,12 +11,12 @@ class Alert
     /**
      * @var AlertDetail
      */
-    protected $alert;
+    private $alert;
 
     /**
      * @var SignatureInterface
      */
-    protected $signature;
+    private $signature;
 
     /**
      * @param AlertDetail $alert

@@ -68,7 +68,7 @@ class InputClassifier implements ScriptClassifierInterface
         }
 
         $type = new OutputClassifier(new Script($final));
-        return false == in_array($type->classify(), [
+        return false === in_array($type->classify(), [
             self::UNKNOWN,
             self::PAYTOSCRIPTHASH
         ]);
