@@ -9,6 +9,10 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Buffertools\Buffer;
+
 class AddressFactory
 {
     /**
@@ -80,16 +84,17 @@ class AddressFactory
      * @return String
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
-    public static function getAssociatedAddress(ScriptInterface $script)
+    public static function getAssociatedAddress(ScriptInterface $script, NetworkInterface $network = null)
     {
         $classifier = new OutputClassifier($script);
+        $network = $network ?: Bitcoin::getNetwork();
         try {
-            $addr = $classifier->isPayToPublicKey()
-            ? PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress()
-            : AddressFactory::fromOutputScript($script);
+            $address = $classifier->isPayToPublicKey()
+                ? PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress()
+                : AddressFactory::fromOutputScript($script);
+            return Base58::encodeCheck(Buffer::hex($network->getAddressByte() . $address->getHash()));
         } catch (\Exception $e) {
             throw new \RuntimeException('No address associated with this script type');
         }
-        return $addr;
     }
 }
