@@ -94,8 +94,8 @@ class DerSignatureSerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            list ($prefix, $inner) = $this->getOuterTemplate()->parse($parser);
-            list ($prefix, $r, $prefix, $s) = $this->getInnerTemplate()->parse(new Parser($inner));
+            list (, $inner) = $this->getOuterTemplate()->parse($parser);
+            list (, $r, , $s) = $this->getInnerTemplate()->parse(new Parser($inner));
             return new Signature($r->getInt(), $s->getInt());
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');
