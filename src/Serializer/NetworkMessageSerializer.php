@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Buffertools\TemplateFactory;
 
 class NetworkMessageSerializer
 {

@@ -7,21 +7,31 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
+use BitWasp\Buffertools\TemplateFactory;
 
 class TransactionOutputSerializer
 {
+    /**
+     * @return \BitWasp\Buffertools\Template
+     */
+    private function getTemplate()
+    {
+        return (new TemplateFactory())
+            ->uint64le()
+            ->varstring()
+            ->getTemplate();
+    }
+
     /**
      * @param TransactionOutputInterface $output
      * @return Buffer
      */
     public function serialize(TransactionOutputInterface $output)
     {
-        $script = new Parser();
-        $script
-            ->writeInt(8, $output->getValue(), true)
-            ->writeWithLength($output->getScript()->getBuffer());
-
-        return $script->getBuffer();
+        return $this->getTemplate()->write([
+            $output->getValue(),
+            $output->getScript()->getBuffer()
+        ]);
     }
 
     /**
@@ -31,9 +41,15 @@ class TransactionOutputSerializer
      */
     public function fromParser(Parser & $parser)
     {
+        $parse = $this->getTemplate()->parse($parser);
+        /** @var int|string $value */
+        $value = $parse[0];
+        /** @var Buffer $scriptBuf */
+        $scriptBuf = $parse[1];
+
         return new TransactionOutput(
-            $parser->readBytes(8, true)->getInt(),
-            new Script($parser->getVarString())
+            $value,
+            new Script($scriptBuf)
         );
     }
 
@@ -45,7 +61,6 @@ class TransactionOutputSerializer
     public function parse($string)
     {
         $parser = new Parser($string);
-        $output = $this->fromParser($parser);
-        return $output;
+        return $this->fromParser($parser);
     }
 }

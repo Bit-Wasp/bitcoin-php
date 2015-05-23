@@ -3,11 +3,13 @@
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Buffertools\TemplateFactory;
 
 class HexBlockSerializer
 {
@@ -39,6 +41,18 @@ class HexBlockSerializer
     }
 
     /**
+     * @return \BitWasp\Buffertools\Template
+     */
+    private function getTxsTemplate()
+    {
+        return (new TemplateFactory())
+            ->vector(function (Parser &$parser) {
+                return $this->txSerializer->fromParser($parser);
+            })
+            ->getTemplate();
+    }
+
+    /**
      * @param Parser $parser
      * @return Block
      * @throws ParserOutOfRange
@@ -51,14 +65,8 @@ class HexBlockSerializer
                 $this->headerSerializer->fromParser($parser)
             );
 
-            $block->getTransactions()->addTransactions(
-                $parser->getArray(
-                    function () use (&$parser) {
-                        $transaction = $this->txSerializer->fromParser($parser);
-                        return $transaction;
-                    }
-                )
-            );
+            $block->getTransactions()->addTransactions($this->getTxsTemplate()->parse($parser)[0]);
+
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }
@@ -84,9 +92,11 @@ class HexBlockSerializer
      */
     public function serialize(BlockInterface $block)
     {
-        $header = $block->getHeader()->getBuffer();
-        $parser = new Parser($header);
-        $parser->writeArray($block->getTransactions()->getTransactions());
-        return $parser->getBuffer();
+        return Buffertools::concat(
+            $block->getHeader()->getBuffer(),
+            $this->getTxsTemplate()->write([
+                $block->getTransactions()->getTransactions()
+            ])
+        );
     }
 }

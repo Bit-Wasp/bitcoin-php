@@ -2,10 +2,12 @@
 
 namespace BitWasp\Bitcoin\Serializer\Block;
 
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
+use BitWasp\Buffertools\TemplateFactory;
 
 class HexBlockHeaderSerializer
 {
@@ -21,6 +23,21 @@ class HexBlockHeaderSerializer
     }
 
     /**
+     * @return \BitWasp\Buffertools\Template
+     */
+    public function getTemplate()
+    {
+        return (new TemplateFactory())
+            ->uint32le()
+            ->bytestringle(32)
+            ->bytestringle(32)
+            ->uint32le()
+            ->bytestringle(4)
+            ->uint32le()
+            ->getTemplate();
+    }
+
+    /**
      * @param $parser
      * @return BlockHeader
      * @throws ParserOutOfRange
@@ -29,20 +46,20 @@ class HexBlockHeaderSerializer
     {
 
         try {
-            $header = new BlockHeader(
-                $parser->readBytes(4, true)->getInt(),
-                $parser->readBytes(32, true)->getHex(),
-                $parser->readBytes(32, true)->getHex(),
-                $parser->readBytes(4, true)->getInt(),
-                $parser->readBytes(4, true),
-                $parser->readBytes(4, true)->getInt()
+            list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->getTemplate()->parse($parser);
+
+            return new BlockHeader(
+                $version,
+                $prevHash->getHex(),
+                $merkleHash->getHex(),
+                $time,
+                $nBits,
+                $nonce
             );
 
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }
-
-        return $header;
     }
 
     /**
@@ -51,15 +68,13 @@ class HexBlockHeaderSerializer
      */
     public function serialize(BlockHeaderInterface $header)
     {
-        $data = new Parser;
-        $data
-            ->writeInt(4, $header->getVersion(), true)
-            ->writeBytes(32, $header->getPrevBlock(), true)
-            ->writeBytes(32, $header->getMerkleRoot(), true)
-            ->writeInt(4, $header->getTimestamp(), true)
-            ->writeBytes(4, $header->getBits(), true)
-            ->writeInt(4, $header->getNonce(), true);
-
-        return $data->getBuffer();
+        return $this->getTemplate()->write([
+            $header->getVersion(),
+            Buffer::hex($header->getPrevBlock()),
+            Buffer::hex($header->getMerkleRoot()),
+            $header->getTimestamp(),
+            $header->getBits(),
+            $header->getNonce()
+        ]);
     }
 }
