@@ -299,7 +299,7 @@ class ScriptInterpreterTest extends \PHPUnit_Framework_TestCase
         $flags = new Flags(0);
         $vectors[] = [
             $flags,
-            new Script(),
+            new Script(new Buffer()),
             ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../../../Data/10010bytes.hex"))),
             false,
             'fails with >10000 bytes',

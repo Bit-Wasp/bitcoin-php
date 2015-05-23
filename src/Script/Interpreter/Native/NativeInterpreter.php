@@ -5,18 +5,17 @@ namespace BitWasp\Bitcoin\Script\Interpreter\Native;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\ScriptStack;
-use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
-use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 
 class NativeInterpreter implements InterpreterInterface
@@ -32,7 +31,7 @@ class NativeInterpreter implements InterpreterInterface
     private $script;
 
     /**
-     * @var Transaction
+     * @var TransactionInterface
      */
     private $transaction;
 
@@ -40,27 +39,17 @@ class NativeInterpreter implements InterpreterInterface
      * Position of OP_CODESEPARATOR, for calculating SigHash
      * @var int
      */
-    protected $hashStartPos;
+    private $hashStartPos;
 
     /**
      * @var int
      */
-    protected $opCount;
+    private $opCount;
 
     /**
      * @var \BitWasp\Bitcoin\Flags
      */
-    protected $flags;
-
-    /**
-     * @var string
-     */
-    protected $constTrue;
-
-    /**
-     * @var string
-     */
-    protected $constFalse;
+    private $flags;
 
     /**
      * @var EcAdapterInterface
@@ -78,21 +67,18 @@ class NativeInterpreter implements InterpreterInterface
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param Transaction $transaction
+     * @param TransactionInterface $transaction
      * @param \BitWasp\Bitcoin\Flags $flags
      * @internal param Math $math
      * @internal param GeneratorPoint $generator
      */
-    public function __construct(EcAdapterInterface $ecAdapter, Transaction $transaction, Flags $flags)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, Flags $flags)
     {
         $this->ecAdapter = $ecAdapter;
         $this->transaction = $transaction;
-        $this->script = new Script();
         $this->flags = $flags;
+        $this->script = new Script();
         $this->state = new State();
-
-        $this->constTrue = pack("H*", '01');
-        $this->constFalse = pack("H*", '00');
     }
 
     /**
@@ -166,7 +152,7 @@ class NativeInterpreter implements InterpreterInterface
     public function isValidSignatureEncoding(Buffer $signature)
     {
         try {
-            TransactionSignature::isDERSignature($signature);
+            \BitWasp\Bitcoin\Signature\TransactionSignature::isDERSignature($signature);
             return true;
         } catch (SignatureNotCanonical $e) {
             return false;
