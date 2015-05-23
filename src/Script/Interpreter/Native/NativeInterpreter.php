@@ -1,25 +1,25 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Interpreter\Native;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
+use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
+use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Script\Interpreter\ArithmeticOperation;
-use BitWasp\Bitcoin\Script\Interpreter\FlowControlOperation;
-use BitWasp\Bitcoin\Script\Interpreter\HashOperation;
-use BitWasp\Bitcoin\Script\Interpreter\PushIntOperation;
-use BitWasp\Bitcoin\Script\Interpreter\StackOperation;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Flags;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
+use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
+use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 
-class ScriptInterpreter implements ScriptInterpreterInterface
+class NativeInterpreter implements InterpreterInterface
 {
     /**
      * @var int|string
@@ -48,7 +48,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     protected $opCount;
 
     /**
-     * @var ScriptInterpreterFlags
+     * @var \BitWasp\Bitcoin\Flags
      */
     protected $flags;
 
@@ -68,27 +68,39 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     private $ecAdapter;
 
     /**
-     * @var ScriptInterpreterState
+     * @var State
      */
     private $state;
+
+    public $maxElementSize = 520;
+    public $checkDisabledOpcodes = true;
+    public $maxBytes = 10000;
 
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param Transaction $transaction
-     * @param ScriptInterpreterFlags $flags
+     * @param \BitWasp\Bitcoin\Flags $flags
      * @internal param Math $math
      * @internal param GeneratorPoint $generator
      */
-    public function __construct(EcAdapterInterface $ecAdapter, Transaction $transaction, ScriptInterpreterFlags $flags = null)
+    public function __construct(EcAdapterInterface $ecAdapter, Transaction $transaction, Flags $flags)
     {
         $this->ecAdapter = $ecAdapter;
         $this->transaction = $transaction;
-        $this->script = ScriptFactory::create();
-        $this->flags = $flags ?: ScriptInterpreterFlags::defaults();
-        $this->state = new ScriptInterpreterState();
+        $this->script = new Script();
+        $this->flags = $flags;
+        $this->state = new State();
 
         $this->constTrue = pack("H*", '01');
         $this->constFalse = pack("H*", '00');
+    }
+
+    /**
+     * @return State
+     */
+    public function getStackState()
+    {
+        return $this->state;
     }
 
     /**
@@ -170,7 +182,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
     public function isLowDerSignature(Buffer $signature)
     {
         if (!$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
+            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_DERSIG, 'Signature with incorrect encoding');
         }
 
         $binary = $signature->getBinary();
@@ -216,12 +228,12 @@ class ScriptInterpreter implements ScriptInterpreterInterface
             return $this;
         }
 
-        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_DERSIG | ScriptInterpreterFlags::VERIFY_LOW_S | ScriptInterpreterFlags::VERIFY_STRICTENC) && !$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        } else if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_LOW_S) && !$this->isLowDerSignature($signature)) {
-            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_LOW_S, 'Signature s element was not low');
-        } else if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_STRICTENC) && !$this->isDefinedHashtypeSignature($signature)) {
-            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Signature with invalid hashtype');
+        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_DERSIG | InterpreterInterface::VERIFY_LOW_S | InterpreterInterface::VERIFY_STRICTENC) && !$this->isValidSignatureEncoding($signature)) {
+            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_DERSIG, 'Signature with incorrect encoding');
+        } else if ($this->flags->checkFlags(InterpreterInterface::VERIFY_LOW_S) && !$this->isLowDerSignature($signature)) {
+            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_LOW_S, 'Signature s element was not low');
+        } else if ($this->flags->checkFlags(InterpreterInterface::VERIFY_STRICTENC) && !$this->isDefinedHashtypeSignature($signature)) {
+            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_STRICTENC, 'Signature with invalid hashtype');
         }
 
         return $this;
@@ -234,8 +246,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
      */
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
-        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
-            throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_STRICTENC, 'Public key with incorrect encoding');
+        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
+            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
         return $this;
@@ -283,6 +295,14 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         return $this;
     }
 
+    /**
+     * @param ScriptInterface $script
+     * @param Buffer $sigBuf
+     * @param Buffer $keyBuf
+     * @return bool
+     * @throws ScriptRuntimeException
+     * @throws \Exception
+     */
     private function checkSig(ScriptInterface $script, Buffer $sigBuf, Buffer $keyBuf)
     {
         $this
@@ -314,7 +334,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
         $mainStack = $this->state->getMainStack();
         $stackCopy = new ScriptStack;
-        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_P2SH)) {
+        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_P2SH)) {
             $stackCopy = $this->state->cloneMainStack();
         }
 
@@ -323,24 +343,26 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         }
 
         if ($mainStack->size() == 0) {
-            throw new \Exception('Script stack empty after evaluation');
+            return false;
         }
 
         if (false === $this->castToBool($mainStack->top(-1))) {
-            throw new \Exception('Script evaluated to false');
+            return false;
         }
 
         $verifier = new OutputClassifier($scriptPubKey);
 
-        if ($this->flags->checkFlags(ScriptInterpreterFlags::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
+        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) {
-                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_SIGPUSHONLY, 'P2SH scriptSig must be push only');
+                return false;
+                //throw new ScriptRuntimeException(InterpreterInterface::VERIFY_SIGPUSHONLY, 'P2SH scriptSig must be push only');
             }
 
             // Restore mainStack to how it was after evaluating scriptSig
             $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
             if ($mainStack->size() == 0) {
-                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_P2SH, 'Stack cannot be empty during p2sh');
+                return false;
+                //throw new ScriptRuntimeException(InterpreterInterface::VERIFY_P2SH, 'Stack cannot be empty during p2sh');
             }
 
             // Load redeemscript as the scriptPubKey
@@ -373,6 +395,10 @@ class ScriptInterpreter implements ScriptInterpreterInterface
         $_bn0 = Buffer::hex('00');
         $_bn1 = Buffer::hex('01');
 
+        if ($this->script->getBuffer()->getSize() > 10000) {
+            return false;
+        }
+
         $checkFExec = function () use (&$vfStack) {
             $c = 0;
             $len = $vfStack->end();
@@ -389,7 +415,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                 $fExec = !$checkFExec();
 
                 // If pushdata was written to,
-                if ($pushData instanceof Buffer && $pushData->getSize() > $flags->getMaxElementSize()) {
+                if ($pushData instanceof Buffer && $pushData->getSize() > $this->maxElementSize) {
                     throw new \Exception('Error - push size');
                 }
 
@@ -398,7 +424,7 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                     $this->checkOpcodeCount();
                 }
 
-                if ($flags->checkDisabledOpcodes()) {
+                if ($this->checkDisabledOpcodes) {
                     if ($this->isDisabledOp($opCode)) {
                         throw new \Exception('Disabled Opcode');
                     }
@@ -406,8 +432,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
 
                 if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
                     // In range of a pushdata opcode
-                    if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
-                        throw  new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_MINIMALDATA, 'Minimal pushdata required');
+                    if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
+                        throw  new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
                     $mainStack->push($pushData);
                     //echo " - [pushed '" . $pushData->getHex() . "']\n";
@@ -421,8 +447,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                             break;
 
                         case $opcodes->cmp($opCode, 'OP_NOP1') >= 0 && $opcodes->cmp($opCode, 'OP_NOP10') <= 0:
-                            if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
-                                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOPS found - this is discouraged');
+                            if ($flags->checkFlags(InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                                throw new ScriptRuntimeException(InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOPS found - this is discouraged');
                             }
                             break;
 
@@ -623,8 +649,8 @@ class ScriptInterpreter implements ScriptInterpreterInterface
                                 throw new \Exception('Invalid stack operation');
                             }
 
-                            if ($flags->checkFlags(ScriptInterpreterFlags::VERIFY_NULL_DUMMY) && $mainStack->top(-1)->getSize()) {
-                                throw new ScriptRuntimeException(ScriptInterpreterFlags::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
+                            if ($flags->checkFlags(InterpreterInterface::VERIFY_NULL_DUMMY) && $mainStack->top(-1)->getSize()) {
+                                throw new ScriptRuntimeException(InterpreterInterface::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
                             }
 
                             $mainStack->pop();

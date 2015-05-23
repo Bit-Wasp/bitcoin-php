@@ -204,3 +204,23 @@ echo $seed->getHex() . "\n";
 $bip32 = \BitWasp\Bitcoin\Key\HierarchicalKeyFactory::fromEntropy($seed);
 
 ```
+
+## Write/interpret bitcoin scripts
+```php
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter;
+use BitWasp\Bitcoin\Script\Interpreter\Flags;
+use BitWasp\Bitcoin\Transaction\Transaction;
+
+$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
+
+$script = ScriptFactory::create()->op('OP_1')->op('OP_1')->op('OP_ADD');
+
+echo "Formed script: " . $script . "\n";
+print_r($script->getScriptParser()->parse());
+
+$i = new NativeInterpreter($ec, new Transaction(), new Flags(0));
+$i->setScript($script)->run();
+
+print_r($i->getStackState());
+```

@@ -1,9 +1,16 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Interpreter;
 
-class ScriptInterpreterFlags
+use BitWasp\Bitcoin\Script\ScriptInterface;
+
+interface InterpreterInterface
 {
+    const SCRIPT_ERR_BAD_OPCODE = "";
+    const SCRIPT_ERR_PUSH_SIZE = "";
+    const SCRIPT_ERR_OP_COUNT = "";
+    const SCRIPT_ERR_MINIMALDATA = "";
+
     const VERIFY_NONE = 0;
 
     // Evaluate P2SH subscripts (softfork safe, BIP16).
@@ -51,83 +58,16 @@ class ScriptInterpreterFlags
     // Note: CLEANSTACK should never be used without P2SH.
     const VERIFY_CLEAN_STACK = 256;
 
-    /**
-     * @var int
-     */
-    private $flags;
+    const SIGHASH_ALL          = 0x1;
+    const SIGHASH_NONE         = 0x2;
+    const SIGHASH_SINGLE       = 0x3;
+    const SIGHASH_ANYONECANPAY = 0x80;
 
     /**
-     * @var int
-     */
-    private $maxBytes = 10000;
-
-    /**
-     * @var int
-     */
-    private $maxElementSize = 520;
-
-    /**
-     * @var bool
-     */
-    private $checkDisabledOpcodes = false;
-
-    /**
-     * @param $flags
-     * @param bool $checkDisabledOpcodes
-     */
-    public function __construct($flags, $checkDisabledOpcodes = false)
-    {
-        if (!is_bool($checkDisabledOpcodes)) {
-            throw new \InvalidArgumentException('CheckDisabledOpcodes must be a boolean');
-        }
-
-        $this->flags = $flags;
-        $this->checkDisabledOpcodes = $checkDisabledOpcodes;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxBytes()
-    {
-        return $this->maxBytes;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxElementSize()
-    {
-        return $this->maxElementSize;
-    }
-
-    /**
+     * @param ScriptInterface $scriptSig
+     * @param ScriptInterface $scriptPubKey
+     * @param $nInputToSign
      * @return bool
      */
-    public function checkDisabledOpcodes()
-    {
-        return $this->checkDisabledOpcodes;
-    }
-
-    /**
-     * @param $flags
-     * @return int
-     */
-    public function checkFlags($flags)
-    {
-        return (bool) ($this->flags & $flags);
-    }
-
-    /**
-     * @return ScriptInterpreterFlags
-     */
-    public static function defaults()
-    {
-        return new self(
-            self::VERIFY_P2SH | self::VERIFY_STRICTENC | self::VERIFY_DERSIG |
-            self::VERIFY_LOW_S | self::VERIFY_NULL_DUMMY | self::VERIFY_SIGPUSHONLY |
-            self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS | self::VERIFY_CLEAN_STACK,
-            true
-        );
-    }
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign);
 }

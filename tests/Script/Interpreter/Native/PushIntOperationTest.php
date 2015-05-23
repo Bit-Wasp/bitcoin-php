@@ -1,13 +1,13 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
+namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Native;
 
-use BitWasp\Bitcoin\Script\Interpreter\FlowControlOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Native\PushIntOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class FlowControlOperationTest extends AbstractTestCase
+class PushIntOperationTest extends AbstractTestCase
 {
     /**
      * @expectedException \Exception
@@ -16,8 +16,7 @@ class FlowControlOperationTest extends AbstractTestCase
     public function testOpCodeNotFound()
     {
         // 101 is not in the right range, should fail.
-        $operation = new FlowControlOperation(new Opcodes(), function () {
-        });
-        $operation->op(101, new ScriptStack(), new ScriptStack(), false);
+        $operation = new PushIntOperation(new Opcodes());
+        $operation->op(101, new ScriptStack());
     }
 }
