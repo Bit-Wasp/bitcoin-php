@@ -42,7 +42,7 @@ class NetworkAddressTimestamp extends NetworkAddress
             ->writeInt(4, $this->getTimestamp(), true)
             ->writeBytes(8, $this->getServices(), true)
             ->writeBytes(16, $this->getIpBuffer())
-            ->writeInt(2, $this->port);
+            ->writeInt(2, $this->getPort());
 
         return $parser->getBuffer();
     }
