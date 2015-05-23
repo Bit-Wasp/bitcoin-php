@@ -16,22 +16,22 @@ class PaymentRequestBuilder
     /**
      * @var int
      */
-    protected $outputCount = 0;
+    private $outputCount = 0;
 
     /**
      * @var PaymentRequestBuf
      */
-    protected $request;
+    private $request;
 
     /**
      * @var PaymentDetailsBuf
      */
-    protected $details;
+    private $details;
 
     /**
      * @var PaymentRequestSigner
      */
-    protected $signer;
+    private $signer;
 
     /**
      * @param PaymentRequestSigner $signer

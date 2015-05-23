@@ -19,11 +19,6 @@ class HierarchicalKey
     private $ecAdapter;
 
     /**
-     * @var string
-     */
-    private $bytes;
-
-    /**
      * @var int|string
      */
     private $depth;

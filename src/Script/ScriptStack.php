@@ -9,14 +9,7 @@ class ScriptStack
     /**
      * @var array
      */
-    protected $stack = array();
-
-    /**
-     * @returns self
-     */
-    public function __construct()
-    {
-    }
+    private $stack = array();
 
     /**
      * Pop a value from the stack
