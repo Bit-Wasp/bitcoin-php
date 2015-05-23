@@ -8,11 +8,6 @@ use JsonRPC\Client;
 class JsonRpcClient extends Client
 {
     /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * @param $host
      * @param $port
      * @param int $timeout

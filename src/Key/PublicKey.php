@@ -13,17 +13,17 @@ class PublicKey extends Key implements PublicKeyInterface
     /**
      * @var EcAdapterInterface
      */
-    protected $ecAdapter;
+    private $ecAdapter;
 
     /**
      * @var PointInterface
      */
-    protected $point;
+    private $point;
 
     /**
      * @var bool
      */
-    protected $compressed;
+    private $compressed;
 
     /**
      * @param EcAdapterInterface $ecAdapter

@@ -12,7 +12,7 @@ class Ping extends NetworkSerializable
     /**
      * @var integer|string
      */
-    protected $nonce;
+    private $nonce;
 
     /**
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure

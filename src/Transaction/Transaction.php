@@ -14,22 +14,22 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @var int|string
      */
-    protected $version;
+    private $version;
 
     /**
      * @var TransactionInputCollection
      */
-    protected $inputs;
+    private $inputs;
 
     /**
      * @var TransactionOutputCollection
      */
-    protected $outputs;
+    private $outputs;
 
     /**
      * @var int|string
      */
-    protected $locktime;
+    private $locktime;
 
     /**
      * @param int|string $version

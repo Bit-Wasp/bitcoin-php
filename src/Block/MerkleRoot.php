@@ -14,22 +14,17 @@ class MerkleRoot
     /**
      * @var TransactionCollection
      */
-    protected $transactions;
+    private $transactions;
 
     /**
      * @var Math
      */
-    protected $math;
-
-    /**
-     * @var callable
-     */
-    protected $hashFxn;
+    private $math;
 
     /**
      * @var string
      */
-    protected $lastHash;
+    private $lastHash;
 
     /**
      * Instantiate the class when given a block

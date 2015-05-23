@@ -13,47 +13,47 @@ class Version extends NetworkSerializable
     /**
      * @var int|string
      */
-    protected $version;
+    private $version;
 
     /**
      * @var int|string
      */
-    protected $services;
+    private $services;
 
     /**
      * @var int|string
      */
-    protected $timestamp;
+    private $timestamp;
 
     /**
      * @var NetworkAddress
      */
-    protected $addrRecv;
+    private $addrRecv;
 
     /**
      * @var NetworkAddress
      */
-    protected $addrFrom;
+    private $addrFrom;
 
     /**
      * @var Buffer
      */
-    protected $userAgent;
+    private $userAgent;
 
     /**
      * @var int|string
      */
-    protected $startHeight;
+    private $startHeight;
 
     /**
      * @var bool
      */
-    protected $relay;
+    private $relay;
 
     /**
      * @var integer|string
      */
-    protected $nonce;
+    private $nonce;
 
     /**
      * @param $version

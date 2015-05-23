@@ -10,7 +10,7 @@ class TransactionSignatureSerializer
     /**
      * @var DerSignatureSerializer
      */
-    protected $sigSerializer;
+    private $sigSerializer;
 
     /**
      * @param DerSignatureSerializer $sigSerializer

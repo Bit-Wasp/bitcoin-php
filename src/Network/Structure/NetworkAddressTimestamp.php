@@ -10,7 +10,7 @@ class NetworkAddressTimestamp extends NetworkAddress
     /**
      * @var int|string
      */
-    protected $time;
+    private $time;
 
     /**
      * @param $time
