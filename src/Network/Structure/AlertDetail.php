@@ -37,7 +37,7 @@ class AlertDetail extends Serializable
     private $cancel;
 
     /**
-     * @var int
+     * @var integer[]
      */
     private $setCancel;
 
@@ -52,7 +52,7 @@ class AlertDetail extends Serializable
     private $maxVer;
 
     /**
-     * @var array[]
+     * @var integer[]
      */
     private $setSubVer;
 
@@ -202,7 +202,7 @@ class AlertDetail extends Serializable
     }
 
     /**
-     * @return array
+     * @return integer[]
      */
     public function getSetSubVer()
     {
