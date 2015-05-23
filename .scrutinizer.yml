@@ -1,5 +1,5 @@
 filter:
-    excluded_paths: [vendor/*, build/*, tests/*, stubs/*, src/Payments/Protobufs/*]
+    excluded_paths: [examples*, vendor/*, build/*, tests/*, stubs/*, src/Payments/Protobufs/*]
 
 before_commands:
     - "composer install --prefer-source --no-dev"
