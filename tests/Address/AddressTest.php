@@ -100,14 +100,6 @@ class AddressTest extends AbstractTestCase
         AddressFactory::fromOutputScript($unknownScript);
     }
 
-    /**
-     * @dataProvider getVectors
-     * @param $type
-     * @param NetworkInterface $network
-     * @param $data
-     * @param $address
-     * @throws \Exception
-     */
     public function testAssociatedAddress()
     {
         $p2pkHex = '76a914e5d14d42026e6999da3c2cc4123f261a3253ef1688ac';
