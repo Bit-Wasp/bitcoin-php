@@ -80,6 +80,7 @@ class AddressFactory
 
     /**
      * @param ScriptInterface $script
+     * @param NetworkInterface $network
      * @return String
      * @throws \RuntimeException
      */
