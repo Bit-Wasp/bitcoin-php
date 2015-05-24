@@ -81,7 +81,7 @@ class AddressFactory
     /**
      * @param ScriptInterface $script
      * @return String
-     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     * @throws \RuntimeException
      */
     public static function getAssociatedAddress(ScriptInterface $script, NetworkInterface $network = null)
     {
