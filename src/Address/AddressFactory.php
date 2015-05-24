@@ -9,6 +9,9 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Buffertools\Buffer;
+
 class AddressFactory
 {
     /**
@@ -72,6 +75,26 @@ class AddressFactory
             return new PayToPubKeyHashAddress($data->slice(1));
         } else {
             throw new \InvalidArgumentException("Invalid prefix [{$prefixByte}]");
+        }
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @param NetworkInterface $network
+     * @return String
+     * @throws \RuntimeException
+     */
+    public static function getAssociatedAddress(ScriptInterface $script, NetworkInterface $network = null)
+    {
+        $classifier = new OutputClassifier($script);
+        $network = $network ?: Bitcoin::getNetwork();
+        try {
+            $address = $classifier->isPayToPublicKey()
+                ? PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress()
+                : self::fromOutputScript($script);
+            return Base58::encodeCheck(Buffer::hex($network->getAddressByte() . $address->getHash()));
+        } catch (\Exception $e) {
+            throw new \RuntimeException('No address associated with this script type');
         }
     }
 }
