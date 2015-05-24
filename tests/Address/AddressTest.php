@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use Symfony\Component\Yaml\Yaml;
@@ -97,5 +98,30 @@ class AddressTest extends AbstractTestCase
 
         $unknownScript = ScriptFactory::create()->op('OP_0')->op('OP_1');
         AddressFactory::fromOutputScript($unknownScript);
+    }
+
+    /**
+     * @dataProvider getVectors
+     * @param $type
+     * @param NetworkInterface $network
+     * @param $data
+     * @param $address
+     * @throws \Exception
+     */
+    public function testAssociatedAddress()
+    {
+        $p2pkHex = '76a914e5d14d42026e6999da3c2cc4123f261a3253ef1688ac';
+        $p2pkAddress = 'n2U7mXV4HFumkKLt7jz8LhNqKHMszTP39c';
+
+        $p2pkhHex = '76a914b96b816f378babb1fe585b7be7a2cd16eb99b3e488ac';
+        $p2pkhAddress = 'mxRN6AQJaDi5R6KmvMaEmZGe3n5ScV9u33';
+
+        $network = NetworkFactory::bitcoinTestnet();
+
+        $p2pkResult = AddressFactory::getAssociatedAddress(ScriptFactory::fromHex($p2pkHex), $network);
+        $this->assertEquals($p2pkAddress, $p2pkResult);
+
+        $p2pkhResult = AddressFactory::getAssociatedAddress(ScriptFactory::fromHex($p2pkhHex), $network);
+        $this->assertEquals($p2pkhAddress, $p2pkhResult);
     }
 }
