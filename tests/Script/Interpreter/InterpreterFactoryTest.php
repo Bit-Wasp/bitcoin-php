@@ -2,14 +2,13 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 
-class InterpreterFactoryTest  extends AbstractTestCase
+class InterpreterFactoryTest extends AbstractTestCase
 {
 
     /**

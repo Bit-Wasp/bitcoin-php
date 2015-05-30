@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterFactory;
 use BitWasp\Buffertools\Buffer;
@@ -23,7 +22,8 @@ class InterpreterTest
         return $results;
     }
 
-    private function loadVectors($dir) {
+    private function loadVectors($dir)
+    {
         $vectors = array();
         foreach ($this->loadExternalTestFiles($dir) as $c => $file) {
             $vectors[] = explode("\n", file_get_contents($file));

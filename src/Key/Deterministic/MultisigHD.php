@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
-
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
@@ -85,7 +84,8 @@ class MultisigHD
     {
         return ScriptFactory::multisig(
             $this->m,
-            array_map(function (HierarchicalKey $key) {
+            array_map(
+                function (HierarchicalKey $key) {
                     return $key->getPublicKey();
                 },
                 $this->keys

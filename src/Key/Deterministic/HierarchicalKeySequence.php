@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
-
 use BitWasp\Bitcoin\Math\Math;
 
 class HierarchicalKeySequence

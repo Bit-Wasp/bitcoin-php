@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
-
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
