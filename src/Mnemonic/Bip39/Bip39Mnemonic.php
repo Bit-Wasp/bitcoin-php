@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Mnemonic\Bip39;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Mnemonic\MnemonicInterface;
 use BitWasp\Buffertools\Buffer;
 
@@ -27,6 +28,21 @@ class Bip39Mnemonic implements MnemonicInterface
     {
         $this->ecAdapter = $ecAdapter;
         $this->wordList = $wordList;
+    }
+
+    /**
+     * Creates a new Bip39 mnemonic string.
+     *
+     * @param int $entropySize
+     * @return string
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
+     */
+    public function create($entropySize = 512)
+    {
+        $random = new Random();
+        $entropy = $random->bytes($entropySize / 8);
+
+        return $this->entropyToMnemonic($entropy);
     }
 
     /**

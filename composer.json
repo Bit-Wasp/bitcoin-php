@@ -21,24 +21,23 @@
       "BitWasp\\Bitcoin\\Tests\\": "tests/"
     }
   },
-  "minimum-stability": "dev",
   "require": {
     "php": ">=5.4.0",
     "ext-gmp": "*",
     "ext-json": "*",
     "ext-openssl": "*",
     "ext-mcrypt": "*",
-    "mdanter/ecc": "dev-master",
+    "mdanter/ecc": "~0.3",
     "pleonasm/merkle-tree": "1.0.0",
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
-    "rgooding/protobuf-php": "*",
+    "rgooding/protobuf-php": "~0.0",
     "bitwasp/buffertools": "~0.1",
-    "bitwasp/stratum": "v0.1.0"
+    "bitwasp/stratum": "~0.1"
   },
   "require-dev": {
-    "bitwasp/testing-php": "0.0.1",
-    "symfony/yaml": "2.6.6"
+    "bitwasp/testing-php": "~0.0",
+    "symfony/yaml": "~2.6"
   },
   "config": {
     "bin-dir": "bin"

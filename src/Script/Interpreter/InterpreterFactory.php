@@ -47,7 +47,7 @@ class InterpreterFactory
 
     /**
      * @param $tx
-     * @param $flags
+     * @param Flags $flags
      * @return NativeInterpreter
      */
     public function getNativeInterpreter(TransactionInterface $tx, Flags $flags)
@@ -67,6 +67,7 @@ class InterpreterFactory
 
     /**
      * @param TransactionInterface $tx
+     * @param Flags $flags
      * @return BitcoinConsensus|NativeInterpreter
      */
     public function create(TransactionInterface $tx, Flags $flags)

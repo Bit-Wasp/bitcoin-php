@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Base58;
-use BitWasp\Bitcoin\Key\HierarchicalKey;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 
 class ExtendedKeySerializer
 {

@@ -1,9 +1,12 @@
 <?php
 
-namespace BitWasp\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Key\KeyInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 

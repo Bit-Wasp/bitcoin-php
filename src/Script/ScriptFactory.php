@@ -25,13 +25,9 @@ class ScriptFactory
     public static function multisig($m, array $keys = array(), $sort = true)
     {
         if ($sort) {
-            usort($keys, function (KeyInterface $a, KeyInterface $b) {
-                $av = $a->getBinary();
-                $bv = $b->getBinary();
-
-                return $av == $bv ? 0 : $av > $bv ? 1 : -1;
-            });
+            $keys = \BitWasp\Buffertools\Buffertools::sort($keys);
         }
+
         return new RedeemScript($m, $keys);
     }
 

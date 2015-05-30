@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Bitcoin\Key\HierarchicalKey;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Buffertools\TemplateFactory;
 
 class HexExtendedKeySerializer
@@ -102,7 +102,7 @@ class HexExtendedKeySerializer
 
     /**
      * @param Buffer $buffer
-     * @return HierarchicalKey
+     * @return \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey
      * @throws ParserOutOfRange
      * @throws \Exception
      */

@@ -10,4 +10,5 @@ build/code-coverage
 build/logs/*
 build/cache/*
 build/cache/lint.cache
+tests/Data/bitcoinconsensus_testcases
 phpunit.xml
