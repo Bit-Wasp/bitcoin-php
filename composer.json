@@ -28,7 +28,7 @@
     "ext-json": "*",
     "ext-openssl": "*",
     "ext-mcrypt": "*",
-    "mdanter/ecc": "dev-master",
+    "mdanter/ecc": "~0.3",
     "pleonasm/merkle-tree": "1.0.0",
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
