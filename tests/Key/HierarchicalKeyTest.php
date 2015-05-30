@@ -384,16 +384,6 @@ class HierarchicalKeyTest extends AbstractTestCase
         $key->deriveChild("2147483648");
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testHardenedSequenceFailure()
-    {
-        $key = HierarchicalKeyFactory::generateMasterKey();
-        // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
-        $key->getHardenedSequence($key->getHardenedSequence(0));
-    }
-
     public function testSkipsInvalidKey()
     {
         $math = new Math();

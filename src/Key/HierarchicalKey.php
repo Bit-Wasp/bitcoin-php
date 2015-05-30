@@ -64,21 +64,7 @@ class HierarchicalKey
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
         $this->key = $key;
-    }
 
-    /**
-     * @param $sequence
-     * @return int|string
-     */
-    public function getHardenedSequence($sequence)
-    {
-        $bMath = $this->ecAdapter->getMath()->getBinaryMath();
-        if ($bMath->isNegative($sequence, 32)) {
-            throw new \LogicException('Sequence is already for a hardened key');
-        }
-
-        $prime = $bMath->makeNegative($sequence, 32);
-        return $prime;
     }
 
     /**
@@ -288,22 +274,12 @@ class HierarchicalKey
         if (strlen($path) == 0 || count($pathPieces) == 0) {
             throw new \InvalidArgumentException('Invalid path passed to decodePath()');
         }
+
         $newPath = array();
 
+        $helper = new HierarchicalKeySequence($this->ecAdapter->getMath());
         foreach ($pathPieces as $c => $sequence) {
-            $hardened = false;
-
-            if (in_array(substr(strtolower($sequence), -1), array("h", "'")) === true) {
-                $intEnd = strlen($sequence) - 1;
-                $sequence = substr($sequence, 0, $intEnd);
-                $hardened = true;
-            }
-
-            if ($hardened) {
-                $sequence = $this->getHardenedSequence($sequence);
-            }
-
-            $newPath[] = $sequence;
+            $newPath[] = $helper->fromNode($sequence);
         }
 
         $path = implode("/", $newPath);
