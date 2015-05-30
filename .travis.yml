@@ -28,9 +28,10 @@ install:
           && phpize && ./configure && make && sudo make install \
           && cd ../..; fi'
     - | 
-       sh -c 'cd tests/Data \ 
-          && git clone https://github.com/jonasnick/bitcoinconsensus_testcases.git \
-          && cd ../..; '
+      sh -c 'if [ "" == ""]; then \
+          cd tests/Data \
+          && git clone https://github.com/jonasnick/bitcoinconsensus_testcases.git  \
+          && cd ../..; fi'
     - composer update --prefer-source
 
 script:
