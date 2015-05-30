@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Key;
+namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;

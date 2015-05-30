@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Key;
+namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
