@@ -44,7 +44,7 @@ class Bip39SeedGenerator
      * @return \BitWasp\Buffertools\Buffer
      * @throws \Exception
      */
-    public function getSeed($mnemonic, $passphrase)
+    public function getSeed($mnemonic, $passphrase = '')
     {
         return Hash::pbkdf2(
             'sha512',
