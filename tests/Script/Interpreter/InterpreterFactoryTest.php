@@ -15,12 +15,12 @@ class InterpreterFactoryTest  extends AbstractTestCase
     /**
      * @var string
      */
-    public $nativeType = 'BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter';
+    public $nativeType = '\BitWasp\Bitcoin\Script\Interpreter\Native\NativeInterpreter';
 
     /**
      * @var string
      */
-    public $extensionType = 'BitWasp\Bitcoin\Script\Interpreter\Native\BitcoinConsensus';
+    public $extensionType = '\BitWasp\Bitcoin\Script\Interpreter\BitcoinConsensus\BitcoinConsensus';
 
     public function getExpectedClass()
     {

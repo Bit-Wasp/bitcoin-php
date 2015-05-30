@@ -1,0 +1,5 @@
+{
+  "require": {
+    "bitwasp/bitcoin": "0.0.4"
+  }
+}
