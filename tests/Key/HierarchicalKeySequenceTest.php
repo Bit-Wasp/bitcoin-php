@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Key;
 
 
-use BitWasp\Bitcoin\Key\HierarchicalKeySequence;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -40,7 +40,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
      */
     public function testHardenedSequenceFailure()
     {
-        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence(new Math());
 
         // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
         $sequence->getHardened(HierarchicalKeySequence::START_HARDENED);

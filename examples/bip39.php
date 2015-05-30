@@ -18,4 +18,4 @@ $mnemonic = $bip39->entropyToMnemonic($entropy);
 $seed = $seedGenerator->getSeed($mnemonic, 'password');
 echo $seed->getHex() . "\n";
 
-$bip32 = \BitWasp\Bitcoin\Key\HierarchicalKeyFactory::fromEntropy($seed);
+$bip32 = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromEntropy($seed);

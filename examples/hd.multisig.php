@@ -5,7 +5,7 @@ require "../vendor/autoload.php";
 use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 
-function status(\BitWasp\Bitcoin\Deterministic\MultisigHD $hd)
+function status(\BitWasp\Bitcoin\Key\Deterministic\MultisigHD $hd)
 {
     echo "Path: " . $hd->getPath() . "\n";
     echo "Keys: \n";
@@ -26,11 +26,11 @@ $s = [];
 $k = [];
 for ($i = 0; $i < 3; $i++) {
     $s[$i] = $seed->getSeed($bip39->create());
-    $k[$i] = \BitWasp\Bitcoin\Key\HierarchicalKeyFactory::fromEntropy($s[$i]);
+    $k[$i] = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromEntropy($s[$i]);
 }
 
-$sequences = new \BitWasp\Bitcoin\Key\HierarchicalKeySequence($ec->getMath());
-$hd = new \BitWasp\Bitcoin\Deterministic\MultisigHD(2, 'm', $k, $sequences, true);
+$sequences = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence($ec->getMath());
+$hd = new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', $k, $sequences, true);
 
 status($hd);
 $new = $hd->derivePath("0/1h/2");

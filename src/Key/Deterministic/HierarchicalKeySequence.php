@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Key\Deterministic;
 
 
 use BitWasp\Bitcoin\Math\Math;

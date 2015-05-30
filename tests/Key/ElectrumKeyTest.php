@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
-use BitWasp\Bitcoin\Key\ElectrumKeyFactory;
+use BitWasp\Bitcoin\Key\Deterministic\ElectrumKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -57,7 +57,7 @@ class ElectrumKeyTest extends AbstractTestCase
      */
     public function testCKD(EcAdapterInterface $ecAdapter, $mnemonic, $eSecExp, $eMPK, array $eAddrList = array())
     {
-        $key = ElectrumKeyFactory::fromMnemonic($mnemonic, null, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\ElectrumKeyFactory::fromMnemonic($mnemonic, null, $ecAdapter);
         $this->assertEquals($eSecExp, $key->getMasterPrivateKey()->getHex());
         $this->assertEquals($eMPK, $key->getMPK()->getHex());
 
@@ -76,17 +76,17 @@ class ElectrumKeyTest extends AbstractTestCase
     {
         $key = PrivateKeyFactory::create(false);
         $e = ElectrumKeyFactory::fromKey($key);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Key\ElectrumKey', $e);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Key\Deterministic\ElectrumKey', $e);
 
         $key = PrivateKeyFactory::create(true);
-        ElectrumKeyFactory::fromKey($key);
+        \BitWasp\Bitcoin\Key\Deterministic\ElectrumKeyFactory::fromKey($key);
     }
 
     public function testGenerate()
     {
         $random = new Random();
-        $key = ElectrumKeyFactory::generateMasterKey($random->bytes(32));
-        $this->assertInstanceOf('BitWasp\Bitcoin\Key\ElectrumKey', $key);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\ElectrumKeyFactory::generateMasterKey($random->bytes(32));
+        $this->assertInstanceOf('BitWasp\Bitcoin\Key\Deterministic\ElectrumKey', $key);
     }
 
     /**
@@ -96,7 +96,7 @@ class ElectrumKeyTest extends AbstractTestCase
     public function testFailsWithoutMasterPrivateKey()
     {
         $key = PrivateKeyFactory::create()->getPublicKey();
-        $e = ElectrumKeyFactory::fromKey($key);
+        $e = \BitWasp\Bitcoin\Key\Deterministic\ElectrumKeyFactory::fromKey($key);
         $e->getMasterPrivateKey();
     }
 }

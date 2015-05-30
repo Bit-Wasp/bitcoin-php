@@ -8,9 +8,9 @@ use BitWasp\Bitcoin\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Network\Network;
-use BitWasp\Bitcoin\Key\HierarchicalKey;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -31,7 +31,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      * @var string
      */
-    protected $baseType = 'BitWasp\Bitcoin\Key\HierarchicalKey';
+    protected $baseType = 'BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey';
 
     /**
      * Used for testing skipped keys
@@ -53,7 +53,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @param HierarchicalKey $key
      * @param $vectors
      */
-    private function compareToPrivVectors(HierarchicalKey $key, $vectors)
+    private function compareToPrivVectors(\BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey $key, $vectors)
     {
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif($this->network));
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif());
@@ -72,7 +72,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testGenerateNew(EcAdapterInterface $ecAdapter)
     {
-        $key = HierarchicalKeyFactory::generateMasterKey($ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::generateMasterKey($ecAdapter);
         $this->assertInstanceOf($this->baseType, $key);
     }
 
@@ -82,7 +82,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testFailsWithUncompressed()
     {
-        new HierarchicalKey(
+        new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey(
             Bitcoin::getEcAdapter(),
             1,
             1,
@@ -141,7 +141,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testTestVectors(EcAdapterInterface $ecAdapter, Buffer $entropy, $details, $derivs)
     {
-        $key = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
         $this->compareToPrivVectors($key, $details);
 
         foreach ($derivs as $childDeriv) {
@@ -154,7 +154,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testDecodePath()
     {
         // need to init a HierarchicalKey to be able to call the method :/
-        $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU', $this->network);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU', $this->network);
 
         $this->assertEquals("2147483648/2147483649/444/2147526030", $key->decodePath("0'/1'/444/42382'"));
     }
@@ -162,7 +162,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testDerivePath()
     {
         $entropy = Buffer::hex("000102030405060708090a0b0c0d0e0f");
-        $masterKey = HierarchicalKeyFactory::fromEntropy($entropy);
+        $masterKey = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromEntropy($entropy);
         $this->assertEquals("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi", $masterKey->toExtendedKey());
 
         $firstChildKey = $masterKey->derivePath("0");
@@ -210,7 +210,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertTrue($key->isPrivate());
 
         $xPub = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
 
         $this->assertInstanceOf($this->baseType, $key);
         $this->assertSame($key->toExtendedPublicKey($this->network), $xPub);
@@ -226,7 +226,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $network = new Network('ff', 'ff', 'ff');
         $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
-        HierarchicalKeyFactory::fromExtended($key, $network);
+        \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($key, $network);
     }
 
     /**
@@ -241,7 +241,7 @@ class HierarchicalKeyTest extends AbstractTestCase
             ->setHDPubByte('ffffffff');
 
         $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
-        HierarchicalKeyFactory::fromExtended($key, $network);
+        \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($key, $network);
     }
 
     /**
@@ -261,7 +261,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xprv = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
         $xpub = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
 
-        $key = HierarchicalKeyFactory::fromExtended($xprv, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xprv, $this->network, $ecAdapter);
 
         $this->assertSame($xprv, $key->toExtendedKey($this->network));
         $this->assertSame($xprv, $key->toExtendedPrivateKey($this->network));
@@ -286,7 +286,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testMasterKeyDepthIsZero(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
-        $key = HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
         $this->assertSame($key->getDepth(), '0');
     }
 
@@ -297,7 +297,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetDepth(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertSame($key->getDepth(), '2');
     }
 
@@ -308,11 +308,11 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testIsHardened(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertFalse($key->isHardened());
 
         $xPub = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertTrue($key->isHardened());
     }
 
@@ -345,7 +345,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetPrivateKey(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
-        $key = HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
         $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $key->getPrivateKey()->getBuffer()->getHex());
     }
 
@@ -358,7 +358,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetPrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $key->getPrivateKey());
     }
 
@@ -380,7 +380,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testDeriveFailure(EcAdapterInterface $ecAdapter)
     {
         $k = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
-        $key = HierarchicalKeyFactory::fromExtended($k, $this->network, $ecAdapter);
+        $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($k, $this->network, $ecAdapter);
         $key->deriveChild("2147483648");
     }
 
@@ -437,7 +437,7 @@ class HierarchicalKeyTest extends AbstractTestCase
                 }
             );
 
-        $key = new HierarchicalKey($mock, 0, 0, 0, 0, $privateKey);
+        $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($mock, 0, 0, 0, 0, $privateKey);
 
         $this->assertEquals(0, $this->HK_run_count);
         $expected = 0;
