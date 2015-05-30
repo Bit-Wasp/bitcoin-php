@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
 class MultisigHD
@@ -41,7 +42,7 @@ class MultisigHD
 
         // Sort here to guarantee calls to getKeys() returns keys in the same order as the redeemScript.
         if ($sort) {
-            $keys = \BitWasp\Buffertools\Buffertools::sort($keys, function (HierarchicalKey $key) {
+            $keys = Buffertools::sort($keys, function (HierarchicalKey $key) {
                 return $key->getPublicKey()->getBuffer();
             });
         }
