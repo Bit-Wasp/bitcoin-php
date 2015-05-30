@@ -28,9 +28,10 @@ class MultisigHD
     private $sort;
 
     /**
-     * @param $m
-     * @param $path
+     * @param int|string $m
+     * @param string $path
      * @param array $keys
+     * @param HierarchicalKeySequence $sequences
      * @param bool $sort
      */
     public function __construct($m, $path, array $keys, HierarchicalKeySequence $sequences, $sort = false)
@@ -96,7 +97,7 @@ class MultisigHD
     /**
      * Derive each HK child and produce a new MultisigHD object
      *
-     * @param $sequence
+     * @param int|string $sequence
      * @return MultisigHD
      */
     public function deriveChild($sequence)
@@ -118,7 +119,7 @@ class MultisigHD
     /**
      * Derive a path in the tree of available addresses.
      *
-     * @param $path
+     * @param string $path
      * @return MultisigHD
      */
     public function derivePath($path)
