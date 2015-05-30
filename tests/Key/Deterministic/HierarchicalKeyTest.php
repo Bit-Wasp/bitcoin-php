@@ -117,7 +117,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function getBip32Vectors()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/bip32testvectors.json');
+        $f = file_get_contents(__DIR__ . '/../../Data/bip32testvectors.json');
         $json = json_decode($f);
 
         $results = [];
