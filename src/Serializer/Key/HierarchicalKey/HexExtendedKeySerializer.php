@@ -108,10 +108,6 @@ class HexExtendedKeySerializer
      */
     public function parse(Buffer $buffer)
     {
-        if ($buffer->getSize() !== 78) {
-            throw new \Exception('Invalid extended key');
-        }
-
         $parser = new Parser($buffer);
         $hd = $this->fromParser($parser);
         return $hd;
