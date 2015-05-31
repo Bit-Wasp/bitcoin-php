@@ -37,7 +37,7 @@ class MultisigHD
     public function __construct($m, $path, array $keys, HierarchicalKeySequence $sequences, $sort = false)
     {
         if (count($keys) < 1) {
-            throw new \RuntimeException('Must have at least one public key for Multisig HD Script');
+            throw new \RuntimeException('Must have at least one HierarchicalKey for Multisig HD Script');
         }
 
         // Sort here to guarantee calls to getKeys() returns keys in the same order as the redeemScript.
