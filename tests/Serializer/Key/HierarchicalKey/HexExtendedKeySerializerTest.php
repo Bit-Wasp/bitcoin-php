@@ -1,13 +1,13 @@
 <?php
 
 namespace BitWasp\Bitcoin\Tests\Serializer\Key\HierarchicalKey;
+
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Parser;
 use Mdanter\Ecc\EccFactory;
 
 class HexExtendedKeySerializerTest extends AbstractTestCase

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Serializer\Block;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;

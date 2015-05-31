@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Serializer\Signature;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
@@ -30,7 +29,7 @@ class CompactSignatureTest extends AbstractTestCase
         $s = str_pad('', 64, '5');
         $serializer = new CompactSignatureSerializer($math);
 
-        for($c = 0; $c <= 7; $c++) {
+        for ($c = 0; $c <= 7; $c++) {
             $t = $math->add($c, 27);
             $test = Buffer::hex($math->decHex($t) . $r . $s);
             $parsed = $serializer->parse($test);
