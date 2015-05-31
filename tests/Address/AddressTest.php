@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use Symfony\Component\Yaml\Yaml;
@@ -115,5 +116,15 @@ class AddressTest extends AbstractTestCase
 
         $p2pkhResult = AddressFactory::getAssociatedAddress(ScriptFactory::fromHex($p2pkhHex), $network);
         $this->assertEquals($p2pkhAddress, $p2pkhResult);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage No address associated with this script type
+     */
+    public function testAssociatedAddressFailure()
+    {
+        $s = new Script();
+        AddressFactory::getAssociatedAddress($s);
     }
 }
