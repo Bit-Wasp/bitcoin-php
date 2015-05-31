@@ -126,7 +126,7 @@ class EcTest extends AbstractTestCase
     public function testSign(EcAdapterInterface $ec)
     {
         $private = $this->getFirstPrivateKey($ec);
-        $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000');
+        $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
 
         $signature = $ec->sign($messageHash, $private);
         $this->assertTrue($ec->verify($messageHash, $private->getPublicKey(), $signature));
@@ -139,7 +139,7 @@ class EcTest extends AbstractTestCase
     public function testSignCompact(EcAdapterInterface $ec)
     {
         $private = $this->getFirstPrivateKey($ec);
-        $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000');
+        $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
 
         $compact = $ec->signCompact($messageHash, $private);
         $publicKey = $ec->recoverCompact($messageHash, $compact);
