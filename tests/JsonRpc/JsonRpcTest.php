@@ -27,7 +27,7 @@ class JsonRpcTest extends AbstractTestCase
             ],
             [
                 1,
-                ['error' => ['code'=> -32601, 'message' => '']]
+                ['error' => ['code'=> -32602, 'message' => '']]
             ],
             [
                 0,
@@ -53,7 +53,7 @@ class JsonRpcTest extends AbstractTestCase
             // should fail
         } else {
             try {
-                $result = $json->getResult($payload);
+                $json->getResult($payload);
             } catch (\Exception $e) {
                 $this->fail('very fail');
             }
