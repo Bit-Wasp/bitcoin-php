@@ -13,24 +13,19 @@ class BitcoinTest extends \PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
-        Bitcoin::setMath(new Math());
-        Bitcoin::setGenerator(EccFactory::getSecgCurves(Bitcoin::getMath())->generator256k1());
-        Bitcoin::setNetwork(Bitcoin::getDefaultNetwork()); // (re)set back to default
+
     }
 
     public function testGetMath()
     {
         $default = Bitcoin::getMath();
-        $this->assertEquals($default, Bitcoin::getMath());
+        $this->assertEquals(new Math(), Bitcoin::getMath());
     }
 
     public function testGetGenerator()
     {
         $default = EccFactory::getSecgCurves(Bitcoin::getMath())->generator256k1();
-        $chosen = EccFactory::getNistCurves(Bitcoin::getMath())->generator192();
         $this->assertEquals($default, Bitcoin::getGenerator());
-        Bitcoin::setGenerator($chosen);
-        $this->assertEquals($chosen, Bitcoin::getGenerator());
     }
 
     public function testGetNetwork()
@@ -43,5 +38,7 @@ class BitcoinTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($default, Bitcoin::getNetwork());
         Bitcoin::setNetwork($viacoin);
         $this->assertSame($viacoin, Bitcoin::getNetwork());
+
+        Bitcoin::setNetwork(Bitcoin::getDefaultNetwork()); // (re)set back to default
     }
 }

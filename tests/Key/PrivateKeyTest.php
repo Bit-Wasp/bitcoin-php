@@ -43,8 +43,8 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function setUp()
     {
-        $this->math = Bitcoin::getMath();
-        $this->generator = Bitcoin::getGenerator();
+        $this->math = $this->safeMath();
+        $this->generator = $this->safeGenerator();
     }
 
     /**
@@ -74,8 +74,9 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testCreatePrivateKeyFailure()
     {
-        $dec = $this->math->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-        PrivateKeyFactory::fromInt($dec, Bitcoin::getEcAdapter());
+        $ec = $this->safeEcAdapter();
+        $dec = $ec->getMath()->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+        PrivateKeyFactory::fromInt($dec, $ec);
     }
 
     /**

@@ -28,7 +28,7 @@ class AddressTest extends AbstractTestCase
         foreach ($data['scriptHash'] as $vector) {
             $datasets[] = [
                 'script',
-                Bitcoin::getNetwork(),
+                Bitcoin::getDefaultNetwork(),
                 $vector['script'],
                 $vector['address'],
             ];
@@ -36,7 +36,7 @@ class AddressTest extends AbstractTestCase
         foreach ($data['pubKeyHash'] as $vector) {
             $datasets[] = [
                 'pubkeyhash',
-                Bitcoin::getNetwork(),
+                Bitcoin::getDefaultNetwork(),
                 $vector['publickey'],
                 $vector['address'],
             ];

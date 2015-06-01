@@ -51,8 +51,8 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
 
     private function createState(ScriptInterface $script, RedeemScript $rs = null)
     {
-        $math = Bitcoin::getMath();
-        $G = Bitcoin::getGenerator();
+        $math = $this->safeMath();
+        $G = $this->safeGenerator();
         $ecAdapter = EcAdapterFactory::getAdapter($math, $G);
         return new TransactionBuilderInputState($ecAdapter, $script, $rs);
     }

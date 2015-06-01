@@ -10,9 +10,9 @@ class BaseEcAdapterTest extends AbstractTestCase
 {
     public function testSetAdapter()
     {
-        $math = Bitcoin::getMath();
-        $g = Bitcoin::getGenerator();
-        $default = Bitcoin::getEcAdapter($math, $g);
+        $math = $this->safeMath();
+        $g = $this->safeGenerator();
+        $default = $this->safeEcAdapter();
 
         // Bitcoin::getEcAdapter and EcAdapterFactory::getAdapter are the same
         $defaultEc = EcAdapterFactory::getAdapter($math, $g);
