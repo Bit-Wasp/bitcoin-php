@@ -69,7 +69,7 @@ interface BlockHeaderInterface extends SerializableInterface
     /**
      * Set the nonce of the block header. Used in mining.
      *
-     * @param $nonce
+     * @param string $nonce
      * @return BlockHeaderInterface
      */
     public function setNonce($nonce);
