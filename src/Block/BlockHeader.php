@@ -68,8 +68,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Return the bits for this block
-     *
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getBits()
      */
@@ -92,8 +90,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Return the Merkle root from the header
-     *
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getMerkleRoot()
      */
@@ -103,8 +99,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Return the previous blocks hash
-     *
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getPrevBlock()
      */
@@ -130,8 +124,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Set the next block hash
-     *
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::setNextBlock()
      */
@@ -142,9 +134,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Return the nonce from this block. This is the value which
-     * is iterated while mining.
-     *
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getNonce()
      */
@@ -154,8 +143,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * Set the nonce for this block
-     *
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::setNonce()
      */

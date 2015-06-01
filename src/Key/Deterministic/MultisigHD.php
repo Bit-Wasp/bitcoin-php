@@ -23,6 +23,11 @@ class MultisigHD
     private $keys;
 
     /**
+     * @var HierarchicalKeySequence
+     */
+    private $sequences;
+
+    /**
      * @var bool
      */
     private $sort;
@@ -47,14 +52,13 @@ class MultisigHD
             });
         }
 
+        $this->m = $m;
+        $this->path = $path;
         foreach ($keys as $key) {
             $this->keys[] = $key;
         }
-
-        $this->m = $m;
-        $this->sort = $sort;
-        $this->path = $path;
         $this->sequences = $sequences;
+        $this->sort = $sort;
     }
 
     /**
