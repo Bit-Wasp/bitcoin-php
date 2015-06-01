@@ -34,6 +34,9 @@ class Bitcoind
         $this->client = $client;
     }
 
+    /**
+     * @return JsonRpcClient
+     */
     public function getRpcClient()
     {
         return $this->client;
@@ -106,7 +109,6 @@ class Bitcoind
                 $this->client->execute('getrawtransaction', array($txid));
             }
             $result = $this->client->send();
-            $this->checkNotNull($result);
 
             // Build the transactions
             $txs = array_map(
