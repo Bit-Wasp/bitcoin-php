@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Tests\JsonRpc;
 
-
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
