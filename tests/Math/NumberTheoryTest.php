@@ -3,10 +3,13 @@
 namespace BitWasp\Bitcoin\Tests\Math;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Math\NumberTheory;
 
-class NumberTheoryTest extends \PHPUnit_Framework_TestCase
+class NumberTheoryTest extends AbstractTestCase
 {
 
     protected $compression_data;
@@ -37,8 +40,8 @@ class NumberTheoryTest extends \PHPUnit_Framework_TestCase
         if (! file_exists($file_sqrt)) {
             $this->fail('Square root input data not found');
         }
-        $this->math = Bitcoin::getMath();
-        $this->generator = Bitcoin::getGenerator();
+        $this->math = $this->safeMath();
+        $this->generator = $this->safeGenerator();
         $this->compression_data = json_decode(file_get_contents($file_comp));
 
         $this->sqrt_data = json_decode(file_get_contents($file_sqrt));

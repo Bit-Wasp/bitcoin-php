@@ -17,7 +17,7 @@ class MerkleRootTest extends AbstractTestCase
      */
     public function testCannotUseEmptyCollection()
     {
-        $math = Bitcoin::getMath();
+        $math = $this->safeMath();
         $root = new MerkleRoot($math, new TransactionCollection());
         $root->calculateHash();
     }

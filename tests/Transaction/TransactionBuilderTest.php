@@ -36,7 +36,7 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testDefaultTransaction()
     {
         $tx = new Transaction();
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
 
         $this->assertEquals($tx, $builder->getTransaction());
@@ -45,7 +45,7 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testCanAddOutput()
     {
         $output = new TransactionOutput(50, new Script());
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->addOutput($output);
 
@@ -56,7 +56,7 @@ class TransactionBuilderTest extends AbstractTestCase
     {
         $input = new TransactionInput('5a4ebf66822b0b2d56bd9dc64ece0bc38ee7844a23ff1d7320a88c5fdb2ad3e2', 0);
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->addInput($input);
 
@@ -69,7 +69,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $vout = 0;
         $utxo = new Utxo($txid, $vout, new TransactionOutput(1, new Script()));
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendUtxo($utxo);
 
@@ -88,7 +88,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $tx->getInputs()->addInput($input);
         $tx->getOutputs()->addOutput($output);
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter, $tx);
         $this->assertEquals($tx, $builder->getTransaction());
         $this->assertEquals($input, $builder->getTransaction()->getInputs()->getInput(0));
@@ -107,7 +107,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $txid = $tx->getTransactionId();
         $nOut = 0;
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($tx, $nOut);
         $this->assertEquals($txid, $builder->getTransaction()->getInputs()->getInput(0)->getTransactionId());
@@ -133,7 +133,7 @@ class TransactionBuilderTest extends AbstractTestCase
     {
         $expectedScript = ScriptFactory::scriptPubKey()->payToAddress($address);
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->payToAddress($address, 50);
 
@@ -155,8 +155,8 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testSecp256k1RefusesRandomSigs()
     {
         if (extension_loaded('secp256k1')) {
-            $math = Bitcoin::getMath();
-            $g = Bitcoin::getGenerator();
+            $math = $this->safeMath();
+            $g = $this->safeGenerator();
             $secp256k1 = EcAdapterFactory::getSecp256k1($math, $g);
             $builder = new TransactionBuilder($secp256k1);
             try {
@@ -171,8 +171,8 @@ class TransactionBuilderTest extends AbstractTestCase
     public function testSecp256k1VerifiablyDeterminstic()
     {
         if (extension_loaded('secp256k1')) {
-            $math = Bitcoin::getMath();
-            $g = Bitcoin::getGenerator();
+            $math = $this->safeMath();
+            $g = $this->safeGenerator();
             $secp256k1 = EcAdapterFactory::getSecp256k1($math, $g);
             $builder = new TransactionBuilder($secp256k1);
 
@@ -195,8 +195,8 @@ class TransactionBuilderTest extends AbstractTestCase
 
     public function testPhpeccVerifiablyRandomOrDeterministic()
     {
-        $math = Bitcoin::getMath();
-        $g = Bitcoin::getGenerator();
+        $math = $this->safeMath();
+        $g = $this->safeGenerator();
         $phpecc = EcAdapterFactory::getPhpEcc($math, $g);
         $builder = new TransactionBuilder($phpecc);
 
@@ -255,7 +255,7 @@ class TransactionBuilderTest extends AbstractTestCase
             $redeemScript->getOutputScript()
         ));
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($spendTx, 0);
 
@@ -293,7 +293,7 @@ class TransactionBuilderTest extends AbstractTestCase
             $outputScript
         ));
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($spendTx, 0);
         $builder->signInputWithKey($privateKey, $outputScript, 0);
@@ -319,7 +319,7 @@ class TransactionBuilderTest extends AbstractTestCase
             $outputScript
         ));
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($spendTx, 0);
         $builder->signInputWithKey($privateKey, $outputScript, 0);
@@ -348,7 +348,7 @@ class TransactionBuilderTest extends AbstractTestCase
             $outputScript
         ));
 
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter);
         $builder->spendOutput($spendTx, 0);
         $builder->signInputWithKey($pk1, $outputScript, 0, $redeemScript);
@@ -364,7 +364,7 @@ class TransactionBuilderTest extends AbstractTestCase
 
     public function testIncrementallySigningP2PK()
     {
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
 
         $pk1 = PrivateKeyFactory::fromHex('421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87');
         $outputScript = ScriptFactory::scriptPubKey()->payToPubKey($pk1->getPublicKey());
@@ -425,7 +425,7 @@ class TransactionBuilderTest extends AbstractTestCase
 
     public function testIncrementallySigningP2PKH()
     {
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
 
         $pk1 = PrivateKeyFactory::fromHex('421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87');
         $outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($pk1->getPublicKey());
@@ -488,7 +488,7 @@ class TransactionBuilderTest extends AbstractTestCase
 
     public function testIncrementallySigningP2SHMultisig()
     {
-        $ecAdapter = Bitcoin::getEcAdapter();
+        $ecAdapter = $this->safeEcAdapter();
 
         $pk1 = PrivateKeyFactory::fromHex('421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87');
         $pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb81e5aa0422402f048162');

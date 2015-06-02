@@ -45,7 +45,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function setUp()
     {
-        $this->math = Bitcoin::getMath();
+        $this->math = $this->safeMath();
         $this->network = NetworkFactory::bitcoin();
     }
 
@@ -324,7 +324,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame(Bitcoin::getMath()->hexDec('615914f3'), $key->getFingerprint());
+        $this->assertSame($this->safeMath()->hexDec('615914f3'), $key->getFingerprint());
     }
 
     /**
@@ -335,7 +335,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame(Bitcoin::getMath()->hexDec('a282920f'), $key->getChildFingerprint());
+        $this->assertSame($this->safeMath()->hexDec('a282920f'), $key->getChildFingerprint());
     }
 
     /**

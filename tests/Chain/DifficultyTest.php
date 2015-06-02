@@ -27,7 +27,7 @@ class DifficultyTest extends AbstractTestCase
 
     public function __construct()
     {
-        $this->math = Bitcoin::getMath();
+        $this->math = $this->safeMath();
         $this->bits = Buffer::hex('1d00ffff');
         $this->targetHash = '00000000ffff0000000000000000000000000000000000000000000000000000';
     }

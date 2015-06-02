@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Key;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\Point;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -25,8 +24,8 @@ class PointTest extends AbstractTestCase
 
     public function __construct()
     {
-        $this->math = Bitcoin::getMath();
-        $this->generator = Bitcoin::getGenerator();
+        $this->math = $this->safeMath();
+        $this->generator = $this->safeGenerator();
     }
 
     public function testCreatePoint()

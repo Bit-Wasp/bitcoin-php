@@ -29,20 +29,27 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
                 $adapters[] = [new Secp256k1($math, $generator)];
             }
         } else {
-            // If NOT travis
-            // Return both adapters if EXT_SECP256K1 is not set (secp256k1 only returned if ext is found)
-            if (strlen(getenv('EXT_SECP256K1')) == 0) {
-                $adapters[] = [new PhpEcc($math, $generator)];
-
-                if (extension_loaded('secp256k1')) {
-                    $adapters[] = [new Secp256k1($math, $generator)];
-                }
-            } else {
-                // Env var was set, just pass secp256k1
-                $adapters[] = [new Secp256k1($math, $generator)];
-            }
+            // Env var was set, just pass secp256k1
+            $adapters[] = [(extension_loaded('secp256k1') ? new Secp256k1($math, $generator) : new PhpEcc($math, $generator))];
         }
 
         return $adapters;
+    }
+
+    public function safeMath()
+    {
+        return new Math();
+    }
+
+    public function safeGenerator()
+    {
+        return EccFactory::getSecgCurves($this->safeMath())->generator256k1();
+    }
+
+    public function safeEcAdapter()
+    {
+        $math = $this->safeMath();
+        $generator = $this->safeGenerator();
+        return extension_loaded('secp256k1') ? new Secp256k1($math, $generator) : new PhpEcc($math, $generator);
     }
 }

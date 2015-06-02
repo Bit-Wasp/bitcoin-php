@@ -33,7 +33,7 @@ abstract class AbstractBip39Case extends AbstractTestCase
         $file = json_decode(file_get_contents(__DIR__ . '/../../Data/bip39.json'), true);
         $vectors = [];
 
-        $ec = Bitcoin::getEcAdapter();
+        $ec = $this->safeEcAdapter();
         foreach ($file as $list => $testSet) {
             $bip39 = new Bip39Mnemonic($ec, $this->getWordList($list));
 

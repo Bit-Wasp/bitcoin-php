@@ -30,7 +30,7 @@ class PongTest extends AbstractTestCase
         $this->assertEquals('pong', $pong->getNetworkCommand());
         $this->assertTrue($ping->getNonce() == $pong->getNonce());
 
-        $math = Bitcoin::getMath();
+        $math = $this->safeMath();
         $this->assertEquals(str_pad($math->decHex($ping->getNonce()), 16, '0', STR_PAD_LEFT), $pong->getHex());
     }
 }
