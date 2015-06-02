@@ -80,6 +80,16 @@ class ElectrumServer
      * @param NetworkInterface $network
      * @return \React\Promise\Promise
      */
+    public function addressGetBalance(AddressInterface $address, NetworkInterface $network = null)
+    {
+        return $this->client->request('blockchain.address.get_balance', [$address->getAddress($network)]);
+    }
+
+    /**
+     * @param AddressInterface $address
+     * @param NetworkInterface $network
+     * @return \React\Promise\Promise
+     */
     public function addressGetProof(AddressInterface $address, NetworkInterface $network = null)
     {
         return $this->client->request('blockchain.address.get_proof', [$address->getAddress($network)]);
