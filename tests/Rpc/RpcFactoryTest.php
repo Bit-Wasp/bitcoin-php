@@ -7,14 +7,11 @@ use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Rpc\Client\ElectrumServer;
 use BitWasp\Bitcoin\Rpc\RpcFactory;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Stratum\Request\Response;
 use React\Promise\FulfilledPromise;
-use React\Promise\Promise;
 
 class RpcFactoryTest extends AbstractTestCase
 {
@@ -31,7 +28,8 @@ class RpcFactoryTest extends AbstractTestCase
         RpcFactory::electrum($math, $loop, '127.0.0.1', 99999);
     }
 
-    public function getResponse($i, $val) {
+    public function getResponse($i, $val)
+    {
         return new Response($i, $val);
     }
 
@@ -146,7 +144,10 @@ class RpcFactoryTest extends AbstractTestCase
         $electrum = $this->getElectrumServer($utxos);
         $call = $electrum->addressListUnspent($address);
         $call->then(function ($value) use ($utxos) {
-            foreach ($value as $c => $r) {
+            $c = count($value);
+            for ($i = 0; $i < $c; $i++) {
+                /** @var \BitWasp\Bitcoin\Utxo\Utxo $r */
+                $r = $value[$i];
                 $this->assertEquals($utxos[$c]['tx_hash'], $r->getTransactionId());
                 $this->assertEquals($utxos[$c]['tx_pos'], $r->getVout());
                 $this->assertEquals($utxos[$c]['value'], $r->getOutput()->getValue());
@@ -174,10 +175,8 @@ class RpcFactoryTest extends AbstractTestCase
             $this->assertEquals($hash, $value->getBlockHash());
             $this->assertEquals('18171a8b', $value->getBits()->getHex());
             $this->assertEquals(3, $value->getVersion());
-            $this->assertEquals($header['merkle_root'] , $value->getMerkleRoot());
+            $this->assertEquals($header['merkle_root'], $value->getMerkleRoot());
             $this->assertEquals($header['nonce'], $value->getNonce());
         });
     }
-
-
 }
