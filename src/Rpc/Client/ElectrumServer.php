@@ -72,7 +72,7 @@ class ElectrumServer
      */
     public function addressGetHistory(AddressInterface $address, NetworkInterface $network = null)
     {
-        return $this->client->request('blockchain.transaction.get', [$address->getAddress($network)]);
+        return $this->client->request('blockchain.address.get_history', [$address->getAddress($network)]);
     }
 
     /**
