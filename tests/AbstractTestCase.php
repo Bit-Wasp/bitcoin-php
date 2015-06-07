@@ -10,6 +10,11 @@ use Mdanter\Ecc\EccFactory;
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
 
+    public function dataFile($filename)
+    {
+        return file_get_contents(__DIR__ . '/Data/' . $filename);
+    }
+
     /**
      * @return array
      */
