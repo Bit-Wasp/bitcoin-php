@@ -2,9 +2,7 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-
 use BitWasp\Bitcoin\Block\BlockInterface;
-use BitWasp\Bitcoin\Chain\Difficulty;
 use BitWasp\Bitcoin\Utxo\UtxoSet;
 
 class Blockchain

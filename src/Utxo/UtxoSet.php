@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Utxo;
 
-
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class UtxoSet
@@ -32,17 +31,29 @@ class UtxoSet
         $this->addOutputs($tx);
     }
 
+    /**
+     * @param $tx
+     * @param $vout
+     * @return bool
+     */
     public function exists($tx, $vout)
     {
         return isset($this->contents[$tx][$vout]);
     }
 
+    /**
+     * @param $txid
+     * @param $vout
+     */
     public function remove($txid, $vout)
     {
-        unset($this->contents[$vout]);
+        unset($this->contents[$txid][$vout]);
         $this->size--;
     }
 
+    /**
+     * @param TransactionInterface $tx
+     */
     public function removeSpends(TransactionInterface $tx)
     {
         $inc = 0;
@@ -56,6 +67,9 @@ class UtxoSet
         $this->size -= $inc;
     }
 
+    /**
+     * @param TransactionInterface $tx
+     */
     public function addOutputs(TransactionInterface $tx)
     {
         $txid = $tx->getTransactionId();
@@ -81,5 +95,4 @@ class UtxoSet
     {
         return $this->size;
     }
-
 }

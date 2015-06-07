@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Serializer\Block;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

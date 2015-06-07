@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Block;
 
-
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
