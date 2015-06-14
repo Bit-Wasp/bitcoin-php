@@ -33,6 +33,12 @@ class Script extends Serializable implements ScriptInterface
         $this->opcodes = new Opcodes;
     }
 
+    public function concat(ScriptInterface $script)
+    {
+        $this->script .= $script->getBinary();
+        return $this;
+    }
+
     /**
      * @return Buffer
      */
