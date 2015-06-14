@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Buffertools\Buffer;
@@ -80,5 +81,34 @@ class OutputScriptFactory
             ->op('OP_HASH160')
             ->push($script->getScriptHash())
             ->op('OP_EQUAL');
+    }
+
+    /**
+     * @param Buffer $secret
+     * @param PublicKeyInterface $a1
+     * @param PublicKeyInterface $a2
+     * @param PublicKeyInterface $b1
+     * @param PublicKeyInterface $b2
+     * @return Script
+     */
+    public function payToLightningChannel(
+        Buffer $secret,
+        PublicKeyInterface $a1,
+        PublicKeyInterface $a2,
+        PublicKeyInterface $b1,
+        PublicKeyInterface $b2
+    ) {
+        return ScriptFactory::create()
+            ->op('OP_DEPTH')
+            ->op('OP_3')
+            ->op('OP_EQUAL')
+            ->op('OP_IF')
+                ->op('OP_HASH160')
+                ->push(Hash::sha256ripe160($secret))
+                ->op('OP_EQUALVERIFY')
+                ->concat(ScriptFactory::multisig(2, [$a1, $b1]))
+            ->op('OP_ELSE')
+                ->concat(ScriptFactory::multisig(2, [$a2, $b2]))
+            ->op('OP_ENDIF');
     }
 }

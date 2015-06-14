@@ -23,6 +23,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('BitWasp\Bitcoin\Script\Opcodes', $opCodes);
     }
 
+
     public function testPushdata4()
     {
         // Create a buffer with a fixed length, in the pushdata4 range.
@@ -88,6 +89,15 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $script->push($data);
         $out = $script->getBuffer()->getHex();
         $this->assertSame($expected, $out);
+    }
+
+    public function testConcat()
+    {
+        $s1 = new Script(Buffer::hex('00'));
+        $s2 = new Script(Buffer::hex('01'));
+        $s1->concat($s2);
+
+        $this->assertEquals('0001', $s1->getHex());
     }
 
     public function testPushBuffer()

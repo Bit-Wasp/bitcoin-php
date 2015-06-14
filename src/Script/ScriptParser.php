@@ -20,7 +20,7 @@ class ScriptParser
     /**
      * @var int
      */
-    private $ptr;
+    private $ptr = 0;
 
     /**
      * @var string
@@ -36,7 +36,6 @@ class ScriptParser
         $this->math = $math;
         $this->script = $script;
         $this->scriptRaw = $script->getBuffer()->getBinary();
-        $this->ptr = 0;
     }
 
     /**
@@ -133,6 +132,15 @@ class ScriptParser
     }
 
     /**
+     * @return $this
+     */
+    public function resetPosition()
+    {
+        $this->ptr = 0;
+        return $this;
+    }
+
+    /**
      * returns a mix of Buffer objects and strings
      *
      * @return Buffer[]|string[]
@@ -154,6 +162,8 @@ class ScriptParser
             $data[] = $push;
         }
 
+        $this->resetPosition();
+
         return $data;
     }
 
@@ -162,6 +172,8 @@ class ScriptParser
      */
     public function getHumanReadable()
     {
+        $parse = $this->parse();
+
         $array = array_map(
             function ($value) {
                 $r = ($value instanceof Buffer)
@@ -169,7 +181,7 @@ class ScriptParser
                     : $value;
                 return $r;
             },
-            $this->parse()
+            $parse
         );
 
         return implode(" ", $array);
