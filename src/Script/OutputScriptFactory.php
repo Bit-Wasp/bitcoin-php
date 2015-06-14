@@ -89,7 +89,7 @@ class OutputScriptFactory
      * @param PublicKeyInterface $a2
      * @param PublicKeyInterface $b1
      * @param PublicKeyInterface $b2
-     * @return $this
+     * @return Script
      */
     public function payToLightningChannel(
         Buffer $secret,
