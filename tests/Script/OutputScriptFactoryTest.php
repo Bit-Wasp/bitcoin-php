@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -50,6 +52,42 @@ class OutputScriptFactoryTest extends AbstractTestCase
 
             $this->assertEquals(OutputClassifier::PAYTOPUBKEY, ScriptFactory::scriptPubKey()->classify($script)->classify());
         }
+    }
+
+    public function testPayToLightningChannel()
+    {
+        $random = new Random();
+        $bytes = $random->bytes(20);
+
+        $a1 = PrivateKeyFactory::fromInt(1)->getPublicKey();
+        $a2 = PrivateKeyFactory::fromInt(2)->getPublicKey();
+        $b1 = PrivateKeyFactory::fromInt(3)->getPublicKey();
+        $b2 = PrivateKeyFactory::fromInt(4)->getPublicKey();
+
+        $contract = ScriptFactory::scriptPubKey()->payToLightningChannel($bytes, $a1, $a2, $b1, $b2);
+        $parsed = $contract->getScriptParser()->parse();
+
+        $this->assertEquals('OP_DEPTH', $parsed[0]);
+        $this->assertEquals('OP_3', $parsed[1]);
+        $this->assertEquals('OP_EQUAL', $parsed[2]);
+        $this->assertEquals('OP_IF', $parsed[3]);
+        $this->assertEquals('OP_HASH160', $parsed[4]);
+        $this->assertEquals(Hash::sha256ripe160($bytes), $parsed[5]);
+        $this->assertEquals('OP_EQUALVERIFY', $parsed[6]);
+        $this->assertEquals(Buffer::hex('00'), $parsed[7]);
+        $this->assertEquals('OP_2', $parsed[8]);
+        $this->assertEquals($a1->getBuffer(), $parsed[9]);
+        $this->assertEquals($b1->getBuffer(), $parsed[10]);
+        $this->assertEquals('OP_2', $parsed[11]);
+        $this->assertEquals('OP_CHECKMULTISIG', $parsed[12]);
+        $this->assertEquals('OP_ELSE', $parsed[13]);
+        $this->assertEquals(Buffer::hex('00'), $parsed[14]);
+        $this->assertEquals('OP_2', $parsed[15]);
+        $this->assertEquals($a2->getBuffer(), $parsed[16]);
+        $this->assertEquals($b2->getBuffer(), $parsed[17]);
+        $this->assertEquals('OP_2', $parsed[18]);
+        $this->assertEquals('OP_CHECKMULTISIG', $parsed[19]);
+        $this->assertEquals('OP_ENDIF', $parsed[20]);
     }
 
     public function testPayToPubKeyInvalid()
