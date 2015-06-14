@@ -107,9 +107,10 @@ class OutputScriptFactory
                 ->push(Hash::sha256ripe160($secret))
                 ->op('OP_EQUALVERIFY')
                 ->op('OP_0')
-                ->concat(ScriptFactory::multisig(2, $a1, $b1))
+                ->concat(ScriptFactory::multisig(2, [$a1, $b1]))
             ->op('OP_ELSE')
-                ->concat(ScriptFactory::multisig(2, $a2, $b2))
-            ->op('OP_END');
+                ->op('OP_0')
+                ->concat(ScriptFactory::multisig(2, [$a2, $b2]))
+            ->op('OP_ENDIF');
     }
 }
