@@ -74,20 +74,20 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals('OP_HASH160', $parsed[4]);
         $this->assertEquals(Hash::sha256ripe160($bytes), $parsed[5]);
         $this->assertEquals('OP_EQUALVERIFY', $parsed[6]);
-        $this->assertEquals(Buffer::hex('00'), $parsed[7]);
-        $this->assertEquals('OP_2', $parsed[8]);
-        $this->assertEquals($a1->getBuffer(), $parsed[9]);
-        $this->assertEquals($b1->getBuffer(), $parsed[10]);
-        $this->assertEquals('OP_2', $parsed[11]);
-        $this->assertEquals('OP_CHECKMULTISIG', $parsed[12]);
-        $this->assertEquals('OP_ELSE', $parsed[13]);
-        $this->assertEquals(Buffer::hex('00'), $parsed[14]);
-        $this->assertEquals('OP_2', $parsed[15]);
-        $this->assertEquals($a2->getBuffer(), $parsed[16]);
-        $this->assertEquals($b2->getBuffer(), $parsed[17]);
-        $this->assertEquals('OP_2', $parsed[18]);
-        $this->assertEquals('OP_CHECKMULTISIG', $parsed[19]);
-        $this->assertEquals('OP_ENDIF', $parsed[20]);
+
+        $this->assertEquals('OP_2', $parsed[7]);
+        $this->assertEquals($a1->getBuffer(), $parsed[8]);
+        $this->assertEquals($b1->getBuffer(), $parsed[9]);
+        $this->assertEquals('OP_2', $parsed[10]);
+        $this->assertEquals('OP_CHECKMULTISIG', $parsed[11]);
+        $this->assertEquals('OP_ELSE', $parsed[12]);
+
+        $this->assertEquals('OP_2', $parsed[13]);
+        $this->assertEquals($a2->getBuffer(), $parsed[14]);
+        $this->assertEquals($b2->getBuffer(), $parsed[15]);
+        $this->assertEquals('OP_2', $parsed[16]);
+        $this->assertEquals('OP_CHECKMULTISIG', $parsed[17]);
+        $this->assertEquals('OP_ENDIF', $parsed[18]);
     }
 
     public function testPayToPubKeyInvalid()
