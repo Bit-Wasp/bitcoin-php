@@ -1,12 +1,15 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Factory;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 
 class OutputScriptFactory

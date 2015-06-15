@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Script;
 
+use BitWasp\Bitcoin\Script\Factory\InputScriptFactory;
+use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Key\KeyInterface;
 

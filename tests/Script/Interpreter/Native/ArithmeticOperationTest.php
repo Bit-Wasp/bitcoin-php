@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Native;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Script\Interpreter\Native\ArithmeticOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\ArithmeticOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

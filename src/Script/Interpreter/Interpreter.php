@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script\Interpreter\Native;
+namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
@@ -9,16 +9,21 @@ use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\ArithmeticOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\FlowControlOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\HashOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\PushIntOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\StackOperation;
+use BitWasp\Bitcoin\Script\Interpreter\State;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 
-class NativeInterpreter implements InterpreterInterface
+class Interpreter implements InterpreterInterface
 {
     /**
      * @var int|string
@@ -341,14 +346,12 @@ class NativeInterpreter implements InterpreterInterface
         if ($this->flags->checkFlags(InterpreterInterface::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) {
                 return false;
-                //throw new ScriptRuntimeException(InterpreterInterface::VERIFY_SIGPUSHONLY, 'P2SH scriptSig must be push only');
             }
 
             // Restore mainStack to how it was after evaluating scriptSig
             $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
             if ($mainStack->size() == 0) {
                 return false;
-                //throw new ScriptRuntimeException(InterpreterInterface::VERIFY_P2SH, 'Stack cannot be empty during p2sh');
             }
 
             // Load redeemscript as the scriptPubKey

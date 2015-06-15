@@ -12,13 +12,13 @@ class ScriptFactoryTest extends AbstractTestCase
     public function testScriptPubKey()
     {
         $outputScripts = ScriptFactory::scriptPubKey();
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\OutputScriptFactory', $outputScripts);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Factory\OutputScriptFactory', $outputScripts);
     }
 
     public function testScriptSig()
     {
         $inputScripts = ScriptFactory::scriptSig();
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\InputScriptFactory', $inputScripts);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Factory\InputScriptFactory', $inputScripts);
     }
 
     public function testMultisig()

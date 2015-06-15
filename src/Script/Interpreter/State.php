@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script\Interpreter\Native;
+namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Script\ScriptStack;
 

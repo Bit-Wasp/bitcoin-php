@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script\Interpreter\Native;
+namespace BitWasp\Bitcoin\Script\Interpreter\Operation;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\Opcodes;
