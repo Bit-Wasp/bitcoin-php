@@ -28,4 +28,5 @@ class InterpreterFactoryTest extends AbstractTestCase
         $interpreter = $factory->create(new Transaction());
         $this->assertInstanceOf($this->nativeType, $interpreter);
     }
+
 }

@@ -146,7 +146,7 @@ class Interpreter implements InterpreterInterface
     public function castToBool(Buffer $value)
     {
         // Since we're using buffers, lets try ensuring the contents are not 0.
-        return $this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0;
+        return $this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0; // cscriptNum or edge case.
     }
 
     /**
@@ -299,13 +299,17 @@ class Interpreter implements InterpreterInterface
             ->checkSignatureEncoding($sigBuf)
             ->checkPublicKeyEncoding($keyBuf);
 
-        $txSignature = TransactionSignatureFactory::fromHex($sigBuf->getHex());
-        $publicKey = PublicKeyFactory::fromHex($keyBuf->getHex());
-        $sigHash = $this->transaction
-            ->getSignatureHash()
-            ->calculate($script, $this->inputToSign, $txSignature->getHashType());
+        try {
+            $txSignature = TransactionSignatureFactory::fromHex($sigBuf->getHex());
+            $publicKey = PublicKeyFactory::fromHex($keyBuf->getHex());
+            $sigHash = $this->transaction
+                ->getSignatureHash()
+                ->calculate($script, $this->inputToSign, $txSignature->getHashType());
 
-        return $this->ecAdapter->verify($sigHash, $publicKey, $txSignature->getSignature());
+            return $this->ecAdapter->verify($sigHash, $publicKey, $txSignature->getSignature());
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
@@ -426,6 +430,8 @@ class Interpreter implements InterpreterInterface
                     $mainStack->push($pushData);
                     //echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || ($opcodes->isOp($opCode, 'OP_IF') <= 0 && $opcodes->isOp($opCode, 'OP_ENDIF'))) {
+                    //echo " - [". $opcodes->getOp($opCode) . "]\n";
+
                     switch ($opCode)
                     {
                         case $opcodes->getOpByName('OP_1NEGATE'):
@@ -484,7 +490,7 @@ class Interpreter implements InterpreterInterface
                             $mainStack->push($size);
                             break;
 
-                        case $opcodes->getOpByName('OP_EQUAL'):
+                        case $opcodes->getOpByName('OP_EQUAL'): // cscriptnum
                         case $opcodes->getOpByName('OP_EQUALVERIFY'):
                         //case $this->isOp($opCode, 'OP_NOTEQUAL'): // use OP_NUMNOTEQUAL
                             if ($mainStack->size() < 2) {
@@ -585,7 +591,8 @@ class Interpreter implements InterpreterInterface
                             if ($mainStack->size() < $i) {
                                 throw new \Exception('Invalid stack operation');
                             }
-                            $sigCount = $mainStack->top(-$i)->getInt();
+
+                            $sigCount = $mainStack->top(-$i)->getInt(); // cscriptnum
                             if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
                                 throw new \Exception('Invalid Signature count');
                             }
@@ -660,7 +667,7 @@ class Interpreter implements InterpreterInterface
                     if ($mainStack->size() + $altStack->size() > 1000) {
                         throw new \Exception('Invalid stack size, exceeds 1000');
                     }
-                    //echo " - [". $opcodes->getOp($opCode) . "]\n";
+
                 }
             }
 
@@ -674,7 +681,7 @@ class Interpreter implements InterpreterInterface
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            //echo "\n General: " . $e->getMessage() . "\n";
+            //echo "\n General: " . $e->getMessage() ;
             return false;
         }
     }
