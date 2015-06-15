@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 class NativeConsensus
 {
     /**
-     * @var \BitWasp\Bitcoin\Script\Interpreter\Interpreter
+     * @var InterpreterFactory
      */
     private $factory;
 
