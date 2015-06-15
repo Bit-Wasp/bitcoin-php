@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 
@@ -27,8 +29,8 @@ class FlagsTest extends AbstractTestCase
 
     public function testDefaults()
     {
-        $factory = new InterpreterFactory();
-        $flags = $factory->defaultFlags();
+        $consensus = new ConsensusFactory(Bitcoin::getEcAdapter());
+        $flags = $consensus->defaultFlags();
         $this->assertTrue($flags->checkFlags(InterpreterInterface::VERIFY_P2SH));
         $this->assertTrue($flags->checkFlags(InterpreterInterface::VERIFY_STRICTENC));
         $this->assertTrue($flags->checkFlags(InterpreterInterface::VERIFY_DERSIG));

@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Native;
+namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Operation;
 
 use BitWasp\Bitcoin\Script\Interpreter\Operation\PushIntOperation;
 use BitWasp\Bitcoin\Script\Opcodes;

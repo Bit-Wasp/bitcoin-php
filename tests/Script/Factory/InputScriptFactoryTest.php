@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script\Factory;
 
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;

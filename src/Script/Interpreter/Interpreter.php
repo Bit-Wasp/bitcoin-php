@@ -14,7 +14,6 @@ use BitWasp\Bitcoin\Script\Interpreter\Operation\FlowControlOperation;
 use BitWasp\Bitcoin\Script\Interpreter\Operation\HashOperation;
 use BitWasp\Bitcoin\Script\Interpreter\Operation\PushIntOperation;
 use BitWasp\Bitcoin\Script\Interpreter\Operation\StackOperation;
-use BitWasp\Bitcoin\Script\Interpreter\State;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptStack;
