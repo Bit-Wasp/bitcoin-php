@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Native;
 
-use BitWasp\Bitcoin\Script\Interpreter\Native\HashOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\HashOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

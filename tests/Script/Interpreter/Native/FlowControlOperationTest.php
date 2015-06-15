@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Native;
 
-use BitWasp\Bitcoin\Script\Interpreter\Native\FlowControlOperation;
+use BitWasp\Bitcoin\Script\Interpreter\Operation\FlowControlOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
