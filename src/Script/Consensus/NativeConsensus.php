@@ -25,7 +25,7 @@ class NativeConsensus
     /**
      * @param TransactionInterface $tx
      * @param ScriptInterface $scriptPubKey
-     * @param $nInputToSign
+     * @param int $nInputToSign
      * @return bool
      */
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign)
