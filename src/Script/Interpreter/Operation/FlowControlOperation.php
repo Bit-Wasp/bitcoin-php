@@ -43,7 +43,7 @@ class FlowControlOperation
         $opName = $opCodes->getOp($opCode);
         if ($opName == 'OP_NOP') {
             return;
-        } elseif (in_array($opName, ['OP_IF', 'OP_NOTIF'])) {
+        } elseif (in_array($opName, ['OP_IF', 'OP_NOTIF'])) { // cscriptnum
             // <expression> if [statements] [else [statements]] endif
             $value = false;
             if ($fExec) {

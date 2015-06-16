@@ -78,7 +78,7 @@ class ConsensusFactory
      */
     public function getConsensus(Flags $flags)
     {
-        if (extension_loaded('libbitcoinconsensus')) {
+        if (extension_loaded('bitcoinconsensus')) {
             return $this->getBitcoinConsensus($flags);
         } else {
             return $this->getNativeConsensus($flags);

@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 class BitcoinConsensus
 {
     /**
-     * @var \BitWasp\Bitcoin\Flags
+     * @var Flags
      */
     private $flags;
 
@@ -24,7 +24,7 @@ class BitcoinConsensus
     /**
      * @param TransactionInterface $tx
      * @param ScriptInterface $scriptPubKey
-     * @param $nInputToSign
+     * @param int $nInputToSign
      * @return bool
      */
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign)
