@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Utxo;
 
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
 class Utxo
 {
@@ -17,16 +17,16 @@ class Utxo
     private $vout;
 
     /**
-     * @var TransactionOutput
+     * @var TransactionOutputInterface
      */
     private $txOut;
 
     /**
      * @param string $txid
      * @param int|string $vout
-     * @param TransactionOutput $txOut
+     * @param TransactionOutputInterface $txOut
      */
-    public function __construct($txid, $vout, TransactionOutput $txOut)
+    public function __construct($txid, $vout, TransactionOutputInterface $txOut)
     {
         $this->txid = $txid;
         $this->vout = $vout;
@@ -50,7 +50,7 @@ class Utxo
     }
 
     /**
-     * @return TransactionOutput
+     * @return TransactionOutputInterface
      */
     public function getOutput()
     {

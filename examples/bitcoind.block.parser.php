@@ -3,6 +3,13 @@
 require_once "../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Chain\Difficulty;
+use BitWasp\Bitcoin\Chain\BlockHashIndex;
+use BitWasp\Bitcoin\Chain\BlockStorage;
+use BitWasp\Bitcoin\Chain\BlockIndex;
+use BitWasp\Bitcoin\Chain\Blockchain;
+use BitWasp\Bitcoin\Utxo\UtxoSet;
+use Doctrine\Common\Cache\ArrayCache;
 
 if (!isset($argv[1])) {
     die("Enter the full path for your .bitcoin directory!\n"
@@ -46,9 +53,34 @@ usort($files, function ($a, $b) {
     return gmp_cmp($intA, $intB);
 });
 
-$difficulty  = new \BitWasp\Bitcoin\Chain\Difficulty($math);
-$utxoSet = new \BitWasp\Bitcoin\Utxo\UtxoSet();
-$blockchain = new \BitWasp\Bitcoin\Chain\Blockchain($difficulty, $utxoSet);
+
+$genesis = new \BitWasp\Bitcoin\Block\Block(
+    $math,
+    new \BitWasp\Bitcoin\Block\BlockHeader(
+        '1',
+        '0000000000000000000000000000000000000000000000000000000000000000',
+        '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
+        1231006505,
+        \BitWasp\Buffertools\Buffer::hex('1d00ffff'),
+        2083236893
+    )
+);
+
+$blockStore = new BlockStorage(new ArrayCache());
+$blockIndex = new BlockIndex(
+    new BlockHashIndex(new ArrayCache()),
+    new \BitWasp\Bitcoin\Chain\BlockHeightIndex(new ArrayCache())
+);
+
+$blockchain = new Blockchain(
+    new \BitWasp\Bitcoin\Math\Math(),
+    new Difficulty($math),
+    $genesis,
+    $blockStore,
+    $blockIndex,
+    new UtxoSet(new ArrayCache())
+);
+print_r($blockchain);
 
 $utxo = 0;
 $bytes = 0;
@@ -76,17 +108,12 @@ foreach ($files as $entry) {
     $buffer = new \BitWasp\Buffertools\Buffer($binary);
     $parser = new \BitWasp\Buffertools\Parser($buffer);
     while ($try) {
-        try {
-            $block = $bds->fromParser($parser);
-            $bytes += $block->getBuffer()->getSize();
-            $blockchain->add($block);
+        $block = $bds->fromParser($parser);
+        $bytes += $block->getBuffer()->getSize();
 
-            $utxo += count($block->getTransactions());
-            echo "   " . $c . " - " .  $block->getHeader()->getBlockHash() . " - (d: ".$blockchain->getChainDifficulty() . ") (u: $utxo) (size: ".out($bytes).") \n";
-
-            $c++;
-        } catch (\Exception $e) {
-            $try = false;
-        }
+        $blockchain->process($block);
+        echo "  [height: " . $blockchain->currentHeight() . "]\n";
+        $utxo += count($block->getTransactions());
     }
+    echo "finished loop\n";
 }
