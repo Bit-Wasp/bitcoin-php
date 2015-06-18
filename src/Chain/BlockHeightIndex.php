@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use Doctrine\Common\Cache\Cache;
 

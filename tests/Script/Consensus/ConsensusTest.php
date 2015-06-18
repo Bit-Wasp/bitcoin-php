@@ -74,7 +74,11 @@ class ConsensusTest
 
             echo "---START---";
             var_dump(
-                $scriptPubKey->gethex(), $tx->gethex(), $nInput, $flags, (int)$result
+                $scriptPubKey->gethex(),
+                $tx->gethex(),
+                $nInput,
+                $flags,
+                (int)$result
             );
             echo $contents . "\n";
             echo $parser->getHumanReadable() . "\n";

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use Doctrine\Common\Cache\Cache;
 
@@ -88,5 +87,4 @@ class BlockHashIndex
     {
         return $this->index->fetch($this->cacheIndex($height));
     }
-
 }

@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\BlockInterface;
+use BitWasp\Bitcoin\Exceptions\BlockPowError;
+use BitWasp\Bitcoin\Exceptions\BlockPrevNotFound;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Utxo\UtxoSet;
@@ -35,30 +37,44 @@ class Blockchain
     private $chainDiff;
 
     /**
+     * @var
+     */
+    private $pow;
+
+    /**
      * @var UtxoSet
      */
     private $utxoset;
 
     /**
      * @param Math $math
-     * @param Difficulty $difficulty
      * @param BlockInterface $genesis
      * @param BlockStorage $blocks
      * @param BlockIndex $index
      * @param UtxoSet $utxoSet
      */
-    public function __construct(Math $math, Difficulty $difficulty, BlockInterface $genesis, BlockStorage $blocks, BlockIndex $index, UtxoSet $utxoSet)
+    public function __construct(Math $math, BlockInterface $genesis, BlockStorage $blocks, BlockIndex $index, UtxoSet $utxoSet)
     {
         $this->math = $math;
         $this->index = $index;
         $this->genesis = $genesis;
         $this->blocks = $blocks;
         $this->utxoset = $utxoSet;
-        $this->difficulty = $difficulty;
-        $this->chainDiff = $this->difficulty->getDifficulty($this->difficulty->lowestBits());
+        $this->difficulty = new Difficulty($math, $genesis->getHeader()->getBits());
+        $this->chainDiff = $this->difficulty->getDifficulty($genesis->getHeader()->getBits());
 
         $this->blocks->save($genesis);
         $this->index->saveGenesis($genesis->getHeader());
+        $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getHeader()->getBits());
+        $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
+    }
+
+    private function updateProofOfWork()
+    {
+        if (0 == $this->currentHeight() % 2016) {
+            $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getHeader()->getBits());
+            $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
+        }
     }
 
     /**
@@ -148,20 +164,19 @@ class Blockchain
      * Will fail if it doesn't elongate the current chain
      *
      * @param BlockInterface $block
+     * @throws BlockPrevNotFound
      */
     public function add(BlockInterface $block)
     {
         if ($this->chainTip()->getHeader()->getBlockHash() !== $block->getHeader()->getPrevBlock()) {
-            throw new \RuntimeException('Block does not elongate the current chain');
+            throw new BlockPrevNotFound('Block does not elongate the current chain');
         }
 
         $this
             ->storeBlock($block)
             ->storeUtxos($block->getTransactions());
 
-        if (0 === $this->currentHeight() % 2016) {
-            $this->chainDiff = $this->difficulty->getDifficulty($block->getHeader()->getBits());
-        }
+        $this->updateProofOfWork();
     }
 
     /**
@@ -181,7 +196,7 @@ class Blockchain
         /** @var \BitWasp\Bitcoin\Block\BlockInterface[] $chainBlocks */
         $chainBlocks = [];
         $chainHeight = $index->height()->height();
-        for ($i = $ancestorHeight; $i < $chainHeight; $i++){
+        for ($i = $ancestorHeight; $i < $chainHeight; $i++) {
             $chainBlocks[] = $blocks->fetch($index->hash()->fetch($i));
         }
 
@@ -211,7 +226,6 @@ class Blockchain
     {
         // While an orphan is not immediately useful, we may be tracking a fork.
         // Save each to the cache, and assess for any link in the chain that we might wish to follow.
-
         $header = $block->getHeader();
         $prevHash = $blockHash = $header->getBlockHash();
         $blocks = $this->blocks();
@@ -246,7 +260,8 @@ class Blockchain
     public function process(BlockInterface $block)
     {
         // Ignore the genesis block
-        $hash = $block->getHeader()->getBlockHash();
+        $header = $block->getHeader();
+        $hash = $header->getBlockHash();
         if ($hash === $this->genesis->getHeader()->getBlockHash()) {
             return true;
         }
@@ -254,14 +269,17 @@ class Blockchain
         try {
             // Attempt to add it to the chain
             $this->add($block);
+            $this->pow->checkHeader($header);
             $result = true;
-        } catch (\RuntimeException $e) {
+        } catch (BlockPrevNotFound $e) {
             // If it fails because it doesn't elongate the chain, process it as an orphan.
             // Result will be determined
             $result = $this->processOrphan($block);
+        } catch (BlockPowError $e) {
+            $result = false;
+            // Invalid block.
         }
 
         return $result;
     }
-
 }

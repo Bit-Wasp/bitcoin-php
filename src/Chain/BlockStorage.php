@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-
 use BitWasp\Bitcoin\Block\BlockInterface;
 use Doctrine\Common\Cache\Cache;
 
@@ -39,7 +38,8 @@ class BlockStorage
      * @param BlockInterface $blk
      * @return string
      */
-    private function cacheIndexBlk(BlockInterface $blk){
+    private function cacheIndexBlk(BlockInterface $blk)
+    {
         return $this->cacheIndex($blk->getHeader()->getBlockHash());
     }
 
