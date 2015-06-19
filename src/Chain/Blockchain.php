@@ -71,7 +71,7 @@ class Blockchain
 
     private function updateProofOfWork()
     {
-        if (0 == $this->currentHeight() % 2016) {
+        if (0 == $this->math->mod($this->currentHeight(), 2016)) {
             $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getHeader()->getBits());
             $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
         }
