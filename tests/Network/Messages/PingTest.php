@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\Messages\Ping;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -13,9 +14,10 @@ class PingTest extends AbstractTestCase
      */
     public function generateSet()
     {
+        $random = new Random();
         $set = [];
         for ($i = 0; $i < 2; $i++) {
-            $set[] = [new Ping()];
+            $set[] = [new Ping($random->bytes(8)->getInt())];
         }
         return $set;
     }

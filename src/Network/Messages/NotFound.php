@@ -4,6 +4,8 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
+use BitWasp\Bitcoin\Serializer\Network\Message\NotFoundSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use BitWasp\Buffertools\Parser;
 
 class NotFound extends NetworkSerializable implements \Countable
@@ -19,9 +21,7 @@ class NotFound extends NetworkSerializable implements \Countable
     public function __construct(array $vectors = [])
     {
         foreach ($vectors as $vector) {
-            if ($vector instanceof InventoryVector) {
-                $this->addItem($vector);
-            }
+            $this->addItem($vector);
         }
     }
 
@@ -78,8 +78,6 @@ class NotFound extends NetworkSerializable implements \Countable
      */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser->writeArray($this->vectors);
-        return $parser->getBuffer();
+        return (new NotFoundSerializer(new InventoryVectorSerializer()))->serialize($this);
     }
 }

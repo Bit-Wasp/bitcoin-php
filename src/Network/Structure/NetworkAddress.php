@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Network\Structure;
 
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Serializable;
 
 class NetworkAddress extends Serializable

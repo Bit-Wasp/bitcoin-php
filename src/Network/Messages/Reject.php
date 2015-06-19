@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
+use BitWasp\Bitcoin\Serializer\Network\Message\RejectSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
-use BitWasp\Buffertools\Parser;
 
 class Reject extends NetworkSerializable
 {
@@ -87,15 +87,40 @@ class Reject extends NetworkSerializable
     /**
      * @return Buffer
      */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCode()
+    {
+        return $this->ccode;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getReason()
+    {
+        return $this->reason;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return Buffer
+     */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser
-            ->writeWithLength($this->message)
-            ->writeInt(1, $this->ccode)
-            ->writeWithLength($this->reason)
-            ->writeWithLength($this->data);
-
-        return $parser->getBuffer();
+        return (new RejectSerializer())->serialize($this);
     }
 }

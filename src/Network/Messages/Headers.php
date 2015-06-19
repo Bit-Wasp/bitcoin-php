@@ -4,6 +4,8 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\HeadersSerializer;
 use BitWasp\Buffertools\Parser;
 use InvalidArgumentException;
 
@@ -20,9 +22,7 @@ class Headers extends NetworkSerializable implements \Countable
     public function __construct(array $headers = [])
     {
         foreach ($headers as $header) {
-            if ($header instanceof BlockHeaderInterface) {
-                $this->addHeader($header);
-            }
+            $this->addHeader($header);
         }
     }
 
@@ -79,15 +79,6 @@ class Headers extends NetworkSerializable implements \Countable
      */
     public function getBuffer()
     {
-        $headers = [];
-        foreach ($this->headers as $header) {
-            $temp = new Parser($header->getBinary());
-            $temp->writeInt(1, 0);
-            $headers[] = $temp->getBuffer();
-        }
-
-        $parser = new Parser();
-        $parser->writeArray($headers);
-        return $parser->getBuffer();
+        return (new HeadersSerializer(new HexBlockHeaderSerializer()))->serialize($this);
     }
 }

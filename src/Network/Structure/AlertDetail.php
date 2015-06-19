@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Network\Structure;
 
+use BitWasp\Bitcoin\Serializer\Network\Structure\AlertDetailSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Serializable;
@@ -214,33 +215,6 @@ class AlertDetail extends Serializable
      */
     public function getBuffer()
     {
-        $setCancels = [];
-        foreach ($this->setCancel as $toCancel) {
-            $t = new Parser();
-            $setCancels[] = $t->writeInt(4, $toCancel, true)->getBuffer();
-        }
-
-        $setSubVers = [];
-        foreach ($this->setSubVer as $subVer) {
-            $t = new Parser();
-            $setSubVers[] = $t->writeInt(4, $subVer, true)->getBuffer();
-        }
-
-        $parser = new Parser();
-        $parser
-            ->writeInt(4, $this->version, true)
-            ->writeInt(8, $this->relayUntil, true)
-            ->writeInt(8, $this->expiration, true)
-            ->writeInt(4, $this->id, true)
-            ->writeInt(4, $this->cancel, true)
-            ->writeArray($setCancels)
-            ->writeInt(4, $this->minVer, true)
-            ->writeInt(4, $this->maxVer, true)
-            ->writeArray($setSubVers)
-            ->writeInt(4, $this->priority, true)
-            ->writeWithLength($this->comment)
-            ->writeWithLength($this->statusBar);
-
-        return $parser->getBuffer();
+        return (new AlertDetailSerializer())->serialize($this);
     }
 }

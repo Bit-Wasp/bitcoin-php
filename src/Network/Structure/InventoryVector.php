@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Network\Structure;
 
+use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Serializable;
@@ -71,11 +72,6 @@ class InventoryVector extends Serializable
      */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser
-            ->writeInt(4, $this->type, true)
-            ->writeBytes(32, $this->hash);
-
-        return $parser->getBuffer();
+        return (new InventoryVectorSerializer())->serialize($this);
     }
 }

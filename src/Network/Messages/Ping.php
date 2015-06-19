@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
+use BitWasp\Bitcoin\Serializer\Network\Message\PingSerializer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 
@@ -15,12 +16,12 @@ class Ping extends NetworkSerializable
     private $nonce;
 
     /**
+     * @param int $nonce
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function __construct()
+    public function __construct($nonce)
     {
-        $random = new Random();
-        $this->nonce = $random->bytes(8)->getInt();
+        $this->nonce = $nonce;
     }
 
     /**
@@ -44,8 +45,6 @@ class Ping extends NetworkSerializable
      */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser->writeInt(8, $this->nonce);
-        return $parser->getBuffer();
+        return (new PingSerializer())->serialize($this);
     }
 }

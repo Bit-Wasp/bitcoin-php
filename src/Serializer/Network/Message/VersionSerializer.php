@@ -22,7 +22,7 @@ class VersionSerializer
             ->uint64le()
             ->varstring()
             ->uint32le()
-            ->uint16()
+            ->uint8le()
             ->getTemplate();
     }
 
@@ -45,6 +45,15 @@ class VersionSerializer
             $startHeight,
             $relay
         );
+    }
+
+    /**
+     * @param $string
+     * @return Version
+     */
+    public function parse($string)
+    {
+        return $this->fromParser(new Parser($string));
     }
 
     /**

@@ -3,7 +3,8 @@
 namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
-use BitWasp\Buffertools\Parser;
+use BitWasp\Bitcoin\Serializer\Network\Message\AlertSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\AlertDetailSerializer;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 
 class Alert
@@ -31,7 +32,7 @@ class Alert
     /**
      * @return AlertDetail
      */
-    public function getAlert()
+    public function getDetail()
     {
         return $this->alert;
     }
@@ -50,7 +51,6 @@ class Alert
      */
     public function getBuffer()
     {
-        $parser = new Parser($this->alert->getBuffer()->getBinary() . $this->signature->getBuffer()->getBinary());
-        return $parser->getBuffer();
+        return (new AlertSerializer(new AlertDetailSerializer()))->serialize($this);
     }
 }

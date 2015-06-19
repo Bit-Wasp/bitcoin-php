@@ -55,7 +55,6 @@ class NetworkAddressSerializer
     public function fromParser(Parser & $parser)
     {
         list ($services, $ipBuffer, $port) = $this->getTemplate()->parse($parser);
-
         return new NetworkAddress(
             $services,
             $ipBuffer,

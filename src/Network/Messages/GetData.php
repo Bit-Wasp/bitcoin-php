@@ -4,6 +4,8 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
+use BitWasp\Bitcoin\Serializer\Network\Message\GetDataSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use BitWasp\Buffertools\Parser;
 use InvalidArgumentException;
 
@@ -20,9 +22,7 @@ class GetData extends NetworkSerializable implements \Countable
     public function __construct(array $vectors = [])
     {
         foreach ($vectors as $vector) {
-            if ($vector instanceof InventoryVector) {
-                $this->addItem($vector);
-            }
+            $this->addItem($vector);
         }
     }
 
@@ -79,8 +79,6 @@ class GetData extends NetworkSerializable implements \Countable
      */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser->writeArray($this->vectors);
-        return $parser->getBuffer();
+        return (new GetDataSerializer(new InventoryVectorSerializer()))->serialize($this);
     }
 }

@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
+use BitWasp\Bitcoin\Serializer\Network\Message\PongSerializer;
 use BitWasp\Buffertools\Parser;
 
 class Pong extends NetworkSerializable
@@ -13,11 +14,11 @@ class Pong extends NetworkSerializable
     private $nonce;
 
     /**
-     * @param Ping $ping
+     * @param int|string $nonce
      */
-    public function __construct(Ping $ping)
+    public function __construct($nonce)
     {
-        $this->nonce = $ping->getNonce();
+        $this->nonce = $nonce;
     }
 
     /**
@@ -41,8 +42,6 @@ class Pong extends NetworkSerializable
      */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser->writeInt(8, $this->nonce);
-        return $parser->getBuffer();
+        return (new PongSerializer())->serialize($this);
     }
 }
