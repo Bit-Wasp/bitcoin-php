@@ -37,7 +37,7 @@ class Blockchain
     private $chainDiff;
 
     /**
-     * @var
+     * @var ProofOfWork
      */
     private $pow;
 
@@ -183,7 +183,7 @@ class Blockchain
      * Given an ancestor height, and a list of hashes in the fork, use this
      * information to compare the work, and if necessary, commit a reorg.
      *
-     * @param $ancestorHeight
+     * @param int $ancestorHeight
      * @param array $forkBlockHashes
      * @return bool
      * @throws \Exception
