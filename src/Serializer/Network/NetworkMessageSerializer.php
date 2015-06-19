@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer;
+namespace BitWasp\Bitcoin\Serializer\Network;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;

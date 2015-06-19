@@ -19,7 +19,7 @@ use BitWasp\Bitcoin\Network\Messages\Tx;
 use BitWasp\Bitcoin\Network\Messages\VerAck;
 use BitWasp\Bitcoin\Network\Messages\Version;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
-use BitWasp\Bitcoin\Serializer\NetworkMessageSerializer;
+use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;

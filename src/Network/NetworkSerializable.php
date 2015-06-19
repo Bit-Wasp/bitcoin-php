@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Network;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\NetworkMessageSerializer;
+use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 
 abstract class NetworkSerializable extends Serializable implements NetworkSerializableInterface
 {
