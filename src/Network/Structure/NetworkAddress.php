@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Network\Structure;
 
+use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Serializable;
@@ -62,26 +63,8 @@ class NetworkAddress extends Serializable
     /**
      * @return Buffer
      */
-    public function getIpBuffer()
-    {
-        $hex = (string)dechex(ip2long($this->ip));
-        $hex = (strlen($hex) % 2 == 1) ? '0' . $hex : $hex;
-        $hex = '00000000000000000000'.'ffff' . $hex;
-        $buffer = Buffer::hex($hex);
-        return $buffer;
-    }
-
-    /**
-     * @return Buffer
-     */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser
-            ->writeBytes(8, $this->services, true)
-            ->writeBytes(16, $this->getIpBuffer())
-            ->writeInt(2, $this->port);
-
-        return $parser->getBuffer();
+        return (new NetworkAddressSerializer())->serialize($this);
     }
 }
