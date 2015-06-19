@@ -51,7 +51,7 @@ class GetData extends NetworkSerializable implements \Countable
     }
 
     /**
-     * @param $index
+     * @param int|string $index
      * @return InventoryVector
      */
     public function getItem($index)

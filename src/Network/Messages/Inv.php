@@ -51,7 +51,7 @@ class Inv extends NetworkSerializable
     }
 
     /**
-     * @param $index
+     * @param int $index
      * @return InventoryVector
      */
     public function getItem($index)

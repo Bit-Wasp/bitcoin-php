@@ -50,7 +50,7 @@ class NotFound extends NetworkSerializable implements \Countable
     }
 
     /**
-     * @param $index
+     * @param int $index
      * @return InventoryVector
      */
     public function getItem($index)

@@ -51,7 +51,7 @@ class Addr extends NetworkSerializable implements \Countable
     }
 
     /**
-     * @param $index
+     * @param int $index
      * @return NetworkAddressTimestamp
      */
     public function getAddress($index)
