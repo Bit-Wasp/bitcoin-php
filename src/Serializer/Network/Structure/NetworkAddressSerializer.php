@@ -30,7 +30,6 @@ class NetworkAddressSerializer
         $hex = (string)dechex(ip2long($ip));
         $hex = (strlen($hex) % 2 == 1) ? '0' . $hex : $hex;
         $hex = '00000000000000000000'.'ffff' . $hex;
-        echo " [ formed ip to send: $hex]\n";
         $buffer = Buffer::hex($hex);
         return $buffer;
     }

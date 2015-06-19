@@ -50,6 +50,26 @@ class NetworkAddressTimestampSerializer
     }
 
     /**
+     * @param Buffer $ip
+     * @return string
+     * @throws \Exception
+     */
+    private function parseIpBuffer(Buffer $ip)
+    {
+        $end = $ip->slice(12, 4);
+
+        return implode(
+            ".",
+            array_map(
+                function ($int) {
+                    return unpack("C", $int)[1];
+                },
+                str_split($end->getBinary(), 1)
+            )
+        );
+    }
+
+    /**
      * @param Parser $parser
      * @return NetworkAddressTimestamp
      */
@@ -59,7 +79,7 @@ class NetworkAddressTimestampSerializer
         return new NetworkAddressTimestamp(
             $timestamp,
             $services,
-            $ipBuffer,
+            $this->parseIpBuffer($ipBuffer),
             $port
         );
     }
