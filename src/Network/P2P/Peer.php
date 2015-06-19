@@ -126,7 +126,7 @@ class Peer extends EventEmitter
             if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
                 $this->missedPings++;
             }
-            if ($this->missedPings > 10) {
+            if ($this->missedPings > $this->maxMissedPings) {
                 $this->stream->close();
             }
         });
