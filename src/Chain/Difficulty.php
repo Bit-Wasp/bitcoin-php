@@ -52,7 +52,7 @@ class Difficulty implements DifficultyInterface
      */
     public function getMaxTarget()
     {
-        $bits   = $this->lowestBits();
+        $bits = $this->lowestBits();
         $target = $this->math->getCompact($bits);
 
         return $target;
@@ -85,7 +85,6 @@ class Difficulty implements DifficultyInterface
     public function getDifficulty(Buffer $bits)
     {
         $target = $this->math->getCompact($bits);
-        
         $lowest = $this->math->getCompact($this->lowestBits());
         $lowest = $this->math->mul($lowest, $this->math->pow(10, self::DIFF_PRECISION));
         
