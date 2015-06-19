@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
+use BitWasp\Bitcoin\Serializer\Network\Message\VersionSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
-use BitWasp\Buffertools\Parser;
 
 class Version extends NetworkSerializable
 {
@@ -176,18 +176,6 @@ class Version extends NetworkSerializable
      */
     public function getBuffer()
     {
-        $bytes = new Parser();
-        $bytes
-            ->writeInt(4, $this->version, true)
-            ->writeInt(8, $this->services, true)
-            ->writeInt(8, $this->timestamp, true)
-            ->writeBytes(26, $this->addrRecv)
-            ->writeBytes(26, $this->addrFrom)
-            ->writeInt(8, $this->nonce, true)
-            ->writeWithLength($this->userAgent)
-            ->writeInt(4, $this->startHeight, true)
-            ->writeInt(1, (int)$this->relay);
-
-        return $bytes->getBuffer();
+        return (new VersionSerializer())->serialize($this);
     }
 }
