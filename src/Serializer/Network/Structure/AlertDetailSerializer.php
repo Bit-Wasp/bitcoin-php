@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Structure;
 
-
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
@@ -122,5 +121,4 @@ class AlertDetailSerializer
             $detail->getStatusBar()
         ]);
     }
-
 }

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
-
 use BitWasp\Bitcoin\Network\Messages\NotFound;
 use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use BitWasp\Buffertools\Parser;

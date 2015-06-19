@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Network\P2P;
 
-
 use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Network\Messages\VerAck;
 use BitWasp\Bitcoin\Network\NetworkMessage;
@@ -122,7 +121,7 @@ class Peer extends EventEmitter
 
         $peer = $this;
 
-        $this->loop->addPeriodicTimer($this->pingInterval, function() use ($peer) {
+        $this->loop->addPeriodicTimer($this->pingInterval, function () use ($peer) {
             $peer->send($this->msgs->ping());
             if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
                 $this->missedPings++;

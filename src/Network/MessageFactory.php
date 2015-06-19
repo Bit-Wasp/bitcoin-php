@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Network;
 
-
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\Messages\Addr;

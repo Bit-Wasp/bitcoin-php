@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
-
 use BitWasp\Bitcoin\Network\Messages\Headers;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Buffertools\Parser;

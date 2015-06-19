@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
-
 use BitWasp\Bitcoin\Network\Messages\Addr;
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressTimestampSerializer;
 use BitWasp\Buffertools\Parser;
@@ -64,5 +63,4 @@ class AddrSerializer
             $addr->getAddresses()
         ]);
     }
-
 }

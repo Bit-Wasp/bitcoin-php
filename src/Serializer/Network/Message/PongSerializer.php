@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
-
 use BitWasp\Bitcoin\Network\Messages\Pong;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;

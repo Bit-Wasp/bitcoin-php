@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
-
 use BitWasp\Bitcoin\Network\Messages\Alert;
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Serializer\Network\Structure\AlertDetailSerializer;

@@ -67,7 +67,8 @@ class NetworkMessageSerializer
     {
         $math = Bitcoin::getMath();
 
-        $parsed = $this->getHeaderTemplate()->parse($parser);;
+        $parsed = $this->getHeaderTemplate()->parse($parser);
+        ;
         /** @var Buffer $netBytes */
         $netBytes = $parsed[0];
         /** @var Buffer $command */

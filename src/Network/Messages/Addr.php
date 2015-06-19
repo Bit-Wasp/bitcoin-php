@@ -43,7 +43,7 @@ class Addr extends NetworkSerializable implements \Countable
     }
 
     /**
-     * @return int
+     * @return NetworkAddressTimestamp[]
      */
     public function getAddresses()
     {

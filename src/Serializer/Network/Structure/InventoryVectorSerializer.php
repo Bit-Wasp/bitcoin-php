@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Structure;
 
-
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
