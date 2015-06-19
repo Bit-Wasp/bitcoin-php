@@ -31,8 +31,24 @@ class NetworkAddressSerializer
         $hex = (string)dechex(ip2long($ip));
         $hex = (strlen($hex) % 2 == 1) ? '0' . $hex : $hex;
         $hex = '00000000000000000000'.'ffff' . $hex;
+        echo " [ formed ip to send: $hex]\n";
         $buffer = Buffer::hex($hex);
         return $buffer;
+    }
+
+    private function parseIpBuffer(Buffer $ip)
+    {
+        $end = $ip->slice(12, 4);
+
+        return implode(
+            ".",
+            array_map(
+                function ($int) {
+                    return unpack("C", $int)[1];
+                },
+                str_split($end->getBinary(), 1)
+            )
+        );
     }
 
     /**
@@ -57,8 +73,17 @@ class NetworkAddressSerializer
         list ($services, $ipBuffer, $port) = $this->getTemplate()->parse($parser);
         return new NetworkAddress(
             $services,
-            $ipBuffer,
+            $this->parseIpBuffer($ipBuffer),
             $port
         );
+    }
+
+    /**
+     * @param $data
+     * @return NetworkAddress
+     */
+    public function parse($data)
+    {
+        return $this->fromParser(new Parser($data));
     }
 }

@@ -4,16 +4,18 @@ namespace BitWasp\Bitcoin\Network\P2P;
 
 
 use BitWasp\Bitcoin\Network\MessageFactory;
+use BitWasp\Bitcoin\Network\Messages\VerAck;
+use BitWasp\Bitcoin\Network\NetworkMessage;
+use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
+use Evenement\EventEmitter;
 use React\EventLoop\LoopInterface;
-use React\Promise\Deferred;
-use React\Socket\Server;
 use React\SocketClient\Connector;
 use React\Stream\Stream;
 
-class Peer
+class Peer extends EventEmitter
 {
     const USER_AGENT = "bitcoin-php/v0.1";
     const PROTOCOL_VERSION = "70000";
@@ -22,11 +24,11 @@ class Peer
      * @var NetworkAddress
      */
     private $remoteAddr;
-    private $localAddr;
+
     /**
-     * @var Stream
+     * @var NetworkAddress
      */
-    private $socket;
+    private $localAddr;
 
     /**
      * @var MessageFactory
@@ -34,9 +36,34 @@ class Peer
     private $msgs;
 
     /**
+     * @var Stream
+     */
+    private $stream;
+
+    /**
      * @var bool
      */
     private $exchangedVersion = false;
+
+    /**
+     * @var int
+     */
+    private $pingInterval = 60;
+
+    /**
+     * @var int
+     */
+    private $maxMissedPings = 5;
+
+    /**
+     * @var int
+     */
+    private $missedPings = 0;
+
+    /**
+     * @var int
+     */
+    private $lastPongTime;
 
     /**
      * @param NetworkAddress $addr
@@ -51,52 +78,85 @@ class Peer
         $this->connector = $connector;
         $this->msgs = $msgs;
         $this->loop = $loop;
-
+        $this->lastPongTime = time();
     }
 
+    /**
+     * @return bool
+     */
     public function ready()
     {
         return $this->exchangedVersion;
     }
 
-    public function connect()
+    /**
+     * @param NetworkSerializable $msg
+     */
+    public function send(NetworkSerializable $msg)
     {
-        echo "connect()\n";
-        $this->connector->create($this->remoteAddr->getIp(), $this->remoteAddr->getPort())->then(function (Stream $stream) {
-            echo "connected\n";
-            $response = new Deferred();
-            $server = new Server($this->loop);
-            echo "create Server\n";
-            $server->on('connection', function (Stream $stream) use (&$response) {
+        $net = $msg->getNetworkMessage();
+        $this->stream->write($net->getBinary());
+        $this->emit('send', [$net]);
+    }
 
-                echo "server had connection!\n";
-                $stream->on('data', function ($data) use (&$response) {
-                    echo "incoming server response\n";
-                    $response->resolve($data)->then(function ($data) {
-                        $parser = new Parser(new Buffer($data));
+    /**
+     * @param Stream $stream
+     */
+    private function initConnection(Stream $stream)
+    {
+        $this->stream = $stream;
+        $this->send($this->version());
 
-                    });
-                });
-            });
-            echo "server told to listen\n";
-            $server->listen($this->localAddr->getIp(), $this->localAddr->getIp());
-            $stream->write($this->version()->getNetworkMessage()->getBinary());
-            return $response->promise();
+        $this->on('msg', function (NetworkMessage $msg) {
+            $this->emit($msg->getCommand(), [$msg->getPayload()]);
+        });
 
-        })->then(function ($data) {
-            echo "omg received response\n";
-            var_dump($data);
+        $this->on('verack', function (VerAck $verAck) {
+            $this->exchangedVersion = true;
+            $this->emit('ready', [$this]);
+        });
+
+        $this->on('pong', function () {
+            $this->lastPongTime = time();
+        });
+
+        $peer = $this;
+
+        $this->loop->addPeriodicTimer($this->pingInterval, function() use ($peer) {
+            $peer->send($this->msgs->ping());
+            if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
+                $this->missedPings++;
+            }
+            if ($this->missedPings > 10) {
+                $this->stream->close();
+            }
         });
     }
 
     /**
-     *
+     * @return \React\Promise\RejectedPromise|static
+     */
+    public function connect()
+    {
+        return $this->connector
+            ->create($this->remoteAddr->getIp(), $this->remoteAddr->getPort())
+            ->then(function (Stream $stream) {
+                $this->initConnection($stream);
+                $stream->on('data', function ($data) {
+                    $message = $this->msgs->parse(new Parser(new Buffer($data)));
+                    $this->emit('msg', [$message]);
+                });
+            });
+    }
+
+    /**
+     * @return \BitWasp\Bitcoin\Network\Messages\Version
      */
     public function version()
     {
         return $this->msgs->version(
             self::PROTOCOL_VERSION,
-            Buffer::hex('00', 16),
+            Buffer::hex('01', 16),
             time(),
             $this->remoteAddr,
             $this->localAddr,

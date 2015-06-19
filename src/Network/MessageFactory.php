@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Network;
 
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Network\Messages\Addr;
 use BitWasp\Bitcoin\Network\Messages\Block;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
 use BitWasp\Bitcoin\Network\Messages\GetData;
@@ -73,6 +74,7 @@ class MessageFactory
             $timestamp,
             $addrRecv,
             $addrFrom,
+            $this->random->bytes(8)->getInt(),
             $userAgent,
             $startHeight,
             $relay
@@ -88,14 +90,12 @@ class MessageFactory
     }
 
     /**
-     * @param $host
-     * @param $port
-     * @param Buffer $services
-     * @return NetworkAddress
+     * @param array $addrs
+     * @return Addr
      */
-    public function addr($host, $port, Buffer $services)
+    public function addr(array $addrs = array())
     {
-        return new NetworkAddress($services, $host, $port);
+        return new Addr($addrs);
     }
 
     /**
@@ -224,9 +224,7 @@ class MessageFactory
 
     public function parse(Parser & $parser)
     {
-        $msg = (new NetworkMessageSerializer($this->network))
+        return (new NetworkMessageSerializer($this->network))
             ->fromParser($parser);
-
-
     }
 }

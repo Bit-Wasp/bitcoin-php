@@ -3,26 +3,40 @@
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
 use BitWasp\Bitcoin\Network\Messages\Version;
+use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
 class VersionSerializer
 {
     /**
+     * @var NetworkAddressSerializer
+     */
+    private $netAddr;
+
+    /**
+     * @param NetworkAddressSerializer $netAddr
+     */
+    public function __construct(NetworkAddressSerializer $netAddr)
+    {
+        $this->netAddr = $netAddr;
+    }
+
+    /**
      * @return \BitWasp\Buffertools\Template
      */
     private function getTemplate()
     {
         return (new TemplateFactory())
-            ->uint32le()
-            ->uint64le()
-            ->uint64le()
-            ->bytestring(26)
-            ->bytestring(26)
-            ->uint64le()
-            ->varstring()
-            ->uint32le()
-            ->uint8le()
+            ->uint32le()      // version
+            ->bytestring(8)   // services
+            ->uint64le()      // timestamp
+            ->bytestring(26)  // addrRecv
+            ->bytestring(26)  // addrFrom
+            ->uint64le()      // nonce
+            ->varstring()     // user agent
+            ->uint32le()      // start height
+            ->uint8le()       // relay
             ->getTemplate();
     }
 
@@ -38,12 +52,12 @@ class VersionSerializer
             $version,
             $services,
             $timestamp,
-            $addrRecv,
-            $addrFrom,
+            $this->netAddr->parse($addrRecv),
+            $this->netAddr->parse($addrFrom),
             $nonce,
             $userAgent,
             $startHeight,
-            $relay
+            (bool)$relay
         );
     }
 

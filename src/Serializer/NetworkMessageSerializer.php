@@ -20,6 +20,7 @@ use BitWasp\Bitcoin\Serializer\Network\Message\PongSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\RejectSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\VersionSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressTimestampSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Buffertools\Buffertools;
@@ -51,7 +52,7 @@ class NetworkMessageSerializer
         return (new TemplateFactory())
             ->bytestringle(4)
             ->bytestring(12)
-            ->uint32()
+            ->uint32le()
             ->bytestring(4)
             ->getTemplate();
     }
@@ -80,15 +81,14 @@ class NetworkMessageSerializer
             throw new \RuntimeException('Invalid magic bytes for network');
         }
 
-        $buffer = $parser->readBytes($payloadSize);
-        if (Hash::sha256ripe160($buffer)->slice(4)->getBinary() !== $checksum->getBinary()) {
-            throw new \Exception('Payload checksum error');
+        if ($payloadSize > 0) {
+            $buffer = $parser->readBytes($payloadSize);
         }
 
-        $cmd = $command->getBinary();
+        $cmd = trim($command->getBinary());
         switch($cmd) {
             case 'version':
-                $serializer = new VersionSerializer();
+                $serializer = new VersionSerializer(new NetworkAddressSerializer());
                 $payload = $serializer->parse($buffer);
                 break;
             case 'verack':
