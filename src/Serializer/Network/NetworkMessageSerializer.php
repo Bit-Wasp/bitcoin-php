@@ -34,7 +34,7 @@ class NetworkMessageSerializer
     /**
      * @var NetworkInterface
      */
-    protected $network;
+    private $network;
 
     /**
      * @param NetworkInterface $network
@@ -68,7 +68,7 @@ class NetworkMessageSerializer
         $math = Bitcoin::getMath();
 
         $parsed = $this->getHeaderTemplate()->parse($parser);
-        ;
+
         /** @var Buffer $netBytes */
         $netBytes = $parsed[0];
         /** @var Buffer $command */
@@ -82,8 +82,13 @@ class NetworkMessageSerializer
             throw new \RuntimeException('Invalid magic bytes for network');
         }
 
-        if ($payloadSize > 0) {
-            $buffer = $parser->readBytes($payloadSize);
+        $buffer = $payloadSize > 0
+            ? $parser->readBytes($payloadSize)
+            : new Buffer();
+
+        // Compare payload checksum against header value
+        if (Hash::sha256d($buffer)->slice(0, 4)->getBinary() !== $checksum->getBinary()) {
+            throw new \RuntimeException('Invalid packet checksum');
         }
 
         $cmd = trim($command->getBinary());
