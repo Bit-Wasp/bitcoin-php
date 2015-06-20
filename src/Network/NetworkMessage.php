@@ -59,8 +59,6 @@ class NetworkMessage extends Serializable
      */
     public function getBuffer()
     {
-        $serializer = new NetworkMessageSerializer($this->network);
-        $buffer = $serializer->serialize($this);
-        return $buffer;
+        return (new NetworkMessageSerializer($this->network))->serialize($this);
     }
 }
