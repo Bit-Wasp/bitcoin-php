@@ -33,6 +33,8 @@
     "fguillot/json-rpc": "0.0.1",
     "rych/hash_pbkdf2-compat": "~1.0",
     "rgooding/protobuf-php": "~0.0",
+    "react/react": "~0.4",
+    "react/socket-client": "~0.4",
     "bitwasp/buffertools": "~0.1",
     "bitwasp/stratum": "~0.1"
   },
