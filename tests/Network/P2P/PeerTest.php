@@ -13,7 +13,7 @@ use React\EventLoop\StreamSelectLoop;
 use React\Socket\Server;
 use React\SocketClient\Connector;
 
-class PeerTest 
+class PeerTest
 {
     protected function expectCallable($type)
     {

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 30/03/15
- * Time: 05:20
- */
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 

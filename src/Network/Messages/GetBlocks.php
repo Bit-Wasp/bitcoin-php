@@ -31,7 +31,7 @@ class GetBlocks extends NetworkSerializable
     public function __construct(
         $version,
         array $hashes,
-        $hashStop
+        Buffer $hashStop
     ) {
         $this->version = $version;
         $this->hashes = $hashes;
