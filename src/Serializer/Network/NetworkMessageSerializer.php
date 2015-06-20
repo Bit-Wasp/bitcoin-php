@@ -4,8 +4,10 @@ namespace BitWasp\Bitcoin\Serializer\Network;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Network\Messages\Block;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
 use BitWasp\Bitcoin\Network\Messages\MemPool;
+use BitWasp\Bitcoin\Network\Messages\Tx;
 use BitWasp\Bitcoin\Network\Messages\VerAck;
 use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
@@ -130,11 +132,11 @@ class NetworkMessageSerializer
                 break;
             case 'tx':
                 $serializer = new TransactionSerializer();
-                $payload = $serializer->parse($buffer);
+                $payload = new Tx($serializer->parse($buffer));
                 break;
             case 'block':
                 $serializer = new HexBlockSerializer($math, new HexBlockHeaderSerializer(), new TransactionSerializer());
-                $payload = $serializer->parse($buffer);
+                $payload = new Block($serializer->parse($buffer));
                 break;
             case 'headers':
                 $serializer = new HeadersSerializer(new HexBlockHeaderSerializer());
