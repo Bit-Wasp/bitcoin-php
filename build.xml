@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="bitcoin-php" default="build">
-    <property name="toolsdir" value="${project.basedir}/bin"/>
     <property name="builddir" value="${project.basedir}/build/"/>
     <import file="vendor/bitwasp/testing-php/build.xml" />
 </project>

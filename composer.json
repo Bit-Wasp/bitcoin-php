@@ -41,8 +41,5 @@
   "require-dev": {
     "bitwasp/testing-php": "~0.0",
     "symfony/yaml": "~2.6"
-  },
-  "config": {
-    "bin-dir": "bin"
   }
 }
