@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Network\P2P;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\MessageFactory;
@@ -14,7 +13,7 @@ use React\EventLoop\StreamSelectLoop;
 use React\Socket\Server;
 use React\SocketClient\Connector;
 
-class PeerTest extends AbstractTestCase
+class PeerTest 
 {
     protected function expectCallable($type)
     {
