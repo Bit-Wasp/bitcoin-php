@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Network\Messages;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetDataSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 
-class GetData extends AbstractInventory implements \Countable
+class GetData extends AbstractInventory
 {
     /**
      * @return string
