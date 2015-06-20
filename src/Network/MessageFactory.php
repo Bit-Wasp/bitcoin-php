@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Network\Messages\Alert;
 use BitWasp\Bitcoin\Network\Messages\Block;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
 use BitWasp\Bitcoin\Network\Messages\GetData;
+use BitWasp\Bitcoin\Network\Messages\GetHeaders;
 use BitWasp\Bitcoin\Network\Messages\Headers;
 use BitWasp\Bitcoin\Network\Messages\Inv;
 use BitWasp\Bitcoin\Network\Messages\MemPool;
@@ -132,9 +133,15 @@ class MessageFactory
 
     }
 
-    public function getheaders()
+    /**
+     * @param $version
+     * @param array $hashes
+     * @param $hashStop
+     * @return GetHeaders
+     */
+    public function getheaders($version, array $hashes, $hashStop)
     {
-
+        return new GetHeaders($version, $hashes, $hashStop);
     }
 
     /**

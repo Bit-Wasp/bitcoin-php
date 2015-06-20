@@ -13,6 +13,7 @@ use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\AddrSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\AlertSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetDataSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\GetHeadersSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\HeadersSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\InvSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\NotFoundSerializer;
@@ -121,6 +122,8 @@ class NetworkMessageSerializer
             case 'getblocks':
                 break;
             case 'getheaders':
+                $serializer = new GetHeadersSerializer();
+                $payload = $serializer->parse($buffer);
                 break;
             case 'tx':
                 $serializer = new TransactionSerializer();
