@@ -69,13 +69,13 @@ class AlertDetailSerializer
             $expiration,
             $id,
             $cancel,
-            $setCancels,
             $minVer,
             $maxVer,
-            $setSubVers,
             $priority,
             $comment,
-            $statusBar
+            $statusBar,
+            $setCancels,
+            $setSubVers
         );
     }
 
