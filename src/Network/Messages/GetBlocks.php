@@ -3,9 +3,9 @@
 namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
-use BitWasp\Bitcoin\Serializer\Network\Message\GetHeadersSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\GetBlocksSerializer;
 
-class GetHeaders extends NetworkSerializable
+class GetBlocks extends NetworkSerializable
 {
     /**
      * @var int
@@ -42,7 +42,7 @@ class GetHeaders extends NetworkSerializable
      */
     public function getNetworkCommand()
     {
-        return 'getheaders';
+        return 'getblocks';
     }
 
     /**
@@ -74,6 +74,6 @@ class GetHeaders extends NetworkSerializable
      */
     public function getBuffer()
     {
-        return (new GetHeadersSerializer())->serialize($this);
+        return (new GetBlocksSerializer())->serialize($this);
     }
 }

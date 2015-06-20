@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Network\Messages\Addr;
 use BitWasp\Bitcoin\Network\Messages\Alert;
 use BitWasp\Bitcoin\Network\Messages\Block;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
+use BitWasp\Bitcoin\Network\Messages\GetBlocks;
 use BitWasp\Bitcoin\Network\Messages\GetData;
 use BitWasp\Bitcoin\Network\Messages\GetHeaders;
 use BitWasp\Bitcoin\Network\Messages\Headers;
@@ -128,9 +129,15 @@ class MessageFactory
         return new NotFound($vectors);
     }
 
-    public function getblocks()
+    /**
+     * @param $version
+     * @param array $hashes
+     * @param $hashStop
+     * @return GetBlocks
+     */
+    public function getblocks($version, array $hashes, $hashStop)
     {
-
+        return new GetBlocks($version, $hashes, $hashStop);
     }
 
     /**
