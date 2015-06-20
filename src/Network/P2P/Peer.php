@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Network\P2P;
 
 use BitWasp\Bitcoin\Network\MessageFactory;
+use BitWasp\Bitcoin\Network\Messages\Ping;
 use BitWasp\Bitcoin\Network\Messages\VerAck;
 use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
@@ -18,6 +19,16 @@ class Peer extends EventEmitter
 {
     const USER_AGENT = "bitcoin-php/v0.1";
     const PROTOCOL_VERSION = "70000";
+
+    /**
+     * @var Connector
+     */
+    private $connector;
+
+    /**
+     * @var LoopInterface
+     */
+    private $loop;
 
     /**
      * @var NetworkAddress
@@ -110,9 +121,14 @@ class Peer extends EventEmitter
             $this->emit($msg->getCommand(), [$msg->getPayload()]);
         });
 
-        $this->on('verack', function (VerAck $verAck) {
+        $this->on('verack', function () {
             $this->exchangedVersion = true;
             $this->emit('ready', [$this]);
+        });
+
+        $this->on('ping', function (Ping $ping) {
+            $this->lastPongTime = time();
+            $this->send($this->msgs->pong($ping));
         });
 
         $this->on('pong', function () {
