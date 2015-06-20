@@ -1,26 +1,29 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: thomas
- * Date: 03/06/15
- * Time: 02:57
- */
 
 namespace BitWasp\Bitcoin\Utxo;
 
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use Doctrine\Common\Cache\Cache;
 
 class UtxoSet
 {
     /**
-     * @var array
+     * @var Cache
      */
-    private $contents = [];
+    private $contents;
 
     /**
      * @var int
      */
     private $size = 0;
+
+    /**
+     * @param Cache $cache
+     */
+    public function __construct(Cache $cache)
+    {
+        $this->contents = $cache;
+    }
 
     /**
      * @param TransactionInterface $tx
@@ -47,7 +50,7 @@ class UtxoSet
      */
     public function remove($txid, $vout)
     {
-        unset($this->contents[$txid][$vout]);
+        $this->contents->delete($this->cacheIndex($txid, $vout));
         $this->size--;
     }
 
@@ -68,24 +71,35 @@ class UtxoSet
     }
 
     /**
+     * @param $txid
+     * @param $vout
+     * @return string
+     */
+    private function cacheIndex($txid, $vout)
+    {
+        return "utxo_{$txid}_{$vout}";
+    }
+
+    /**
      * @param TransactionInterface $tx
      */
     public function addOutputs(TransactionInterface $tx)
     {
         $txid = $tx->getTransactionId();
-        $inc = 0;
-        foreach ($tx->getOutputs()->getOutputs() as $v => $output) {
-            $utxo = new Utxo(
-                $txid,
-                $v,
-                $output
-            );
+        $vout = 0;
 
-            $this->contents[$txid][$v] = $utxo;
-            $inc++;
+        foreach ($tx->getOutputs()->getOutputs() as $output) {
+            $this->contents->save(
+                $this->cacheIndex($txid, $vout),
+                new Utxo(
+                    $txid,
+                    $vout++,
+                    $output
+                )
+            );
         }
-        
-        $this->size += $inc;
+
+        $this->size += $vout;
     }
 
     /**

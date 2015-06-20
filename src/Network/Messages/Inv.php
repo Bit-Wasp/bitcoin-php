@@ -4,7 +4,8 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
-use BitWasp\Buffertools\Parser;
+use BitWasp\Bitcoin\Serializer\Network\Message\InvSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use InvalidArgumentException;
 
 class Inv extends NetworkSerializable
@@ -20,9 +21,7 @@ class Inv extends NetworkSerializable
     public function __construct(array $vectors = [])
     {
         foreach ($vectors as $vector) {
-            if ($vector instanceof InventoryVector) {
-                $this->addItem($vector);
-            }
+            $this->addItem($vector);
         }
     }
 
@@ -51,7 +50,7 @@ class Inv extends NetworkSerializable
     }
 
     /**
-     * @param $index
+     * @param int $index
      * @return InventoryVector
      */
     public function getItem($index)
@@ -79,8 +78,6 @@ class Inv extends NetworkSerializable
      */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser->writeArray($this->vectors);
-        return $parser->getBuffer();
+        return (new InvSerializer(new InventoryVectorSerializer()))->serialize($this);
     }
 }

@@ -2,11 +2,12 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
+use BitWasp\Bitcoin\Serializer\Network\Message\VersionSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
-use BitWasp\Buffertools\Parser;
 
 class Version extends NetworkSerializable
 {
@@ -16,7 +17,7 @@ class Version extends NetworkSerializable
     private $version;
 
     /**
-     * @var int|string
+     * @var Buffer
      */
     private $services;
 
@@ -56,14 +57,15 @@ class Version extends NetworkSerializable
     private $nonce;
 
     /**
-     * @param $version
+     * @param int $version
      * @param Buffer $services
-     * @param $timestamp
+     * @param int $timestamp
      * @param NetworkAddress $addrRecv
      * @param NetworkAddress $addrFrom
-     * @param $userAgent
-     * @param $startHeight
-     * @param $relay
+     * @param int $nonce
+     * @param Buffer $userAgent
+     * @param int $startHeight
+     * @param bool $relay
      */
     public function __construct(
         $version,
@@ -71,16 +73,18 @@ class Version extends NetworkSerializable
         $timestamp,
         NetworkAddress $addrRecv,
         NetworkAddress $addrFrom,
-        $userAgent,
+        $nonce,
+        Buffer $userAgent,
         $startHeight,
         $relay
     ) {
         $random = new Random();
         $this->nonce = $random->bytes(8)->getInt();
         $this->version = $version;
-        $this->services = $services->getInt();
+        $this->services = $services;
         $this->timestamp = $timestamp;
         $this->addrRecv = $addrRecv;
+        $this->nonce = $nonce;
         $this->addrFrom = $addrFrom;
         $this->userAgent = $userAgent;
         $this->startHeight = $startHeight;
@@ -116,7 +120,7 @@ class Version extends NetworkSerializable
     }
 
     /**
-     * @return int|string
+     * @return Buffer
      */
     public function getServices()
     {
@@ -176,18 +180,6 @@ class Version extends NetworkSerializable
      */
     public function getBuffer()
     {
-        $bytes = new Parser();
-        $bytes
-            ->writeInt(4, $this->version, true)
-            ->writeInt(8, $this->services, true)
-            ->writeInt(8, $this->timestamp, true)
-            ->writeBytes(26, $this->addrRecv)
-            ->writeBytes(26, $this->addrFrom)
-            ->writeInt(8, $this->nonce, true)
-            ->writeWithLength($this->userAgent)
-            ->writeInt(4, $this->startHeight, true)
-            ->writeInt(1, (int)$this->relay);
-
-        return $bytes->getBuffer();
+        return (new VersionSerializer(new NetworkAddressSerializer()))->serialize($this);
     }
 }

@@ -3,6 +3,16 @@
 require_once "../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Chain\Difficulty;
+use BitWasp\Bitcoin\Chain\BlockHashIndex;
+use BitWasp\Bitcoin\Chain\BlockStorage;
+use BitWasp\Bitcoin\Chain\BlockIndex;
+use BitWasp\Bitcoin\Chain\Blockchain;
+use BitWasp\Bitcoin\Utxo\UtxoSet;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
+use Doctrine\Common\Cache\ArrayCache;
 
 if (!isset($argv[1])) {
     die("Enter the full path for your .bitcoin directory!\n"
@@ -14,12 +24,15 @@ $directory = $argv[1] . ('/' == substr($argv[1], -1) ? '' : '/') . 'blocks/';
 $ec = Bitcoin::getEcAdapter();
 $math = $ec->getMath();
 
-$bhs = new \BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer();
-$txs = new \BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer();
-$bs = new \BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer($math, $bhs, $txs);
-
 $network = Bitcoin::getDefaultNetwork();
-$bds = new \BitWasp\Bitcoin\Serializer\Block\BitcoindBlockSerializer($network, $bs);
+$bds = new \BitWasp\Bitcoin\Serializer\Block\BitcoindBlockSerializer(
+    $network,
+    new HexBlockSerializer(
+        $math,
+        new HexBlockHeaderSerializer(),
+        new TransactionSerializer()
+    )
+);
 $counter = 0;
 
 function name($counter) {
@@ -46,28 +59,32 @@ usort($files, function ($a, $b) {
     return gmp_cmp($intA, $intB);
 });
 
-$difficulty  = new \BitWasp\Bitcoin\Chain\Difficulty($math);
-$utxoSet = new \BitWasp\Bitcoin\Utxo\UtxoSet();
-$blockchain = new \BitWasp\Bitcoin\Chain\Blockchain($difficulty, $utxoSet);
-
-$utxo = 0;
-$bytes = 0;
-
-function out($bytes) {
-    if ($bytes < 1024) {
-        return $bytes . "b";
-    }
-    if ($bytes < pow(1024, 2)) {
-        return $bytes/1024 . 'kb';
-    }
-    if ($bytes < pow(1024, 3)) {
-        return $bytes/1024^2 . 'mb';
-    }
-    if ($bytes < pow(1024, 4)) {
-        return $bytes/1024^3 . 'gb';
-    }
-    return $bytes .' b';
-}
+$blockchain = new Blockchain(
+    $math,
+    new \BitWasp\Bitcoin\Block\Block(
+        $math,
+        new \BitWasp\Bitcoin\Block\BlockHeader(
+            '1',
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
+            1231006505,
+            \BitWasp\Buffertools\Buffer::hex('1d00ffff'),
+            2083236893
+        )
+    ),
+    new BlockStorage(
+        new ArrayCache()
+    ),
+    new BlockIndex(
+        new BlockHashIndex(
+            new ArrayCache()
+        ),
+        new \BitWasp\Bitcoin\Chain\BlockHeightIndex(
+            new ArrayCache()
+        )
+    ),
+    new UtxoSet(new ArrayCache())
+);
 
 foreach ($files as $entry) {
     echo " FILE: $entry\n";
@@ -78,15 +95,13 @@ foreach ($files as $entry) {
     while ($try) {
         try {
             $block = $bds->fromParser($parser);
-            $bytes += $block->getBuffer()->getSize();
-            $blockchain->add($block);
-
-            $utxo += count($block->getTransactions());
-            echo "   " . $c . " - " .  $block->getHeader()->getBlockHash() . " - (d: ".$blockchain->getChainDifficulty() . ") (u: $utxo) (size: ".out($bytes).") \n";
-
-            $c++;
-        } catch (\Exception $e) {
+        } catch (\BitWasp\Buffertools\Exceptions\ParserOutOfRange $e) {
+            echo "reached end of file - next!\n";
             $try = false;
         }
+
+        $blockchain->process($block);
+        echo "  [height: " . $blockchain->currentHeight() . "]\n";
     }
+    echo "finished loop\n";
 }

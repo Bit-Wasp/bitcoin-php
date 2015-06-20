@@ -77,5 +77,4 @@ class ConsensusFactoryTest extends AbstractTestCase
         $factory = $this->getConsensusFactory();
         $this->assertInstanceOf($this->getExpectedAdapter(), $factory->getConsensus($factory->defaultFlags()));
     }
-
 }

@@ -2,6 +2,10 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Network\MessageFactory;
+use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\GetData;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
@@ -52,5 +56,23 @@ class GetDataTest extends AbstractTestCase
     {
         $get = new GetData();
         $get->getItem(10);
+    }
+
+    public function testNetworkSerializer()
+    {
+        $net = Bitcoin::getDefaultNetwork();
+        $parser = new NetworkMessageSerializer($net);
+        $factory = new MessageFactory($net, new Random());
+        $getdata = $factory->getdata([
+            new InventoryVector(
+                InventoryVector::MSG_BLOCK,
+                Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141')
+            )
+        ]);
+
+        $serialized = $getdata->getNetworkMessage()->getBuffer();
+        $parsed = $parser->parse($serialized)->getPayload();
+
+        $this->assertEquals($getdata, $parsed);
     }
 }

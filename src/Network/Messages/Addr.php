@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
+use BitWasp\Bitcoin\Serializer\Network\Message\AddrSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressTimestampSerializer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddressTimestamp;
@@ -20,9 +22,7 @@ class Addr extends NetworkSerializable implements \Countable
     public function __construct(array $addresses = [])
     {
         foreach ($addresses as $addr) {
-            if ($addr instanceof NetworkAddressTimestamp) {
-                $this->addAddress($addr);
-            }
+            $this->addAddress($addr);
         }
     }
 
@@ -43,7 +43,7 @@ class Addr extends NetworkSerializable implements \Countable
     }
 
     /**
-     * @return int
+     * @return NetworkAddressTimestamp[]
      */
     public function getAddresses()
     {
@@ -51,7 +51,7 @@ class Addr extends NetworkSerializable implements \Countable
     }
 
     /**
-     * @param $index
+     * @param int $index
      * @return NetworkAddressTimestamp
      */
     public function getAddress($index)
@@ -78,8 +78,6 @@ class Addr extends NetworkSerializable implements \Countable
      */
     public function getBuffer()
     {
-        $parser = new Parser();
-        $parser->writeArray($this->addresses);
-        return $parser->getBuffer();
+        return (new AddrSerializer(new NetworkAddressTimestampSerializer()))->serialize($this);
     }
 }
