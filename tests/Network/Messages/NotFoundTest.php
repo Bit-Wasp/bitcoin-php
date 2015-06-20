@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Tests\Network\Messages;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\NotFound;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
@@ -46,5 +48,21 @@ class NotFoundTest extends AbstractTestCase
     {
         $not = new NotFound();
         $not->getItem(10);
+    }
+
+    public function testNetworkSerializer()
+    {
+        $array = [
+            new InventoryVector(InventoryVector::MSG_TX, Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141')),
+            new InventoryVector(InventoryVector::MSG_TX, Buffer::hex('4141414141414141414141414141414141414141414141414141414141414142')),
+            new InventoryVector(InventoryVector::MSG_TX, Buffer::hex('4141414141414141414141414141414141414141414141414141414141414143'))
+        ];
+
+        $not = new NotFound($array);
+        $serializer = new NetworkMessageSerializer(Bitcoin::getDefaultNetwork());
+        $serialized = $not->getNetworkMessage()->getBuffer();
+        $parsed = $serializer->parse($serialized)->getPayload();
+
+        $this->assertEquals($not, $parsed);
     }
 }
