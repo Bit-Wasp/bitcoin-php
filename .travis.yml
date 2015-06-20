@@ -35,8 +35,8 @@ install:
     - composer update --prefer-source
 
 script:
-  - php $EXT_SECP256K1 bin/phpunit --coverage-clover build/logs/clover.xml
-  - php bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
+  - php $EXT_SECP256K1 vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+  - php vendor/bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
 after_script:
