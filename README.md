@@ -16,6 +16,7 @@
 
 ## Optional:
  * [[secp256k1-php](https://github.com/Bit-Wasp/secp256k1-php)] - Install the secp256k1 PHP extension for blazing speeds.
+ * [[bitcoinconsensus-php](https://github.com/Bit-Wasp/bitcoin-consensus-php)] - Install libbitcoinconsensus for script validation
 
 ##Installation
 You can install this library via Composer:
@@ -35,19 +36,22 @@ or
  - Deterministic signatures (RFC6979)
  - BIP32 deterministic algorithms
  - Script builder for common input/output types, parser, interpreter.
- - RPC bindings to Bitcoin Core's RPC, getting OOP responses :)
+ - Supports bindings to libsecp25k61 and libbitcoinconsensus.
+ - RPC bindings to Bitcoin Core's RPC, getting OOP responses
+ - Bindings to Stratum (electrum) servers 
  - Easy serialization to binary representation of most classes
  - SIGHASH types when creating transactions (not tested)
  - Payment Protocol (BIP70)
+ - Peer-to-peer protocol
+ - Blockchain classes utilizing the doctrine/cache package
 
 ##Known Issues:
-The script interpreter has a modest set of test vectors, but these are mostly positive tests, that don't really exercise many of the edge cases. While it works, it's not bug-for-bug compatible yet. 
+
+  The script interpreter has a modest set of test vectors, but these are mostly positive tests, that don't really exercise many of the edge cases. While it works, it's not bug-for-bug compatible yet and should not be relied on for consensus.
+  Similarly, the secp256k1-php extension is a wrapper around an experimental library which has not yet been formally released. It's use should not be relied on until the upstream library has made a stable release. 
 
 ##Todo:
   - SPV
-  - P2P
-  - Wishlist: 
-     - libbitcoinconsensus as an extension, and an adapter similar to EcAdapter to allow switching between this + the pure PHP code. 
   
 ## Implemented BIPs
   - BIP0011
@@ -55,6 +59,7 @@ The script interpreter has a modest set of test vectors, but these are mostly po
   - BIP0032
   - BIP0039
   - BIP0066
+  - BIP0067
   - BIP0070
   
 # Examples  
