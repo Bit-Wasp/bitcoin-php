@@ -13,6 +13,7 @@ use BitWasp\Buffertools\Parser;
 use Evenement\EventEmitter;
 use React\EventLoop\LoopInterface;
 use React\SocketClient\Connector;
+use React\Stream\BufferedSink;
 use React\Stream\Stream;
 
 class Peer extends EventEmitter
@@ -80,6 +81,7 @@ class Peer extends EventEmitter
      * @param NetworkAddress $local
      * @param Connector $connector
      * @param MessageFactory $msgs
+     * @param LoopInterface $loop
      */
     public function __construct(NetworkAddress $addr, NetworkAddress $local, Connector $connector, MessageFactory $msgs, LoopInterface $loop)
     {
@@ -136,7 +138,6 @@ class Peer extends EventEmitter
         });
 
         $peer = $this;
-
         $this->loop->addPeriodicTimer($this->pingInterval, function () use ($peer) {
             $peer->send($this->msgs->ping());
             if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
@@ -157,10 +158,15 @@ class Peer extends EventEmitter
             ->create($this->remoteAddr->getIp(), $this->remoteAddr->getPort())
             ->then(function (Stream $stream) {
                 $this->initConnection($stream);
-                $stream->on('data', function ($data) {
+
+                $stream->on('data', function ($data) use ($stream) {
+                    if ($data == "") {
+                        $stream->close();
+                    }
                     $message = $this->msgs->parse(new Parser(new Buffer($data)));
                     $this->emit('msg', [$message]);
                 });
+                return BufferedSink::createPromise($stream);
             });
     }
 
