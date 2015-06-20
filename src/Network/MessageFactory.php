@@ -170,10 +170,10 @@ class MessageFactory
     }
 
     /**
-     * @param array $headers
+     * @param \BitWasp\Bitcoin\Block\BlockHeaderInterface[] $headers
      * @return Headers
      */
-    public function headers(array $headers = array())
+    public function headers(array $headers)
     {
         return new Headers($headers);
     }
@@ -216,7 +216,7 @@ class MessageFactory
      * @param Buffer $message
      * @param int $code
      * @param Buffer $reason
-     * @param Buffer $data
+     * @param Buffer|null $data
      * @return Reject
      */
     public function reject(

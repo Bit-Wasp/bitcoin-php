@@ -6,24 +6,31 @@ use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\HeadersSerializer;
-use BitWasp\Buffertools\Parser;
-use InvalidArgumentException;
 
 class Headers extends NetworkSerializable implements \Countable
 {
     /**
      * @var BlockHeaderInterface[]
      */
-    protected $headers = [];
+    private $headers = [];
 
     /**
      * @param BlockHeaderInterface[] $headers
      */
-    public function __construct(array $headers = [])
+    public function __construct(array $headers)
     {
         foreach ($headers as $header) {
             $this->addHeader($header);
         }
+    }
+
+    /**
+     * @param BlockHeaderInterface $header
+     * @return $this
+     */
+    private function addHeader(BlockHeaderInterface $header)
+    {
+        $this->headers[] = $header;
     }
 
     /**
@@ -57,20 +64,10 @@ class Headers extends NetworkSerializable implements \Countable
     public function getHeader($index)
     {
         if (false === isset($this->headers[$index])) {
-            throw new InvalidArgumentException('No header exists at this index');
+            throw new \InvalidArgumentException('No header exists at this index');
         }
 
         return $this->headers[$index];
-    }
-
-    /**
-     * @param BlockHeaderInterface $header
-     * @return $this
-     */
-    public function addHeader(BlockHeaderInterface $header)
-    {
-        $this->headers[] = $header;
-        return $this;
     }
 
     /**
