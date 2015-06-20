@@ -64,7 +64,7 @@ class HeadersSerializer
     {
         $headers = [];
         foreach ($msg->getHeaders() as $header) {
-            $temp = new Parser($header->getBinary());
+            $temp = new Parser($header->getBuffer());
             $temp->writeInt(1, 0);
             $headers[] = $temp->getBuffer();
         }

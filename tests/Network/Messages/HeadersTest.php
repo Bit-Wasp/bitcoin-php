@@ -2,9 +2,13 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\BlockHeaderFactory;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\Messages\Headers;
+use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Network\MessageFactory;
 
 class HeadersTest extends AbstractTestCase
 {
@@ -43,5 +47,23 @@ class HeadersTest extends AbstractTestCase
     {
         $headers = new Headers();
         $headers->getHeader(10);
+    }
+
+    public function testNetworkMessage()
+    {
+        $net = Bitcoin::getDefaultNetwork();
+        $parser = new NetworkMessageSerializer($net);
+        $factory = new MessageFactory($net, new Random());
+
+        $headers = $factory->headers([
+            BlockHeaderFactory::fromHex('0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c')
+        ]);
+
+
+        $serialized = $headers->getNetworkMessage()->getBuffer();
+        $parsed = $parser->parse($serialized)->getPayload();
+
+        $this->assertEquals($headers, $parsed);
+
     }
 }
