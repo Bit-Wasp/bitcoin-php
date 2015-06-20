@@ -18,10 +18,7 @@ class AlertTest extends AbstractTestCase
     public function testNetworkSerializer()
     {
         $network = Bitcoin::getDefaultNetwork();
-
-
         $parser = new NetworkMessageSerializer(Bitcoin::getDefaultNetwork());
-
         $factory = new MessageFactory($network, new Random());
 
         $version = '1';
