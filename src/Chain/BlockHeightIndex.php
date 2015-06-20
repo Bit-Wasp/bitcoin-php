@@ -94,6 +94,10 @@ class BlockHeightIndex
         return $this->index->fetch($this->cacheIndex($hash));
     }
 
+    /**
+     * @return int
+     * @throws \Exception
+     */
     public function height()
     {
         if (null === $this->height) {
