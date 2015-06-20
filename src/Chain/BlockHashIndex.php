@@ -34,13 +34,18 @@ class BlockHashIndex
         return "blkhash_{$height}";
     }
 
+    /**
+     * @param BlockHeaderInterface $header
+     */
     public function saveGenesis(BlockHeaderInterface $header)
     {
-        echo "hashIndex() save genesis\n";
         $this->index->save($this->cacheIndex(0), $header->getBlockHash());
         $this->height = 0;
     }
 
+    /**
+     * @return int
+     */
     public function height()
     {
         return $this->height;
