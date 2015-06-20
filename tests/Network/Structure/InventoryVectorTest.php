@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Structure;
 
+use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -38,5 +39,18 @@ class InventoryVectorTest extends AbstractTestCase
     public function testInvalidLength()
     {
         new InventoryVector(InventoryVector::MSG_TX, new Buffer('41414141414141414141414141414141414141414141414141414141414141'));
+    }
+
+    public function testSerializer()
+    {
+        $buffer = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
+        $inv = new InventoryVector(InventoryVector::ERROR, $buffer);
+
+        $serializer = new InventoryVectorSerializer();
+        $serialized = $inv->getBuffer();
+
+        $parsed = $serializer->parse($serialized);
+        $this->assertEquals($inv, $parsed);
+
     }
 }

@@ -34,7 +34,7 @@ class AlertTest extends AbstractTestCase
         $setSubVer = [50, 99];
 
         $detail = new AlertDetail(
-            '1',
+            $version,
             $relayUntil,
             $expiration,
             $id,
