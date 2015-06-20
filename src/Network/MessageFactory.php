@@ -252,7 +252,6 @@ class MessageFactory
      */
     public function parse(Parser & $parser)
     {
-        return (new NetworkMessageSerializer($this->network))
-            ->fromParser($parser);
+        return (new NetworkMessageSerializer($this->network))->fromParser($parser);
     }
 }
