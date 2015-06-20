@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\AddrSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\AlertSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetDataSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\HeadersSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\InvSerializer;
@@ -19,6 +20,7 @@ use BitWasp\Bitcoin\Serializer\Network\Message\PingSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\PongSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\RejectSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\VersionSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\AlertDetailSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressTimestampSerializer;
@@ -151,6 +153,8 @@ class NetworkMessageSerializer
                 $payload = $serializer->parse($buffer);
                 break;
             case 'alert':
+                $serializer = new AlertSerializer(new AlertDetailSerializer());
+                $payload = $serializer->parse($buffer);
                 break;
             default:
                 throw new \RuntimeException('Invalid command');

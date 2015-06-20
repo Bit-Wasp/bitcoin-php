@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Network;
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\Messages\Addr;
+use BitWasp\Bitcoin\Network\Messages\Alert;
 use BitWasp\Bitcoin\Network\Messages\Block;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
 use BitWasp\Bitcoin\Network\Messages\GetData;
@@ -18,11 +19,13 @@ use BitWasp\Bitcoin\Network\Messages\Reject;
 use BitWasp\Bitcoin\Network\Messages\Tx;
 use BitWasp\Bitcoin\Network\Messages\VerAck;
 use BitWasp\Bitcoin\Network\Messages\Version;
+use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
+use Mdanter\Ecc\Crypto\Signature\SignatureInterface;
 
 class MessageFactory
 {
@@ -216,11 +219,23 @@ class MessageFactory
         );
     }
 
-    public function alert()
+    /**
+     * @param AlertDetail $detail
+     * @param SignatureInterface $sig
+     * @return Alert
+     */
+    public function alert(AlertDetail $detail, SignatureInterface $sig)
     {
-
+        return new Alert(
+            $detail,
+            $sig
+        );
     }
 
+    /**
+     * @param Parser $parser
+     * @return NetworkMessage
+     */
     public function parse(Parser & $parser)
     {
         return (new NetworkMessageSerializer($this->network))
