@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Serializer\Network\Message\InvSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
-use BitWasp\Buffertools\Parser;
 use InvalidArgumentException;
 
 class Inv extends NetworkSerializable

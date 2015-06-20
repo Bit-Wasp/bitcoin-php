@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetBlocksSerializer;
+use BitWasp\Buffertools\Buffer;
 
 class GetBlocks extends NetworkSerializable
 {
@@ -18,14 +19,14 @@ class GetBlocks extends NetworkSerializable
     private $hashes;
 
     /**
-     * @var int
+     * @var Buffer
      */
     private $hashStop;
 
     /**
      * @param int $version
      * @param string[] $hashes
-     * @param int $hashStop
+     * @param Buffer $hashStop
      */
     public function __construct(
         $version,
@@ -62,7 +63,7 @@ class GetBlocks extends NetworkSerializable
     }
 
     /**
-     * @return int
+     * @return Buffer
      */
     public function getHashStop()
     {
