@@ -24,10 +24,10 @@ use BitWasp\Bitcoin\Network\Messages\Version;
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
+use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
-use Mdanter\Ecc\Crypto\Signature\SignatureInterface;
 
 class MessageFactory
 {
@@ -59,7 +59,7 @@ class MessageFactory
      * @param NetworkAddress $addrFrom
      * @param Buffer $userAgent
      * @param int $startHeight
-     * @param int $relay
+     * @param bool $relay
      * @return Version
      */
     public function version(
@@ -132,10 +132,10 @@ class MessageFactory
     /**
      * @param int $version
      * @param array $hashes
-     * @param string $hashStop
+     * @param Buffer $hashStop
      * @return GetBlocks
      */
-    public function getblocks($version, array $hashes, $hashStop)
+    public function getblocks($version, array $hashes, Buffer $hashStop = true)
     {
         return new GetBlocks($version, $hashes, $hashStop);
     }
