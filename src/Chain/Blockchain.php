@@ -22,6 +22,11 @@ class Blockchain
     private $blocks;
 
     /**
+     * @var BlockInterface
+     */
+    private $genesis;
+
+    /**
      * @var BlockIndex
      */
     private $index;
@@ -69,6 +74,9 @@ class Blockchain
         $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
     }
 
+    /**
+     *
+     */
     private function updateProofOfWork()
     {
         if (0 == $this->math->mod($this->currentHeight(), 2016)) {
@@ -227,7 +235,7 @@ class Blockchain
         // While an orphan is not immediately useful, we may be tracking a fork.
         // Save each to the cache, and assess for any link in the chain that we might wish to follow.
         $header = $block->getHeader();
-        $prevHash = $blockHash = $header->getBlockHash();
+        $prevHash = $header->getBlockHash();
         $blocks = $this->blocks();
         $index = $this->index();
         $this->blocks()->save($block);
