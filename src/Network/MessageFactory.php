@@ -135,7 +135,7 @@ class MessageFactory
      * @param Buffer $hashStop
      * @return GetBlocks
      */
-    public function getblocks($version, array $hashes, Buffer $hashStop = true)
+    public function getblocks($version, array $hashes, Buffer $hashStop = null)
     {
         return new GetBlocks($version, $hashes, $hashStop);
     }
