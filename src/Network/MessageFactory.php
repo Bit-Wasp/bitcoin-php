@@ -130,9 +130,9 @@ class MessageFactory
     }
 
     /**
-     * @param $version
+     * @param int $version
      * @param array $hashes
-     * @param $hashStop
+     * @param string $hashStop
      * @return GetBlocks
      */
     public function getblocks($version, array $hashes, $hashStop)
@@ -141,9 +141,9 @@ class MessageFactory
     }
 
     /**
-     * @param $version
+     * @param int $version
      * @param array $hashes
-     * @param $hashStop
+     * @param string $hashStop
      * @return GetHeaders
      */
     public function getheaders($version, array $hashes, $hashStop)
@@ -214,7 +214,7 @@ class MessageFactory
 
     /**
      * @param Buffer $message
-     * @param $code
+     * @param int $code
      * @param Buffer $reason
      * @param Buffer $data
      * @return Reject
