@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Chain\BlockStorage;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

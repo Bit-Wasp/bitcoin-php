@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Chain\BlockHashIndex;
 use BitWasp\Bitcoin\Chain\BlockHeightIndex;
@@ -52,6 +51,22 @@ class BlockIndexTest extends AbstractTestCase
         $this->assertSame($heightIndex, $index->height());
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Index not initialized with genesis block
+     */
+    public function testErrorsBeforeGenesis()
+    {
+        $hashIndex = new BlockHashIndex(new ArrayCache());
+        $heightIndex = new BlockHeightIndex(new ArrayCache());
+        $index = new BlockIndex(
+            $hashIndex,
+            $heightIndex
+        );
+
+        $index->height()->height();
+    }
+
     public function testWithGenesis()
     {
         $hashIndex = new BlockHashIndex(new ArrayCache());
@@ -61,15 +76,13 @@ class BlockIndexTest extends AbstractTestCase
             $heightIndex
         );
 
-        $this->assertEquals(0, $index->height());
-
         $genesis = $this->getGenesis();
         $header = $genesis->getHeader();
         $hash = $header->getBlockHash();
         $height = 0;
 
         $index->saveGenesis($header);
-        $this->assertEquals(1, $index->height());
+        $this->assertEquals(0, $index->height()->height());
 
         $this->assertEquals($hash, $index->hash()->fetch($height));
         $this->assertEquals($height, $index->height()->fetch($hash));
