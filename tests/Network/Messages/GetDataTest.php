@@ -15,7 +15,7 @@ class GetDataTest extends AbstractTestCase
 {
     public function testGetData()
     {
-        $get = new GetData();
+        $get = new GetData([]);
         $this->assertEquals('getdata', $get->getNetworkCommand());
 
         $this->assertEquals(0, count($get));
@@ -27,8 +27,7 @@ class GetDataTest extends AbstractTestCase
         $data2 = Buffer::hex('6541414141414141414141414141414141414141414141414141414141414142');
         $inv1 = new InventoryVector(InventoryVector::MSG_TX, $data1);
         $inv2 = new InventoryVector(InventoryVector::MSG_TX, $data2);
-        $get->addItem($inv1);
-        $get->addItem($inv2);
+        $get = new GetData([$inv1, $inv2]);
         $this->assertEquals(2, count($get));
     }
 
@@ -54,7 +53,7 @@ class GetDataTest extends AbstractTestCase
      */
     public function testGetItemFailure()
     {
-        $get = new GetData();
+        $get = new GetData([]);
         $get->getItem(10);
     }
 

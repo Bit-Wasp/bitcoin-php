@@ -13,7 +13,7 @@ class NotFoundTest extends AbstractTestCase
 {
     public function testNotFound()
     {
-        $not = new NotFound();
+        $not = new NotFound([]);
         $this->assertEquals('notfound', $not->getNetworkCommand());
         $this->assertEquals(0, count($not));
 
@@ -22,7 +22,7 @@ class NotFoundTest extends AbstractTestCase
         $this->assertInternalType('array', $empty);
 
         $inv = new InventoryVector(InventoryVector::MSG_TX, Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'));
-        $not->addItem($inv);
+        $not = new NotFound([$inv]);
         $this->assertEquals(1, count($not));
         $this->assertEquals($inv, $not->getItem(0));
     }
@@ -46,7 +46,7 @@ class NotFoundTest extends AbstractTestCase
      */
     public function testNotFoundFailure()
     {
-        $not = new NotFound();
+        $not = new NotFound([]);
         $not->getItem(10);
     }
 

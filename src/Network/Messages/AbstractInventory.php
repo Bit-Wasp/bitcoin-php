@@ -11,7 +11,7 @@ abstract class AbstractInventory extends NetworkSerializable implements \Countab
     /**
      * @var InventoryVector[]
      */
-    private $items;
+    private $items = [];
 
     /**
      * @param InventoryVector[] $vector
