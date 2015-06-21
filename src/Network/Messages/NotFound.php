@@ -3,7 +3,9 @@
 namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Serializer\Network\Message\NotFoundSerializer;
-use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;;
+use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
+
+;
 
 class NotFound extends AbstractInventory
 {
