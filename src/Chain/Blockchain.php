@@ -148,7 +148,7 @@ class Blockchain
     private function storeUtxos(TransactionCollection $txs)
     {
         foreach ($txs->getTransactions() as $tx) {
-            $this->utxoset->add($tx);
+            $this->utxoset->save($tx);
         }
 
         return $this;

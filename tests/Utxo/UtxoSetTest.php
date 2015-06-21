@@ -28,7 +28,7 @@ class UtxoSetTest extends AbstractTestCase
         ));
 
         $utxoSet = new UtxoSet(new ArrayCache());
-        $utxoSet->add($tx);
+        $utxoSet->save($tx);
         $this->assertEquals(1, $utxoSet->size());
 
         $txid = $tx->getTransactionId();
