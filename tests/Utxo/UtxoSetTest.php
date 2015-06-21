@@ -28,10 +28,12 @@ class UtxoSetTest extends AbstractTestCase
         ));
 
         $utxoSet = new UtxoSet(new ArrayCache());
+        $this->assertFalse($utxoSet->contains($tx->getTransactionId(), 0));
         $utxoSet->save($tx);
         $this->assertEquals(1, $utxoSet->size());
 
         $txid = $tx->getTransactionId();
+        $this->assertTrue($utxoSet->contains($tx->getTransactionId(), 0));
         $utxo = $utxoSet->fetch($txid, 0);
         $this->assertEquals($txid, $utxo->getTransactionId());
         $this->assertEquals(0, $utxo->getVout());
