@@ -62,8 +62,7 @@ class BlockHeightIndex
         if (null === $this->height) {
             throw new \Exception('Index not initialized with genesis block');
         }
-        $key = $this->cacheIndexHeader($header);
-        $this->index->save($key, $this->height++);
+        $this->index->save($this->cacheIndexHeader($header), $this->height++);
         return $this;
     }
 
@@ -82,6 +81,7 @@ class BlockHeightIndex
      */
     public function delete($hash)
     {
+        $this->height--;
         return $this->index->delete($this->cacheIndex($hash));
     }
 

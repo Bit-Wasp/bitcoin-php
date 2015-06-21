@@ -81,6 +81,7 @@ class BlockHashIndex
      */
     public function delete($height)
     {
+        $this->height--;
         return $this->index->delete($this->cacheIndex($height));
     }
 
