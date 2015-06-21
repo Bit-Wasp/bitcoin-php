@@ -87,4 +87,52 @@ class BlockIndexTest extends AbstractTestCase
         $this->assertEquals($hash, $index->hash()->fetch($height));
         $this->assertEquals($height, $index->height()->fetch($hash));
     }
+
+    public function testDelete()
+    {
+        $hashIndex = new BlockHashIndex(new ArrayCache());
+        $heightIndex = new BlockHeightIndex(new ArrayCache());
+        $index = new BlockIndex(
+            $hashIndex,
+            $heightIndex
+        );
+
+        $genesis = $this->getGenesis();
+        $header = $genesis->getHeader();
+        $hash = $header->getBlockHash();
+        $height = 0;
+
+        $index->saveGenesis($genesis->getHeader());
+        $this->assertTrue($index->height()->contains($hash));
+        $this->assertTrue($index->hash()->contains(0));
+
+        $index->delete($genesis->getHeader());
+        $this->assertFalse($index->height()->contains($hash));
+        $this->assertFalse($index->hash()->contains(0));
+    }
+
+    public function testDeleteByHeight()
+    {
+        $hashIndex = new BlockHashIndex(new ArrayCache());
+        $heightIndex = new BlockHeightIndex(new ArrayCache());
+        $index = new BlockIndex(
+            $hashIndex,
+            $heightIndex
+        );
+
+        $genesis = $this->getGenesis();
+        $header = $genesis->getHeader();
+        $hash = $header->getBlockHash();
+        $height = 0;
+
+        $index->saveGenesis($genesis->getHeader());
+        $this->assertTrue($index->height()->contains($hash));
+        $this->assertTrue($index->hash()->contains(0));
+
+        $index->deleteByHeight($height);
+        $this->assertFalse($index->height()->contains($hash));
+        $this->assertFalse($index->hash()->contains(0));
+    }
+
+
 }
