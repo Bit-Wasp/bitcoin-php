@@ -35,6 +35,16 @@ class UtxoSet
     }
 
     /**
+     * @param string $txid
+     * @param int $vout
+     * @return Utxo
+     */
+    public function fetch($txid, $vout)
+    {
+        return $this->contents->fetch($this->cacheIndex($txid, $vout));
+    }
+
+    /**
      * @param $tx
      * @param $vout
      * @return bool
@@ -59,15 +69,11 @@ class UtxoSet
      */
     public function removeSpends(TransactionInterface $tx)
     {
-        $inc = 0;
         foreach ($tx->getInputs()->getInputs() as $v => $input) {
             if (!$input->isCoinBase()) {
                 $this->remove($input->getTransactionId(), $input->getVout());
-                $inc++;
             }
         }
-
-        $this->size -= $inc;
     }
 
     /**

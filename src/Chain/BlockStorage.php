@@ -66,6 +66,7 @@ class BlockStorage
      */
     public function delete($hash)
     {
+        $this->size--;
         return $this->blocks->delete($this->cacheIndex($hash));
     }
 
