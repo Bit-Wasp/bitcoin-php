@@ -2,12 +2,9 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-<<<<<<< HEAD
-=======
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Block\BlockHeader;
->>>>>>> 17321d34ed4edd8c40e603e1cb873c8399d37f9a
 use BitWasp\Bitcoin\Chain\Blockchain;
 use BitWasp\Bitcoin\Chain\BlockHashIndex;
 use BitWasp\Bitcoin\Chain\BlockHeightIndex;
