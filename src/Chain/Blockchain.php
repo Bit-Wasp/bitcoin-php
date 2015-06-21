@@ -75,17 +75,6 @@ class Blockchain
     }
 
     /**
-     *
-     */
-    private function updateProofOfWork()
-    {
-        if (0 == $this->math->mod($this->currentHeight(), 2016)) {
-            $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getHeader()->getBits());
-            $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
-        }
-    }
-
-    /**
      * @return BlockIndex
      */
     public function index()
@@ -122,8 +111,7 @@ class Blockchain
      */
     public function currentHeight()
     {
-        $h = $this->index()->hash()->height();
-        return $h;
+        return $this->index()->hash()->height();
     }
 
     /**
@@ -131,8 +119,7 @@ class Blockchain
      */
     public function currentBlockHash()
     {
-        $hash = $this->index()->hash()->fetch($this->currentHeight());
-        return $hash;
+        return $this->index()->hash()->fetch($this->currentHeight());
     }
 
     /**
@@ -168,6 +155,18 @@ class Blockchain
     }
 
     /**
+     * @return $this
+     */
+    private function updateProofOfWork()
+    {
+        if ($this->math->cmp(0, $this->math->mod($this->currentHeight(), 2016)) == 0) {
+            $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getHeader()->getBits());
+            $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
+        }
+        return $this;
+    }
+
+    /**
      * Add the block to the cache and index, commiting the utxos also.
      * Will fail if it doesn't elongate the current chain
      *
@@ -182,9 +181,8 @@ class Blockchain
 
         $this
             ->storeBlock($block)
-            ->storeUtxos($block->getTransactions());
-
-        $this->updateProofOfWork();
+            ->storeUtxos($block->getTransactions())
+            ->updateProofOfWork();
     }
 
     /**
@@ -238,6 +236,7 @@ class Blockchain
         $prevHash = $header->getBlockHash();
         $blocks = $this->blocks();
         $index = $this->index();
+
         $this->blocks()->save($block);
 
         // Determine fork block hashes, and more importantly, the ancestor height
