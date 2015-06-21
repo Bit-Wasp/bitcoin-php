@@ -27,6 +27,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     {
         $blocks = $this->dataFile('180blocks');
         $a = explode("\n", $blocks);
+        return array_filter($a, 'strlen');
         return $a;
     }
 
