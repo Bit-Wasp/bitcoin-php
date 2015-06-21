@@ -2,14 +2,13 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Chain\BlockStorage;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use Doctrine\Common\Cache\ArrayCache;
 
 class BlockStorageTest extends AbstractTestCase
 {
-        public function testInstance()
+    public function testInstance()
     {
         $blockStorage = new BlockStorage(new ArrayCache());
         $this->assertEquals(0, $blockStorage->size());

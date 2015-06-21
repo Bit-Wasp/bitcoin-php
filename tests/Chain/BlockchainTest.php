@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Block\BlockHeader;
@@ -156,7 +155,8 @@ class BlockchainTest extends AbstractTestCase
         ));
 
         // References wrong prevBlock
-        $invalid = new Block($math,
+        $invalid = new Block(
+            $math,
             new BlockHeader(
                 1,
                 '1234123412341234123412341234123412341234123412341234123412341234',
@@ -211,7 +211,8 @@ class BlockchainTest extends AbstractTestCase
         ));
 
         // References wrong prevBlock
-        $invalid = new Block($math,
+        $invalid = new Block(
+            $math,
             new BlockHeader(
                 1,
                 '1234123412341234123412341234123412341234123412341234123412341234',

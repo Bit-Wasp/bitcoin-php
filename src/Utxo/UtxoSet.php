@@ -26,57 +26,6 @@ class UtxoSet
     }
 
     /**
-     * @param TransactionInterface $tx
-     */
-    public function add(TransactionInterface $tx)
-    {
-        $this->removeSpends($tx);
-        $this->addOutputs($tx);
-    }
-
-    /**
-     * @param string $txid
-     * @param int $vout
-     * @return Utxo
-     */
-    public function fetch($txid, $vout)
-    {
-        return $this->contents->fetch($this->cacheIndex($txid, $vout));
-    }
-
-    /**
-     * @param $tx
-     * @param $vout
-     * @return bool
-     */
-    public function exists($tx, $vout)
-    {
-        return isset($this->contents[$tx][$vout]);
-    }
-
-    /**
-     * @param $txid
-     * @param $vout
-     */
-    public function remove($txid, $vout)
-    {
-        $this->contents->delete($this->cacheIndex($txid, $vout));
-        $this->size--;
-    }
-
-    /**
-     * @param TransactionInterface $tx
-     */
-    public function removeSpends(TransactionInterface $tx)
-    {
-        foreach ($tx->getInputs()->getInputs() as $v => $input) {
-            if (!$input->isCoinBase()) {
-                $this->remove($input->getTransactionId(), $input->getVout());
-            }
-        }
-    }
-
-    /**
      * @param $txid
      * @param $vout
      * @return string
@@ -87,9 +36,31 @@ class UtxoSet
     }
 
     /**
+     * @param $txid
+     * @param $vout
+     */
+    public function delete($txid, $vout)
+    {
+        $this->contents->delete($this->cacheIndex($txid, $vout));
+        $this->size--;
+    }
+
+    /**
      * @param TransactionInterface $tx
      */
-    public function addOutputs(TransactionInterface $tx)
+    private function deleteSpends(TransactionInterface $tx)
+    {
+        foreach ($tx->getInputs()->getInputs() as $v => $input) {
+            if (!$input->isCoinBase()) {
+                $this->delete($input->getTransactionId(), $input->getVout());
+            }
+        }
+    }
+
+    /**
+     * @param TransactionInterface $tx
+     */
+    private function saveOutputs(TransactionInterface $tx)
     {
         $txid = $tx->getTransactionId();
         $vout = 0;
@@ -106,6 +77,35 @@ class UtxoSet
         }
 
         $this->size += $vout;
+    }
+
+    /**
+     * @param TransactionInterface $tx
+     */
+    public function save(TransactionInterface $tx)
+    {
+        $this->deleteSpends($tx);
+        $this->saveOutputs($tx);
+    }
+
+    /**
+     * @param string $txid
+     * @param int $vout
+     * @return Utxo
+     */
+    public function fetch($txid, $vout)
+    {
+        return $this->contents->fetch($this->cacheIndex($txid, $vout));
+    }
+
+    /**
+     * @param string $tx
+     * @param int $vout
+     * @return bool
+     */
+    public function contains($tx, $vout)
+    {
+        return $this->contents->contains($this->cacheIndex($tx, $vout));
     }
 
     /**
