@@ -133,6 +133,4 @@ class BlockIndexTest extends AbstractTestCase
         $this->assertFalse($index->height()->contains($hash));
         $this->assertFalse($index->hash()->contains(0));
     }
-
-
 }
