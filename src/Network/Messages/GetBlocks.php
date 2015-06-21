@@ -26,16 +26,16 @@ class GetBlocks extends NetworkSerializable
     /**
      * @param int $version
      * @param string[] $hashes
-     * @param Buffer $hashStop
+     * @param Buffer|null $hashStop
      */
     public function __construct(
         $version,
         array $hashes,
-        Buffer $hashStop
+        Buffer $hashStop = null
     ) {
         $this->version = $version;
         $this->hashes = $hashes;
-        $this->hashStop = $hashStop;
+        $this->hashStop = $hashStop ?: new Buffer('0000000000000000000000000000000000000000000000000000000000000000');
     }
 
     /**

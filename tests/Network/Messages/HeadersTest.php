@@ -14,7 +14,7 @@ class HeadersTest extends AbstractTestCase
 {
     public function testHeaders()
     {
-        $headers = new Headers();
+        $headers = new Headers([]);
         $this->assertEquals('headers', $headers->getNetworkCommand());
         $this->assertEquals(0, count($headers));
 
@@ -23,8 +23,7 @@ class HeadersTest extends AbstractTestCase
         $this->assertInternalType('array', $empty);
 
         $h = BlockHeaderFactory::fromHex('0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c');
-
-        $headers->addHeader($h);
+        $headers = new Headers([$h]);
         $this->assertEquals(1, count($headers));
         $this->assertEquals($h, $headers->getHeader(0));
     }
@@ -45,7 +44,7 @@ class HeadersTest extends AbstractTestCase
      */
     public function testGetHeaderFailure()
     {
-        $headers = new Headers();
+        $headers = new Headers([]);
         $headers->getHeader(10);
     }
 
@@ -58,7 +57,6 @@ class HeadersTest extends AbstractTestCase
         $headers = $factory->headers([
             BlockHeaderFactory::fromHex('0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4a29ab5f49ffff001d1dac2b7c')
         ]);
-
 
         $serialized = $headers->getNetworkMessage()->getBuffer();
         $parsed = $parser->parse($serialized)->getPayload();

@@ -121,7 +121,7 @@ class MessageFactory
     }
 
     /**
-     * @param array $vectors
+     * @param \BitWasp\Bitcoin\Network\Structure\InventoryVector[] $vectors
      * @return NotFound
      */
     public function notfound(array $vectors = array())
@@ -131,8 +131,8 @@ class MessageFactory
 
     /**
      * @param int $version
-     * @param array $hashes
-     * @param Buffer $hashStop
+     * @param Buffer[] $hashes
+     * @param Buffer|null $hashStop
      * @return GetBlocks
      */
     public function getblocks($version, array $hashes, Buffer $hashStop = null)
@@ -142,11 +142,11 @@ class MessageFactory
 
     /**
      * @param int $version
-     * @param array $hashes
-     * @param string $hashStop
+     * @param Buffer[] $hashes
+     * @param Buffer|null $hashStop
      * @return GetHeaders
      */
-    public function getheaders($version, array $hashes, $hashStop)
+    public function getheaders($version, array $hashes, Buffer $hashStop = null)
     {
         return new GetHeaders($version, $hashes, $hashStop);
     }
@@ -170,10 +170,10 @@ class MessageFactory
     }
 
     /**
-     * @param array $headers
+     * @param \BitWasp\Bitcoin\Block\BlockHeaderInterface[] $headers
      * @return Headers
      */
-    public function headers(array $headers = array())
+    public function headers(array $headers)
     {
         return new Headers($headers);
     }
@@ -216,7 +216,7 @@ class MessageFactory
      * @param Buffer $message
      * @param int $code
      * @param Buffer $reason
-     * @param Buffer $data
+     * @param Buffer|null $data
      * @return Reject
      */
     public function reject(

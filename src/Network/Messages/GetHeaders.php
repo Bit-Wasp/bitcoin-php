@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetHeadersSerializer;
+use BitWasp\Buffertools\Buffer;
 
 class GetHeaders extends NetworkSerializable
 {
@@ -13,28 +14,28 @@ class GetHeaders extends NetworkSerializable
     private $version;
 
     /**
-     * @var string[]
+     * @var Buffer[]
      */
     private $hashes;
 
     /**
-     * @var int
+     * @var Buffer
      */
     private $hashStop;
 
     /**
      * @param int $version
-     * @param string[] $hashes
-     * @param int $hashStop
+     * @param Buffer[] $hashes
+     * @param Buffer|null $hashStop
      */
     public function __construct(
         $version,
         array $hashes,
-        $hashStop
+        Buffer $hashStop = null
     ) {
         $this->version = $version;
         $this->hashes = $hashes;
-        $this->hashStop = $hashStop;
+        $this->hashStop = $hashStop ?: new Buffer('0000000000000000000000000000000000000000000000000000000000000000');
     }
 
     /**
