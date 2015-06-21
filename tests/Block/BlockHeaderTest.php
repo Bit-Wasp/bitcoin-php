@@ -3,31 +3,22 @@
 namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Block\BlockHeaderFactory;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
-class BlockHeaderTest extends \PHPUnit_Framework_TestCase
+class BlockHeaderTest extends AbstractTestCase
 {
     /**
-     * @var BlockHeader
+     * @var string
      */
-    protected $header;
+    private $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
 
     /**
      * @var string
      */
-    protected $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
-
-    /**
-     * @var string
-     */
-    protected $bufferType;
-
-    public function __construct()
-    {
-        $this->bufferType = 'BitWasp\Buffertools\Buffer';
-    }
+    private $bufferType = 'BitWasp\Buffertools\Buffer';
 
     private function getGenesisHex()
     {
@@ -133,7 +124,7 @@ class BlockHeaderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetBlockHash()
     {
-        $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
+        $result = $this->getGenesisBlock()->getHeader();
         $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $result->getBlockHash());
     }
 
