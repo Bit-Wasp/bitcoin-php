@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Utxo;
 
-
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -24,8 +23,8 @@ class UtxoSetTest extends AbstractTestCase
             new Script()
         ));
         $tx->getOutputs()->addOutput(new TransactionOutput(
-                100000000,
-                new Script()
+            100000000,
+            new Script()
         ));
 
         $utxoSet = new UtxoSet(new ArrayCache());
@@ -38,5 +37,4 @@ class UtxoSetTest extends AbstractTestCase
         $this->assertEquals(0, $utxo->getVout());
         $this->assertEquals($tx->getOutputs()->getOutput(0), $utxo->getOutput());
     }
-
 }

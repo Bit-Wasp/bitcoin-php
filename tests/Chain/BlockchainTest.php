@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-
 use BitWasp\Bitcoin\Chain\Blockchain;
 use BitWasp\Bitcoin\Chain\BlockHashIndex;
 use BitWasp\Bitcoin\Chain\BlockHeightIndex;
