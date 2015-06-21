@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
+use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Secp256k1;
@@ -10,9 +11,44 @@ use Mdanter\Ecc\EccFactory;
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
 
+    /**
+     * @param $filename
+     * @return string
+     */
     public function dataFile($filename)
     {
         return file_get_contents(__DIR__ . '/Data/' . $filename);
+    }
+
+    /**
+     * @return array
+     */
+    public function getBlocks()
+    {
+        $blocks = $this->dataFile('180blocks');
+        $a = explode("\n", $blocks);
+        return $a;
+    }
+
+    /**
+     * @param $i
+     * @return \BitWasp\Bitcoin\Block\Block
+     */
+    public function getBlock($i)
+    {
+        $blocks = $this->getBlocks();
+        $hex = $blocks[$i];
+        $b = BlockFactory::fromHex($hex);
+        return $b;
+    }
+
+    /**
+     * @return \BitWasp\Bitcoin\Block\Block
+     */
+    public function getGenesisBlock()
+    {
+        $b = $this->getBlock(0);
+        return $b;
     }
 
     /**
