@@ -14,7 +14,7 @@ abstract class AbstractInventory extends NetworkSerializable implements \Countab
     private $items;
 
     /**
-     * @param array $vector
+     * @param InventoryVector[] $vector
      */
     public function __construct(array $vector)
     {
@@ -40,7 +40,7 @@ abstract class AbstractInventory extends NetworkSerializable implements \Countab
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Network\Structure\InventoryVector[]
+     * @return InventoryVector[]
      */
     public function getItems()
     {
