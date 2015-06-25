@@ -56,7 +56,7 @@ class MerkleBlock
      */
     public function getHashes()
     {
-        
+
     }
 
     /**
