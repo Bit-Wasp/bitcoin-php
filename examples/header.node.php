@@ -84,7 +84,7 @@ $node->connect($host)->then(function (Peer $peer) use ($node) {
 
         if ($cHeaders > 0) {
             echo "cHeaders > 1 - send getheaders\n";
-            $peer->getheaders($this->locator(true));
+            $peer->getheaders($node->locator(true));
         } else {
             echo "nothing to sync\n";
         }
