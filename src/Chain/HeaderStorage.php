@@ -2,10 +2,10 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-use BitWasp\Bitcoin\Block\BlockInterface;
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use Doctrine\Common\Cache\Cache;
 
-class BlockStorage
+class HeaderStorage
 {
     /**
      * @var Cache
@@ -35,12 +35,12 @@ class BlockStorage
     }
 
     /**
-     * @param BlockInterface $blk
+     * @param BlockHeaderInterface $blk
      * @return string
      */
-    private function cacheIndexBlk(BlockInterface $blk)
+    private function cacheIndexBlk(BlockHeaderInterface $blk)
     {
-        return $this->cacheIndex($blk->getHeader()->getBlockHash());
+        return $this->cacheIndex($blk->getBlockHash());
     }
 
     /**
@@ -48,12 +48,7 @@ class BlockStorage
      */
     public function size()
     {
-        $size = $this->blocks->fetch('size');
-        if (null === $size) {
-            throw new \RuntimeException('Not initialized with genesis block');
-        }
-
-        return $size;
+        return $this->size;
     }
 
     /**
@@ -71,14 +66,13 @@ class BlockStorage
      */
     public function delete($hash)
     {
-        $size = $this->size();
-        $this->blocks->save('size', --$size);
+        $this->size--;
         return $this->blocks->delete($this->cacheIndex($hash));
     }
 
     /**
      * @param string $hash
-     * @return BlockInterface
+     * @return BlockHeaderInterface
      */
     public function fetch($hash)
     {
@@ -86,16 +80,14 @@ class BlockStorage
     }
 
     /**
-     * @param BlockInterface $block
+     * @param BlockHeaderInterface $block
      * @return bool
      */
-    public function save(BlockInterface $block)
+    public function save(BlockHeaderInterface $block)
     {
         $key = $this->cacheIndexBlk($block);
         $this->blocks->save($key, $block);
-
-        $size = $this->size();
-        $this->blocks->save('size', ++$size);
+        $this->size++;
         return $this;
     }
 }

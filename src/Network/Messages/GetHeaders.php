@@ -26,16 +26,14 @@ class GetHeaders extends NetworkSerializable
     /**
      * @param int $version
      * @param Buffer[] $hashes
-     * @param Buffer|null $hashStop
      */
     public function __construct(
         $version,
-        array $hashes,
-        Buffer $hashStop = null
+        array $hashes
     ) {
         $this->version = $version;
-        $this->hashes = $hashes;
-        $this->hashStop = $hashStop ?: new Buffer('0000000000000000000000000000000000000000000000000000000000000000');
+        $this->hashes = array_slice($hashes, 0, count($hashes) - 1);
+        $this->hashStop = end($hashes);
     }
 
     /**
@@ -55,7 +53,7 @@ class GetHeaders extends NetworkSerializable
     }
 
     /**
-     * @return string[]
+     * @return Buffer[]
      */
     public function getHashes()
     {
@@ -63,7 +61,7 @@ class GetHeaders extends NetworkSerializable
     }
 
     /**
-     * @return int
+     * @return Buffer
      */
     public function getHashStop()
     {

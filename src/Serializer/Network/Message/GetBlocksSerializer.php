@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
 use BitWasp\Bitcoin\Network\Messages\GetBlocks;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
@@ -16,7 +18,7 @@ class GetBlocksSerializer
         return (new TemplateFactory())
             ->uint32le()
             ->vector(function (Parser & $parser) {
-                return $parser->readBytes(32);
+                return $parser->readBytes(32, true);
             })
             ->bytestring(32)
             ->getTemplate();
@@ -52,9 +54,15 @@ class GetBlocksSerializer
      */
     public function serialize(GetBlocks $msg)
     {
+        $hashes = [];
+        foreach ($msg->getHashes() as $hash) {
+            $flipped = new Buffer(Buffertools::flipBytes($hash->getBinary()));
+            $hashes[] = $flipped;
+        }
+
         return $this->getTemplate()->write([
             $msg->getVersion(),
-            $msg->getHashes(),
+            $hashes,
             $msg->getHashStop()
         ]);
     }

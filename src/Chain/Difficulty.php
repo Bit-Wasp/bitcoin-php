@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-use BitWasp\Bitcoin\Block\BlockInterface;
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Buffer;
 
@@ -107,22 +107,22 @@ class Difficulty implements DifficultyInterface
     }
 
     /**
-     * @param BlockInterface[] $blocks
+     * @param BlockHeaderInterface[] $blocks
      * @return int|string
      */
     public function sumWork(array $blocks)
     {
         $work = 0;
-        foreach ($blocks as $block) {
-            $work = $this->math->add($this->getWork($block->getHeader()->getBits()), $work);
+        foreach ($blocks as $header) {
+            $work = $this->math->add($this->getWork($header->getBits()), $work);
         }
 
         return $work;
     }
 
     /**
-     * @param BlockInterface[] $blockSet1
-     * @param BlockInterface[] $blockSet2
+     * @param BlockHeaderInterface[] $blockSet1
+     * @param BlockHeaderInterface[] $blockSet2
      * @return int
      */
     public function compareWork($blockSet1, $blockSet2)

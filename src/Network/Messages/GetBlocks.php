@@ -14,7 +14,7 @@ class GetBlocks extends NetworkSerializable
     private $version;
 
     /**
-     * @var string[]
+     * @var Buffer[]
      */
     private $hashes;
 
@@ -25,17 +25,15 @@ class GetBlocks extends NetworkSerializable
 
     /**
      * @param int $version
-     * @param string[] $hashes
-     * @param Buffer|null $hashStop
+     * @param Buffer[] $hashes
      */
     public function __construct(
         $version,
-        array $hashes,
-        Buffer $hashStop = null
+        array $hashes
     ) {
         $this->version = $version;
-        $this->hashes = $hashes;
-        $this->hashStop = $hashStop ?: new Buffer('0000000000000000000000000000000000000000000000000000000000000000');
+        $this->hashes = array_slice($hashes, 0, count($hashes) - 1);
+        $this->hashStop = end($hashes);
     }
 
     /**
@@ -55,7 +53,7 @@ class GetBlocks extends NetworkSerializable
     }
 
     /**
-     * @return string[]
+     * @return Buffer[]
      */
     public function getHashes()
     {

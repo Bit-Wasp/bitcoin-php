@@ -8,24 +8,34 @@ use BitWasp\Buffertools\Buffer;
 class BlockLocator
 {
     /**
-     * @param $height
+     * @param int $height
      * @param BlockIndex $index
      * @param bool $all
      * @return array
      */
-    public function hashes($height, BlockIndex $index, $all = true)
+    public function hashes($height, BlockIndex $index, $all = false)
     {
-        $hash = [];
-        for ($step = 1, $start = 0, $i = $height; $i > 0; $i -= $step, ++$start) {
-            if ($start >= 0) {
-                $step *= 2;
+        $step = 1;
+        $vHash = [];
+        $pIndex = $index->hash()->fetch($height);
+
+        while (true) {
+            array_push($vHash, Buffer::hex($pIndex, 32));
+            if ($height == 0) {
+                break;
             }
 
-            $hash[] = Buffer::hex($index->hash()->fetch($i));
+            $height = max($height - $step, 0);
+            $pIndex = $index->hash()->fetch($height);
+            if (count($vHash) >= 10) {
+                $step *= 2;
+            }
         }
 
-        $hash[] = Buffer::hex('', 32);
+        if ($all) {
+            array_push($vHash, Buffer::hex('00', 32));
+        }
 
-        return $hash;
+        return $vHash;
     }
 }

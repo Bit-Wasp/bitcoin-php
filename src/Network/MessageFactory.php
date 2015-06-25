@@ -229,7 +229,7 @@ class MessageFactory
             $message,
             $code,
             $reason,
-            $data
+            $data ?: new Buffer()
         );
     }
 

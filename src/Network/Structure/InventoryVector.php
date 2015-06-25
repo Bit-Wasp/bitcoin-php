@@ -51,6 +51,30 @@ class InventoryVector extends Serializable
     }
 
     /**
+     * @return bool
+     */
+    public function isTx()
+    {
+        return $this->type === self::MSG_TX;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBlock()
+    {
+        return $this->type === self::MSG_BLOCK;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFilteredBlock()
+    {
+        return $this->type === self::MSG_FILTERED_BLOCK;
+    }
+
+    /**
      * @return Buffer
      */
     public function getHash()

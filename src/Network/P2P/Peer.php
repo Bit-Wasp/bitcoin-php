@@ -2,24 +2,43 @@
 
 namespace BitWasp\Bitcoin\Network\P2P;
 
+use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Network\Messages\Ping;
-use BitWasp\Bitcoin\Network\Messages\VerAck;
 use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
+use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
+use BitWasp\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use Evenement\EventEmitter;
 use React\EventLoop\LoopInterface;
+use React\Promise\Deferred;
 use React\SocketClient\Connector;
-use React\Stream\BufferedSink;
 use React\Stream\Stream;
+use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 
 class Peer extends EventEmitter
 {
     const USER_AGENT = "bitcoin-php/v0.1";
     const PROTOCOL_VERSION = "70000";
+
+    /**
+     * @var string
+     */
+    private $buffer = '';
+
+    /**
+     * @var NetworkAddress
+     */
+    private $localAddr;
+
+    /**
+     * @var NetworkAddress
+     */
+    private $remoteAddr;
 
     /**
      * @var Connector
@@ -30,16 +49,6 @@ class Peer extends EventEmitter
      * @var LoopInterface
      */
     private $loop;
-
-    /**
-     * @var NetworkAddress
-     */
-    private $remoteAddr;
-
-    /**
-     * @var NetworkAddress
-     */
-    private $localAddr;
 
     /**
      * @var MessageFactory
@@ -55,11 +64,11 @@ class Peer extends EventEmitter
      * @var bool
      */
     private $exchangedVersion = false;
-
+    private $exchangedVerack = false;
     /**
      * @var int
      */
-    private $pingInterval = 60;
+    private $pingInterval = 120;
 
     /**
      * @var int
@@ -106,9 +115,11 @@ class Peer extends EventEmitter
      */
     public function send(NetworkSerializable $msg)
     {
+
         $net = $msg->getNetworkMessage();
         $this->stream->write($net->getBinary());
         $this->emit('send', [$net]);
+
     }
 
     /**
@@ -117,24 +128,18 @@ class Peer extends EventEmitter
     private function initConnection(Stream $stream)
     {
         $this->stream = $stream;
-        $this->send($this->version());
 
-        $this->on('msg', function (NetworkMessage $msg) {
-            $this->emit($msg->getCommand(), [$msg->getPayload()]);
+        $this->on('msg', function (Peer $peer, NetworkMessage $msg) {
+            echo " [ received " . $msg->getCommand() . " ]\n";
+            $this->emit($msg->getCommand(), [$peer, $msg->getPayload()]);
         });
 
-        $this->on('verack', function () {
-            $this->exchangedVersion = true;
-            $this->emit('ready', [$this]);
+        $this->on('peerdisconnect', function (Peer $peer) {
+            echo 'peer disconnected';
         });
 
-        $this->on('ping', function (Ping $ping) {
-            $this->lastPongTime = time();
-            $this->send($this->msgs->pong($ping));
-        });
-
-        $this->on('pong', function () {
-            $this->lastPongTime = time();
+        $this->on('send', function (\BitWasp\Bitcoin\Network\NetworkMessage $msg) {
+            echo " [ sending " . $msg->getCommand() . " ]\n";
         });
 
         $peer = $this;
@@ -154,20 +159,50 @@ class Peer extends EventEmitter
      */
     public function connect()
     {
-        return $this->connector
+        $deferred = new Deferred();
+
+        $this->connector
             ->create($this->remoteAddr->getIp(), $this->remoteAddr->getPort())
-            ->then(function (Stream $stream) {
+            ->then(function (Stream $stream) use ($deferred) {
+                echo "connection connected\n";
                 $this->initConnection($stream);
 
-                $stream->on('data', function ($data) use ($stream) {
-                    if ($data == "") {
-                        $stream->close();
-                    }
-                    $message = $this->msgs->parse(new Parser(new Buffer($data)));
-                    $this->emit('msg', [$message]);
+                $this->version();
+                $this->on('version', function () {
+                    $this->send($this->msgs()->verack());
                 });
-                return BufferedSink::createPromise($stream);
+
+                $this->on('verack', function () use ($deferred, $stream) {
+                    $this->exchangedVersion = true;
+                    $this->emit('ready', [$this]);
+                    $deferred->resolve($this);
+                });
+
+                $stream->on('data', function ($data) use ($stream) {
+                    $this->buffer .= $data;
+                    $length = strlen($this->buffer);
+                    $parser = new Parser(new Buffer($this->buffer));
+                    try {
+                        while ($parser->getPosition() !== $length && $message = $this->msgs->parse($parser)) {
+                            $this->buffer = $parser->getBuffer()->slice($parser->getPosition())->getBinary();
+                            $this->emit('msg', [$this, $message]);
+                        }
+                    } catch (\Exception $e) {
+                        echo "..";
+                        //echo $e->getMessage();
+                    }
+                });
             });
+
+        return $deferred->promise();
+    }
+
+    /**
+     * @return MessageFactory
+     */
+    public function msgs()
+    {
+        return $this->msgs;
     }
 
     /**
@@ -175,7 +210,7 @@ class Peer extends EventEmitter
      */
     public function version()
     {
-        return $this->msgs->version(
+        $this->send($this->msgs->version(
             self::PROTOCOL_VERSION,
             Buffer::hex('01', 16),
             time(),
@@ -184,6 +219,131 @@ class Peer extends EventEmitter
             new Buffer(self::USER_AGENT),
             0,
             false
-        );
+        ));
+    }
+
+    /**
+     * @param InventoryVector[] $vInv
+     */
+    public function inv(array $vInv)
+    {
+        $this->send($this->msgs()->inv($vInv));
+    }
+
+    /**
+     * @param InventoryVector[] $vInv
+     */
+    public function getdata(array $vInv)
+    {
+        $this->send($this->msgs()->getdata($vInv));
+    }
+
+    /**
+     * @param array $vInv
+     */
+    public function notfound(array $vInv)
+    {
+        $this->send($this->msgs()->notfound($vInv));
+    }
+
+    /**
+     *
+     */
+    public function getaddr()
+    {
+        $this->send($this->msgs()->getaddr());
+    }
+
+    /**
+     *
+     */
+    public function ping()
+    {
+        $this->send($this->msgs()->ping());
+    }
+
+    /**
+     * @param Ping $ping
+     */
+    public function pong(Ping $ping)
+    {
+        $this->send($this->msgs()->pong($ping));
+    }
+
+    /**
+     * @param TransactionInterface $tx
+     */
+    public function tx(TransactionInterface $tx)
+    {
+        $this->send($this->msgs()->tx($tx));
+    }
+
+    /**
+     * @param array $locatorHashes
+     */
+    public function getblocks(array $locatorHashes)
+    {
+        $this->send($this->msgs()->getblocks(
+            self::PROTOCOL_VERSION,
+            $locatorHashes
+        ));
+    }
+
+    /**
+     * @param Buffer[] $locatorHashes
+     * @return \BitWasp\Bitcoin\Network\Messages\GetHeaders
+     */
+    public function getheaders(array $locatorHashes)
+    {
+        $this->send($this->msgs()->getheaders(
+            self::PROTOCOL_VERSION,
+            $locatorHashes
+        ));
+    }
+
+    /**
+     * @param BlockInterface $block
+     */
+    public function block(BlockInterface $block)
+    {
+        $this->send($this->msgs()->block($block));
+    }
+
+    /**
+     * @param array $vHeaders
+     */
+    public function headers(array $vHeaders)
+    {
+        $this->send($this->msgs()->headers($vHeaders));
+    }
+
+    /**
+     * @param AlertDetail $detail
+     * @param SignatureInterface $signature
+     */
+    public function alert(AlertDetail $detail, SignatureInterface $signature)
+    {
+        $this->send($this->msgs()->alert($detail, $signature));
+    }
+
+    /**
+     *
+     */
+    public function mempool()
+    {
+        $this->send($this->msgs()->mempool());
+    }
+
+    /**
+     * Issue a Reject message, with a required $msg, $code, and $reason
+     *
+     * @param Buffer $msg
+     * @param $code
+     * @param Buffer $reason
+     * @param Buffer $data
+     */
+    public function reject(Buffer $msg, $code, Buffer $reason, Buffer $data = null)
+    {
+        $this->send($this->msgs()->reject($msg, $code, $reason, $data));
     }
 }
