@@ -11,6 +11,7 @@ namespace BitWasp\Bitcoin\Network\Messages;
 
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
+use BitWasp\Bitcoin\Serializer\Network\Message\FilterLoadSerializer;
 use BitWasp\Buffertools\Buffer;
 
 class FilterLoad extends NetworkSerializable
@@ -94,6 +95,6 @@ class FilterLoad extends NetworkSerializable
      */
     public function getBuffer()
     {
-        return new Buffer();
+        return (new FilterLoadSerializer())->serialize($this);
     }
 }
