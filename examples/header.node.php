@@ -75,6 +75,22 @@ echo "create node\n";
 $node = new \BitWasp\Bitcoin\Network\P2P\Node($local, $headerchain, $connector, $factory, $loop);
 
 $node->connect($host)->then(function (Peer $peer) use ($node) {
+    $peer->on('headers', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Headers $headers) use ($node) {
+        $vHeaders = $headers->getHeaders();
+        $cHeaders = count($vHeaders);
+        for ($i = 0; $i < $cHeaders; $i++) {
+            $node->chain()->process($vHeaders[$i]);
+        }
+
+        if ($cHeaders > 0) {
+            echo "cHeaders > 1 - send getheaders\n";
+            $peer->getheaders($this->locator(true));
+        } else {
+            echo "nothing to sync\n";
+        }
+        echo "size: " . $node->chain()->currentHeight() . "\n";
+    });
+
     echo "connected\n";
     $peer->getheaders($node->locator(false));
 });

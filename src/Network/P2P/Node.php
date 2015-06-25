@@ -13,14 +13,10 @@ use BitWasp\Bitcoin\Network\BlockLocator;
 use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Chain\Headerchain;
 use BitWasp\Bitcoin\Chain\Blockchain;
-
-use BitWasp\Bitcoin\Network\Messages\Block;
 use BitWasp\Bitcoin\Network\Messages\Headers;
 use BitWasp\Bitcoin\Network\Messages\Inv;
 use BitWasp\Bitcoin\Network\Messages\Ping;
-use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
-use BitWasp\Buffertools\Buffer;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\SocketClient\Connector;
@@ -70,6 +66,18 @@ class Node
         $this->locator = new BlockLocator();
     }
 
+    /**
+     * @return Blockchain|Headerchain
+     */
+    public function chain()
+    {
+        return $this->chain;
+    }
+
+    /**
+     * @param bool|false $all
+     * @return array
+     */
     public function locator($all = false)
     {
         return $this->locator->hashes($this->chain->currentHeight(), $this->chain->index(), $all);
@@ -97,22 +105,6 @@ class Node
             echo "peer connected\n";
             $this->peers[] = $peer;
             $peer->getaddr();
-
-            $peer->on('headers', function (Peer $peer, Headers $headers) {
-                $vHeaders = $headers->getHeaders();
-                $cHeaders = count($vHeaders);
-                for ($i = 0; $i < $cHeaders; $i++) {
-                    $this->chain->process($vHeaders[$i]);
-                }
-
-                if ($cHeaders > 0) {
-                    echo "cHeaders > 1 - send getheaders\n";
-                    $peer->getheaders($this->locator(true));
-                } else {
-                    echo "nothing to sync\n";
-                }
-                echo "size: " . $this->chain->currentHeight() . "\n";
-            });
 
             $peer->on('inv', function (Peer $peer, Inv $vInv) {
                 $this->processInv($peer, $vInv);
