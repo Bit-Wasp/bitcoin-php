@@ -63,10 +63,9 @@ class MerkleRoot
      * @return string
      * @throws \Exception
      */
-    public function calculateHash()
+    public function calculateHash($hashFunction = null)
     {
-
-        $hashFxn = function ($value) {
+        $hashFxn = $hashFunction ?: function ($value) {
             return hash('sha256', hash('sha256', $value, true), true);
         };
 
@@ -107,5 +106,26 @@ class MerkleRoot
 
         $this->setLastHash($hash);
         return $this->getLastHash();
+    }
+
+    /**
+     * @return Buffer[]
+     * @throws MerkleTreeEmpty
+     */
+    public function calculateTree()
+    {
+        $hashes = [];
+
+        $this->calculateHash(function ($value) use (&$hashes) {
+            $h = hash('sha256', hash('sha256', $value, true), true);
+            $hashes[] = $h;
+            return $h;
+        });
+
+        foreach ($hashes as &$hash) {
+            $hash = new Buffer($hash);
+        }
+
+        return $hashes;
     }
 }
