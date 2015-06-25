@@ -68,67 +68,27 @@ $factory = new MessageFactory(
     new Random()
 );
 
-$peer = new Peer(
-    $host,
-    $local,
-    $connector,
-    $factory,
-    $loop
-);
+$node = new \BitWasp\Bitcoin\Network\P2P\Node($local, $blockchain, $connector, $factory, $loop);
 
-// init
-$peer->on('ready', function (Peer $peer) use ($factory) {
-    echo "version exchanged\n";
-});
-$peer->connect()->then(function (Peer $peer) use (&$blockchain, $locator, $loop) {
-
-    $peer->on('headers', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Headers $headers) {
-        foreach ($headers->getHeaders() as $h) {
-            echo $h->getBlockHash() . "\n";
-        }
-    });
-    $peer->on('inv', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Inv $inv) {
-        for ($i = 0; $i < count($inv); $i += 100) {
-            $peer->send($peer->msgs()->getdata($inv->getItems()));
-        }
+$node->connect($host)->then(function (Peer $peer) use ($node, $loop) {
+    $loop->addPeriodicTimer(60, function () use ($node, $peer) {
+        $peer->getblocks($node->locator(true));
     });
 
-    $peer->on('block', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Block $block) use (& $blockchain, $locator) {
-        //echo "received block for processing \n";
+    $inboundBlocks = 0;
+    $peer->on('block', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Block $block) use ($node, &$inboundBlocks) {
         $blk = $block->getBlock();
-        echo "received block\n";
-        if (!$blockchain->index()->height()->contains($blk->getHeader()->getPrevBlock())) {
-            echo "was not in chain\n";
-            $peer->send(
-                $peer->msgs()
-                    ->getdata([
-                        new InventoryVector(
-                            InventoryVector::MSG_BLOCK,
-                            Buffer::hex($blk->getHeader()->getPrevBlock())
-                        )
-                    ])
-            )
-            ;
+        $node->chain()->process($blk);
 
-            $peer->send(
-                $peer->msgs()
-                    ->getblocks(60000, [Buffer::hex($blk->getHeader()->getPrevBlock())])
-            )
-            ;
-            $peer->send(
-                $peer->msgs()
-                    ->getheaders(60000, [Buffer::hex($blk->getHeader()->getPrevBlock())])
-            )
-            ;
-            $peer->send(
-                $peer->msgs()
-                    ->getblocks(1, [Buffer::hex($blk->getHeader()->getPrevBlock())])
-            )
-            ;
+        if ($inboundBlocks++ % 500 == 0) {
+            $peer->getblocks($node->locator(true));
         }
 
-        $blockchain->process($blk);
+        echo $blk->getHeader()->getBlockHash(). "\n";
+        echo $node->chain()->currentHeight() . "\n";
     });
+
+    $peer->getblocks($node->locator(true));
 });
 
 $loop->run();

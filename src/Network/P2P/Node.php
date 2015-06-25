@@ -48,6 +48,11 @@ class Node
     private $peers;
 
     /**
+     * @var BlockLocator
+     */
+    private $locator;
+
+    /**
      * @param NetworkAddress $local
      * @param $chain
      * @param Connector $connector
@@ -95,10 +100,6 @@ class Node
             $deferred->resolve($peer);
         });
 
-        $peer->on('ping', function (Peer $peer, Ping $ping) {
-            $peer->pong($ping);
-        });
-
         $loop = $this->loop;
         $peer->connect()->then(function (Peer $peer) use ($loop) {
             echo "peer connected\n";
@@ -121,12 +122,16 @@ class Node
     {
         $vDontHave = [];
         foreach ($vInv->getItems() as $vector) {
+            $key = $vector->getHash()->getHex();
             if ($vector->isBlock()) {
-                if (!$this->chain->index()->height()->contains($vector->getHash())) {
+                if (!$this->chain->index()->height()->contains($key)) {
                     $vDontHave[] = $vector;
                 }
             } elseif ($vector->isTx()) {
             } elseif ($vector->isFilteredBlock()) {
+                if (!$this->chain->index()->height()->contains($key)) {
+                    $vDontHave[] = $vector;
+                }
             }
         }
 

@@ -115,43 +115,9 @@ class Peer extends EventEmitter
      */
     public function send(NetworkSerializable $msg)
     {
-
         $net = $msg->getNetworkMessage();
         $this->stream->write($net->getBinary());
         $this->emit('send', [$net]);
-
-    }
-
-    /**
-     * @param Stream $stream
-     */
-    private function initConnection(Stream $stream)
-    {
-        $this->stream = $stream;
-
-        $this->on('msg', function (Peer $peer, NetworkMessage $msg) {
-            echo " [ received " . $msg->getCommand() . " ]\n";
-            $this->emit($msg->getCommand(), [$peer, $msg->getPayload()]);
-        });
-
-        $this->on('peerdisconnect', function (Peer $peer) {
-            echo 'peer disconnected';
-        });
-
-        $this->on('send', function (\BitWasp\Bitcoin\Network\NetworkMessage $msg) {
-            echo " [ sending " . $msg->getCommand() . " ]\n";
-        });
-
-        $peer = $this;
-        $this->loop->addPeriodicTimer($this->pingInterval, function () use ($peer) {
-            $peer->send($this->msgs->ping());
-            if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
-                $this->missedPings++;
-            }
-            if ($this->missedPings > $this->maxMissedPings) {
-                $this->stream->close();
-            }
-        });
     }
 
     /**
@@ -165,18 +131,7 @@ class Peer extends EventEmitter
             ->create($this->remoteAddr->getIp(), $this->remoteAddr->getPort())
             ->then(function (Stream $stream) use ($deferred) {
                 echo "connection connected\n";
-                $this->initConnection($stream);
-
-                $this->version();
-                $this->on('version', function () {
-                    $this->send($this->msgs()->verack());
-                });
-
-                $this->on('verack', function () use ($deferred, $stream) {
-                    $this->exchangedVersion = true;
-                    $this->emit('ready', [$this]);
-                    $deferred->resolve($this);
-                });
+                $this->stream = $stream;
 
                 $stream->on('data', function ($data) use ($stream) {
                     $this->buffer .= $data;
@@ -189,9 +144,48 @@ class Peer extends EventEmitter
                         }
                     } catch (\Exception $e) {
                         echo "..";
-                        //echo $e->getMessage();
                     }
                 });
+
+                $this->on('msg', function (Peer $peer, NetworkMessage $msg) {
+                    echo " [ received " . $msg->getCommand() . " ]\n";
+                    $this->emit($msg->getCommand(), [$peer, $msg->getPayload()]);
+                });
+
+                $this->on('peerdisconnect', function (Peer $peer) {
+                    echo 'peer disconnected';
+                });
+
+                $this->on('send', function (NetworkMessage $msg) {
+                    echo " [ sending " . $msg->getCommand() . " ]\n";
+                });
+
+                $peer = $this;
+                $this->loop->addPeriodicTimer($this->pingInterval, function () use ($peer) {
+                    $peer->send($this->msgs->ping());
+                    if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
+                        $this->missedPings++;
+                    }
+                    if ($this->missedPings > $this->maxMissedPings) {
+                        $this->stream->close();
+                    }
+                });
+
+                $this->on('version', function () {
+                    $this->verack();
+                });
+
+                $this->on('verack', function () use ($deferred, $stream) {
+                    $this->exchangedVersion = true;
+                    $this->emit('ready', [$this]);
+                    $deferred->resolve($this);
+                });
+
+                $this->on('ping', function (Peer $peer, Ping $ping) {
+                    $peer->pong($ping);
+                });
+
+                $this->version();
             });
 
         return $deferred->promise();
@@ -220,6 +214,14 @@ class Peer extends EventEmitter
             0,
             false
         ));
+    }
+
+    /**
+     *
+     */
+    public function verack()
+    {
+        $this->send($this->msgs()->verack());
     }
 
     /**
