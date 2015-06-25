@@ -68,7 +68,7 @@ class Blockchain
         $this->difficulty = new Difficulty($math, $genesis->getHeader()->getBits());
         $this->chainDiff = $this->difficulty->getDifficulty($genesis->getHeader()->getBits());
 
-        $this->blocks->save($genesis);
+        $this->blocks->saveGenesis($genesis);
         $this->index->saveGenesis($genesis->getHeader());
         $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getHeader()->getBits());
         $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
@@ -273,12 +273,10 @@ class Blockchain
         $header = $block->getHeader();
         $hash = $header->getBlockHash();
         if ($hash === $this->genesis->getHeader()->getBlockHash()) {
-            echo "GENESIS\n";
             return true;
         }
 
         if ($this->index()->height()->contains($hash)) {
-            echo "ALREADY IN CHAIN\n";
             return true;
         }
 

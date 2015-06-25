@@ -93,7 +93,7 @@ class BlockHashIndex
     public function height()
     {
         $height = $this->index->fetch('height');
-        if (null === $height) {
+        if (false === $height) {
             throw new \Exception('Index not initialized with genesis block');
         }
 

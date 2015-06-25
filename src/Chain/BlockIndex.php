@@ -48,7 +48,9 @@ class BlockIndex
      */
     public function saveGenesis(BlockHeaderInterface $header)
     {
-        if (!$this->hash()->height()) {
+        try {
+            $this->hash()->height();
+        } catch (\Exception $e) {
             $this->hash()->saveGenesis($header);
             $this->height()->saveGenesis($header);
         }
