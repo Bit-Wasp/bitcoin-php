@@ -56,7 +56,7 @@ $locator = new \BitWasp\Bitcoin\Network\BlockLocator();
 
 $host = new NetworkAddress(
     Buffer::hex('01', 16),
-    '192.168.192.101',
+    '91.146.57.187',
     8333
 );
 

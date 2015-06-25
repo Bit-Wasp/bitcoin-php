@@ -64,11 +64,11 @@ class Peer extends EventEmitter
      * @var bool
      */
     private $exchangedVersion = false;
-    private $exchangedVerack = false;
+
     /**
      * @var int
      */
-    private $pingInterval = 120;
+    private $pingInterval = '600';
 
     /**
      * @var int

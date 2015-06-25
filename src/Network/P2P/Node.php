@@ -98,12 +98,6 @@ class Node
             $this->peers[] = $peer;
             $peer->getaddr();
 
-            $loop->addPeriodicTimer(10, function () use (&$headerchain, $peer) {
-                $peer->ping();
-            });
-
-
-
             $peer->on('headers', function (Peer $peer, Headers $headers) {
                 $vHeaders = $headers->getHeaders();
                 $cHeaders = count($vHeaders);
