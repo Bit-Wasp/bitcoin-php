@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
-
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\Messages\FilterLoad;
 use BitWasp\Buffertools\Parser;

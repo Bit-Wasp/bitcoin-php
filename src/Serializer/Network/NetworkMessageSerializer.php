@@ -98,7 +98,7 @@ class NetworkMessageSerializer
         }
 
         $cmd = trim($command->getBinary());
-        switch($cmd) {
+        switch ($cmd) {
             case 'version':
                 $serializer = new VersionSerializer(new NetworkAddressSerializer());
                 $payload = $serializer->parse($buffer);

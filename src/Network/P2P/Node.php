@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Network\P2P;
 
-
 use BitWasp\Bitcoin\Network\BlockLocator;
 use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Chain\Headerchain;
@@ -127,9 +126,7 @@ class Node
                     $vDontHave[] = $vector;
                 }
             } elseif ($vector->isTx()) {
-
             } elseif ($vector->isFilteredBlock()) {
-
             }
         }
 

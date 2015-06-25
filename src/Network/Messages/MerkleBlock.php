@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Block\MerkleRoot;
 

@@ -432,8 +432,7 @@ class Interpreter implements InterpreterInterface
                 } elseif ($fExec || ($opcodes->isOp($opCode, 'OP_IF') <= 0 && $opcodes->isOp($opCode, 'OP_ENDIF'))) {
                     //echo " - [". $opcodes->getOp($opCode) . "]\n";
 
-                    switch ($opCode)
-                    {
+                    switch ($opCode) {
                         case $opcodes->getOpByName('OP_1NEGATE'):
                         case $opcodes->cmp($opCode, 'OP_1') >= 0 && $opcodes->cmp($opCode, 'OP_16') <= 0:
                             $pushInt = new PushIntOperation($opcodes);
@@ -490,7 +489,8 @@ class Interpreter implements InterpreterInterface
                             $mainStack->push($size);
                             break;
 
-                        case $opcodes->getOpByName('OP_EQUAL'): // cscriptnum
+                        case $opcodes->getOpByName('OP_EQUAL'):
+                            // cscriptnum
                         case $opcodes->getOpByName('OP_EQUALVERIFY'):
                         //case $this->isOp($opCode, 'OP_NOTEQUAL'): // use OP_NUMNOTEQUAL
                             if ($mainStack->size() < 2) {

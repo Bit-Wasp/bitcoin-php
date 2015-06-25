@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
 use BitWasp\Bitcoin\Serializer\Network\Message\FilterLoadSerializer;

@@ -34,8 +34,7 @@ class GetHeadersSerializer
 
         return new GetHeaders(
             $version,
-            $hashes,
-            $hashStop
+            $hashes + [$hashStop]
         );
     }
 

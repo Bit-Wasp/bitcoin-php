@@ -34,8 +34,7 @@ class GetBlocksSerializer
 
         return new GetBlocks(
             $version,
-            $hashes,
-            $hashStop
+            $hashes + [$hashStop]
         );
     }
 
