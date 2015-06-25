@@ -9,10 +9,10 @@ use BitWasp\Bitcoin\Serializable;
 
 class InventoryVector extends Serializable
 {
-    const ERROR = 0;
-    const MSG_TX = 1;
-    const MSG_BLOCK = 2;
-    const MSG_FILTERED_BLOCK = 3;
+    const ERROR = '0';
+    const MSG_TX = '1';
+    const MSG_BLOCK = '2';
+    const MSG_FILTERED_BLOCK = '3';
 
     /**
      * @var int
