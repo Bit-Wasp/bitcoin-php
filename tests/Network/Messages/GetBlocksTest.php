@@ -17,11 +17,10 @@ class GetBlocksTest extends AbstractTestCase
         $factory = new MessageFactory($net, new Random());
 
         $getblocks = $factory->getblocks(
-            1,
+            '1',
             [
                 Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141')
-            ],
-            Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000')
+            ]
         );
 
         $serialized = $getblocks->getNetworkMessage()->getBuffer();

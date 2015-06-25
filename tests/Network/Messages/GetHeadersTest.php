@@ -17,11 +17,10 @@ class GetHeadersTest extends AbstractTestCase
         $factory = new MessageFactory($net, new Random());
 
         $getheaders = $factory->getheaders(
-            1,
+            '1',
             [
                 Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141')
-            ],
-            Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000')
+            ]
         );
 
         $serialized = $getheaders->getNetworkMessage()->getBuffer();
