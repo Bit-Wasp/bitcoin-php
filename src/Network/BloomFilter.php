@@ -288,14 +288,16 @@ class BloomFilter extends Serializable
             return false;
         }
 
+        // Check if the txid hash is in the filter
         $txHash = $tx->getTransactionId();
         if ($this->containsHash($txHash)) {
             $found = true;
         }
 
-        $nFlags = $this->flags->getFlags();
+        $nFlags = $this->flags->getFlags() & self::UPDATE_MASK;
         $outputs = $tx->getOutputs();
 
+        // Check for relevant output scripts. We add the outpoint to the filter if found.
         for ($i = 0, $nOutputs = count($outputs); $i < $nOutputs; $i++) {
             $txOut = $outputs->getOutput($i);
             $script = $txOut = $txOut->getScript();
@@ -303,11 +305,12 @@ class BloomFilter extends Serializable
             while ($parser->next($opcode, $pushdata)) {
                 if ($pushdata instanceof Buffer && $pushdata->getSize() > 0 && $this->containsData($pushdata)) {
                     $found = true;
-                    if ($nFlags & self::UPDATE_MASK == self::UPDATE_ALL) {
+
+                    if (self::UPDATE_ALL === $nFlags) {
                         $this->insertOutpoint($txHash, $i);
-                    } else if ($nFlags & self::UPDATE_MASK == self::UPDATE_P2PUBKEY_ONLY) {
+                    } else if (self::UPDATE_P2PUBKEY_ONLY === $nFlags) {
                         $type = ScriptFactory::scriptPubKey()->classify($script);
-                        if ($type == ScriptClassifierInterface::MULTISIG || $type == ScriptClassifierInterface::PAYTOPUBKEY) {
+                        if ($type === ScriptClassifierInterface::MULTISIG || $type === ScriptClassifierInterface::PAYTOPUBKEY) {
                             $this->insertOutpoint($txHash, $i);
                         }
                     }
@@ -318,7 +321,6 @@ class BloomFilter extends Serializable
         if ($found) {
             return true;
         }
-
 
         $inputs = $tx->getInputs();
         for ($i = 0, $nInputs = count($inputs); $i < $nInputs; $i++) {
