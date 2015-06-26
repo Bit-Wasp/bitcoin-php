@@ -171,15 +171,8 @@ class BloomFilter extends Serializable
      */
     public function hash($nHashNum, Buffer $data)
     {
-        $math = $this->math;
-
-        $i = Hash::murmur3(
-            $data,
-            ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff
-        )->getInt();
-
-        return $math->mod(
-            $i,
+        return $this->math->mod(
+            Hash::murmur3($data, ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff)->getInt(),
             count($this->data) * 8
         );
     }
