@@ -227,9 +227,8 @@ class BloomFilter extends Serializable
 
         for ($i = 0; $i < $this->numHashFuncs; $i++) {
             $index = $this->hash($i, $data);
-            $val = ($this->data[($index >> 3)] & (1 << (7 & $index)));
 
-            if (!$val) {
+            if (!($this->data[($index >> 3)] & (1 << (7 & $index)))) {
                 return false;
             }
         }
