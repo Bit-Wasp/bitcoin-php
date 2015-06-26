@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network;
 
-
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\BloomFilter;

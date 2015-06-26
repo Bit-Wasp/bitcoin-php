@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
-
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use Mdanter\Ecc\Message\MessageFactory;

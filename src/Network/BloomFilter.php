@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Network;
 
-
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
@@ -194,8 +193,7 @@ class BloomFilter extends Serializable
             return;
         }
 
-        for ($i = 0; $i < $this->numHashFuncs; $i++)
-        {
+        for ($i = 0; $i < $this->numHashFuncs; $i++) {
             $index = $this->hash($i, $data);
             $this->data[$index >> 3] |= (1 << (7 & $index));
         }
