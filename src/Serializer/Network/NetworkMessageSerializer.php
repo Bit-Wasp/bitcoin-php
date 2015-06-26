@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\Network;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Network\Messages\Block;
+use BitWasp\Bitcoin\Network\Messages\FilterClear;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
 use BitWasp\Bitcoin\Network\Messages\MemPool;
 use BitWasp\Bitcoin\Network\Messages\Tx;
@@ -14,6 +15,8 @@ use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\AddrSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\AlertSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\FilterAddSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\FilterLoadSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetBlocksSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetDataSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetHeadersSerializer;
@@ -147,6 +150,17 @@ class NetworkMessageSerializer
                 break;
             case 'mempool':
                 $payload = new MemPool();
+                break;
+            case 'filterload':
+                $serializer = new FilterLoadSerializer();
+                $payload = $serializer->parse($buffer);
+                break;
+            case 'filteradd':
+                $serializer = new FilterAddSerializer();
+                $payload = $serializer->parse($buffer);
+                break;
+            case 'filterclear':
+                $payload = new FilterClear();
                 break;
             case 'ping':
                 $serializer = new PingSerializer();
