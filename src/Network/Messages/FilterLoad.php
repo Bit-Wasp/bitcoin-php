@@ -41,7 +41,7 @@ class FilterLoad extends NetworkSerializable
      * @param int $nTweak
      * @param Flags $flags
      */
-    public function __construct($vFilter, $nHashFuncs, $nTweak, Flags $flags)
+    public function __construct(array $vFilter, $nHashFuncs, $nTweak, Flags $flags)
     {
         $this->filter = $vFilter;
         $this->nHashFxns = $nHashFuncs;
