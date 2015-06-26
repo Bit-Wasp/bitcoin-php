@@ -8,10 +8,12 @@ use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Classifier\ScriptClassifierInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Serializer\Network\BloomFilterSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 
-class BloomFilter
+class BloomFilter extends Serializable
 {
     const LN2SQUARED = '0.4804530139182014246671025263266649717305529515945455';
     const LN2 = '0.6931471805599453094172321214581765680755001343602552';
@@ -30,6 +32,16 @@ class BloomFilter
     private $math;
 
     /**
+     * @var bool
+     */
+    private $isEmpty = false;
+
+    /**
+     * @var bool
+     */
+    private $isFull = false;
+
+    /**
      * @var float
      */
     private $numHashFuncs;
@@ -40,14 +52,9 @@ class BloomFilter
     private $data = [];
 
     /**
-     * @var bool
+     * @var int|string
      */
-    private $isEmpty = false;
-
-    /**
-     * @var bool
-     */
-    private $isFull = false;
+    private $nTweak;
 
     /**
      * @param Math $math
@@ -65,8 +72,40 @@ class BloomFilter
         }
 
         $this->numHashFuncs = self::idealNumHashFuncs($size, $nElements);
-        $this->tweak = $nTweak;
+        $this->nTweak = $nTweak;
         $this->flags = $flags;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return float
+     */
+    public function getNumHashFuncs()
+    {
+        return $this->numHashFuncs;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getTweak()
+    {
+        return $this->nTweak;
+    }
+
+    /**
+     * @return Flags
+     */
+    public function getFlags()
+    {
+        return $this->flags;
     }
 
     /**
@@ -106,7 +145,7 @@ class BloomFilter
      */
     public static function idealNumHashFuncs($filterSize, $nElements)
     {
-        return floor(
+        return (int) floor(
             min(
                 bcmul(
                     bcdiv(
@@ -117,6 +156,10 @@ class BloomFilter
                         $nElements
                     ),
                     self::LN2
+                ),
+                bcmul(
+                    self::MAX_FILTER_SIZE,
+                    8
                 )
             )
         );
@@ -131,11 +174,13 @@ class BloomFilter
     {
         $math = $this->math;
 
+        $i = Hash::murmur3(
+            $data,
+            ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff
+        )->getInt();
+
         return $math->mod(
-            Hash::murmur3(
-                $data,
-                ($nHashNum * self::TWEAK_START + $this->tweak) & 0xffffffff
-            )->getInt(),
+            $i,
             count($this->data) * 8
         );
     }
@@ -172,7 +217,7 @@ class BloomFilter
      */
     public function insertHash($hash)
     {
-        $this->insertData(Buffer::hex($hash, 32));
+        $this->insertData(Buffer::hex($hash));
     }
 
     /**
@@ -191,12 +236,14 @@ class BloomFilter
 
         for ($i = 0; $i < $this->numHashFuncs; $i++) {
             $index = $this->hash($i, $data);
-            if (!$this->data[$index >> 3] & (1 << (7 & $index))) {
+            $val = ($this->data[($index >> 3)] & (1 << (7 & $index)));
+
+            if (!$val) {
                 return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -241,7 +288,6 @@ class BloomFilter
             return false;
         }
 
-
         $txHash = $tx->getTransactionId();
         if ($this->containsHash($txHash)) {
             $found = true;
@@ -253,7 +299,8 @@ class BloomFilter
         for ($i = 0, $nOutputs = count($outputs); $i < $nOutputs; $i++) {
             $txOut = $outputs->getOutput($i);
             $script = $txOut = $txOut->getScript();
-            while ($script->getScriptParser()->next($opcode, $pushdata)) {
+            $parser = $script->getScriptParser();
+            while ($parser->next($opcode, $pushdata)) {
                 if ($pushdata instanceof Buffer && $pushdata->getSize() > 0 && $this->containsData($pushdata)) {
                     $found = true;
                     if ($nFlags & self::UPDATE_MASK == self::UPDATE_ALL) {
@@ -273,7 +320,6 @@ class BloomFilter
         }
 
         $inputs = $tx->getInputs();
-
         for ($i = 0, $nInputs = count($inputs); $i < $nInputs; $i++) {
             $txIn = $inputs->getInput($i);
             if ($this->containsUtxo($txIn->getTransactionId(), $txIn->getVout())) {
@@ -305,5 +351,13 @@ class BloomFilter
 
         $this->isFull = $full;
         $this->isEmpty = $empty;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getBuffer()
+    {
+        return (new BloomFilterSerializer())->serialize($this);
     }
 }
