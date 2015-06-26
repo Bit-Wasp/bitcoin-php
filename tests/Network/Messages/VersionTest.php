@@ -10,6 +10,7 @@ namespace BitWasp\Bitcoin\Test\Network\Messages;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\Version;
@@ -20,6 +21,7 @@ class VersionTest extends AbstractTestCase
 {
     public function testVersion()
     {
+        $factory = new MessageFactory(Bitcoin::getDefaultNetwork(), new Random());
         $v = '60002';
         $services = Buffer::hex('0000000000000001');
         $time = (string)time();
@@ -27,15 +29,13 @@ class VersionTest extends AbstractTestCase
         $sender = new NetworkAddress(Buffer::hex('1'), '10.0.0.2', '8332');
         $userAgent = new Buffer("/Satoshi:0.7.2/");
         $lastBlock = '212672';
-        $random = new Random();
-        $nonce = $random->bytes(8)->getInt();
-        $version = new Version(
+
+        $version = $factory->version(
             $v,
             $services,
             $time,
             $recipient,
             $sender,
-            $nonce,
             $userAgent,
             $lastBlock,
             true

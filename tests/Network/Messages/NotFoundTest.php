@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Tests\Network\Messages;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\NotFound;
@@ -13,7 +15,9 @@ class NotFoundTest extends AbstractTestCase
 {
     public function testNotFound()
     {
-        $not = new NotFound([]);
+        $factory = new MessageFactory(Bitcoin::getDefaultNetwork(), new Random());
+        $not = $factory->notfound([]);
+
         $this->assertEquals('notfound', $not->getNetworkCommand());
         $this->assertEquals(0, count($not));
 

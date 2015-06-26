@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Test\Network\Messages;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
@@ -12,7 +14,8 @@ class GetAddrTest extends AbstractTestCase
 {
     public function testGetAddr()
     {
-        $getaddr = new GetAddr();
+        $factory = new MessageFactory(Bitcoin::getDefaultNetwork(), new Random());
+        $getaddr = $factory->getaddr();
         $this->assertSame('getaddr', $getaddr->getNetworkCommand());
         $this->assertEquals(new Buffer(), $getaddr->getBuffer());
     }

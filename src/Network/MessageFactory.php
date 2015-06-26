@@ -2,10 +2,8 @@
 
 namespace BitWasp\Bitcoin\Network;
 
-use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\Messages\Addr;
 use BitWasp\Bitcoin\Network\Messages\Alert;
 use BitWasp\Bitcoin\Network\Messages\Block;
@@ -30,6 +28,7 @@ use BitWasp\Bitcoin\Network\Messages\Version;
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Network\Structure\FilteredBlock;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
+use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -101,37 +100,37 @@ class MessageFactory
     }
 
     /**
-     * @param array $addrs
+     * @param InventoryVector[] $addrs
      * @return Addr
      */
-    public function addr(array $addrs = array())
+    public function addr(array $addrs)
     {
         return new Addr($addrs);
     }
 
     /**
-     * @param array $vectors
+     * @param InventoryVector[] $vectors
      * @return Inv
      */
-    public function inv(array $vectors = array())
+    public function inv(array $vectors)
     {
         return new Inv($vectors);
     }
 
     /**
-     * @param array $vectors
+     * @param InventoryVector[] $vectors
      * @return GetData
      */
-    public function getdata(array $vectors = array())
+    public function getdata(array $vectors)
     {
         return new GetData($vectors);
     }
 
     /**
-     * @param \BitWasp\Bitcoin\Network\Structure\InventoryVector[] $vectors
+     * @param InventoryVector[] $vectors
      * @return NotFound
      */
-    public function notfound(array $vectors = array())
+    public function notfound(array $vectors)
     {
         return new NotFound($vectors);
     }

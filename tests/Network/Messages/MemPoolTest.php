@@ -14,7 +14,9 @@ class MemPoolTest extends AbstractTestCase
 {
     public function testMemPool()
     {
-        $mem = new MemPool();
+        $factory = new MessageFactory(Bitcoin::getDefaultNetwork(), new Random());
+        $mem = $factory->mempool();
+        
         $this->assertSame('mempool', $mem->getNetworkCommand());
         $this->assertEquals(new Buffer(), $mem->getBuffer());
     }

@@ -43,7 +43,9 @@ class BlockTest extends AbstractTestCase
 
         $newBlock = BlockFactory::fromHex($blockHex);
 
-        $block = new Block($newBlock);
+        $factory = new MessageFactory(Bitcoin::getDefaultNetwork(), new Random());
+        $block = $factory->block($newBlock);
+
         $this->assertEquals('block', $block->getNetworkCommand());
         $this->assertEquals($newBlock, $block->getBlock());
         $this->assertEquals($newBlock->getHex(), $block->getHex());
