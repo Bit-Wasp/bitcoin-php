@@ -4,9 +4,13 @@ namespace BitWasp\Bitcoin\Network;
 
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\Messages\Addr;
 use BitWasp\Bitcoin\Network\Messages\Alert;
 use BitWasp\Bitcoin\Network\Messages\Block;
+use BitWasp\Bitcoin\Network\Messages\FilterAdd;
+use BitWasp\Bitcoin\Network\Messages\FilterClear;
+use BitWasp\Bitcoin\Network\Messages\FilterLoad;
 use BitWasp\Bitcoin\Network\Messages\GetAddr;
 use BitWasp\Bitcoin\Network\Messages\GetBlocks;
 use BitWasp\Bitcoin\Network\Messages\GetData;
@@ -192,6 +196,45 @@ class MessageFactory
     public function mempool()
     {
         return new MemPool();
+    }
+
+    /**
+     * @param array $vFilter
+     * @return FilterAdd
+     */
+    public function filteradd(
+        array $vFilter
+    ) {
+        return new FilterAdd($vFilter);
+    }
+
+    /**
+     * @param int[] $vFilter
+     * @param int $nHashFunc
+     * @param int $nTweak
+     * @param Flags $flags
+     * @return FilterLoad
+     */
+    public function filterload(
+        array $vFilter,
+        $nHashFunc,
+        $nTweak,
+        Flags $flags
+    ) {
+        return new FilterLoad(
+            $vFilter,
+            $nHashFunc,
+            $nTweak,
+            $flags
+        );
+    }
+
+    /**
+     * @return FilterClear
+     */
+    public function filterclear()
+    {
+        return new FilterClear();
     }
 
     /**
