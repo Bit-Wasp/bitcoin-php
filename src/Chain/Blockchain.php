@@ -67,9 +67,14 @@ class Blockchain
         $this->utxoset = $utxoSet;
         $this->difficulty = new Difficulty($math, $genesis->getHeader()->getBits());
         $this->chainDiff = $this->difficulty->getDifficulty($genesis->getHeader()->getBits());
+        
+        try {
+            $this->index()->height()->height();
+        } catch (\Exception $e) {
+            $this->blocks->saveGenesis($genesis);
+            $this->index->saveGenesis($genesis->getHeader());
+        }
 
-        $this->blocks->saveGenesis($genesis);
-        $this->index->saveGenesis($genesis->getHeader());
         $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getHeader()->getBits());
         $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
     }

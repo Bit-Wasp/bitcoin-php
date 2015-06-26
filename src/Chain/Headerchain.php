@@ -57,7 +57,9 @@ class Headerchain
         $this->genesis = $genesis;
         $this->headers = $blocks;
 
-        if (!$this->index()->height()->height()) {
+        try {
+            $this->index()->height()->height();
+        } catch (\Exception $e) {
             $this->headers->save($genesis);
             $this->index->saveGenesis($genesis);
         }
