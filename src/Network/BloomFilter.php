@@ -319,6 +319,7 @@ class BloomFilter extends Serializable
             return true;
         }
 
+
         $inputs = $tx->getInputs();
         for ($i = 0, $nInputs = count($inputs); $i < $nInputs; $i++) {
             $txIn = $inputs->getInput($i);
@@ -327,7 +328,8 @@ class BloomFilter extends Serializable
             }
 
             $script = $txIn->getScript();
-            while ($script->getScriptParser()->next($opcode, $pushdata)) {
+            $parser = $script->getScriptParser();
+            while ($parser->next($opcode, $pushdata)) {
                 if ($pushdata instanceof Buffer && $pushdata->getSize() > 0 && $this->containsData($pushdata)) {
                     return true;
                 }
