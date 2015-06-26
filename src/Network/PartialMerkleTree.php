@@ -89,7 +89,7 @@ class PartialMerkleTree extends Serializable
         $p = $position * 2 + 1;
 
         $left = $this->calculateHash($nextHeight, $position * 2, $vTxid);
-        $right = $p < $this->calcTreeWidth($nextHeight)
+        $right = $p < $this->calcTreeWidth($nextHeight - 1)
             ? $this->calculateHash($nextHeight, $p, $vTxid)
             : $left;
 
@@ -112,11 +112,16 @@ class PartialMerkleTree extends Serializable
         $this->vFlagBits[] = $parent;
 
         if (0 == $height || !$parent) {
-            $this->vHashes[] = $this->calculateHash($height, $position, $vTxid);
+            $this->vHashes[] = array_map(
+                function ($value) {
+                    return new Buffer($value, 32);
+                },
+                str_split($this->calculateHash($height, $position, $vTxid)->getBinary(), 32)
+            );
         } else {
-            $this->traverseAndBuild($height, $position, $vTxid, $vMatch);
+            $this->traverseAndBuild($height - 1, 2 * $position, $vTxid, $vMatch);
             if (($position * 2 - 1) > $this->calcTreeWidth($height - 1)) {
-                $this->traverseAndBuild($height, $position + 1, $vTxid, $vMatch);
+                $this->traverseAndBuild($height - 1, 2 * $position + 1, $vTxid, $vMatch);
             }
         }
     }

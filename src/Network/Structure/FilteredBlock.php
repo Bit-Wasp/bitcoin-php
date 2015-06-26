@@ -63,8 +63,10 @@ class FilteredBlock extends Serializable
         $txns = $block->getTransactions();
         for ($i = 0, $txCount = count($txns); $i < $txCount; $i++) {
             $tx = $txns->getTransaction($i);
-            $vHashes[] = Buffer::hex($tx->getTransactionId());
             $vMatch[] = $filter->isRelevantAndUpdate($tx);
+
+            $txid = $tx->getTransactionId();
+            $vHashes[] = Buffer::hex($txid);
         }
 
         return new FilteredBlock(
