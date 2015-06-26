@@ -31,10 +31,10 @@ class GetHeadersSerializer
     public function fromParser(Parser & $parser)
     {
         list ($version, $hashes, $hashStop) = $this->getTemplate()->parse($parser);
-
+        $hashes[] = $hashStop;
         return new GetHeaders(
             $version,
-            $hashes + [$hashStop]
+            $hashes
         );
     }
 

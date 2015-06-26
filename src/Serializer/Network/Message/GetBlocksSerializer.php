@@ -31,10 +31,10 @@ class GetBlocksSerializer
     public function fromParser(Parser & $parser)
     {
         list ($version, $hashes, $hashStop) = $this->getTemplate()->parse($parser);
-
+        $hashes[] = $hashStop;
         return new GetBlocks(
             $version,
-            $hashes + [$hashStop]
+            $hashes
         );
     }
 
@@ -55,7 +55,7 @@ class GetBlocksSerializer
     {
         $hashes = [];
         foreach ($msg->getHashes() as $hash) {
-            $flipped = new Buffer(Buffertools::flipBytes($hash->getBinary()));
+            $flipped = new Buffer(Buffertools::flipBytes($hash->getBinary()), 32);
             $hashes[] = $flipped;
         }
 

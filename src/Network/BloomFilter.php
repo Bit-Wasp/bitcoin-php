@@ -57,22 +57,48 @@ class BloomFilter extends Serializable
 
     /**
      * @param Math $math
-     * @param int $nElements
-     * @param int $nFpRate
-     * @param int|string $nTweak
+     * @param array $vFilter
+     * @param int $numHashFuncs
+     * @param int $nTweak
      * @param Flags $flags
      */
-    public function __construct(Math $math, $nElements, $nFpRate, $nTweak, Flags $flags)
+    public function __construct(Math $math, array $vFilter, $numHashFuncs, $nTweak, Flags $flags)
     {
         $this->math = $math;
-        $size = self::idealSize($nElements, $nFpRate);
-        for ($i = 0; $i < $size; $i++) {
-            $this->data[$i] = '0';
-        }
-
-        $this->numHashFuncs = self::idealNumHashFuncs($size, $nElements);
+        $this->data = $vFilter;
+        $this->numHashFuncs = $numHashFuncs;
         $this->nTweak = $nTweak;
         $this->flags = $flags;
+    }
+
+    /**
+     * @param $size
+     * @return array
+     */
+    public static function emptyFilter($size)
+    {
+        return str_split(str_pad('', $size, '0'), 1);
+    }
+
+    /**
+     * @param Math $math
+     * @param int $nElements
+     * @param int $nFpRate
+     * @param int $nTweak
+     * @param Flags $flags
+     * @return BloomFilter
+     */
+    public static function create(Math $math, $nElements, $nFpRate, $nTweak, Flags $flags)
+    {
+        $size = self::idealSize($nElements, $nFpRate);
+
+        return new self(
+            $math,
+            self::emptyFilter($size),
+            self::idealNumHashFuncs($size, $nElements),
+            $nTweak,
+            $flags
+        );
     }
 
     /**

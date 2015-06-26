@@ -19,13 +19,13 @@ class GetBlocksTest extends AbstractTestCase
         $getblocks = $factory->getblocks(
             '1',
             [
-                Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141')
+                Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'),
+                Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000')
             ]
         );
 
         $serialized = $getblocks->getNetworkMessage()->getBuffer();
         $parsed = $factory->parse(new Parser($serialized))->getPayload();
-
         $this->assertEquals($getblocks, $parsed);
     }
 }
