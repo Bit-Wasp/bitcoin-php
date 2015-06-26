@@ -248,12 +248,10 @@ class Headerchain
         // Ignore the genesis block
         $hash = $header->getBlockHash();
         if ($hash === $this->genesis->getBlockHash()) {
-            echo "GENESIS\n";
             return true;
         }
 
         if ($this->index()->height()->contains($hash)) {
-            echo "ALREADY IN CHAIN\n";
             return true;
         }
 
