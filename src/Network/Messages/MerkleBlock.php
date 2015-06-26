@@ -2,67 +2,49 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
-use BitWasp\Bitcoin\Block\BlockHeaderInterface;
-use BitWasp\Bitcoin\Block\MerkleRoot;
+use BitWasp\Bitcoin\Network\Structure\FilteredBlock;
+use BitWasp\Bitcoin\Network\NetworkSerializable;
+use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\MerkleBlockSerializer;
+use BitWasp\Bitcoin\Serializer\Network\PartialMerkleTreeSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\FilteredBlockSerializer;
 
-class MerkleBlock
+class MerkleBlock extends NetworkSerializable
 {
     /**
-     * @var BlockHeaderInterface
-     */
-    private $header;
-
-    /**
-     * @var \BitWasp\Buffertools\Buffer[]
+     * @var FilteredBlock
      */
     private $merkle;
 
     /**
-     * @var
+     * @param FilteredBlock $merkleBlock
      */
-    private $ntxns;
-
-    /**
-     * @param BlockHeaderInterface $header
-     * @param MerkleRoot $merkle
-     * @param $nTxs
-     */
-    public function __construct(BlockHeaderInterface $header, MerkleRoot $merkle, $nTxs)
+    public function __construct(FilteredBlock $merkleBlock)
     {
-        $this->header = $header;
-        $this->merkle = $merkle->calculateTree();
-        $this->ntxns = $nTxs;
+        $this->merkle = $merkleBlock;
     }
 
     /**
-     * @return BlockHeaderInterface
+     * @return string
      */
-    public function getHeader()
+    public function getNetworkCommand()
     {
-        return $this->header;
+        return 'merkleblock';
     }
 
     /**
-     * @return mixed
+     * @return FilteredBlock
      */
-    public function getTransactionCount()
+    public function getFilteredBlock()
     {
-        return $this->ntxns;
+        return $this->merkle;
     }
 
     /**
-     * @return mixed
+     * @return \BitWasp\Buffertools\Buffer
      */
-    public function getHashes()
+    public function getBuffer()
     {
-
-    }
-
-    /**
-     *
-     */
-    public function getFlags()
-    {
-
+        return (new MerkleBlockSerializer(new FilteredBlockSerializer(new HexBlockHeaderSerializer(), new PartialMerkleTreeSerializer())))->serialize($this);
     }
 }

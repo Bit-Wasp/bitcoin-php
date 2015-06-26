@@ -9,16 +9,16 @@ use BitWasp\Buffertools\Buffer;
 class FilterAdd extends NetworkSerializable
 {
     /**
-     * @var int[]
+     * @var Buffer
      */
-    private $filter;
+    private $data;
 
     /**
-     * @param int[] $vFilter
+     * @param Buffer $data
      */
-    public function __construct($vFilter)
+    public function __construct(Buffer $data)
     {
-        $this->filter = $vFilter;
+        $this->data = $data;
     }
 
     /**
@@ -30,11 +30,11 @@ class FilterAdd extends NetworkSerializable
     }
 
     /**
-     * @return \int[]
+     * @return Buffer
      */
-    public function getFilter()
+    public function getData()
     {
-        return $this->filter;
+        return $this->data;
     }
 
     /**

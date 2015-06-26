@@ -4,24 +4,23 @@ namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\Messages\FilterLoad;
+use BitWasp\Bitcoin\Serializer\Network\BloomFilterSerializer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
 class FilterLoadSerializer
 {
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var BloomFilterSerializer
      */
-    public function getTemplate()
+    private $filterSerializer;
+
+    /**
+     * @param BloomFilterSerializer $filterSerializer
+     */
+    public function __construct(BloomFilterSerializer $filterSerializer)
     {
-        return (new TemplateFactory())
-            ->vector(function (Parser & $parser) {
-                return $parser->readBytes(1, true);
-            })
-            ->uint32le()
-            ->uint32le()
-            ->uint8()
-            ->getTemplate();
+        $this->filterSerializer = $filterSerializer;
     }
 
     /**
@@ -30,14 +29,7 @@ class FilterLoadSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        list ($vFilter, $nHashFuncs, $nTweak, $nFlags) = $this->getTemplate()->parse($parser);
-
-        return new FilterLoad(
-            $vFilter,
-            $nHashFuncs,
-            $nTweak,
-            new Flags($nFlags)
-        );
+        return new FilterLoad($this->filterSerializer->fromParser($parser));
     }
 
     /**
@@ -55,11 +47,6 @@ class FilterLoadSerializer
      */
     public function serialize(FilterLoad $filterload)
     {
-        return $this->getTemplate()->write([
-            $filterload->getFilter(),
-            $filterload->getNumHashFuncs(),
-            $filterload->getTweak(),
-            $filterload->getFlags()->getFlags()
-        ]);
+        return $this->filterSerializer->serialize($filterload->getFilter());
     }
 }

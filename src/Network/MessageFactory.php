@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Network;
 
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Flags;
@@ -18,6 +19,7 @@ use BitWasp\Bitcoin\Network\Messages\GetHeaders;
 use BitWasp\Bitcoin\Network\Messages\Headers;
 use BitWasp\Bitcoin\Network\Messages\Inv;
 use BitWasp\Bitcoin\Network\Messages\MemPool;
+use BitWasp\Bitcoin\Network\Messages\MerkleBlock;
 use BitWasp\Bitcoin\Network\Messages\NotFound;
 use BitWasp\Bitcoin\Network\Messages\Ping;
 use BitWasp\Bitcoin\Network\Messages\Pong;
@@ -26,6 +28,7 @@ use BitWasp\Bitcoin\Network\Messages\Tx;
 use BitWasp\Bitcoin\Network\Messages\VerAck;
 use BitWasp\Bitcoin\Network\Messages\Version;
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
+use BitWasp\Bitcoin\Network\Structure\FilteredBlock;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
@@ -199,34 +202,20 @@ class MessageFactory
     }
 
     /**
-     * @param array $vFilter
+     * @param Buffer $data
      * @return FilterAdd
      */
-    public function filteradd(
-        array $vFilter
-    ) {
-        return new FilterAdd($vFilter);
+    public function filteradd(Buffer $data) {
+        return new FilterAdd($data);
     }
 
     /**
-     * @param int[] $vFilter
-     * @param int $nHashFunc
-     * @param int $nTweak
-     * @param Flags $flags
+     * @param BloomFilter $filter
      * @return FilterLoad
      */
-    public function filterload(
-        array $vFilter,
-        $nHashFunc,
-        $nTweak,
-        Flags $flags
-    ) {
-        return new FilterLoad(
-            $vFilter,
-            $nHashFunc,
-            $nTweak,
-            $flags
-        );
+    public function filterload(BloomFilter $filter)
+    {
+        return new FilterLoad($filter);
     }
 
     /**
@@ -237,6 +226,14 @@ class MessageFactory
         return new FilterClear();
     }
 
+    /**
+     * @param FilteredBlock $filtered
+     * @return MerkleBlock
+     */
+    public function merkleblock(FilteredBlock $filtered)
+    {
+        return new MerkleBlock($filtered);
+    }
     /**
      * @return Ping
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure

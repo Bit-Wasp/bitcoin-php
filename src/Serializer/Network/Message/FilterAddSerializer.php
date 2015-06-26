@@ -14,9 +14,7 @@ class FilterAddSerializer
     public function getTemplate()
     {
         return (new TemplateFactory())
-            ->vector(function (Parser & $parser) {
-                return $parser->readBytes(1, true);
-            })
+            ->varstring()
             ->getTemplate();
     }
 
@@ -26,9 +24,9 @@ class FilterAddSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        list ($vFilter) = $this->getTemplate()->parse($parser);
+        list ($data) = $this->getTemplate()->parse($parser);
 
-        return new FilterAdd($vFilter);
+        return new FilterAdd($data);
     }
 
     /**
@@ -47,7 +45,7 @@ class FilterAddSerializer
     public function serialize(FilterAdd $filteradd)
     {
         return $this->getTemplate()->write([
-            $filteradd->getFilter()
+            $filteradd->getData()
         ]);
     }
 }

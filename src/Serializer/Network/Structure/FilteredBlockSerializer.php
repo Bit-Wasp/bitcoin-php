@@ -1,23 +1,25 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Network;
+namespace BitWasp\Bitcoin\Serializer\Network\Structure;
 
-use BitWasp\Bitcoin\Network\MerkleBlock;
+use BitWasp\Bitcoin\Network\Structure\FilteredBlock;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Network\PartialMerkleTreeSerializer;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
-class MerkleBlockSerializer
+class FilteredBlockSerializer
 {
-    /**
-     * @var PartialMerkleTreeSerializer
-     */
-    private $treeSerializer;
 
     /**
      * @var HexBlockHeaderSerializer
      */
     private $headerSerializer;
+
+    /**
+     * @var PartialMerkleTreeSerializer
+     */
+    private $treeSerializer;
 
     /**
      * @param HexBlockHeaderSerializer $header
@@ -31,14 +33,14 @@ class MerkleBlockSerializer
 
     /**
      * @param Parser $parser
-     * @return MerkleBlock
+     * @return FilteredBlock
      */
     public function fromParser(Parser & $parser)
     {
         $header = $this->headerSerializer->fromParser($parser);
         $partialTree = $this->treeSerializer->fromParser($parser);
 
-        return new MerkleBlock(
+        return new FilteredBlock(
             $header,
             $partialTree
         );
@@ -46,7 +48,7 @@ class MerkleBlockSerializer
 
     /**
      * @param $data
-     * @return MerkleBlock
+     * @return FilteredBlock
      */
     public function parse($data)
     {
@@ -54,10 +56,10 @@ class MerkleBlockSerializer
     }
 
     /**
-     * @param MerkleBlock $merkleBlock
+     * @param FilteredBlock $merkleBlock
      * @return \BitWasp\Buffertools\Buffer
      */
-    public function serialize(MerkleBlock $merkleBlock)
+    public function serialize(FilteredBlock $merkleBlock)
     {
         return Buffertools::concat(
             $this->headerSerializer->serialize($merkleBlock->getHeader()),

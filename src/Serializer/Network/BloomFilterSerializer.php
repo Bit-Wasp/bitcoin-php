@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\BloomFilter;
@@ -57,6 +58,7 @@ class BloomFilterSerializer
         list ($vData, $numHashFuncs, $nTweak, $flags) = $this->getTemplate()->parse($parser);
 
         return new BloomFilter(
+            Bitcoin::getMath(),
             $vData,
             $numHashFuncs,
             $nTweak,

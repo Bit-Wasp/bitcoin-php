@@ -2,14 +2,22 @@
 
 namespace BitWasp\Bitcoin\Network\P2P;
 
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Flags;
+use BitWasp\Bitcoin\Network\BloomFilter;
+use BitWasp\Bitcoin\Network\Structure\FilteredBlock;
 use BitWasp\Bitcoin\Network\MessageFactory;
+use BitWasp\Bitcoin\Network\Messages\FilterAdd;
+use BitWasp\Bitcoin\Network\Messages\FilterClear;
+use BitWasp\Bitcoin\Network\Messages\FilterLoad;
 use BitWasp\Bitcoin\Network\Messages\Ping;
 use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
+use BitWasp\Bitcoin\Network\PartialMerkleTree;
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
@@ -40,6 +48,11 @@ class Peer extends EventEmitter
      * @var NetworkAddress
      */
     private $remoteAddr;
+
+    /**
+     * @var BloomFilter
+     */
+    private $filter;
 
     /**
      * @var Connector
@@ -86,6 +99,8 @@ class Peer extends EventEmitter
      */
     private $lastPongTime;
 
+    private $shouldRelay = false;
+
     /**
      * @param NetworkAddress $addr
      * @param NetworkAddress $local
@@ -101,6 +116,35 @@ class Peer extends EventEmitter
         $this->msgs = $msgs;
         $this->loop = $loop;
         $this->lastPongTime = time();
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldRelay()
+    {
+        return $this->shouldRelay;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasFilter()
+    {
+        return $this->filter !== null;
+    }
+
+    /**
+     * @return BloomFilter
+     * @throws \Exception
+     */
+    public function getFilter()
+    {
+        if (!$this->hasFilter()) {
+            throw new \Exception('No filter set for peer');
+        }
+
+        return $this->filter;
     }
 
     /**
@@ -184,6 +228,33 @@ class Peer extends EventEmitter
 
                 $this->on('ping', function (Peer $peer, Ping $ping) {
                     $peer->pong($ping);
+                });
+
+                $this->on('filterload', function (Peer $peer, FilterLoad $filterLoad) {
+                    $filter = $filterLoad->getFilter();
+
+                    $this->filter = $filter;
+                    $this->shouldRelay = true;
+                });
+
+                $this->on('filteradd', function (Peer $peer, FilterAdd $filterAdd) {
+                    if (!$this->hasFilter()) {
+                        // misbehaving
+                        $this->close();
+                    }
+
+                    $data = $filterAdd->getData();
+                    if ($data->getSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
+                        // misbehaving
+                        $this->close();
+                    }
+
+                    $this->filter->insertData($data);
+                });
+
+                $this->on('filterclear', function () {
+                    $this->filter = null;
+                    $this->shouldRelay = true;
                 });
 
                 $this->version();
@@ -338,22 +409,19 @@ class Peer extends EventEmitter
     }
 
     /**
-     * @param int[] $vFilter
+     * @param Buffer $data
      */
-    public function filteradd(array $vFilter)
+    public function filteradd(Buffer $data)
     {
-        $this->send($this->msgs()->filteradd($vFilter));
+        $this->send($this->msgs()->filteradd($data));
     }
 
     /**
-     * @param int[] $vFilter
-     * @param int $nNumHashFunc
-     * @param int $nTweak
-     * @param Flags $flags
+     * @param BloomFilter $filter
      */
-    public function filterload(array $vFilter, $nNumHashFunc, $nTweak, Flags $flags)
+    public function filterload(BloomFilter $filter)
     {
-        $this->send($this->msgs()->filterload($vFilter, $nNumHashFunc, $nTweak, $flags));
+        $this->send($this->msgs()->filterload($filter));
     }
 
     /**
@@ -362,6 +430,14 @@ class Peer extends EventEmitter
     public function filterclear()
     {
         $this->send($this->msgs()->filterclear());
+    }
+
+    /**
+     * @param FilteredBlock $filtered
+     */
+    public function merkleblock(FilteredBlock $filtered)
+    {
+        $this->send($this->msgs()->merkleblock($filtered));
     }
 
     /**

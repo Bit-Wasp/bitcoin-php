@@ -22,12 +22,14 @@ use BitWasp\Bitcoin\Serializer\Network\Message\GetDataSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\GetHeadersSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\HeadersSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\InvSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Message\MerkleBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\NotFoundSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\PingSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\PongSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\RejectSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Message\VersionSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\AlertDetailSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\FilteredBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\InventoryVectorSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressTimestampSerializer;
@@ -152,7 +154,7 @@ class NetworkMessageSerializer
                 $payload = new MemPool();
                 break;
             case 'filterload':
-                $serializer = new FilterLoadSerializer();
+                $serializer = new FilterLoadSerializer(new BloomFilterSerializer());
                 $payload = $serializer->parse($buffer);
                 break;
             case 'filteradd':
@@ -161,6 +163,10 @@ class NetworkMessageSerializer
                 break;
             case 'filterclear':
                 $payload = new FilterClear();
+                break;
+            case 'merkleblock':
+                $serializer = new MerkleBlockSerializer(new FilteredBlockSerializer(new HexBlockHeaderSerializer(), new PartialMerkleTreeSerializer()));
+                $payload = $serializer->parse($buffer);
                 break;
             case 'ping':
                 $serializer = new PingSerializer();

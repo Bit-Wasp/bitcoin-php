@@ -1,16 +1,18 @@
 <?php
 
-namespace BitWasp\Bitcoin\Network;
+namespace BitWasp\Bitcoin\Network\Structure;
 
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Block\BlockInterface;
+use BitWasp\Bitcoin\Network\BloomFilter;
+use BitWasp\Bitcoin\Network\PartialMerkleTree;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
-use BitWasp\Bitcoin\Serializer\Network\MerkleBlockSerializer;
+use BitWasp\Bitcoin\Serializer\Network\Structure\FilteredBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Network\PartialMerkleTreeSerializer;
 use BitWasp\Buffertools\Buffer;
 
-class MerkleBlock extends Serializable
+class FilteredBlock extends Serializable
 {
     /**
      * @var BlockHeaderInterface
@@ -51,7 +53,7 @@ class MerkleBlock extends Serializable
     /**
      * @param BlockInterface $block
      * @param BloomFilter $filter
-     * @return MerkleBlock
+     * @return FilteredBlock
      */
     public static function filter(BlockInterface $block, BloomFilter $filter)
     {
@@ -65,7 +67,7 @@ class MerkleBlock extends Serializable
             $vMatch[] = $filter->isRelevantAndUpdate($tx);
         }
 
-        return new MerkleBlock(
+        return new FilteredBlock(
             $block->getHeader(),
             new PartialMerkleTree(
                 $txCount,
@@ -78,7 +80,7 @@ class MerkleBlock extends Serializable
     /**
      * @param BlockInterface $block
      * @param Buffer[] $vTxid
-     * @return MerkleBlock
+     * @return FilteredBlock
      */
     public static function transactions(BlockInterface $block, array $vTxid)
     {
@@ -93,7 +95,7 @@ class MerkleBlock extends Serializable
             $vHashes[] = $txid;
         }
 
-        return new MerkleBlock(
+        return new FilteredBlock(
             $block->getHeader(),
             new PartialMerkleTree(
                 $txCount,
@@ -108,6 +110,6 @@ class MerkleBlock extends Serializable
      */
     public function getBuffer()
     {
-        return (new MerkleBlockSerializer(new HexBlockHeaderSerializer(), new PartialMerkleTreeSerializer()))->serialize($this);
+        return (new FilteredBlockSerializer(new HexBlockHeaderSerializer(), new PartialMerkleTreeSerializer()))->serialize($this);
     }
 }
