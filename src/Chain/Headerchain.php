@@ -70,6 +70,15 @@ class Headerchain
     }
 
     /**
+     * @return BlockHeaderInterface
+     */
+    public function chainTip()
+    {
+        $tip = $this->headers()->fetch($this->currentBlockHash());
+        return $tip;
+    }
+
+    /**
      * @return BlockIndex
      */
     public function index()
@@ -117,15 +126,6 @@ class Headerchain
     {
         $h = $this->index()->hash()->fetch($this->currentHeight());
         return $h;
-    }
-
-    /**
-     * @return BlockHeaderInterface
-     */
-    public function chainTip()
-    {
-        $tip = $this->headers()->fetch($this->currentBlockHash());
-        return $tip;
     }
 
     /**

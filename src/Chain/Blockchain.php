@@ -75,6 +75,14 @@ class Blockchain
     }
 
     /**
+     * @return BlockInterface
+     */
+    public function chainTip()
+    {
+        return $this->blocks()->fetch($this->currentBlockHash());
+    }
+    
+    /**
      * @return BlockIndex
      */
     public function index()
@@ -120,14 +128,6 @@ class Blockchain
     public function currentBlockHash()
     {
         return $this->index()->hash()->fetch($this->currentHeight());
-    }
-
-    /**
-     * @return BlockInterface
-     */
-    public function chainTip()
-    {
-        return $this->blocks()->fetch($this->currentBlockHash());
     }
 
     /**
