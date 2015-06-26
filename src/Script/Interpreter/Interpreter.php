@@ -65,7 +65,6 @@ class Interpreter implements InterpreterInterface
      */
     private $state;
 
-    public $maxElementSize = 520;
     public $checkDisabledOpcodes = true;
     public $maxBytes = 10000;
 
@@ -407,7 +406,7 @@ class Interpreter implements InterpreterInterface
                 $fExec = !$checkFExec();
 
                 // If pushdata was written to,
-                if ($pushData instanceof Buffer && $pushData->getSize() > $this->maxElementSize) {
+                if ($pushData instanceof Buffer && $pushData->getSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
                     throw new \Exception('Error - push size');
                 }
 
