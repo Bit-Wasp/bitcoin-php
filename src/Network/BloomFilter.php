@@ -290,8 +290,7 @@ class BloomFilter extends Serializable
 
         // Check for relevant output scripts. We add the outpoint to the filter if found.
         for ($i = 0, $nOutputs = count($outputs); $i < $nOutputs; $i++) {
-            $txOut = $outputs->getOutput($i);
-            $script = $txOut = $txOut->getScript();
+            $script = $outputs->getOutput($i)->getScript();
             $parser = $script->getScriptParser();
             while ($parser->next($opcode, $pushdata)) {
                 if ($pushdata instanceof Buffer && $pushdata->getSize() > 0 && $this->containsData($pushdata)) {
