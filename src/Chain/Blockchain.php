@@ -81,7 +81,7 @@ class Blockchain
     {
         return $this->blocks()->fetch($this->currentBlockHash());
     }
-    
+
     /**
      * @return BlockIndex
      */

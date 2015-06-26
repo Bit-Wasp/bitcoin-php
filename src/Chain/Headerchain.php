@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Exceptions\BlockPowError;
 use BitWasp\Bitcoin\Exceptions\BlockPrevNotFound;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Utxo\UtxoSet;
 
 class Headerchain
 {
@@ -74,8 +73,7 @@ class Headerchain
      */
     public function chainTip()
     {
-        $tip = $this->headers()->fetch($this->currentBlockHash());
-        return $tip;
+        return $this->headers()->fetch($this->currentBlockHash());
     }
 
     /**
@@ -115,8 +113,7 @@ class Headerchain
      */
     public function currentHeight()
     {
-        $h = $this->index()->hash()->height();
-        return $h;
+        return $this->index()->hash()->height();
     }
 
     /**
@@ -124,8 +121,7 @@ class Headerchain
      */
     public function currentBlockHash()
     {
-        $h = $this->index()->hash()->fetch($this->currentHeight());
-        return $h;
+        return $this->index()->hash()->fetch($this->currentHeight());
     }
 
     /**

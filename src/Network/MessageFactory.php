@@ -205,7 +205,8 @@ class MessageFactory
      * @param Buffer $data
      * @return FilterAdd
      */
-    public function filteradd(Buffer $data) {
+    public function filteradd(Buffer $data)
+    {
         return new FilterAdd($data);
     }
 

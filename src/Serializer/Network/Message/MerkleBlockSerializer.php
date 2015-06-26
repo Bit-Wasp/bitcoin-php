@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Serializer\Network\Message;
 
-
 use BitWasp\Bitcoin\Network\Messages\MerkleBlock;
 use BitWasp\Bitcoin\Serializer\Network\Structure\FilteredBlockSerializer;
 use BitWasp\Buffertools\Parser;
@@ -48,5 +47,4 @@ class MerkleBlockSerializer
     {
         return $this->filteredSerializer->serialize($merkle->getFilteredBlock());
     }
-
 }
