@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Network\P2P;
 
 use BitWasp\Bitcoin\Block\BlockInterface;
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Network\Messages\Ping;
 use BitWasp\Bitcoin\Network\NetworkMessage;
@@ -162,7 +163,7 @@ class Peer extends EventEmitter
 
                 $peer = $this;
                 $this->loop->addPeriodicTimer($this->pingInterval, function () use ($peer) {
-                    $peer->send($this->msgs->ping());
+                    $this->ping();
                     if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
                         $this->missedPings++;
                     }
@@ -189,6 +190,14 @@ class Peer extends EventEmitter
             });
 
         return $deferred->promise();
+    }
+
+    /**
+     *
+     */
+    public function close()
+    {
+        $this->stream->close();
     }
 
     /**
@@ -326,6 +335,33 @@ class Peer extends EventEmitter
     public function alert(AlertDetail $detail, SignatureInterface $signature)
     {
         $this->send($this->msgs()->alert($detail, $signature));
+    }
+
+    /**
+     * @param int[] $vFilter
+     */
+    public function filteradd(array $vFilter)
+    {
+        $this->send($this->msgs()->filteradd($vFilter));
+    }
+
+    /**
+     * @param int[] $vFilter
+     * @param int $nNumHashFunc
+     * @param int $nTweak
+     * @param Flags $flags
+     */
+    public function filterload(array $vFilter, $nNumHashFunc, $nTweak, Flags $flags)
+    {
+        $this->send($this->msgs()->filterload($vFilter, $nNumHashFunc, $nTweak, $flags));
+    }
+
+    /**
+     *
+     */
+    public function filterclear()
+    {
+        $this->send($this->msgs()->filterclear());
     }
 
     /**
