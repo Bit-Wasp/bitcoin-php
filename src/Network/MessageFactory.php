@@ -29,6 +29,7 @@ use BitWasp\Bitcoin\Network\Structure\AlertDetail;
 use BitWasp\Bitcoin\Network\Structure\FilteredBlock;
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
 use BitWasp\Bitcoin\Network\Structure\InventoryVector;
+use BitWasp\Bitcoin\Network\Structure\NetworkAddressInterface;
 use BitWasp\Bitcoin\Serializer\Network\NetworkMessageSerializer;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -61,8 +62,8 @@ class MessageFactory
      * @param int $version
      * @param Buffer $services
      * @param int $timestamp
-     * @param NetworkAddress $addrRecv
-     * @param NetworkAddress $addrFrom
+     * @param NetworkAddressInterface $addrRecv
+     * @param NetworkAddressInterface $addrFrom
      * @param Buffer $userAgent
      * @param int $startHeight
      * @param bool $relay
@@ -72,8 +73,8 @@ class MessageFactory
         $version,
         Buffer $services,
         $timestamp,
-        NetworkAddress $addrRecv,
-        NetworkAddress $addrFrom,
+        NetworkAddressInterface $addrRecv,
+        NetworkAddressInterface $addrFrom,
         Buffer $userAgent,
         $startHeight,
         $relay
