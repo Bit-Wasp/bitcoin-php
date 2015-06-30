@@ -281,7 +281,8 @@ class Peer extends EventEmitter
                     $this->filter->insertData($data);
                 });
 
-                $this->on('filterclear',
+                $this->on(
+                    'filterclear',
                     function () {
                         $this->filter = null;
                         $this->shouldRelay = true;
