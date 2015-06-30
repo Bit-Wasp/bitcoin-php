@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Network\Messages;
 
+use BitWasp\Bitcoin\Network\Structure\NetworkAddressInterface;
+use BitWasp\Bitcoin\Network\Structure\NetworkAddressTimestamp;
 use BitWasp\Bitcoin\Serializer\Network\Message\VersionSerializer;
 use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Buffertools\Buffer;
@@ -27,12 +29,12 @@ class Version extends NetworkSerializable
     private $timestamp;
 
     /**
-     * @var NetworkAddress
+     * @var NetworkAddressInterface
      */
     private $addrRecv;
 
     /**
-     * @var NetworkAddress
+     * @var NetworkAddressInterface
      */
     private $addrFrom;
 
@@ -60,8 +62,8 @@ class Version extends NetworkSerializable
      * @param int $version
      * @param Buffer $services
      * @param int $timestamp
-     * @param NetworkAddress $addrRecv
-     * @param NetworkAddress $addrFrom
+     * @param NetworkAddressInterface $addrRecv
+     * @param NetworkAddressInterface $addrFrom
      * @param int $nonce
      * @param Buffer $userAgent
      * @param int $startHeight
@@ -71,13 +73,21 @@ class Version extends NetworkSerializable
         $version,
         Buffer $services,
         $timestamp,
-        NetworkAddress $addrRecv,
-        NetworkAddress $addrFrom,
+        NetworkAddressInterface $addrRecv,
+        NetworkAddressInterface $addrFrom,
         $nonce,
         Buffer $userAgent,
         $startHeight,
         $relay
     ) {
+
+        if ($addrRecv instanceof NetworkAddressTimestamp) {
+            $addrRecv = $addrRecv->withoutTimestamp();
+        }
+        if ($addrFrom instanceof NetworkAddressTimestamp) {
+            $addrFrom = $addrFrom->withoutTimestamp();
+        }
+
         $random = new Random();
         $this->nonce = $random->bytes(8)->getInt();
         $this->version = $version;
