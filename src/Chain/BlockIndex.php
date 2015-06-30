@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
-use BitWasp\Bitcoin\Block\BlockInterface;
 
 class BlockIndex
 {
@@ -49,8 +48,13 @@ class BlockIndex
      */
     public function saveGenesis(BlockHeaderInterface $header)
     {
-        $this->hash()->saveGenesis($header);
-        $this->height()->saveGenesis($header);
+        try {
+            $this->hash()->height();
+        } catch (\Exception $e) {
+            $this->hash()->saveGenesis($header);
+            $this->height()->saveGenesis($header);
+        }
+
         return $this;
     }
 
@@ -68,19 +72,19 @@ class BlockIndex
 
     /**
      * @param int $forkStartHeight
-     * @param BlockInterface[] $newBlocks
+     * @param BlockHeaderInterface[] $newHeaders
      * @return $this
      * @throws \Exception
      */
-    public function reorg($forkStartHeight, $newBlocks)
+    public function reorg($forkStartHeight, array $newHeaders)
     {
         $chainHeight = $this->height()->height();
         for ($i = $forkStartHeight; $i < $chainHeight; $i++) {
             $this->deleteByHeight($i);
         }
 
-        foreach ($newBlocks as $block) {
-            $this->save($block->getHeader());
+        foreach ($newHeaders as $header) {
+            $this->save($header);
         }
 
         return $this;

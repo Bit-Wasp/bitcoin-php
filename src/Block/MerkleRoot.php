@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
@@ -63,10 +64,9 @@ class MerkleRoot
      * @return string
      * @throws \Exception
      */
-    public function calculateHash()
+    public function calculateHash($hashFunction = null)
     {
-
-        $hashFxn = function ($value) {
+        $hashFxn = $hashFunction ?: function ($value) {
             return hash('sha256', hash('sha256', $value, true), true);
         };
 
@@ -78,7 +78,7 @@ class MerkleRoot
         }
 
         if ($txCount == 1) {
-            $buffer = new Buffer($hashFxn($this->transactions->getTransaction(0)->getBinary()), 32);
+            $buffer = $hashFxn($this->transactions->getTransaction(0)->getBinary());
 
         } else {
             // Create a fixed size Merkle Tree
@@ -96,14 +96,11 @@ class MerkleRoot
                 $tree->set($txCount, $last);
             }
 
-            $buffer = new Buffer($tree->hash());
+            $buffer = $tree->hash();
         }
 
-        $hash = new Parser();
-        $hash = $hash
-            ->writeBytes(32, $buffer, true)
-            ->getBuffer()
-            ->getHex();
+        $hash = new Buffer(Buffertools::flipBytes($buffer));
+        $hash = $hash->getHex();
 
         $this->setLastHash($hash);
         return $this->getLastHash();

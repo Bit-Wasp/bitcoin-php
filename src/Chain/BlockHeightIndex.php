@@ -13,11 +13,6 @@ class BlockHeightIndex
     private $index;
 
     /**
-     * @var int
-     */
-    private $height;
-
-    /**
      * @param Cache $cache
      */
     public function __construct(Cache $cache)
@@ -48,7 +43,7 @@ class BlockHeightIndex
      */
     public function saveGenesis(BlockHeaderInterface $header)
     {
-        $this->height = 0;
+        $this->index->save('height', 0);
         $this->index->save($this->cacheIndexHeader($header), 0);
     }
 
@@ -59,10 +54,9 @@ class BlockHeightIndex
      */
     public function save(BlockHeaderInterface $header)
     {
-        if (null === $this->height) {
-            throw new \Exception('Index not initialized with genesis block');
-        }
-        $this->index->save($this->cacheIndexHeader($header), $this->height++);
+        $height = $this->height();
+        $this->index->save($this->cacheIndexHeader($header), ++$height);
+        $this->index->save('height', (string)$height);
         return $this;
     }
 
@@ -81,7 +75,8 @@ class BlockHeightIndex
      */
     public function delete($hash)
     {
-        $this->height--;
+        $height = $this->height();
+        $this->index->save('height', ($height - 1));
         return $this->index->delete($this->cacheIndex($hash));
     }
 
@@ -100,9 +95,11 @@ class BlockHeightIndex
      */
     public function height()
     {
-        if (null === $this->height) {
+        $height = $this->index->fetch('height');
+        if (false === $height) {
             throw new \Exception('Index not initialized with genesis block');
         }
-        return $this->height;
+
+        return $height;
     }
 }

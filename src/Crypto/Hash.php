@@ -103,6 +103,16 @@ class Hash
     }
 
     /**
+     * @param Buffer $data
+     * @param int $seed
+     * @return Buffer
+     */
+    public static function murmur3(Buffer $data, $seed)
+    {
+        return new Buffer(pack("N", base_convert(murmurhash3($data->getBinary(), (int)$seed), 32, 10)));
+    }
+
+    /**
      * Do HMAC hashing on $data and $salt
      *
      * @param string $algo

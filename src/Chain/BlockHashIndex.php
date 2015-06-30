@@ -40,15 +40,7 @@ class BlockHashIndex
     public function saveGenesis(BlockHeaderInterface $header)
     {
         $this->index->save($this->cacheIndex(0), $header->getBlockHash());
-        $this->height = 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function height()
-    {
-        return $this->height;
+        $this->index->save('height', '0');
     }
 
     /**
@@ -58,16 +50,16 @@ class BlockHashIndex
      */
     public function save(BlockHeaderInterface $header)
     {
-        if (null === $this->height) {
-            throw new \Exception('Index not initialized with genesis block');
-        }
-        $key = $this->cacheIndex(++$this->height);
+        $height = $this->height();
+        $this->index->save('height', ++$height);
+
+        $key = $this->cacheIndex($height);
         $this->index->save($key, $header->getBlockHash());
         return $this;
     }
 
     /**
-     * @param $height
+     * @param int $height
      * @return bool
      */
     public function contains($height)
@@ -76,21 +68,35 @@ class BlockHashIndex
     }
 
     /**
-     * @param $height
+     * @param int $height
      * @return bool
      */
     public function delete($height)
     {
-        $this->height--;
+        $this->index->save('height', (string)($height - 1));
         return $this->index->delete($this->cacheIndex($height));
     }
 
     /**
-     * @param $height
-     * @return mixed
+     * @param int $height
+     * @return string
      */
     public function fetch($height)
     {
         return $this->index->fetch($this->cacheIndex($height));
+    }
+
+    /**
+     * @return int
+     * @throws \Exception
+     */
+    public function height()
+    {
+        $height = $this->index->fetch('height');
+        if (false === $height) {
+            throw new \Exception('Index not initialized with genesis block');
+        }
+
+        return $height;
     }
 }

@@ -11,9 +11,6 @@ env:
   - EXT_SECP256K1="-dextension=secp256k1.so"
   - EXT_SECP256K1=""
 
-before_install:
-  - composer selfupdate
-
 install:
     - |
         sh -c 'if [ "$EXT_SECP256K1" != "" ]; then \

@@ -242,9 +242,9 @@ class BitcoindTest extends AbstractTestCase
     public function testCreateRawTransaction()
     {
         $inputs = [[
-                'txid' => '4141414141414141414141414141414141414141414141414141414141414141',
-                'vout' => 0
-            ]
+            'txid' => '4141414141414141414141414141414141414141414141414141414141414141',
+            'vout' => 0
+        ]
         ];
 
         $outputs = [[
