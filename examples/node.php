@@ -68,27 +68,47 @@ $factory = new MessageFactory(
     new Random()
 );
 
-$node = new \BitWasp\Bitcoin\Network\P2P\Node($local, $blockchain, $connector, $factory, $loop);
 
-$node->connect($host)->then(function (Peer $peer) use ($node, $loop) {
-    $loop->addPeriodicTimer(60, function () use ($node, $peer) {
-        $peer->getblocks($node->locator(true));
-    });
+$locator = new \BitWasp\Bitcoin\Network\P2P\PeerLocator(
+    $local,
+    $factory,
+    $connector,
+    $loop
+);
 
-    $inboundBlocks = 0;
-    $peer->on('block', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Block $block) use ($node, &$inboundBlocks) {
-        $blk = $block->getBlock();
-        $node->chain()->process($blk);
+$node = new \BitWasp\Bitcoin\Network\P2P\Node($local, $blockchain, $locator);
 
-        if ($inboundBlocks++ % 500 == 0) {
+$locator
+    ->discoverPeers()
+    ->then(
+        function (\BitWasp\Bitcoin\Network\P2P\PeerLocator $locator) {
+            return $locator->connectNextPeer();
+        },
+        function ($error) {
+            echo $error;
+            throw $error;
+        })
+    ->then(
+        function (Peer $peer) use ($node, $loop) {
+            echo 'asdf';
+            $loop->addPeriodicTimer(60, function () use ($node, $peer) {
+                $peer->getblocks($node->locator(true));
+            });
+
+            $inboundBlocks = 0;
+            $peer->on('block', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Block $block) use ($node, &$inboundBlocks) {
+                $blk = $block->getBlock();
+                $node->chain()->process($blk);
+
+                if ($inboundBlocks++ % 500 == 0) {
+                    $peer->getblocks($node->locator(true));
+                }
+
+                echo $blk->getHeader()->getBlockHash() . "\n";
+                echo $node->chain()->currentHeight() . "\n";
+            });
+
             $peer->getblocks($node->locator(true));
-        }
-
-        echo $blk->getHeader()->getBlockHash(). "\n";
-        echo $node->chain()->currentHeight() . "\n";
-    });
-
-    $peer->getblocks($node->locator(true));
-});
+        });
 
 $loop->run();

@@ -2,21 +2,18 @@
 
 namespace BitWasp\Bitcoin\Network\P2P;
 
-use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Block\BlockInterface;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Network\BloomFilter;
 use BitWasp\Bitcoin\Network\Structure\FilteredBlock;
 use BitWasp\Bitcoin\Network\MessageFactory;
 use BitWasp\Bitcoin\Network\Messages\FilterAdd;
-use BitWasp\Bitcoin\Network\Messages\FilterClear;
 use BitWasp\Bitcoin\Network\Messages\FilterLoad;
 use BitWasp\Bitcoin\Network\Messages\Ping;
 use BitWasp\Bitcoin\Network\NetworkMessage;
 use BitWasp\Bitcoin\Network\NetworkSerializable;
-use BitWasp\Bitcoin\Network\PartialMerkleTree;
 use BitWasp\Bitcoin\Network\Structure\AlertDetail;
-use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
+use BitWasp\Bitcoin\Network\Structure\InventoryVector;
+use BitWasp\Bitcoin\Network\Structure\NetworkAddressInterface;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -27,7 +24,6 @@ use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\SocketClient\Connector;
 use React\Stream\Stream;
-use BitWasp\Bitcoin\Network\Structure\InventoryVector;
 
 class Peer extends EventEmitter
 {
@@ -40,12 +36,12 @@ class Peer extends EventEmitter
     private $buffer = '';
 
     /**
-     * @var NetworkAddress
+     * @var NetworkAddressInterface
      */
     private $localAddr;
 
     /**
-     * @var NetworkAddress
+     * @var NetworkAddressInterface
      */
     private $remoteAddr;
 
@@ -102,20 +98,41 @@ class Peer extends EventEmitter
     private $shouldRelay = false;
 
     /**
-     * @param NetworkAddress $addr
-     * @param NetworkAddress $local
+     * @param NetworkAddressInterface $addr
+     * @param NetworkAddressInterface $local
      * @param Connector $connector
      * @param MessageFactory $msgs
      * @param LoopInterface $loop
      */
-    public function __construct(NetworkAddress $addr, NetworkAddress $local, Connector $connector, MessageFactory $msgs, LoopInterface $loop)
-    {
+    public function __construct(
+        NetworkAddressInterface $addr,
+        NetworkAddressInterface $local,
+        Connector $connector,
+        MessageFactory $msgs,
+        LoopInterface $loop
+    ) {
         $this->remoteAddr = $addr;
         $this->localAddr = $local;
         $this->connector = $connector;
         $this->msgs = $msgs;
         $this->loop = $loop;
         $this->lastPongTime = time();
+    }
+
+    /**
+     * @return NetworkAddressInterface
+     */
+    public function getRemoteAddr()
+    {
+        return $this->remoteAddr;
+    }
+
+    /**
+     * @return NetworkAddressInterface
+     */
+    public function getLocalAddr()
+    {
+        return $this->localAddr;
     }
 
     /**
@@ -165,6 +182,24 @@ class Peer extends EventEmitter
         $this->emit('send', [$net]);
     }
 
+    public function onData($data)
+    {
+        $this->buffer .= $data;
+        $length = strlen($this->buffer);
+        $parser = new Parser(new Buffer($this->buffer));
+        try {
+            while ($parser->getPosition() !== $length && $message = $this->msgs->parse($parser)) {
+                $this->buffer = $parser->getBuffer()->slice($parser->getPosition())->getBinary();
+                $this->emit('msg', [$this, $message]);
+            }
+        } catch (\Exception $e) {
+            if ($data == "") {
+                echo "EMPTY PACKET!";
+            }
+            echo ".";
+        }
+    }
+
     /**
      * @return \React\Promise\RejectedPromise|static
      */
@@ -175,26 +210,17 @@ class Peer extends EventEmitter
         $this->connector
             ->create($this->remoteAddr->getIp(), $this->remoteAddr->getPort())
             ->then(function (Stream $stream) use ($deferred) {
-                echo "connection connected\n";
                 $this->stream = $stream;
 
-                $stream->on('data', function ($data) use ($stream) {
-                    $this->buffer .= $data;
-                    $length = strlen($this->buffer);
-                    $parser = new Parser(new Buffer($this->buffer));
-                    try {
-                        while ($parser->getPosition() !== $length && $message = $this->msgs->parse($parser)) {
-                            $this->buffer = $parser->getBuffer()->slice($parser->getPosition())->getBinary();
-                            $this->emit('msg', [$this, $message]);
-                        }
-                    } catch (\Exception $e) {
-                        echo "..";
-                    }
-                });
+                $stream->on('data', [$this, 'onData']);
 
                 $this->on('msg', function (Peer $peer, NetworkMessage $msg) {
-                    echo " [ received " . $msg->getCommand() . " ]\n";
+                    echo " [ received " . $msg->getCommand() . " - " . $this->getRemoteAddr()->getIp() . "]\n";
                     $this->emit($msg->getCommand(), [$peer, $msg->getPayload()]);
+                });
+
+                $this->on('close', function () {
+                    echo "Connection was closed\n";
                 });
 
                 $this->on('peerdisconnect', function (Peer $peer) {
@@ -202,32 +228,35 @@ class Peer extends EventEmitter
                 });
 
                 $this->on('send', function (NetworkMessage $msg) {
-                    echo " [ sending " . $msg->getCommand() . " ]\n";
-                });
-
-                $peer = $this;
-                $this->loop->addPeriodicTimer($this->pingInterval, function () use ($peer) {
-                    $this->ping();
-                    if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
-                        $this->missedPings++;
-                    }
-                    if ($this->missedPings > $this->maxMissedPings) {
-                        $this->stream->close();
-                    }
+                    echo " [ sending " . $msg->getCommand() . " - " . $this->getRemoteAddr()->getIp() . "]\n";
                 });
 
                 $this->on('version', function () {
                     $this->verack();
                 });
 
-                $this->on('verack', function () use ($deferred, $stream) {
-                    $this->exchangedVersion = true;
-                    $this->emit('ready', [$this]);
-                    $deferred->resolve($this);
+                $this->on('verack', function () use ($deferred) {
+                    if ($this->exchangedVersion == false) {
+                        $this->exchangedVersion = true;
+                        $this->loop->addPeriodicTimer($this->pingInterval, function (\React\EventLoop\Timer\Timer $timer) {
+                            if (null === $this->stream) {
+                                $timer->cancel();
+                            }
+                            $this->ping();
+                            if ($this->lastPongTime > time() - ($this->pingInterval + $this->pingInterval * 0.20)) {
+                                $this->missedPings++;
+                            }
+                            if ($this->missedPings > $this->maxMissedPings) {
+                                $this->close();
+                            }
+                        });
+                        $this->emit('ready', [$this]);
+                        $deferred->resolve($this);
+                    }
                 });
 
                 $this->on('ping', function (Peer $peer, Ping $ping) {
-                    $peer->pong($ping);
+                    $this->pong($ping);
                 });
 
                 $this->on('filterload', function (Peer $peer, FilterLoad $filterLoad) {
@@ -252,12 +281,16 @@ class Peer extends EventEmitter
                     $this->filter->insertData($data);
                 });
 
-                $this->on('filterclear', function () {
-                    $this->filter = null;
-                    $this->shouldRelay = true;
-                });
+                $this->on('filterclear',
+                    function () {
+                        $this->filter = null;
+                        $this->shouldRelay = true;
+                    }
+                );
 
                 $this->version();
+            }, function ($error) use ($deferred) {
+                $deferred->reject($error);
             });
 
         return $deferred->promise();
@@ -268,15 +301,8 @@ class Peer extends EventEmitter
      */
     public function close()
     {
+        $this->stream->end();
         $this->stream->close();
-    }
-
-    /**
-     * @return MessageFactory
-     */
-    public function msgs()
-    {
-        return $this->msgs;
     }
 
     /**
@@ -301,7 +327,7 @@ class Peer extends EventEmitter
      */
     public function verack()
     {
-        $this->send($this->msgs()->verack());
+        $this->send($this->msgs->verack());
     }
 
     /**
@@ -309,7 +335,7 @@ class Peer extends EventEmitter
      */
     public function inv(array $vInv)
     {
-        $this->send($this->msgs()->inv($vInv));
+        $this->send($this->msgs->inv($vInv));
     }
 
     /**
@@ -317,7 +343,7 @@ class Peer extends EventEmitter
      */
     public function getdata(array $vInv)
     {
-        $this->send($this->msgs()->getdata($vInv));
+        $this->send($this->msgs->getdata($vInv));
     }
 
     /**
@@ -325,7 +351,7 @@ class Peer extends EventEmitter
      */
     public function notfound(array $vInv)
     {
-        $this->send($this->msgs()->notfound($vInv));
+        $this->send($this->msgs->notfound($vInv));
     }
 
     /**
@@ -333,7 +359,7 @@ class Peer extends EventEmitter
      */
     public function getaddr()
     {
-        $this->send($this->msgs()->getaddr());
+        $this->send($this->msgs->getaddr());
     }
 
     /**
@@ -341,7 +367,7 @@ class Peer extends EventEmitter
      */
     public function ping()
     {
-        $this->send($this->msgs()->ping());
+        $this->send($this->msgs->ping());
     }
 
     /**
@@ -349,7 +375,7 @@ class Peer extends EventEmitter
      */
     public function pong(Ping $ping)
     {
-        $this->send($this->msgs()->pong($ping));
+        $this->send($this->msgs->pong($ping));
     }
 
     /**
@@ -357,7 +383,7 @@ class Peer extends EventEmitter
      */
     public function tx(TransactionInterface $tx)
     {
-        $this->send($this->msgs()->tx($tx));
+        $this->send($this->msgs->tx($tx));
     }
 
     /**
@@ -365,7 +391,7 @@ class Peer extends EventEmitter
      */
     public function getblocks(array $locatorHashes)
     {
-        $this->send($this->msgs()->getblocks(
+        $this->send($this->msgs->getblocks(
             self::PROTOCOL_VERSION,
             $locatorHashes
         ));
@@ -377,7 +403,7 @@ class Peer extends EventEmitter
      */
     public function getheaders(array $locatorHashes)
     {
-        $this->send($this->msgs()->getheaders(
+        $this->send($this->msgs->getheaders(
             self::PROTOCOL_VERSION,
             $locatorHashes
         ));
@@ -388,7 +414,7 @@ class Peer extends EventEmitter
      */
     public function block(BlockInterface $block)
     {
-        $this->send($this->msgs()->block($block));
+        $this->send($this->msgs->block($block));
     }
 
     /**
@@ -396,7 +422,7 @@ class Peer extends EventEmitter
      */
     public function headers(array $vHeaders)
     {
-        $this->send($this->msgs()->headers($vHeaders));
+        $this->send($this->msgs->headers($vHeaders));
     }
 
     /**
@@ -405,7 +431,7 @@ class Peer extends EventEmitter
      */
     public function alert(AlertDetail $detail, SignatureInterface $signature)
     {
-        $this->send($this->msgs()->alert($detail, $signature));
+        $this->send($this->msgs->alert($detail, $signature));
     }
 
     /**
@@ -413,7 +439,7 @@ class Peer extends EventEmitter
      */
     public function filteradd(Buffer $data)
     {
-        $this->send($this->msgs()->filteradd($data));
+        $this->send($this->msgs->filteradd($data));
     }
 
     /**
@@ -421,7 +447,7 @@ class Peer extends EventEmitter
      */
     public function filterload(BloomFilter $filter)
     {
-        $this->send($this->msgs()->filterload($filter));
+        $this->send($this->msgs->filterload($filter));
     }
 
     /**
@@ -429,7 +455,7 @@ class Peer extends EventEmitter
      */
     public function filterclear()
     {
-        $this->send($this->msgs()->filterclear());
+        $this->send($this->msgs->filterclear());
     }
 
     /**
@@ -437,7 +463,7 @@ class Peer extends EventEmitter
      */
     public function merkleblock(FilteredBlock $filtered)
     {
-        $this->send($this->msgs()->merkleblock($filtered));
+        $this->send($this->msgs->merkleblock($filtered));
     }
 
     /**
@@ -445,19 +471,19 @@ class Peer extends EventEmitter
      */
     public function mempool()
     {
-        $this->send($this->msgs()->mempool());
+        $this->send($this->msgs->mempool());
     }
 
     /**
      * Issue a Reject message, with a required $msg, $code, and $reason
      *
      * @param Buffer $msg
-     * @param $code
+     * @param int $code
      * @param Buffer $reason
      * @param Buffer $data
      */
     public function reject(Buffer $msg, $code, Buffer $reason, Buffer $data = null)
     {
-        $this->send($this->msgs()->reject($msg, $code, $reason, $data));
+        $this->send($this->msgs->reject($msg, $code, $reason, $data));
     }
 }

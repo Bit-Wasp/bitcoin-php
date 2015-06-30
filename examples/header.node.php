@@ -2,6 +2,7 @@
 
 require_once "../vendor/autoload.php";
 
+
 use BitWasp\Bitcoin\Network\Structure\NetworkAddress;
 use BitWasp\Bitcoin\Chain\BlockHashIndex;
 use BitWasp\Bitcoin\Chain\BlockHeightIndex;
@@ -52,7 +53,7 @@ $headerchain = new \BitWasp\Bitcoin\Chain\Headerchain(
     )
 );
 
-$locator = new \BitWasp\Bitcoin\Network\BlockLocator();
+$peers = new \BitWasp\Bitcoin\Network\BlockLocator();
 
 $host = new NetworkAddress(
     Buffer::hex('01', 16),
@@ -71,28 +72,67 @@ $factory = new MessageFactory(
     new Random()
 );
 
-echo "create node\n";
-$node = new \BitWasp\Bitcoin\Network\P2P\Node($local, $headerchain, $connector, $factory, $loop);
+$peers = new \BitWasp\Bitcoin\Network\P2P\PeerLocator($local, $factory, $connector, $loop);
+$node = new \BitWasp\Bitcoin\Network\P2P\Node($local, $headerchain, $peers);
 
-$node->connect($host)->then(function (Peer $peer) use ($node) {
-    $peer->on('headers', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Headers $headers) use ($node) {
-        $vHeaders = $headers->getHeaders();
-        $cHeaders = count($vHeaders);
-        for ($i = 0; $i < $cHeaders; $i++) {
-            $node->chain()->process($vHeaders[$i]);
-        }
+$peers
+->discoverPeers()
+->then(
+    function (\BitWasp\Bitcoin\Network\P2P\PeerLocator $locator) {
+        return $locator->connectNextPeer();
+    },
+    function ($error) {
+        echo $error;
+        throw $error;
+    })
+->then(
+    function (Peer $peer) use (&$node) {
+        $peer->on('inv', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Inv $inv) use (&$node) {
+            $missedBlock = false;
+            foreach ($inv->getItems() as $item) {
+                if ($item->isBlock()) {
+                    $key = $item->getHash()->getHex();
+                    if (!$node->chain()->index()->hash()->contains($key)) {
+                        $missedBlock = true;
+                    }
+                }
+            }
 
-        if ($cHeaders > 0) {
-            echo "cHeaders > 1 - send getheaders\n";
-            $peer->getheaders($node->locator(true));
-        } else {
-            echo "nothing to sync\n";
-        }
-        echo "size: " . $node->chain()->currentHeight() . "\n";
-    });
+            if ($missedBlock) {
+                $peer->getheaders($node->locator(true));
+            }
+        });
 
-    echo "connected\n";
-    $peer->getheaders($node->locator(false));
-});
+        $peer->on('block', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Block $block) use ($node) {
+            $header = $block->getBlock()->getHeader();
+            if (!$node->chain()->index()->hash()->contains($header->getBlockHash())) {
+                $node->chain()->process($header);
+            }
+        });
+
+        $peer->on('headers', function (Peer $peer, \BitWasp\Bitcoin\Network\Messages\Headers $headers) use ($node) {
+            $vHeaders = $headers->getHeaders();
+            $cHeaders = count($vHeaders);
+            for ($i = 0; $i < $cHeaders; $i++) {
+                $node->chain()->process($vHeaders[$i]);
+            }
+
+            echo "Now have up to " . $node->chain()->currentHeight() . " headers\n";
+            if ($cHeaders > 0) {
+                $peer->getheaders($node->locator(true));
+            }
+        });
+
+        $peer->getheaders($node->locator(true));
+    },
+    function ($error) {
+        echo $error;
+        throw $error;
+    }
+);
 
 $loop->run();
+
+
+
+
