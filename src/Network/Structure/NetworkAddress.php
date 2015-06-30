@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Serializer\Network\Structure\NetworkAddressSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Serializable;
 
-class NetworkAddress extends Serializable
+class NetworkAddress extends Serializable implements NetworkAddressInterface
 {
     /**
      * @var Buffer
@@ -36,7 +36,7 @@ class NetworkAddress extends Serializable
     }
 
     /**
-     * @return int|string
+     * @return Buffer
      */
     public function getServices()
     {
