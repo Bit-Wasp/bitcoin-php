@@ -33,6 +33,18 @@ class NetworkAddressTimestamp extends NetworkAddress
     }
 
     /**
+     * @return NetworkAddress
+     */
+    public function withoutTimestamp()
+    {
+        return new NetworkAddress(
+            $this->getServices(),
+            $this->getIp(),
+            $this->getPort()
+        );
+    }
+
+    /**
      * @return Buffer
      */
     public function getBuffer()
