@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Networking;
+namespace BitWasp\Bitcoin\Tests\Network;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
@@ -104,7 +104,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Networking\NetworkInterface
+     * @return \BitWasp\Bitcoin\Network\NetworkInterface
      */
     private function getTestNetwork()
     {
@@ -112,7 +112,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Networking\NetworkInterface
+     * @return \BitWasp\Bitcoin\Network\NetworkInterface
      */
     private function getLiveNetwork()
     {
