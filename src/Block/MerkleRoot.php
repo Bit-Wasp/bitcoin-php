@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Block;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
@@ -59,12 +58,11 @@ class MerkleRoot
     }
 
     /**
-     * Calculate the hash from the transactions in this block.
-     *
+     * @param callable|null $hashFunction
      * @return string
-     * @throws \Exception
+     * @throws MerkleTreeEmpty
      */
-    public function calculateHash($hashFunction = null)
+    public function calculateHash(callable $hashFunction = null)
     {
         $hashFxn = $hashFunction ?: function ($value) {
             return hash('sha256', hash('sha256', $value, true), true);
