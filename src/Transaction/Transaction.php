@@ -126,30 +126,8 @@ class Transaction extends Serializable implements TransactionInterface
     {
         return new Transaction(
             $this->getVersion(),
-            new TransactionInputCollection(
-                array_map(
-                    function (TransactionInputInterface $value) {
-                        return new TransactionInput(
-                            $value->getTransactionId(),
-                            $value->getVout(),
-                            clone $value->getScript(),
-                            $value->getSequence()
-                        );
-                    },
-                    $this->getInputs()->getInputs()
-                )
-            ),
-            new TransactionOutputCollection(
-                array_map(
-                    function (TransactionOutputInterface $value) {
-                        return new TransactionOutput(
-                            $value->getValue(),
-                            clone $value->getScript()
-                        );
-                    },
-                    $this->getOutputs()->getOutputs()
-                )
-            ),
+            $this->getInputs()->makeImmutableCopy(),
+            $this->getOutputs()->makeImmutableCopy(),
             $this->getLockTime()
         );
     }
@@ -161,30 +139,8 @@ class Transaction extends Serializable implements TransactionInterface
     {
         return new MutableTransaction(
             $this->getVersion(),
-            new MutableTransactionInputCollection(
-                array_map(
-                    function (TransactionInputInterface $value) {
-                        return new TransactionInput(
-                            $value->getTransactionId(),
-                            $value->getVout(),
-                            clone $value->getScript(),
-                            $value->getSequence()
-                        );
-                    },
-                    $this->getInputs()->getInputs()
-                )
-            ),
-            new MutableTransactionOutputCollection(
-                array_map(
-                    function (TransactionOutputInterface $value) {
-                        return new TransactionOutput(
-                            $value->getValue(),
-                            clone $value->getScript()
-                        );
-                    },
-                    $this->getOutputs()->getOutputs()
-                )
-            ),
+            $this->getInputs()->makeMutableCopy(),
+            $this->getOutputs()->makeMutableCopy(),
             $this->getLockTime()
         );
     }

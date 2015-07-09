@@ -64,7 +64,7 @@ interface TransactionInterface extends SerializableInterface
      *
      * @return TransactionInterface
      */
-    public function makeCopy();
+    public function makeImmutableCopy();
 
     /**
      * @return MutableTransactionInterface

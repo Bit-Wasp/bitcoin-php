@@ -68,4 +68,14 @@ class TransactionOutputCollection extends Collection
     {
         return new static(array_slice($this->outputs, $start, $length));
     }
+
+    public function makeImmutableCopy()
+    {
+        return new TransactionOutputCollection($this->getOutputs());
+    }
+
+    public function makeMutableCopy()
+    {
+        return new MutableTransactionOutputCollection($this->getOutputs());
+    }
 }

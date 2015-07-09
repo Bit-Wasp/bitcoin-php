@@ -68,4 +68,14 @@ class TransactionInputCollection extends Collection
     {
         return new static(array_slice($this->inputs, $start, $length));
     }
+
+    public function makeImmutableCopy()
+    {
+        return new TransactionInputCollection($this->getInputs());
+    }
+
+    public function makeMutableCopy()
+    {
+        return new MutableTransactionInputCollection($this->getInputs());
+    }
 }
