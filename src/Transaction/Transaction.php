@@ -14,22 +14,22 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @var int|string
      */
-    private $version;
+    protected $version;
 
     /**
      * @var TransactionInputCollection
      */
-    private $inputs;
+    protected $inputs;
 
     /**
      * @var TransactionOutputCollection
      */
-    private $outputs;
+    protected $outputs;
 
     /**
      * @var int|string
      */
-    private $locktime;
+    protected $locktime;
 
     /**
      * @param int|string $version
@@ -82,16 +82,6 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @param TransactionInputCollection $inputs
-     * @return $this
-     */
-    public function setInputs(TransactionInputCollection $inputs)
-    {
-        $this->inputs = $inputs;
-        return $this;
-    }
-
-    /**
      * Get the array of inputs in the transaction
      *
      * @return TransactionInputCollection
@@ -99,16 +89,6 @@ class Transaction extends Serializable implements TransactionInterface
     public function getInputs()
     {
         return $this->inputs;
-    }
-
-    /**
-     * @param TransactionOutputCollection $outputs
-     * @return $this
-     */
-    public function setOutputs(TransactionOutputCollection $outputs)
-    {
-        $this->outputs = $outputs;
-        return $this;
     }
 
     /**
@@ -132,22 +112,6 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * Set Lock Time
-     * @param int $locktime
-     * @return $this
-     * @throws \Exception
-     */
-    public function setLockTime($locktime)
-    {
-        if (Bitcoin::getMath()->cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
-            throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
-        }
-
-        $this->locktime = $locktime;
-        return $this;
-    }
-
-    /**
      * @return SignatureHash
      */
     public function getSignatureHash()
@@ -156,7 +120,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Transaction
+     * @return TransactionInterface
      */
     public function makeCopy()
     {
@@ -178,10 +142,45 @@ class Transaction extends Serializable implements TransactionInterface
             new TransactionOutputCollection(
                 array_map(
                     function (TransactionOutputInterface $value) {
-                            return new TransactionOutput(
-                                $value->getValue(),
-                                clone $value->getScript()
-                            );
+                        return new TransactionOutput(
+                            $value->getValue(),
+                            clone $value->getScript()
+                        );
+                    },
+                    $this->getOutputs()->getOutputs()
+                )
+            ),
+            $this->getLockTime()
+        );
+    }
+
+    /**
+     * @return MutableTransactionInterface
+     */
+    public function makeMutableCopy()
+    {
+        return new MutableTransaction(
+            $this->getVersion(),
+            new MutableTransactionInputCollection(
+                array_map(
+                    function (TransactionInputInterface $value) {
+                        return new TransactionInput(
+                            $value->getTransactionId(),
+                            $value->getVout(),
+                            clone $value->getScript(),
+                            $value->getSequence()
+                        );
+                    },
+                    $this->getInputs()->getInputs()
+                )
+            ),
+            new MutableTransactionOutputCollection(
+                array_map(
+                    function (TransactionOutputInterface $value) {
+                        return new TransactionOutput(
+                            $value->getValue(),
+                            clone $value->getScript()
+                        );
                     },
                     $this->getOutputs()->getOutputs()
                 )

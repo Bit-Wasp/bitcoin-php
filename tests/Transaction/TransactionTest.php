@@ -3,6 +3,11 @@
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\MutableTransaction;
+use BitWasp\Bitcoin\Transaction\MutableTransactionInput;
+use BitWasp\Bitcoin\Transaction\MutableTransactionInputCollection;
+use BitWasp\Bitcoin\Transaction\MutableTransactionOutput;
+use BitWasp\Bitcoin\Transaction\MutableTransactionOutputCollection;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
@@ -50,7 +55,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function testSetLockTime()
     {
-        $tx = new Transaction();
+        $tx = new MutableTransaction();
         $tx->setLockTime('0');
         $this->assertSame('0', $tx->getLockTime());
     }
@@ -60,16 +65,16 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetLockTimeException()
     {
-        $tx = new Transaction();
+        $tx = new MutableTransaction();
         $tx->setLockTime('4294967297');
     }
 
     public function testGetInputs()
     {
-        $tx = new Transaction(1);
+        $tx = new MutableTransaction(1);
         $this->assertEmpty($tx->getInputs());
 
-        $inputs = new TransactionInputCollection([new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0)]);
+        $inputs = new MutableTransactionInputCollection([new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0)]);
         $tx->setInputs($inputs);
 
         $this->assertEquals(1, count($tx->getInputs()));
@@ -79,7 +84,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     {
         $in = new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0);
 
-        $tx = new Transaction();
+        $tx = new MutableTransaction();
         $tx->getInputs()->addInput($in);
         $inputs = $tx->getInputs();
         $this->assertSame(1, count($inputs));
@@ -99,10 +104,10 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOutputs()
     {
-        $tx = new Transaction();
+        $tx = new MutableTransaction();
         $this->assertEmpty($tx->getOutputs());
 
-        $outputs = new TransactionOutputCollection([new TransactionOutput(50, new Script())]);
+        $outputs = new MutableTransactionOutputCollection([new TransactionOutput(50, new Script())]);
         $tx->setOutputs($outputs);
 
         $this->assertEquals(1, count($tx->getOutputs()));
@@ -110,7 +115,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOutput()
     {
-        $tx = new Transaction();
+        $tx = new MutableTransaction();
 
         $out = new TransactionOutput(1, new Script);
         $tx->getOutputs()->addOutput($out);

@@ -9,7 +9,7 @@ class TransactionInputCollection extends Collection
     /**
      * @var TransactionInputInterface[]
      */
-    private $inputs = [];
+    protected $inputs;
 
     /**
      * Initialize a new collection with a list of inputs.
@@ -18,29 +18,8 @@ class TransactionInputCollection extends Collection
      */
     public function __construct(array $inputs = [])
     {
-        $this->addInputs($inputs);
-    }
-
-    /**
-     * Adds an input to the collection.
-     *
-     * @param TransactionInputInterface $input
-     */
-    public function addInput(TransactionInputInterface $input)
-    {
-        $this->inputs[] = $input;
-    }
-
-    /**
-     * Adds a list of inputs to the collection.
-     *
-     * @param TransactionInputInterface[] $inputs
-     */
-    public function addInputs(array $inputs)
-    {
-        foreach ($inputs as $input) {
-            $this->addInput($input);
-        }
+        // array_map to force instanceof TransactionOutputInterface
+        $this->inputs = array_map(function(TransactionInputInterface $input) { return $input; }, $inputs);
     }
 
     /**
@@ -83,10 +62,10 @@ class TransactionInputCollection extends Collection
      *
      * @param int $start
      * @param int $length
-     * @return \BitWasp\Bitcoin\Transaction\TransactionInputCollection
+     * @return static
      */
     public function slice($start, $length)
     {
-        return new self(array_slice($this->inputs, $start, $length));
+        return new static(array_slice($this->inputs, $start, $length));
     }
 }

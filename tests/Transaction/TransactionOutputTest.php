@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
+use BitWasp\Bitcoin\Transaction\MutableTransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Buffertools\Buffer;
@@ -45,17 +46,6 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $script = $out->getScript();
         $this->assertInstanceOf($this->scriptType, $script);
         $this->assertEmpty($script->getBuffer()->getBinary());
-    }
-
-    public function testSetScript()
-    {
-        $script = new Script();
-        $script = $script->op('OP_2')->op('OP_3');
-
-        $out = new TransactionOutput(1, new Script());
-        $this->assertEquals(new Script(), $out->getScript());
-        $out->setScript($script);
-        $this->assertSame($script, $out->getScript());
     }
 
     public function testFromParser()

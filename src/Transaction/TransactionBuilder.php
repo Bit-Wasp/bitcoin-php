@@ -46,7 +46,7 @@ class TransactionBuilder
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
     {
-        $this->transaction = $tx ?: new Transaction();
+        $this->transaction = $tx ? $tx->makeMutableCopy() : new MutableTransaction();
         $this->ecAdapter = $ecAdapter;
     }
 
@@ -265,10 +265,11 @@ class TransactionBuilder
                 $script = $this->transaction->getInputs()->getInput($i)->getScript();
             }
 
-            $transaction->getInputs()->getInput($i)->setScript($script);
+            $input = $transaction->getInputs()->getInput($i);
+            $transaction->getInputs()->setInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), $script, $input->getSequence()));
         }
 
-        return $transaction;
+        return $transaction->makeCopy();
     }
 
     /**

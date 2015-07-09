@@ -40,7 +40,6 @@ interface TransactionInterface extends SerializableInterface
      * @return TransactionInputCollection
      */
     public function getInputs();
-    public function setInputs(TransactionInputCollection $inputs);
 
     /**
      * Return an array of all outputs
@@ -48,7 +47,6 @@ interface TransactionInterface extends SerializableInterface
      * @return TransactionOutputCollection
      */
     public function getOutputs();
-    public function setOutputs(TransactionOutputCollection $outputs);
     /**
      * Return the locktime for this transaction
      *
@@ -57,14 +55,19 @@ interface TransactionInterface extends SerializableInterface
     public function getLockTime();
 
     /**
-     * @return SignatureHash
+     * @return SignatureHashInterface
      */
     public function getSignatureHash();
 
     /**
      * Returns an exact clone of the current transaction
      *
-     * @return Transaction
+     * @return TransactionInterface
      */
     public function makeCopy();
+
+    /**
+     * @return MutableTransactionInterface
+     */
+    public function makeMutableCopy();
 }

@@ -24,12 +24,12 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     /**
      * @var string|int
      */
-    private $sequence;
+    protected $sequence;
 
     /**
      * @var ScriptInterface
      */
-    private $script;
+    protected $script;
 
     /**
      * @param string|null $txid
@@ -91,18 +91,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function getScript()
     {
         return $this->script;
-    }
-
-    /**
-     * Set a Script
-     *
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
     }
 
     /**

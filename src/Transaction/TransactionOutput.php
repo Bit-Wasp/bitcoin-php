@@ -17,7 +17,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     /**
      * @var ScriptInterface
      */
-    private $script;
+    protected $script;
 
     /**
      * Initialize class
@@ -47,16 +47,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     public function getScript()
     {
         return $this->script;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @see TransactionOutputInterface::setScript()
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
     }
 
     /**

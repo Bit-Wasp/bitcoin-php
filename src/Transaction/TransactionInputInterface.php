@@ -33,23 +33,11 @@ interface TransactionInputInterface
     public function getSequence();
 
     /**
-     * @param integer|string $sequence
-     * @return $this
-     */
-    public function setSequence($sequence);
-
-    /**
      * Get the script in this transaction
      *
      * @return Script
      */
     public function getScript();
-
-    /**
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script);
 
     /**
      * Check whether the txid is for a coinbase transaction
