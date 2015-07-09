@@ -122,7 +122,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return TransactionInterface
      */
-    public function makeCopy()
+    public function makeImmutableCopy()
     {
         return new Transaction(
             $this->getVersion(),
