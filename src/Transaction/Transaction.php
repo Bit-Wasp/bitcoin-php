@@ -32,17 +32,29 @@ class Transaction extends Serializable implements TransactionInterface
     protected $locktime;
 
     /**
-     * @param int|string $version
-     * @param TransactionInputCollection $inputs
+     * @var string|null
+     */
+    private $txId = null;
+
+    /**
+     * @var Buffer|null
+     */
+    private $raw = null;
+
+    /**
+     * @param int|string                  $version
+     * @param TransactionInputCollection  $inputs
      * @param TransactionOutputCollection $outputs
-     * @param int|string $locktime
+     * @param int|string                  $locktime
+     * @param Buffer                      $raw
      * @throws \Exception
      */
     public function __construct(
         $version = TransactionInterface::DEFAULT_VERSION,
         TransactionInputCollection $inputs = null,
         TransactionOutputCollection $outputs = null,
-        $locktime = '0'
+        $locktime = '0',
+        Buffer $raw = null
     ) {
 
         if (!is_numeric($version)) {
@@ -61,6 +73,7 @@ class Transaction extends Serializable implements TransactionInterface
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
         $this->locktime = $locktime;
+        $this->raw = $raw;
     }
 
     /**
@@ -68,9 +81,15 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTransactionId()
     {
-        $hash = bin2hex(Buffertools::flipBytes(Hash::sha256d($this->getBuffer())));
+        if ($this->txId === null) {
+            $this->txId = $this->createTransactionId();
+        }
 
-        return $hash;
+        return $this->txId;
+    }
+
+    protected function createTransactionId() {
+        return bin2hex(Buffertools::flipBytes(Hash::sha256d($this->getBuffer())));
     }
 
     /**
@@ -150,8 +169,18 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
+        if ($this->raw === null) {
+            $this->raw = $this->createBuffer();
+        }
+
+        return $this->raw;
+    }
+
+    protected function createBuffer()
+    {
         $serializer = new TransactionSerializer();
-        $hex = $serializer->serialize($this);
-        return $hex;
+        $raw = $serializer->serialize($this);
+
+        return $raw;
     }
 }

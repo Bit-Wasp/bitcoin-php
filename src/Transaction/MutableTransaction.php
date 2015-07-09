@@ -44,6 +44,14 @@ class MutableTransaction extends Transaction implements MutableTransactionInterf
     }
 
     /**
+     * @return string
+     */
+    public function getTransactionId()
+    {
+        return $this->createTransactionId();
+    }
+
+    /**
      * Get the array of inputs in the transaction
      *
      * @return MutableTransactionInputCollection
@@ -104,8 +112,6 @@ class MutableTransaction extends Transaction implements MutableTransactionInterf
      */
     public function getBuffer()
     {
-        $serializer = new TransactionSerializer();
-        $hex = $serializer->serialize($this);
-        return $hex;
+        return $this->createBuffer();
     }
 }

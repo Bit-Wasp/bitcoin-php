@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -49,7 +50,7 @@ class TransactionSerializer
 
     /**
      * @param TransactionInterface $transaction
-     * @return string
+     * @return Buffer
      */
     public function serialize(TransactionInterface $transaction)
     {
