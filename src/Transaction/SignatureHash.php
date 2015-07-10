@@ -17,9 +17,9 @@ class SignatureHash implements SignatureHashInterface
     private $transaction;
 
     /**
-     * @param TransactionInterface $transaction
+     * @param AbstractTransactionInterface $transaction
      */
-    public function __construct(TransactionInterface $transaction)
+    public function __construct(AbstractTransactionInterface $transaction)
     {
         $this->transaction = $transaction->makeMutableCopy();
     }

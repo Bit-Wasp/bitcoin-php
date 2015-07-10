@@ -87,11 +87,11 @@ class TransactionBuilder
     /**
      * Create an input for this transaction spending $tx's output, $outputToSpend.
      *
-     * @param TransactionInterface $tx
+     * @param AbstractTransactionInterface $tx
      * @param $outputToSpend
      * @return $this
      */
-    public function spendOutput(TransactionInterface $tx, $outputToSpend)
+    public function spendOutput(AbstractTransactionInterface $tx, $outputToSpend)
     {
         // Check TransactionOutput exists in $tx
         $tx->getOutputs()->getOutput($outputToSpend);

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-interface MutableTransactionInterface extends TransactionInterface
+interface MutableTransactionInterface extends AbstractTransactionInterface
 {
 
     /**

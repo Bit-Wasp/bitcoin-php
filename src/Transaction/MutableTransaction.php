@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
-class MutableTransaction extends Transaction implements MutableTransactionInterface
+class MutableTransaction extends AbstractTransaction implements MutableTransactionInterface
 {
     /**
      * @param int|string $version

@@ -203,11 +203,11 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @param TransactionInterface $tx
+     * @param AbstractTransactionInterface $tx
      * @param integer $inputToExtract
      * @throws \Exception
      */
-    public function extractSigs(TransactionInterface $tx, $inputToExtract)
+    public function extractSigs(AbstractTransactionInterface $tx, $inputToExtract)
     {
         $parsed = $tx
             ->getInputs()
