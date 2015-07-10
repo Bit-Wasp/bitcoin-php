@@ -266,7 +266,7 @@ class TransactionBuilder
             }
 
             $input = $transaction->getInputs()->getInput($i);
-            $transaction->getInputs()->setInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), $script, $input->getSequence()));
+            $transaction->getInputs()->replaceInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), $script, $input->getSequence()));
         }
 
         return $transaction->makeImmutableCopy();

@@ -50,12 +50,12 @@ class SignatureHash implements SignatureHashInterface
         for ($i = 0; $i < $inputCount; $i++) {
             // null the script
             $input = $inputs->getInput($i);
-            $inputs->setInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), new Script(), $input->getSequence()));
+            $inputs->replaceInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), new Script(), $input->getSequence()));
         }
 
         // set the $txOutScript
         $inputToSign = $inputs->getInput($inputToSignIdx);
-        $inputs->setInput($inputToSignIdx, new TransactionInput($inputToSign->getTransactionId(), $inputToSign->getVout(), $txOutScript, $inputToSign->getSequence()));
+        $inputs->replaceInput($inputToSignIdx, new TransactionInput($inputToSign->getTransactionId(), $inputToSign->getVout(), $txOutScript, $inputToSign->getSequence()));
         $math = Bitcoin::getMath();
 
         if ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_NONE) {
@@ -68,7 +68,7 @@ class SignatureHash implements SignatureHashInterface
                 if ($math->cmp($i, $inputToSignIdx) !== 0) {
                     // 0 the sequence
                     $input = $inputs->getInput($i);
-                    $inputs->setInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), $input->getScript(), 0));
+                    $inputs->replaceInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), $input->getScript(), 0));
                 }
             }
 
@@ -97,7 +97,7 @@ class SignatureHash implements SignatureHashInterface
                 if ($math->cmp($i, $inputToSignIdx) !== 0) {
                     // 0 the sequence
                     $input = $inputs->getInput($i);
-                    $inputs->setInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), $input->getScript(), 0));
+                    $inputs->replaceInput($i, new TransactionInput($input->getTransactionId(), $input->getVout(), $input->getScript(), 0));
                 }
             }
         }

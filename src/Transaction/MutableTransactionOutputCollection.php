@@ -20,8 +20,12 @@ class MutableTransactionOutputCollection extends TransactionOutputCollection
      * @param int                       $i
      * @param TransactionOutputInterface $output
      */
-    public function setOutput($i, TransactionOutputInterface $output)
+    public function replaceOutput($i, TransactionOutputInterface $output)
     {
+        if (!isset($this->outputs[$i])) {
+            throw new \InvalidArgumentException();
+        }
+
         $this->outputs[$i] = $output;
     }
 

@@ -21,8 +21,12 @@ class MutableTransactionInputCollection extends TransactionInputCollection
      * @param int                       $i
      * @param TransactionInputInterface $input
      */
-    public function setInput($i, TransactionInputInterface $input)
+    public function replaceInput($i, TransactionInputInterface $input)
     {
+        if (!isset($this->inputs[$i])) {
+            throw new \InvalidArgumentException();
+        }
+
         $this->inputs[$i] = $input;
     }
 
