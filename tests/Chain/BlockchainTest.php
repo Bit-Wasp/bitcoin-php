@@ -14,7 +14,9 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Utxo\UtxoSet;
 use BitWasp\Buffertools\Buffer;
 use Doctrine\Common\Cache\ArrayCache;
@@ -143,16 +145,22 @@ class BlockchainTest extends AbstractTestCase
             $utxos
         );
 
-        $cb = new Transaction();
-        $cb->getInputs()->addInput(new TransactionInput(
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            0,
-            new Script()
-        ));
-        $cb->getOutputs()->addOutput(new TransactionOutput(
-            100000000,
-            new Script()
-        ));
+        $cb = new Transaction(
+            Transaction::DEFAULT_VERSION,
+            new TransactionInputCollection([
+                new TransactionInput(
+                    '0000000000000000000000000000000000000000000000000000000000000000',
+                    0,
+                    new Script()
+                )
+            ]),
+            new TransactionOutputCollection([
+                new TransactionOutput(
+                    100000000,
+                    new Script()
+                )
+            ])
+        );
 
         // References wrong prevBlock
         $invalid = new Block(
@@ -199,16 +207,22 @@ class BlockchainTest extends AbstractTestCase
             $utxos
         );
 
-        $cb = new Transaction();
-        $cb->getInputs()->addInput(new TransactionInput(
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            0,
-            new Script()
-        ));
-        $cb->getOutputs()->addOutput(new TransactionOutput(
-            100000000,
-            new Script()
-        ));
+        $cb = new Transaction(
+            Transaction::DEFAULT_VERSION,
+            new TransactionInputCollection([
+                new TransactionInput(
+                    '0000000000000000000000000000000000000000000000000000000000000000',
+                    0,
+                    new Script()
+                )
+            ]),
+            new TransactionOutputCollection([
+                new TransactionOutput(
+                    100000000,
+                    new Script()
+                )
+            ])
+        );
 
         // References wrong prevBlock
         $invalid = new Block(

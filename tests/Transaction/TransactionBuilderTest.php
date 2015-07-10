@@ -12,13 +12,18 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\MutableTransaction;
+use BitWasp\Bitcoin\Transaction\MutableTransactionInput;
+use BitWasp\Bitcoin\Transaction\MutableTransactionOutput;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionBuilder;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Utxo\Utxo;
 
 class TransactionBuilderTest extends AbstractTestCase
@@ -84,9 +89,11 @@ class TransactionBuilderTest extends AbstractTestCase
         $input = new TransactionInput('5a4ebf66822b0b2d56bd9dc64ece0bc38ee7844a23ff1d7320a88c5fdb2ad3e2', 0);
         $output = new TransactionOutput(50, new Script());
 
-        $tx = new Transaction();
-        $tx->getInputs()->addInput($input);
-        $tx->getOutputs()->addOutput($output);
+        $tx = new Transaction(
+            Transaction::DEFAULT_VERSION,
+            new TransactionInputCollection([$input]),
+            new TransactionOutputCollection([$output])
+        );
 
         $ecAdapter = $this->safeEcAdapter();
         $builder = new TransactionBuilder($ecAdapter, $tx);
@@ -100,9 +107,11 @@ class TransactionBuilderTest extends AbstractTestCase
         $input = new TransactionInput('5a4ebf66822b0b2d56bd9dc64ece0bc38ee7844a23ff1d7320a88c5fdb2ad3e2', 0);
         $output = new TransactionOutput(50, new Script());
 
-        $tx = new Transaction();
-        $tx->getInputs()->addInput($input);
-        $tx->getOutputs()->addOutput($output);
+        $tx = new Transaction(
+            Transaction::DEFAULT_VERSION,
+            new TransactionInputCollection([$input]),
+            new TransactionOutputCollection([$output])
+        );
 
         $txid = $tx->getTransactionId();
         $nOut = 0;
@@ -178,7 +187,7 @@ class TransactionBuilderTest extends AbstractTestCase
 
             $privateKey = PrivateKeyFactory::create();
             $outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
-            $sampleSpendTx = new Transaction();
+            $sampleSpendTx = new MutableTransaction();
             $sampleSpendTx->getInputs()->addInput(new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0));
             $sampleSpendTx->getOutputs()->addOutput(new TransactionOutput(
                 50,
@@ -202,7 +211,7 @@ class TransactionBuilderTest extends AbstractTestCase
 
         $privateKey = PrivateKeyFactory::create();
         $outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
-        $sampleSpendTx = new Transaction();
+        $sampleSpendTx = new MutableTransaction();
         $sampleSpendTx->getInputs()->addInput(new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0));
         $sampleSpendTx->getOutputs()->addOutput(new TransactionOutput(
             50,
@@ -245,7 +254,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $pk2 = PrivateKeyFactory::create();
         $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
 
-        $spendTx = new Transaction();
+        $spendTx = new MutableTransaction();
         $spendTx->getInputs()->addInput(new TransactionInput(
             '4141414141414141414141414141414141414141414141414141414141414141',
             0
@@ -283,7 +292,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $privateKey = PrivateKeyFactory::fromHex('f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b');
         $outputScript = ScriptFactory::scriptPubKey()->paytoPubKey($privateKey->getPublicKey());
 
-        $spendTx = new Transaction();
+        $spendTx = new MutableTransaction();
         $spendTx->getInputs(0)->addInput(new TransactionInput(
             '4141414141414141414141414141414141414141414141414141414141414141',
             0
@@ -309,7 +318,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $privateKey = PrivateKeyFactory::fromHex('421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87');
         $outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
 
-        $spendTx = new Transaction();
+        $spendTx = new MutableTransaction();
         $spendTx->getInputs(0)->addInput(new TransactionInput(
             '4141414141414141414141414141414141414141414141414141414141414141',
             0
@@ -338,7 +347,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
         $outputScript = $redeemScript->getOutputScript();
 
-        $spendTx = new Transaction();
+        $spendTx = new MutableTransaction();
         $spendTx->getInputs(0)->addInput(new TransactionInput(
             '4141414141414141414141414141414141414141414141414141414141414141',
             0
@@ -370,7 +379,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $outputScript = ScriptFactory::scriptPubKey()->payToPubKey($pk1->getPublicKey());
 
         // This is the transaction we are pretending exists in the blockchain
-        $spendTx = new Transaction();
+        $spendTx = new MutableTransaction();
         $spendTx->getInputs(0)->addInput(new TransactionInput(
             '4141414141414141414141414141414141414141414141414141414141414141',
             0
@@ -431,7 +440,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($pk1->getPublicKey());
 
         // This is the transaction we are pretending exists in the blockchain
-        $spendTx = new Transaction();
+        $spendTx = new MutableTransaction();
         $spendTx->getInputs(0)->addInput(new TransactionInput(
             '4141414141414141414141414141414141414141414141414141414141414141',
             0
@@ -496,7 +505,7 @@ class TransactionBuilderTest extends AbstractTestCase
         $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
         $outputScript = $redeemScript->getOutputScript();
 
-        $spendTx = new Transaction();
+        $spendTx = new MutableTransaction();
         $spendTx->getInputs(0)->addInput(new TransactionInput(
             '4141414141414141414141414141414141414141414141414141414141414141',
             0

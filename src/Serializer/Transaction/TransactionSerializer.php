@@ -2,6 +2,10 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Bitcoin\Transaction\AbstractTransactionInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -46,10 +50,10 @@ class TransactionSerializer
     }
 
     /**
-     * @param TransactionInterface $transaction
-     * @return string
+     * @param AbstractTransactionInterface $transaction
+     * @return Buffer
      */
-    public function serialize(TransactionInterface $transaction)
+    public function serialize(AbstractTransactionInterface $transaction)
     {
         return $this->getTemplate()->write([
             $transaction->getVersion(),
@@ -72,9 +76,7 @@ class TransactionSerializer
         $txIns = $parse[1];
         $txOuts = $parse[2];
         $locktime = $parse[3];
-        $tx = new Transaction($version, null, null, $locktime);
-        $tx->getInputs()->addInputs($txIns);
-        $tx->getOutputs()->addOutputs($txOuts);
+        $tx = new Transaction($version, new TransactionInputCollection($txIns), new TransactionOutputCollection($txOuts), $locktime);
 
         return $tx;
     }

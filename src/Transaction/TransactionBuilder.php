@@ -46,7 +46,7 @@ class TransactionBuilder
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
     {
-        $this->transaction = $tx ?: new Transaction();
+        $this->transaction = $tx ? $tx->makeMutableCopy() : new MutableTransaction();
         $this->ecAdapter = $ecAdapter;
     }
 
@@ -87,11 +87,11 @@ class TransactionBuilder
     /**
      * Create an input for this transaction spending $tx's output, $outputToSpend.
      *
-     * @param TransactionInterface $tx
+     * @param AbstractTransactionInterface $tx
      * @param $outputToSpend
      * @return $this
      */
-    public function spendOutput(TransactionInterface $tx, $outputToSpend)
+    public function spendOutput(AbstractTransactionInterface $tx, $outputToSpend)
     {
         // Check TransactionOutput exists in $tx
         $tx->getOutputs()->getOutput($outputToSpend);
@@ -265,10 +265,10 @@ class TransactionBuilder
                 $script = $this->transaction->getInputs()->getInput($i)->getScript();
             }
 
-            $transaction->getInputs()->getInput($i)->setScript($script);
+            $transaction->getInputs()->replaceInput($i, $transaction->getInputs()->getInput($i)->copyWithNewScript($script));
         }
 
-        return $transaction;
+        return $transaction->makeImmutableCopy();
     }
 
     /**

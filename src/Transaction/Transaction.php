@@ -9,40 +9,32 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
-class Transaction extends Serializable implements TransactionInterface
+class Transaction extends AbstractTransaction implements TransactionInterface
 {
     /**
-     * @var int|string
+     * @var Buffer|null
      */
-    private $version;
+    private $raw = null;
 
     /**
-     * @var TransactionInputCollection
+     * @var string|null
      */
-    private $inputs;
+    private $txId = null;
 
     /**
-     * @var TransactionOutputCollection
-     */
-    private $outputs;
-
-    /**
-     * @var int|string
-     */
-    private $locktime;
-
-    /**
-     * @param int|string $version
-     * @param TransactionInputCollection $inputs
+     * @param int|string                  $version
+     * @param TransactionInputCollection  $inputs
      * @param TransactionOutputCollection $outputs
-     * @param int|string $locktime
+     * @param int|string                  $locktime
+     * @param Buffer                      $raw
      * @throws \Exception
      */
     public function __construct(
         $version = TransactionInterface::DEFAULT_VERSION,
         TransactionInputCollection $inputs = null,
         TransactionOutputCollection $outputs = null,
-        $locktime = '0'
+        $locktime = '0',
+        Buffer $raw = null
     ) {
 
         if (!is_numeric($version)) {
@@ -61,6 +53,7 @@ class Transaction extends Serializable implements TransactionInterface
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
         $this->locktime = $locktime;
+        $this->raw = $raw;
     }
 
     /**
@@ -68,126 +61,11 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTransactionId()
     {
-        $hash = bin2hex(Buffertools::flipBytes(Hash::sha256d($this->getBuffer())));
-
-        return $hash;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getVersion()
-    {
-        return $this->version;
-    }
-
-    /**
-     * @param TransactionInputCollection $inputs
-     * @return $this
-     */
-    public function setInputs(TransactionInputCollection $inputs)
-    {
-        $this->inputs = $inputs;
-        return $this;
-    }
-
-    /**
-     * Get the array of inputs in the transaction
-     *
-     * @return TransactionInputCollection
-     */
-    public function getInputs()
-    {
-        return $this->inputs;
-    }
-
-    /**
-     * @param TransactionOutputCollection $outputs
-     * @return $this
-     */
-    public function setOutputs(TransactionOutputCollection $outputs)
-    {
-        $this->outputs = $outputs;
-        return $this;
-    }
-
-    /**
-     * Get Outputs
-     *
-     * @return TransactionOutputCollection
-     */
-    public function getOutputs()
-    {
-        return $this->outputs;
-    }
-
-    /**
-     * Get Lock Time
-     *
-     * @return int|string
-     */
-    public function getLockTime()
-    {
-        return $this->locktime;
-    }
-
-    /**
-     * Set Lock Time
-     * @param int $locktime
-     * @return $this
-     * @throws \Exception
-     */
-    public function setLockTime($locktime)
-    {
-        if (Bitcoin::getMath()->cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
-            throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
+        if ($this->txId === null) {
+            $this->txId = $this->createTransactionId();
         }
 
-        $this->locktime = $locktime;
-        return $this;
-    }
-
-    /**
-     * @return SignatureHash
-     */
-    public function getSignatureHash()
-    {
-        return new SignatureHash($this);
-    }
-
-    /**
-     * @return Transaction
-     */
-    public function makeCopy()
-    {
-        return new Transaction(
-            $this->getVersion(),
-            new TransactionInputCollection(
-                array_map(
-                    function (TransactionInputInterface $value) {
-                        return new TransactionInput(
-                            $value->getTransactionId(),
-                            $value->getVout(),
-                            clone $value->getScript(),
-                            $value->getSequence()
-                        );
-                    },
-                    $this->getInputs()->getInputs()
-                )
-            ),
-            new TransactionOutputCollection(
-                array_map(
-                    function (TransactionOutputInterface $value) {
-                            return new TransactionOutput(
-                                $value->getValue(),
-                                clone $value->getScript()
-                            );
-                    },
-                    $this->getOutputs()->getOutputs()
-                )
-            ),
-            $this->getLockTime()
-        );
+        return $this->txId;
     }
 
     /**
@@ -195,8 +73,10 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
-        $serializer = new TransactionSerializer();
-        $hex = $serializer->serialize($this);
-        return $hex;
+        if ($this->raw === null) {
+            $this->raw = $this->createBuffer();
+        }
+
+        return $this->raw;
     }
 }

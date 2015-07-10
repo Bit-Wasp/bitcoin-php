@@ -9,7 +9,7 @@ class TransactionOutputCollection extends Collection
     /**
      * @var TransactionOutput[]
      */
-    private $outputs = [];
+    protected $outputs = [];
 
     /**
      * Initialize a new collection with a list of outputs.
@@ -18,29 +18,8 @@ class TransactionOutputCollection extends Collection
      */
     public function __construct(array $outputs = [])
     {
-        $this->addOutputs($outputs);
-    }
-
-    /**
-     * Adds an output to the collection.
-     *
-     * @param TransactionOutputInterface $output
-     */
-    public function addOutput(TransactionOutputInterface $output)
-    {
-        $this->outputs[] = $output;
-    }
-
-    /**
-     * Adds a list of outputs to the collection
-     *
-     * @param TransactionOutputInterface[] $outputs
-     */
-    public function addOutputs(array $outputs)
-    {
-        foreach ($outputs as $output) {
-            $this->addOutput($output);
-        }
+        // array_map to force instanceof TransactionOutputInterface
+        $this->outputs = array_map(function(TransactionOutputInterface $output) { return $output; }, $outputs);
     }
 
     /**
@@ -83,10 +62,20 @@ class TransactionOutputCollection extends Collection
      *
      * @param int $start
      * @param int $length
-     * @return \BitWasp\Bitcoin\Transaction\TransactionOutputCollection
+     * @return static
      */
     public function slice($start, $length)
     {
-        return new self(array_slice($this->outputs, $start, $length));
+        return new static(array_slice($this->outputs, $start, $length));
+    }
+
+    public function makeImmutableCopy()
+    {
+        return new TransactionOutputCollection($this->getOutputs());
+    }
+
+    public function makeMutableCopy()
+    {
+        return new MutableTransactionOutputCollection($this->getOutputs());
     }
 }

@@ -24,12 +24,12 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     /**
      * @var string|int
      */
-    private $sequence;
+    protected $sequence;
 
     /**
      * @var ScriptInterface
      */
-    private $script;
+    protected $script;
 
     /**
      * @param string|null $txid
@@ -94,18 +94,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * Set a Script
-     *
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
-    }
-
-    /**
      * Check whether this transaction is a coinbase transaction
      *
      * @return boolean
@@ -124,5 +112,21 @@ class TransactionInput extends Serializable implements TransactionInputInterface
         $serializer = new TransactionInputSerializer();
         $out = $serializer->serialize($this);
         return $out;
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @return TransactionInput
+     */
+    public function copyWithNewScript(ScriptInterface $script) {
+        return new TransactionInput($this->getTransactionId(), $this->getVout(), $script, $this->getSequence());
+    }
+
+    /**
+     * @param int $sequence
+     * @return TransactionInput
+     */
+    public function copyWithNewSequence($sequence) {
+        return new TransactionInput($this->getTransactionId(), $this->getVout(), $this->getScript(), $sequence);
     }
 }
