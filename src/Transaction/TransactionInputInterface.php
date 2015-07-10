@@ -45,4 +45,16 @@ interface TransactionInputInterface
      * @return bool
      */
     public function isCoinBase();
+
+    /**
+     * @param ScriptInterface $script
+     * @return TransactionInput
+     */
+    public function copyWithNewScript(ScriptInterface $script);
+
+    /**
+     * @param int $sequence
+     * @return TransactionInput
+     */
+    public function copyWithNewSequence($sequence);
 }

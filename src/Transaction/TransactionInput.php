@@ -113,4 +113,20 @@ class TransactionInput extends Serializable implements TransactionInputInterface
         $out = $serializer->serialize($this);
         return $out;
     }
+
+    /**
+     * @param ScriptInterface $script
+     * @return TransactionInput
+     */
+    public function copyWithNewScript(ScriptInterface $script) {
+        return new TransactionInput($this->getTransactionId(), $this->getVout(), $script, $this->getSequence());
+    }
+
+    /**
+     * @param int $sequence
+     * @return TransactionInput
+     */
+    public function copyWithNewSequence($sequence) {
+        return new TransactionInput($this->getTransactionId(), $this->getVout(), $this->getScript(), $sequence);
+    }
 }
