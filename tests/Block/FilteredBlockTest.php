@@ -34,6 +34,11 @@ class FilteredBlockTest extends AbstractTestCase
         $serializer = new FilteredBlockSerializer(new HexBlockHeaderSerializer(), new PartialMerkleTreeSerializer());
         $parsed = $serializer->parse($serialized);
         $this->assertEquals($filtered, $parsed);
-    }
 
+        $tree = $filtered->getPartialTree();
+        /** @var \BitWasp\Buffertools\Buffer[] $matches */
+        $matches = [];
+        $extracted = $tree->extractMatches($matches);
+        $this->assertEquals($block->getHeader()->getMerkleRoot(), $extracted->getHex());
+    }
 }
