@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Bloom\BloomFilter;
 
 class Block extends Serializable implements BlockInterface
 {
@@ -68,6 +69,30 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
+     * @param BloomFilter $filter
+     * @return FilteredBlock
+     */
+    public function filter(BloomFilter $filter)
+    {
+        $vMatch = [];
+        $vHashes = [];
+
+        $txns = $this->getTransactions();
+        for ($i = 0, $txCount = count($txns); $i < $txCount; $i++) {
+            $tx = $txns->getTransaction($i);
+            $vMatch[] = $filter->isRelevantAndUpdate($tx);
+
+            $txid = $tx->getTransactionId();
+            $vHashes[] = \BitWasp\Buffertools\Buffer::hex($txid);
+        }
+
+        return new FilteredBlock(
+            $this->getHeader(),
+            PartialMerkleTree::create($txCount, $vHashes, $vMatch)
+        );
+    }
+
+    /**
      * {@inheritdoc}
      * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
@@ -79,7 +104,6 @@ class Block extends Serializable implements BlockInterface
             new TransactionSerializer()
         );
 
-        $hex = $serializer->serialize($this);
-        return $hex;
+        return $serializer->serialize($this);
     }
 }
