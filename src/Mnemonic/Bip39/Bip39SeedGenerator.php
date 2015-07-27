@@ -31,7 +31,7 @@ class Bip39SeedGenerator
             if (mb_detect_encoding($string) == "UTF-8") {
                 throw new \Exception("UTF-8 passphrase is not supported without the PECL intl extension installed.");
             } else {
-                return $string;
+                return new Buffer($string);
             }
         }
 
