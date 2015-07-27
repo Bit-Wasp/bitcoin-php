@@ -63,6 +63,11 @@ class Transaction extends Serializable implements TransactionInterface
         $this->locktime = $locktime;
     }
 
+    public function getTransactionHash()
+    {
+        return Hash::sha256d($this->getBuffer());
+    }
+
     /**
      * @return string
      */

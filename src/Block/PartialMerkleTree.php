@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Block;
 
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\PartialMerkleTreeSerializer;
 use BitWasp\Buffertools\Buffer;
@@ -54,9 +55,19 @@ class PartialMerkleTree extends Serializable
     public static function create($txCount, array $vTxHashes, array $vMatch)
     {
         $tree = new self($txCount);
-        $treeHeight = $tree->calcTreeHeight();
-        $tree->traverseAndBuild($treeHeight, 0, $vTxHashes, $vMatch);
+        $tree->traverseAndBuild($tree->calcTreeHeight(), 0, $vTxHashes, $vMatch);
         return $tree;
+    }
+
+    /**
+     * Calculate tree width for a given height.
+     *
+     * @param int $height
+     * @return int
+     */
+    public function calcTreeWidth($height)
+    {
+        return ($this->elementCount + (1 << $height) - 1) >> $height;
     }
 
     /**
@@ -99,26 +110,16 @@ class PartialMerkleTree extends Serializable
     }
 
     /**
-     * Calculate tree width for a given height.
-     *
-     * @param int $height
-     * @return int
-     */
-    public function calcTreeWidth($height)
-    {
-        return ($this->elementCount + (1 << $height) - 1) >> $height;
-    }
-
-    /**
      * Calculate the hash for the given $height and $position
      *
      * @param int $height
      * @param int $position
-     * @param array $vTxid
+     * @param \BitWasp\Buffertools\Buffer[] $vTxid
      * @return \BitWasp\Buffertools\Buffer
      */
     public function calculateHash($height, $position, array $vTxid)
     {
+
         if ($height == 0) {
             return $vTxid[$position];
         } else {
@@ -129,7 +130,8 @@ class PartialMerkleTree extends Serializable
                 $right = $left;
             }
 
-            return Buffertools::concat($left, $right);
+            $hash = Hash::sha256(Buffertools::concat($left, $right));
+            return new Buffer(Buffertools::flipBytes($hash));
         }
     }
 
@@ -144,24 +146,18 @@ class PartialMerkleTree extends Serializable
     public function traverseAndBuild($height, $position, array $vTxid, array &$vMatch)
     {
         $parent = false;
-        for ($p = ($position << $height); $p < (($position + 1) << $height) && $p < $this->elementCount; $p++) {
-            $parent = $parent || $vMatch[$p];
+        for ($p = $position << $height; $p < ($position + 1) << $height && $p < $this->elementCount; $p++) {
+            $parent |= $vMatch[$p];
         }
 
         $this->vFlagBits[] = $parent;
 
         if (0 == $height || !$parent) {
-            $hash = $this->calculateHash($height, $position, $vTxid);
-            $this->vHashes = array_map(
-                function ($value) {
-                    return new Buffer($value, 32);
-                },
-                str_split($hash->getBinary(), 32)
-            );
+            $this->vHashes[] = $this->calculateHash($height, $position, $vTxid);
         } else {
-            $this->traverseAndBuild($height - 1, 2 * $position, $vTxid, $vMatch);
-            if (($position * 2 - 1) > $this->calcTreeWidth($height - 1)) {
-                $this->traverseAndBuild($height - 1, 2 * $position + 1, $vTxid, $vMatch);
+            $this->traverseAndBuild($height - 1, $position * 2, $vTxid, $vMatch);
+            if (($position * 2 + 1) < $this->calcTreeWidth($height - 1)) {
+                $this->traverseAndBuild($height - 1, $position * 2 + 1, $vTxid, $vMatch);
             }
         }
     }

@@ -35,6 +35,9 @@ class PartialMerkleTreeSerializer
     {
         list ($txCount, $vHash, $vBits) = $this->getTemplate()->parse($parser);
 
+        //var_dump(str_split($vBits->getBinary(), 1));
+        //var_dump($vBits);
+        //Bitcoin::getMath()->baseConvert($vBits->)
         return new PartialMerkleTree(
             (int)$txCount,
             $vHash,
@@ -76,10 +79,15 @@ class PartialMerkleTreeSerializer
         for ($p = 0; $p < $size; $p++) {
             $byteIndex = (int)floor($p / 8);
             $byte = ord($vBytes[$byteIndex]->getBinary());
+            echo $byte . "\n";
+            $v =(1 << ($p % 8));
+            echo " [ " . $v . "\n";
 
             $vBits[$p] = ($byte & (1 << ($p % 8))) != 0;
+            echo $vBits[$p] . "\n";
+            echo "---\n";
         }
-
+        var_dump($vBits);
         return array_slice($vBits, 0, $last);
         return $vBits;
     }
