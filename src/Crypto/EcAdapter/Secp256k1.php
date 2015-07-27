@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -12,9 +13,22 @@ use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Bitcoin\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
 use BitWasp\Bitcoin\Signature\SignatureInterface;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class Secp256k1 extends BaseEcAdapter
 {
+    private $context;
+
+    public function __construct(Math $math, GeneratorPoint $generator, $context)
+    {
+        if (get_resource_type($context) !== 'secp256k1_context_t') {
+            throw new \InvalidArgumentException('Must pass initialized secp256k1 context');
+        }
+
+        $this->context = $context;
+        parent::__construct($math, $generator);
+    }
+
     /**
      * @return int
      */
@@ -63,6 +77,7 @@ class Secp256k1 extends BaseEcAdapter
     {
         $sigStr = '';
         $ret = \secp256k1_ecdsa_sign(
+            $this->context,
             $messageHash->getBinary(),
             $privateKey->getBuffer()->getBinary(),
             $sigStr
@@ -87,6 +102,7 @@ class Secp256k1 extends BaseEcAdapter
         $sigStr = '';
         $recid = 0;
         $ret = \secp256k1_ecdsa_sign_compact(
+            $this->context,
             $messageHash->getBinary(),
             $privateKey->getBuffer()->getBinary(),
             $sigStr,
@@ -117,6 +133,7 @@ class Secp256k1 extends BaseEcAdapter
     {
         $pubkey = '';
         $ret = \secp256k1_ecdsa_recover_compact(
+            $this->context,
             $messageHash->getBinary(),
             $signature->getBuffer()->slice(1)->getBinary(),
             (int)$signature->getRecoveryId(),
@@ -142,6 +159,7 @@ class Secp256k1 extends BaseEcAdapter
     public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
     {
         $ret = \secp256k1_ecdsa_verify(
+            $this->context,
             $messageHash->getBinary(),
             $signature->getBuffer()->getBinary(),
             $publicKey->getBuffer()->getBinary()
@@ -153,9 +171,7 @@ class Secp256k1 extends BaseEcAdapter
             throw new \Exception('Secp256k1 verify: Invalid signature');
         }
 
-        return ($ret === 1)
-            ? true
-            : false;
+        return $ret === 1;
     }
 
     /**
@@ -164,8 +180,7 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function validatePrivateKey(Buffer $privateKey)
     {
-        $ret = (bool) \secp256k1_ec_seckey_verify($privateKey->getBinary());
-        return $ret;
+        return (bool) \secp256k1_ec_seckey_verify($this->context, $privateKey->getBinary());
     }
 
     /**
@@ -174,8 +189,7 @@ class Secp256k1 extends BaseEcAdapter
      */
     public function validatePublicKey(Buffer $publicKey)
     {
-        $ret = (bool) \secp256k1_ec_pubkey_verify($publicKey->getBinary());
-        return $ret;
+        return (bool) \secp256k1_ec_pubkey_verify($this->context, $publicKey->getBinary());
     }
 
     /**
@@ -187,6 +201,7 @@ class Secp256k1 extends BaseEcAdapter
     {
         $publicKey = '';
         $ret = \secp256k1_ec_pubkey_create(
+            $this->context,
             $privateKey->getBuffer()->getBinary(),
             (int)$privateKey->isCompressed(),
             $publicKey
@@ -210,6 +225,7 @@ class Secp256k1 extends BaseEcAdapter
     {
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
         $ret = (bool) \secp256k1_ec_privkey_tweak_mul(
+            $this->context,
             $privKey,
             $this->getBinaryScalar($integer)
         );
@@ -231,6 +247,7 @@ class Secp256k1 extends BaseEcAdapter
     {
         $privKey = $privateKey->getBuffer()->getBinary(); // mod by reference
         $ret = (bool) \secp256k1_ec_privkey_tweak_add(
+            $this->context,
             $privKey,
             $this->getBinaryScalar($integer)
         );
@@ -252,6 +269,7 @@ class Secp256k1 extends BaseEcAdapter
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
         $ret = (bool) \secp256k1_ec_pubkey_tweak_add(
+            $this->context,
             $pubKey,
             $this->getBinaryScalar($integer)
         );
@@ -273,6 +291,7 @@ class Secp256k1 extends BaseEcAdapter
     {
         $pubKey = $publicKey->getBuffer()->getBinary();
         $ret = (bool) \secp256k1_ec_pubkey_tweak_mul(
+            $this->context,
             $pubKey,
             $this->getBinaryScalar($integer)
         );

@@ -50,6 +50,17 @@ class EcAdapterFactory
         return new PhpEcc($math, $generator);
     }
 
+    private static $context;
+
+    public static function getSecp256k1Context($flags = null)
+    {
+        if (self::$context == null) {
+            self::$context = secp256k1_context_create($flags ?: SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+        }
+
+        return self::$context;
+    }
+
     /**
      * @param Math $math
      * @param GeneratorPoint $generator
@@ -57,6 +68,6 @@ class EcAdapterFactory
      */
     public static function getSecp256k1(Math $math, GeneratorPoint $generator)
     {
-        return new Secp256k1($math, $generator);
+        return new Secp256k1($math, $generator, self::getSecp256k1Context());
     }
 }
