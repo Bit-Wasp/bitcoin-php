@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Serializer\Block;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\PartialMerkleTree;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
@@ -35,9 +34,6 @@ class PartialMerkleTreeSerializer
     {
         list ($txCount, $vHash, $vBits) = $this->getTemplate()->parse($parser);
 
-        //var_dump(str_split($vBits->getBinary(), 1));
-        //var_dump($vBits);
-        //Bitcoin::getMath()->baseConvert($vBits->)
         return new PartialMerkleTree(
             (int)$txCount,
             $vHash,
@@ -72,24 +68,15 @@ class PartialMerkleTreeSerializer
     public function buffersToBitArray($last, array $vBytes)
     {
         $size = count($vBytes) * 8;
-        //$vBits = str_split(str_pad('', $size, chr('0'), STR_PAD_LEFT), 1);
-
         $vBits = [];
 
         for ($p = 0; $p < $size; $p++) {
             $byteIndex = (int)floor($p / 8);
             $byte = ord($vBytes[$byteIndex]->getBinary());
-            echo $byte . "\n";
-            $v =(1 << ($p % 8));
-            echo " [ " . $v . "\n";
-
             $vBits[$p] = ($byte & (1 << ($p % 8))) != 0;
-            echo $vBits[$p] . "\n";
-            echo "---\n";
         }
-        var_dump($vBits);
+
         return array_slice($vBits, 0, $last);
-        return $vBits;
     }
 
     /**
@@ -107,18 +94,10 @@ class PartialMerkleTreeSerializer
      */
     public function serialize(PartialMerkleTree $tree)
     {
-        $flipped = array_map(
-            function (Buffer $value) {
-                return $value->getBinary();
-            },
-            $tree->getHashes()
-        );
-
-        $padded = $this->bitsToBuffers($tree->getFlagBits());
         return $this->getTemplate()->write([
             $tree->getTxCount(),
             $tree->getHashes(),
-            $padded
+            $this->bitsToBuffers($tree->getFlagBits())
         ]);
     }
 }
