@@ -98,7 +98,7 @@ class ScriptParser
      * @param Buffer $pushData
      * @return bool
      */
-    public function next(&$opCode, &$pushData)
+    public function next(&$opCode, Buffer &$pushData)
     {
         $opcodes = $this->script->getOpcodes();
         $opCode = $opcodes->getOpByName('OP_INVALIDOPCODE');
@@ -148,7 +148,7 @@ class ScriptParser
     public function parse()
     {
         $data = array();
-
+        $pushData = new Buffer();
         while ($this->next($opCode, $pushData)) {
             if ($opCode < 1) {
                 $push = Buffer::hex('00');
