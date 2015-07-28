@@ -56,6 +56,11 @@ class BloomFilter extends Serializable
     private $nTweak;
 
     /**
+     * @var Flags
+     */
+    private $flags;
+
+    /**
      * @param Math $math
      * @param array $vFilter
      * @param int $numHashFuncs
