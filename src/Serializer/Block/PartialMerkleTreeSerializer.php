@@ -19,7 +19,7 @@ class PartialMerkleTreeSerializer
         return (new TemplateFactory())
             ->uint32le()
             ->vector(function (Parser & $parser) {
-                return $parser->readBytes(32, true);
+                return $parser->readBytes(32);
             })
             ->vector(function (Parser & $parser) {
                 return $parser->readBytes(1);
@@ -109,7 +109,7 @@ class PartialMerkleTreeSerializer
     {
         $flipped = array_map(
             function (Buffer $value) {
-                return new Buffer(Buffertools::flipBytes($value->getBinary()));
+                return $value->getBinary();
             },
             $tree->getHashes()
         );
@@ -117,7 +117,7 @@ class PartialMerkleTreeSerializer
         $padded = $this->bitsToBuffers($tree->getFlagBits());
         return $this->getTemplate()->write([
             $tree->getTxCount(),
-            $flipped,
+            $tree->getHashes(),
             $padded
         ]);
     }

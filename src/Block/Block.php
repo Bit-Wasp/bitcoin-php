@@ -81,9 +81,7 @@ class Block extends Serializable implements BlockInterface
         for ($i = 0, $txCount = count($txns); $i < $txCount; $i++) {
             $tx = $txns->getTransaction($i);
             $vMatch[] = $filter->isRelevantAndUpdate($tx);
-
-            $txid = $tx->getTransactionId();
-            $vHashes[] = \BitWasp\Buffertools\Buffer::hex($txid);
+            $vHashes[] = $tx->getTxHash();
         }
 
         return new FilteredBlock(

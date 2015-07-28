@@ -130,8 +130,8 @@ class PartialMerkleTree extends Serializable
                 $right = $left;
             }
 
-            $hash = Hash::sha256(Buffertools::concat($left, $right));
-            return new Buffer(Buffertools::flipBytes($hash));
+            $hash = Hash::sha256d(Buffertools::concat($left, $right));
+            return $hash;
         }
     }
 
@@ -187,7 +187,7 @@ class PartialMerkleTree extends Serializable
             }
             $hash = $this->vHashes[$nHashUsed++];
             if ($height == 0 && $parent) {
-                $vMatch[] = $hash;
+                $vMatch[] = new Buffer(Buffertools::flipBytes($hash));
             }
             return $hash;
         } else {
@@ -201,7 +201,7 @@ class PartialMerkleTree extends Serializable
                 $right = $left;
             }
 
-            return Buffertools::concat($left, $right);
+            return Hash::sha256d(Buffertools::concat($left, $right));
         }
     }
 
@@ -235,6 +235,7 @@ class PartialMerkleTree extends Serializable
         $nBitsUsed = 0;
         $nHashesUsed = 0;
         $merkleRoot = $this->traverseAndExtract($height, 0, $nBitsUsed, $nHashesUsed, $vMatch);
+        $merkleRoot = new Buffer(Buffertools::flipBytes($merkleRoot));
         if ($this->fBad) {
             throw new \Exception('bad data');
         }

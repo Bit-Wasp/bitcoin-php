@@ -242,6 +242,7 @@ class BloomFilter extends Serializable
 
     /**
      * @param Buffer $data
+     * @return $this
      */
     public function insertData(Buffer $data)
     {
@@ -255,23 +256,26 @@ class BloomFilter extends Serializable
         }
 
         $this->updateEmptyFull();
+        return $this;
     }
 
     /**
      * @param string $txid
      * @param int $vout
+     * @return $this
      */
     public function insertOutpoint($txid, $vout)
     {
-        $this->insertData(new Buffer(pack("H64N", $txid, $vout)));
+        return $this->insertData(new Buffer(pack("H64N", $txid, $vout)));
     }
 
     /**
      * @param string $hash
+     * @return $this
      */
     public function insertHash($hash)
     {
-        $this->insertData(Buffer::hex($hash));
+        return $this->insertData(Buffer::hex($hash));
     }
 
     /**
