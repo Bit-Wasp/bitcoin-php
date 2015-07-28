@@ -365,7 +365,7 @@ class BloomFilter extends Serializable
             $script = $outputs->getOutput($i)->getScript();
             $parser = $script->getScriptParser();
             while ($parser->next($opCode, $pushData)) {
-                if ($pushData instanceof Buffer && $pushData->getSize() > 0 && $this->containsData($pushData)) {
+                if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
                     $found = true;
 
                     if ($this->isUpdateAll()) {
@@ -391,12 +391,11 @@ class BloomFilter extends Serializable
                 return true;
             }
 
-            $script = $txIn->getScript();
-            $parser = $script->getScriptParser();
+            $parser = $txIn->getScript()->getScriptParser();
             $opCode = null;
-            $pushData = null;
+            $pushData = new Buffer();
             while ($parser->next($opCode, $pushData)) {
-                if ($pushData instanceof Buffer && $pushData->getSize() > 0 && $this->containsData($pushData)) {
+                if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
                     return true;
                 }
             }

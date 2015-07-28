@@ -6,7 +6,7 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 
 class BlockHeader extends Serializable implements BlockHeaderInterface
 {
@@ -180,7 +180,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getBuffer()
     {
-        $serializer = new HexBlockHeaderSerializer();
+        $serializer = new BlockHeaderSerializer();
         $hex = $serializer->serialize($this);
         return $hex;
     }

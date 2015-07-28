@@ -9,9 +9,9 @@ use BitWasp\Bitcoin\Chain\BlockStorage;
 use BitWasp\Bitcoin\Chain\BlockIndex;
 use BitWasp\Bitcoin\Chain\Blockchain;
 use BitWasp\Bitcoin\Utxo\UtxoSet;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use Doctrine\Common\Cache\ArrayCache;
 
 if (!isset($argv[1])) {
@@ -27,9 +27,9 @@ $math = $ec->getMath();
 $network = Bitcoin::getDefaultNetwork();
 $bds = new \BitWasp\Bitcoin\Serializer\Block\BitcoindBlockSerializer(
     $network,
-    new HexBlockSerializer(
+    new BlockSerializer(
         $math,
-        new HexBlockHeaderSerializer(),
+        new BlockHeaderSerializer(),
         new TransactionSerializer()
     )
 );

@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Buffertools\TemplateFactory;
 
-class HexBlockHeaderSerializer
+class BlockHeaderSerializer
 {
     /**
      * @param $string

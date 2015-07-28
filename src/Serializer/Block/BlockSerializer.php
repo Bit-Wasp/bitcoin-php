@@ -11,7 +11,7 @@ use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Buffertools\TemplateFactory;
 
-class HexBlockSerializer
+class BlockSerializer
 {
     /**
      * @var Math
@@ -19,7 +19,7 @@ class HexBlockSerializer
     private $math;
 
     /**
-     * @var HexBlockHeaderSerializer
+     * @var BlockHeaderSerializer
      */
     private $headerSerializer;
 
@@ -30,10 +30,10 @@ class HexBlockSerializer
 
     /**
      * @param Math $math
-     * @param HexBlockHeaderSerializer $headerSerializer
+     * @param BlockHeaderSerializer $headerSerializer
      * @param TransactionSerializer $txSerializer
      */
-    public function __construct(Math $math, HexBlockHeaderSerializer $headerSerializer, TransactionSerializer $txSerializer)
+    public function __construct(Math $math, BlockHeaderSerializer $headerSerializer, TransactionSerializer $txSerializer)
     {
         $this->math = $math;
         $this->headerSerializer = $headerSerializer;

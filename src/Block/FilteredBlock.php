@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\FilteredBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Block\PartialMerkleTreeSerializer;
 use BitWasp\Buffertools\Buffer;
@@ -51,6 +51,6 @@ class FilteredBlock extends Serializable
      */
     public function getBuffer()
     {
-        return (new FilteredBlockSerializer(new HexBlockHeaderSerializer(), new PartialMerkleTreeSerializer()))->serialize($this);
+        return (new FilteredBlockSerializer(new BlockHeaderSerializer(), new PartialMerkleTreeSerializer()))->serialize($this);
     }
 }

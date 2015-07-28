@@ -4,8 +4,8 @@ namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
@@ -96,9 +96,9 @@ class Block extends Serializable implements BlockInterface
      */
     public function getBuffer()
     {
-        $serializer = new HexBlockSerializer(
+        $serializer = new BlockSerializer(
             $this->math,
-            new HexBlockHeaderSerializer(),
+            new BlockHeaderSerializer(),
             new TransactionSerializer()
         );
 

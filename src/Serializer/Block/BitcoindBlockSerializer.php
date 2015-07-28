@@ -16,15 +16,15 @@ class BitcoindBlockSerializer
     private $network;
 
     /**
-     * @var HexBlockSerializer
+     * @var BlockSerializer
      */
     private $blockSerializer;
 
     /**
      * @param NetworkInterface $network
-     * @param HexBlockSerializer $blockSerializer
+     * @param BlockSerializer $blockSerializer
      */
-    public function __construct(NetworkInterface $network, HexBlockSerializer $blockSerializer)
+    public function __construct(NetworkInterface $network, BlockSerializer $blockSerializer)
     {
         $this->network = $network;
         $this->blockSerializer = $blockSerializer;
