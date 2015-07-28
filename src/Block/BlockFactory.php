@@ -4,8 +4,8 @@ namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
 class BlockFactory
@@ -17,9 +17,9 @@ class BlockFactory
      */
     public static function fromHex($string, Math $math = null)
     {
-        $serializer = new HexBlockSerializer(
+        $serializer = new BlockSerializer(
             $math ?: Bitcoin::getMath(),
-            new HexBlockHeaderSerializer(),
+            new BlockHeaderSerializer(),
             new TransactionSerializer()
         );
 

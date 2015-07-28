@@ -10,7 +10,7 @@ class FilteredBlockSerializer
 {
 
     /**
-     * @var HexBlockHeaderSerializer
+     * @var BlockHeaderSerializer
      */
     private $headerSerializer;
 
@@ -20,10 +20,10 @@ class FilteredBlockSerializer
     private $treeSerializer;
 
     /**
-     * @param HexBlockHeaderSerializer $header
+     * @param BlockHeaderSerializer $header
      * @param PartialMerkleTreeSerializer $tree
      */
-    public function __construct(HexBlockHeaderSerializer $header, PartialMerkleTreeSerializer $tree)
+    public function __construct(BlockHeaderSerializer $header, PartialMerkleTreeSerializer $tree)
     {
         $this->headerSerializer = $header;
         $this->treeSerializer = $tree;

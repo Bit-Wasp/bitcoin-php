@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Block;
 
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 
 class BlockHeaderFactory
 {
@@ -13,7 +13,7 @@ class BlockHeaderFactory
      */
     public static function fromHex($string)
     {
-        $serializer = new HexBlockHeaderSerializer();
+        $serializer = new BlockHeaderSerializer();
         $block = $serializer->parse($string);
         return $block;
     }

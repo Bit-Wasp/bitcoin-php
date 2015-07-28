@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Serializer\Block\FilteredBlockSerializer;
-use BitWasp\Bitcoin\Serializer\Block\HexBlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\PartialMerkleTreeSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -32,7 +32,7 @@ class FilteredBlockTest extends AbstractTestCase
         $this->assertEquals($expectedMerkleBlockPayload, $serialized->getHex());
 
         // Check that the serialized NetworkMessage can be parsed again
-        $serializer = new FilteredBlockSerializer(new HexBlockHeaderSerializer(), new PartialMerkleTreeSerializer());
+        $serializer = new FilteredBlockSerializer(new BlockHeaderSerializer(), new PartialMerkleTreeSerializer());
         $parsed = $serializer->parse($serialized);
         $this->assertEquals($filtered, $parsed);
 
