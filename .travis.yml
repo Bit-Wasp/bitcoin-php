@@ -30,7 +30,7 @@ install:
           cd tests/Data \
           && git clone https://github.com/jonasnick/bitcoinconsensus_testcases.git  \
           && cd ../..; fi'
-    - composer update --prefer-source
+    - composer update
 
 script:
   - php $EXT_SECP256K1 vendor/bin/phpunit --coverage-clover build/logs/clover.xml
