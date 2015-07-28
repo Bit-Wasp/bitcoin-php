@@ -47,36 +47,6 @@ class FilteredBlock extends Serializable
     }
 
     /**
-     * Todo: Probably move this method..
-     *
-     * @param BlockInterface $block
-     * @param Buffer[] $vTxid
-     * @return FilteredBlock
-     */
-    public static function transactions(BlockInterface $block, array $vTxid)
-    {
-        $vMatch = [];
-        $vHashes = [];
-
-        $txns = $block->getTransactions();
-        for ($i = 0, $txCount = count($txns); $i < $txCount; $i++) {
-            $tx = $txns->getTransaction($i);
-            $txid = Buffer::hex($tx->getTransactionId());
-            $vMatch[] = in_array($txid, $vTxid);
-            $vHashes[] = $txid;
-        }
-
-        return new FilteredBlock(
-            $block->getHeader(),
-            new PartialMerkleTree(
-                $txCount,
-                $vHashes,
-                $vMatch
-            )
-        );
-    }
-
-    /**
      * @return Buffer
      */
     public function getBuffer()
