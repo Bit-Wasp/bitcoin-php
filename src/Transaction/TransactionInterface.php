@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Buffertools\Buffer;
 
 interface TransactionInterface extends SerializableInterface
 {
@@ -23,14 +24,21 @@ interface TransactionInterface extends SerializableInterface
     /**
      * Get the transaction ID
      *
-     * @return mixed
+     * @return string
      */
     public function getTransactionId();
 
     /**
+     * Get the transactions sha256d hash.
+     *
+     * @return Buffer
+     */
+    public function getTxHash();
+
+    /**
      * Get the version of this transaction
      *
-     * @return mixed
+     * @return int|string
      */
     public function getVersion();
 
@@ -52,7 +60,7 @@ interface TransactionInterface extends SerializableInterface
     /**
      * Return the locktime for this transaction
      *
-     * @return mixed
+     * @return int|string
      */
     public function getLockTime();
 

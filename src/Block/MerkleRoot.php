@@ -64,6 +64,7 @@ class MerkleRoot
      */
     public function calculateHash(callable $hashFunction = null)
     {
+
         $hashFxn = $hashFunction ?: function ($value) {
             return hash('sha256', hash('sha256', $value, true), true);
         };
