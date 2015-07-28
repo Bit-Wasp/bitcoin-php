@@ -401,6 +401,8 @@ class Interpreter implements InterpreterInterface
             return (bool)$c;
         };
 
+        $pushData = new Buffer();
+
         try {
             while ($parser->next($opCode, $pushData) === true) {
                 $fExec = !$checkFExec();
@@ -424,7 +426,7 @@ class Interpreter implements InterpreterInterface
                 if ($fExec && $opCode >= 0 && $opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
                     // In range of a pushdata opcode
                     if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
-                        throw  new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
+                        throw new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
                     $mainStack->push($pushData);
                     //echo " - [pushed '" . $pushData->getHex() . "']\n";
