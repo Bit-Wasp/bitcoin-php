@@ -63,7 +63,10 @@ class Transaction extends Serializable implements TransactionInterface
         $this->locktime = $locktime;
     }
 
-    public function getTransactionHash()
+    /**
+     * @return Buffer
+     */
+    public function getTxHash()
     {
         return Hash::sha256d($this->getBuffer());
     }
@@ -73,9 +76,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTransactionId()
     {
-        $hash = bin2hex(Buffertools::flipBytes(Hash::sha256d($this->getBuffer())));
-
-        return $hash;
+        return bin2hex(Buffertools::flipBytes($this->getTxHash()));
     }
 
     /**
