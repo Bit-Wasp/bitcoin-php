@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Networking\Serializer\Structure;
+namespace BitWasp\Bitcoin\Serializer\Chain;
 
 use BitWasp\Bitcoin\Chain\BlockLocator;
 use BitWasp\Buffertools\Parser;
