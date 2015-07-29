@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
@@ -82,11 +81,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getBlockHash()
     {
-        $parser = new Parser();
-        return $parser
-            ->writeBytes(32, Hash::sha256d($this->getBuffer()), true)
-            ->getBuffer()
-            ->getHex();
+        return Hash::sha256d($this->getBuffer())->flip()->getHex();
     }
 
     /**
@@ -180,8 +175,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getBuffer()
     {
-        $serializer = new BlockHeaderSerializer();
-        $hex = $serializer->serialize($this);
-        return $hex;
+        return (new BlockHeaderSerializer())->serialize($this);
     }
 }
