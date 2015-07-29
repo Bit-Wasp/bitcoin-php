@@ -68,11 +68,4 @@ interface TransactionInterface extends SerializableInterface
      * @return SignatureHash
      */
     public function getSignatureHash();
-
-    /**
-     * Returns an exact clone of the current transaction
-     *
-     * @return Transaction
-     */
-    public function makeCopy();
 }

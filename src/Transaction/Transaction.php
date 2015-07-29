@@ -164,37 +164,11 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return Transaction
      */
-    public function makeCopy()
+    public function __clone()
     {
-        return new Transaction(
-            $this->getVersion(),
-            new TransactionInputCollection(
-                array_map(
-                    function (TransactionInputInterface $value) {
-                        return new TransactionInput(
-                            $value->getTransactionId(),
-                            $value->getVout(),
-                            clone $value->getScript(),
-                            $value->getSequence()
-                        );
-                    },
-                    $this->getInputs()->getInputs()
-                )
-            ),
-            new TransactionOutputCollection(
-                array_map(
-                    function (TransactionOutputInterface $value) {
-                            return new TransactionOutput(
-                                $value->getValue(),
-                                clone $value->getScript()
-                            );
-                    },
-                    $this->getOutputs()->getOutputs()
-                )
-            ),
-            $this->getLockTime()
-        );
-    }
+        $this->inputs = clone $this->inputs;
+        $this->outputs = clone $this->outputs;
+        }
 
     /**
      * @return Buffer
