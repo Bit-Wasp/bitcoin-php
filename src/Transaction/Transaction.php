@@ -168,7 +168,7 @@ class Transaction extends Serializable implements TransactionInterface
     {
         $this->inputs = clone $this->inputs;
         $this->outputs = clone $this->outputs;
-        }
+    }
 
     /**
      * @return Buffer
