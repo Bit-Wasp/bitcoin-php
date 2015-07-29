@@ -76,7 +76,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTransactionId()
     {
-        return bin2hex(Buffertools::flipBytes($this->getTxHash()));
+        return $this->getTxHash()->flip()->getHex();
     }
 
     /**
