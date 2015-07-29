@@ -176,8 +176,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getBuffer()
     {
-        $serializer = new BlockHeaderSerializer();
-        $hex = $serializer->serialize($this);
-        return $hex;
+        return (new BlockHeaderSerializer())->serialize($this);
     }
 }
