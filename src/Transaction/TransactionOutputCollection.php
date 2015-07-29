@@ -22,6 +22,19 @@ class TransactionOutputCollection extends Collection
     }
 
     /**
+     * @return TransactionOutputCollection
+     */
+    public function __clone()
+    {
+        $this->outputs = array_map(
+            function (TransactionOutputInterface $txOut) {
+                return clone $txOut;
+            },
+            $this->outputs
+        );
+    }
+
+    /**
      * Adds an output to the collection.
      *
      * @param TransactionOutputInterface $output

@@ -38,7 +38,7 @@ class SignatureHash implements SignatureHashInterface
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
-        $copy = $this->transaction->makeCopy();
+        $copy = clone $this->transaction;
 
         $inputs = $copy->getInputs();
         $outputs = $copy->getOutputs();

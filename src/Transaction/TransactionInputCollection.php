@@ -22,6 +22,19 @@ class TransactionInputCollection extends Collection
     }
 
     /**
+     * @return TransactionInputCollection
+     */
+    public function __clone()
+    {
+        $this->inputs = array_map(
+            function (TransactionInputInterface $txIn) {
+                return clone $txIn;
+            },
+            $this->inputs
+        );
+    }
+
+    /**
      * Adds an input to the collection.
      *
      * @param TransactionInputInterface $input
