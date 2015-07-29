@@ -28,7 +28,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @var int|string
      */
-    private $locktime;
+    private $lockTime;
 
     /**
      * @param int|string $version
@@ -59,7 +59,7 @@ class Transaction extends Serializable implements TransactionInterface
         $this->version = $version;
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
-        $this->locktime = $locktime;
+        $this->lockTime = $locktime;
     }
 
     /**
@@ -133,22 +133,22 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getLockTime()
     {
-        return $this->locktime;
+        return $this->lockTime;
     }
 
     /**
      * Set Lock Time
-     * @param int $locktime
+     * @param int $lockTime
      * @return $this
      * @throws \Exception
      */
-    public function setLockTime($locktime)
+    public function setLockTime($lockTime)
     {
-        if (Bitcoin::getMath()->cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
+        if (Bitcoin::getMath()->cmp($lockTime, TransactionInterface::MAX_LOCKTIME) > 0) {
             throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 
-        $this->locktime = $locktime;
+        $this->lockTime = $lockTime;
         return $this;
     }
 
