@@ -187,7 +187,7 @@ class PartialMerkleTree extends Serializable
             }
             $hash = $this->vHashes[$nHashUsed++];
             if ($height == 0 && $parent) {
-                $vMatch[] = new Buffer(Buffertools::flipBytes($hash));
+                $vMatch[] = $hash->flip();
             }
             return $hash;
         } else {
@@ -235,7 +235,7 @@ class PartialMerkleTree extends Serializable
         $nBitsUsed = 0;
         $nHashesUsed = 0;
         $merkleRoot = $this->traverseAndExtract($height, 0, $nBitsUsed, $nHashesUsed, $vMatch);
-        $merkleRoot = new Buffer(Buffertools::flipBytes($merkleRoot));
+        $merkleRoot = $merkleRoot->flip();
         if ($this->fBad) {
             throw new \Exception('bad data');
         }
