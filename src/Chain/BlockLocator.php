@@ -2,9 +2,11 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
+use BitWasp\Bitcoin\Networking\Serializer\Structure\BlockLocatorSerializer;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
 
-class BlockLocator
+class BlockLocator extends Serializable
 {
     /**
      * @var Buffer[]
@@ -51,6 +53,14 @@ class BlockLocator
     public function getHashStop()
     {
         return $this->hashStop;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getBuffer()
+    {
+        return (new BlockLocatorSerializer())->serialize($this);
     }
 
     /**
