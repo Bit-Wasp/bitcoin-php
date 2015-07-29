@@ -88,9 +88,11 @@ class BlockLocator extends Serializable
             }
         }
 
-        $hashStop = ($all || count($hashes) == 1)
-            ? Buffer::hex('00', 32)
-            : array_pop($hashes);
+        if ($all || count($hashes) == 1) {
+            $hashStop = Buffer::hex('00', 32);
+        } else {
+            $hashStop = array_pop($hashes);
+        }
 
         return new self(
             $hashes,
