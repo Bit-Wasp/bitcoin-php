@@ -201,8 +201,6 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
-        $serializer = new TransactionSerializer();
-        $hex = $serializer->serialize($this);
-        return $hex;
+        return (new TransactionSerializer())->serialize($this);
     }
 }
