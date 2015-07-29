@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Networking;
+namespace BitWasp\Bitcoin\Tests\Bloom;
 
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
