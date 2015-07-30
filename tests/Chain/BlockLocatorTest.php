@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Chain\BlockLocator;
 use Doctrine\Common\Cache\ArrayCache;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-
 class BlockLocatorTest extends AbstractTestCase
 {
     public function testGenesis()
