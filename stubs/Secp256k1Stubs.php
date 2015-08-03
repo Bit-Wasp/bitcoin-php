@@ -1,7 +1,7 @@
 <?php
 
 namespace {
-    
+
     /**
      * Create a Secp256k1 context resource
      *
