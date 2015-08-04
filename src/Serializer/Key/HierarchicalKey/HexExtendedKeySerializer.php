@@ -4,7 +4,7 @@
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;

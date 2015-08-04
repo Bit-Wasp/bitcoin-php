@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Signature;
 
-use BitWasp\Bitcoin\Signature\Signature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
 
 /**

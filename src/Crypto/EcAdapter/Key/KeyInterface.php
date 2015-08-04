@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;

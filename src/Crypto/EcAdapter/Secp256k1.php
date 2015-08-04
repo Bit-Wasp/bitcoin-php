@@ -6,13 +6,13 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\CompactSignature;
-use BitWasp\Bitcoin\Signature\Signature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
-use BitWasp\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class Secp256k1 extends BaseEcAdapter
@@ -49,7 +49,7 @@ class Secp256k1 extends BaseEcAdapter
     /**
      * @param PrivateKeyInterface $oldPrivate
      * @param string $newBinary
-     * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
      */
     private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newBinary)
     {
@@ -59,7 +59,7 @@ class Secp256k1 extends BaseEcAdapter
     /**
      * @param PublicKeyInterface $oldPublic
      * @param string $newBinary
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      */
     private function getRelatedPublicKey(PublicKeyInterface $oldPublic, $newBinary)
     {
@@ -126,7 +126,7 @@ class Secp256k1 extends BaseEcAdapter
     /**
      * @param CompactSignature $signature
      * @param Buffer $messageHash
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      * @throws \Exception
      */
     public function recoverCompact(Buffer $messageHash, CompactSignature $signature)
@@ -194,7 +194,7 @@ class Secp256k1 extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      * @throws \Exception
      */
     public function privateToPublic(PrivateKeyInterface $privateKey)
@@ -218,7 +218,7 @@ class Secp256k1 extends BaseEcAdapter
     /**
      * @param PrivateKeyInterface $privateKey
      * @param int|string $integer
-     * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
      * @throws \Exception
      */
     public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
@@ -240,7 +240,7 @@ class Secp256k1 extends BaseEcAdapter
     /**
      * @param PrivateKeyInterface $privateKey
      * @param int|string $integer
-     * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
      * @throws \Exception
      */
     public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
@@ -262,7 +262,7 @@ class Secp256k1 extends BaseEcAdapter
     /**
      * @param PublicKeyInterface $publicKey
      * @param int|string $integer
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      * @throws \Exception
      */
     public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
@@ -284,7 +284,7 @@ class Secp256k1 extends BaseEcAdapter
     /**
      * @param PublicKeyInterface $publicKey
      * @param int|string $integer
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      * @throws \Exception
      */
     public function publicKeyMul(PublicKeyInterface $publicKey, $integer)

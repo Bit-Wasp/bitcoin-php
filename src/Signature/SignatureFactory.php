@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 

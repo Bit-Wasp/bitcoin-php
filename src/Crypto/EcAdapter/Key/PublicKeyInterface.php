@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 interface PublicKeyInterface extends KeyInterface
 {
@@ -28,12 +28,4 @@ interface PublicKeyInterface extends KeyInterface
      * When y coordinate is odd, prepend x coordinate with this if
      * generating a public key
      */
-    const KEY_COMPRESSED_ODD = '03';
-
-    /**
-     * Get public key point on the curve
-     *
-     * @return \Mdanter\Ecc\Primitives\PointInterface
-     */
-    public function getPoint();
 }

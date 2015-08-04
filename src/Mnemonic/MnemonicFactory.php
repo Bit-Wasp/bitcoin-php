@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Mnemonic;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39Mnemonic;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39WordListInterface;
 use BitWasp\Bitcoin\Mnemonic\Electrum\ElectrumMnemonic;

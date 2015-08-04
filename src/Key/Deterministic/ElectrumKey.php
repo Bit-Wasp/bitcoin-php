@@ -3,10 +3,10 @@
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\KeyInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 

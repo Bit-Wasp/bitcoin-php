@@ -7,8 +7,8 @@ use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PrivateKey;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 
 class CompactSignatureTest extends AbstractTestCase
 {

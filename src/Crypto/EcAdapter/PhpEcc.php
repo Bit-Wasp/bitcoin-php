@@ -2,16 +2,16 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
-use BitWasp\Bitcoin\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\CompactSignature;
-use BitWasp\Bitcoin\Signature\Signature;
-use BitWasp\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class PhpEcc extends BaseEcAdapter
@@ -155,9 +155,9 @@ class PhpEcc extends BaseEcAdapter
         $Q = $R->mul($signature->getS())->add($eGNeg)->mul($rInv);
 
         // 1.6.2 Test Q as a public key
-        $Qk = new PublicKey($this, $Q);
+        $Qk = new PublicKey($this, $Q, $signature->isCompressed());
         if ($this->verify($messageHash, $Qk, new Signature($signature->getR(), $signature->getS()))) {
-            return $Qk->setCompressed($signature->isCompressed());
+            return $Qk;
         }
 
         throw new \Exception('Unable to recover public key');
@@ -239,7 +239,7 @@ class PhpEcc extends BaseEcAdapter
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      */
     public function privateToPublic(PrivateKeyInterface $privateKey)
     {
@@ -253,7 +253,7 @@ class PhpEcc extends BaseEcAdapter
     /**
      * @param PrivateKeyInterface $oldPrivate
      * @param $newSecret
-     * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
      */
     private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newSecret)
     {
@@ -267,7 +267,7 @@ class PhpEcc extends BaseEcAdapter
     /**
      * @param PublicKeyInterface $oldPublic
      * @param PointInterface $newPoint
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      */
     private function getRelatedPublicKey(PublicKeyInterface $oldPublic, PointInterface $newPoint)
     {
@@ -281,7 +281,7 @@ class PhpEcc extends BaseEcAdapter
     /**
      * @param PrivateKeyInterface $privateKey
      * @param $integer
-     * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
      */
     public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
     {
@@ -301,7 +301,7 @@ class PhpEcc extends BaseEcAdapter
     /**
      * @param PrivateKeyInterface $privateKey
      * @param $integer
-     * @return \BitWasp\Bitcoin\Key\PrivateKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
      */
     public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
     {
@@ -322,7 +322,7 @@ class PhpEcc extends BaseEcAdapter
     /**
      * @param PublicKeyInterface $publicKey
      * @param $integer
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      */
     public function publicKeyMul(PublicKeyInterface $publicKey, $integer)
     {
@@ -333,7 +333,7 @@ class PhpEcc extends BaseEcAdapter
     /**
      * @param PublicKeyInterface $publicKey
      * @param $integer
-     * @return \BitWasp\Bitcoin\Key\PublicKey
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
      */
     public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
     {

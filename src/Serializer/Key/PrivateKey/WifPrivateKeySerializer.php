@@ -6,8 +6,8 @@ use BitWasp\Bitcoin\Base58;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
-use BitWasp\Bitcoin\Key\PrivateKey;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 

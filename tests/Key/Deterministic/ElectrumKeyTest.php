@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\ElectrumKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;

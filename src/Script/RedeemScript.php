@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Buffer;
 
 class RedeemScript extends Script
@@ -20,7 +20,7 @@ class RedeemScript extends Script
 
     /**
      * @param int|string $m
-     * @param \BitWasp\Bitcoin\Key\PublicKeyInterface[] $keys
+     * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[] $keys
      */
     public function __construct($m, array $keys)
     {

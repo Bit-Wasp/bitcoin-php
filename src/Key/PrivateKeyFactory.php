@@ -3,8 +3,9 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;

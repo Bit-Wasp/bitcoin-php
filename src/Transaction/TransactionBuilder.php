@@ -3,11 +3,11 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;

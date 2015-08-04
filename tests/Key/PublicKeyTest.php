@@ -4,8 +4,8 @@ namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Key\Point;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 

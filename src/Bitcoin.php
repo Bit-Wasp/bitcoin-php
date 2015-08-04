@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;

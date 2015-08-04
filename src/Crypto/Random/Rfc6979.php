@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin\Crypto\Random;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\Crypto\Key\PrivateKey as MdPrivateKey;
 use Mdanter\Ecc\Random\HmacRandomNumberGenerator;

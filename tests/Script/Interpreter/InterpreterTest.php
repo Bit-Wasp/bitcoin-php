@@ -4,9 +4,9 @@ namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;

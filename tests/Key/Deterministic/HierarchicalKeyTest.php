@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
-use BitWasp\Bitcoin\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bitcoin;

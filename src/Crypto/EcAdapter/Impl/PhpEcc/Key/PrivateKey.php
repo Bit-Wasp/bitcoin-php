@@ -1,10 +1,12 @@
 <?php
 
-namespace BitWasp\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
@@ -55,7 +57,16 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function tweakAdd($tweak)
     {
-        return $this->ecAdapter->privateKeyAdd($this, $tweak);
+        $adapter = $this->ecAdapter;
+        $math = $adapter->getMath();
+        $new = $math->mod(
+            $math->add(
+                $tweak,
+                $this->getSecretMultiplier()
+            ),
+            $this->ecAdapter->getGenerator()->getOrder()
+        );
+        return new PrivateKey($adapter, $new, $this->compressed);
     }
 
     /**
@@ -64,15 +75,16 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function tweakMul($tweak)
     {
-        return $this->ecAdapter->privateKeyMul($this, $tweak);
-    }
-
-    /**
-     * @return int
-     */
-    public function getSecretMultiplier()
-    {
-        return $this->secretMultiplier;
+        $adapter = $this->ecAdapter;
+        $math = $adapter->getMath();
+        $new = $math->mod(
+            $math->mul(
+                $tweak,
+                $this->getSecretMultiplier()
+            ),
+            $this->ecAdapter->getGenerator()->getOrder()
+        );
+        return new PrivateKey($adapter, $new, $this->compressed);
     }
 
     /**

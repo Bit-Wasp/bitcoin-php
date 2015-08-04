@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
-use BitWasp\Bitcoin\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;

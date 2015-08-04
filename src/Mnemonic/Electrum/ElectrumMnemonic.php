@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Mnemonic\Electrum;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Mnemonic\MnemonicInterface;
 use BitWasp\Buffertools\Buffer;
 

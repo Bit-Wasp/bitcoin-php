@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Flags;
-use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Interpreter\Operation\ArithmeticOperation;

@@ -1,7 +1,9 @@
 <?php
 
-namespace BitWasp\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
 interface PrivateKeyInterface extends KeyInterface

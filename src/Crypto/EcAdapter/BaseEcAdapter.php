@@ -2,7 +2,8 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
-use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use BitWasp\Buffertools\Buffer;
@@ -108,7 +109,7 @@ abstract class BaseEcAdapter implements EcAdapterInterface
     /**
      * @param array $signatures
      * @param Buffer $messageHash
-     * @param \BitWasp\Bitcoin\Key\PublicKeyInterface[] $publicKeys
+     * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[] $publicKeys
      * @return array
      */
     public function associateSigs(array $signatures, Buffer $messageHash, array $publicKeys)

@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Network\NetworkFactory;

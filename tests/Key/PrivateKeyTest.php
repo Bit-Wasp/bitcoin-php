@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;

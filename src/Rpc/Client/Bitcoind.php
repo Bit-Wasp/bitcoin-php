@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\SignatureHashInterface;

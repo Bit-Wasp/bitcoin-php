@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

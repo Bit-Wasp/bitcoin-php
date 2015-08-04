@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 

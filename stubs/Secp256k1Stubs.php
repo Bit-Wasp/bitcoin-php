@@ -138,6 +138,25 @@ namespace {
 
     /**
      * @param resource $secp256k1_context_t
+     * @param string $pubkeyIn
+     * @param resource $secp256k1_pubkey_t
+     */
+    function secp256k1_ec_pubkey_parse($secp256k1_context_t, $pubkeyIn, $secp256k1_pubkey_t)
+    {
+    }
+
+    /**
+     * @param resource $secp256k1_context_t
+     * @param resource $secp256k1_pubkey_t
+     * @param $compressed
+     * @param $pubkeyOut
+     */
+    function secp256k1_ec_pubkey_serialize($secp256k1_context_t, $secp256k1_pubkey_t, $compressed, $pubkeyOut)
+    {
+    }
+
+    /**
+     * @param resource $secp256k1_context_t
      * @param string $privateKey
      * @param string $tweak
      * @return int

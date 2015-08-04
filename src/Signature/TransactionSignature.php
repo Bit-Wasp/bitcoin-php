@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;

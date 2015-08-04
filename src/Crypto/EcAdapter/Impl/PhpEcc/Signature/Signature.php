@@ -1,8 +1,9 @@
 <?php
 
-namespace BitWasp\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 

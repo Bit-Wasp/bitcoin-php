@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Signature;
 
 use BitWasp\Bitcoin\SerializableInterface;
 

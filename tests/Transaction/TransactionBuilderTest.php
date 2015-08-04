@@ -18,7 +18,7 @@ use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
 
 class TransactionBuilderTest extends AbstractTestCase

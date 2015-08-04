@@ -6,8 +6,8 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Signature\Signature;
-use BitWasp\Bitcoin\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 

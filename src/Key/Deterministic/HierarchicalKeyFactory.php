@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Key\Deterministic;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;

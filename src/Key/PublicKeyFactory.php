@@ -3,7 +3,8 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
 use Mdanter\Ecc\Primitives\PointInterface;
 

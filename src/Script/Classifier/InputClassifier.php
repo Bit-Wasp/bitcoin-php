@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Script\Classifier;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 

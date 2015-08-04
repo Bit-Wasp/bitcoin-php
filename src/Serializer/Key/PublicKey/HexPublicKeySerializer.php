@@ -3,9 +3,9 @@
 namespace BitWasp\Bitcoin\Serializer\Key\PublicKey;
 
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\PublicKey;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Parser;
 use Mdanter\Ecc\Primitives\PointInterface;
 

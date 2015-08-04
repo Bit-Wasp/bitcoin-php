@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 
 class InputScriptFactory

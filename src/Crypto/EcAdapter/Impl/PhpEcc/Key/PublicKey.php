@@ -1,8 +1,10 @@
 <?php
 
-namespace BitWasp\Bitcoin\Key;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
@@ -57,21 +59,24 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @return PublicKeyInterface
      */
     public function tweakAdd($tweak)
     {
-        return $this->ecAdapter->publicKeyAdd($this, $tweak);
+        $G = $this->ecAdapter->getGenerator();
+        $point = $this->point->add($G->mul($tweak));
+        return new PublicKey($this->ecAdapter, $point, $this->compressed);
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @return PublicKeyInterface
      */
     public function tweakMul($tweak)
     {
-        return $this->ecAdapter->publicKeyMul($this, $tweak);
+        $point = $this->point->mul($tweak);
+        return new PublicKey($this->ecAdapter, $point, $this->compressed);
     }
 
     /**

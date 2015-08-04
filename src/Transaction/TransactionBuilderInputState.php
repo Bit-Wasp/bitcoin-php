@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -166,7 +166,7 @@ class TransactionBuilderInputState
     }
 
     /**
-     * @return array|\BitWasp\Bitcoin\Key\PublicKeyInterface[]
+     * @return array|\BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[]
      */
     public function getPublicKeys()
     {
