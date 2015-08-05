@@ -1,26 +1,20 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aeonium
- * Date: 03/08/15
- * Time: 17:51
- */
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter;
 
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Signature\CompactSignature;
 use BitWasp\Buffertools\Buffer;
-use Mdanter\Ecc\Crypto\Signature\SignatureInterface;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Primitives\PointInterface;
 
@@ -51,12 +45,12 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param PublicKey $publicKey
-     * @param Signature $signature
      * @param Buffer $messageHash
+     * @param PublicKeyInterface $publicKey
+     * @param SignatureInterface $signature
      * @return bool
      */
-    public function verify(Buffer $messageHash, PublicKey $publicKey, Signature $signature)
+    public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
     {
         $n = $this->getGenerator()->getOrder();
         $math = $this->getMath();
@@ -86,7 +80,7 @@ class EcAdapter implements EcAdapterInterface
      * @return SignatureInterface
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function sign($messageHash, $privateKey, $rbg = null)
+    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
         $rbg = $rbg ?: new Rfc6979($this, $privateKey, $messageHash);
         $randomK = $rbg->bytes(32);

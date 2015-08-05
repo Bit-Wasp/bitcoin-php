@@ -11,7 +11,6 @@ use BitWasp\Bitcoin\Signature\CompactSignature;
 
 interface EcAdapterInterface
 {
-
     /**
      * @return \BitWasp\Bitcoin\Math\Math
      */
@@ -28,7 +27,7 @@ interface EcAdapterInterface
      * @param RbgInterface $rbg
      * @return SignatureInterface
      */
-    public function sign($messageHash, $privateKey, $rbg = null);
+    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
 
     /**
      * @param PublicKeyInterface $publicKey
