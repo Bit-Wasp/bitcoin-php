@@ -14,9 +14,8 @@ env:
 install:
     - |
         sh -c 'if [ "$EXT_SECP256K1" != "" ]; then \
-            wget https://github.com/bitcoin/secp256k1/archive/4c63780710351ffcc52341497e3ca0e518fbad79.zip \
-            && unzip 4c63780710351ffcc52341497e3ca0e518fbad79.zip \
-            && cd secp256k1-4c63780710351ffcc52341497e3ca0e518fbad79 \
+            git clone git@github.com:bitcoin/secp256k1.git \
+            && cd secp256k1 \
             && ./autogen.sh && ./configure && make && sudo make install \
             && cd ..; fi'
     - |
