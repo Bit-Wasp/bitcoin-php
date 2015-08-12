@@ -13,10 +13,10 @@ class EcSerializer
      * @var array
      */
     private static $serializerInterface = [
-        Serializer\Key\PrivateKeySerializerInterface::class,
-        Serializer\Key\PublicKeySerializerInterface::class,
-        Serializer\Signature\CompactSignatureSerializerInterface::class,
-        Serializer\Signature\DerSignatureSerializerInterface::class
+        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface',
+        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface',
+        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface',
+        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface'
     ];
 
     /**
