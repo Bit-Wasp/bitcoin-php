@@ -82,8 +82,6 @@ class EcAdapterFactory
      */
     public static function getSecp256k1(Math $math, GeneratorPoint $generator)
     {
-        $a = new Secp256k1($math, $generator, self::getSecp256k1Context());
-        print_r($a);
-        return $a;
+        return new Secp256k1($math, $generator, self::getSecp256k1Context());
     }
 }
