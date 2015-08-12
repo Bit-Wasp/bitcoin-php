@@ -25,7 +25,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      */
     public function __construct(EcAdapter $adapter)
     {
-        $this->math = $adapter->getMath();
+        $this->ecAdapter = $adapter;
     }
 
     /**
@@ -84,7 +84,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
 
-        return new CompactSignature($r, $s, $recoveryId, $isCompressed);
+        return new CompactSignature($this->ecAdapter, $r, $s, $recoveryId, $isCompressed);
     }
 
     /**
