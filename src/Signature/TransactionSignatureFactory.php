@@ -3,23 +3,33 @@
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
+
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 
 class TransactionSignatureFactory
 {
 
     /**
      * @param $string
-     * @param Math $math
+     * @param EcAdapterInterface $ecAdapter
      * @return TransactionSignatureInterface
      */
-    public static function fromHex($string, Math $math = null)
+    public static function fromHex($string, EcAdapterInterface $ecAdapter = null)
     {
-        $math = $math ?: Bitcoin::getMath();
-        $serializer = new TransactionSignatureSerializer(new DerSignatureSerializer($math));
-        $signature = $serializer->parse($string);
-        return $signature;
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+
+        $serializer = new TransactionSignatureSerializer(
+            EcSerializer::getSerializer(
+                $ecAdapter,
+                DerSignatureSerializerInterface::class
+            )
+        );
+
+        return $serializer->parse($string);
     }
 }
