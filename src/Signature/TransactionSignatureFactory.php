@@ -25,7 +25,7 @@ class TransactionSignatureFactory
         $serializer = new TransactionSignatureSerializer(
             EcSerializer::getSerializer(
                 $ecAdapter,
-                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SignatureSerializerInterface'
+                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface'
             )
         );
 

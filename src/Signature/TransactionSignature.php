@@ -125,7 +125,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
         $txSigSerializer = new TransactionSignatureSerializer(
             EcSerializer::getSerializer(
                 $this->ecAdapter,
-                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SignatureSerializerInterface'
+                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface'
             )
         );
 

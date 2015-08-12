@@ -56,14 +56,15 @@ class CompactSignatureTest extends AbstractTestCase
         $pubKey = $private->getPublicKey();
         $msgSigner = new MessageSigner($ecAdapter);
         $signed = $msgSigner->sign($message, $private);
-        //$compact = $signed->getCompactSignature();
+        $compact = $signed->getCompactSignature();
 
-        //$this->assertEquals(65, $compact->getBuffer()->getSize());
-        //$this->assertTrue($msgSigner->verify($signed, $pubKey->getAddress()));
+        $this->assertEquals(65, $compact->getBuffer()->getSize());
+        $this->assertTrue($msgSigner->verify($signed, $pubKey->getAddress()));
 
-        $serializer = EcSerializer::getSerializer($ecAdapter, CompactSignatureSerializerInterface::class);
+        $serializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface');
         /** @var CompactSignatureSerializerInterface $serializer */
-        //$parsed = $serializer->parse($compact->getBuffer());
-        //$this->assertEquals($compact, $parsed);
+
+        $parsed = $serializer->parse($compact->getBuffer());
+        $this->assertEquals($compact->getBinary(), $parsed->getBinary());
     }
 }
