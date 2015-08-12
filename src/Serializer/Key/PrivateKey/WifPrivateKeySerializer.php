@@ -61,8 +61,13 @@ class WifPrivateKeySerializer
     {
         $payload = Base58::decodeCheck($wif)->slice(1);
         $size = $payload->getSize();
-        $compressed = 33 === $size;
-        if (!in_array($size, [32, 33])) {
+
+        if (33 === $size) {
+            $compressed = true;
+            $payload = $payload->slice(0, 32);
+        } else if (32 == $size) {
+            $compressed = false;
+        } else {
             throw new InvalidPrivateKey("Private key should be always be 32 or 33 bytes (depending on if it's compressed)");
         }
 

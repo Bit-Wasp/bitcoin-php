@@ -27,13 +27,21 @@ class MessageSigner
 
     /**
      * @param string $message
+     * @return Buffer
+     * @throws \Exception
+     */
+    private function calculateBody($message)
+    {
+        return new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message);
+    }
+
+    /**
+     * @param string $message
      * @return \BitWasp\Buffertools\Buffer
      */
     public function calculateMessageHash($message)
     {
-        $content = new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message);
-        $hash = Hash::sha256d($content);
-        return $hash;
+        return Hash::sha256d($this->calculateBody($message));
     }
 
     /**
@@ -45,7 +53,7 @@ class MessageSigner
     {
         $hash = $this->calculateMessageHash($signedMessage->getMessage());
 
-        $publicKey = $this->ecAdapter->recoverCompact(
+        $publicKey = $this->ecAdapter->recover(
             $hash,
             $signedMessage->getCompactSignature()
         );

@@ -169,7 +169,7 @@ class EcAdapter implements EcAdapterInterface
         }
 
         /** @var resource $publicKey */
-        return new PublicKey($this, $publicKey);
+        return new PublicKey($this, $publicKey, $compactSig->isCompressed());
     }
 
     /**

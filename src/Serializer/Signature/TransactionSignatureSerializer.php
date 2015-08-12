@@ -41,9 +41,8 @@ class TransactionSignatureSerializer
     public function parse($string)
     {
         $buffer = (new Parser($string))->getBuffer();
-        $size = $buffer->getSize();
-        $sig = $buffer->slice(0, $size - 2);
-        $hashType = $buffer->slice($size, 1);
+        $sig = $buffer->slice(0, $buffer->getSize() - 1);
+        $hashType = $buffer->slice(-1);
         return new TransactionSignature(
             $this->sigSerializer->parse($sig),
             $hashType->getInt()

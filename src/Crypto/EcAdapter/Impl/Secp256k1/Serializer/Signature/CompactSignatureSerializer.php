@@ -32,7 +32,8 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     private function doSerialize(CompactSignature $signature)
     {
         $sig_t = '';
-        if (!secp256k1_ecdsa_signature_serialize_compact($this->ecAdapter->getContext(), $signature->getResource(), $sig_t)) {
+        $recid = '';
+        if (!secp256k1_ecdsa_signature_serialize_compact($this->ecAdapter->getContext(), $signature->getResource(), $sig_t, $recid)) {
             throw new \RuntimeException('Secp256k1 serialize compact failure');
         }
         return new Buffer(chr((int)$signature->getFlags()) . $sig_t);
@@ -56,20 +57,26 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     {
         $math = $this->ecAdapter->getMath();
         $buffer = (new Parser($data))->getBuffer();
+
         if ($buffer->getSize() !== 65) {
             throw new \RuntimeException('Compact Sig must be 65 bytes');
         }
 
-        $sig = $buffer->slice(0, 64);
-        $byte = $buffer->slice(-1)->getInt();
+        $byte = $buffer->slice(0, 1)->getInt();
+        $sig = $buffer->slice(1, 64);
 
         $recoveryFlags = $math->sub($byte, 27);
-        $isCompressed = ($math->bitwiseAnd($recoveryFlags, 4) != 0);
-        $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
+        if ($math->cmp($recoveryFlags, 7) > 0) {
+            throw new \RuntimeException('Invalid signature type');
+        }
 
+        $isCompressed = ($math->bitwiseAnd($recoveryFlags, 4) != 0);
+        $recoveryId = (int)$recoveryFlags - ($isCompressed ? 4 : 0);
+
+        echo $sig->getHex() . " and recid: $recoveryId \n";
         $sig_t = '';
-        if (!secp256k1_ecdsa_signature_parse_compact($this->ecAdapter->getContext(), $sig->getBinary(), $sig_t)) {
-            throw new \RuntimeException('');
+        if (!secp256k1_ecdsa_signature_parse_compact($this->ecAdapter->getContext(), $sig->getBinary(), $sig_t, $recoveryId)) {
+            throw new \RuntimeException('Unable to parse compact signature');
         }
 
         /** @var resource $sig_t */

@@ -163,6 +163,23 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
+     * @param int|string $element
+     * @param bool $half
+     * @return bool
+     */
+    public function validateSignatureElement($element, $half = false)
+    {
+        $adapter = $this->ecAdapter;
+        $math = $adapter->getMath();
+        $against = $adapter->getGenerator()->getOrder();
+        if ($half) {
+            $against = $math->rightShift($against, 1);
+        }
+
+        return $math->cmp($element, $against) < 0 && $math->cmp($element, 0) !== 0;
+    }
+
+    /**
      * @param Buffer $signature
      * @return bool
      * @throws ScriptRuntimeException
@@ -179,7 +196,7 @@ class Interpreter implements InterpreterInterface
         $nLenS = ord($binary[5 + $nLenR]);
         $s = $signature->slice(6 + $nLenR, $nLenS)->getInt();
 
-        return $this->ecAdapter->validateSignatureElement($s, true);
+        return $this->validateSignatureElement($s, true);
     }
 
     /**

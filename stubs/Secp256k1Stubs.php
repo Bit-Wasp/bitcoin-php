@@ -2,8 +2,8 @@
 
 namespace {
 
-    define('SECP256K1_CONTEXT_SIGN', 1 << 0);
-    define('SECP256K1_CONTEXT_VERIFY', 1 << 1);
+    define('SECP256K1_CONTEXT_VERIFY', 1 << 0);
+    define('SECP256K1_CONTEXT_SIGN', 1 << 1);
     define('SECP256K1_TYPE_CONTEXT', "secp256k1_context_t");
     define('SECP256K1_TYPE_PUBKEY', "secp256k1_pubkey_t");
     define('SECP256K1_TYPE_SIG', "secp256k1_ecdsa_signature_t");

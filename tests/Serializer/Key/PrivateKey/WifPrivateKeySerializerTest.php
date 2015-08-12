@@ -3,31 +3,30 @@
 namespace BitWasp\Bitcoin\Tests\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Bitcoin\Tests\Mnemonic\Bip39\AbstractBip39Case;
 use BitWasp\Buffertools\Buffer;
-use Mdanter\Ecc\EccFactory;
 
 class WifPrivateKeySerializerTest extends AbstractBip39Case
 {
     /**
+     * @dataProvider getEcAdapters
      * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidPrivateKey
      * @expectedExceptionMessage Private key should be always be 32 or 33 bytes (depending on if it's compressed)
      */
-    public function testSerializer()
+    public function testSerializer(EcAdapterInterface $ecAdapter)
     {
-        $math = new Math();
-        $generator = EccFactory::getSecgCurves()->generator256k1();
         $network = NetworkFactory::bitcoin();
-        $ecAdapter = EcAdapterFactory::getAdapter($math, $generator);
 
-        $hexSerializer = new HexPrivateKeySerializer($ecAdapter);
-        $wifSerializer = new WifPrivateKeySerializer($math, $hexSerializer);
+        $hexSerializer = EcSerializer::getSerializer($ecAdapter, PrivateKeySerializerInterface::class);
+        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $hexSerializer);
 
         $valid = PrivateKeyFactory::create();
         $this->assertEquals($valid, $wifSerializer->parse($wifSerializer->serialize($network, $valid)));

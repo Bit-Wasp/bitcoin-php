@@ -3,9 +3,10 @@
 namespace BitWasp\Bitcoin\MessageSigner;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 
 class SignedMessage
 {
@@ -16,15 +17,15 @@ class SignedMessage
     private $message;
 
     /**
-     * @var CompactSignature
+     * @var CompactSignatureInterface
      */
     private $compactSignature;
 
     /**
      * @param string $message
-     * @param CompactSignature $signature
+     * @param CompactSignatureInterface $signature
      */
-    public function __construct($message, CompactSignature $signature)
+    public function __construct($message, CompactSignatureInterface $signature)
     {
         $this->message = $message;
         $this->compactSignature = $signature;
@@ -39,7 +40,7 @@ class SignedMessage
     }
 
     /**
-     * @return CompactSignature
+     * @return CompactSignatureInterface
      */
     public function getCompactSignature()
     {
@@ -51,7 +52,9 @@ class SignedMessage
      */
     public function getBuffer()
     {
-        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(Bitcoin::getMath()));
+        $serializer = new SignedMessageSerializer(
+            EcSerializer::getSerializer(Bitcoin::getEcAdapter(), CompactSignatureSerializerInterface::class)
+        );
         return $serializer->serialize($this);
     }
 }

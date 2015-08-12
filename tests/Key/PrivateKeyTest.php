@@ -67,13 +67,13 @@ class PrivateKeyTest extends AbstractTestCase
     }
 
     /**
+     * @dataProvider getEcAdapters
      * @expectedException \Exception
      */
-    public function testCreatePrivateKeyFailure()
+    public function testCreatePrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
-        $ec = $this->safeEcAdapter();
-        $dec = $ec->getMath()->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-        PrivateKeyFactory::fromInt($dec, $ec);
+        $dec = $ecAdapter->getMath()->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
+        PrivateKeyFactory::fromInt($dec, $ecAdapter);
     }
 
     /**

@@ -67,7 +67,8 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         }
 
         /** @var resource $pubkey_t */
-        return new PublicKey($this->ecAdapter,
+        return new PublicKey(
+            $this->ecAdapter,
             $pubkey_t,
             $buffer->getSize() === 33
         );

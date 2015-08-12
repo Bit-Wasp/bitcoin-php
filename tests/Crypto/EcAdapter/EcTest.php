@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
@@ -22,7 +21,7 @@ class EcTest extends AbstractTestCase
      */
     public function getFirstPrivateKey(EcAdapterInterface $ecAdapterInterface)
     {
-        return new PrivateKey($ecAdapterInterface, 1);
+        return $ecAdapterInterface->getPrivateKey(1);
     }
 
     /**
@@ -59,12 +58,13 @@ class EcTest extends AbstractTestCase
         $g = EccFactory::getSecgCurves($math)->generator256k1();
 
         $phpecc = new PhpEcc($math, $g);
-        $private = PrivateKeyFactory::fromInt(1);
+        $private = $phpecc->getPrivateKey(1, false);
         $phpecc->calcPubKeyRecoveryParam(1, 1, Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'), $private->getPublicKey());
     }
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ec
      */
     public function testAdd(EcAdapterInterface $ec)
     {
@@ -72,7 +72,7 @@ class EcTest extends AbstractTestCase
         $public = $private->getPublicKey();
         $tweak = 1;
 
-        $expected = new PrivateKey($ec, $this->addModN($private, $tweak, $ec));
+        $expected = $ec->getPrivateKey($this->addModN($private, $tweak, $ec));
         $expectedPub = $expected->getPublicKey();
         // Check addModN works just the same
         $this->assertEquals('2', $expected->getSecretMultiplier());
@@ -84,13 +84,11 @@ class EcTest extends AbstractTestCase
         // (k + k % n) * G
         // Check our publickey matches that of expectedPub
         $tweaked = $new->getPublicKey();
-        $this->assertEquals($expectedPub->getPoint()->getX(), $tweaked->getPoint()->getX());
-        $this->assertEquals($expectedPub->getPoint()->getY(), $tweaked->getPoint()->getY());
+        $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
 
         // (k+k%n)*G  === k*G +(tweak*G) (since tweak == k)
         $tweaked = $public->tweakAdd($tweak);
-        $this->assertEquals($expectedPub->getPoint()->getX(), $tweaked->getPoint()->getX());
-        $this->assertEquals($expectedPub->getPoint()->getY(), $tweaked->getPoint()->getY());
+        $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
     }
 
     /**
@@ -103,7 +101,7 @@ class EcTest extends AbstractTestCase
         $public = $private->getPublicKey();
         $tweak = 4;
 
-        $expected = new PrivateKey($ec, $this->mulModN($private, $tweak, $ec));
+        $expected = $ec->getPrivateKey($this->mulModN($private, $tweak, $ec));
         $expectedPub = $expected->getPublicKey();
         // Check addModN works just the same
         $this->assertEquals('4', $expected->getSecretMultiplier());
@@ -112,12 +110,11 @@ class EcTest extends AbstractTestCase
         $this->assertEquals('4', $new->getSecretMultiplier());
 
         $tweaked = $new->getPublicKey();
-        $this->assertEquals($expectedPub->getPoint()->getX(), $tweaked->getPoint()->getX());
-        $this->assertEquals($expectedPub->getPoint()->getY(), $tweaked->getPoint()->getY());
+        $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
 
         $tweaked = $public->tweakMul($tweak);
-        $this->assertEquals($expectedPub->getPoint()->getX(), $tweaked->getPoint()->getX());
-        $this->assertEquals($expectedPub->getPoint()->getY(), $tweaked->getPoint()->getY());
+        $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
+
     }
 
     /**
@@ -143,40 +140,9 @@ class EcTest extends AbstractTestCase
         $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
 
         $compact = $ec->signCompact($messageHash, $private);
-        $publicKey = $ec->recoverCompact($messageHash, $compact);
+        $publicKey = $ec->recover($messageHash, $compact);
         $this->assertEquals($private->isCompressed(), $publicKey->isCompressed());
-        $this->assertEquals($private->getPublicKey()->getPoint()->getX(), $publicKey->getPoint()->getX());
-        $this->assertEquals($private->getPublicKey()->getPoint()->getY(), $publicKey->getPoint()->getY());
-    }
-
-    public function testPhpeccFailPrivateToPublic()
-    {
-        $math = new Math();
-        $g = EccFactory::getSecgCurves($math)->generator256k1();
-
-        $phpecc = new PhpEcc($math, $g);
-
-        $mock = $this->getMock(
-            'BitWasp\Bitcoin\Key\PrivateKeyInterface',
-            [
-                'getSecretMultiplier', 'toWif', 'getPublicKey',
-                'isCompressed', 'getPubKeyHash', 'isPrivate',
-                'getAddress', 'tweakMul', 'tweakAdd',
-                // serializable
-                'getInt', 'getBinary', 'getHex', 'getBuffer'
-            ],
-            [$phpecc]
-        );
-
-        $mock->expects($this->atLeastOnce())
-            ->method('getSecretMultiplier')
-            ->willReturn($math->baseConvert('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141', 16, 10));
-
-        $mock->expects($this->atLeastOnce())
-            ->method('isCompressed')
-            ->willReturn(false);
-
-        $phpecc->privateToPublic($mock);
+        $this->assertEquals($private->getPublicKey()->getBinary(), $publicKey->getBinary());
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin\Serializer\MessageSigner;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Bitcoin\MessageSigner\SignedMessage;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
 
 class SignedMessageSerializer
@@ -15,14 +15,14 @@ class SignedMessageSerializer
     const FOOTER = '-----END BITCOIN SIGNED MESSAGE-----';
 
     /**
-     * @var CompactSignatureSerializer
+     * @var CompactSignatureSerializerInterface
      */
     private $csSerializer;
 
     /**
-     * @param CompactSignatureSerializer $csSerializer
+     * @param CompactSignatureSerializerInterface $csSerializer
      */
-    public function __construct(CompactSignatureSerializer $csSerializer)
+    public function __construct(CompactSignatureSerializerInterface $csSerializer)
     {
         $this->csSerializer = $csSerializer;
     }
@@ -65,7 +65,11 @@ class SignedMessageSerializer
         $messageStartPos = strlen(self::HEADER) + 1;
         $messageEndPos = $sigHeaderPos - $messageStartPos - 1;
         $message = substr($content, $messageStartPos, $messageEndPos);
-        $sigHex = bin2hex(base64_decode(substr($content, ($sigHeaderPos + strlen(self::SIG_START)), $sigEnd)));
+
+        $sigStart = $sigHeaderPos + strlen(self::SIG_START);
+
+        $sig = trim(substr($content, $sigStart, $sigEnd - $sigStart));
+        $sigHex = bin2hex(base64_decode($sig));
         $compactSig = $this->csSerializer->parse($sigHex);
 
         return new SignedMessage($message, $compactSig);

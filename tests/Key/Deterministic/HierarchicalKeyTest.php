@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bitcoin;
@@ -299,7 +300,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertSame($key->getDepth(), '2');
-    }
+    }/**/
 
     /**
      * @dataProvider getEcAdapters
@@ -314,7 +315,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPub = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
         $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertTrue($key->isHardened());
-    }
+    }/**/
 
     /**
      * @dataProvider getEcAdapters
@@ -325,7 +326,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertSame($this->safeMath()->hexDec('615914f3'), $key->getFingerprint());
-    }
+    }/**/
 
     /**
      * @dataProvider getEcAdapters
@@ -336,7 +337,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertSame($this->safeMath()->hexDec('a282920f'), $key->getChildFingerprint());
-    }
+    }/**/
 
     /**
      * @dataProvider getEcAdapters
@@ -347,7 +348,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPrv = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
         $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
         $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $key->getPrivateKey()->getBuffer()->getHex());
-    }
+    }/**/
 
     /**
      * @dataProvider getEcAdapters
@@ -360,7 +361,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $key->getPrivateKey());
-    }
+    }/**/
 
     /**
      * @dataProvider getEcAdapters
@@ -371,7 +372,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $xPub = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
         $this->assertSame('02e399a713db445b33340034ee5f71cd782bd9bc78f6f3352ca640109fe24ca23a', $xPub->getPublicKey()->getBuffer()->getHex());
-    }
+    }/**/
 
     /**
      * @dataProvider getEcAdapters
@@ -384,12 +385,16 @@ class HierarchicalKeyTest extends AbstractTestCase
         $key->deriveChild("2147483648");
     }
 
+    /**
+     *
+     */
     public function testSkipsInvalidKey()
     {
         $math = new Math();
         $generator = EccFactory::getSecgCurves($math)->generator256k1();
-        $ec = new PhpEcc($math, $generator);
-        $privateKey = PrivateKeyFactory::create(true, $ec);
+
+        $k = $math->sub($generator->getOrder(), 1);
+        $startPub = PrivateKeyFactory::fromInt($k, true)->getPublicKey();
 
         $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface')
             ->setMethods([
@@ -404,15 +409,8 @@ class HierarchicalKeyTest extends AbstractTestCase
                 'getPrivateKey',
                 'halfOrder',
                 'checkInt',
-                'validateSignatureElement',
                 'signCompact',
                 'recover',
-                'validatePublicKey',
-                'privateToPublic',
-                'privateKeyAdd',
-                'privateKeyMul',
-                'publicKeyAdd',
-                'publicKeyMul',
                 'validatePrivateKey'
             ])
             ->getMock();
@@ -420,10 +418,6 @@ class HierarchicalKeyTest extends AbstractTestCase
         $mock->expects($this->any())
             ->method('getMath')
             ->willReturn($math);
-
-        $mock->expects($this->any())
-            ->method('privateKeyAdd')
-            ->willReturn(new PrivateKey($ec, $math->add($privateKey->getSecretMultiplier(), 1), true));
 
         $mock->expects($this->atLeastOnce())
             ->method('validatePrivateKey')
@@ -438,14 +432,71 @@ class HierarchicalKeyTest extends AbstractTestCase
                 }
             );
 
-        $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($mock, 0, 0, 0, 0, $privateKey);
+
+        $privMockBuilder = $this->getMockBuilder('BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface')
+            ->setMethods([
+                'getSecretMultiplier',
+                'getPublicKey',
+                'sign',
+                'toWif',
+
+                // Key Interface
+                'tweakAdd',
+                'tweakMul',
+                'isCompressed',
+                'isPrivate',
+                'getPubKeyHash',
+                'getAddress',
+
+                // serializable
+                'getBuffer',
+                'getInt',
+                'getHex',
+                'getBinary'
+            ]);
+
+        $invalidPriv = $privMockBuilder->getMock();
+        $invalidPriv->expects($this->any())
+            ->method('isCompressed')
+            ->willReturn(true);
+        $invalidPriv->expects($this->any())
+            ->method('isPrivate')
+            ->willReturn(true);
+        $invalidPriv->expects($this->any())
+            ->method('getSecretMultiplier')
+            ->willReturn($generator->getOrder());
+
+        $mockPriv = $privMockBuilder->getMock();
+        $mockPriv->expects($this->any())
+            ->method('getSecretMultiplier')
+            ->willReturn($k);
+
+        $mockPriv->expects($this->any())
+            ->method('getPublicKey')
+            ->willReturn($startPub);
+
+        $mockPriv->expects($this->any())
+            ->method('isCompressed')
+            ->willReturn(true);
+
+        $mockPriv->expects($this->any())
+            ->method('isPrivate')
+            ->willReturn(true);
+
+        $mockPriv->expects($this->any())
+            ->method('tweakAdd')
+            ->willReturn($invalidPriv);
+
+        /** @var EcAdapterInterface $mock */
+        /** @var PrivateKeyInterface $mockPriv */
+        $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($mock, 0, 0, 0, 0, $mockPriv);
 
         $this->assertEquals(0, $this->HK_run_count);
-        $expected = 0;
+        $expected = 1;
         $child = $key->deriveChild($expected);
         $this->assertNotEquals($expected, $child->getSequence());
-        $this->assertEquals(1, $child->getSequence());
+        $this->assertEquals(2, $child->getSequence());
         $this->assertEquals(2, $this->HK_run_count);
-        $this->assertEquals($math->add($privateKey->getSecretMultiplier(), 1), $child->getPrivateKey()->getSecretMultiplier());
+        $this->assertEquals($math->add($k, 1), $child->getPrivateKey()->getSecretMultiplier());
     }
 }

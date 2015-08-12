@@ -3,10 +3,11 @@
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
 
@@ -115,7 +116,12 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      */
     public function getBuffer()
     {
-        $txSigSerializer = new TransactionSignatureSerializer(new DerSignatureSerializer(Bitcoin::getMath()));
+        $txSigSerializer = new TransactionSignatureSerializer(
+            EcSerializer::getSerializer(
+                Bitcoin::getEcAdapter(),
+                DerSignatureSerializerInterface::class
+            )
+        );
         return $txSigSerializer->serialize($this);
     }
 }

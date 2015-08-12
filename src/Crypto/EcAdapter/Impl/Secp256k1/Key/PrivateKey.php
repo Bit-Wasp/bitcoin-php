@@ -47,9 +47,13 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function __construct(EcAdapter $adapter, $secret, $compressed = false)
     {
+        $buffer = Buffer::hex(str_pad($adapter->getMath()->decHex($secret), 64, '0', STR_PAD_LEFT));
+        if (!$adapter->validatePrivateKey($buffer)) {
+            throw new \Exception('Invalid private key');
+        }
         $this->ecAdapter = $adapter;
         $this->secret = $secret;
-        $this->secretBin = pack("H*", str_pad($adapter->getMath()->decHex($secret), 64, '0', STR_PAD_LEFT));
+        $this->secretBin = $buffer->getBinary();
         $this->compressed = $compressed;
     }
 
