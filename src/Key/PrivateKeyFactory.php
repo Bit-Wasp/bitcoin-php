@@ -67,7 +67,15 @@ class PrivateKeyFactory
     public static function fromWif($wif, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), EcSerializer::getSerializer($ecAdapter, PrivateKeySerializerInterface::class));
+
+        $wifSerializer = new WifPrivateKeySerializer(
+            $ecAdapter->getMath(),
+            EcSerializer::getSerializer(
+                $ecAdapter,
+                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface'
+            )
+        );
+
         return $wifSerializer->parse($wif);
     }
 
@@ -81,7 +89,11 @@ class PrivateKeyFactory
     {
         $hex = Buffer::hex($hex);
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $serializer = EcSerializer::getSerializer($ecAdapter, PrivateKeySerializerInterface::class);
+        $serializer = EcSerializer::getSerializer(
+            $ecAdapter,
+            'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface'
+        );
+
         /** @var PrivateKeySerializerInterface $serializer */
 
         $parsed = $serializer->parse($hex);

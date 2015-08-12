@@ -19,10 +19,7 @@ class SignatureFactory
     public static function fromHex($string, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $serializer = EcSerializer::getSerializer(
-            $ecAdapter,
-            DerSignatureSerializerInterface::class
-        );
+        $serializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface');
         /** @var DerSignatureSerializerInterface $serializer */
         return $serializer->parse($string);
     }

@@ -13,7 +13,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializer
 
 class TransactionSignatureFactory
 {
-
     /**
      * @param $string
      * @param EcAdapterInterface $ecAdapter
@@ -26,7 +25,7 @@ class TransactionSignatureFactory
         $serializer = new TransactionSignatureSerializer(
             EcSerializer::getSerializer(
                 $ecAdapter,
-                DerSignatureSerializerInterface::class
+                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SignatureSerializerInterface'
             )
         );
 

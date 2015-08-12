@@ -19,7 +19,7 @@ class PublicKeyFactory
     public static function getSerializer(EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $hexSerializer = EcSerializer::getSerializer($ecAdapter, PublicKeySerializerInterface::class);
+        $hexSerializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface');
         return $hexSerializer;
     }
 
