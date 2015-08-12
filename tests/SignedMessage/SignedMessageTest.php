@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
-use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class SignedMessage extends AbstractTestCase

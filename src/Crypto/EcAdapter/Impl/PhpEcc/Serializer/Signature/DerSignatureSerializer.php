@@ -1,7 +1,9 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Signature;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
@@ -11,20 +13,19 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 
-class DerSignatureSerializer
+class DerSignatureSerializer implements DerSignatureSerializerInterface
 {
-
     /**
      * @var Math
      */
     private $math;
 
     /**
-     * @param Math $math
+     * @param EcAdapter $adapter
      */
-    public function __construct(Math $math)
+    public function __construct(EcAdapter $adapter)
     {
-        $this->math = $math;
+        $this->math = $adapter->getMath();
     }
 
     /**
@@ -96,7 +97,13 @@ class DerSignatureSerializer
         try {
             list (, $inner) = $this->getOuterTemplate()->parse($parser);
             list (, $r, , $s) = $this->getInnerTemplate()->parse(new Parser($inner));
-            return new Signature($r->getInt(), $s->getInt());
+            /** @var Buffer $r */
+            /** @var Buffer $s */
+
+            return new Signature(
+                $r->getInt(),
+                $s->getInt()
+            );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }

@@ -2,10 +2,11 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Key;
 
-
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key\PublicKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Buffertools\Buffer;
 
@@ -33,9 +34,23 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function __construct(EcAdapter $ecAdapter, $secp256k1_pubkey_t, $compressed = false)
     {
+        if (!is_resource($secp256k1_pubkey_t) ||
+            !get_resource_type($secp256k1_pubkey_t) === SECP256K1_TYPE_PUBKEY) {
+            throw new \InvalidArgumentException('Secp256k1\Key\PublicKey expects ' . SECP256K1_TYPE_PUBKEY . ' resource');
+        }
         $this->ecAdapter = $ecAdapter;
         $this->pubkey_t = $secp256k1_pubkey_t;
         $this->compressed = $compressed;
+    }
+
+    /**
+     * @param Buffer $msg32
+     * @param SignatureInterface $signature
+     * @return bool
+     */
+    public function verify(Buffer $msg32, SignatureInterface $signature)
+    {
+        return $this->ecAdapter->verify($msg32, $this, $signature);
     }
 
     /**
@@ -61,6 +76,7 @@ class PublicKey extends Key implements PublicKeyInterface
     {
         return $this->pubkey_t;
     }
+
     /**
      * @return Buffer
      */
@@ -78,12 +94,12 @@ class PublicKey extends Key implements PublicKeyInterface
         $context = $this->ecAdapter->getContext();
         $serialized = '';
         if (1 !== secp256k1_ec_pubkey_serialize($context, $this->pubkey_t, $this->compressed, $serialized)) {
-            throw new \Exception('');
+            throw new \Exception('Secp256k1: pubkey serialize');
         }
 
         $clone = '';
         if (1 !== secp256k1_ec_pubkey_parse($context, $serialized, $clone)) {
-            throw new \Exception('');
+            throw new \Exception('Secp256k1 pubkey parse');
         }
         return $clone;
     }
@@ -100,7 +116,7 @@ class PublicKey extends Key implements PublicKeyInterface
         $bin = pack("H*", str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
 
         $clone = $this->clonePubkey();
-        if (1 !== secp256k1_ec_pubkey_tweak_add($context, $clone, $bin)){
+        if (1 !== secp256k1_ec_pubkey_tweak_add($context, $clone, $bin)) {
             throw new \RuntimeException('Secp256k1: tweak add failed.');
         }
 
@@ -119,7 +135,7 @@ class PublicKey extends Key implements PublicKeyInterface
         $bin = pack("H*", str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
 
         $clone = $this->clonePubkey();
-        if (1 !== secp256k1_ec_pubkey_tweak_mul($context, $clone, $bin)){
+        if (1 !== secp256k1_ec_pubkey_tweak_mul($context, $clone, $bin)) {
             throw new \RuntimeException('Secp256k1: tweak mul failed.');
         }
 
@@ -131,8 +147,6 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function getBuffer()
     {
-        $out = '';
-        secp256k1_ec_pubkey_serialize($this->ecAdapter->getContext(), $this->pubkey_t, $this->compressed, $out);
-        return new Buffer($out);
+        return (new PublicKeySerializer($this->ecAdapter))->serialize($this);
     }
 }

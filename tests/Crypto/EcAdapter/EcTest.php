@@ -3,10 +3,11 @@
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -222,7 +223,7 @@ class EcTest extends AbstractTestCase
 
         array_map(
             function ($value) use ($ec) {
-                $this->assertTrue($ec->validatePublicKey(Buffer::hex($value)));
+                $this->assertTrue(PublicKeyFactory::validateHex($value, $ec));
             },
             $valid
         );
@@ -234,7 +235,7 @@ class EcTest extends AbstractTestCase
 
         array_map(
             function ($value) use ($ec) {
-                $this->assertFalse($ec->validatePublicKey(Buffer::hex($value)));
+                $this->assertFalse(PublicKeyFactory::validateHex($value, $ec));
             },
             $invalid
         );

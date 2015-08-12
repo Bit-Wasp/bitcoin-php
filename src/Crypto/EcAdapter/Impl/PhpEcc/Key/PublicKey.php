@@ -3,11 +3,13 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PublicKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Serializer\Key\PublicKey\HexPublicKeySerializer;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKey extends Key implements PublicKeyInterface
@@ -28,12 +30,12 @@ class PublicKey extends Key implements PublicKeyInterface
     private $compressed;
 
     /**
-     * @param EcAdapterInterface $ecAdapter
+     * @param EcAdapter $ecAdapter
      * @param PointInterface $point
      * @param bool $compressed
      */
     public function __construct(
-        EcAdapterInterface $ecAdapter,
+        EcAdapter $ecAdapter,
         PointInterface $point,
         $compressed = false
     ) {
@@ -59,14 +61,25 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
+     * @param Buffer $msg32
+     * @param SignatureInterface $signature
+     * @return bool
+     */
+    public function verify(Buffer $msg32, SignatureInterface $signature)
+    {
+        return $this->ecAdapter->verify($msg32, $this, $signature);
+    }
+
+    /**
      * @param int|string $tweak
      * @return PublicKeyInterface
      */
     public function tweakAdd($tweak)
     {
-        $G = $this->ecAdapter->getGenerator();
+        $adapter = $this->ecAdapter;
+        $G = $adapter->getGenerator();
         $point = $this->point->add($G->mul($tweak));
-        return new PublicKey($this->ecAdapter, $point, $this->compressed);
+        return $adapter->getPublicKey($point, $this->compressed);
     }
 
     /**
@@ -76,7 +89,7 @@ class PublicKey extends Key implements PublicKeyInterface
     public function tweakMul($tweak)
     {
         $point = $this->point->mul($tweak);
-        return new PublicKey($this->ecAdapter, $point, $this->compressed);
+        return $this->ecAdapter->getPublicKey($point, $this->compressed);
     }
 
     /**
@@ -146,8 +159,6 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function getBuffer()
     {
-        $serializer = new HexPublicKeySerializer($this->ecAdapter);
-        $hex = $serializer->serialize($this);
-        return $hex;
+        return (new PublicKeySerializer($this->ecAdapter))->serialize($this);
     }
 }

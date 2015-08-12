@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\MessageSigner;
 
 use BitWasp\Bitcoin\MessageSigner\SignedMessage;
-use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
 
 class SignedMessageSerializer

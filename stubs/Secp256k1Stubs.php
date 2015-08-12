@@ -2,6 +2,12 @@
 
 namespace {
 
+    define('SECP256K1_CONTEXT_SIGN', 1 << 0);
+    define('SECP256K1_CONTEXT_VERIFY', 1 << 1);
+    define('SECP256K1_TYPE_CONTEXT', "secp256k1_context_t");
+    define('SECP256K1_TYPE_PUBKEY', "secp256k1_pubkey_t");
+    define('SECP256K1_TYPE_SIG', "secp256k1_ecdsa_signature_t");
+
     /**
      * Create a Secp256k1 context resource
      *
@@ -62,7 +68,7 @@ namespace {
      * @param resource $secp256k1_context_t
      * @param resource $secp256k1_ecdsa_signature_t
      * @param string $signatureOut
-     * @param int $recIdOut (opt) when set, the recid will be saved here.
+     * @param int $recIdOut [optional] when set, the recid will be saved here.
      * @return int
      */
     function secp256k1_ecdsa_signature_serialize_compact($secp256k1_context_t, $secp256k1_ecdsa_signature_t, &$signatureOut, &$recIdOut)
@@ -74,7 +80,8 @@ namespace {
      *
      * @param resource $secp256k1_context_t
      * @param string $signatureIn
-     * @param resource $secp256k1_ecdsa_signature_t
+     * @param resource|string $secp256k1_ecdsa_signature_t
+     * @return int
      */
     function secp256k1_ecdsa_signature_parse_der($secp256k1_context_t, $signatureIn, $secp256k1_ecdsa_signature_t)
     {
@@ -86,8 +93,9 @@ namespace {
      *
      * @param resource $secp256k1_context_t
      * @param string $signatureIn
-     * @param resource $secp256k1_ecdsa_signature_t
-     * @param int $recIdIn (opt) - pass the recid to allow pubkey recovery
+     * @param resource|string $secp256k1_ecdsa_signature_t
+     * @param int $recIdIn [optional]
+     * @return int
      */
     function secp256k1_ecdsa_signature_parse_compact($secp256k1_context_t, $signatureIn, $secp256k1_ecdsa_signature_t, $recIdIn)
     {
@@ -108,7 +116,7 @@ namespace {
      * @param resource $secp256k1_context_t
      * @param string $msg32
      * @param string $privateKey
-     * @param resource $secp256k1_ecdsa_signature_t
+     * @param resource|string $secp256k1_ecdsa_signature_t
      * @return int
      */
     function secp256k1_ecdsa_sign($secp256k1_context_t, $msg32, $privateKey, $secp256k1_ecdsa_signature_t)
@@ -119,7 +127,7 @@ namespace {
      * @param resource $secp256k1_context_t
      * @param string $msg32
      * @param resource $secp256k1_ecdsa_signature_t
-     * @param resource $secp256k1_pubkey_t
+     * @param resource|string $secp256k1_pubkey_t
      * @return int
      */
     function secp256k1_ecdsa_recover($secp256k1_context_t, $msg32, $secp256k1_ecdsa_signature_t, $secp256k1_pubkey_t)
@@ -129,7 +137,7 @@ namespace {
     /**
      * @param resource $secp256k1_context_t
      * @param string $secretKey
-     * @param resource $secp256k1_pubkey_t
+     * @param resource|string $secp256k1_pubkey_t
      * @return int
      */
     function secp256k1_ec_pubkey_create($secp256k1_context_t, $secretKey, $secp256k1_pubkey_t)
@@ -139,7 +147,8 @@ namespace {
     /**
      * @param resource $secp256k1_context_t
      * @param string $pubkeyIn
-     * @param resource $secp256k1_pubkey_t
+     * @param resource|string $secp256k1_pubkey_t
+     * @return int
      */
     function secp256k1_ec_pubkey_parse($secp256k1_context_t, $pubkeyIn, $secp256k1_pubkey_t)
     {
@@ -148,8 +157,9 @@ namespace {
     /**
      * @param resource $secp256k1_context_t
      * @param resource $secp256k1_pubkey_t
-     * @param $compressed
-     * @param $pubkeyOut
+     * @param bool $compressed
+     * @param string $pubkeyOut
+     * @return int
      */
     function secp256k1_ec_pubkey_serialize($secp256k1_context_t, $secp256k1_pubkey_t, $compressed, $pubkeyOut)
     {
@@ -193,16 +203,6 @@ namespace {
      */
     function secp256k1_ec_pubkey_tweak_mul($secp256k1_context_t, $secp256k1_pubkey_t, $tweak)
     {
-    }
-
-    /**
-     * @param resource $secp256k1_context_t
-     * @param string $publicKey
-     * @return int
-     */
-    function secp256k1_ec_pubkey_verify($secp256k1_context_t, $publicKey)
-    {
-
     }
 
     /**

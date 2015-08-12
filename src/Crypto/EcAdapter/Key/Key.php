@@ -13,7 +13,6 @@ abstract class Key extends Serializable implements KeyInterface
      */
     public function getAddress()
     {
-        $address = AddressFactory::fromKey($this);
-        return $address;
+        return AddressFactory::fromKey($this);
     }
 }

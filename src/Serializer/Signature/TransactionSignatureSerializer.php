@@ -2,29 +2,30 @@
 
 namespace BitWasp\Bitcoin\Serializer\Signature;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Parser;
 
 class TransactionSignatureSerializer
 {
     /**
-     * @var DerSignatureSerializer
+     * @var DerSignatureSerializerInterface
      */
     private $sigSerializer;
 
     /**
-     * @param DerSignatureSerializer $sigSerializer
+     * @param DerSignatureSerializerInterface $sigSerializer
      */
-    public function __construct(DerSignatureSerializer $sigSerializer)
+    public function __construct(DerSignatureSerializerInterface $sigSerializer)
     {
         $this->sigSerializer = $sigSerializer;
     }
 
     /**
-     * @param \BitWasp\Bitcoin\Signature\TransactionSignature $txSig
+     * @param TransactionSignature $txSig
      * @return \BitWasp\Buffertools\Buffer
      */
-    public function serialize(\BitWasp\Bitcoin\Signature\TransactionSignature $txSig)
+    public function serialize(TransactionSignature $txSig)
     {
         $sig = $this->sigSerializer->serialize($txSig->getSignature());
         $parser = new Parser($sig->getHex());
@@ -34,24 +35,18 @@ class TransactionSignatureSerializer
     }
 
     /**
-     * @param Parser $parser
-     * @return \BitWasp\Bitcoin\Signature\TransactionSignature
-     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
-     */
-    public function fromParser(Parser & $parser)
-    {
-        $signature = $this->sigSerializer->fromParser($parser);
-        $hashtype = $parser->readBytes(1)->getInt();
-        return new TransactionSignature($signature, $hashtype);
-    }
-
-    /**
      * @param $string
      * @return TransactionSignature
      */
     public function parse($string)
     {
-        $parser = new Parser($string);
-        return $this->fromParser($parser);
+        $buffer = (new Parser($string))->getBuffer();
+        $size = $buffer->getSize();
+        $sig = $buffer->slice(0, $size - 2);
+        $hashType = $buffer->slice($size, 1);
+        return new TransactionSignature(
+            $this->sigSerializer->parse($sig),
+            $hashType->getInt()
+        );
     }
 }

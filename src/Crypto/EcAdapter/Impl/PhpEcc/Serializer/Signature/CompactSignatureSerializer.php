@@ -1,15 +1,18 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Signature;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
-use BitWasp\Bitcoin\Signature\CompactSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 use BitWasp\Buffertools\TemplateFactory;
 
-class CompactSignatureSerializer
+class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 {
 
     /**
@@ -18,11 +21,11 @@ class CompactSignatureSerializer
     private $math;
 
     /**
-     * @param Math $math
+     * @param EcAdapter $adapter
      */
-    public function __construct(Math $math)
+    public function __construct(EcAdapter $adapter)
     {
-        $this->math = $math;
+        $this->math = $adapter->getMath();
     }
 
     /**
@@ -41,13 +44,23 @@ class CompactSignatureSerializer
      * @param CompactSignature $signature
      * @return Buffer
      */
-    public function serialize(CompactSignature $signature)
+    private function doSerialize(CompactSignature $signature)
     {
         return $this->getTemplate()->write([
             $signature->getFlags(),
             $signature->getR(),
             $signature->getS()
         ]);
+    }
+
+    /**
+     * @param CompactSignatureInterface $signature
+     * @return Buffer
+     */
+    public function serialize(CompactSignatureInterface $signature)
+    {
+        /** @var CompactSignature $signature */
+        return $this->doSerialize($signature);
     }
 
     /**
@@ -71,8 +84,7 @@ class CompactSignatureSerializer
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
 
-        $signature = new CompactSignature($r, $s, $recoveryId, $isCompressed);
-        return $signature;
+        return new CompactSignature($r, $s, $recoveryId, $isCompressed);
     }
 
     /**
@@ -82,8 +94,6 @@ class CompactSignatureSerializer
      */
     public function parse($string)
     {
-        $parser = new Parser($string);
-        $signature = $this->fromParser($parser);
-        return $signature;
+        return $this->fromParser(new Parser($string));
     }
 }

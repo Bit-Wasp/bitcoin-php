@@ -4,8 +4,8 @@ namespace BitWasp\Bitcoin\MessageSigner;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
-use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
-use BitWasp\Bitcoin\Signature\CompactSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 
 class SignedMessage
 {

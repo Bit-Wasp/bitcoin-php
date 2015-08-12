@@ -4,10 +4,12 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key\PrivateKeySerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Buffertools\Buffer;
 
@@ -52,6 +54,16 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
+     * @param Buffer $msg32
+     * @param RbgInterface|null $rbgInterface
+     * @return Signature
+     */
+    public function sign(Buffer $msg32, RbgInterface $rbgInterface = null)
+    {
+        return $this->ecAdapter->sign($msg32, $this, $rbgInterface);
+    }
+
+    /**
      * @return bool|false
      */
     public function isCompressed()
@@ -76,6 +88,14 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
+     * @return string
+     */
+    public function getSecretBinary()
+    {
+        return $this->secretBin;
+    }
+
+    /**
      * @return PublicKey
      */
     public function getPublicKey()
@@ -86,6 +106,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
             if (1 !== secp256k1_ec_pubkey_create($context, $this->getBinary(), $pubkey_t)) {
                 throw new \RuntimeException('Failed to create public key');
             }
+            /** @var resource $pubkey_t */
             $this->publicKey = new PublicKey($this->ecAdapter, $pubkey_t, $this->compressed);
         }
 
@@ -124,19 +145,23 @@ class PrivateKey extends Key implements PrivateKeyInterface
         }
 
         $secret = $math->hexDec(bin2hex($privKey));
-        return new PrivateKey($adapter, $secret, $this->compressed);
+        return $adapter->getPrivateKey($secret, $this->compressed);
     }
 
+    /**
+     * @param int $tweak
+     * @return PrivateKey
+     */
     public function tweakMul($tweak)
     {
         $adapter = $this->ecAdapter;
         $math = $adapter->getMath();
         $context = $adapter->getContext();
-        $privKey = $this->getBinary(); // mod by reference
+        $privateKey = $this->getBinary(); // mod by reference
         $tweak = pack("H*", str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
         $ret = \secp256k1_ec_privkey_tweak_mul(
             $context,
-            $privKey,
+            $privateKey,
             $tweak
         );
 
@@ -144,8 +169,8 @@ class PrivateKey extends Key implements PrivateKeyInterface
             throw new \RuntimeException('Secp256k1 privkey tweak mul: failed');
         }
 
-        $secret = $math->hexDec(bin2hex($privKey));
-        return new PrivateKey($adapter, $secret, $this->compressed);
+        $secret = $math->hexDec(bin2hex($privateKey));
+        return $adapter->getPrivateKey($secret, $this->compressed);
     }
 
     /**
@@ -155,15 +180,15 @@ class PrivateKey extends Key implements PrivateKeyInterface
     public function toWif(NetworkInterface $network = null)
     {
         $network = $network ?: Bitcoin::getNetwork();
-
-        $wifSerializer = new WifPrivateKeySerializer($this->ecAdapter->getMath(), new HexPrivateKeySerializer($this->ecAdapter));
-        $wif = $wifSerializer->serialize($network, $this);
-        return $wif;
+        $wifSerializer = new WifPrivateKeySerializer($this->ecAdapter->getMath(), new PrivateKeySerializer($this->ecAdapter));
+        return $wifSerializer->serialize($network, $this);
     }
 
+    /**
+     * @return Buffer
+     */
     public function getBuffer()
     {
-        return new Buffer($this->secretBin);
+        return (new PrivateKeySerializer($this->ecAdapter))->serialize($this);
     }
-
 }

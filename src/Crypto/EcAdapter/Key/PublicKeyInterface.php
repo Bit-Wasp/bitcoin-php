@@ -2,6 +2,9 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
+use BitWasp\Buffertools\Buffer;
+
 interface PublicKeyInterface extends KeyInterface
 {
     /**
@@ -10,22 +13,29 @@ interface PublicKeyInterface extends KeyInterface
     const LENGTH_UNCOMPRESSED = 65;
 
     /**
+     * Length of a compressed key
+     */
+    const LENGTH_COMPRESSED = 33;
+
+    /**
      * When key is uncompressed, this is the prefix.
      */
     const KEY_UNCOMPRESSED = '04';
 
     /**
-     * Length of a compressed key
-     */
-    const LENGTH_COMPRESSED = 33;
-    /**
-     * When y coordinate is even, prepend x coordinate with this if
-     * generating a public key
+     * When y coordinate is even, prepend x coordinate with this hex byte
      */
     const KEY_COMPRESSED_EVEN = '02';
 
     /**
-     * When y coordinate is odd, prepend x coordinate with this if
-     * generating a public key
+     * When y coordinate is odd, prepend x coordinate this this hex byte
      */
+    const KEY_COMPRESSED_ODD = '03';
+
+    /**
+     * @param Buffer $msg32
+     * @param SignatureInterface $signature
+     * @return bool
+     */
+    public function verify(Buffer $msg32, SignatureInterface $signature);
 }

@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
@@ -391,7 +391,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $ec = new PhpEcc($math, $generator);
         $privateKey = PrivateKeyFactory::create(true, $ec);
 
-        $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface')
+        $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface')
             ->setMethods([
                 'getMath',
                 'getAdapterName',
@@ -401,11 +401,12 @@ class HierarchicalKeyTest extends AbstractTestCase
                 'associateSigs',
                 'sign',
                 'verify',
+                'getPrivateKey',
                 'halfOrder',
                 'checkInt',
                 'validateSignatureElement',
                 'signCompact',
-                'recoverCompact',
+                'recover',
                 'validatePublicKey',
                 'privateToPublic',
                 'privateKeyAdd',

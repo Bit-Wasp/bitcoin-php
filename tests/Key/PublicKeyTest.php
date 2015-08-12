@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Key;
 
-use BitWasp\Bitcoin\Key\Point;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
@@ -11,7 +10,6 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class PublicKeyTest extends AbstractTestCase
 {
-
     /**
      * @var
      */
@@ -46,8 +44,6 @@ class PublicKeyTest extends AbstractTestCase
         unset($eUncompressed);
         $publicKey = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
 
-        $this->assertInstanceOf($this->publicType, $publicKey);
-        $this->assertInstanceOf('\Mdanter\Ecc\Primitives\PointInterface', $publicKey->getPoint());
         $this->assertSame($eCompressed, $publicKey->getBuffer()->getHex());
         $this->assertSame($publicKey->getBuffer()->getHex(), $eCompressed);
         $this->assertTrue($publicKey->isCompressed());
@@ -61,9 +57,6 @@ class PublicKeyTest extends AbstractTestCase
     {
         unset($eCompressed);
         $publicKey = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
-        
-        $this->assertInstanceOf($this->publicType, $publicKey);
-        $this->assertInstanceOf('\Mdanter\Ecc\Primitives\PointInterface', $publicKey->getPoint());
         $this->assertSame($eUncompressed, $publicKey->getBuffer()->getHex());
         $this->assertSame($publicKey->getBuffer()->getHex(), $eUncompressed);
         $this->assertFalse($publicKey->isCompressed());
@@ -154,29 +147,24 @@ class PublicKeyTest extends AbstractTestCase
      * @dataProvider getPublicVectors
      * @param EcAdapterInterface $ecAdapter
      */
-    public function testSetCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
+    public function testIsNotCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
     {
         unset($eCompressed);
         $pub = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
         $this->assertFalse($pub->isCompressed());
-
-        $pub->setCompressed(true);
-        $this->assertTrue($pub->isCompressed());
     }
 
     /**
      * @dataProvider getPublicVectors
      * @param EcAdapterInterface $ecAdapter
      */
-    public function testSetUnCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
+    public function testIsCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
     {
         unset($eUncompressed);
         
         $pub = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
         $this->assertTrue($pub->isCompressed());
 
-        $pub->setCompressed(false);
-        $this->assertFalse($pub->isCompressed());
     }
 
     /**
@@ -195,31 +183,5 @@ class PublicKeyTest extends AbstractTestCase
             $hHex = substr($hex, $i*2, 2);
             $this->assertSame($nHex, $hHex);
         }
-    }
-
-    /**
-     * @expectedException \Exception
-     */
-    public function testSetCompressedFailure()
-    {
-        $pub = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $pub->setCompressed('a');
-    }
-
-    /**
-     * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $ecAdapter
-     */
-    public function testPublicKeyFromPoint(EcAdapterInterface $ecAdapter)
-    {
-        $point = new Point(
-            $ecAdapter->getMath(),
-            $ecAdapter->getGenerator(),
-            '94075108042016923119479678483338406049382274483038030215794449747077048324075',
-            '68068239036272628750825525318805297439390570305050728515552223656985804538350'
-        );
-
-        $publicKey = PublicKeyFactory::fromPoint($point);
-        $this->assertSame($point, $publicKey->getPoint());
     }
 }

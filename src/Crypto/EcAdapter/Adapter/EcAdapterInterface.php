@@ -6,8 +6,8 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
-use BitWasp\Bitcoin\Signature\CompactSignature;
 
 interface EcAdapterInterface
 {
@@ -20,6 +20,19 @@ interface EcAdapterInterface
      * @return \Mdanter\Ecc\Primitives\GeneratorPoint
      */
     public function getGenerator();
+
+    /**
+     * @param Buffer $buffer
+     * @return bool
+     */
+    public function validatePrivateKey(Buffer $buffer);
+
+    /**
+     * @param $scalar
+     * @param bool|false $compressed
+     * @return PrivateKeyInterface
+     */
+    public function getPrivateKey($scalar, $compressed = false);
 
     /**
      * @param Buffer $messageHash
@@ -41,15 +54,14 @@ interface EcAdapterInterface
      * @param PrivateKeyInterface $privateKey
      * @param Buffer $messageHash
      * @param RbgInterface $rbg
-     * @return CompactSignature
+     * @return CompactSignatureInterface
      */
     public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
 
     /**
      * @param Buffer $messageHash
-     * @param CompactSignature $compactSignature
+     * @param CompactSignatureInterface $compactSignature
      * @return PublicKeyInterface
      */
-    public function recover(Buffer $messageHash, CompactSignature $compactSignature);
-
+    public function recover(Buffer $messageHash, CompactSignatureInterface $compactSignature);
 }

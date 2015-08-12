@@ -33,7 +33,7 @@ class Rfc6979 implements RbgInterface
         Buffer $messageHash,
         $algo = 'sha256'
     ) {
-        $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey->getSecretMultiplier());
+        $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey->getInt());
         $this->ecAdapter = $ecAdapter;
         $this->hmac = new HmacRandomNumberGenerator($ecAdapter->getMath(), $mdPk, $messageHash->getInt(), $algo);
     }

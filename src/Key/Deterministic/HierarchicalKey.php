@@ -229,6 +229,7 @@ class HierarchicalKey
         $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain);
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
+        $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
 
         if (false === $this->ecAdapter->validatePrivateKey($offset)) {
             return $this->deriveChild($sequence + 1);
@@ -240,9 +241,7 @@ class HierarchicalKey
             $this->getChildFingerprint(),
             $sequence,
             $chain->getInt(),
-            $this->isPrivate()
-            ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
-            : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt())
+            $key->tweakAdd($offset->getInt())
         );
     }
 

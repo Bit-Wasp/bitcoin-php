@@ -1,24 +1,14 @@
 <?php
 
 
-namespace BitWasp\Bitcoin\Signature;
+namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 
-class CompactSignature extends Serializable
+class CompactSignature extends Signature implements CompactSignatureInterface
 {
-    /**
-     * @var int|string
-     */
-    private $r;
-
-    /**
-     * @var int|string
-     */
-    private $s;
-
     /**
      * @var int|string
      */
@@ -37,26 +27,13 @@ class CompactSignature extends Serializable
      */
     public function __construct($r, $s, $recid, $compressed)
     {
-        $this->r = $r;
-        $this->s = $s;
+        if (!is_bool($compressed)) {
+            throw new \InvalidArgumentException('CompactSignature: $compressed must be a boolean');
+        }
+
         $this->recid = $recid;
         $this->compressed = $compressed;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getR()
-    {
-        return $this->r;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getS()
-    {
-        return $this->s;
+        parent::__construct($r, $s);
     }
 
     /**
@@ -72,7 +49,7 @@ class CompactSignature extends Serializable
      */
     public function isCompressed()
     {
-        return $this->compressed === true;
+        return $this->compressed;
     }
 
     /**
@@ -88,7 +65,6 @@ class CompactSignature extends Serializable
      */
     public function getBuffer()
     {
-        $serializer = new CompactSignatureSerializer(Bitcoin::getMath());
-        return $serializer->serialize($this);
+        return (new CompactSignatureSerializer(Bitcoin::getMath()))->serialize($this);
     }
 }

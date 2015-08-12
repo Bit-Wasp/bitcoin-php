@@ -3,19 +3,18 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Buffertools\Buffer;
 
 class Signature extends Serializable implements SignatureInterface
 {
     /**
-     * @var int
+     * @var int|string
      */
     private $r;
 
     /**
-     * @var int
+     * @var  int|string
      */
     private $s;
 
@@ -30,27 +29,37 @@ class Signature extends Serializable implements SignatureInterface
     private $secp256k1_sig;
 
     /**
+     * @param EcAdapter $adapter
      * @param resource $secp256k1_ecdsa_signature_t
      */
-    public function __construct(EcAdapter $adapter, $secp256k1_ecdsa_signature_t)
+    public function __construct(EcAdapter $adapter, $r, $s, $secp256k1_ecdsa_signature_t)
     {
-        $sig = '';
-        if (1 !== secp256k1_ecdsa_signature_serialize_compact($adapter->getContext(), $secp256k1_ecdsa_signature_t, $sig)) {
-            throw new \RuntimeException('Secp256k1: Failed to parse signature');
+        if (!is_resource($secp256k1_ecdsa_signature_t) ||
+            !get_resource_type($secp256k1_ecdsa_signature_t) === SECP256K1_TYPE_SIG
+        ) {
+            throw new \InvalidArgumentException('Secp256k1\Signature\Signature expects ' . SECP256K1_TYPE_SIG . ' resource');
         }
 
-        $math = $adapter->getMath();
-        list ($r, $s) = array_map(
-            function ($binaryValue) use ($math) {
-                return $math->hexDec(bin2hex($binaryValue));
-            },
-            str_split($sig, 32)
-        );
-
-        $this->r = $r;
-        $this->s = $s;
         $this->secp256k1_sig = $secp256k1_ecdsa_signature_t;
         $this->ecAdapter = $adapter;
+        $this->r = $r;
+        $this->s = $s;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getR()
+    {
+        return $this->r;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getS()
+    {
+        return $this->s;
     }
 
     /**
@@ -60,32 +69,12 @@ class Signature extends Serializable implements SignatureInterface
     {
         return $this->secp256k1_sig;
     }
-    /**
-     * @inheritdoc
-     */
-    public function getR()
-    {
-        return $this->r;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getS()
-    {
-        return $this->s;
-    }
 
     /**
      * @return \BitWasp\Buffertools\Buffer
      */
     public function getBuffer()
     {
-        $sigOut = '';
-        if (!secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $this->secp256k1_sig, $sigOut)) {
-            throw new \RuntimeException('Secp256k1: failed to serialize DER signature');
-        }
-
-        return new Buffer($sigOut);
+        return (new DerSignatureSerializer($this->ecAdapter))->serialize($this);
     }
 }

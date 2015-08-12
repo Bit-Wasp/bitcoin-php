@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Serializer\Signature;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Buffertools;
 
 class ElectrumKey
 {
@@ -44,7 +43,6 @@ class ElectrumKey
         }
 
         $this->publicKey = $masterKey;
-
     }
 
     /**
@@ -72,12 +70,7 @@ class ElectrumKey
      */
     public function getMPK()
     {
-        $math = $this->ecAdapter->getMath();
-        $point = $this->getMasterPublicKey()->getPoint();
-        return Buffertools::concat(
-            Buffer::hex($math->decHex($point->getX()), 32),
-            Buffer::hex($math->decHex($point->getY()), 32)
-        );
+        return $this->getMasterPublicKey()->getBuffer()->slice(1);
     }
 
     /**

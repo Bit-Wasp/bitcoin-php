@@ -2,55 +2,97 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter;
 
-
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
-use BitWasp\Bitcoin\Signature\CompactSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class EcAdapter implements EcAdapterInterface
 {
+    /**
+     * @var Math
+     */
     private $math;
+
+    /**
+     * @var GeneratorPoint
+     */
     private $generator;
 
+    /**
+     * @param Math $math
+     * @param GeneratorPoint $generator
+     */
     public function __construct(Math $math, GeneratorPoint $generator)
     {
         $this->math = $math;
         $this->generator = $generator;
     }
 
+    /**
+     * @return Math
+     */
     public function getMath()
     {
         return $this->math;
     }
 
+    /**
+     * @return GeneratorPoint
+     */
     public function getGenerator()
     {
         return $this->generator;
     }
 
+    /**
+     * @param $scalar
+     * @param bool|false $compressed
+     * @return PrivateKey
+     */
     public function getPrivateKey($scalar, $compressed = false)
     {
         return new PrivateKey($this, $scalar, $compressed);
     }
 
     /**
+     * @param PointInterface $point
+     * @param bool|false $compressed
+     * @return PublicKey
+     */
+    public function getPublicKey(PointInterface $point, $compressed = false)
+    {
+        return new PublicKey($this, $point, $compressed);
+    }
+
+    /**
+     * @param int|string $r
+     * @param int|string $s
+     * @return Signature
+     */
+    public function getSignature($r, $s)
+    {
+        return new Signature($r, $s);
+    }
+
+    /**
      * @param Buffer $messageHash
-     * @param PublicKeyInterface $publicKey
-     * @param SignatureInterface $signature
+     * @param PublicKey $publicKey
+     * @param Signature $signature
      * @return bool
      */
-    public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
+    private function doVerify(Buffer $messageHash, PublicKey $publicKey, Signature $signature)
     {
         $n = $this->getGenerator()->getOrder();
         $math = $this->getMath();
@@ -75,12 +117,24 @@ class EcAdapter implements EcAdapterInterface
 
     /**
      * @param Buffer $messageHash
-     * @param PrivateKeyInterface $privateKey
-     * @param RbgInterface $rbg
-     * @return SignatureInterface
-     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
+     * @param PublicKeyInterface $publicKey
+     * @param SignatureInterface $signature
+     * @return bool
      */
-    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
+    {
+        /** @var $publicKey PublicKey */
+        /** @var $signature Signature */
+        return $this->doVerify($messageHash, $publicKey, $signature);
+    }
+
+    /**
+     * @param Buffer $messageHash
+     * @param PrivateKey $privateKey
+     * @param RbgInterface|null $rbg
+     * @return Signature
+     */
+    private function doSign(Buffer $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null)
     {
         $rbg = $rbg ?: new Rfc6979($this, $privateKey, $messageHash);
         $randomK = $rbg->bytes(32);
@@ -126,6 +180,19 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
+     * @param Buffer $messageHash
+     * @param PrivateKeyInterface $privateKey
+     * @param RbgInterface $rbg
+     * @return SignatureInterface
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
+     */
+    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    {
+        /** @var $privateKey PrivateKey */
+        return $this->doSign($messageHash, $privateKey, $rbg);
+    }
+
+    /**
      * @return string
      */
     public function halfOrder()
@@ -141,13 +208,11 @@ class EcAdapter implements EcAdapterInterface
     public function checkInt($int, $max)
     {
         $math = $this->getMath();
-
-        return $math->cmp($int, $max) < 0
-        && $math->cmp($int, 0) !== 0;
+        return $math->cmp($int, $max) < 0 && $math->cmp($int, 0) !== 0;
     }
 
     /**
-     * @param $element
+     * @param int|string $element
      * @param bool $half
      * @return bool
      */
@@ -156,18 +221,18 @@ class EcAdapter implements EcAdapterInterface
         return $this->checkInt(
             $element,
             $half
-                ? $this->halfOrder()
-                : $this->getGenerator()->getOrder()
+            ? $this->halfOrder()
+            : $this->getGenerator()->getOrder()
         );
     }
 
     /**
      * @param Buffer $messageHash
-     * @param CompactSignature $signature
+     * @param CompactSignatureInterface $signature
      * @return PublicKey
      * @throws \Exception
      */
-    public function recover(Buffer $messageHash, CompactSignature $signature)
+    public function recover(Buffer $messageHash, CompactSignatureInterface $signature)
     {
         $math = $this->getMath();
         $G = $this->getGenerator();
@@ -211,9 +276,9 @@ class EcAdapter implements EcAdapterInterface
         $Q = $R->mul($signature->getS())->add($eGNeg)->mul($rInv);
 
         // 1.6.2 Test Q as a public key
-        $Qk = new PublicKey($this, $Q);
+        $Qk = new PublicKey($this, $Q, $signature->isCompressed());
         if ($this->verify($messageHash, $Qk, new Signature($signature->getR(), $signature->getS()))) {
-            return $Qk->setCompressed($signature->isCompressed());
+            return $Qk;
         }
 
         throw new \Exception('Unable to recover public key');
@@ -225,17 +290,17 @@ class EcAdapter implements EcAdapterInterface
      * @param                $r
      * @param                $s
      * @param Buffer $messageHash
-     * @param PublicKeyInterface $publicKey
+     * @param PublicKey $publicKey
      * @return int
      * @throws \Exception
      */
-    public function calcPubKeyRecoveryParam($r, $s, Buffer $messageHash, PublicKeyInterface $publicKey)
+    public function calcPubKeyRecoveryParam($r, $s, Buffer $messageHash, PublicKey $publicKey)
     {
         $Q = $publicKey->getPoint();
         for ($i = 0; $i < 4; $i++) {
             try {
-                $test = new CompactSignature($r, $s, $i, $publicKey->isCompressed());
-                if ($this->recover($messageHash, $test)->getPoint()->equals($Q)) {
+                $recover = $this->recover($messageHash, new CompactSignature($r, $s, $i, $publicKey->isCompressed()));
+                if ($recover->getPoint()->equals($Q)) {
                     return $i;
                 }
             } catch (\Exception $e) {
@@ -247,12 +312,13 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param PrivateKeyInterface $privateKey
      * @param Buffer $messageHash
-     * @param RbgInterface $rbg
+     * @param PrivateKey $privateKey
+     * @param RbgInterface|null $rbg
      * @return CompactSignature
+     * @throws \Exception
      */
-    public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    private function doSignCompact(Buffer $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null)
     {
         $sign = $this->sign($messageHash, $privateKey, $rbg);
 
@@ -267,6 +333,18 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
+     * @param PrivateKeyInterface $privateKey
+     * @param Buffer $messageHash
+     * @param RbgInterface $rbg
+     * @return CompactSignature
+     */
+    public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    {
+        /** @var PrivateKey $privateKey */
+        return $this->doSignCompact($messageHash, $privateKey, $rbg);
+    }
+
+    /**
      * @param Buffer $privateKey
      * @return bool
      */
@@ -277,125 +355,61 @@ class EcAdapter implements EcAdapterInterface
 
     /**
      * @param Buffer $publicKey
-     * @return bool
+     * @return \Mdanter\Ecc\Primitives\PointInterface
+     * @throws \Exception
      */
-    public function validatePublicKey(Buffer $publicKey)
+    public function publicKeyFromBuffer(Buffer $publicKey)
     {
-        if (PublicKey::isCompressedOrUncompressed($publicKey)) {
-            try {
-                $this->publicKeyFromBuffer($publicKey);
-                return true;
-            } catch (\Exception $e) {
-                // Let the function finish and return false
-            }
+        $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
+        $xCoord = $publicKey->slice(1, 32)->getInt();
+
+        return new PublicKey(
+            $this,
+            $this->getGenerator()
+                ->getCurve()
+                ->getPoint(
+                    $xCoord,
+                    $compressed
+                    ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
+                    : $publicKey->slice(33, 32)->getInt()
+                ),
+            $compressed
+        );
+    }
+
+    /**
+     * @param integer $xCoord
+     * @param string $prefix
+     * @return int|string
+     * @throws \Exception
+     */
+    public function recoverYfromX($xCoord, $prefix)
+    {
+        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
+            throw new \RuntimeException('Incorrect byte for a public key');
         }
 
-        return false;
-    }
-
-    /**
-     * @param PrivateKeyInterface $privateKey
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
-     */
-    public function privateToPublic(PrivateKeyInterface $privateKey)
-    {
-        return new PublicKey(
-            $this,
-            $this->getGenerator()->mul($privateKey->getSecretMultiplier()),
-            $privateKey->isCompressed()
-        );
-    }
-
-    /**
-     * @param PrivateKeyInterface $oldPrivate
-     * @param $newSecret
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
-     */
-    private function getRelatedPrivateKey(PrivateKeyInterface $oldPrivate, $newSecret)
-    {
-        return new PrivateKey(
-            $this,
-            $newSecret,
-            $oldPrivate->isCompressed()
-        );
-    }
-
-    /**
-     * @param PublicKeyInterface $oldPublic
-     * @param PointInterface $newPoint
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
-     */
-    private function getRelatedPublicKey(PublicKeyInterface $oldPublic, PointInterface $newPoint)
-    {
-        return new PublicKey(
-            $this,
-            $newPoint,
-            $oldPublic->isCompressed()
-        );
-    }
-
-    /**
-     * @param PrivateKeyInterface $privateKey
-     * @param $integer
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
-     */
-    public function privateKeyAdd(PrivateKeyInterface $privateKey, $integer)
-    {
         $math = $this->getMath();
-        return $this->getRelatedPrivateKey(
-            $privateKey,
-            $math->mod(
-                $math->add(
-                    $integer,
-                    $privateKey->getSecretMultiplier()
+        $curve = $this->getGenerator()->getCurve();
+        $prime = $curve->getPrime();
+
+        // Calculate first root
+        $root0 = $math->getNumberTheory()->squareRootModP(
+            $math->add(
+                $math->powMod(
+                    $xCoord,
+                    3,
+                    $prime
                 ),
-                $this->getGenerator()->getOrder()
-            )
+                $curve->getB()
+            ),
+            $prime
         );
-    }
 
-    /**
-     * @param PrivateKeyInterface $privateKey
-     * @param $integer
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
-     */
-    public function privateKeyMul(PrivateKeyInterface $privateKey, $integer)
-    {
-        $math = $this->getMath();
-
-        return $this->getRelatedPrivateKey(
-            $privateKey,
-            $math->mod(
-                $math->mul(
-                    $integer,
-                    $privateKey->getSecretMultiplier()
-                ),
-                $this->getGenerator()->getOrder()
-            )
-        );
-    }
-
-    /**
-     * @param PublicKeyInterface $publicKey
-     * @param $integer
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
-     */
-    public function publicKeyMul(PublicKeyInterface $publicKey, $integer)
-    {
-        $newPoint = $publicKey->getPoint()->mul($integer);
-        return $this->getRelatedPublicKey($publicKey, $newPoint);
-    }
-
-    /**
-     * @param PublicKeyInterface $publicKey
-     * @param $integer
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey
-     */
-    public function publicKeyAdd(PublicKeyInterface $publicKey, $integer)
-    {
-        return $this->getRelatedPublicKey(
-            $publicKey,
-            $publicKey->getPoint()->add($this->getGenerator()->mul($integer))
-        );
+        // Depending on the byte, we expect the Y value to be even or odd.
+        // We only calculate the second y root if it's needed.
+        return (($prefix == PublicKey::KEY_COMPRESSED_EVEN) == $math->isEven($root0))
+            ? $root0
+            : $math->sub($prime, $root0);
     }
 }

@@ -10,16 +10,9 @@ interface KeyInterface extends SerializableInterface
     /**
      * Check if the key should be be using compressed format
      *
-     * @return mixed
+     * @return bool
      */
     public function isCompressed();
-
-    /**
-     * Return the hash of the public key.
-     *
-     * @return Buffer
-     */
-    public function getPubKeyHash();
 
     /**
      * Return a boolean indicating whether the key is private.
@@ -29,14 +22,16 @@ interface KeyInterface extends SerializableInterface
     public function isPrivate();
 
     /**
+     * Return the hash of the public key.
+     *
+     * @return Buffer
+     */
+    public function getPubKeyHash();
+
+    /**
      * @return \BitWasp\Bitcoin\Address\PayToPubKeyHashAddress
      */
     public function getAddress();
-
-    /**
-     * @return \BitWasp\Buffertools\Buffer
-     */
-    public function getBuffer();
 
     /**
      * @param integer $offset
@@ -49,4 +44,9 @@ interface KeyInterface extends SerializableInterface
      * @return KeyInterface
      */
     public function tweakMul($offset);
+
+    /**
+     * @return \BitWasp\Buffertools\Buffer
+     */
+    public function getBuffer();
 }

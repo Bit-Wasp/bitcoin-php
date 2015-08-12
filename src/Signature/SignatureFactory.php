@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Signature;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 
 class SignatureFactory
@@ -17,6 +18,7 @@ class SignatureFactory
      */
     public static function fromHex($string, Math $math = null)
     {
+        $adapter = Bitcoin::getEcAdapter();
         $math = $math ?: Bitcoin::getMath();
         $serializer = new DerSignatureSerializer($math);
         $signature = $serializer->parse($string);

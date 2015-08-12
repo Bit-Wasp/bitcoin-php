@@ -3,7 +3,9 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
@@ -41,8 +43,7 @@ class PrivateKeyFactory
     public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $privateKey = new PrivateKey($ecAdapter, $int, $compressed);
-        return $privateKey;
+        return $ecAdapter->getPrivateKey($int, $compressed);
     }
 
     /**
@@ -66,7 +67,7 @@ class PrivateKeyFactory
     public static function fromWif($wif, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), new HexPrivateKeySerializer($ecAdapter));
+        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), EcSerializer::getSerializer($ecAdapter, PrivateKeySerializerInterface::class));
         return $wifSerializer->parse($wif);
     }
 
@@ -81,6 +82,10 @@ class PrivateKeyFactory
         $hex = Buffer::hex($hex);
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $hexSerializer = new HexPrivateKeySerializer($ecAdapter);
-        return $hexSerializer->parse($hex)->setCompressed($compressed);
+        $parsed = $hexSerializer->parse($hex);
+        if ($compressed) {
+            $parsed = $ecAdapter->getPrivateKey($parsed->getSecretMultiplier(), $compressed);
+        }
+        return $parsed;
     }
 }
