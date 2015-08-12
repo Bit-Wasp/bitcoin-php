@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
@@ -60,11 +59,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     {
         $compressed = $this->haveNextCompressed;
         $this->haveNextCompressed = false;
-        return PrivateKeyFactory::fromInt(
-            $parser->readBytes(32)->getInt(),
-            $compressed,
-            $this->ecAdapter
-        );
+        return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getInt(), $compressed);
     }
 
     /**

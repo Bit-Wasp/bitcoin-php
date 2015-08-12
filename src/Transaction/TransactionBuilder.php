@@ -126,7 +126,7 @@ class TransactionBuilder
      */
     public function useRandomSignatures()
     {
-        if ($this->ecAdapter->getAdapterName() == EcAdapterInterface::SECP256K1) {
+        if ($this->ecAdapter instanceof \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter) {
             throw new \RuntimeException('Secp256k1 extension does not yet support random signatures');
         }
 
@@ -152,6 +152,7 @@ class TransactionBuilder
     public function sign(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
     {
         return new TransactionSignature(
+            $this->ecAdapter,
             $this->ecAdapter->sign(
                 $hash,
                 $privKey,

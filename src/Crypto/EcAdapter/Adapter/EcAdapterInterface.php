@@ -28,6 +28,13 @@ interface EcAdapterInterface
     public function validatePrivateKey(Buffer $buffer);
 
     /**
+     * @param int|string $element
+     * @param bool|false $halfOrder
+     * @return bool
+     */
+    public function validateSignatureElement($element, $halfOrder = false);
+
+    /**
      * @param $scalar
      * @param bool|false $compressed
      * @return PrivateKeyInterface

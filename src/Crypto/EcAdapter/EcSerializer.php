@@ -35,6 +35,11 @@ class EcSerializer
     private static $map = [];
 
     /**
+     * @var bool
+     */
+    private static $useCache = true;
+
+    /**
      * @var array
      */
     private static $cache = [];
@@ -97,12 +102,25 @@ class EcSerializer
      */
     public static function getSerializer(EcAdapterInterface $adapter, $interface)
     {
-        if (!isset(self::$cache[$interface])) {
-            $classPath = self::getAdapterImplPath($adapter) . self::getImplRelPath($interface);
-            $class = new $classPath($adapter);
+        if (isset(self::$cache[$interface])) {
+            return self::$cache[$interface];
+        }
+
+        $classPath = self::getAdapterImplPath($adapter) . self::getImplRelPath($interface);
+        $class = new $classPath($adapter);
+
+        if (self::$useCache) {
             self::$cache[$interface] = $class;
         }
 
-        return self::$cache[$interface];
+        return $class;
+    }
+
+    /**
+     * Disables caching of serializers
+     */
+    public static function disableCache()
+    {
+        self::$useCache = false;
     }
 }

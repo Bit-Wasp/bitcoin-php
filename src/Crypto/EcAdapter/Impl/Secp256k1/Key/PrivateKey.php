@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
+use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Buffertools\Buffer;
@@ -42,15 +43,25 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     /**
      * @param EcAdapter $adapter
-     * @param int|string $secret
+     * @param $secret
      * @param bool|false $compressed
+     * @throws \Exception
      */
     public function __construct(EcAdapter $adapter, $secret, $compressed = false)
     {
         $buffer = Buffer::hex(str_pad($adapter->getMath()->decHex($secret), 64, '0', STR_PAD_LEFT));
         if (!$adapter->validatePrivateKey($buffer)) {
-            throw new \Exception('Invalid private key');
+            throw new InvalidPrivateKey('Invalid private key');
         }
+
+        if (false === is_numeric($secret)) {
+            throw new \InvalidArgumentException('PrivateKey: Secret must be an integer');
+        }
+
+        if (false === is_bool($compressed)) {
+            throw new \InvalidArgumentException('PrivateKey: Compressed argument must be a boolean');
+        }
+
         $this->ecAdapter = $adapter;
         $this->secret = $secret;
         $this->secretBin = $buffer->getBinary();

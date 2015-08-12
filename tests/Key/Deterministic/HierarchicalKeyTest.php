@@ -40,7 +40,6 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     private $HK_run_count = 0;
 
-
     /**
      *
      */
@@ -403,6 +402,7 @@ class HierarchicalKeyTest extends AbstractTestCase
                 'getGenerator',
                 'publicKeyFromBuffer',
                 'recoverYfromX',
+                'validateSignatureElement',
                 'associateSigs',
                 'sign',
                 'verify',

@@ -83,7 +83,33 @@ class EcAdapter implements EcAdapterInterface
      */
     public function getSignature($r, $s)
     {
-        return new Signature($r, $s);
+        return new Signature($this, $r, $s);
+    }
+
+    /**
+     * @param array $signatures
+     * @param Buffer $messageHash
+     * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[] $publicKeys
+     * @return array
+     */
+    public function associateSigs(array $signatures, Buffer $messageHash, array $publicKeys)
+    {
+        $sigCount = count($signatures);
+        $linked = [];
+        foreach ($signatures as $c => $signature) {
+            foreach ($publicKeys as $key) {
+                $verify = $this->verify($messageHash, $key, $signature);
+                if ($verify) {
+                    $linked[$key->getPubKeyHash()->getHex()][] = $signature;
+                    if (count($linked) == $sigCount) {
+                        break 2;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return $linked;
     }
 
     /**
@@ -176,7 +202,7 @@ class EcAdapter implements EcAdapterInterface
             $s = $math->sub($n, $s);
         }
 
-        return new Signature($r, $s);
+        return new Signature($this, $r, $s);
     }
 
     /**
@@ -243,7 +269,7 @@ class EcAdapter implements EcAdapterInterface
 
         // 1.6.2 Test Q as a public key
         $Qk = new PublicKey($this, $Q, $signature->isCompressed());
-        if ($this->verify($messageHash, $Qk, new Signature($signature->getR(), $signature->getS()))) {
+        if ($this->verify($messageHash, $Qk, $signature)) {
             return $Qk;
         }
 
@@ -265,7 +291,7 @@ class EcAdapter implements EcAdapterInterface
         $Q = $publicKey->getPoint();
         for ($i = 0; $i < 4; $i++) {
             try {
-                $recover = $this->recover($messageHash, new CompactSignature($r, $s, $i, $publicKey->isCompressed()));
+                $recover = $this->recover($messageHash, new CompactSignature($this, $r, $s, $i, $publicKey->isCompressed()));
                 if ($recover->getPoint()->equals($Q)) {
                     return $i;
                 }
@@ -291,6 +317,7 @@ class EcAdapter implements EcAdapterInterface
         // calculate the recovery param
         // there should be a way to get this when signing too, but idk how ...
         return new CompactSignature(
+            $this,
             $sign->getR(),
             $sign->getS(),
             $this->calcPubKeyRecoveryParam($sign->getR(), $sign->getS(), $messageHash, $privateKey->getPublicKey()),
@@ -319,6 +346,22 @@ class EcAdapter implements EcAdapterInterface
         $math = $this->math;
         $scalar = $privateKey->getInt();
         return $math->cmp($scalar, 0) > 0 && $math->cmp($scalar, $this->getGenerator()->getOrder()) < 0;
+    }
+
+    /**
+     * @param int|string $element
+     * @param bool $half
+     * @return bool
+     */
+    public function validateSignatureElement($element, $half = false)
+    {
+        $math = $this->getMath();
+        $against = $this->getGenerator()->getOrder();
+        if ($half) {
+            $against = $math->rightShift($against, 1);
+        }
+
+        return $math->cmp($element, $against) < 0 && $math->cmp($element, 0) !== 0;
     }
 
     /**

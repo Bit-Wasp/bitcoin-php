@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHash;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Buffertools\Buffer;
@@ -222,7 +221,7 @@ class TransactionBuilderInputState
             case OutputClassifier::PAYTOPUBKEYHASH:
                 // Supply signature and public key in scriptSig
                 if ($size == 2) {
-                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath())]);
+                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)]);
                     $this->setPublicKeys([PublicKeyFactory::fromHex($parsed[1]->getHex(), $this->ecAdapter)]);
                 }
 
@@ -230,7 +229,7 @@ class TransactionBuilderInputState
             case OutputClassifier::PAYTOPUBKEY:
                 // Only has a signature in the scriptSig
                 if ($size == 1) {
-                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter->getMath())]);
+                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)]);
                 }
 
                 break;
@@ -251,7 +250,7 @@ class TransactionBuilderInputState
 
                     foreach (array_slice($parsed, 1, -1) as $item) {
                         if ($item instanceof Buffer) {
-                            $txSig = TransactionSignatureFactory::fromHex($item, $this->ecAdapter->getMath());
+                            $txSig = TransactionSignatureFactory::fromHex($item, $this->ecAdapter);
                             $linked = $this->ecAdapter->associateSigs(
                                 [$txSig->getSignature()],
                                 $sigHash->calculate(

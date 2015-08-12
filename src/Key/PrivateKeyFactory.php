@@ -83,10 +83,12 @@ class PrivateKeyFactory
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $serializer = EcSerializer::getSerializer($ecAdapter, PrivateKeySerializerInterface::class);
         /** @var PrivateKeySerializerInterface $serializer */
+
         $parsed = $serializer->parse($hex);
         if ($compressed) {
             $parsed = $ecAdapter->getPrivateKey($parsed->getSecretMultiplier(), $compressed);
         }
+
         return $parsed;
     }
 }

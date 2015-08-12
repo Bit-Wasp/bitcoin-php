@@ -44,6 +44,7 @@ class TransactionSignatureSerializer
         $sig = $buffer->slice(0, $buffer->getSize() - 1);
         $hashType = $buffer->slice(-1);
         return new TransactionSignature(
+            $this->sigSerializer->getEcAdapter(),
             $this->sigSerializer->parse($sig),
             $hashType->getInt()
         );

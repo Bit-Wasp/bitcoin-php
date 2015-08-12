@@ -3,25 +3,27 @@
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
-use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
-use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 
 class SignatureFactory
 {
 
     /**
      * @param $string
-     * @param Math $math
-     * @return Signature
+     * @param EcAdapterInterface $ecAdapter
+     * @return SignatureInterface
      */
-    public static function fromHex($string, Math $math = null)
+    public static function fromHex($string, EcAdapterInterface $ecAdapter = null)
     {
-        $adapter = Bitcoin::getEcAdapter();
-        $math = $math ?: Bitcoin::getMath();
-        $serializer = new DerSignatureSerializer($math);
-        $signature = $serializer->parse($string);
-        return $signature;
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $serializer = EcSerializer::getSerializer(
+            $ecAdapter,
+            DerSignatureSerializerInterface::class
+        );
+        /** @var DerSignatureSerializerInterface $serializer */
+        return $serializer->parse($string);
     }
 }

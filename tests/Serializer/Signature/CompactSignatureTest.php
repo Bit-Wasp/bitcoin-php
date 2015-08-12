@@ -25,7 +25,6 @@ class CompactSignatureTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
-     * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function testValidRecovery(EcAdapterInterface $ecAdapter)
     {
@@ -35,12 +34,11 @@ class CompactSignatureTest extends AbstractTestCase
         /** @var CompactSignatureSerializerInterface $serializer */
 
         $math = $ecAdapter->getMath();
-        for ($c = 1; $c < 4; $c++) {
-            echo $c . "\n";
+        for ($c = 1; $c < 5; $c++) {
             $t = $math->add($c, 27);
             $test = Buffer::hex($math->decHex($t) . $r . $s);
             $parsed = $serializer->parse($test);
-            $this->assertInstanceOf('BitWasp\Bitcoin\Signature\CompactSignature', $parsed);
+            $this->assertInstanceOf('BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface', $parsed);
         }
     }
 

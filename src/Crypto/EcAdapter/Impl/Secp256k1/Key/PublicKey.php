@@ -38,6 +38,9 @@ class PublicKey extends Key implements PublicKeyInterface
             !get_resource_type($secp256k1_pubkey_t) === SECP256K1_TYPE_PUBKEY) {
             throw new \InvalidArgumentException('Secp256k1\Key\PublicKey expects ' . SECP256K1_TYPE_PUBKEY . ' resource');
         }
+        if (false === is_bool($compressed)) {
+            throw new \InvalidArgumentException('PublicKey: Compressed must be a boolean');
+        }
         $this->ecAdapter = $ecAdapter;
         $this->pubkey_t = $secp256k1_pubkey_t;
         $this->compressed = $compressed;

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Math\Math;
@@ -16,16 +17,24 @@ use BitWasp\Buffertools\TemplateFactory;
 class DerSignatureSerializer implements DerSignatureSerializerInterface
 {
     /**
-     * @var Math
+     * @var EcAdapter
      */
-    private $math;
+    private $ecAdapter;
 
     /**
      * @param EcAdapter $adapter
      */
     public function __construct(EcAdapter $adapter)
     {
-        $this->math = $adapter->getMath();
+        $this->ecAdapter = $adapter;
+    }
+
+    /**
+     * @return EcAdapterInterface
+     */
+    public function getEcAdapter()
+    {
+        return $this->ecAdapter;
     }
 
     /**
@@ -58,7 +67,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      */
     public function serialize(SignatureInterface $signature)
     {
-        $math = $this->math;
+        $math = $this->ecAdapter->getMath();
 
         // Ensure that the R and S hex's are of even length
         $rBin = pack('H*', $math->decHex($signature->getR()));
@@ -101,6 +110,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
             /** @var Buffer $s */
 
             return new Signature(
+                $this->ecAdapter,
                 $r->getInt(),
                 $s->getInt()
             );

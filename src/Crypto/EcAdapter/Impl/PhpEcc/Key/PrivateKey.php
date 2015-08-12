@@ -48,6 +48,12 @@ class PrivateKey extends Key implements PrivateKeyInterface
         if (false === $ecAdapter->validatePrivateKey(Buffer::int($int, 32))) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
+        if (false === is_numeric($int)) {
+            throw new \InvalidArgumentException('PrivateKey: Secret must be an integer');
+        }
+        if (false === is_bool($compressed)) {
+            throw new \InvalidArgumentException('PrivateKey: Compressed argument must be a boolean');
+        }
         $this->ecAdapter = $ecAdapter;
         $this->secretMultiplier = $int;
         $this->compressed = $compressed;
@@ -188,6 +194,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function getBuffer()
     {
-        return EcSerializer::getSerializer($this->ecAdapter, \BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface::class);
+        return (new PrivateKeySerializer($this->ecAdapter))->serialize($this);
     }
 }

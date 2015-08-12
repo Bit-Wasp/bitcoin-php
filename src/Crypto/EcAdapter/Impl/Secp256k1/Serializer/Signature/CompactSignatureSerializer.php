@@ -73,7 +73,6 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
         $isCompressed = ($math->bitwiseAnd($recoveryFlags, 4) != 0);
         $recoveryId = (int)$recoveryFlags - ($isCompressed ? 4 : 0);
 
-        echo $sig->getHex() . " and recid: $recoveryId \n";
         $sig_t = '';
         if (!secp256k1_ecdsa_signature_parse_compact($this->ecAdapter->getContext(), $sig->getBinary(), $sig_t, $recoveryId)) {
             throw new \RuntimeException('Unable to parse compact signature');

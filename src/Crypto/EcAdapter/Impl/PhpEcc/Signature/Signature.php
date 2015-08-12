@@ -2,9 +2,11 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\DerSignatureSerializer;
+use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 
 class Signature extends Serializable implements SignatureInterface
 {
@@ -19,11 +21,18 @@ class Signature extends Serializable implements SignatureInterface
     private $s;
 
     /**
+     * @var EcAdapter
+     */
+    protected $ecAdapter;
+
+    /**
+     * @param EcAdapter $ecAdapter
      * @param $r
      * @param $s
      */
-    public function __construct($r, $s)
+    public function __construct(EcAdapter $ecAdapter, $r, $s)
     {
+        $this->ecAdapter = $ecAdapter;
         $this->r = $r;
         $this->s = $s;
     }
@@ -49,6 +58,6 @@ class Signature extends Serializable implements SignatureInterface
      */
     public function getBuffer()
     {
-        return (new DerSignatureSerializer(Bitcoin::getMath()))->serialize($this);
+        return (new DerSignatureSerializer($this->ecAdapter))->serialize($this);
     }
 }

@@ -39,6 +39,9 @@ class PublicKey extends Key implements PublicKeyInterface
         PointInterface $point,
         $compressed = false
     ) {
+        if (false === is_bool($compressed)) {
+            throw new \InvalidArgumentException('PublicKey: Compressed must be a boolean');
+        }
         $this->ecAdapter = $ecAdapter;
         $this->point = $point;
         $this->compressed = $compressed;
