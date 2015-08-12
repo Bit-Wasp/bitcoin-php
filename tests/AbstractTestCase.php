@@ -106,6 +106,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     {
         $math = $this->safeMath();
         $generator = $this->safeGenerator();
-        return extension_loaded('secp256k1') ? EcAdapterFactory::getSecp256k1($math, $generator): new PhpEcc($math, $generator);
+        return extension_loaded('secp256k1') ? EcAdapterFactory::getSecp256k1($math, $generator): new \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter($math, $generator);
     }
 }
