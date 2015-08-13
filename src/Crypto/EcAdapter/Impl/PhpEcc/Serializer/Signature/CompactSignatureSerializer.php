@@ -18,7 +18,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     /**
      * @var Math
      */
-    private $math;
+    private $ecAdapter;
 
     /**
      * @param EcAdapter $adapter
@@ -70,15 +70,17 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      */
     public function fromParser(Parser & $parser)
     {
+        $math = $this->ecAdapter->getMath();
+
         try {
             list ($byte, $r, $s) = $this->getTemplate()->parse($parser);
 
-            $recoveryFlags = $this->math->sub($byte, 27);
+            $recoveryFlags = $math->sub($byte, 27);
             if ($recoveryFlags < 0 || $recoveryFlags > 7) {
                 throw new \InvalidArgumentException('invalid signature type');
             }
 
-            $isCompressed = ($this->math->bitwiseAnd($recoveryFlags, 4) != 0);
+            $isCompressed = ($math->bitwiseAnd($recoveryFlags, 4) != 0);
             $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');
@@ -94,6 +96,6 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      */
     public function parse($string)
     {
-        return $this->fromParser(new Parser($string));
+        return $this->fromParser(new Parser($string, $this->ecAdapter->getMath()));
     }
 }
