@@ -315,7 +315,7 @@ class BloomFilter extends Serializable
      */
     public function containsUtxo($txid, $vout)
     {
-        return $this->containsData(new Buffer(pack("H64N", $txid, $vout)));
+        return $this->containsData(new Buffer(pack("H64N", $txid, $vout), 36, $this->math));
     }
 
     /**
@@ -324,7 +324,7 @@ class BloomFilter extends Serializable
      */
     public function containsHash($hash)
     {
-        return $this->containsData(Buffer::hex($hash, 32));
+        return $this->containsData(Buffer::hex($hash, 32, $this->math));
     }
 
     /**
