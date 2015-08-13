@@ -34,7 +34,7 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param $int
+     * @param int|string $int
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKey
