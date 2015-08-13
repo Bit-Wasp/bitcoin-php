@@ -20,12 +20,12 @@
   library does NOT contain any code to interact with the network, or any API's.
 
   Other repositories which are part of this project:
-    [Secp256k1 PHP extension](https://github.com/Bit-Wasp/secp256k1-php)
-    [Bitcoinconsensus PHP extension](https://github.com/Bit-Wasp/bitcoinconsensus-php)
-    [Buffertools library](https://github.com/Bit-Wasp/buffertools-php) - a library for dealing with binary data
-    [Stratum client library](https://github.com/Bit-Wasp/stratum-php) - a library for connecting to Stratum servers (uses ReactPHP)
-    [Bitcoin P2P PHP](https://github.com/Bit-Wasp/bitcoin-p2p-php) - a library that speaks the Bitcoin protocol (uses ReactPHP)
-    [Testing package](https://github.com/Bit-Wasp/testing-php) - a composer package to pull CI and development tools
+    - [Secp256k1 PHP extension](https://github.com/Bit-Wasp/secp256k1-php)
+    - [Bitcoinconsensus PHP extension](https://github.com/Bit-Wasp/bitcoinconsensus-php)
+    - [Buffertools library](https://github.com/Bit-Wasp/buffertools-php) - a library for dealing with binary data
+    - [Stratum client library](https://github.com/Bit-Wasp/stratum-php) - a library for connecting to Stratum servers (uses ReactPHP)
+    - [Bitcoin P2P PHP](https://github.com/Bit-Wasp/bitcoin-p2p-php) - a library that speaks the Bitcoin protocol (uses ReactPHP)
+    - [Testing package](https://github.com/Bit-Wasp/testing-php) - a composer package to pull CI and development tools
 
 ## Requirements:
  * PHP 5.4+
