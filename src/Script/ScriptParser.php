@@ -124,7 +124,7 @@ class ScriptParser
                 return false;
             }
 
-            $pushData = new Buffer(substr($this->scriptRaw, $this->ptr, $size), $size);
+            $pushData = new Buffer(substr($this->scriptRaw, $this->ptr, $size), $size, $this->math);
             $this->ptr += $size;
         }
 
@@ -148,10 +148,10 @@ class ScriptParser
     public function parse()
     {
         $data = array();
-        $pushData = new Buffer();
+        $pushData = new Buffer('', 0, $this->math);
         while ($this->next($opCode, $pushData)) {
             if ($opCode < 1) {
-                $push = Buffer::hex('00');
+                $push = Buffer::hex('00', 1, $this->math);
             } elseif ($opCode <= 78) {
                 $push = $pushData;
             } else {

@@ -132,7 +132,7 @@ class Bip39Mnemonic implements MnemonicInterface
             $binary .= hex2bin(str_pad($math->baseConvert($eBits, 2, 16), 2, '0', STR_PAD_LEFT));
         }
 
-        $entropy = new Buffer($binary);
+        $entropy = new Buffer($binary, null, $math);
         if ($csBits !== $this->calculateChecksum($entropy, $CS)) {
             throw new \InvalidArgumentException('Checksum does not match');
         }

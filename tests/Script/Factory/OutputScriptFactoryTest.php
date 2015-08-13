@@ -72,19 +72,19 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals('OP_EQUAL', $parsed[2]);
         $this->assertEquals('OP_IF', $parsed[3]);
         $this->assertEquals('OP_HASH160', $parsed[4]);
-        $this->assertEquals(Hash::sha256ripe160($bytes), $parsed[5]);
+        $this->assertEquals(Hash::sha256ripe160($bytes)->getBinary(), $parsed[5]->getBinary());
         $this->assertEquals('OP_EQUALVERIFY', $parsed[6]);
 
         $this->assertEquals('OP_2', $parsed[7]);
-        $this->assertEquals($a1->getBuffer(), $parsed[8]);
-        $this->assertEquals($b1->getBuffer(), $parsed[9]);
+        $this->assertEquals($a1->getBinary(), $parsed[8]->getBinary());
+        $this->assertEquals($b1->getBinary(), $parsed[9]->getBinary());
         $this->assertEquals('OP_2', $parsed[10]);
         $this->assertEquals('OP_CHECKMULTISIG', $parsed[11]);
         $this->assertEquals('OP_ELSE', $parsed[12]);
 
         $this->assertEquals('OP_2', $parsed[13]);
-        $this->assertEquals($a2->getBuffer(), $parsed[14]);
-        $this->assertEquals($b2->getBuffer(), $parsed[15]);
+        $this->assertEquals($a2->getBinary(), $parsed[14]->getBinary());
+        $this->assertEquals($b2->getBinary(), $parsed[15]->getBinary());
         $this->assertEquals('OP_2', $parsed[16]);
         $this->assertEquals('OP_CHECKMULTISIG', $parsed[17]);
         $this->assertEquals('OP_ENDIF', $parsed[18]);
