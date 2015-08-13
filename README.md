@@ -38,23 +38,18 @@
  * [[bitcoinconsensus-php](https://github.com/Bit-Wasp/bitcoin-consensus-php)] - Install libbitcoinconsensus for script validation
 
 ## Installation
-You can install this library via Composer:
-`composer require bitwasp/bitcoin`
-or
-```{
-    "require": "bitwasp/bitcoin"
-}```
+You can install this library via Composer: `composer require bitwasp/bitcoin`
 
 ## Contributing
 
- All contributions are welcome. Please see (this page)[https://github.com/Bit-Wasp/bitcoin-php/blob/master/CONTRIBUTING.md] before you get started
+ All contributions are welcome. Please see [[this page](https://github.com/Bit-Wasp/bitcoin-php/blob/master/CONTRIBUTING.md)] before you get started
 
 ##Presently supported:
 
  - Bloom filters
  - Blocks, headers, and merkle blocks.
  - Regular/P2SH scripts.
- - An adaptable elliptic-curve library, using (mdanter/phpecc)[https://github.com/mdanter/phpecc] by default, or libsecp256k1 if the bindings are found.
+ - An adaptable elliptic-curve library, using [[PhpEcc](https://github.com/mdanter/phpecc)] by default, or libsecp256k1 if the bindings are found.
  - Support for building, parsing, signing/validating transactions.
  - Deterministic signatures (RFC6979)
  - BIP32 and electrum (older type I) deterministic key algorithms.
