@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;

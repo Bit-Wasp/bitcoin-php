@@ -2,22 +2,22 @@
 
 namespace BitWasp\Bitcoin\Tests\Serializer\Signature;
 
-use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Buffertools\Parser;
 
 class DerSignatureSerializerTest extends AbstractTestCase
 {
     /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $adapter
      * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function testFromParserFailure()
+    public function testFromParserFailure(EcAdapterInterface $adapter)
     {
-        $math = new Math();
-        $serializer = new DerSignatureSerializer($math);
-        $parser = new Parser();
-
-        $serializer->fromParser($parser);
+        $serializer = EcSerializer::getSerializer($adapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface');
+        /** @var DerSignatureSerializerInterface $serializer */
+        $serializer->parse('');
     }
 }

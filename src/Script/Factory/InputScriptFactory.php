@@ -6,9 +6,8 @@ use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
-use BitWasp\Bitcoin\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 
 class InputScriptFactory
@@ -23,11 +22,11 @@ class InputScriptFactory
     }
 
     /**
-     * @param \BitWasp\Bitcoin\Signature\TransactionSignature $signature
+     * @param \BitWasp\Bitcoin\Signature\TransactionSignatureInterface $signature
      * @param PublicKeyInterface $publicKey
      * @return Script
      */
-    public function payToPubKeyHash(TransactionSignature $signature, PublicKeyInterface $publicKey)
+    public function payToPubKeyHash(TransactionSignatureInterface $signature, PublicKeyInterface $publicKey)
     {
         return ScriptFactory::create()
             ->push($signature->getBuffer())
@@ -36,7 +35,7 @@ class InputScriptFactory
 
     /**
      * @param RedeemScript $redeemScript
-     * @param TransactionSignature[] $signatures
+     * @param TransactionSignatureInterface[] $signatures
      * @return Script
      */
     public function multisigP2sh(RedeemScript $redeemScript, $signatures)

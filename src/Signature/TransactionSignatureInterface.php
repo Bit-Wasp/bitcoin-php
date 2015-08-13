@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\SerializableInterface;
 
 interface TransactionSignatureInterface extends SerializableInterface

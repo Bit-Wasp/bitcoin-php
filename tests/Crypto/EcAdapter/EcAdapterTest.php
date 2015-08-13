@@ -4,8 +4,9 @@ namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -16,7 +17,7 @@ class EcAdapterTest extends AbstractTestCase
     /**
      * @var string
      */
-    public $sigType = 'BitWasp\Bitcoin\Signature\Signature';
+    public $sigType = 'BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface';
 
     /**
      * @return array
@@ -52,8 +53,10 @@ class EcAdapterTest extends AbstractTestCase
     public function testPrivateToPublic(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
     {
         $priv = PrivateKeyFactory::fromHex($privHex, false, $ec);
-        $this->assertSame($priv->getPublicKey()->getBuffer()->getHex(), $pubHex);
-        $this->assertSame($priv->getPublicKey()->setCompressed(true)->getBuffer()->getHex(), $compressedHex);
+        $this->assertSame($priv->getPublicKey()->getHex(), $pubHex);
+
+        $priv = PrivateKeyFactory::fromHex($privHex, true, $ec);
+        $this->assertSame($priv->getPublicKey()->getHex(), $compressedHex);
     }
 
     /**
@@ -97,8 +100,13 @@ class EcAdapterTest extends AbstractTestCase
         $f    = file_get_contents(__DIR__.'/../../Data/publickey.compressed.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
-            $key = Buffer::hex($test->compressed);
-            $this->assertTrue($ecAdapter->validatePublicKey($key));
+            try {
+                PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
+                $valid = true;
+            } catch (\Exception $e) {
+                $valid = false;
+            }
+            $this->assertTrue($valid);
         }
     }
 
@@ -137,7 +145,7 @@ class EcAdapterTest extends AbstractTestCase
     public function testPrivateKeySign(EcAdapterInterface $ecAdapter)
     {
         $random = new Random();
-        $pk = PrivateKeyFactory::fromInt('4141414141414141414141414141414141414141414141414141414141414141', false, $ecAdapter);
+        $pk = $ecAdapter->getPrivateKey('4141414141414141414141414141414141414141414141414141414141414141', false);
 
         $hash = $random->bytes(32);
         $sig = $ecAdapter->sign($hash, $pk, new Random());

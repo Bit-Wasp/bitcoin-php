@@ -3,11 +3,11 @@
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\KeyInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use BitWasp\Buffertools\Parser;
@@ -224,11 +224,12 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $chain = Buffer::hex($this->ecAdapter->getMath()->decHex($this->getChainCode()), 32);
+        $chain = Buffer::int($this->getChainCode(), 32);
 
         $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain);
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
+        $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
 
         if (false === $this->ecAdapter->validatePrivateKey($offset)) {
             return $this->deriveChild($sequence + 1);
@@ -240,9 +241,7 @@ class HierarchicalKey
             $this->getChildFingerprint(),
             $sequence,
             $chain->getInt(),
-            $this->isPrivate()
-            ? $this->ecAdapter->privateKeyAdd($this->getPrivateKey(), $offset->getInt())
-            : $this->ecAdapter->publicKeyAdd($this->getPublicKey(), $offset->getInt())
+            $key->tweakAdd($offset->getInt())
         );
     }
 

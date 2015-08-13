@@ -3,12 +3,14 @@
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
-use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PrivateKey;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 
 class CompactSignatureTest extends AbstractTestCase
 {
@@ -46,10 +48,10 @@ class CompactSignatureTest extends AbstractTestCase
     /**
      * @dataProvider getCSVectors
      * @param EcAdapterInterface $ecAdapter
-     * @param PrivateKey $private
+     * @param PrivateKeyInterface $private
      * @param string $message
      */
-    public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKey $private, $message)
+    public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKeyInterface $private, $message)
     {
         $pubKey = $private->getPublicKey();
         $msgSigner = new MessageSigner($ecAdapter);
@@ -59,8 +61,10 @@ class CompactSignatureTest extends AbstractTestCase
         $this->assertEquals(65, $compact->getBuffer()->getSize());
         $this->assertTrue($msgSigner->verify($signed, $pubKey->getAddress()));
 
-        $serializer = new CompactSignatureSerializer($ecAdapter->getMath());
+        $serializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface');
+        /** @var CompactSignatureSerializerInterface $serializer */
+
         $parsed = $serializer->parse($compact->getBuffer());
-        $this->assertEquals($compact, $parsed);
+        $this->assertEquals($compact->getBinary(), $parsed->getBinary());
     }
 }

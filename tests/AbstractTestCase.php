@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Secp256k1;
@@ -66,16 +67,29 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             // If EXT_SECP256K1 env var is set, only return secp256k1.
             // Otherwise return phpecc
             if (strlen(getenv('EXT_SECP256K1')) == 0) {
-                $adapters[] = [new PhpEcc($math, $generator)];
+                $adapters[] = [EcAdapterFactory::getPhpEcc($math, $generator)];
             } else {
-                $adapters[] = [new Secp256k1($math, $generator)];
+                $adapters[] = [EcAdapterFactory::getSecp256k1($math, $generator)];
             }
         } else {
             // Env var was set, just pass secp256k1
-            $adapters[] = [(extension_loaded('secp256k1') ? new Secp256k1($math, $generator) : new PhpEcc($math, $generator))];
+            $adapters[] = [(extension_loaded('secp256k1')
+                ? EcAdapterFactory::getSecp256k1($math, $generator)
+                : EcAdapterFactory::getPhpEcc($math, $generator))];
         }
 
         return $adapters;
+    }
+
+    private static $context;
+
+    public static function getContext()
+    {
+        if (self::$context == null) {
+            self::$context = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
+        }
+
+        return self::$context;
     }
 
     public function safeMath()
@@ -92,6 +106,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     {
         $math = $this->safeMath();
         $generator = $this->safeGenerator();
-        return extension_loaded('secp256k1') ? new Secp256k1($math, $generator) : new PhpEcc($math, $generator);
+        return extension_loaded('secp256k1') ? EcAdapterFactory::getSecp256k1($math, $generator): new \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter($math, $generator);
     }
 }

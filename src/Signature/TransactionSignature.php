@@ -2,15 +2,22 @@
 
 namespace BitWasp\Bitcoin\Signature;
 
-use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
 
 class TransactionSignature extends Serializable implements TransactionSignatureInterface
 {
+    /**
+     * @var EcAdapterInterface
+     */
+    private $ecAdapter;
+
     /**
      * @var SignatureInterface
      */
@@ -25,8 +32,9 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      * @param SignatureInterface $signature
      * @param $hashType
      */
-    public function __construct(SignatureInterface $signature, $hashType)
+    public function __construct(EcAdapterInterface $ecAdapter, SignatureInterface $signature, $hashType)
     {
+        $this->ecAdapter = $ecAdapter;
         $this->sig = $signature;
         $this->hashType = $hashType;
     }
@@ -114,7 +122,13 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      */
     public function getBuffer()
     {
-        $txSigSerializer = new TransactionSignatureSerializer(new DerSignatureSerializer(Bitcoin::getMath()));
+        $txSigSerializer = new TransactionSignatureSerializer(
+            EcSerializer::getSerializer(
+                $this->ecAdapter,
+                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface'
+            )
+        );
+
         return $txSigSerializer->serialize($this);
     }
 }

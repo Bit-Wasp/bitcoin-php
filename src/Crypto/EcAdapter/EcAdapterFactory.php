@@ -2,8 +2,11 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1;
 
 class EcAdapterFactory
 {
@@ -11,6 +14,28 @@ class EcAdapterFactory
      * @var EcAdapterInterface
      */
     private static $adapter;
+
+    /**
+     * @var
+     */
+    private static $context;
+
+    /**
+     * @param null $flags
+     * @return resource
+     */
+    public static function getSecp256k1Context($flags = null)
+    {
+        if (!extension_loaded('secp256k1')) {
+            throw new \RuntimeException('Secp256k1 not installed');
+        }
+
+        if (self::$context == null) {
+            self::$context = secp256k1_context_create($flags ?: SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+        }
+
+        return self::$context;
+    }
 
     /**
      * @param Math $math
@@ -57,6 +82,6 @@ class EcAdapterFactory
      */
     public static function getSecp256k1(Math $math, GeneratorPoint $generator)
     {
-        return new Secp256k1($math, $generator);
+        return new Secp256k1($math, $generator, self::getSecp256k1Context());
     }
 }

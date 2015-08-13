@@ -3,15 +3,15 @@
 namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
-use BitWasp\Bitcoin\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class SignedMessage extends AbstractTestCase
+class SignedMessageTest extends AbstractTestCase
 {
     public function sampleMessage()
     {
@@ -34,12 +34,13 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
      */
     public function testParsesMessage(EcAdapterInterface $ecAdapter)
     {
-        $math = $ecAdapter->getMath();
-
         list ($message, $address, $content, $network) = $this->sampleMessage();
+        /** @var PayToPubKeyHashAddress $address */
         $address = AddressFactory::fromString($address, $network);
+        $serializer = new SignedMessageSerializer(
+            EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+        );
 
-        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer($math));
         $signed = $serializer->parse($content);
         $signer = new MessageSigner($ecAdapter);
 
@@ -48,9 +49,9 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $this->assertSame('38787429741286654786942380905403782954160859974631158035207591010286944440307', $signed->getCompactSignature()->getS());
         $this->assertSame(1, $signed->getCompactSignature()->getRecoveryId());
         $this->assertSame(true, $signed->getCompactSignature()->isCompressed());
+        $this->assertTrue($signer->verify($signed, $address));
         $this->assertSame($content, $signed->getBuffer()->getBinary());
 
-        $this->assertTrue($signer->verify($signed, $address));
     }
 
     /**
@@ -65,7 +66,9 @@ hi
 IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
         -----END BITCOIN SIGNED MESSAGE-----';
 
-        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(new Math()));
+        $serializer = new SignedMessageSerializer(
+            EcSerializer::getSerializer($this->safeEcAdapter(), 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+        );
         $serializer->parse($invalid);
     }
 
@@ -81,7 +84,9 @@ hi
 IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
         ';
 
-        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(new Math()));
+        $serializer = new SignedMessageSerializer(
+            EcSerializer::getSerializer($this->safeEcAdapter(), 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+        );
         $serializer->parse($invalid);
     }
 
@@ -97,7 +102,9 @@ hi
 IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
         -----END BITCOIN SIGNED MESSAGE-----';
 
-        $serializer = new SignedMessageSerializer(new CompactSignatureSerializer(new Math()));
+        $serializer = new SignedMessageSerializer(
+            EcSerializer::getSerializer($this->safeEcAdapter(), 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+        );
         $serializer->parse($invalid);
     }
 }

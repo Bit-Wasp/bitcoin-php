@@ -3,11 +3,11 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
-use BitWasp\Bitcoin\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -126,7 +126,7 @@ class TransactionBuilder
      */
     public function useRandomSignatures()
     {
-        if ($this->ecAdapter->getAdapterName() == EcAdapterInterface::SECP256K1) {
+        if ($this->ecAdapter instanceof \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter) {
             throw new \RuntimeException('Secp256k1 extension does not yet support random signatures');
         }
 
@@ -152,6 +152,7 @@ class TransactionBuilder
     public function sign(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
     {
         return new TransactionSignature(
+            $this->ecAdapter,
             $this->ecAdapter->sign(
                 $hash,
                 $privKey,
