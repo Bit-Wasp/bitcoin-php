@@ -22,7 +22,6 @@
   Other repositories which are part of this project:
     [Secp256k1 PHP extension](https://github.com/Bit-Wasp/secp256k1-php)
     [Bitcoinconsensus PHP extension](https://github.com/Bit-Wasp/bitcoinconsensus-php)
-
     [Buffertools library](https://github.com/Bit-Wasp/buffertools-php) - a library for dealing with binary data
     [Stratum client library](https://github.com/Bit-Wasp/stratum-php) - a library for connecting to Stratum servers (uses ReactPHP)
     [Bitcoin P2P PHP](https://github.com/Bit-Wasp/bitcoin-p2p-php) - a library that speaks the Bitcoin protocol (uses ReactPHP)
