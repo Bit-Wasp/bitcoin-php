@@ -38,12 +38,7 @@
  * [[bitcoinconsensus-php](https://github.com/Bit-Wasp/bitcoin-consensus-php)] - Install libbitcoinconsensus for script validation
 
 ## Installation
-You can install this library via Composer:
-`composer require bitwasp/bitcoin`
-or
-```{
-    "require": "bitwasp/bitcoin"
-}```
+You can install this library via Composer: `composer require bitwasp/bitcoin`
 
 ## Contributing
 
