@@ -45,35 +45,16 @@ or
     "require": "bitwasp/bitcoin"
 }```
 
-
 ## Contributing
-  Contributions are most welcome, and the more eyes on the code the better.
 
-  To get started:
-   - Fork this library
-   - Check out the code:
-     `git clone git@github.com:yourfork/bitcoin-php && cd bitcoin-php`
-   - Start your own branch:
-     `git checkout -b your-feature-branch`
-   - Check your work, and apply code style:
-       (phing): `phing`
-       (other) `vendor/bin/phpunit && vendor/bin/phpcbf -n --standard=PSR1,PSR2 tests src`
-   - Commit your work: `git commit ... ` sign it with GPG if you can: `git commit -S ...`
-   - Push your work:
-      `git push origin your-feature-branch`
-   - And open a pull request!
-
-  There will always be some iteration over new features - mainly this is to ensure
-  classes don't run afoul of scope creep, and that the library remains precise and powerful.
-
-  Please supplement all submissions with tests, and ensure it conforms with the code style.
+ All contributions are welcome. Please see (this page)[https://github.com/Bit-Wasp/bitcoin-php/blob/master/CONTRIBUTING.md] before you get started
 
 ##Presently supported:
 
  - Bloom filters
  - Blocks, headers, and merkle blocks.
  - Regular/P2SH scripts.
- - An adaptable elliptic-curve library, using mdanter/phpecc by default, or libsecp256k1 if the bindings are found.
+ - An adaptable elliptic-curve library, using (mdanter/phpecc)[https://github.com/mdanter/phpecc] by default, or libsecp256k1 if the bindings are found.
  - Support for building, parsing, signing/validating transactions.
  - Deterministic signatures (RFC6979)
  - BIP32 and electrum (older type I) deterministic key algorithms.
@@ -82,7 +63,7 @@ or
  - RPC bindings to Bitcoin Core's RPC, getting OOP responses
  - Bindings to Stratum (electrum) servers
  - Easy serialization to binary representation of most classes
- - SIGHASH types when creating transactions (not tested)
+ - SIGHASH types when creating transactions
  - Payment Protocol (BIP70)
  - Blockchain classes utilizing the doctrine/cache package
 
@@ -100,7 +81,7 @@ or
   - BIP0032 - Hierarchical Deterministic Wallets
   - BIP0035 - Mempool Message
   - BIP0037 - Blooom Filtering
-  - BIP0039 - Mnemonic code for generating determinisitc keys
+  - BIP0039 - Mnemonic code for generating deterministic keys
   - BIP0066 - Strict DER Signatures
   - BIP0067 - Deterministic P2SH multi-signature addresses
   - BIP0070 - Payment Protocol
