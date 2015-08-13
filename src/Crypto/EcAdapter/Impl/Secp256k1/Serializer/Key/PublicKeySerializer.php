@@ -40,7 +40,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
             throw new \RuntimeException('Secp256k1: Failed to serialize public key');
         }
 
-        return new Buffer($serialized);
+        return new Buffer($serialized, $publicKey->isCompressed() ? PublicKey::LENGTH_COMPRESSED : PublicKey::LENGTH_UNCOMPRESSED, $this->ecAdapter->getMath());
     }
 
     /**
