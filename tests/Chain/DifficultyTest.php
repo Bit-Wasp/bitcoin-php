@@ -2,11 +2,10 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-use BitWasp\Bitcoin\Chain\DifficultyInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Chain\Difficulty;
-use BitWasp\Bitcoin\Bitcoin;
+use Mdanter\Ecc\Math\MathAdapterInterface;
 
 class DifficultyTest extends AbstractTestCase
 {
@@ -18,7 +17,7 @@ class DifficultyTest extends AbstractTestCase
     /**
      * @var string
      */
-    protected $targetHash;
+    protected $targetHash = '00000000ffff0000000000000000000000000000000000000000000000000000';
 
     /**
      * @var Buffer
@@ -28,8 +27,11 @@ class DifficultyTest extends AbstractTestCase
     public function __construct()
     {
         $this->math = $this->safeMath();
-        $this->bits = Buffer::hex('1d00ffff');
-        $this->targetHash = '00000000ffff0000000000000000000000000000000000000000000000000000';
+    }
+
+    public function getLowestBits(MathAdapterInterface $math)
+    {
+        return Buffer::hex('1d00ffff', 4, $math);
     }
 
     public function testGetWork()
@@ -53,7 +55,7 @@ class DifficultyTest extends AbstractTestCase
     {
         $difficulty = new Difficulty($this->math);
 
-        $this->assertEquals($this->bits, $difficulty->lowestBits());
+        $this->assertEquals($this->getLowestBits($this->math), $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
     }
 
@@ -61,11 +63,9 @@ class DifficultyTest extends AbstractTestCase
     {
         $difficulty = new Difficulty($this->math, $this->bits);
 
-        $this->assertEquals($this->bits, $difficulty->lowestBits());
+        $this->assertEquals($this->getLowestBits($this->math), $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
     }
-
-
 
     public function testSetLowestDifficulty()
     {

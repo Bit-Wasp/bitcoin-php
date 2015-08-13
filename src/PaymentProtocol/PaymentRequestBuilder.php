@@ -106,9 +106,10 @@ class PaymentRequestBuilder
      */
     private function bufToOutput(OutputBuf $outBuf)
     {
-        $script = ScriptFactory::create(new Buffer($outBuf->getScript()));
-        $output = new TransactionOutput($outBuf->getAmount(), $script);
-        return $output;
+        return new TransactionOutput(
+            $outBuf->getAmount(),
+            ScriptFactory::create(new Buffer($outBuf->getScript()))
+        );
     }
 
     /**

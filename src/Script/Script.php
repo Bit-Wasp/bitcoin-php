@@ -52,8 +52,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function getAddress()
     {
-        $address = AddressFactory::fromScript($this);
-        return $address;
+        return AddressFactory::fromScript($this);
     }
 
     /**
@@ -81,10 +80,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function getScriptHash()
     {
-        $hex = $this->getBuffer();
-        $hash = Hash::sha256ripe160($hex);
-
-        return $hash;
+        return Hash::sha256ripe160($this->getBuffer());
     }
 
     /**
@@ -110,7 +106,7 @@ class Script extends Serializable implements ScriptInterface
     public function push(Buffer $data)
     {
         $length = $data->getSize();
-        $parsed = new Parser();
+        $parsed = new Parser('', Bitcoin::getMath());
 
         /** Note that larger integers are serialized without flipping bits - Big endian */
 

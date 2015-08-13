@@ -36,7 +36,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
         if (!secp256k1_ecdsa_signature_serialize_compact($this->ecAdapter->getContext(), $signature->getResource(), $sig_t, $recid)) {
             throw new \RuntimeException('Secp256k1 serialize compact failure');
         }
-        return new Buffer(chr((int)$signature->getFlags()) . $sig_t);
+        return new Buffer(chr((int)$signature->getFlags()) . $sig_t, 65, $this->ecAdapter->getMath());
     }
 
     /**
@@ -56,7 +56,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     public function parse($data)
     {
         $math = $this->ecAdapter->getMath();
-        $buffer = (new Parser($data))->getBuffer();
+        $buffer = (new Parser($data, $math))->getBuffer();
 
         if ($buffer->getSize() !== 65) {
             throw new \RuntimeException('Compact Sig must be 65 bytes');

@@ -45,6 +45,6 @@ class Rfc6979 implements RbgInterface
     public function bytes($bytes)
     {
         $integer = $this->hmac->generate($this->ecAdapter->getGenerator()->getOrder());
-        return Buffer::hex($this->ecAdapter->getMath()->decHex($integer));
+        return Buffer::int($integer, $bytes, $this->ecAdapter->getMath());
     }
 }

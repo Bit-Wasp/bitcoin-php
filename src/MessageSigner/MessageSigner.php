@@ -32,7 +32,7 @@ class MessageSigner
      */
     private function calculateBody($message)
     {
-        return new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message);
+        return new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message, null, $this->ecAdapter->getMath());
     }
 
     /**

@@ -49,7 +49,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function __construct(EcAdapter $adapter, $secret, $compressed = false)
     {
-        $buffer = Buffer::hex(str_pad($adapter->getMath()->decHex($secret), 64, '0', STR_PAD_LEFT));
+        $buffer = Buffer::int($secret, 32, $adapter->getMath());
         if (!$adapter->validatePrivateKey($buffer)) {
             throw new InvalidPrivateKey('Invalid private key');
         }

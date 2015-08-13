@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-use BitWasp\Bitcoin\Networking\Serializer\Structure\BlockLocatorSerializer;
+use BitWasp\Bitcoin\Serializer\Chain\BlockLocatorSerializer;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
 

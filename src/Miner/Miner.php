@@ -87,7 +87,7 @@ class Miner
         $this->math = $math;
         $this->lastBlockHeader = $lastBlockHeader;
         $this->script = $script;
-        $this->personalString = $personalString ?: new Buffer();
+        $this->personalString = $personalString ?: new Buffer('', 0, $math);
         $this->timestamp = $timestamp ?: time();
         $this->version = $version;
         $this->report = $report;
@@ -111,7 +111,7 @@ class Miner
     {
         $buffer = (new Parser)
             ->writeWithLength($this->lastBlockHeader->getBits())
-            ->writeWithLength(Buffer::hex($this->math->decHex($this->extraNonce)))
+            ->writeWithLength(Buffer::int($this->extraNonce, 4, $this->math))
             ->writeWithLength($this->personalString)
             ->getBuffer();
 

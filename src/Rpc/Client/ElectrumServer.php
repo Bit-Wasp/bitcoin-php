@@ -144,14 +144,14 @@ class ElectrumServer
                     @$content['prev_block_hash'],
                     $content['merkle_root'],
                     $content['timestamp'],
-                    Buffer::hex($this->math->decHex($content['bits'])),
+                    Buffer::int($content['bits'], 4, $this->math),
                     $content['nonce']
                 );
             });
     }
 
     /**
-     * @param $height
+     * @param int $height
      * @return \React\Promise\Promise
      */
     public function blockGetChunk($height)

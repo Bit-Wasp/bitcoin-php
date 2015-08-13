@@ -29,7 +29,7 @@ class Difficulty implements DifficultyInterface
     public function __construct(Math $math, Buffer $lowestBits = null)
     {
         $this->math = $math;
-        $this->lowestBits = $lowestBits;
+        $this->lowestBits = $lowestBits ?: Buffer::hex(self::MAX_TARGET, 4, $math);
     }
 
     /**
@@ -38,11 +38,6 @@ class Difficulty implements DifficultyInterface
      */
     public function lowestBits()
     {
-        if (is_null($this->lowestBits)) {
-            // Todo - from container?
-            return Buffer::hex(self::MAX_TARGET);
-        }
-
         return $this->lowestBits;
     }
 
@@ -52,10 +47,7 @@ class Difficulty implements DifficultyInterface
      */
     public function getMaxTarget()
     {
-        $bits = $this->lowestBits();
-        $target = $this->math->getCompact($bits);
-
-        return $target;
+        return $this->math->getCompact($this->lowestBits());
     }
 
     /**
@@ -64,8 +56,7 @@ class Difficulty implements DifficultyInterface
      */
     public function getTarget(Buffer $bits)
     {
-        $target = $this->math->getCompact($bits);
-        return $target;
+        return $this->math->getCompact($bits);
     }
 
     /**
@@ -74,8 +65,11 @@ class Difficulty implements DifficultyInterface
      */
     public function getTargetHash(Buffer $bits)
     {
-        $target = $this->getTarget($bits);
-        return Buffer::hex($this->math->decHex($target), 32); // let buffer pad it
+        return Buffer::int(
+            $this->getTarget($bits),
+            32,
+            $this->math
+        );
     }
 
     /**
@@ -102,8 +96,7 @@ class Difficulty implements DifficultyInterface
      */
     public function getWork(Buffer $bits)
     {
-        $work = bcdiv($this->math->pow(2, 256), $this->getTargetHash($bits)->getInt());
-        return $work;
+        return bcdiv($this->math->pow(2, 256), $this->getTargetHash($bits)->getInt());
     }
 
     /**
