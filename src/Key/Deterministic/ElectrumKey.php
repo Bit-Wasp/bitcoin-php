@@ -86,7 +86,9 @@ class ElectrumKey
                 $sequence,
                 $change ? '1' : '0',
                 $this->getMPK()->getBinary()
-            )
+            ),
+            null,
+            $this->ecAdapter->getMath()
         ))->getInt();
     }
 

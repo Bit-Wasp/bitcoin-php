@@ -46,12 +46,13 @@ class ElectrumKeyFactory
             $seed = hash('sha256', $seed . $oldseed, true);
         }
 
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         // Convert binary data to hex.
-        $str = new Buffer($seed);
+        $str = new Buffer($seed, 32, $ecAdapter->getMath());
 
         return self::fromSecretExponent(
             $str->getInt(),
-            $ecAdapter ?: Bitcoin::getEcAdapter()
+            $ecAdapter
         );
     }
 
