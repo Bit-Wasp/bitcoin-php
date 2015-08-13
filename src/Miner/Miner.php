@@ -111,7 +111,7 @@ class Miner
     {
         $buffer = (new Parser)
             ->writeWithLength($this->lastBlockHeader->getBits())
-            ->writeWithLength(Buffer::hex($this->math->decHex($this->extraNonce)))
+            ->writeWithLength(Buffer::int($this->extraNonce, 4, $this->math))
             ->writeWithLength($this->personalString)
             ->getBuffer();
 

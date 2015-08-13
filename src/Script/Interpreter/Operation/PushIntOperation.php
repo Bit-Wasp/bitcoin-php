@@ -49,7 +49,7 @@ class PushIntOperation
             case 'OP_15':
             case 'OP_16':
                 $num = $opCode - ($opCodes->getOpByName('OP_1') - 1);
-                $mainStack->push(new Buffer(chr($num)));
+                $mainStack->push(new Buffer(chr($num), 1));
                 return;
             default:
                 throw new \Exception('Opcode not found');

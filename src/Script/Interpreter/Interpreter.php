@@ -401,7 +401,7 @@ class Interpreter implements InterpreterInterface
             return (bool)$c;
         };
 
-        $pushData = new Buffer();
+        $pushData = new Buffer('', 0, $math);
 
         try {
             while ($parser->next($opCode, $pushData) === true) {
@@ -485,7 +485,7 @@ class Interpreter implements InterpreterInterface
                             }
                             // todo: Int sizes?
                             $vch = $mainStack->top(-1);
-                            $size = Buffer::hex($math->decHex($vch->getSize()));
+                            $size = Buffer::int($vch->getSize(), null, $math);
 
                             $mainStack->push($size);
                             break;

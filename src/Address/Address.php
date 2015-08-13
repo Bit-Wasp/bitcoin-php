@@ -27,6 +27,7 @@ abstract class Address implements AddressInterface
     }
 
     /**
+     * TODO: Check why this is a string
      * @return string
      */
     public function getHash()

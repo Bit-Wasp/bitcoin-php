@@ -55,27 +55,24 @@ class Base58
      */
     public static function decode($base58)
     {
+        $math = Bitcoin::getMath();
         if (strlen($base58) == 0) {
-            return new Buffer();
+            return new Buffer('', 0, $math);
         }
 
         $original = $base58;
         $strlen = strlen($base58);
         $return = '0';
-        $math = Bitcoin::getMath();
-
         for ($i = 0; $i < $strlen; $i++) {
             $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
         }
 
         $hex = ($return == '0') ? '' : $math->decHex($return);
-
         for ($i = 0; $i < $strlen && $original[$i] == "1"; $i++) {
             $hex = "00" . $hex;
         }
 
-        $buffer = Buffer::hex($hex);
-        return $buffer;
+        return Buffer::hex($hex);
     }
 
     /**
@@ -119,8 +116,6 @@ class Base58
      */
     public static function encodeCheck(Buffer $data)
     {
-        $checksum = self::checksum($data);
-        $data = Buffer::hex($data->getHex() . $checksum->getHex());
-        return self::encode($data);
+        return self::encode(Buffer::hex($data->getHex() . self::checksum($data)->getHex()));
     }
 }

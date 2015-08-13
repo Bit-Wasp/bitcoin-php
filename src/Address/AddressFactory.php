@@ -20,8 +20,7 @@ class AddressFactory
      */
     public static function fromKey(KeyInterface $key)
     {
-        $address = new PayToPubKeyHashAddress($key->getPubKeyHash());
-        return $address;
+        return new PayToPubKeyHashAddress($key->getPubKeyHash());
     }
 
     /**
@@ -30,8 +29,7 @@ class AddressFactory
      */
     public static function fromScript(ScriptInterface $script)
     {
-        $address = new ScriptHashAddress($script->getScriptHash());
-        return $address;
+        return new ScriptHashAddress($script->getScriptHash());
     }
 
     /**
@@ -89,10 +87,12 @@ class AddressFactory
         $classifier = new OutputClassifier($script);
         $network = $network ?: Bitcoin::getNetwork();
         try {
-            $address = $classifier->isPayToPublicKey()
-                ? PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress()
-                : self::fromOutputScript($script);
-            return Base58::encodeCheck(Buffer::hex($network->getAddressByte() . $address->getHash()));
+            if ($classifier->isPayToPublicKey()) {
+                $address = PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress();
+            } else {
+                $address = self::fromOutputScript($script);
+            }
+            return Base58::encodeCheck(Buffer::hex($network->getAddressByte() . $address->getHash(), 21));
         } catch (\Exception $e) {
             throw new \RuntimeException('No address associated with this script type');
         }

@@ -10,7 +10,6 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
-use BitWasp\Bitcoin\Serializer\Key\PrivateKey\HexPrivateKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 
 class PrivateKeyFactory
@@ -87,14 +86,14 @@ class PrivateKeyFactory
      */
     public static function fromHex($hex, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
-        $hex = Buffer::hex($hex);
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $hex = Buffer::hex($hex, null, $ecAdapter->getMath());
+
+        /** @var PrivateKeySerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(
             $ecAdapter,
             'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface'
         );
-
-        /** @var PrivateKeySerializerInterface $serializer */
 
         $parsed = $serializer->parse($hex);
         if ($compressed) {
