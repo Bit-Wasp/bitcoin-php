@@ -58,8 +58,7 @@ or
    - Check your work, and apply code style:
        (phing): `phing`
        (other) `vendor/bin/phpunit && vendor/bin/phpcbf -n --standard=PSR1,PSR2 tests src`
-   - Commit your work:
-      `git commit -a`
+   - Commit your work: `git commit ... ` sign it with GPG if you can: `git commit -S ...`
    - Push your work:
       `git push origin your-feature-branch`
    - And open a pull request!
