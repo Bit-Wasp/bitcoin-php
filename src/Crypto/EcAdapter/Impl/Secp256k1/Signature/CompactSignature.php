@@ -51,6 +51,12 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
             throw new \InvalidArgumentException('CompactSignature: compressed must be a boolean');
         }
 
+        if (!is_resource($secp256k1_ecdsa_signature_t)
+            || SECP256K1_TYPE_RECOVERABLE_SIG !== get_resource_type($secp256k1_ecdsa_signature_t)
+        ) {
+            throw new \RuntimeException('CompactSignature: must pass recoverable signature resource');
+        }
+
         $ser = '';
         $recidout = '';
         secp256k1_ecdsa_recoverable_signature_serialize_compact($ecAdapter->getContext(), $secp256k1_ecdsa_signature_t, $ser, $recidout);
