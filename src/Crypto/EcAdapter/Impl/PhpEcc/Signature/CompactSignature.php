@@ -3,17 +3,26 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 
-class CompactSignature extends Signature implements CompactSignatureInterface
+class CompactSignature extends Serializable implements CompactSignatureInterface
 {
     /**
      * @var
      */
-    protected $ecAdapter;
+    private $ecAdapter;
+
+    /**
+     * @var int|string
+     */
+    private $r;
+
+    /**
+     * @var int|string
+     */
+    private $s;
 
     /**
      * @var int|string
@@ -39,9 +48,25 @@ class CompactSignature extends Signature implements CompactSignatureInterface
 
         $this->recid = $recid;
         $this->compressed = $compressed;
-        parent::__construct($adapter, $r, $s);
+        $this->r = $r;
+        $this->s = $s;
     }
 
+    /**
+     * @return int|string
+     */
+    public function getR()
+    {
+        return $this->r;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getS()
+    {
+        return $this->s;
+    }
     /**
      * @return int|string
      */

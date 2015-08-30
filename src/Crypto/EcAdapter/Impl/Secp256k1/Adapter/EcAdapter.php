@@ -136,19 +136,34 @@ class EcAdapter implements EcAdapterInterface
     /**
      * @param Buffer $msg32
      * @param PrivateKey $privateKey
+     * @return resource
+     */
+    private function doSignRecoverable(Buffer $msg32, PrivateKey $privateKey)
+    {
+        $sig_t = '';
+        /** @var resource $sig_t */
+        if (1 !== secp256k1_ecdsa_sign_recoverable($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
+            throw new \RuntimeException('Secp256k1: failed to sign');
+        }
+
+        return $sig_t;
+    }
+
+    /**
+     * @param Buffer $msg32
+     * @param PrivateKey $privateKey
      * @return Signature
      */
     private function doSign(Buffer $msg32, PrivateKey $privateKey)
     {
-        $sig_t = '';
-        if (1 !== secp256k1_ecdsa_sign($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
-            throw new \RuntimeException('Secp256k1: failed to sign');
-        }
-        /** @var resource $sig_t */
+        $signature = $this->doSignRecoverable($msg32, $privateKey);
 
         $recid = '';
         $sig_out = '';
-        secp256k1_ecdsa_signature_serialize_compact($this->context, $sig_t, $sig_out, $recid);
+        if (1 !== secp256k1_ecdsa_recoverable_signature_serialize_compact($this->context, $signature, $sig_out, $recid)) {
+            throw new \RuntimeException('Secp256k1: failed to sign');
+        }
+
         list ($r, $s) = array_map(
             function ($val) {
                 return $this->math->hexDec(bin2hex($val));
@@ -156,8 +171,9 @@ class EcAdapter implements EcAdapterInterface
             str_split($sig_out, 32)
         );
 
-        /** @var resource $sig_t */
-        return new Signature($this, $r, $s, $sig_t);
+        secp256k1_ecdsa_recoverable_signature_convert($this->context, $signature, $signature);
+
+        return new Signature($this, $r, $s, $signature);
     }
 
     /**
@@ -233,10 +249,10 @@ class EcAdapter implements EcAdapterInterface
      */
     private function doSignCompact(Buffer $msg32, PrivateKey $privateKey, RbgInterface $rbg = null)
     {
-        $sig_t = $this->sign($msg32, $privateKey, $rbg)->getResource();
+        $sig_t = $this->doSignRecoverable($msg32, $privateKey);
         $recid = '';
         $ser = '';
-        if (!secp256k1_ecdsa_signature_serialize_compact($this->context, $sig_t, $ser, $recid)) {
+        if (!secp256k1_ecdsa_recoverable_signature_serialize_compact($this->context, $sig_t, $ser, $recid)) {
             throw new \RuntimeException('Failed to obtain recid');
         }
 
