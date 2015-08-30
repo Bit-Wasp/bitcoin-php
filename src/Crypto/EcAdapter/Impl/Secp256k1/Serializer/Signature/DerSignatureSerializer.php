@@ -82,7 +82,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
             ->varstring()
             ->getTemplate();
     }
-    
+
     /**
      * @param $data
      * @return SignatureInterface
@@ -93,6 +93,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         $binary = $buffer->getBinary();
 
         $sig_t = '';
+        /** @var resource $sig_t */
         if (!secp256k1_ecdsa_signature_parse_der($this->ecAdapter->getContext(), $binary, $sig_t)) {
             throw new \RuntimeException('Secp256k1: parse der failure');
         }
@@ -103,8 +104,6 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         /** @var Buffer $r */
         /** @var Buffer $s */
 
-
-        /** @var resource $sig_t */
         return new Signature($this->ecAdapter, $r->getInt(), $s->getInt(), $sig_t);
     }
 }
