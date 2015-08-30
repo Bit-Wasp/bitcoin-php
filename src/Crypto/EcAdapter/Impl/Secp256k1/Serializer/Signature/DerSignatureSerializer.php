@@ -90,6 +90,11 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     {
         $buffer = (new Parser($data))->getBuffer();
         $binary = $buffer->getBinary();
+        
+        $sig_t = '';
+        if (!secp256k1_ecdsa_signature_parse_der($this->ecAdapter->getContext(), $binary, $sig_t)) {
+            throw new \RuntimeException('Secp256k1: parse der failure');
+        }
 
         // Unfortunately, we need to use the Parser here to get r and s :/
         list (, $inner) = $this->getOuterTemplate()->parse(new Parser($buffer));
@@ -97,10 +102,6 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         /** @var Buffer $r */
         /** @var Buffer $s */
 
-        $sig_t = '';
-        if (!secp256k1_ecdsa_signature_parse_der($this->ecAdapter->getContext(), $binary, $sig_t)) {
-            throw new \RuntimeException('Secp256k1: parse der failure');
-        }
 
         /** @var resource $sig_t */
         return new Signature($this->ecAdapter, $r->getInt(), $s->getInt(), $sig_t);
