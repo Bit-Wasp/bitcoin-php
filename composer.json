@@ -37,7 +37,8 @@
     "react/react": "~0.4",
     "react/socket-client": "~0.4",
     "bitwasp/buffertools": "~0.1",
-    "bitwasp/stratum": "~0.1"
+    "bitwasp/stratum": "~0.1",
+    "bitwasp/secp256k1-php": "0.0.5"
   },
   "require-dev": {
     "bitwasp/testing-php": "~0.0",

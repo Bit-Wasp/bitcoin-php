@@ -71,8 +71,11 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     {
         $compressed = $this->haveNextCompressed;
         $this->haveNextCompressed = false;
-        $int = $parser->readBytes(32)->getInt();
-        return $this->ecAdapter->getPrivateKey($int, $compressed);
+
+        return $this->ecAdapter->getPrivateKey(
+            $parser->readBytes(32)->getInt(),
+            $compressed
+        );
     }
 
     /**

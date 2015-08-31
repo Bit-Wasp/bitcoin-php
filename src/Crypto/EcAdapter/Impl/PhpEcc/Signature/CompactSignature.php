@@ -3,17 +3,26 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 
-class CompactSignature extends Signature implements CompactSignatureInterface
+class CompactSignature extends Serializable implements CompactSignatureInterface
 {
     /**
      * @var
      */
-    protected $ecAdapter;
+    private $ecAdapter;
+
+    /**
+     * @var int|string
+     */
+    private $r;
+
+    /**
+     * @var int|string
+     */
+    private $s;
 
     /**
      * @var int|string
@@ -26,6 +35,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     private $compressed;
 
     /**
+     * @param EcAdapter $adapter
      * @param int|string $r
      * @param int|string $s
      * @param int|string $recid
@@ -37,9 +47,35 @@ class CompactSignature extends Signature implements CompactSignatureInterface
             throw new \InvalidArgumentException('CompactSignature: $compressed must be a boolean');
         }
 
+        $this->ecAdapter = $adapter;
         $this->recid = $recid;
         $this->compressed = $compressed;
-        parent::__construct($adapter, $r, $s);
+        $this->r = $r;
+        $this->s = $s;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getR()
+    {
+        return $this->r;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getS()
+    {
+        return $this->s;
+    }
+
+    /**
+     * @return Signature
+     */
+    public function convert()
+    {
+        return new Signature($this->ecAdapter, $this->r, $this->s);
     }
 
     /**

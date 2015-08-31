@@ -118,10 +118,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
         if ($this->publicKey == null) {
             $context = $this->ecAdapter->getContext();
             $pubkey_t = '';
+            /** @var resource $pubkey_t */
             if (1 !== secp256k1_ec_pubkey_create($context, $this->getBinary(), $pubkey_t)) {
                 throw new \RuntimeException('Failed to create public key');
             }
-            /** @var resource $pubkey_t */
+
             $this->publicKey = new PublicKey($this->ecAdapter, $pubkey_t, $this->compressed);
         }
 

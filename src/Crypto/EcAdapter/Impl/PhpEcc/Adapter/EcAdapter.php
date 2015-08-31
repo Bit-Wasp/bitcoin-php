@@ -269,7 +269,7 @@ class EcAdapter implements EcAdapterInterface
 
         // 1.6.2 Test Q as a public key
         $Qk = new PublicKey($this, $Q, $signature->isCompressed());
-        if ($this->verify($messageHash, $Qk, $signature)) {
+        if ($this->verify($messageHash, $Qk, $signature->convert())) {
             return $Qk;
         }
 

@@ -40,7 +40,13 @@ class PublicKeySerializer implements PublicKeySerializerInterface
             throw new \RuntimeException('Secp256k1: Failed to serialize public key');
         }
 
-        return new Buffer($serialized, $publicKey->isCompressed() ? PublicKey::LENGTH_COMPRESSED : PublicKey::LENGTH_UNCOMPRESSED, $this->ecAdapter->getMath());
+        return new Buffer(
+            $serialized,
+            $publicKey->isCompressed()
+            ? PublicKey::LENGTH_COMPRESSED
+            : PublicKey::LENGTH_UNCOMPRESSED,
+            $this->ecAdapter->getMath()
+        );
     }
 
     /**
@@ -62,11 +68,11 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         $buffer = (new Parser($data))->getBuffer();
         $binary = $buffer->getBinary();
         $pubkey_t = '';
+        /** @var resource $pubkey_t */
         if (!secp256k1_ec_pubkey_parse($this->ecAdapter->getContext(), $binary, $pubkey_t)) {
             throw new \RuntimeException('Secp256k1 failed to parse public key');
         }
 
-        /** @var resource $pubkey_t */
         return new PublicKey(
             $this->ecAdapter,
             $pubkey_t,
