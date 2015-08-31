@@ -21,13 +21,11 @@ class ProofOfWork
     /**
      * @param Math $math
      * @param Difficulty $difficulty
-     * @param int|string $networkDifficulty
      */
-    public function __construct(Math $math, Difficulty $difficulty, $networkDifficulty)
+    public function __construct(Math $math, Difficulty $difficulty)
     {
         $this->math = $math;
         $this->difficulty = $difficulty;
-        $this->networkDifficulty = $networkDifficulty;
     }
 
     /**

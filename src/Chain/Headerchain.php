@@ -67,7 +67,7 @@ class Headerchain
         $initBlock = $this->chainTip();
         $this->difficulty = new Difficulty($math, $initBlock->getBits());
         $this->chainDiff = $this->difficulty->getDifficulty($initBlock->getBits());
-        $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
+        $this->pow = new ProofOfWork($this->math, $this->difficulty);
     }
 
     /**
@@ -144,7 +144,7 @@ class Headerchain
     {
         if ($this->math->cmp(0, $this->math->mod($this->currentHeight(), 2016)) == 0) {
             $this->chainDiff = $this->difficulty->getDifficulty($this->chainTip()->getBits());
-            $this->pow = new ProofOfWork($this->math, $this->difficulty, $this->chainDiff);
+            $this->pow = new ProofOfWork($this->math, $this->difficulty);
         }
         return $this;
     }
