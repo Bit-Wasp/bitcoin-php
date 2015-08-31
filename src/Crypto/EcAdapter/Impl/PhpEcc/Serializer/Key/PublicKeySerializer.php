@@ -45,18 +45,19 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      */
     private function doSerialize(PublicKey $publicKey)
     {
-        $point = $publicKey->getPoint();
-
-        $parser = new Parser();
-        $parser->writeBytes(1, $this->getPrefix($publicKey->isCompressed(), $point));
         $math = $this->ecAdapter->getMath();
+        $point = $publicKey->getPoint();
+        $compressed = $publicKey->isCompressed();
 
-        $publicKey->isCompressed()
+        $parser = new Parser('', $math);
+        $parser->writeBytes(1, $this->getPrefix($compressed, $point));
+
+        $compressed
             ? $parser
-            ->writeBytes(32, $math->decHex($point->getX()))
+            ->writeBytes(32, Buffer::int($point->getX(), null, $math))
             : $parser
-            ->writeBytes(32, $math->decHex($point->getX()))
-            ->writeBytes(32, $math->decHex($point->getY()));
+            ->writeBytes(32, Buffer::int($point->getX(), null, $math))
+            ->writeBytes(32, Buffer::int($point->getY(), null, $math));
 
         return $parser->getBuffer();
     }
@@ -72,17 +73,17 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param $hex
+     * @param Buffer|string $data
      * @return PublicKey
      * @throws \Exception
      */
-    public function parse($hex)
+    public function parse($data)
     {
-        $hex = Buffer::hex($hex);
-        if (!in_array($hex->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED])) {
+        $buffer = (new Parser($data))->getBuffer();
+        if (!in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED])) {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
-        return $this->ecAdapter->publicKeyFromBuffer($hex);
+        return $this->ecAdapter->publicKeyFromBuffer($buffer);
     }
 }
