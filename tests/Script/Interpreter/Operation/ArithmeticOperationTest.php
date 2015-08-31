@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Operation;
 
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Operation\ArithmeticOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -18,7 +19,7 @@ class ArithmeticOperationTest extends AbstractTestCase
     public function testOpCodeNotFound()
     {
         // 101 is not in the right range, should fail.
-        $operation = new ArithmeticOperation(new Opcodes(), new Math(), function () {
+        $operation = new ArithmeticOperation(new Opcodes(), new Flags(0), new Math(),  function () {
         }, new Buffer(), new Buffer());
         $stack = new ScriptStack();
         $stack->push(new Buffer());

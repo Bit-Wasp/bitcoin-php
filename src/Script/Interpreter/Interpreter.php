@@ -681,11 +681,11 @@ class Interpreter implements InterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            echo "\n Runtime: " . $e->getMessage() . "\n";
+            //echo "\n Runtime: " . $e->getMessage() . "\n";
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            echo "\n General: " . $e->getMessage() ;
+            //echo "\n General: " . $e->getMessage() ;
             return false;
         }
     }
