@@ -244,10 +244,9 @@ class EcAdapter implements EcAdapterInterface
     /**
      * @param Buffer $msg32
      * @param PrivateKey $privateKey
-     * @param RbgInterface|null $rbg
      * @return CompactSignature
      */
-    private function doSignCompact(Buffer $msg32, PrivateKey $privateKey, RbgInterface $rbg = null)
+    private function doSignCompact(Buffer $msg32, PrivateKey $privateKey)
     {
         $sig_t = $this->doSignRecoverable($msg32, $privateKey);
         $recid = '';
@@ -274,6 +273,6 @@ class EcAdapter implements EcAdapterInterface
     public function signCompact(Buffer $msg32, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
         /** @var PrivateKey $privateKey */
-        return $this->doSignCompact($msg32, $privateKey, $rbg);
+        return $this->doSignCompact($msg32, $privateKey);
     }
 }
