@@ -47,7 +47,9 @@ class BlockHeaderSerializer
 
         try {
             list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->getTemplate()->parse($parser);
-
+            /** @var int|string $version */
+            /** @var Buffer $prevHash */
+            /** @var Buffer $merkleHash */
             return new BlockHeader(
                 $version,
                 $prevHash->getHex(),
