@@ -50,8 +50,8 @@ class ScriptNum extends Buffer
             }
         }
 
+        $this->originalSize = $bufferSize;
         $this->math = $math;
-
         parent::__construct($str, $size, $math);
     }
 
@@ -60,6 +60,6 @@ class ScriptNum extends Buffer
      */
     public function getBuffer()
     {
-        return new Buffer($this->buffer, null, $this->math);
+        return new Buffer($this->buffer, $this->originalSize, $this->math);
     }
 }

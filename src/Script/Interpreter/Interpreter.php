@@ -453,6 +453,8 @@ class Interpreter implements InterpreterInterface
                         case $opcodes->getOpByName('OP_RETURN'):
                             $flowControl = new FlowControlOperation(
                                 $opcodes,
+                                $math,
+                                $flags,
                                 function (Buffer $buffer) {
                                     return $this->castToBool($buffer);
                                 }
@@ -472,6 +474,7 @@ class Interpreter implements InterpreterInterface
                             $stackOper = new StackOperation(
                                 $opcodes,
                                 $math,
+                                $flags,
                                 function (Buffer $buffer) {
                                     return $this->castToBool($buffer);
                                 }

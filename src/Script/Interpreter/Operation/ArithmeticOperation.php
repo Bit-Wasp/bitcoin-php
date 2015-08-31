@@ -69,12 +69,13 @@ class ArithmeticOperation
             throw new \Exception('Invalid stack operation 1ADD');
         }
 
-        $num = (new ScriptNum($this->math, $this->flags, $mainStack->top(-1), 4))->getInt();
+        $math = $this->math;
+        $num = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
 
         $opCodes = $this->opCodes;
         $opName = $opCodes->getOp($opCode);
 
-        $math = $this->math;
+
 
         if ($opName == 'OP_1ADD') { // cscriptnum
             $num = $math->add($num, '1');
@@ -82,13 +83,13 @@ class ArithmeticOperation
             $num = $math->sub($num, '1');
         } elseif ($opName == 'OP_2MUL') {
             $num = $math->mul(2, $num);
-        } elseif ($opName == 'OP_NEGATE') { // cscriptnum
+        } elseif ($opName == 'OP_NEGATE') {
             $num = $math->sub(0, $num);
         } elseif ($opName == 'OP_ABS') {
             if ($math->cmp($num, '0') < 0) {
                 $num = $math->sub(0, $num);
             }
-        } elseif ($opName == 'OP_NOT') { // cscriptnum
+        } elseif ($opName == 'OP_NOT') {
             $num = ($math->cmp($num, '0') == 0);
         } else {
             // is OP_0NOTEQUAL
