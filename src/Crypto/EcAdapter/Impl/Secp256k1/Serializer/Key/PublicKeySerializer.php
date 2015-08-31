@@ -43,8 +43,8 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         return new Buffer(
             $serialized,
             $publicKey->isCompressed()
-                ? PublicKey::LENGTH_COMPRESSED
-                : PublicKey::LENGTH_UNCOMPRESSED,
+            ? PublicKey::LENGTH_COMPRESSED
+            : PublicKey::LENGTH_UNCOMPRESSED,
             $this->ecAdapter->getMath()
         );
     }
