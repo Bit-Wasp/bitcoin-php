@@ -35,6 +35,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     private $compressed;
 
     /**
+     * @param EcAdapter $adapter
      * @param int|string $r
      * @param int|string $s
      * @param int|string $recid
@@ -46,6 +47,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
             throw new \InvalidArgumentException('CompactSignature: $compressed must be a boolean');
         }
 
+        $this->ecAdapter = $adapter;
         $this->recid = $recid;
         $this->compressed = $compressed;
         $this->r = $r;
