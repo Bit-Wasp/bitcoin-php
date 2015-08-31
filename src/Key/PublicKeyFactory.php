@@ -18,9 +18,10 @@ class PublicKeyFactory
      */
     public static function getSerializer(EcAdapterInterface $ecAdapter = null)
     {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $hexSerializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface');
-        return $hexSerializer;
+        return EcSerializer::getSerializer(
+            $ecAdapter ?: Bitcoin::getEcAdapter(),
+            'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface'
+        );
     }
 
     /**
@@ -34,15 +35,18 @@ class PublicKeyFactory
         return self::getSerializer($ecAdapter)->parse($hex);
     }
 
+    /**
+     * @param $hex
+     * @param EcAdapterInterface|null $ecAdapter
+     * @return bool
+     */
     public static function validateHex($hex, EcAdapterInterface $ecAdapter = null)
     {
         try {
             self::fromHex($hex, $ecAdapter);
-            $valid = true;
+            return true;
         } catch (\Exception $e) {
-            $valid = false;
+            return false;
         }
-
-        return $valid;
     }
 }
