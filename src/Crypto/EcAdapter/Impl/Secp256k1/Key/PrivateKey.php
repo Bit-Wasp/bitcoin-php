@@ -87,14 +87,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @return bool
-     */
-    public function isPrivate()
-    {
-        return true;
-    }
-
-    /**
      * @return int|string
      */
     public function getSecretMultiplier()
@@ -127,16 +119,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
         }
 
         return $this->publicKey;
-    }
-
-    /**
-     * Return the hash of the associated public key
-     *
-     * @return Buffer
-     */
-    public function getPubKeyHash()
-    {
-        return $this->getPublicKey()->getPubKeyHash();
     }
 
     /**

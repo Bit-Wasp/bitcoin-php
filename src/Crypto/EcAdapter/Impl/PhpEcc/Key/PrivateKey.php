@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PrivateKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -32,7 +31,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     private $publicKey;
 
     /**
-     * @var EcAdapterInterface
+     * @var EcAdapter
      */
     private $ecAdapter;
 
@@ -80,7 +79,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @return PrivateKeyInterface
      */
     public function tweakAdd($tweak)
@@ -103,7 +102,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @return PrivateKeyInterface
      */
     public function tweakMul($tweak)
@@ -123,16 +122,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
             ),
             $this->compressed
         );
-    }
-
-    /**
-     * Always returns true when private key.
-     *
-     * @return bool
-     */
-    public function isPrivate()
-    {
-        return true;
     }
 
     /**
@@ -161,16 +150,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
         }
 
         return $this->publicKey;
-    }
-
-    /**
-     * Return the hash of the associated public key
-     *
-     * @return Buffer
-     */
-    public function getPubKeyHash()
-    {
-        return $this->getPublicKey()->getPubKeyHash();
     }
 
     /**

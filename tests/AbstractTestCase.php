@@ -11,6 +11,16 @@ use Mdanter\Ecc\EccFactory;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
+    private static $context;
+
+    public static function getContext()
+    {
+        if (self::$context == null) {
+            self::$context = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
+        }
+
+        return self::$context;
+    }
 
     /**
      * @param $filename
@@ -29,7 +39,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $blocks = $this->dataFile('180blocks');
         $a = explode("\n", $blocks);
         return array_filter($a, 'strlen');
-        return $a;
     }
 
     /**
@@ -39,9 +48,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     public function getBlock($i)
     {
         $blocks = $this->getBlocks();
-        $hex = $blocks[$i];
-        $b = BlockFactory::fromHex($hex);
-        return $b;
+        return BlockFactory::fromHex($blocks[$i]);
     }
 
     /**
@@ -49,8 +56,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      */
     public function getGenesisBlock()
     {
-        $b = $this->getBlock(0);
-        return $b;
+        return $this->getBlock(0);
     }
 
     /**
@@ -77,19 +83,8 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
                 ? EcAdapterFactory::getSecp256k1($math, $generator)
                 : EcAdapterFactory::getPhpEcc($math, $generator))];
         }
-
+        
         return $adapters;
-    }
-
-    private static $context;
-
-    public static function getContext()
-    {
-        if (self::$context == null) {
-            self::$context = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
-        }
-
-        return self::$context;
     }
 
     public function safeMath()
