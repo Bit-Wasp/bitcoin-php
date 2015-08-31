@@ -3,7 +3,6 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter\Operation;
 
-
 use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
