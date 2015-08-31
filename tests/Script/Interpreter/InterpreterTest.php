@@ -407,20 +407,20 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
             [81, Buffer::hex('01')],
             [79, Buffer::hex('81')],
             [5, Buffer::hex('0102030405')],
-            [0x4c, Buffer::hex('', 76)],
-            [0x4c, Buffer::hex('', 78)],
-            [0x4c, Buffer::hex('', 255)],
-            [0x4d, Buffer::hex('', 256)],
-            [0x4d, Buffer::hex('', 65535)],
-            [0x4e, Buffer::hex('', 65536)],
+            [0x4c, new Buffer('', 76)],
+            [0x4c, new Buffer('', 78)],
+            [0x4c, new Buffer('', 255)],
+            [0x4d, new Buffer('', 256)],
+            [0x4d, new Buffer('', 65535)],
+            [0x4e, new Buffer('', 65536)],
         ];
 
         $invalid = [
-            [0x81, Buffer::hex('')],
+            [0x81, new Buffer('')],
             [01, Buffer::hex('0102030405')],
-            [0x4d, Buffer::hex('', 74)],
-            [0x4e, Buffer::hex('', 255)],
-            [0x4d, Buffer::hex('', 255)]
+            [0x4d, new Buffer('', 74)],
+            [0x4e, new Buffer('', 255)],
+            [0x4d, new Buffer('', 255)]
         ];
 
         $i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(InterpreterInterface::VERIFY_P2SH));
