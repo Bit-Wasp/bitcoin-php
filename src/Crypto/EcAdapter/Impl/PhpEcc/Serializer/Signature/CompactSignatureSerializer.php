@@ -16,7 +16,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 {
 
     /**
-     * @var Math
+     * @var EcAdapter
      */
     private $ecAdapter;
 
