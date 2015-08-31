@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter\Operation;
 
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
@@ -13,6 +14,11 @@ class ArithmeticOperation
      * @var Opcodes
      */
     private $opCodes;
+
+    /**
+     * @var Flags
+     */
+    private $flags;
 
     /**
      * @var Math
@@ -41,9 +47,10 @@ class ArithmeticOperation
      * @param Buffer $_bn0
      * @param Buffer $_bn1
      */
-    public function __construct(Opcodes $opCodes, Math $math, callable $castToBool, Buffer $_bn0, Buffer $_bn1)
+    public function __construct(Opcodes $opCodes, Flags $flags, Math $math, callable $castToBool, Buffer $_bn0, Buffer $_bn1)
     {
         $this->opCodes = $opCodes;
+        $this->flags = $flags;
         $this->math = $math;
         $this->castToBool = $castToBool;
         $this->_bn0 = $_bn0;
@@ -61,7 +68,9 @@ class ArithmeticOperation
         if ($mainStack->size() < 1) {
             throw new \Exception('Invalid stack operation 1ADD');
         }
-        $num = $mainStack->top(-1)->getInt();
+
+        $num = (new ScriptNum($this->math, $this->flags, $mainStack->top(-1), 4))->getInt();
+
         $opCodes = $this->opCodes;
         $opName = $opCodes->getOp($opCode);
 
@@ -88,7 +97,7 @@ class ArithmeticOperation
 
         $mainStack->pop();
 
-        $buffer = Buffer::hex($math->decHex($num));
+        $buffer = Buffer::int($num, null, $math);
         $mainStack->push($buffer);
     }
 
@@ -104,8 +113,8 @@ class ArithmeticOperation
             throw new \Exception('Invalid stack operation (greater than)');
         }
 
-        $num1 = $mainStack->top(-2)->getInt(); // cscriptnum
-        $num2 = $mainStack->top(-1)->getInt();
+        $num1 = (new ScriptNum($this->math, $this->flags, $mainStack->top(-2), 4))->getInt();
+        $num2 = (new ScriptNum($this->math, $this->flags, $mainStack->top(-1), 4))->getInt();
 
         $opCodes = $this->opCodes;
         $opName = $opCodes->getOp($opCode);
@@ -143,7 +152,7 @@ class ArithmeticOperation
 
         $mainStack->pop();
         $mainStack->pop();
-        $buffer = Buffer::hex($math->decHex($num));
+        $buffer = Buffer::int($num, null, $this->math);
         $mainStack->push($buffer);
 
         if ($opCodes->isOp($opCode, 'OP_NUMEQUALVERIFY')) {
@@ -170,9 +179,9 @@ class ArithmeticOperation
             if ($mainStack->size() < 3) {
                 throw new \Exception('Invalid stack operation');
             }
-            $num1 = $mainStack->top(-3)->getInt();
-            $num2 = $mainStack->top(-2)->getInt();
-            $num3 = $mainStack->top(-1)->getInt();
+            $num1 = (new ScriptNum($this->math, $this->flags, $mainStack->top(-1), 4))->getInt();
+            $num2 = (new ScriptNum($this->math, $this->flags, $mainStack->top(-1), 4))->getInt();
+            $num3 = (new ScriptNum($this->math, $this->flags, $mainStack->top(-1), 4))->getInt();
 
             $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
             $mainStack->pop();

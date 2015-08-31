@@ -436,7 +436,7 @@ class Interpreter implements InterpreterInterface
                     switch ($opCode) {
                         case $opcodes->getOpByName('OP_1NEGATE'):
                         case $opcodes->cmp($opCode, 'OP_1') >= 0 && $opcodes->cmp($opCode, 'OP_16') <= 0:
-                            $pushInt = new PushIntOperation($opcodes);
+                            $pushInt = new PushIntOperation($opcodes, $math);
                             $pushInt->op($opCode, $mainStack);
                             break;
 
@@ -471,7 +471,7 @@ class Interpreter implements InterpreterInterface
                         case $opcodes->cmp($opCode, 'OP_2DROP') >= 0 && $opcodes->cmp($opCode, 'OP_2SWAP') <= 0:
                             $stackOper = new StackOperation(
                                 $opcodes,
-                                $this->ecAdapter->getMath(),
+                                $math,
                                 function (Buffer $buffer) {
                                     return $this->castToBool($buffer);
                                 }
@@ -524,7 +524,8 @@ class Interpreter implements InterpreterInterface
                         case $opcodes->cmp($opCode, 'OP_1ADD') >= 0 && $opcodes->cmp($opCode, 'OP_WITHIN') <= 0:
                             $arithmetic = new ArithmeticOperation(
                                 $opcodes,
-                                $this->ecAdapter->getMath(),
+                                $flags,
+                                $math,
                                 function (Buffer $buffer) {
                                     return $this->castToBool($buffer);
                                 },
@@ -578,7 +579,6 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation');
                             }
 
-                            $math = $this->ecAdapter->getMath();
                             $keyCount = $mainStack->top(-$i)->getInt();
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
                                 throw new \Exception('OP_CHECKMULTISIG: Public key count exceeds 20');
@@ -678,11 +678,11 @@ class Interpreter implements InterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            //echo "\n Runtime: " . $e->getMessage() . "\n";
+            echo "\n Runtime: " . $e->getMessage() . "\n";
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            //echo "\n General: " . $e->getMessage() ;
+            echo "\n General: " . $e->getMessage() ;
             return false;
         }
     }

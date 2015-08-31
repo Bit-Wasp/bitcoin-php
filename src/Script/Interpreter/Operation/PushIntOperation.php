@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter\Operation;
 
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Buffertools\Buffer;
@@ -9,15 +10,22 @@ use BitWasp\Buffertools\Buffer;
 class PushIntOperation
 {
     /**
+     * @var Math
+     */
+    private $math;
+
+    /**
      * @var Opcodes
      */
     private $opCodes;
 
     /**
      * @param Opcodes $opCodes
+     * @param Math $math
      */
-    public function __construct(Opcodes $opCodes)
+    public function __construct(Opcodes $opCodes, Math $math)
     {
+        $this->math = $math;
         $this->opCodes = $opCodes;
     }
 
@@ -49,7 +57,7 @@ class PushIntOperation
             case 'OP_15':
             case 'OP_16':
                 $num = $opCode - ($opCodes->getOpByName('OP_1') - 1);
-                $mainStack->push(new Buffer(chr($num), 1));
+                $mainStack->push(new Buffer(chr($num), 1, $this->math));
                 return;
             default:
                 throw new \Exception('Opcode not found');
