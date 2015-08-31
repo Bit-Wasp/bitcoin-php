@@ -59,14 +59,6 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @return bool
-     */
-    public function isPrivate()
-    {
-        return false;
-    }
-
-    /**
      * @return bool|false
      */
     public function isCompressed()
@@ -80,14 +72,6 @@ class PublicKey extends Key implements PublicKeyInterface
     public function getResource()
     {
         return $this->pubkey_t;
-    }
-
-    /**
-     * @return Buffer
-     */
-    public function getPubKeyHash()
-    {
-        return Hash::sha256ripe160($this->getBuffer());
     }
 
     /**

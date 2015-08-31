@@ -2,20 +2,18 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PublicKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
-use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKey extends Key implements PublicKeyInterface
 {
     /**
-     * @var EcAdapterInterface
+     * @var EcAdapter
      */
     private $ecAdapter;
 
@@ -56,14 +54,6 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @return Buffer
-     */
-    public function getPubKeyHash()
-    {
-        return Hash::sha256ripe160($this->getBuffer());
-    }
-
-    /**
      * @param Buffer $msg32
      * @param SignatureInterface $signature
      * @return bool
@@ -80,9 +70,9 @@ class PublicKey extends Key implements PublicKeyInterface
     public function tweakAdd($tweak)
     {
         $adapter = $this->ecAdapter;
-        $G = $adapter->getGenerator();
-        $point = $this->point->add($G->mul($tweak));
-        return $adapter->getPublicKey($point, $this->compressed);
+        $offset = $adapter->getGenerator()->mul($tweak);
+        $newPoint = $this->point->add($offset);
+        return $adapter->getPublicKey($newPoint, $this->compressed);
     }
 
     /**
@@ -125,36 +115,11 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * Sets a public key to be compressed
-     *
-     * @param $compressed
-     * @return $this
-     * @throws \Exception
-     */
-    public function setCompressed($compressed)
-    {
-        if (!is_bool($compressed)) {
-            throw new \Exception('Compressed flag must be a boolean');
-        }
-
-        $this->compressed = $compressed;
-        return $this;
-    }
-
-    /**
      * @return bool
      */
     public function isCompressed()
     {
         return $this->compressed;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function isPrivate()
-    {
-        return false;
     }
 
     /**

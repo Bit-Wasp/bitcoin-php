@@ -3,12 +3,10 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PrivateKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -33,7 +31,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     private $publicKey;
 
     /**
-     * @var EcAdapterInterface
+     * @var EcAdapter
      */
     private $ecAdapter;
 
@@ -45,6 +43,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function __construct(EcAdapter $ecAdapter, $int, $compressed = false)
     {
+        if (gettype($int) == 'double') {
+            die();
+        }
         if (false === $ecAdapter->validatePrivateKey(Buffer::int($int, 32, $ecAdapter->getMath()))) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
@@ -78,53 +79,49 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @return PrivateKeyInterface
      */
     public function tweakAdd($tweak)
     {
         $adapter = $this->ecAdapter;
-        $math = $adapter->getMath();
         return $adapter->getPrivateKey(
-            $math->mod(
-                $math->add(
+            $adapter
+                ->getMath()
+                ->getModularArithmetic(
+                    $adapter
+                        ->getGenerator()
+                        ->getOrder()
+                )
+                ->add(
                     $tweak,
                     $this->getSecretMultiplier()
                 ),
-                $this->ecAdapter->getGenerator()->getOrder()
-            ),
             $this->compressed
         );
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @return PrivateKeyInterface
      */
     public function tweakMul($tweak)
     {
         $adapter = $this->ecAdapter;
-        $math = $adapter->getMath();
         return $adapter->getPrivateKey(
-            $math->mod(
-                $math->mul(
-                    $tweak,
-                    $this->getSecretMultiplier()
-                ),
-                $this->ecAdapter->getGenerator()->getOrder()
+            $adapter
+            ->getMath()
+            ->getModularArithmetic(
+                $adapter
+                    ->getGenerator()
+                    ->getOrder()
+            )
+            ->mul(
+                $tweak,
+                $this->getSecretMultiplier()
             ),
             $this->compressed
         );
-    }
-
-    /**
-     * Always returns true when private key.
-     *
-     * @return bool
-     */
-    public function isPrivate()
-    {
-        return true;
     }
 
     /**
@@ -132,7 +129,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function isCompressed()
     {
-        return $this->compressed === true;
+        return $this->compressed;
     }
 
     /**
@@ -144,34 +141,15 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         if ($this->publicKey == null) {
             $adapter = $this->ecAdapter;
-            $point = $adapter->getGenerator()->mul($this->secretMultiplier);
-            $this->publicKey = $adapter->getPublicKey($point, $this->compressed);
+            $this->publicKey = $adapter->getPublicKey(
+                $adapter
+                    ->getGenerator()
+                    ->mul($this->secretMultiplier),
+                $this->compressed
+            );
         }
 
         return $this->publicKey;
-    }
-
-    /**
-     * Return the hash of the associated public key
-     *
-     * @return Buffer
-     */
-    public function getPubKeyHash()
-    {
-        return $this->getPublicKey()->getPubKeyHash();
-    }
-
-    /**
-     * Set that this key should be compressed
-     *
-     * @param boolean $setting
-     * @return $this
-     * @throws \Exception
-     */
-    public function setCompressed($setting)
-    {
-        $this->compressed = $setting;
-        return $this;
     }
 
     /**

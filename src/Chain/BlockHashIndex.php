@@ -13,11 +13,6 @@ class BlockHashIndex
     private $index;
 
     /**
-     * @var int
-     */
-    private $height;
-
-    /**
      * @param Cache $cache
      */
     public function __construct(Cache $cache)

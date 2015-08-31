@@ -57,7 +57,7 @@ class Miner
     private $timestamp;
 
     /**
-     * @var int
+     * @var int|string
      */
     private $version;
 
@@ -71,8 +71,8 @@ class Miner
      * @param BlockHeaderInterface $lastBlockHeader
      * @param ScriptInterface $script
      * @param Buffer $personalString
-     * @param mixed $timestamp
-     * @param int $version
+     * @param int|string $timestamp
+     * @param int|string $version
      * @param bool $report
      */
     public function __construct(

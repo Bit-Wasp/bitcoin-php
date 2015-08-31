@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Block;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
 

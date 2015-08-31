@@ -118,21 +118,21 @@ class EcAdapterTest extends AbstractTestCase
     {
         $f = file_get_contents(__DIR__.'/../../Data/hmacdrbg.json');
         $json = json_decode($f);
-
+        $math = $ecAdapter->getMath();
         foreach ($json->test as $c => $test) {
             $privateKey = PrivateKeyFactory ::fromHex($test->privKey, false, $ecAdapter);
-            $message = new Buffer($test->message);
+            $message = new Buffer($test->message, null, $math);
             $messageHash = Hash::sha256($message);
 
             $k = new Rfc6979($ecAdapter, $privateKey, $messageHash);
             $sig = $ecAdapter->sign($messageHash, $privateKey, $k);
 
             // K must be correct (from privatekey and message hash)
-            $this->assertEquals(Buffer::hex($test->expectedK), $k->bytes(32));
+            $this->assertEquals(strtolower($test->expectedK), $k->bytes(32)->getHex());
 
             // R and S should be correct
-            $rHex = $ecAdapter->getMath()->dechex($sig->getR());
-            $sHex = $ecAdapter->getMath()->decHex($sig->getS());
+            $rHex = $math->dechex($sig->getR());
+            $sHex = $math->decHex($sig->getS());
             $this->assertSame($test->expectedRSLow, $rHex . $sHex);
 
             $this->assertTrue($ecAdapter->verify($messageHash, $privateKey->getPublicKey(), $sig));

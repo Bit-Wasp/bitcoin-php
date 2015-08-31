@@ -130,8 +130,7 @@ class PartialMerkleTree extends Serializable
                 $right = $left;
             }
 
-            $hash = Hash::sha256d(Buffertools::concat($left, $right));
-            return $hash;
+            return Hash::sha256d(Buffertools::concat($left, $right));
         }
     }
 
