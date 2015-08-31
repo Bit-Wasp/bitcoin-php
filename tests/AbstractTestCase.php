@@ -5,8 +5,6 @@ namespace BitWasp\Bitcoin\Tests;
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Crypto\EcAdapter\PhpEcc;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Secp256k1;
 use Mdanter\Ecc\EccFactory;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
@@ -83,7 +81,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
                 ? EcAdapterFactory::getSecp256k1($math, $generator)
                 : EcAdapterFactory::getPhpEcc($math, $generator))];
         }
-        
+
         return $adapters;
     }
 
