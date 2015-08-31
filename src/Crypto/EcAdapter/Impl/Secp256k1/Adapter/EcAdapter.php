@@ -220,13 +220,13 @@ class EcAdapter implements EcAdapterInterface
     private function doRecover(Buffer $msg32, CompactSignature $compactSig)
     {
         $publicKey = '';
+        /** @var resource $publicKey */
         $context = $this->context;
         $sig = $compactSig->getResource();
         if (1 != secp256k1_ecdsa_recover($context, $msg32->getBinary(), $sig, $publicKey)) {
             throw new \RuntimeException('Unable to recover Public Key');
         }
 
-        /** @var resource $publicKey */
         return new PublicKey($this, $publicKey, $compactSig->isCompressed());
     }
 
