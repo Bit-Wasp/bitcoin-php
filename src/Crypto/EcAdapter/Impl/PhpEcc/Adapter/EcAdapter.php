@@ -149,8 +149,8 @@ class EcAdapter implements EcAdapterInterface
      */
     public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
     {
-        /** @var $publicKey PublicKey */
-        /** @var $signature Signature */
+        /** @var PublicKey $publicKey */
+        /** @var Signature $signature */
         return $this->doVerify($messageHash, $publicKey, $signature);
     }
 
@@ -214,7 +214,7 @@ class EcAdapter implements EcAdapterInterface
      */
     public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
-        /** @var $privateKey PrivateKey */
+        /** @var PrivateKey $privateKey */
         return $this->doSign($messageHash, $privateKey, $rbg);
     }
 
