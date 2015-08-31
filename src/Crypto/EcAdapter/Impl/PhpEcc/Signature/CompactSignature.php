@@ -67,6 +67,15 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     {
         return $this->s;
     }
+
+    /**
+     * @return Signature
+     */
+    public function convert()
+    {
+        return new Signature($this->ecAdapter, $this->r, $this->s);
+    }
+
     /**
      * @return int|string
      */

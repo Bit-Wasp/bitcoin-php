@@ -12,7 +12,7 @@ class DerSignatureSerializerTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $adapter
-     * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @expectedException \Exception
      */
     public function testFromParserFailure(EcAdapterInterface $adapter)
     {

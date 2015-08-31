@@ -17,6 +17,11 @@ interface CompactSignatureInterface extends SerializableInterface
     public function getS();
 
     /**
+     * @return SignatureInterface
+     */
+    public function convert();
+
+    /**
      * @return int
      */
     public function getRecoveryId();
