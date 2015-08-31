@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
-use Mdanter\Ecc\Crypto\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 
 interface PrivateKeyInterface extends KeyInterface
 {

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PublicKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
@@ -15,7 +14,7 @@ use Mdanter\Ecc\Primitives\PointInterface;
 class PublicKey extends Key implements PublicKeyInterface
 {
     /**
-     * @var EcAdapterInterface
+     * @var EcAdapter
      */
     private $ecAdapter;
 

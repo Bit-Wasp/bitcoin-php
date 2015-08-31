@@ -57,7 +57,7 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param $scalar
+     * @param int|string $scalar
      * @param bool|false $compressed
      * @return PrivateKey
      */
