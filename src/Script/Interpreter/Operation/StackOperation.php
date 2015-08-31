@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter\Operation;
 
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
@@ -25,13 +26,16 @@ class StackOperation
     private $castToBool;
 
     /**
+     * @param Opcodes $opCodes
      * @param Math $math
+     * @param Flags $flags
      * @param callable $castToBool
      */
-    public function __construct(Opcodes $opCodes, Math $math, callable $castToBool)
+    public function __construct(Opcodes $opCodes, Math $math, Flags $flags, callable $castToBool)
     {
         $this->opCodes = $opCodes;
         $this->math = $math;
+        $this->flags = $flags;
         $this->castToBool = $castToBool;
     }
 
@@ -72,7 +76,7 @@ class StackOperation
             return;
         } else if ($opName == 'OP_DEPTH') {
             $num = $mainStack->size();
-            $bin = Buffer::hex($this->math->decHex($num));
+            $bin = Buffer::int($num, null, $this->math);
             $mainStack->push($bin);
             return;
         } else if ($opName == 'OP_DROP') {
@@ -101,11 +105,12 @@ class StackOperation
             $vch = $mainStack->top(-2);
             $mainStack->push($vch);
             return;
-        } else if (in_array($opName, ['OP_PICK', 'OP_ROLL'])) { // cscriptnum
+        } else if (in_array($opName, ['OP_PICK', 'OP_ROLL'])) {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_PICK');
             }
-            $n = $mainStack->top(-1)->getInt();
+            $top = $mainStack->top(-1);
+            $n = (new ScriptNum($this->math, $this->flags, $top, 4))->getInt();
             $mainStack->pop();
             if ($this->math->cmp($n, 0) < 0 || $this->math->cmp($n, $mainStack->size()) >= 0) {
                 throw new \Exception('Invalid stack operation OP_PICK');

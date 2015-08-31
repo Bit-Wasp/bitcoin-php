@@ -2,11 +2,23 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter\Operation;
 
+use BitWasp\Bitcoin\Flags;
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
 
 class FlowControlOperation
 {
+    /**
+     * @var Flags
+     */
+    private $flags;
+
+    /**
+     * @var Math
+     */
+    private $math;
+
     /**
      * @var Opcodes
      */
@@ -19,12 +31,16 @@ class FlowControlOperation
 
     /**
      * @param Opcodes $opCodes
+     * @param Math $math
+     * @param Flags $flags
      * @param callable $castToBool
      */
-    public function __construct(Opcodes $opCodes, callable $castToBool)
+    public function __construct(Opcodes $opCodes, Math $math, Flags $flags, callable $castToBool)
     {
-        $this->opCodes = $opCodes;
         $this->castToBool = $castToBool;
+        $this->flags = $flags;
+        $this->math = $math;
+        $this->opCodes = $opCodes;
     }
 
     /**
@@ -51,7 +67,7 @@ class FlowControlOperation
                     throw new \Exception('Unbalanced conditional');
                 }
                 // todo
-                $buffer = $mainStack->pop();
+                $buffer = new ScriptNum($this->math, $this->flags, $mainStack->pop(), 4);
                 $value = $castToBool($buffer);
                 if ($opCodes->isOp($opCode, 'OP_NOTIF')) {
                     $value = !$value;

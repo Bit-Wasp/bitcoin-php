@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter\Operation;
 
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Operation\PushIntOperation;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptStack;
@@ -16,7 +17,7 @@ class PushIntOperationTest extends AbstractTestCase
     public function testOpCodeNotFound()
     {
         // 101 is not in the right range, should fail.
-        $operation = new PushIntOperation(new Opcodes());
+        $operation = new PushIntOperation(new Opcodes(), new Math());
         $operation->op(101, new ScriptStack());
     }
 }
