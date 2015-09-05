@@ -7,7 +7,6 @@ use BitWasp\Buffertools\Buffer;
 
 interface TransactionInterface extends SerializableInterface
 {
-
     const DEFAULT_VERSION = 1;
 
     /**
@@ -48,6 +47,12 @@ interface TransactionInterface extends SerializableInterface
      * @return TransactionInputCollection
      */
     public function getInputs();
+
+    /**
+     * @return TransactionOutputInterface
+     */
+    public function getInput($i);
+
     public function setInputs(TransactionInputCollection $inputs);
 
     /**
@@ -56,13 +61,25 @@ interface TransactionInterface extends SerializableInterface
      * @return TransactionOutputCollection
      */
     public function getOutputs();
+
+    /**
+     * @return TransactionOutputInterface
+     */
+    public function getOutput($i);
+
     public function setOutputs(TransactionOutputCollection $outputs);
+
     /**
      * Return the locktime for this transaction
      *
      * @return int|string
      */
     public function getLockTime();
+
+    /**
+     * @return bool
+     */
+    public function isCoinbase();
 
     /**
      * @return SignatureHash

@@ -63,6 +63,15 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @return Transaction
+     */
+    public function __clone()
+    {
+        $this->inputs = clone $this->inputs;
+        $this->outputs = clone $this->outputs;
+    }
+
+    /**
      * @return Buffer
      */
     public function getTxHash()
@@ -107,6 +116,15 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @param int $i
+     * @return TransactionInputInterface
+     */
+    public function getInput($i)
+    {
+        return $this->inputs->getInput($i);
+    }
+
+    /**
      * @param TransactionOutputCollection $outputs
      * @return $this
      */
@@ -124,6 +142,15 @@ class Transaction extends Serializable implements TransactionInterface
     public function getOutputs()
     {
         return $this->outputs;
+    }
+
+    /**
+     * @param int $i
+     * @return TransactionOutputInterface
+     */
+    public function getOutput($i)
+    {
+        return $this->outputs->getOutput($i);
     }
 
     /**
@@ -161,12 +188,11 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Transaction
+     * @return bool
      */
-    public function __clone()
+    public function isCoinbase()
     {
-        $this->inputs = clone $this->inputs;
-        $this->outputs = clone $this->outputs;
+        return count($this->inputs) == 1 && $this->getInput(0)->isCoinBase();
     }
 
     /**

@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Buffertools\Buffer;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,6 +47,23 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         // Default
         $tx = new Transaction();
         $this->assertSame('0', $tx->getLockTime());
+    }
+
+    public function testIsCoinbase()
+    {
+        $tx = new Transaction();
+        $this->assertFalse($tx->isCoinbase());
+        $inputs = $tx->getInputs();
+        $inputs->addInput(new TransactionInput(Buffer::hex('00', 32)->getHex(), 0xffffffff));
+        $this->assertTrue($tx->isCoinbase());
+        $inputs->addInput(new TransactionInput(Buffer::hex('00', 32)->getHex(), 0xffffffff));
+        $this->assertFalse($tx->isCoinbase());
+
+        $tx = new Transaction();
+        $inputs = $tx->getInputs();
+        $inputs->addInput(new TransactionInput('abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 1));
+        $inputs->addInput(new TransactionInput(Buffer::hex('00', 32)->getHex(), 0xffffffff));
+        $this->assertFalse($tx->isCoinbase());
     }
 
     public function testSetLockTime()
@@ -86,6 +104,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($in, $inputs->getInput(0));
         $return = $tx->getInputs()->getInput(0);
         $this->assertSame($in, $return);
+        $return2 = $tx->getInput(0);
+        $this->assertSame($in, $return2);
     }
 
     /**
@@ -119,6 +139,8 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($out, $outputs->getOutput(0));
         $return = $tx->getOutputs()->getOutput(0);
         $this->assertSame($out, $return);
+        $return2 = $tx->getOutput(0);
+        $this->assertSame($out, $return2);
     }
 
     /**
