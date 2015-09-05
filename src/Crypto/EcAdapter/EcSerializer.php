@@ -98,9 +98,10 @@ class EcSerializer
 
     /**
      * @param EcAdapterInterface $adapter
-     * @param $interface
+     * @param string $interface
+     * @param bool|true $useCache
      */
-    public static function getSerializer(EcAdapterInterface $adapter, $interface)
+    public static function getSerializer(EcAdapterInterface $adapter, $interface, $useCache = true)
     {
         if (isset(self::$cache[$interface])) {
             return self::$cache[$interface];
@@ -109,7 +110,7 @@ class EcSerializer
         $classPath = self::getAdapterImplPath($adapter) . self::getImplRelPath($interface);
         $class = new $classPath($adapter);
 
-        if (self::$useCache) {
+        if ($useCache && self::$useCache) {
             self::$cache[$interface] = $class;
         }
 
