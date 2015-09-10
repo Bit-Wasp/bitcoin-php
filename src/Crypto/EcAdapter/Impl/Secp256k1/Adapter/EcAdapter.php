@@ -136,44 +136,26 @@ class EcAdapter implements EcAdapterInterface
     /**
      * @param Buffer $msg32
      * @param PrivateKey $privateKey
-     * @return resource
-     */
-    private function doSignRecoverable(Buffer $msg32, PrivateKey $privateKey)
-    {
-        $sig_t = '';
-        /** @var resource $sig_t */
-        if (1 !== secp256k1_ecdsa_sign_recoverable($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
-            throw new \RuntimeException('Secp256k1: failed to sign');
-        }
-
-        return $sig_t;
-    }
-
-    /**
-     * @param Buffer $msg32
-     * @param PrivateKey $privateKey
      * @return Signature
      */
     private function doSign(Buffer $msg32, PrivateKey $privateKey)
     {
-        $signature = $this->doSignRecoverable($msg32, $privateKey);
-
-        $recid = '';
-        $sig_out = '';
-        if (1 !== secp256k1_ecdsa_recoverable_signature_serialize_compact($this->context, $signature, $sig_out, $recid)) {
+        /** @var resource $sig_t */
+        $sig_t = '';
+        if (1 !== secp256k1_ecdsa_sign($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
             throw new \RuntimeException('Secp256k1: failed to sign');
         }
 
-        list ($r, $s) = array_map(
-            function ($val) {
-                return $this->math->hexDec(bin2hex($val));
-            },
-            str_split($sig_out, 32)
-        );
+        $derSig = '';
+        secp256k1_ecdsa_signature_serialize_der($this->context, $sig_t, $derSig);
 
-        secp256k1_ecdsa_recoverable_signature_convert($this->context, $signature, $signature);
+        $rL = ord($derSig[3]);
+        $r = (new Buffer(substr($derSig, 4, $rL), $rL, $this->math))->getInt();
 
-        return new Signature($this, $r, $s, $signature);
+        $sL = ord($derSig[4+$rL + 1]);
+        $s = (new Buffer(substr($derSig, 4 + $rL + 2, $sL), $rL, $this->math))->getInt();
+
+        return new Signature($this, $r, $s, $sig_t);
     }
 
     /**
@@ -248,7 +230,12 @@ class EcAdapter implements EcAdapterInterface
      */
     private function doSignCompact(Buffer $msg32, PrivateKey $privateKey)
     {
-        $sig_t = $this->doSignRecoverable($msg32, $privateKey);
+        $sig_t = '';
+        /** @var resource $sig_t */
+        if (1 !== secp256k1_ecdsa_sign_recoverable($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
+            throw new \RuntimeException('Secp256k1: failed to sign');
+        }
+
         $recid = '';
         $ser = '';
         if (!secp256k1_ecdsa_recoverable_signature_serialize_compact($this->context, $sig_t, $ser, $recid)) {
