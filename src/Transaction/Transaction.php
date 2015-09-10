@@ -188,6 +188,21 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @return int|string
+     */
+    public function getValueOut()
+    {
+        $outputs = $this->outputs->getOutputs();
+        $nOutputs = count($outputs);
+        $math = Bitcoin::getMath();
+        $value = 0;
+        for ($i = 0; $i < $nOutputs; $i++) {
+            $value = $math->add($value, $outputs[$i]->getValue());
+        }
+        return $value;
+    }
+
+    /**
      * @return bool
      */
     public function isCoinbase()

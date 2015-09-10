@@ -85,4 +85,9 @@ interface TransactionInterface extends SerializableInterface
      * @return SignatureHash
      */
     public function getSignatureHash();
+
+    /**
+     * @return int|string
+     */
+    public function getValueOut();
 }

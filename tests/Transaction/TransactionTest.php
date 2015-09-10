@@ -19,6 +19,19 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
 
+    public function testGetValueOut()
+    {
+        $value = 10;
+        $count = 5;
+
+        $tx = new Transaction();
+        $outputs = $tx->getOutputs();
+        for ($i = 0; $i < $count; $i++) {
+            $outputs->addOutput(new TransactionOutput($value, new Script()));
+        }
+        $this->assertEquals($count * $value, $tx->getValueOut());
+    }
+
     public function testGetVersionEmpty()
     {
         $tx = new Transaction();

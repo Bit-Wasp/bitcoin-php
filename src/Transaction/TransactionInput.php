@@ -120,8 +120,18 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function isCoinbase()
     {
+        $math = Bitcoin::getMath();
         return $this->getTransactionId() == '0000000000000000000000000000000000000000000000000000000000000000'
-            && Bitcoin::getMath()->cmp($this->getVout(), Bitcoin::getMath()->hexDec('ffffffff')) == '0';
+            && $math->cmp($this->getVout(), $math->hexDec('ffffffff')) == 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFinal()
+    {
+        $math = Bitcoin::getMath();
+        return $math->cmp($this->getSequence(), $math->hexDec('ffffffff')) == 0;
     }
 
     /**
