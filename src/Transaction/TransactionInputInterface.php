@@ -57,4 +57,9 @@ interface TransactionInputInterface
      * @return bool
      */
     public function isCoinBase();
+
+    /**
+     * @return bool
+     */
+    public function isFinal();
 }
