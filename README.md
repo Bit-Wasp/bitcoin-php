@@ -31,6 +31,8 @@
  * PHP 5.4+
  * Composer
  * ext-gmp
+ * ext-json
+ * ext-curl
  * ext-mcrypt
 
 ## Optional:

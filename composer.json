@@ -25,6 +25,7 @@
     "php": ">=5.4.0",
     "ext-gmp": "*",
     "ext-json": "*",
+    "ext-curl": "*",
     "ext-openssl": "*",
     "ext-mcrypt": "*",
     "mdanter/ecc": "~0.3",
