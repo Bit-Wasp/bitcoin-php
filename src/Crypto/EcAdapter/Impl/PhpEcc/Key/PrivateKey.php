@@ -43,9 +43,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function __construct(EcAdapter $ecAdapter, $int, $compressed = false)
     {
-        if (gettype($int) == 'double') {
-            die();
-        }
         if (false === $ecAdapter->validatePrivateKey(Buffer::int($int, 32, $ecAdapter->getMath()))) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
