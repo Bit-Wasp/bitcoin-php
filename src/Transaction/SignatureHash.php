@@ -74,7 +74,7 @@ class SignatureHash implements SignatureHashInterface
             $nOutput = $inputToSign;
 
             if ($math->cmp($nOutput, count($outputs)) >= 0) {
-                return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000');
+                return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
             }
 
             // Resize..
