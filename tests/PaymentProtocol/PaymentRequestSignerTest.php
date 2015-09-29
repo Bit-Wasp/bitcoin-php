@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
-
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 

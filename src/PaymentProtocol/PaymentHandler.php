@@ -71,7 +71,7 @@ class PaymentHandler
         // Check that regardless of the other outputs, that each specific output was paid.
         $txs = $this->getTransactions();
         $nTx = count($txs);
-        for($i = 0; $i < $nTx; $i++) {
+        for ($i = 0; $i < $nTx; $i++) {
             $tx = $txs->getTransaction($i);
             $outs = $tx->getOutputs()->getOutputs();
             $nOut = count($outs);

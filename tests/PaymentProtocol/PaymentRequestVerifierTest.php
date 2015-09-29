@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
-
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestVerifier;
