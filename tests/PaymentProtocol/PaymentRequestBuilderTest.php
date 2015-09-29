@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
-
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestVerifier;
@@ -61,7 +60,7 @@ class PaymentRequestBuilderTest extends AbstractTestCase
 
         $list = $details->getOutputsList();
         foreach ($list as $c => $i) {
-            $this->assertEquals($amts[$c],  $i->getAmount());
+            $this->assertEquals($amts[$c], $i->getAmount());
         }
 
         $this->assertEquals(3, count($list));
