@@ -11,9 +11,14 @@ use BitWasp\Buffertools\Buffer;
 class StackOperation
 {
     /**
-     * @var Opcodes
+     * @var callable
      */
-    private $opCodes;
+    private $castToBool;
+
+    /**
+     * @var Flags
+     */
+    private $flags;
 
     /**
      * @var Math
@@ -21,9 +26,9 @@ class StackOperation
     private $math;
 
     /**
-     * @var callable
+     * @var Opcodes
      */
-    private $castToBool;
+    private $opCodes;
 
     /**
      * @param Opcodes $opCodes
@@ -40,7 +45,7 @@ class StackOperation
     }
 
     /**
-     * @param $opCode
+     * @param int $opCode
      * @param ScriptStack $mainStack
      * @param ScriptStack $altStack
      * @throws \BitWasp\Bitcoin\Exceptions\ScriptStackException
