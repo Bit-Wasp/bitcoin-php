@@ -156,7 +156,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $math = $adapter->getMath();
         $context = $adapter->getContext();
         $privateKey = $this->getBinary(); // mod by reference
-        $tweak = pack("H*", str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
+        $tweak = Buffer::int($tweak, 32, $math)->getBinary();
         $ret = \secp256k1_ec_privkey_tweak_mul(
             $context,
             $privateKey,
