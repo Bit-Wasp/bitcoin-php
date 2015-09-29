@@ -39,7 +39,7 @@ class ScriptFactoryTest extends AbstractTestCase
     public function testCreate()
     {
         $script = ScriptFactory::create(null);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Script', $script);
-        $this->assertEmpty($script->getBinary());
+        $this->assertInstanceOf('BitWasp\Bitcoin\Script\ScriptCreator', $script);
+        $this->assertEmpty($script->getScript()->getBinary());
     }
 }

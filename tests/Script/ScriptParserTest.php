@@ -78,7 +78,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
 
     public function testDefaultParse()
     {
-        $parse = ScriptFactory::create()->getScriptParser()->parse();
+        $parse = ScriptFactory::create()->getScript()->getScriptParser()->parse();
         $this->assertInternalType('array', $parse);
         $this->assertEmpty($parse);
     }
@@ -86,7 +86,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
     public function testParse()
     {
         $buf = Buffer::hex('0f9947c2b0fdd82ef3153232ee23d5c0bed84a02');
-        $script = ScriptFactory::create()->op('OP_HASH160')->push($buf)->op('OP_EQUAL');
+        $script = ScriptFactory::create()->op('OP_HASH160')->push($buf)->op('OP_EQUAL')->getScript();
         $parse = $script->getScriptParser()->parse();
 
         $this->assertSame($parse[0], 'OP_HASH160');
@@ -103,15 +103,14 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
      */
     public function testParseInvalidOp()
     {
-        $script = ScriptFactory::create(Buffer::hex('fa'));
+        $script = ScriptFactory::create(Buffer::hex('fa'))->getScript();
         $script->getScriptParser()->parse();
     }
 
     public function testParseNullByte()
     {
         $null = chr(0x00);
-        $script = ScriptFactory::create();
-        $script->op('OP_0');
+        $script = ScriptFactory::create()->op('OP_0')->getScript();
         $parse = $script->getScriptParser()->parse();
         $this->assertSame($parse[0]->getBinary(), $null);
     }
@@ -122,7 +121,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $json = json_decode($f);
 
         // Pay to pubkey hash
-        $s0 = ScriptFactory::create(Buffer::hex($json->test[0]->script));
+        $s0 = ScriptFactory::create(Buffer::hex($json->test[0]->script))->getScript();
 
         $script0 = $s0->getScriptParser()->parse();
         $this->assertSame($script0[0], 'OP_DUP');
@@ -133,7 +132,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($s0->getScriptParser()->getHumanReadable(), $json->test[0]->asm);
 
         // <65 bytes> OP_CHECKSIG - uncompressed paytopubkey
-        $s1 = ScriptFactory::create(Buffer::hex($json->test[1]->script));
+        $s1 = ScriptFactory::create(Buffer::hex($json->test[1]->script))->getScript();
 
         $script1 = $s1->getScriptParser()->parse();
         $this->assertSame($script1[0]->getSize(), 65);
@@ -141,7 +140,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($s1->getScriptParser()->getHumanReadable(), $json->test[1]->asm);
 
         // pay to script hash output
-        $s2 = ScriptFactory::create(Buffer::hex($json->test[2]->script));
+        $s2 = ScriptFactory::create(Buffer::hex($json->test[2]->script))->getScript();
 
         $script2 = $s2->getScriptParser()->parse();
         $this->assertSame($script2[0], 'OP_HASH160');
@@ -149,13 +148,13 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script2[2], 'OP_EQUAL');
 
         // <33 bytes> OP_CHECKSIG - compressed paytopubkey
-        $s3 = ScriptFactory::create(Buffer::hex($json->test[3]->script));
+        $s3 = ScriptFactory::create(Buffer::hex($json->test[3]->script))->getScript();
         $script3 = $s3->getScriptParser()->parse();
         $this->assertSame($script3[0]->getSize(), 33);
         $this->assertSame($script3[1], 'OP_CHECKSIG');
 
         // 1 <pubkey> <pubkey> OP_CHECKMULTISIG
-        $s4 = ScriptFactory::create(Buffer::hex($json->test[4]->script));
+        $s4 = ScriptFactory::create(Buffer::hex($json->test[4]->script))->getScript();
 
         $script4 = $s4->getScriptParser()->parse();
         $this->assertSame($script4[0], 'OP_1');
@@ -165,14 +164,14 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script4[4], 'OP_CHECKMULTISIG');
 
         // OP_RETURN <40 bytes>
-        $s5 = ScriptFactory::create(Buffer::hex($json->test[5]->script));
+        $s5 = ScriptFactory::create(Buffer::hex($json->test[5]->script))->getScript();
 
         $script5 = $s5->getScriptParser()->parse();
         $this->assertSame($script5[0], 'OP_RETURN');
         $this->assertSame($script5[1]->getSize(), 38);
 
         // MtGox fuckup.
-        $s6 = ScriptFactory::create(Buffer::hex($json->test[6]->script));
+        $s6 = ScriptFactory::create(Buffer::hex($json->test[6]->script))->getScript();
         $script6 = $s6->getScriptParser()->parse();
         $this->assertSame($script6[0], 'OP_DUP');
         $this->assertSame($script6[1], 'OP_HASH160');
@@ -181,13 +180,13 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script6[4], 'OP_CHECKSIG');
 
         // OP_RETURN <38 bytes>
-        $s7 = ScriptFactory::create(Buffer::hex($json->test[7]->script));
+        $s7 = ScriptFactory::create(Buffer::hex($json->test[7]->script))->getScript();
         $script7 = $s7->getScriptParser()->parse();
         $this->assertSame($script7[0], 'OP_RETURN');
         $this->assertSame($script7[1]->getSize(), 40);
 
         //
-        $s8 = ScriptFactory::create(Buffer::hex($json->test[8]->script));
+        $s8 = ScriptFactory::create(Buffer::hex($json->test[8]->script))->getScript();
         $script8 = $s8->getScriptParser()->parse();
         $this->assertSame($script8[0], 'OP_IFDUP');
         $this->assertSame($script8[1], 'OP_IF');

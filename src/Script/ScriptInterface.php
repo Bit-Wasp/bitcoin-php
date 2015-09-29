@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Address\Address;
 interface ScriptInterface extends SerializableInterface
 {
     /**
-     * @return mixed
+     * @return \BitWasp\Buffertools\Buffer
      */
     public function getScriptHash();
 
@@ -28,7 +28,7 @@ interface ScriptInterface extends SerializableInterface
     public function getOpcodes();
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function isPushOnly();
 }

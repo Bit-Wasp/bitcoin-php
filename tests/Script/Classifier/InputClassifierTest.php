@@ -21,8 +21,7 @@ class InputClassifierTest extends AbstractTestCase
     {
         $privateKey = PrivateKeyFactory::create();
         $p2sh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
-        $scriptSig = new Script();
-        $scriptSig->op('OP_0')->push($p2sh->getBuffer());
+        $scriptSig = ScriptFactory::create()->op('OP_0')->push($p2sh->getBuffer())->getScript();
 
         $classifier = new InputClassifier($scriptSig);
         $this->assertTrue($classifier->isPayToScriptHash());

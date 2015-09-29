@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output as OutputBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
@@ -108,7 +109,7 @@ class PaymentRequestBuilder
     {
         return new TransactionOutput(
             $outBuf->getAmount(),
-            ScriptFactory::create(new Buffer($outBuf->getScript()))
+            new Script(new Buffer($outBuf->getScript()))
         );
     }
 

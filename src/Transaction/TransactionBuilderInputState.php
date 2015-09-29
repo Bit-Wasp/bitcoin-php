@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
@@ -292,17 +293,17 @@ class TransactionBuilderInputState
             function () use (&$signatures) {
                 return count($signatures) == 1
                     ? ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $this->publicKeys[0])
-                    : ScriptFactory::create();
+                    : new Script();
             },
             function () use (&$signatures) {
                 return count($signatures) == 1
                     ? ScriptFactory::scriptSig()->payToPubKey($signatures[0])
-                    : ScriptFactory::create();
+                    : new Script;
             },
             function () use (&$signatures) {
                 return count($signatures) > 0
                     ? ScriptFactory::scriptSig()->multisigP2sh($this->getRedeemScript(), array_filter($this->signatures))
-                    : ScriptFactory::create();
+                    : new Script();
             }
         );
 

@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Script\Factory;
 
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
@@ -13,7 +14,7 @@ class InputScriptFactoryTest extends AbstractTestCase
 {
     public function testClassify()
     {
-        $script = ScriptFactory::create();
+        $script = new Script();
         $classifier = ScriptFactory::scriptSig()->classify($script);
         $this->assertInstanceOf('BitWasp\Bitcoin\Script\Classifier\InputClassifier', $classifier);
     }

@@ -97,7 +97,7 @@ class AddressTest extends AbstractTestCase
         $scriptAddress = AddressFactory::fromOutputScript($scriptHash);
         $this->assertInstanceOf('BitWasp\Bitcoin\Address\ScriptHashAddress', $scriptAddress);
 
-        $unknownScript = ScriptFactory::create()->op('OP_0')->op('OP_1');
+        $unknownScript = ScriptFactory::create()->op('OP_0')->op('OP_1')->getScript();
         AddressFactory::fromOutputScript($unknownScript);
     }
 

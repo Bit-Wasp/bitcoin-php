@@ -14,6 +14,11 @@ class RedeemScript extends Script
     private $m;
 
     /**
+     * @var string
+     */
+    protected $script;
+
+    /**
      * @var array
      */
     private $keys = [];
@@ -38,18 +43,21 @@ class RedeemScript extends Script
         $opM = $ops->getOp($ops->getOpByName('OP_1') - 1 + $m);
         $opN = $ops->getOp($ops->getOpByName('OP_1') - 1 + $n);
 
-        $this->op($opM);
+        $script = ScriptFactory::create();
+        $script->op($opM);
         foreach ($keys as $key) {
             if (!$key instanceof PublicKeyInterface) {
                 throw new \LogicException('Values in $keys[] must be a PublicKey');
             }
 
             $this->keys[] = $key;
-            $this->push($key->getBuffer());
+            $script->push($key->getBuffer());
         }
-        $this
+        $script
             ->op($opN)
             ->op('OP_CHECKMULTISIG');
+
+        $this->script = $script->getScript()->getBinary();
 
         $this->m = $m;
     }

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Script\Script;
@@ -49,8 +50,7 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
     public function testSetScript()
     {
-        $script = new Script();
-        $script = $script->op('OP_2')->op('OP_3');
+        $script = ScriptFactory::create()->op('OP_2')->op('OP_3')->getScript();
 
         $out = new TransactionOutput(1, new Script());
         $this->assertEquals(new Script(), $out->getScript());
