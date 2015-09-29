@@ -49,7 +49,7 @@ interface TransactionInterface extends SerializableInterface
     public function getInputs();
 
     /**
-     * @return TransactionOutputInterface
+     * @return TransactionInputInterface
      */
     public function getInput($i);
 
