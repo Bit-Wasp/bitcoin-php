@@ -88,10 +88,11 @@ class AddressFactory
         $network = $network ?: Bitcoin::getNetwork();
         try {
             if ($classifier->isPayToPublicKey()) {
-                $address = PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0]->getHex())->getAddress();
+                $address = PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0])->getAddress();
             } else {
                 $address = self::fromOutputScript($script);
             }
+
             return Base58::encodeCheck(Buffer::hex($network->getAddressByte() . $address->getHash(), 21));
         } catch (\Exception $e) {
             throw new \RuntimeException('No address associated with this script type');
