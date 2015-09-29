@@ -57,27 +57,45 @@ class PaymentHandler
         $details = new PaymentDetailsBuf();
         $details->parse($request->getSerializedPaymentDetails());
         $outputs = $details->getOutputsList();
-        $nOutputs = count($outputs);
-        $found = 0;
+        $requirements = [];
+        foreach ($outputs as $out) {
+            if (isset($requirements[$out->getScript()])) {
+                $requirements[$out->getScript()] += $out->getAmount();
+            } else {
+                $requirements[$out->getScript()] = $out->getAmount();
+            }
+        }
+
+        $parsed = [];
 
         // Check that regardless of the other outputs, that each specific output was paid.
-        foreach ($this->getTransactions()->getTransactions() as $tx) {
-            foreach ($tx->getOutputs()->getOutputs() as $txOut) {
-                foreach (array_keys($outputs) as $index) {
-                    // Check the scripts/amounts match
-                    if ($txOut->getScript()->getBinary() == $outputs[$index]->getScript()
-                    && $txOut->getValue() == $outputs[$index]->getAmount()
-                    ) {
-                        unset($outputs[$index]);
-                        if (++$found == $nOutputs) {
-                            return true;
-                        }
-                    }
+        $txs = $this->getTransactions();
+        $nTx = count($txs);
+        for ($i = 0; $i < $nTx; $i++) {
+            $tx = $txs->getTransaction($i);
+            $outs = $tx->getOutputs()->getOutputs();
+            $nOut = count($outs);
+            for ($j = 0; $j < $nOut; $j++) {
+                $txOut = $outs[$j];
+                $scriptBin = $txOut->getScript()->getBinary();
+                if (isset($parsed[$scriptBin])) {
+                    $parsed[$scriptBin] += $txOut->getValue();
+                } else {
+                    $parsed[$scriptBin] = $txOut->getValue();
                 }
             }
         }
 
-        return false;
+        foreach ($requirements as $script => $value) {
+            if (!isset($parsed[$script])) {
+                return false;
+            }
+            if ($parsed[$script] < $value) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

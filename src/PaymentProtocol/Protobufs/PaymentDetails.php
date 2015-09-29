@@ -54,7 +54,7 @@ class PaymentDetails extends Message
         $f->name = "outputs";
         $f->type = Protobuf::TYPE_MESSAGE;
         $f->rule = Protobuf::RULE_REPEATED;
-        $f->reference = '\BitWasp\Bitcoin\Payments\Protobufs\Output';
+        $f->reference = '\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output';
         $descriptor->addField($f);
 
         // REQUIRED UINT64 time = 3

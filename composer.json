@@ -25,6 +25,7 @@
     "php": ">=5.4.0",
     "ext-gmp": "*",
     "ext-json": "*",
+    "ext-curl": "*",
     "ext-openssl": "*",
     "ext-mcrypt": "*",
     "mdanter/ecc": "~0.3",
@@ -38,7 +39,7 @@
     "react/socket-client": "~0.4",
     "bitwasp/buffertools": "~0.1",
     "bitwasp/stratum": "~0.1",
-    "bitwasp/secp256k1-php": "~0.0.5"
+    "bitwasp/secp256k1-php": "~0.0.6"
   },
   "require-dev": {
     "bitwasp/testing-php": "~0.0",

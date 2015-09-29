@@ -23,7 +23,7 @@ class PaymentRequestSigner
     private $certificates;
 
     /**
-     * @var
+     * @var resource
      */
     private $privateKey;
 
@@ -31,7 +31,6 @@ class PaymentRequestSigner
      * @param string $type
      * @param string $keyFile
      * @param string $certFile
-     * @throws \InvalidArgumentException
      * @throws \Exception
      */
     public function __construct($type = 'none', $keyFile = '', $certFile = '')
@@ -44,41 +43,81 @@ class PaymentRequestSigner
         $this->certificates = new X509CertificatesBuf();
 
         if ($type !== 'none') {
-            if (false === file_exists($keyFile)) {
-                throw new \InvalidArgumentException('Private key file does not exist');
-            }
-
-            if (false === file_exists($certFile)) {
-                throw new \InvalidArgumentException('Certificate file does not exist');
-            }
-
-            if ('x509+sha256' == $type  and !defined('OPENSSL_ALGO_SHA256')) {
-                throw new \Exception('Server does not support x.509+SHA256');
-            }
-
-            $chain = $this->fetchChain($certFile);
-            if (!is_array($chain) || count($chain) == 0) {
-                throw new \RuntimeException('Certificate file contains no certificates');
-            }
-
-            foreach ($chain as $cert) {
-                $this->certificates->addCertificate($cert);
-            }
-
-            $pkeyid = openssl_get_privatekey(file_get_contents($keyFile));
-            if (false === $pkeyid) {
-                throw new \InvalidArgumentException('Private key is invalid');
-            }
-
-            $this->privateKey = $pkeyid;
-            $this->algoConst = ($type == 'x509+sha256')
-                ? OPENSSL_ALGO_SHA256
-                : OPENSSL_ALGO_SHA1;
+            $this->initialize($keyFile, $certFile);
         }
-
     }
 
     /**
+     * @return bool
+     */
+    public function supportsSha256()
+    {
+        return defined('OPENSSL_ALGO_SHA256');
+    }
+
+    /**
+     * @param string $keyFile - path to key file
+     * @param string $certFile - path to certificate chain file
+     * @throws \Exception
+     */
+    private function initialize($keyFile, $certFile)
+    {
+        if (false === file_exists($keyFile)) {
+            throw new \InvalidArgumentException('Private key file does not exist');
+        }
+
+        if (false === file_exists($certFile)) {
+            throw new \InvalidArgumentException('Certificate file does not exist');
+        }
+
+        if ('x509+sha256' == $this->type && !$this->supportsSha256()) {
+            throw new \Exception('Server does not support x.509+SHA256');
+        }
+
+        $chain = $this->fetchChain($certFile);
+        if (!is_array($chain) || count($chain) == 0) {
+            throw new \RuntimeException('Certificate file contains no certificates');
+        }
+
+        foreach ($chain as $cert) {
+            $this->certificates->addCertificate($cert);
+        }
+
+        $pkeyid = openssl_get_privatekey(file_get_contents($keyFile));
+        if (false === $pkeyid) {
+            throw new \InvalidArgumentException('Private key is invalid');
+        }
+
+        $this->privateKey = $pkeyid;
+        $this->algoConst = $this->type == 'x509+sha256'
+            ? OPENSSL_ALGO_SHA256
+            : OPENSSL_ALGO_SHA1;
+    }
+
+    /**
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    public function signData($data)
+    {
+        if ($this->type == 'none') {
+            throw new \RuntimeException('signData called when Signer is not configured for signatures');
+        }
+
+        $signature = '';
+        $result = openssl_sign($data, $signature, $this->privateKey, $this->algoConst);
+        if (!$result) {
+            throw new \Exception('PaymentRequestSigner: Unable to create signature');
+        }
+
+        return $signature;
+    }
+
+    /**
+     * Applies the configured signature algorithm, adding values to
+     * the protobuf: 'pkiType', 'signature', 'pkiData'
+     *
      * @param PaymentRequestBuf $request
      * @return PaymentRequestBuf
      * @throws \Exception
@@ -89,13 +128,9 @@ class PaymentRequestSigner
         $request->setSignature('');
 
         if ($this->type !== 'none') {
+            // PkiData must be captured in signature, and signature must be empty!
             $request->setPkiData($this->certificates->serialize());
-            $data = $request->serialize();
-            $signature = '';
-            $result = openssl_sign($data, $signature, $this->privateKey, $this->algoConst);
-            if ($signature === false || $result === false) {
-                throw new \Exception('Error during signing: Unable to create signature');
-            }
+            $signature = $this->signData($request->serialize());
             $request->setSignature($signature);
         }
 
@@ -103,7 +138,8 @@ class PaymentRequestSigner
     }
 
     /**
-     * @param $certificate
+     * Checks whether the decoded certificate is a root / self-signed certificate
+     * @param array $certificate
      * @return bool
      */
     private function isRoot($certificate)
@@ -112,6 +148,8 @@ class PaymentRequestSigner
     }
 
     /**
+     * Fetches parent certificates using network requests
+     * Todo: review use of file_get_contents
      * @param $leafCertificate
      * @return bool|string
      */
@@ -134,6 +172,7 @@ class PaymentRequestSigner
     }
 
     /**
+     * Parses a PEM or DER certificate
      * @param $certData
      * @return array
      */
@@ -152,7 +191,8 @@ class PaymentRequestSigner
     }
 
     /**
-     * @param $pem_data
+     * Decode PEM data, return the internal DER data
+     * @param string $pem_data - pem certificate data
      * @return string
      */
     private function pem2der($pem_data)
@@ -169,7 +209,7 @@ class PaymentRequestSigner
     }
 
     /**
-     * @param $leaf
+     * @param string $leaf - path to a file with certificates
      * @return array|bool
      */
     private function fetchChain($leaf)
@@ -180,10 +220,15 @@ class PaymentRequestSigner
         if ($cert === false) {
             return false;
         }
-        $certData = self::pem2der($leaf);
 
-        while ($cert !== false && !$this->isRoot($cert)) {
+        $certData = self::pem2der($leaf);
+        $result[] = $certData;
+        while ($cert) {
             $result[] = $certData;
+            // Only break after adding Cert Data - allows for self-signed certificates
+            if ($this->isRoot($cert)) {
+                break;
+            }
             $certData = $this->fetchCertificateParent($cert);
             $cert = $this->parseCertificate($certData);
         }

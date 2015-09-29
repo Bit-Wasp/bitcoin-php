@@ -136,12 +136,12 @@ class PaymentRequestBuilder
     }
 
     /**
-     * @param $index
-     * @return OutputBuf
+     * @param int $index
+     * @return TransactionOutputInterface
      */
     public function getOutput($index)
     {
-        if ($index < 0 || $index > $this->outputCount) {
+        if ($index < 0 || $index > count($this->details->getOutputsList())) {
             throw new \InvalidArgumentException('Output not found at this index');
         }
 
@@ -149,13 +149,13 @@ class PaymentRequestBuilder
     }
 
     /**
-     * @return Protobufs\Output[]
+     * @return TransactionOutputInterface[]
      */
     public function getOutputs()
     {
         return array_map(
             function (OutputBuf $outBuf) {
-                $this->bufToOutput($outBuf);
+                return $this->bufToOutput($outBuf);
             },
             $this->details->getOutputsList()
         );
