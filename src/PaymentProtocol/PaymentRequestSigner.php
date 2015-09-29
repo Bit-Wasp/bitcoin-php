@@ -95,6 +95,26 @@ class PaymentRequestSigner
     }
 
     /**
+     * @param $data
+     * @return string
+     * @throws \Exception
+     */
+    public function signData($data)
+    {
+        if ($this->type == 'none') {
+            throw new \RuntimeException('signData called when Signer is not configured for signatures');
+        }
+
+        $signature = '';
+        $result = openssl_sign($data, $signature, $this->privateKey, $this->algoConst);
+        if (!$result) {
+            throw new \Exception('PaymentRequestSigner: Unable to create signature');
+        }
+
+        return $signature;
+    }
+
+    /**
      * Applies the configured signature algorithm, adding values to
      * the protobuf: 'pkiType', 'signature', 'pkiData'
      *
@@ -108,13 +128,9 @@ class PaymentRequestSigner
         $request->setSignature('');
 
         if ($this->type !== 'none') {
-            $signature = '';
+            // PkiData must be captured in signature, and signature must be empty!
             $request->setPkiData($this->certificates->serialize());
-            $result = openssl_sign($request->serialize(), $signature, $this->privateKey, $this->algoConst);
-            if ($signature === false || $result === false) {
-                throw new \Exception('PaymentRequestSigner: Unable to create signature');
-            }
-
+            $signature = $this->signData($request->serialize());
             $request->setSignature($signature);
         }
 

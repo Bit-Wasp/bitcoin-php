@@ -2,10 +2,13 @@
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestVerifier;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
@@ -61,9 +64,37 @@ class PaymentRequestBuilderTest extends AbstractTestCase
         $list = $details->getOutputsList();
         foreach ($list as $c => $i) {
             $this->assertEquals($amts[$c], $i->getAmount());
+            $out = $builder->getOutput($c);
+            $this->assertEquals($i->getScript(), $out->getScript()->getBinary());
+            $this->assertEquals($i->getAmount(), $out->getValue());
         }
 
         $this->assertEquals(3, count($list));
+
+        $request = $builder->getPaymentRequest();
+        $serialized = $request->serialize();
+
+        $new = new PaymentRequestBuilder($nox509, $network, $time);
+        $parsed = $new->parse($serialized);
+        $parsedReq = $parsed->getPaymentRequest();
+        $this->assertEquals($request, $parsedReq);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testNoOutputsFail()
+    {
+        $builder =  new PaymentRequestBuilder(new PaymentRequestSigner('none'), 'main', time());
+        $builder->getOutput(10);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidNetworkFail()
+    {
+        new PaymentRequestBuilder(new PaymentRequestSigner('none'), 'main000', time());
     }
 
     public function getAlgoVectors()
@@ -72,6 +103,18 @@ class PaymentRequestBuilderTest extends AbstractTestCase
             ['x509+sha256', OPENSSL_ALGO_SHA256],
             ['x509+sha1', OPENSSL_ALGO_SHA1],
         ];
+    }
+
+    public function testBuiltByAddress()
+    {
+        $builder =  new PaymentRequestBuilder(new PaymentRequestSigner('none'), 'main', time());
+        $address = PublicKeyFactory::fromHex('0496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858ee')->getAddress();
+        $script = ScriptFactory::scriptPubKey()->payToAddress($address);
+
+        $builder->addAddressPayment($address, 50);
+        $outputs = $builder->getOutputs();
+        $this->assertEquals($script, $outputs[0]->getScript());
+        $this->assertEquals(50, $outputs[0]->getValue());
     }
 
     /**

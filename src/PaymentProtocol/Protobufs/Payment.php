@@ -47,7 +47,7 @@ class Payment extends \DrSlump\Protobuf\Message
         $f->name = "refund_to";
         $f->type = \DrSlump\Protobuf::TYPE_MESSAGE;
         $f->rule = \DrSlump\Protobuf::RULE_REPEATED;
-        $f->reference = '\BitWasp\Bitcoin\Payments\Protobufs\Output';
+        $f->reference = '\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output';
         $descriptor->addField($f);
 
         // OPTIONAL STRING memo = 4
