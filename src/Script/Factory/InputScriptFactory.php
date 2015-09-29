@@ -30,7 +30,8 @@ class InputScriptFactory
     {
         return ScriptFactory::create()
             ->push($signature->getBuffer())
-            ->push($publicKey->getBuffer());
+            ->push($publicKey->getBuffer())
+            ->getScript();
     }
 
     /**
@@ -41,14 +42,12 @@ class InputScriptFactory
     public function multisigP2sh(RedeemScript $redeemScript, $signatures)
     {
         $script = ScriptFactory::create()->op('OP_0');
-
         foreach ($signatures as $signature) {
             $script->push($signature->getBuffer());
         }
-
         $script->push($redeemScript->getBuffer());
 
-        return $script;
+        return $script->getScript();
     }
 
     /**
@@ -57,6 +56,8 @@ class InputScriptFactory
      */
     public function payToPubKey(TransactionSignatureInterface $signature)
     {
-        return ScriptFactory::create()->push($signature->getBuffer());
+        return ScriptFactory::create()
+            ->push($signature->getBuffer())
+            ->getScript();
     }
 }

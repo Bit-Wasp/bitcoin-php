@@ -95,7 +95,8 @@ class RedeemScriptTest extends AbstractTestCase
             ->push(Buffer::hex($pkHex))
             ->push(Buffer::hex($pkHex))
             ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
+            ->op('OP_CHECKMULTISIG')
+            ->getScript();
 
         $rs = RedeemSCript::fromScript($script);
         $this->assertEquals(2, $rs->getRequiredSigCount());
@@ -112,7 +113,8 @@ class RedeemScriptTest extends AbstractTestCase
         $script = ScriptFactory::create()
             ->op('OP_2')
             ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
+            ->op('OP_CHECKMULTISIG')
+            ->getScript();
 
         RedeemSCript::fromScript($script);
     }
@@ -127,7 +129,8 @@ class RedeemScriptTest extends AbstractTestCase
             ->op('OP_2')
             ->op('OP_3')
             ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
+            ->op('OP_CHECKMULTISIG')
+            ->getScript();
 
         RedeemSCript::fromScript($script);
     }
@@ -142,7 +145,8 @@ class RedeemScriptTest extends AbstractTestCase
             ->push(Buffer::hex($pkHex))
             ->push(Buffer::hex($pkHex))
             ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
+            ->op('OP_CHECKMULTISIG')
+            ->getScript();
 
         $hash = hash('ripemd160', hash('sha256', $script->getBinary(), true), true);
         $this->assertEquals($hash, $script->getScriptHash()->getBinary());

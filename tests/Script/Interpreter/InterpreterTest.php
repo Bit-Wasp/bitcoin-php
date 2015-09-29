@@ -237,7 +237,7 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
         ];
 
         // Pay to pubkey that succeeds
-        $s1 = ScriptFactory::create()->push($privateKey->getPublicKey()->getBuffer())->op('OP_CHECKSIG');
+        $s1 = ScriptFactory::create()->push($privateKey->getPublicKey()->getBuffer())->op('OP_CHECKSIG')->getScript();
         $vectors[] = [
             true,
             $ec,
@@ -300,7 +300,7 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
         $vectors[] = [
             $flags,
             new Script(new Buffer()),
-            ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../../Data/10010bytes.hex"))),
+            ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../../Data/10010bytes.hex")))->getScript(),
             false,
             'fails with >10000 bytes',
             new Transaction
@@ -330,8 +330,7 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
     public function testVerifyOnScriptSigFail()
     {
         $i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(0));
-        $script = new Script();
-        $script->op('OP_RETURN');
+        $script = ScriptFactory::create()->op('OP_RETURN')->getScript();
 
         $this->assertFalse($i->verify($script, new Script, 0));
     }
@@ -340,8 +339,7 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
     {
         $i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(0));
         $true = new Script(Buffer::hex('0101'));
-        $false = new Script();
-        $false->op('OP_RETURN');
+        $false = ScriptFactory::create()->op('OP_RETURN')->getScript();
         $this->assertFalse($i->verify($true, $false, 0));
     }
 
@@ -373,13 +371,11 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidPayToScriptHash()
     {
-        $p2sh = new Script();
-        $p2sh->op('OP_RETURN');
+        $p2sh = ScriptFactory::create()->op('OP_RETURN')->getScript();
 
         $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
 
-        $scriptSig = new Script();
-        $scriptSig->op('OP_0')->push($p2sh->getBuffer());
+        $scriptSig = ScriptFactory::create()->op('OP_0')->push($p2sh->getBuffer())->getScript();
 
         $i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter(Bitcoin::getEcAdapter(), new Transaction, new Flags(InterpreterInterface::VERIFY_P2SH));
         $this->assertFalse($i->verify($scriptSig, $scriptPubKey, 0));
@@ -388,11 +384,9 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyScriptsigMustBePushOnly()
     {
-        $p2sh = new Script();
-        $p2sh->op('OP_1')->push(Buffer::hex('41414141'))->op('OP_DEPTH');
+        $p2sh = ScriptFactory::create()->op('OP_1')->push(Buffer::hex('41414141'))->op('OP_DEPTH')->getScript();
 
-        $scriptSig = new Script();
-        $scriptSig->op('OP_DEPTH')->push($p2sh->getBuffer());
+        $scriptSig = ScriptFactory::create()->op('OP_DEPTH')->push($p2sh->getBuffer())->getScript();
 
         $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
 

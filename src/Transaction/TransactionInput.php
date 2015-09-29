@@ -32,8 +32,8 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $script;
 
     /**
-     * @param string|null $txid
-     * @param string|null $vout
+     * @param string $txid
+     * @param string $vout
      * @param ScriptInterface|Buffer $script
      * @param int $sequence
      */
@@ -56,7 +56,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     /**
      * Return the transaction ID buffer
      *
-     * @return mixed
+     * @return string
      */
     public function getTransactionId()
     {
@@ -64,7 +64,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getVout()
     {

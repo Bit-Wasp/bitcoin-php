@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -92,11 +93,12 @@ class OutputScriptFactoryTest extends AbstractTestCase
 
     public function testPayToPubKeyInvalid()
     {
-        $script = ScriptFactory::create();
+        $script = new Script();
         $this->assertFalse(ScriptFactory::scriptPubKey()->classify($script)->isPayToPublicKey());
 
         $script = ScriptFactory::create()
-            ->push(new Buffer());
+            ->push(new Buffer())
+            ->getScript();
         $this->assertFalse(ScriptFactory::scriptPubKey()->classify($script)->isPayToPublicKey());
     }
 
@@ -120,7 +122,8 @@ class OutputScriptFactoryTest extends AbstractTestCase
             ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
             ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
             ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
+            ->op('OP_CHECKMULTISIG')
+            ->getScript();
 
         $this->assertEquals(OutputClassifier::MULTISIG, ScriptFactory::scriptPubKey()->classify($script)->classify());
     }
@@ -134,7 +137,8 @@ class OutputScriptFactoryTest extends AbstractTestCase
             ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
             ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
             ->op('OP_3')
-            ->op('OP_CHECKMULTISIG');
+            ->op('OP_CHECKMULTISIG')
+            ->getScript();
 
         $scriptHash = ScriptFactory::scriptPubKey()->payToScriptHash($script);
         $parsed = $scriptHash->getScriptParser()->parse();

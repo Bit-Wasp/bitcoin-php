@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Script;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Factory\InputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Buffertools\Buffer;
@@ -10,10 +12,20 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 class ScriptFactory
 {
     /**
+     * @param Opcodes $opcodes
+     * @param Math|null $math
+     * @return ScriptCreator
+     */
+    public static function create(Buffer $buffer = null, Opcodes $opcodes = null, Math $math = null)
+    {
+        return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes ?: new Opcodes(), $buffer);
+    }
+
+    /**
      * @param Buffer $script
      * @return Script
      */
-    public static function create(Buffer $script = null)
+    public static function createOld(Buffer $script = null)
     {
         return new Script($script ?: new Buffer());
     }
@@ -55,6 +67,6 @@ class ScriptFactory
      */
     public static function fromHex($string)
     {
-        return self::create(Buffer::hex($string));
+        return new Script(Buffer::hex($string));
     }
 }

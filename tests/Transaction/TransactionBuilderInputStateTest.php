@@ -3,7 +3,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\RedeemScript;
@@ -126,7 +125,7 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      */
     public function testNonStandardScriptFails()
     {
-        $script = ScriptFactory::create()->push(new Buffer('abab'));
+        $script = ScriptFactory::create()->push(new Buffer('abab'))->getScript();
         $this->createState($script);
     }
 }

@@ -29,7 +29,7 @@ class OutputScriptFactory
      */
     public function payToAddress(AddressInterface $address)
     {
-        return ($address instanceof ScriptHashAddress
+        $script = ($address instanceof ScriptHashAddress
             ? ScriptFactory::create()
                 ->op('OP_HASH160')
                 ->push(Buffer::hex($address->getHash(), 20))
@@ -40,6 +40,8 @@ class OutputScriptFactory
                 ->push(Buffer::hex($address->getHash(), 20))
                 ->op('OP_EQUALVERIFY')
                 ->op('OP_CHECKSIG'));
+
+        return $script->getScript();
     }
 
     /**
@@ -52,7 +54,8 @@ class OutputScriptFactory
     {
         return ScriptFactory::create()
             ->push($public_key->getBuffer())
-            ->op('OP_CHECKSIG');
+            ->op('OP_CHECKSIG')
+            ->getScript();
     }
 
     /**
@@ -68,7 +71,8 @@ class OutputScriptFactory
             ->op('OP_HASH160')
             ->push($public_key->getPubKeyHash())
             ->op('OP_EQUALVERIFY')
-            ->op('OP_CHECKSIG');
+            ->op('OP_CHECKSIG')
+            ->getScript();
     }
 
     /**
@@ -82,7 +86,8 @@ class OutputScriptFactory
         return ScriptFactory::create()
             ->op('OP_HASH160')
             ->push($script->getScriptHash())
-            ->op('OP_EQUAL');
+            ->op('OP_EQUAL')
+            ->getScript();
     }
 
     /**
@@ -111,6 +116,7 @@ class OutputScriptFactory
                 ->concat(ScriptFactory::multisig(2, [$a1, $b1]))
             ->op('OP_ELSE')
                 ->concat(ScriptFactory::multisig(2, [$a2, $b2]))
-            ->op('OP_ENDIF');
+            ->op('OP_ENDIF')
+            ->getScript();
     }
 }
