@@ -8,11 +8,13 @@ use BitWasp\Bitcoin\Script\Factory\InputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
+use BitWasp\Buffertools\Buffertools;
 
 class ScriptFactory
 {
     /**
-     * @param Opcodes $opcodes
+     * @param Buffer|null $buffer
+     * @param Opcodes|null $opcodes
      * @param Math|null $math
      * @return ScriptCreator
      */
@@ -39,7 +41,7 @@ class ScriptFactory
     public static function multisig($m, array $keys = array(), $sort = true)
     {
         if ($sort) {
-            $keys = \BitWasp\Buffertools\Buffertools::sort($keys);
+            $keys = Buffertools::sort($keys);
         }
 
         return new RedeemScript($m, $keys);
@@ -67,6 +69,6 @@ class ScriptFactory
      */
     public static function fromHex($string)
     {
-        return self::create($string instanceof Buffer ? $string : Buffer::hex($string));
+        return self::create($string instanceof Buffer ? $string : Buffer::hex($string))->getScript();
     }
 }
