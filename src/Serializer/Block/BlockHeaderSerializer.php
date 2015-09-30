@@ -12,14 +12,13 @@ use BitWasp\Buffertools\TemplateFactory;
 class BlockHeaderSerializer
 {
     /**
-     * @param $string
+     * @param \BitWasp\Buffertools\Buffer|string $string
      * @return BlockHeader
      * @throws ParserOutOfRange
      */
     public function parse($string)
     {
-        $parser = new Parser($string);
-        return $this->fromParser($parser);
+        return $this->fromParser(new Parser($string));
     }
 
     /**

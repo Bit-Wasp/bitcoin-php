@@ -60,7 +60,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param $data
+     * @param \BitWasp\Buffertools\Buffer|string $data
      * @return PublicKey
      */
     public function parse($data)

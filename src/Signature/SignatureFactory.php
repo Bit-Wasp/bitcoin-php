@@ -12,7 +12,7 @@ class SignatureFactory
 {
 
     /**
-     * @param $string
+     * @param \BitWasp\Buffertools\Buffer|string $string
      * @param EcAdapterInterface $ecAdapter
      * @return SignatureInterface
      */

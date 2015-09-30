@@ -66,6 +66,8 @@ class BitcoindBlockSerializer
      */
     public function fromParser(Parser &$parser)
     {
+        /** @var Buffer $bytes */
+        /** @var int|string $blockSize */
         list ($bytes, $blockSize) = $this->getHeaderTemplate()->parse($parser);
         if ($bytes->getHex() !== $this->network->getNetMagicBytes()) {
             throw new \RuntimeException('Block version bytes did not match network');
@@ -75,12 +77,11 @@ class BitcoindBlockSerializer
     }
 
     /**
-     * @param $data
+     * @param \BitWasp\Buffertools\Buffer|string $data
      * @return \BitWasp\Bitcoin\Block\Block
      */
     public function parse($data)
     {
-        $parser = new Parser($data);
-        return $this->fromParser($parser);
+        return $this->fromParser(new Parser($data));
     }
 }

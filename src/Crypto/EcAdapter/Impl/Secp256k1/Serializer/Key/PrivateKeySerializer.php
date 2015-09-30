@@ -79,7 +79,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * @param $data
+     * @param \BitWasp\Buffertools\Buffer|string $data
      * @return PrivateKey
      */
     public function parse($data)

@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 
 class TransactionFactory
@@ -28,7 +26,7 @@ class TransactionFactory
     }
 
     /**
-     * @param $string
+     * @param \BitWasp\Buffertools\Buffer|string $string
      * @return Transaction
      */
     public static function fromHex($string)
