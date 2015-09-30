@@ -25,7 +25,7 @@ class PublicKeyFactory
     }
 
     /**
-     * @param string $hex
+     * @param \BitWasp\Buffertools\Buffer|string $hex
      * @param EcAdapterInterface $ecAdapter
      * @return PublicKey
      * @throws \Exception
@@ -36,7 +36,7 @@ class PublicKeyFactory
     }
 
     /**
-     * @param $hex
+     * @param \BitWasp\Buffertools\Buffer|string $hex
      * @param EcAdapterInterface|null $ecAdapter
      * @return bool
      */

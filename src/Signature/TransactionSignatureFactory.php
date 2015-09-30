@@ -14,7 +14,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializer
 class TransactionSignatureFactory
 {
     /**
-     * @param $string
+     * @param \BitWasp\Buffertools\Buffer|string $string
      * @param EcAdapterInterface $ecAdapter
      * @return TransactionSignatureInterface
      */

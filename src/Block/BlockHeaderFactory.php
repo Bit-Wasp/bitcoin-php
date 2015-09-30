@@ -8,7 +8,7 @@ class BlockHeaderFactory
 {
 
     /**
-     * @param $string
+     * @param \BitWasp\Buffertools\Buffer|string $string
      * @return BlockHeader
      */
     public static function fromHex($string)

@@ -41,6 +41,10 @@ class PartialMerkleTreeSerializer
         );
     }
 
+    /**
+     * @param array $bits
+     * @return array
+     */
     public function bitsToBuffers(array $bits)
     {
         $math = Bitcoin::getMath();
@@ -54,7 +58,7 @@ class PartialMerkleTreeSerializer
 
         $results = array_map(
             function ($value) use ($math) {
-                return Buffer::hex($math->decHex($value));
+                return Buffer::int($value, null, $math);
             },
             $vBytes
         );

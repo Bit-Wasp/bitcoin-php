@@ -11,7 +11,7 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 class BlockFactory
 {
     /**
-     * @param $string
+     * @param \BitWasp\Buffertools\Buffer|string $string
      * @param Math $math
      * @return Block
      */

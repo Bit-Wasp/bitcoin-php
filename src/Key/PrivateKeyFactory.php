@@ -79,7 +79,7 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param string $hex
+     * @param \BitWasp\Buffertools\Buffer|string $hex
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKey
@@ -87,7 +87,6 @@ class PrivateKeyFactory
     public static function fromHex($hex, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $hex = Buffer::hex($hex, null, $ecAdapter->getMath());
 
         /** @var PrivateKeySerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(

@@ -75,15 +75,13 @@ class BlockSerializer
     }
 
     /**
-     * @param $string
+     * @param \BitWasp\Buffertools\Buffer|string $string
      * @return Block
      * @throws ParserOutOfRange
      */
     public function parse($string)
     {
-        $parser = new Parser($string);
-        $block = $this->fromParser($parser);
-        return $block;
+        return $this->fromParser(new Parser($string));
     }
 
     /**
@@ -93,7 +91,7 @@ class BlockSerializer
     public function serialize(BlockInterface $block)
     {
         return Buffertools::concat(
-            $block->getHeader()->getBuffer(),
+            $this->headerSerializer->serialize($block->getHeader()),
             $this->getTxsTemplate()->write([
                 $block->getTransactions()->getTransactions()
             ])
