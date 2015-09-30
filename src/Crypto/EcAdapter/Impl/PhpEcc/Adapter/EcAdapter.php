@@ -277,10 +277,10 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * attempt to calculate the public key recovery param by trial and error
+     * Attempt to calculate the public key recovery param by trial and error
      *
-     * @param                $r
-     * @param                $s
+     * @param int|string     $r
+     * @param int|string     $s
      * @param Buffer $messageHash
      * @param PublicKey $publicKey
      * @return int
@@ -366,7 +366,7 @@ class EcAdapter implements EcAdapterInterface
 
     /**
      * @param Buffer $publicKey
-     * @return \Mdanter\Ecc\Primitives\PointInterface
+     * @return PublicKeyInterface
      * @throws \Exception
      */
     public function publicKeyFromBuffer(Buffer $publicKey)
@@ -389,7 +389,7 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param integer $xCoord
+     * @param int|string $xCoord
      * @param string $prefix
      * @return int|string
      * @throws \Exception

@@ -95,7 +95,7 @@ class PaymentRequestSigner
     }
 
     /**
-     * @param $data
+     * @param string $data
      * @return string
      * @throws \Exception
      */
@@ -151,7 +151,7 @@ class PaymentRequestSigner
      * Fetches parent certificates using network requests
      * Todo: review use of file_get_contents
      * @param $leafCertificate
-     * @return bool|string
+     * @return false|string
      */
     private function fetchCertificateParent($leafCertificate)
     {
@@ -168,12 +168,13 @@ class PaymentRequestSigner
                 return $parentCert;
             }
         }
+
         return false;
     }
 
     /**
      * Parses a PEM or DER certificate
-     * @param $certData
+     * @param string $certData
      * @return array
      */
     private function parseCertificate($certData)
