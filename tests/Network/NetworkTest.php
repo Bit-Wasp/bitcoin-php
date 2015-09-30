@@ -151,7 +151,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(NetworkFactory::litecoin()->isTestnet(), false);
         $this->assertEquals(NetworkFactory::litecoin()->getHDPrivByte(), '019d9cfe');
         $this->assertEquals(NetworkFactory::litecoin()->getHDPubByte(), '019da462');
-        $this->assertEquals(NetworkFactory::litecoin()->getNetMagicBytes(), 'd9b4bef9');
+        $this->assertEquals(NetworkFactory::litecoin()->getNetMagicBytes(), 'dbb6c0fb');
 
         $this->assertEquals("36PrZ1KHYMpqSyAQXSG8VwbUiq2EogxLo2", $p2sh->getAddress(NetworkFactory::litecoin()));
         $this->assertEquals("LKrfsrS4SE1tajYRQCPuRcY1sMkoFf1BN3", $p2pk->getAddress(NetworkFactory::litecoin()));
@@ -172,7 +172,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(NetworkFactory::viacoinTestnet()->isTestnet(), true);
         $this->assertEquals(NetworkFactory::viacoinTestnet()->getHDPrivByte(), '04358394');
         $this->assertEquals(NetworkFactory::viacoinTestnet()->getHDPubByte(), '043587cf');
-        $this->assertEquals(NetworkFactory::viacoinTestnet()->getNetMagicBytes(), 'cbc6680f');
+        $this->assertEquals(NetworkFactory::viacoinTestnet()->getNetMagicBytes(), '92efc5a9');
         $this->assertEquals("2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV", $p2sh->getAddress(NetworkFactory::viacoinTestnet()));
         $this->assertEquals("t7ZKfRypXUd7ByZGLLi5jX3AbD7KQvDj4a", $p2pk->getAddress(NetworkFactory::viacoinTestnet()));
     }
