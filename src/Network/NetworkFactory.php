@@ -54,7 +54,21 @@ class NetworkFactory
         $network = self::create('30', '05', 'b0')
             ->setHDPubByte('019da462')
             ->setHDPrivByte('019d9cfe')
-            ->setNetMagicBytes('d9b4bef9');
+            ->setNetMagicBytes('dbb6c0fb');
+
+        return $network;
+    }
+
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function litecoinTestnet()
+    {
+        $network = self::create('6f', 'c4', 'ef', true)
+            ->setHDPubByte('019da462')
+            ->setHDPrivByte('019d9cfe')
+            ->setNetMagicBytes('dcb7c1fc');
 
         return $network;
     }
@@ -83,7 +97,7 @@ class NetworkFactory
         $network = self::create('7f', 'c4', 'ff', true)
             ->setHDPubByte('043587cf')
             ->setHDPrivByte('04358394')
-            ->setNetMagicBytes('cbc6680f')
+            ->setNetMagicBytes('92efc5a9')
         ;
 
         return $network;
