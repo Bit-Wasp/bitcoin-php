@@ -31,7 +31,7 @@ class ScriptFactory
     }
 
     /**
-     * @param                   $m
+     * @param int               $m
      * @param KeyInterface[]    $keys
      * @param bool              $sort
      * @return RedeemScript
@@ -62,11 +62,11 @@ class ScriptFactory
     }
 
      /**
-     * @param $string
+     * @param Buffer|string $string
      * @return Script
      */
     public static function fromHex($string)
     {
-        return new Script(Buffer::hex($string));
+        return self::create($string instanceof Buffer ? $string : Buffer::hex($string));
     }
 }
