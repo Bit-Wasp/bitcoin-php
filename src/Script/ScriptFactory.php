@@ -24,15 +24,6 @@ class ScriptFactory
     }
 
     /**
-     * @param Buffer $script
-     * @return Script
-     */
-    public static function createOld(Buffer $script = null)
-    {
-        return new Script($script ?: new Buffer());
-    }
-
-    /**
      * @param int               $m
      * @param KeyInterface[]    $keys
      * @param bool              $sort
