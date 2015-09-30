@@ -36,7 +36,7 @@ class EcAdapter implements EcAdapterInterface
     /**
      * @param Math $math
      * @param GeneratorPoint $generator
-     * @param $secp256k1_context_t
+     * @param resource $secp256k1_context_t
      */
     public function __construct(Math $math, GeneratorPoint $generator, $secp256k1_context_t)
     {
