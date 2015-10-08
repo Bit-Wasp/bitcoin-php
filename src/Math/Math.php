@@ -25,6 +25,16 @@ class Math extends Gmp
     }
 
     /**
+     * @param int|string $int
+     * @param int|string $otherInt
+     * @return string
+     */
+    public function bitwiseOr($int, $otherInt)
+    {
+        return gmp_strval(gmp_or(gmp_init($int, 10), gmp_init($otherInt, 10)), 10);
+    }
+
+    /**
      * Similar to gmp_div_qr, return a tuple containing the
      * result and the remainder
      *
