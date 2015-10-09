@@ -7,60 +7,60 @@ class Params implements ParamsInterface
     /**
      * @var int
      */
-    static $maxBlockSizeBytes = 1000000;
+    protected static $maxBlockSizeBytes = 1000000;
 
     /**
      * @var int
      */
-    static $maxMoney = 21000000;
+    protected static $maxMoney = 21000000;
 
     /**
      * @var int
      */
-    static $subsidyHalvingInterval = 210000;
+    protected static $subsidyHalvingInterval = 210000;
 
     /**
      * @var int
      */
-    static $coinbaseMaturityAge = 120;
+    protected static $coinbaseMaturityAge = 120;
 
     /**
      * = 14 * 24 * 60 * 60
      * @var int
      */
-    static $powTargetTimespan = 1209600;
+    protected static $powTargetTimespan = 1209600;
 
     /**
      * = 10 * 60
      * @var int
      */
-    static $powTargetSpacing = 600;
+    protected static $powTargetSpacing = 600;
 
     /**
      * @var int
      */
-    static $powRetargetInterval = 2016;
+    protected static $powRetargetInterval = 2016;
 
     /**
      * @var string
      */
-    static $powTargetLimit = '26959946667150639794667015087019630673637144422540572481103610249215';
+    protected static $powTargetLimit = '26959946667150639794667015087019630673637144422540572481103610249215';
 
     /**
      * Hex: 1d00ffff
      * @var string
      */
-    static $powBitsLimit = '486604799';
+    protected static $powBitsLimit = '486604799';
 
     /**
      * @var int
      */
-    static $majorityWindow = 1000;
+    protected static $majorityWindow = 1000;
 
     /**
      * @var int
      */
-    static $majorityEnforceBlockUpgrade = 750;
+    protected static $majorityEnforceBlockUpgrade = 750;
 
     /**
      * @return int
