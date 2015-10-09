@@ -8,13 +8,7 @@ use BitWasp\Buffertools\Buffer;
 
 class ProofOfWork
 {
-    const MAX_TARGET = '1d00ffff';
     const DIFF_PRECISION = 12;
-
-    /**
-     * @var Buffer
-     */
-    private $lowestBits;
 
     /**
      * @var Math
@@ -22,27 +16,23 @@ class ProofOfWork
     private $math;
 
     /**
-     * @param Math $math
-     * @param Buffer $lowestBits
+     * @var ParamsInterface
      */
-    public function __construct(Math $math, Buffer $lowestBits = null)
+    private $params;
+
+    /**
+     * @param Math $math
+     * @param ParamsInterface $params
+     */
+    public function __construct(Math $math, ParamsInterface $params)
     {
         $this->math = $math;
-        $this->lowestBits = $lowestBits ?: Buffer::hex(self::MAX_TARGET, 4, $math);
+        $this->params = $params;
     }
 
     /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::lowestBits()
-     */
-    public function lowestBits()
-    {
-        return $this->lowestBits;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getTarget()
+     * @param Buffer $bits
+     * @return int|string
      */
     public function getTarget(Buffer $bits)
     {
@@ -50,17 +40,16 @@ class ProofOfWork
     }
 
     /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getMaxTarget()
+     * @return int|string
      */
     public function getMaxTarget()
     {
-        return $this->getTarget($this->lowestBits());
+        return $this->getTarget(Buffer::int($this->params->powBitsLimit(), 4, $this->math));
     }
 
     /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getTargetHash()
+     * @param Buffer $bits
+     * @return Buffer
      */
     public function getTargetHash(Buffer $bits)
     {
@@ -72,8 +61,8 @@ class ProofOfWork
     }
 
     /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getDifficulty()
+     * @param Buffer $bits
+     * @return string
      */
     public function getDifficulty(Buffer $bits)
     {
@@ -87,17 +76,6 @@ class ProofOfWork
         $decPart = substr($difficulty, 0 - self::DIFF_PRECISION, self::DIFF_PRECISION);
         
         return $intPart . '.' . $decPart;
-    }
-
-
-    /**
-     * @param BlockHeaderInterface $header
-     * @return bool
-     * @throws \Exception
-     */
-    public function checkHeader(BlockHeaderInterface $header)
-    {
-        $this->check($header->getBlockHash(), $header->getBits()->getInt());
     }
 
     /**
@@ -115,15 +93,25 @@ class ProofOfWork
         }
 
         if ($this->math->cmp($this->math->hexDec($hash), $target) > 0) {
-            throw new \RuntimeException("hash doesn't match nBits");
+            throw new \RuntimeException("Hash doesn't match nBits");
         }
 
         return true;
     }
 
     /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Chain\DifficultyInterface::getWork()
+     * @param BlockHeaderInterface $header
+     * @return bool
+     * @throws \Exception
+     */
+    public function checkHeader(BlockHeaderInterface $header)
+    {
+        return $this->check($header->getBlockHash(), $header->getBits()->getInt());
+    }
+
+    /**
+     * @param Buffer $bits
+     * @return int|string
      */
     public function getWork(Buffer $bits)
     {

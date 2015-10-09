@@ -42,8 +42,7 @@ class MerkleRoot
      */
     private function getLastHash()
     {
-        $hash = $this->lastHash;
-        return $hash;
+        return $this->lastHash;
     }
 
     /**
