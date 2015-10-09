@@ -8,6 +8,24 @@ use \Mdanter\Ecc\Math\Gmp;
 class Math extends Gmp
 {
     /**
+     * @var CompactInteger
+     */
+    private $compact;
+
+    public function __construct()
+    {
+        $this->compact = new CompactInteger($this);
+    }
+
+    /**
+     * @return CompactInteger
+     */
+    public function compact()
+    {
+        return $this->compact;
+    }
+
+    /**
      * @return BinaryMath
      */
     public function getBinaryMath()

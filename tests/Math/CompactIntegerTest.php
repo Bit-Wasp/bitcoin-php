@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Math;
 
-
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Math\CompactInteger;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

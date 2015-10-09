@@ -3,7 +3,6 @@
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Address;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Network\Network;
 
 require __DIR__ . "/../vendor/autoload.php";
 

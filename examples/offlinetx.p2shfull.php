@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionBuilder;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 $ecAdapter = Bitcoin::getEcAdapter();
 
