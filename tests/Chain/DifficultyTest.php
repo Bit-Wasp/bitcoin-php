@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Chain;
 
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Chain\Difficulty;
+use BitWasp\Bitcoin\Chain\ProofOfWork;
 use Mdanter\Ecc\Math\MathAdapterInterface;
 
 class DifficultyTest extends AbstractTestCase
@@ -43,7 +43,7 @@ class DifficultyTest extends AbstractTestCase
             ]
         ];
 
-        $difficulty = new Difficulty($this->math, $this->bits);
+        $difficulty = new ProofOfWork($this->math, $this->bits);
 
         foreach ($vectors as $v) {
             $this->assertEquals($v[1], $difficulty->getWork($v[0]));
@@ -53,7 +53,7 @@ class DifficultyTest extends AbstractTestCase
 
     public function testDefaultLowestDifficulty()
     {
-        $difficulty = new Difficulty($this->math);
+        $difficulty = new ProofOfWork($this->math);
 
         $this->assertEquals($this->getLowestBits($this->math), $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
@@ -61,7 +61,7 @@ class DifficultyTest extends AbstractTestCase
 
     public function testLowestDifficulty()
     {
-        $difficulty = new Difficulty($this->math, $this->bits);
+        $difficulty = new ProofOfWork($this->math, $this->bits);
 
         $this->assertEquals($this->getLowestBits($this->math), $difficulty->lowestBits());
         $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
@@ -70,7 +70,7 @@ class DifficultyTest extends AbstractTestCase
     public function testSetLowestDifficulty()
     {
         $bits = Buffer::hex('1e123456');
-        $difficulty = new Difficulty($this->math, $bits);
+        $difficulty = new ProofOfWork($this->math, $bits);
         $this->assertEquals($bits, $difficulty->lowestBits());
     }
 
@@ -82,7 +82,7 @@ class DifficultyTest extends AbstractTestCase
         foreach ($json->test as $test) {
             $default = Buffer::hex($test->defaultBits);
             $bits = Buffer::hex($test->bits);
-            $difficulty = new Difficulty($this->math, $default);
+            $difficulty = new ProofOfWork($this->math, $default);
 
             $this->assertEquals($test->targetHash, $difficulty->getTargetHash($bits)->getHex());
             $this->assertEquals($test->difficulty, $difficulty->getDifficulty($bits));
