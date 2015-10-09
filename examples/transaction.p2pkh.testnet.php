@@ -37,8 +37,6 @@ $builder
 echo "setup stage\n";
 print_r($builder);
 
-
-
 echo "signing\n";
 $builder->signInputWithKey($privateKey, $myTx->getOutputs()->getOutput($spendOutput)->getScript(), 0);
 

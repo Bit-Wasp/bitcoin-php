@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Miner;
 
-use BitWasp\Bitcoin\Chain\Difficulty;
+use BitWasp\Bitcoin\Chain\ProofOfWork;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -147,7 +147,7 @@ class Miner
         $found = false;
 
         $usingDiff = $this->lastBlockHeader->getBits();
-        $diff = new Difficulty($this->math);
+        $diff = new ProofOfWork($this->math);
         $target = $diff->getTarget($usingDiff);
 
         while (false === $found) {

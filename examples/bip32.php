@@ -15,7 +15,7 @@ echo "   " . $master->toExtendedPrivateKey($network) . "\n";
 echo "   Address: " . $master->getPublicKey()->getAddress()->getAddress() . "\n\n";
 echo "Derive sequential keys:\n";
 
-$key1 = $master->deriveChild($master->getHardenedSequence(0));
+$key1 = $master->deriveChild(0);
 echo " - m/0' " . $key1->toExtendedPrivateKey($network) . "\n";
 echo "   Address: " . $key1->getPublicKey()->getAddress()->getAddress() . "\n\n";
 

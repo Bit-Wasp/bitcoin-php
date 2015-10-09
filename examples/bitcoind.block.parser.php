@@ -3,16 +3,9 @@
 require_once "../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Chain\Difficulty;
-use BitWasp\Bitcoin\Chain\BlockHashIndex;
-use BitWasp\Bitcoin\Chain\BlockStorage;
-use BitWasp\Bitcoin\Chain\BlockIndex;
-use BitWasp\Bitcoin\Chain\Blockchain;
-use BitWasp\Bitcoin\Utxo\UtxoSet;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
-use Doctrine\Common\Cache\ArrayCache;
 
 if (!isset($argv[1])) {
     die("Enter the full path for your .bitcoin directory!\n"
@@ -59,33 +52,6 @@ usort($files, function ($a, $b) {
     return gmp_cmp($intA, $intB);
 });
 
-$blockchain = new Blockchain(
-    $math,
-    new \BitWasp\Bitcoin\Block\Block(
-        $math,
-        new \BitWasp\Bitcoin\Block\BlockHeader(
-            '1',
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-            1231006505,
-            \BitWasp\Buffertools\Buffer::hex('1d00ffff'),
-            2083236893
-        )
-    ),
-    new BlockStorage(
-        new ArrayCache()
-    ),
-    new BlockIndex(
-        new BlockHashIndex(
-            new ArrayCache()
-        ),
-        new \BitWasp\Bitcoin\Chain\BlockHeightIndex(
-            new ArrayCache()
-        )
-    ),
-    new UtxoSet(new ArrayCache())
-);
-
 foreach ($files as $entry) {
     echo " FILE: $entry\n";
     $try = true;
@@ -99,9 +65,6 @@ foreach ($files as $entry) {
             echo "reached end of file - next!\n";
             $try = false;
         }
-
-        $blockchain->process($block);
-        echo "  [height: " . $blockchain->currentHeight() . "]\n";
     }
     echo "finished loop\n";
 }
