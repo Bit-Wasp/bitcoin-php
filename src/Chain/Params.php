@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
-
 class Params implements ParamsInterface
 {
     /**
