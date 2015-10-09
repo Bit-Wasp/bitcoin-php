@@ -31,14 +31,6 @@ class ProofOfWork
     }
 
     /**
-     * @return Buffer
-     */
-    public function lowestBits()
-    {
-        return Buffer::int($this->params->powBitsLimit(), 4, $this->math);
-    }
-
-    /**
      * @param Buffer $bits
      * @return int|string
      */

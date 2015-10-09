@@ -53,15 +53,6 @@ class DifficultyTest extends AbstractTestCase
 
     }
 
-    public function testLowestDifficulty()
-    {
-        $params = new Params();
-        $difficulty = new ProofOfWork($this->math, $params);
-
-        $this->assertEquals($this->getLowestBits($this->math), $difficulty->lowestBits());
-        $this->assertEquals($this->math->hexDec($this->targetHash), $difficulty->getMaxTarget());
-    }
-
     public function testGetTarget()
     {
         $f = file_get_contents(__DIR__.'/../Data/difficulty.json');
