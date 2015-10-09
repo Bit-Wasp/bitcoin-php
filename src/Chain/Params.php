@@ -50,7 +50,7 @@ class Params implements ParamsInterface
      * Hex: 1d00ffff
      * @var string
      */
-    protected static $powBitsLimit = '486604799';
+    protected static $powBitsLimit = 486604799;
 
     /**
      * @var int

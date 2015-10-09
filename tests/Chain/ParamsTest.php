@@ -10,21 +10,20 @@ class ParamsTest extends AbstractTestCase
     public function testParams()
     {
         $params = new Params();
-        $this->assertEquals(Params::$powBitsLimit, $params->powBitsLimit());
-        $this->assertEquals(Params::$powTargetLimit, $params->powTargetLimit());
-        $this->assertEquals(Params::$powRetargetInterval, $params->powRetargetInterval());
-        $this->assertEquals(Params::$powTargetTimespan, $params->powTargetTimespan());
-        $this->assertEquals(Params::$powTargetSpacing, $params->powTargetSpacing());
+        $this->assertEquals(486604799, $params->powBitsLimit());
+        $this->assertEquals('26959946667150639794667015087019630673637144422540572481103610249215', $params->powTargetLimit());
+        $this->assertEquals(2016, $params->powRetargetInterval());
+        $this->assertEquals(1209600, $params->powTargetTimespan());
+        $this->assertEquals(600, $params->powTargetSpacing());
 
-        $this->assertEquals(Params::$subsidyHalvingInterval, $params->subsidyHalvingInterval());
-        $this->assertEquals(Params::$coinbaseMaturityAge, $params->coinbaseMaturityAge());
+        $this->assertEquals(210000, $params->subsidyHalvingInterval());
+        $this->assertEquals(120, $params->coinbaseMaturityAge());
 
-        $this->assertEquals(Params::$majorityEnforceBlockUpgrade, $params->majorityEnforceBlockUpgrade());
-        $this->assertEquals(Params::$majorityWindow, $params->majorityWindow());
+        $this->assertEquals(750, $params->majorityEnforceBlockUpgrade());
+        $this->assertEquals(1000, $params->majorityWindow());
 
-        $this->assertEquals(Params::$maxBlockSizeBytes, $params->maxBlockSizeBytes());
-        $this->assertEquals(Params::$maxMoney, $params->maxMoney());
-
+        $this->assertEquals(1000000, $params->maxBlockSizeBytes());
+        $this->assertEquals(21000000, $params->maxMoney());
 
     }
 }
