@@ -21,9 +21,6 @@ class ProofOfWorkTest extends AbstractTestCase
 
         $results = [];
         foreach ($data as $c => $record) {
-            if ($c == 2) {
-                break;
-            }
             list ($height, $hash, $version, $prev, $merkle, $time, $bits, $nonce) = $record;
             $header = new BlockHeader($version, $prev, $merkle, $time, Buffer::hex($bits), $nonce);
             $results[] = [$pow, $height, $hash, $header];
