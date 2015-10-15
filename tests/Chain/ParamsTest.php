@@ -24,6 +24,7 @@ class ParamsTest extends AbstractTestCase
 
         $this->assertEquals(1000000, $params->maxBlockSizeBytes());
         $this->assertEquals(21000000, $params->maxMoney());
+        $this->assertEquals(1333238400, $params->p2shActivateTime());
 
     }
 }

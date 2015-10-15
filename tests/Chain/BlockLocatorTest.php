@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Chain;
 
-
 use BitWasp\Bitcoin\Chain\BlockLocator;
 use BitWasp\Bitcoin\Serializer\Chain\BlockLocatorSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

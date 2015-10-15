@@ -25,6 +25,11 @@ class Params implements ParamsInterface
     protected static $coinbaseMaturityAge = 120;
 
     /**
+     * @var int
+     */
+    protected static $p2shActivateTime = 1333238400;
+
+    /**
      * = 14 * 24 * 60 * 60
      * @var int
      */
@@ -148,5 +153,13 @@ class Params implements ParamsInterface
     public function majorityWindow()
     {
         return static::$majorityWindow;
+    }
+
+    /**
+     * @return int
+     */
+    public function p2shActivateTime()
+    {
+        return static::$p2shActivateTime;
     }
 }
