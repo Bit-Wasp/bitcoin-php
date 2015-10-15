@@ -59,4 +59,6 @@ interface ParamsInterface
      * @return int
      */
     public function majorityWindow();
+
+    public function p2shActivateTime();
 }
