@@ -33,9 +33,10 @@ interface ScriptInterface extends SerializableInterface
     public function isPushOnly();
 
     /**
+     * @param bool $accurate
      * @return int
      */
-    public function countSigOps();
+    public function countSigOps($accurate = true);
 
     /**
      * @param ScriptInterface $scriptSig
