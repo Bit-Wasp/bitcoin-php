@@ -92,15 +92,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $out);
     }
 
-    public function testConcat()
-    {
-        $s1 = new Script(Buffer::hex('00'));
-        $s2 = new Script(Buffer::hex('01'));
-        $s1->concat($s2);
-
-        $this->assertEquals('0001', $s1->getHex());
-    }
-
     public function testPushBuffer()
     {
         $hash = '0f9947c2b0fdd82ef3153232ee23d5c0bed84a02';

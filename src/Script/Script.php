@@ -33,16 +33,6 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function concat(ScriptInterface $script)
-    {
-        $this->script .= $script->getBinary();
-        return $this;
-    }
-
-    /**
      * @return Buffer
      */
     public function getBuffer()
@@ -117,6 +107,40 @@ class Script extends Serializable implements ScriptInterface
         }
 
         return $count;
+    }
+
+    /**
+     * @param ScriptInterface $scriptSig
+     * @return int
+     */
+    public function countP2shSigOps(ScriptInterface $scriptSig)
+    {
+        if (ScriptFactory::scriptPubKey()
+            ->classify($this)
+            ->isPayToScriptHash() === false
+        ) {
+            return $this->countSigOps(true);
+        }
+
+        $parsed = $scriptSig->getScriptParser();
+        $op = 0xff;
+        $push = new Buffer();
+        $data = null;
+        while ($parsed->next($op, $push)) {
+            if ($this->opcodes->cmp($op, 'OP_16') > 0) {
+                return 0;
+            }
+
+            if ($push instanceof Buffer) {
+                $data = $push;
+            }
+        }
+
+        if (!$data instanceof Buffer) {
+            return 0;
+        }
+
+        return (new Script($push))->countSigOps(true);
     }
 
     /**
