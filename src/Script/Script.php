@@ -86,6 +86,38 @@ class Script extends Serializable implements ScriptInterface
         return Hash::sha256ripe160($this->getBuffer());
     }
 
+    /**
+     * @param bool|true $accurate
+     * @return int
+     */
+    public function countSigOps($accurate = true)
+    {
+        $count = 0;
+        $ops = $this->opcodes;
+        $parser = $this->getScriptParser();
+        $op = 0xff;
+        $pushData = new Buffer();
+        $lastOp = 0xff;
+        while ($parser->next($op, $pushData)) {
+            if ($op > 78) {
+                // None of these are pushdatas, so just an opcode
+                if ($ops->isOp($op, 'OP_CHECKSIG') || $ops->isOp($op, 'OP_CHECKSIGVERIFY')) {
+                    $count++;
+                } elseif ($ops->isOp($op, 'OP_CHECKMULTISIG') || $ops->isOp($op, 'OP_CHECKMULTISIGVERIFY')) {
+                    if ($accurate && ($ops->cmp($lastOp, 'OP_1') >= 0 && $ops->cmp($lastOp, 'OP_16') <= 0)) {
+                        $c = ($lastOp - ($ops->getOpByName('OP_1') - 1));
+                        $count += $c;
+                    } else {
+                        $count += 20;
+                    }
+                }
+
+                $lastOp = $op;
+            }
+        }
+
+        return $count;
+    }
 
     /**
      * @return bool

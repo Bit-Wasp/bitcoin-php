@@ -31,4 +31,9 @@ interface ScriptInterface extends SerializableInterface
      * @return bool
      */
     public function isPushOnly();
+
+    /**
+     * @return int
+     */
+    public function countSigOps();
 }
