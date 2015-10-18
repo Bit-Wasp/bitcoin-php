@@ -103,6 +103,6 @@ class ScriptCreator
      */
     public function getScript()
     {
-        return new Script(new Buffer($this->script, null, $this->math));
+        return new Script(new Buffer($this->script, null, $this->math), $this->opcodes);
     }
 }

@@ -26,10 +26,10 @@ class Script extends Serializable implements ScriptInterface
      *
      * @param Buffer $script
      */
-    public function __construct(Buffer $script = null)
+    public function __construct(Buffer $script = null, Opcodes $opcodes = null)
     {
         $this->script = $script instanceof Buffer ? $script->getBinary() : '';
-        $this->opcodes = new Opcodes;
+        $this->opcodes = $opcodes ?: new Opcodes();
     }
 
     /**
