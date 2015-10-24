@@ -1,9 +1,9 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Transaction;
+namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Transaction\Locktime;
+use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class LocktimeTest extends AbstractTestCase
@@ -12,11 +12,6 @@ class LocktimeTest extends AbstractTestCase
      * @var Locktime
      */
     private $locktime;
-
-    public function __construct()
-    {
-
-    }
 
     public function fromTimestampVectors()
     {

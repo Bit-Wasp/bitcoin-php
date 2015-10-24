@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBu
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails as PaymentDetailsBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment as PaymentBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentACK as PaymentACKBuf;
-use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class PaymentHandler
@@ -72,8 +72,8 @@ class PaymentHandler
         $txs = $this->getTransactions();
         $nTx = count($txs);
         for ($i = 0; $i < $nTx; $i++) {
-            $tx = $txs->getTransaction($i);
-            $outs = $tx->getOutputs()->getOutputs();
+            $tx = $txs->get($i);
+            $outs = $tx->getOutputs()->all();
             $nOut = count($outs);
             for ($j = 0; $j < $nOut; $j++) {
                 $txOut = $outs[$j];

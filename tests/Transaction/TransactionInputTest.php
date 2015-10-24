@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Transaction;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Buffertools\Buffer;
 
 class TransactionInputTest extends \PHPUnit_Framework_TestCase
@@ -22,10 +21,13 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSequence()
     {
-        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0');
+        // test default
+        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0', null);
         $this->assertSame(0xffffffff, $in->getSequence());
         $this->assertTrue($in->isFinal());
-        $in->setSequence(23);
+
+        // test when set
+        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0', null, 23);
         $this->assertSame(23, $in->getSequence());
         $this->assertFalse($in->isFinal());
     }

@@ -9,6 +9,34 @@ use Mdanter\Ecc\EccFactory;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var string
+     */
+    protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
+
+    /**
+     * @var string
+     */
+    protected $txSignerType = 'BitWasp\Bitcoin\Transaction\Factory\TxSigner';
+
+    /**
+     * @var string
+     */
+    protected $txSignerStateType = 'BitWasp\Bitcoin\Transaction\Factory\TxSignerState';
+
+    /**
+     * @var string
+     */
+    protected $txBuilderType = 'BitWasp\Bitcoin\Transaction\Factory\TxBuilder';
+
+    /**
+     * @var string
+     */
+    protected $txMutatorType = 'BitWasp\Bitcoin\Transaction\Mutator\TxMutator';
+
+    /**
+     * @var resource
+     */
     private static $context;
 
     public static function getContext()

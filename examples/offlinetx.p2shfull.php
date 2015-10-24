@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionBuilder;
+use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
 
 $ecAdapter = Bitcoin::getEcAdapter();
 
@@ -33,13 +33,13 @@ $spendTx->getOutputs()->addOutput(new TransactionOutput(
 ));
 
 // One party wants to spend funds. He creates a transaction spending the funding tx to his address.
-$builder = new TransactionBuilder($ecAdapter);
+$builder = new TxSigner($ecAdapter);
 $builder->spendOutput($spendTx, 0)
     ->payToAddress($pk1->getAddress(), 50)
     ->signInputWithKey($pk1, $outputScript, 0, $redeemScript)
     ->signInputWithKey($pk2, $outputScript, 0, $redeemScript);
 
-$rawTx = $builder->getTransaction()->getHex();
+$rawTx = $builder->get()->getHex();
 
-echo "Fully signed transaction: " . $builder->getTransaction()->getHex() . "\n";
+echo "Fully signed transaction: " . $builder->get()->getHex() . "\n";
 

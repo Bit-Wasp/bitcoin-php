@@ -22,14 +22,14 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $vout;
 
     /**
-     * @var string|int
-     */
-    private $sequence;
-
-    /**
      * @var ScriptInterface
      */
     private $script;
+
+    /**
+     * @var string|int
+     */
+    private $sequence;
 
     /**
      * @param string $txid
@@ -80,16 +80,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @param int|string $sequence
-     * @return $this
-     */
-    public function setSequence($sequence)
-    {
-        $this->sequence = $sequence;
-        return $this;
-    }
-
-    /**
      * Return an initialized script. Checks if already has a script
      * object. If not, returns script from scriptBuf (which can simply
      * be null).
@@ -99,18 +89,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function getScript()
     {
         return $this->script;
-    }
-
-    /**
-     * Set a Script
-     *
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
     }
 
     /**
@@ -131,7 +109,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function isFinal()
     {
         $math = Bitcoin::getMath();
-        return $math->cmp($this->getSequence(), $math->hexDec('ffffffff')) == 0;
+        return $math->cmp($this->getSequence(), self::DEFAULT_SEQUENCE) == 0;
     }
 
     /**
@@ -139,8 +117,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getBuffer()
     {
-        $serializer = new TransactionInputSerializer();
-        $out = $serializer->serialize($this);
-        return $out;
+        return (new TransactionInputSerializer())->serialize($this);
     }
 }

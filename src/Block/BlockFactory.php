@@ -17,12 +17,11 @@ class BlockFactory
      */
     public static function fromHex($string, Math $math = null)
     {
-        $serializer = new BlockSerializer(
+        return (new BlockSerializer(
             $math ?: Bitcoin::getMath(),
             new BlockHeaderSerializer(),
             new TransactionSerializer()
-        );
-
-        return $serializer->parse($string);
+        ))
+            ->parse($string);
     }
 }

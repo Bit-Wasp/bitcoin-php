@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Math\Math;
 

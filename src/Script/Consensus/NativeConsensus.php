@@ -32,7 +32,7 @@ class NativeConsensus
     {
         return $this->factory->create($tx)
             ->verify(
-                $tx->getInputs()->getInput($nInputToSign)->getScript(),
+                $tx->getInputs()->get($nInputToSign)->getScript(),
                 $scriptPubKey,
                 $nInputToSign
             );

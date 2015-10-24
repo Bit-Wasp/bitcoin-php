@@ -35,15 +35,15 @@ $privateKey2 = PrivateKeyFactory::fromHex('17a2209250b59f07a25b560aa09cb395a183e
 $redeemScript = ScriptFactory::multisig(2, array($privateKey1->getPublicKey(), $privateKey2->getPublicKey()));
 
 // First, move money from fundsKey to the multisig address
-$new = new \BitWasp\Bitcoin\Transaction\TransactionBuilder($ecAdapter);
+$new = new \BitWasp\Bitcoin\Transaction\Factory\TxSigner($ecAdapter);
 $new->spendOutput($myTx, $spendOutput)
     ->payToAddress($redeemScript->getAddress(), 200000);
 
 echo "[Fund this address: $address]\n";
 echo "[P2SH address: " . $redeemScript->getAddress() ." ]\n";
 
-$new->signInputWithKey($fundsKey, $myTx->getOutputs()->getOutput($spendOutput)->getScript(), 0);
-$tx = $new->getTransaction();
+$new->sign(0, $fundsKey, $myTx->getOutputs()->get($spendOutput)->getScript());
+$tx = $new->get();
 
 try {
     echo "try sending to multisig address\n";
@@ -57,14 +57,14 @@ try {
 }
 
 echo "Now redeem from the multisig address, send to " . $recipient->getAddress() . "\n";
-$new = new \BitWasp\Bitcoin\Transaction\TransactionBuilder($ecAdapter);
+$new = new \BitWasp\Bitcoin\Transaction\Factory\TxSigner($ecAdapter);
 $new
     ->spendOutput($tx, 0)
     ->payToAddress($recipient, 50000);
 
-$tx = $new->signInputWithKey($privateKey1, $redeemScript->getOutputScript(), 0, $redeemScript)
-    ->signInputWithKey($privateKey2, $redeemScript->getOutputScript(), 0, $redeemScript)
-    ->getTransaction();
+$tx = $new->sign(0, $privateKey1, $redeemScript->getOutputScript(), $redeemScript)
+    ->sign(0, $privateKey2, $redeemScript->getOutputScript(), $redeemScript)
+    ->get();
 
 echo $tx->getHex()."\n";
 try {

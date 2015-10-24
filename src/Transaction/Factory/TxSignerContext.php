@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -12,9 +12,11 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
+use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 
-class TransactionBuilderInputState
+class TxSignerContext
 {
     /**
      * @var null|RedeemScript
@@ -204,14 +206,14 @@ class TransactionBuilderInputState
 
     /**
      * @param TransactionInterface $tx
-     * @param integer $inputToExtract
-     * @throws \Exception
+     * @param $inputToExtract
+     * @return $this
      */
     public function extractSigs(TransactionInterface $tx, $inputToExtract)
     {
         $parsed = $tx
             ->getInputs()
-            ->getInput($inputToExtract)
+            ->get($inputToExtract)
             ->getScript()
             ->getScriptParser()
             ->parse();
@@ -247,7 +249,7 @@ class TransactionBuilderInputState
                     }
 
                     // Extract Signatures (as buffers), then compile arrays of [pubkeyHash => signature]
-                    $sigHash = new SignatureHash($tx);
+                    $sigHash = new Hasher($tx);
 
                     foreach (array_slice($parsed, 1, -1) as $item) {
                         if ($item instanceof Buffer) {
@@ -280,6 +282,8 @@ class TransactionBuilderInputState
 
                 break;
         }
+
+        return $this;
     }
 
     /**

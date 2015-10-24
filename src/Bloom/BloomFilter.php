@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
-use BitWasp\Bitcoin\Script\Classifier\ScriptClassifierInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -252,7 +251,7 @@ class BloomFilter extends Serializable
     public function insertData(Buffer $data)
     {
         if ($this->isFull) {
-            return;
+            return $this;
         }
 
         for ($i = 0; $i < $this->numHashFuncs; $i++) {
@@ -356,24 +355,22 @@ class BloomFilter extends Serializable
             $found = true;
         }
 
-        $outputs = $tx->getOutputs();
-
         // Check for relevant output scripts. We add the outpoint to the filter if found.
-        for ($i = 0, $nOutputs = count($outputs); $i < $nOutputs; $i++) {
+        foreach ($tx->getOutputs() as $vout => $output) {
             $opCode = null;
             $pushData = new Buffer('', 0, $this->math);
-            $script = $outputs->getOutput($i)->getScript();
+
+            $script = $output->getScript();
             $parser = $script->getScriptParser();
             while ($parser->next($opCode, $pushData)) {
                 if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
                     $found = true;
-
                     if ($this->isUpdateAll()) {
-                        $this->insertOutpoint($txHash, $i);
+                        $this->insertOutpoint($txHash, $vout);
                     } else if ($this->isUpdatePubKeyOnly()) {
                         $type = ScriptFactory::scriptPubKey()->classify($script);
-                        if ($type === ScriptClassifierInterface::MULTISIG || $type === ScriptClassifierInterface::PAYTOPUBKEY) {
-                            $this->insertOutpoint($txHash, $i);
+                        if ($type->isMultisig() || $type->isPayToPublicKey()) {
+                            $this->insertOutpoint($txHash, $vout);
                         }
                     }
                 }
@@ -384,9 +381,7 @@ class BloomFilter extends Serializable
             return true;
         }
 
-        $inputs = $tx->getInputs();
-        for ($i = 0, $nInputs = count($inputs); $i < $nInputs; $i++) {
-            $txIn = $inputs->getInput($i);
+        foreach ($tx->getInputs() as $txIn) {
             if ($this->containsUtxo($txIn->getTransactionId(), $txIn->getVout())) {
                 return true;
             }

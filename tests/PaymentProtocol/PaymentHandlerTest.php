@@ -12,9 +12,9 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Buffertools\Buffer;
 
 class PaymentHandlerTest extends AbstractTestCase

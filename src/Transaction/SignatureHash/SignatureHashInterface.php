@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 

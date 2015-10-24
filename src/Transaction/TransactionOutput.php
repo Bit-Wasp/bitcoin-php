@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
-
     /**
      * @var string|int
      */
@@ -32,7 +31,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * @return TransactionOutput
+     * @return void
      */
     public function __clone()
     {
@@ -40,7 +39,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * {@inheritdoc}
      * @see TransactionOutputInterface::getValue()
      */
     public function getValue()
@@ -49,7 +47,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * {@inheritdoc}
      * @see TransactionOutputInterface::getScript()
      */
     public function getScript()
@@ -58,23 +55,10 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * {@inheritdoc}
-     * @see TransactionOutputInterface::setScript()
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
      * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
      */
     public function getBuffer()
     {
-        $serializer = new TransactionOutputSerializer();
-        $out = $serializer->serialize($this);
-        return $out;
+        return (new TransactionOutputSerializer())->serialize($this);
     }
 }

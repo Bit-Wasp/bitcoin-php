@@ -44,17 +44,17 @@ $recipient = AddressFactory::fromString('n1b2a9rFvuU9wBgBaoWngNvvMxRV94ke3x');
 echo "[Send to: " . $recipient->getAddress($network) . " \n";
 
 // Prep work - importing from a tx will only bring container to contents of $new - no metadata
-$new = new \BitWasp\Bitcoin\Transaction\TransactionBuilder($ecAdapter);
+$new = new \BitWasp\Bitcoin\Transaction\Factory\TxSigner($ecAdapter);
 $new
     ->spendOutput($myTx, $spendOutput)
     ->payToAddress($recipient, 100000);
 
 // Start doing things which require state tracking
 $new
-    ->signInputWithKey($privateKey1, $redeemScript->getOutputScript(), $spendOutput, $redeemScript)
-    ->signInputWithKey($privateKey2, $redeemScript->getOutputScript(), $spendOutput, $redeemScript);
+    ->sign($spendOutput, $privateKey1, $redeemScript->getOutputScript(), $redeemScript)
+    ->sign($spendOutput, $privateKey2, $redeemScript->getOutputScript(), $redeemScript);
 
-$tx = $new->getTransaction();
+$tx = $new->get();
 
 // Send transaction to multisig address
 try {

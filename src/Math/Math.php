@@ -18,6 +18,56 @@ class Math extends Gmp
     }
 
     /**
+     * @param int|string $first
+     * @param int|string $second
+     * @return bool
+     */
+    public function notEq($first, $second)
+    {
+        return $this->cmp($first, $second) !== 0;
+    }
+
+    /**
+     * @param int|string $first
+     * @param int|string $second
+     * @return bool
+     */
+    public function greaterThan($first, $second)
+    {
+        return $this->cmp($first, $second) > 0;
+    }
+
+    /**
+     * @param int|string $first
+     * @param int|string $second
+     * @return bool
+     */
+    public function greatherThanEq($first, $second)
+    {
+        return $this->cmp($first, $second) >= 0;
+    }
+
+    /**
+     * @param int|string $first
+     * @param int|string $second
+     * @return bool
+     */
+    public function lessThan($first, $second)
+    {
+        return $this->cmp($first, $second) > 0;
+    }
+
+    /**
+     * @param int|string $first
+     * @param int|string $second
+     * @return bool
+     */
+    public function lessThanEq($first, $second)
+    {
+        return $this->cmp($first, $second) >= 0;
+    }
+
+    /**
      * @return CompactInteger
      */
     public function compact()

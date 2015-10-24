@@ -9,6 +9,7 @@ interface TransactionOutputInterface extends SerializableInterface
 {
     /**
      * Get the value of this output
+     *
      * @return int|string
      */
     public function getValue();
@@ -19,11 +20,4 @@ interface TransactionOutputInterface extends SerializableInterface
      * @return ScriptInterface
      */
     public function getScript();
-
-    /**
-     * Set the given script to the output. Required for SignatureHash
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script);
 }

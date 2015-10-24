@@ -3,46 +3,42 @@
 
 namespace BitWasp\Bitcoin\Tests\Block;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
-use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
-class BlockTest extends \PHPUnit_Framework_TestCase
+class BlockTest extends AbstractTestCase
 {
-    /**
-     * @var Block
-     */
-    protected $block;
 
     /**
      * @var string
      */
-    protected $blockType;
+    protected $blockType = 'BitWasp\Bitcoin\Block\Block';
 
     /**
      * @var string
      */
-    protected $headerType;
+    protected $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
 
     /**
      * @var string
      */
-    protected $bufferType;
+    protected $bufferType = 'BitWasp\Buffertools\Buffer';
 
     /**
-     *
+     * @var string
      */
-    public function __construct()
-    {
-        $this->blockType = 'BitWasp\Bitcoin\Block\Block';
-        $this->headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
-        $this->bufferType = 'BitWasp\Buffertools\Buffer';
-    }
+    protected $txColType = 'BitWasp\Bitcoin\Collection\Transaction\TransactionCollection';
+
+    /**
+     * @var string
+     */
+    protected $txInterfaceType = 'BitWasp\Bitcoin\Transaction\TransactionInterface';
 
     private function getBlockHeader()
     {
@@ -59,16 +55,16 @@ class BlockTest extends \PHPUnit_Framework_TestCase
     public function testSetHeader()
     {
         $header = $this->getBlockHeader();
-        $block = new Block(new Math(), $header);
+        $block = new Block(new Math(), $header, new TransactionCollection());
         $this->assertSame($header, $block->getHeader());
     }
 
     public function testGetTransactions()
     {
         $header = $this->getBlockHeader();
-        $block = new Block(new Math(), $header);
+        $block = new Block(new Math(), $header, new TransactionCollection());
 
-        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $block->getTransactions());
+        $this->assertInstanceOf($this->txColType, $block->getTransactions());
         $this->assertEmpty($block->getTransactions());
     }
 
@@ -120,8 +116,9 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf($this->blockType, $newBlock);
 
-        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\TransactionCollection', $newBlock->getTransactions());
+        $this->assertInstanceOf($this->txColType, $newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
+        $this->assertInstanceOf($this->txInterfaceType, $newBlock->getTransaction(0));
         $this->assertSame($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
     }
 

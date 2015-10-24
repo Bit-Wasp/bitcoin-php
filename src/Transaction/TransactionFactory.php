@@ -2,27 +2,43 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
+use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
+use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 
 class TransactionFactory
 {
     /**
-     * @param int|null $version
-     * @param TransactionInputCollection|null $inputs
-     * @param TransactionOutputCollection|null $outputs
-     * @return Transaction
+     * @return TxBuilder
      */
-    public static function create(
-        $version = null,
-        TransactionInputCollection $inputs = null,
-        TransactionOutputCollection $outputs = null
-    ) {
-        if (null === $version) {
-            $version = TransactionInterface::DEFAULT_VERSION;
-        }
+    public static function build()
+    {
+        return new TxBuilder();
+    }
 
-        $transaction = new Transaction($version, $inputs, $outputs);
-        return $transaction;
+    /**
+     * @param TransactionInterface $transaction
+     * @return TxMutator
+     */
+    public static function mutate(TransactionInterface $transaction)
+    {
+        return new TxMutator($transaction);
+    }
+
+    /**
+     * @param TransactionInterface $transaction
+     * @param EcAdapterInterface|null $ecAdapter
+     * @return TxSigner
+     */
+    public static function sign(TransactionInterface $transaction, EcAdapterInterface $ecAdapter = null)
+    {
+        return new TxSigner(
+            $ecAdapter ?: Bitcoin::getEcAdapter(),
+            $transaction
+        );
     }
 
     /**
@@ -31,8 +47,6 @@ class TransactionFactory
      */
     public static function fromHex($string)
     {
-        $serializer = new TransactionSerializer;
-        $hex = $serializer->parse($string);
-        return $hex;
+        return (new TransactionSerializer())->parse($string);
     }
 }

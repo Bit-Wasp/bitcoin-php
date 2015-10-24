@@ -48,16 +48,6 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($script->getBuffer()->getBinary());
     }
 
-    public function testSetScript()
-    {
-        $script = ScriptFactory::create()->op('OP_2')->op('OP_3')->getScript();
-
-        $out = new TransactionOutput(1, new Script());
-        $this->assertEquals(new Script(), $out->getScript());
-        $out->setScript($script);
-        $this->assertSame($script, $out->getScript());
-    }
-
     public function testFromParser()
     {
         $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');

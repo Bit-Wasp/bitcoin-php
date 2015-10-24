@@ -12,9 +12,9 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 
@@ -236,7 +236,7 @@ class BitcoindTest extends AbstractTestCase
         $block = $bitcoind->getblock('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048');
 
         $this->assertEquals($hash, $block->getHeader()->getBlockHash());
-        $this->assertEquals($txHex, $block->getTransactions()->getTransaction(0)->getHex());
+        $this->assertEquals($txHex, $block->getTransactions()->get(0)->getHex());
     }
 
     public function testCreateRawTransaction()
@@ -258,11 +258,11 @@ class BitcoindTest extends AbstractTestCase
             new TransactionOutput(Amount::COIN, new Script(Buffer::hex('76a9142f14886d6dde16d37e8149f603b18c879f486c5388ac')))
         ];
 
-        $t = TransactionFactory::create(
-            null,
-            new TransactionInputCollection($i),
-            new TransactionOutputCollection($o)
-        );
+        $t = TransactionFactory::build()
+            ->version(1)
+            ->inputs($i)
+            ->outputs($o)
+            ->get();
 
         $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
         $json->expects($this->atLeastOnce())
@@ -336,10 +336,12 @@ class BitcoindTest extends AbstractTestCase
 
         $txid = '4f00a317a1c3ec76a87dc1f223d9317ff7520ca3838331ab0c57ff56937ffd7d';
         $vout = 1;
-        $i = new TransactionInput($txid, $vout);
-        $o = new TransactionOutput('9794466', ScriptFactory::scriptPubKey()->payToAddress(AddressFactory::fromString('1BvGQa7QHK3M4t2DXKePrKEpLRisM8eVys')));
+        $t = TransactionFactory::build()
+            ->input($txid, $vout)
+            ->payToAddress(AddressFactory::fromString('1BvGQa7QHK3M4t2DXKePrKEpLRisM8eVys'), '9794466')
+            ->get();
 
-        $t = TransactionFactory::create(null, new TransactionInputCollection([$i]), new TransactionOutputCollection([$o]));
+        $o = $t->getOutput(0);
 
         $json = $this->getMock($this->jsonRpcType, ['execute'], ['127.0.0.1', 8332]);
         $json->expects($this->atLeastOnce())

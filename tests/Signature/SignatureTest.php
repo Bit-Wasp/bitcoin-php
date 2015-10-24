@@ -49,11 +49,13 @@ class SignatureTest extends AbstractTestCase
      */
     public function testFromHex(EcAdapterInterface $ecAdapter)
     {
-        $hex = '304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b01';
+
+        $hex = '304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b';
         $sig = SignatureFactory::fromHex($hex, $ecAdapter);
 
         $this->assertInstanceOf($this->sigType, $sig);
         $this->assertEquals('56860522993476239843569407076292679822350064328987049204205911586688428093823', $sig->getR());
         $this->assertEquals('75328468267675219166053001951181042681597800329127462438170420074748074627387', $sig->getS());
+
     }
 }
