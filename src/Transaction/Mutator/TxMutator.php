@@ -3,9 +3,9 @@
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 
 class TxMutator
 {

@@ -1,19 +1,19 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Transaction;
-
+namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\Locktime;
+use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Transaction\TxBuilder;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
 
 class TxBuilderTest extends AbstractTestCase
@@ -130,5 +130,31 @@ class TxBuilderTest extends AbstractTestCase
 
         $this->assertEquals($blockHeightLocktime, $builder->lockToBlockHeight($locktime, $blockHeight)->getAndReset()->getLockTime());
         $this->assertEquals($timestampLocktime, $builder->lockToTimestamp($locktime, $timestamp)->getAndReset()->getLockTime());
+    }
+
+    public function getAddresses()
+    {
+        $key = PrivateKeyFactory::create(false);
+        $script = ScriptFactory::multisig(1, [$key->getPublicKey()]);
+
+        return [
+            [$key->getAddress()],
+            [$script->getAddress()],
+        ];
+    }
+
+    /**
+     * @dataProvider getAddresses
+     * @param AddressInterface $address
+     */
+    public function testPayToAddress2(AddressInterface $address)
+    {
+        $expectedScript = ScriptFactory::scriptPubKey()->payToAddress($address);
+
+        $ecAdapter = $this->safeEcAdapter();
+        $builder = new TxBuilder($ecAdapter);
+        $builder->payToAddress($address, 50);
+
+        $this->assertEquals($expectedScript, $builder->get()->getOutput(0)->getScript());
     }
 }

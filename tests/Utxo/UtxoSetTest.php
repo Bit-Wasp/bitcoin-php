@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Utxo\UtxoSet;
 use Doctrine\Common\Cache\ArrayCache;
 
@@ -16,16 +17,11 @@ class UtxoSetTest extends AbstractTestCase
     public function testUtxoSet()
     {
         /// test coinbase
-        $tx = new Transaction();
-        $tx->getInputs()->addInput(new TransactionInput(
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            TransactionInterface::MAX_LOCKTIME,
-            new Script()
-        ));
-        $tx->getOutputs()->addOutput(new TransactionOutput(
-            100000000,
-            new Script()
-        ));
+        $builder = new TxBuilder();
+        $builder
+            ->input('0000000000000000000000000000000000000000000000000000000000000000', TransactionInterface::MAX_LOCKTIME)
+            ->output(100000000, new Script());
+        $tx = $builder->get();
         $txid = $tx->getTransactionId();
 
         $utxoSet = new UtxoSet(new ArrayCache());
@@ -38,6 +34,6 @@ class UtxoSetTest extends AbstractTestCase
         $utxo = $utxoSet->fetch($txid, 0);
         $this->assertEquals($txid, $utxo->getTransactionId());
         $this->assertEquals(0, $utxo->getVout());
-        $this->assertEquals($tx->getOutputs()->getOutput(0), $utxo->getOutput());
+        $this->assertEquals($tx->getOutputs()->get(0), $utxo->getOutput());
     }
 }

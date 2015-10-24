@@ -2,7 +2,10 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Buffertools\Buffer;
 
 interface TransactionInterface extends SerializableInterface
@@ -19,6 +22,11 @@ interface TransactionInterface extends SerializableInterface
      * The locktime parameter is encoded as a uint32
      */
     const MAX_LOCKTIME = '4294967295';
+
+    /**
+     * @return bool
+     */
+    public function isCoinbase();
 
     /**
      * Get the transaction ID
@@ -51,9 +59,7 @@ interface TransactionInterface extends SerializableInterface
     /**
      * @return TransactionInputInterface
      */
-    public function getInput($i);
-
-    public function setInputs(TransactionInputCollection $inputs);
+    public function getInput($index);
 
     /**
      * Return an array of all outputs
@@ -63,11 +69,10 @@ interface TransactionInterface extends SerializableInterface
     public function getOutputs();
 
     /**
+     * @param int $index
      * @return TransactionOutputInterface
      */
-    public function getOutput($i);
-
-    public function setOutputs(TransactionOutputCollection $outputs);
+    public function getOutput($index);
 
     /**
      * Return the locktime for this transaction
@@ -77,17 +82,12 @@ interface TransactionInterface extends SerializableInterface
     public function getLockTime();
 
     /**
-     * @return bool
-     */
-    public function isCoinbase();
-
-    /**
-     * @return SignatureHash
-     */
-    public function getSignatureHash();
-
-    /**
      * @return int|string
      */
     public function getValueOut();
+
+    /**
+     * @return Hasher
+     */
+    public function getSignatureHash();
 }

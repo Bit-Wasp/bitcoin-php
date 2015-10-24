@@ -50,7 +50,7 @@ class UtxoSet
      */
     private function deleteSpends(TransactionInterface $tx)
     {
-        foreach ($tx->getInputs()->getInputs() as $v => $input) {
+        foreach ($tx->getInputs()->all() as $v => $input) {
             if (!$input->isCoinBase()) {
                 $this->delete($input->getTransactionId(), $input->getVout());
             }
@@ -65,7 +65,7 @@ class UtxoSet
         $txid = $tx->getTransactionId();
         $vout = 0;
 
-        foreach ($tx->getOutputs()->getOutputs() as $output) {
+        foreach ($tx->getOutputs()->all() as $output) {
             $this->contents->save(
                 $this->cacheIndex($txid, $vout),
                 new Utxo(

@@ -1,11 +1,20 @@
 <?php
 
-namespace BitWasp\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
 class TxBuilder
 {
@@ -106,6 +115,19 @@ class TxBuilder
     }
 
     /**
+     * @param TransactionInputInterface[] $inputs
+     * @return $this
+     */
+    public function inputs(array $inputs)
+    {
+        array_walk($inputs, function (TransactionInputInterface $input) {
+            $this->inputs[] = $input;
+        });
+
+        return $this;
+    }
+
+    /**
      * @param int|string $value
      * @param ScriptInterface $script
      * @return $this
@@ -113,6 +135,19 @@ class TxBuilder
     public function output($value, ScriptInterface $script)
     {
         $this->outputs[] = new TransactionOutput($value, $script);
+        return $this;
+    }
+
+    /**
+     * @param TransactionOutputInterface[] $outputs
+     * @return $this
+     */
+    public function outputs(array $outputs)
+    {
+        array_walk($outputs, function (TransactionOutputInterface $output) {
+            $this->outputs[] = $output;
+        });
+
         return $this;
     }
 

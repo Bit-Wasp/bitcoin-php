@@ -362,7 +362,7 @@ class BloomFilter extends Serializable
         for ($i = 0, $nOutputs = count($outputs); $i < $nOutputs; $i++) {
             $opCode = null;
             $pushData = new Buffer('', 0, $this->math);
-            $script = $outputs->getOutput($i)->getScript();
+            $script = $outputs->get($i)->getScript();
             $parser = $script->getScriptParser();
             while ($parser->next($opCode, $pushData)) {
                 if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
@@ -386,7 +386,7 @@ class BloomFilter extends Serializable
 
         $inputs = $tx->getInputs();
         for ($i = 0, $nInputs = count($inputs); $i < $nInputs; $i++) {
-            $txIn = $inputs->getInput($i);
+            $txIn = $inputs->get($i);
             if ($this->containsUtxo($txIn->getTransactionId(), $txIn->getVout())) {
                 return true;
             }

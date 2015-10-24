@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Math\Math;
@@ -60,18 +61,14 @@ class BlockSerializer
     public function fromParser(Parser & $parser)
     {
         try {
-            $block = new Block(
+            return new Block(
                 $this->math,
-                $this->headerSerializer->fromParser($parser)
+                $this->headerSerializer->fromParser($parser),
+                new TransactionCollection($this->getTxsTemplate()->parse($parser)[0])
             );
-
-            $block->getTransactions()->addTransactions($this->getTxsTemplate()->parse($parser)[0]);
-
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }
-
-        return $block;
     }
 
     /**
@@ -92,9 +89,7 @@ class BlockSerializer
     {
         return Buffertools::concat(
             $this->headerSerializer->serialize($block->getHeader()),
-            $this->getTxsTemplate()->write([
-                $block->getTransactions()->getTransactions()
-            ])
+            $this->getTxsTemplate()->write([$block->getTransactions()->all()])
         );
     }
 }

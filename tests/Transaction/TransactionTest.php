@@ -5,12 +5,9 @@ namespace BitWasp\Bitcoin\Tests\Transaction;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,11 +21,12 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $value = 10;
         $count = 5;
 
-        $tx = new Transaction();
-        $outputs = $tx->getOutputs();
+        $outputs = [];
         for ($i = 0; $i < $count; $i++) {
-            $outputs->addOutput(new TransactionOutput($value, new Script()));
+            $outputs[] = new TransactionOutput($value, new Script());
         }
+
+        $tx = new Transaction(1, null, new TransactionOutputCollection($outputs));
         $this->assertEquals($count * $value, $tx->getValueOut());
     }
 
@@ -62,28 +60,11 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('0', $tx->getLockTime());
     }
 
-    public function testIsCoinbase()
-    {
-        $tx = new Transaction();
-        $this->assertFalse($tx->isCoinbase());
-        $inputs = $tx->getInputs();
-        $inputs->addInput(new TransactionInput(Buffer::hex('00', 32)->getHex(), 0xffffffff));
-        $this->assertTrue($tx->isCoinbase());
-        $inputs->addInput(new TransactionInput(Buffer::hex('00', 32)->getHex(), 0xffffffff));
-        $this->assertFalse($tx->isCoinbase());
-
-        $tx = new Transaction();
-        $inputs = $tx->getInputs();
-        $inputs->addInput(new TransactionInput('abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 1));
-        $inputs->addInput(new TransactionInput(Buffer::hex('00', 32)->getHex(), 0xffffffff));
-        $this->assertFalse($tx->isCoinbase());
-    }
-
     public function testSetLockTime()
     {
-        $tx = new Transaction();
-        $tx->setLockTime('0');
-        $this->assertSame('0', $tx->getLockTime());
+        $tx = new Transaction(1, null, null, '1093');
+
+        $this->assertSame('1093', $tx->getLockTime());
     }
 
     /**
@@ -91,34 +72,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetLockTimeException()
     {
-        $tx = new Transaction();
-        $tx->setLockTime('4294967297');
-    }
-
-    public function testGetInputs()
-    {
-        $tx = new Transaction(1);
-        $this->assertEmpty($tx->getInputs());
-
-        $inputs = new TransactionInputCollection([new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0)]);
-        $tx->setInputs($inputs);
-
-        $this->assertEquals(1, count($tx->getInputs()));
-    }
-
-    public function testAddInput()
-    {
-        $in = new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0);
-
-        $tx = new Transaction();
-        $tx->getInputs()->addInput($in);
-        $inputs = $tx->getInputs();
-        $this->assertSame(1, count($inputs));
-        $this->assertSame($in, $inputs->getInput(0));
-        $return = $tx->getInputs()->getInput(0);
-        $this->assertSame($in, $return);
-        $return2 = $tx->getInput(0);
-        $this->assertSame($in, $return2);
+        new Transaction(1, null, null, '4294967297');
     }
 
     /**
@@ -127,33 +81,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testGetInputException()
     {
         $tx = new Transaction();
-        $tx->getInputs()->getInput(0);
-    }
-
-    public function testGetOutputs()
-    {
-        $tx = new Transaction();
-        $this->assertEmpty($tx->getOutputs());
-
-        $outputs = new TransactionOutputCollection([new TransactionOutput(50, new Script())]);
-        $tx->setOutputs($outputs);
-
-        $this->assertEquals(1, count($tx->getOutputs()));
-    }
-
-    public function testAddOutput()
-    {
-        $tx = new Transaction();
-
-        $out = new TransactionOutput(1, new Script);
-        $tx->getOutputs()->addOutput($out);
-        $outputs = $tx->getOutputs();
-        $this->assertSame(1, count($outputs));
-        $this->assertSame($out, $outputs->getOutput(0));
-        $return = $tx->getOutputs()->getOutput(0);
-        $this->assertSame($out, $return);
-        $return2 = $tx->getOutput(0);
-        $this->assertSame($out, $return2);
+        $tx->getInputs()->get(0);
     }
 
     /**
@@ -180,7 +108,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testGetOutputException()
     {
         $tx = new Transaction();
-        $tx->getOutputs()->getOutput(0);
+        $tx->getOutputs()->get(0);
     }
 
     public function testFromHex()
@@ -230,9 +158,9 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $tx = TransactionFactory::fromHex($raw);
 
-        $this->assertTrue($tx->getInputs()->getInput(0)->isCoinBase());
-        $this->assertEquals(0, $tx->getInputs()->getInput(0)->getSequence());
-        $this->assertEquals("03681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c", $tx->getInputs()->getInput(0)->getScript()->getHex());
+        $this->assertTrue($tx->getInputs()->get(0)->isCoinBase());
+        $this->assertEquals(0, $tx->getInputs()->get(0)->getSequence());
+        $this->assertEquals("03681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c", $tx->getInputs()->get(0)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTransactionId());
@@ -246,7 +174,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $tx = TransactionFactory::fromHex($raw);
 
         $this->assertEquals(3, $tx->getOutputs()->count());
-        $this->assertEquals("6a0a6f6d000000468000002a", $tx->getOutputs()->getOutput(1)->getScript()->getHex());
+        $this->assertEquals("6a0a6f6d000000468000002a", $tx->getOutputs()->get(1)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTransactionId());

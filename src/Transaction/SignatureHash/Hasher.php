@@ -1,18 +1,20 @@
 <?php
 
-namespace BitWasp\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
 use BitWasp\Bitcoin\Transaction\Mutator\OutputMutator;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-class SignatureHash implements SignatureHashInterface
+class Hasher implements SignatureHashInterface
 {
     /**
      * @var TransactionInterface

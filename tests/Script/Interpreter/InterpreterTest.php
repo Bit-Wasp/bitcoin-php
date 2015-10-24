@@ -18,8 +18,9 @@ use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Flags;
-use BitWasp\Bitcoin\Transaction\TransactionBuilder;
+use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;
 
@@ -266,16 +267,17 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
     public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, Flags $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, RedeemScript $rs = null)
     {
         // Create a fake tx to spend - an output script we supposedly can spend.
-        $fake = new TransactionBuilder($ec);
-        $fake->addOutput(new TransactionOutput(1, $outputScript));
+        $builder = new TxBuilder();
+        $fake = $builder->output(1, $outputScript)->getAndReset();
 
         // Here is where
-        $spend = new TransactionBuilder($ec);
-        $spend->spendOutput($fake->getTransaction(), 0);
-        $spend->signInputWithKey($privateKey, $outputScript, 0, $rs);
+        $spend = $builder->spendOutputFrom($fake, 0)->get();
 
-        $spendTx = $spend->getTransaction();
-        $scriptSig = $spendTx->getInputs()->getInput(0)->getScript();
+        $signer = new TxSigner($ec, $spend);
+        $signer->sign(0, $privateKey, $outputScript, $rs);
+
+        $spendTx = $signer->get();
+        $scriptSig = $spendTx->getInputs()->get(0)->getScript();
 
         $i = new Interpreter($ec, $spendTx, $flags);
         $this->assertEquals($eVerifyResult, $i->verify($scriptSig, $outputScript, 0));

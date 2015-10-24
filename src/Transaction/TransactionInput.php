@@ -22,14 +22,14 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $vout;
 
     /**
-     * @var string|int
-     */
-    private $sequence;
-
-    /**
      * @var ScriptInterface
      */
     private $script;
+
+    /**
+     * @var string|int
+     */
+    private $sequence;
 
     /**
      * @param string $txid
@@ -109,7 +109,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function isFinal()
     {
         $math = Bitcoin::getMath();
-        return $math->cmp($this->getSequence(), $math->hexDec('ffffffff')) == 0;
+        return $math->cmp($this->getSequence(), self::DEFAULT_SEQUENCE) == 0;
     }
 
     /**
@@ -117,8 +117,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getBuffer()
     {
-        $serializer = new TransactionInputSerializer();
-        $out = $serializer->serialize($this);
-        return $out;
+        return (new TransactionInputSerializer())->serialize($this);
     }
 }

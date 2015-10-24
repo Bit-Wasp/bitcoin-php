@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 
 class Block extends Serializable implements BlockInterface
@@ -32,11 +32,11 @@ class Block extends Serializable implements BlockInterface
      * @param BlockHeaderInterface $header
      * @param TransactionCollection $transactions
      */
-    public function __construct(Math $math, BlockHeaderInterface $header, TransactionCollection $transactions = null)
+    public function __construct(Math $math, BlockHeaderInterface $header, TransactionCollection $transactions)
     {
         $this->math = $math;
         $this->header = $header;
-        $this->transactions = $transactions ?: new TransactionCollection();
+        $this->transactions = $transactions;
     }
 
     /**
@@ -69,6 +69,15 @@ class Block extends Serializable implements BlockInterface
     }
 
     /**
+     * @param int $i
+     * @return \BitWasp\Bitcoin\Transaction\TransactionInterface
+     */
+    public function getTransaction($i)
+    {
+        return $this->transactions->get($i);
+    }
+
+    /**
      * @param BloomFilter $filter
      * @return FilteredBlock
      */
@@ -79,7 +88,7 @@ class Block extends Serializable implements BlockInterface
 
         $txns = $this->getTransactions();
         for ($i = 0, $txCount = count($txns); $i < $txCount; $i++) {
-            $tx = $txns->getTransaction($i);
+            $tx = $txns->get($i);
             $vMatch[] = $filter->isRelevantAndUpdate($tx);
             $vHashes[] = $tx->getTxHash();
         }
@@ -96,12 +105,6 @@ class Block extends Serializable implements BlockInterface
      */
     public function getBuffer()
     {
-        $serializer = new BlockSerializer(
-            $this->math,
-            new BlockHeaderSerializer(),
-            new TransactionSerializer()
-        );
-
-        return $serializer->serialize($this);
+        return (new BlockSerializer($this->math, new BlockHeaderSerializer(), new TransactionSerializer()))->serialize($this);
     }
 }

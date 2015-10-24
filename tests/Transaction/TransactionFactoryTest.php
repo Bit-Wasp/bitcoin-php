@@ -3,16 +3,26 @@
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class TransactionFactoryTest extends AbstractTestCase
 {
-    public function testCreate()
+    public function testBuilder()
     {
-        $tx = TransactionFactory::create();
-        $this->assertSame(TransactionInterface::DEFAULT_VERSION, $tx->getVersion());
-        $this->assertEmpty($tx->getInputs()->getInputs());
-        $this->assertEmpty($tx->getOutputs()->getOutputs());
+        $builder = TransactionFactory::build();
+        $this->assertInstanceOf($this->txBuilderType, $builder);
+    }
+
+    public function testSigner()
+    {
+        $signer = TransactionFactory::sign(new Transaction());
+        $this->assertInstanceOf($this->txSignerType, $signer);
+    }
+
+    public function testMutateSigner()
+    {
+        $signer = TransactionFactory::mutate(new Transaction());
+        $this->assertInstanceOf($this->txMutatorType, $signer);
     }
 }

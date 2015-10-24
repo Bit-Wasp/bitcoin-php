@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\TransactionBuilderInputState;
+use BitWasp\Bitcoin\Transaction\Factory\TxSignerContext;
 use BitWasp\Buffertools\Buffer;
 
 class TransactionBuilderInputStateTest extends AbstractTestCase
@@ -53,7 +53,7 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
         $math = $this->safeMath();
         $G = $this->safeGenerator();
         $ecAdapter = EcAdapterFactory::getAdapter($math, $G);
-        return new TransactionBuilderInputState($ecAdapter, $script, $rs);
+        return new TxSignerContext($ecAdapter, $script, $rs);
     }
 
     /**

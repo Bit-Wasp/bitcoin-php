@@ -18,7 +18,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
-use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 

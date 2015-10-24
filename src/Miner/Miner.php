@@ -2,18 +2,18 @@
 
 namespace BitWasp\Bitcoin\Miner;
 
+use BitWasp\Bitcoin\Chain\Params;
 use BitWasp\Bitcoin\Chain\ProofOfWork;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\MerkleRoot;
 use BitWasp\Bitcoin\Block\BlockHeader;
@@ -67,28 +67,36 @@ class Miner
     private $report;
 
     /**
+     * @var Params
+     */
+    private $params;
+
+    /**
+     * @param Params $params
      * @param Math $math
      * @param BlockHeaderInterface $lastBlockHeader
      * @param ScriptInterface $script
-     * @param Buffer $personalString
-     * @param int|string $timestamp
-     * @param int|string $version
-     * @param bool $report
+     * @param int $timestamp
+     * @param Buffer|null $personalString
+     * @param int $version
+     * @param bool|false $report
      */
     public function __construct(
+        Params $params,
         Math $math,
         BlockHeaderInterface $lastBlockHeader,
         ScriptInterface $script,
+        $timestamp,
         Buffer $personalString = null,
-        $timestamp = null,
         $version = 1,
         $report = false
     ) {
+        $this->params = $params;
         $this->math = $math;
         $this->lastBlockHeader = $lastBlockHeader;
         $this->script = $script;
         $this->personalString = $personalString ?: new Buffer('', 0, $math);
-        $this->timestamp = $timestamp ?: time();
+        $this->timestamp = $timestamp;
         $this->version = $version;
         $this->report = $report;
         $this->transactions = new TransactionCollection();
@@ -125,36 +133,35 @@ class Miner
      * @return Block
      * @throws \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      */
-    public function run(TransactionInterface $coinbaseTx = null)
+    public function run()
     {
         $nonce = '0';
         $maxNonce = $this->math->pow(2, 32);
 
-        // Allow user supplied transactions
-        if ($coinbaseTx == null) {
-            $coinbaseTx = new Transaction();
-            $coinbaseTx->getInputs()->addInput(new TransactionInput(
-                '0000000000000000000000000000000000000000000000000000000000000000',
-                0xffffffff
-            ));
-            $coinbaseTx->getOutputs()->addOutput(new TransactionOutput(
-                5000000000,
-                $this->script
-            ));
-        }
 
-        $inputs = $coinbaseTx->getInputs();
+        $coinbaseBuilder = TransactionFactory::build()
+            ->input('0000000000000000000000000000000000000000000000000000000000000000', 0xffffffff)
+            ->output(5000000000, $this->script);
+
+        $coinbaseTx = $coinbaseBuilder->get();
+        $coinbaseMutator = TransactionFactory::mutate($coinbaseTx);
+        $inputsMutator = $coinbaseMutator->inputsMutator();
+
         $found = false;
 
         $usingDiff = $this->lastBlockHeader->getBits();
-        $diff = new ProofOfWork($this->math);
+        $diff = new ProofOfWork($this->math, $this->params);
         $target = $diff->getTarget($usingDiff);
 
         while (false === $found) {
             // Set coinbase script, and build Merkle tree & block header.
-            $inputs->getInput(0)->setScript($this->getCoinbaseScriptBuf());
+            $inputsMutator->applyTo(0, function (InputMutator $m) {
+                $m->script($this->getCoinbaseScriptBuf());
 
-            $transactions = new TransactionCollection(array_merge(array($coinbaseTx), $this->transactions->getTransactions()));
+            });
+            $coinbaseTx = $coinbaseMutator->inputs($inputsMutator->get())->get();
+
+            $transactions = new TransactionCollection(array_merge(array($coinbaseTx), $this->transactions->all()));
 
             $merkleRoot = new MerkleRoot($this->math, $transactions);
             $merkleHash = $merkleRoot->calculateHash();
@@ -173,9 +180,7 @@ class Miner
             // Loop through all nonces (up to 2^32). Restart after modifying extranonce.
             while ($this->math->cmp($header->getNonce(), $maxNonce) <= 0) {
                 $header->setNonce($this->math->add($header->getNonce(), '1'));
-                $hash = (new Parser())
-                    ->writeBytes(32, Hash::sha256d($header->getBuffer()), true)
-                    ->getBuffer();
+                $hash = Hash::sha256d($header->getBuffer())->flip();
 
                 if ($this->math->cmp($hash->getInt(), $target) <= 0) {
                     $block = new Block($this->math, $header, $transactions);

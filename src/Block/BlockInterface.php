@@ -3,7 +3,8 @@
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 interface BlockInterface extends SerializableInterface
 {
@@ -30,4 +31,10 @@ interface BlockInterface extends SerializableInterface
      * @return TransactionCollection
      */
     public function getTransactions();
+
+    /**
+     * @param int $i
+     * @return TransactionInterface
+     */
+    public function getTransaction($i);
 }

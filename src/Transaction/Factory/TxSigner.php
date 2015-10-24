@@ -1,8 +1,7 @@
 <?php
 
-namespace BitWasp\Bitcoin\Transaction;
+namespace BitWasp\Bitcoin\Transaction\Factory;
 
-use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
@@ -10,15 +9,18 @@ use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
-use BitWasp\Bitcoin\Utxo\Utxo;
+use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1Adapter;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\Transaction;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Bitcoin\Transaction\Factory\TxSignerContext;
 use BitWasp\Buffertools\Buffer;
 
-class TransactionBuilder
+class TxSigner
 {
     /**
      * @var TransactionInterface
@@ -31,7 +33,7 @@ class TransactionBuilder
     private $deterministicSignatures = true;
 
     /**
-     * @var TransactionBuilderInputState[]
+     * @var TxSignerContext[]
      */
     private $inputStates = [];
 
@@ -43,84 +45,11 @@ class TransactionBuilder
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
-     * @internal param Math $math
-     * @internal param GeneratorPoint $generatorPoint
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx = null)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx)
     {
         $this->transaction = $tx ?: new Transaction();
         $this->ecAdapter = $ecAdapter;
-    }
-
-    /**
-     * @param TransactionInputInterface $input
-     * @return $this
-     */
-    public function addInput(TransactionInputInterface $input)
-    {
-        $this->transaction->getInputs()->addInput($input);
-        return $this;
-    }
-
-    /**
-     * @param TransactionOutputInterface $output
-     * @return $this
-     */
-    public function addOutput(TransactionOutputInterface $output)
-    {
-        $this->transaction->getOutputs()->addOutput($output);
-        return $this;
-    }
-
-    /**
-     * @param Utxo $utxo
-     * @return $this
-     */
-    public function spendUtxo(Utxo $utxo)
-    {
-        $this->addInput(new TransactionInput(
-            $utxo->getTransactionId(),
-            $utxo->getVout()
-        ));
-
-        return $this;
-    }
-
-    /**
-     * Create an input for this transaction spending $tx's output, $outputToSpend.
-     *
-     * @param TransactionInterface $tx
-     * @param $outputToSpend
-     * @return $this
-     */
-    public function spendOutput(TransactionInterface $tx, $outputToSpend)
-    {
-        // Check TransactionOutput exists in $tx
-        $tx->getOutputs()->getOutput($outputToSpend);
-        $this->addInput(new TransactionInput(
-            $tx->getTransactionId(),
-            $outputToSpend
-        ));
-
-        return $this;
-    }
-
-    /**
-     * Create an output paying $value to an Address.
-     *
-     * @param AddressInterface $address
-     * @param $value
-     * @return $this
-     */
-    public function payToAddress(AddressInterface $address, $value)
-    {
-        // Create Script from address, then create an output.
-        $this->addOutput(new TransactionOutput(
-            $value,
-            ScriptFactory::scriptPubKey()->payToAddress($address)
-        ));
-
-        return $this;
     }
 
     /**
@@ -128,7 +57,7 @@ class TransactionBuilder
      */
     public function useRandomSignatures()
     {
-        if ($this->ecAdapter instanceof \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter) {
+        if ($this->ecAdapter instanceof Secp256k1Adapter) {
             throw new \RuntimeException('Secp256k1 extension does not yet support random signatures');
         }
 
@@ -151,7 +80,7 @@ class TransactionBuilder
      * @param $sigHashType
      * @return TransactionSignature
      */
-    public function sign(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
+    public function makeSignature(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
     {
         return new TransactionSignature(
             $this->ecAdapter,
@@ -173,12 +102,12 @@ class TransactionBuilder
 
     /**
      * @param $input
-     * @return TransactionBuilderInputState
+     * @return TxSignerContext
      * @throws BuilderNoInputState
      */
-    public function getInputState($input)
+    public function inputState($input)
     {
-        $this->transaction->getInputs()->getInput($input);
+        $this->transaction->getInputs()->get($input);
         if (!isset($this->inputStates[$input])) {
             throw new BuilderNoInputState('State not found for this input');
         }
@@ -190,40 +119,36 @@ class TransactionBuilder
      * @param integer $inputToSign
      * @param ScriptInterface $outputScript
      * @param RedeemScript $redeemScript
-     * @return TransactionBuilderInputState
+     * @return TxSignerContext
      */
-    public function createInputState($inputToSign, $outputScript, RedeemScript $redeemScript = null)
+    private function createInputState($inputToSign, $outputScript, RedeemScript $redeemScript = null)
     {
-        $this->inputStates[$inputToSign] = new TransactionBuilderInputState(
-            $this->ecAdapter,
-            $outputScript,
-            $redeemScript
-        );
+        $state = (new TxSignerContext($this->ecAdapter, $outputScript, $redeemScript))
+            ->extractSigs($this->transaction, $inputToSign);
 
-        $this->inputStates[$inputToSign]->extractSigs($this->transaction, $inputToSign);
+        $this->inputStates[$inputToSign] = $state;
 
-        return $this->getInputState($inputToSign);
+        return $state;
     }
 
     /**
+     * @param $inputToSign
      * @param PrivateKeyInterface $privateKey
      * @param ScriptInterface $outputScript
-     * @param $inputToSign
-     * @param int $sigHashType
      * @param RedeemScript $redeemScript
+     * @param int $sigHashType
      * @return $this
-     * @throws \Exception
      */
-    public function signInputWithKey(
+    public function sign(
+        $inputToSign,
         PrivateKeyInterface $privateKey,
         ScriptInterface $outputScript,
-        $inputToSign,
         RedeemScript $redeemScript = null,
         $sigHashType = SignatureHashInterface::SIGHASH_ALL
     ) {
         // If the input state hasn't been set up, do so now.
         try {
-            $inputState = $this->getInputState($inputToSign);
+            $inputState = $this->inputState($inputToSign);
         } catch (BuilderNoInputState $e) {
             $inputState = $this->createInputState($inputToSign, $outputScript, $redeemScript);
         }
@@ -238,7 +163,7 @@ class TransactionBuilder
             if ($privateKey->getPublicKey()->getBinary() === $publicKey->getBinary()) {
                 $inputState->setSignature(
                     $idx,
-                    $this->sign(
+                    $this->makeSignature(
                         $privateKey,
                         $this->transaction
                             ->getSignatureHash()
@@ -253,26 +178,24 @@ class TransactionBuilder
     }
 
     /**
-     * @return Transaction
+     * @return TransactionInterface
      */
-    public function getTransaction()
+    public function get()
     {
         $inCount = count($this->transaction->getInputs());
-
         $mutator = new TxMutator($this->transaction);
         $inputs = $mutator->inputsMutator();
 
         for ($i = 0; $i < $inCount; $i++) {
             // Call regenerateScript if inputState is set, otherwise defer to previous script.
             try {
-                $script = $this->getInputState($i)->regenerateScript();
+                $script = $this->inputState($i)->regenerateScript();
             } catch (BuilderNoInputState $e) {
-                $script = $this->transaction->getInputs()->getInput($i)->getScript();
+                $script = $this->transaction->getInputs()->get($i)->getScript();
             }
 
             $inputs->applyTo($i, function (InputMutator $m) use ($script) {
                 $m->script($script);
-
             });
         }
 
@@ -292,8 +215,10 @@ class TransactionBuilder
         $signed = 0;
         for ($i = 0; $i < $inCount; $i++) {
             if (isset($this->inputStates[$i])) {
-                $total += $this->inputStates[$i]->getRequiredSigCount();
-                $signed += $this->inputStates[$i]->getSigCount();
+                /** @var TxSignerContext $state */
+                $state = $this->inputStates[$i];
+                $total += $state->getRequiredSigCount();
+                $signed += $state->getSigCount();
             }
         }
 

@@ -1,35 +1,28 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Transaction;
+namespace BitWasp\Bitcoin\Tests\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Transaction\SignatureHashInterface;
-use BitWasp\Bitcoin\Transaction\TransactionBuilder;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\SignatureHash;
+use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
-class SignatureHashTest extends \PHPUnit_Framework_TestCase
+class HasherTest extends AbstractTestCase
 {
-    /**
-     * @var SignatureHash
-     */
-    protected $sighash;
 
     /**
      * @var Transaction
      */
     protected $tx;
-
-    /**
-     * @var string
-     */
-    protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
 
     public function setUp()
     {
@@ -38,8 +31,8 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateNew()
     {
-        $sighash = new SignatureHash($this->tx);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\SignatureHash', $sighash);
+        $sighash = new Hasher($this->tx);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Transaction\SignatureHash\Hasher', $sighash);
     }
 
     /**
@@ -48,13 +41,13 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
      */
     public function testFailsWithInvalidInputToSign()
     {
-        $sighash = new \BitWasp\Bitcoin\Transaction\SignatureHash($this->tx);
+        $sighash = new \BitWasp\Bitcoin\Transaction\SignatureHash\Hasher($this->tx);
         $sighash->calculate(new Script(), 99);
     }
 
     public function testCalculateHash()
     {
-        $f    = file_get_contents(__DIR__ . '/../Data/signaturehash.hash.json');
+        $f    = file_get_contents(__DIR__ . '/../../Data/signaturehash.hash.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $script = new Script(Buffer::hex($test->outScript));
@@ -76,22 +69,24 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         //  bitcoin-cli -testnet=1 signrawtransaction "01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a0100000000ffffffff02c0e1e400000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac809698000000000019
 
         $spend = '0100000001e2deba2aaf49ccbca9bafabc9049917db0d219cd9a44cfc751369d0a1c538b4e010000006a47304402205f73e04abdc4687e12ded30916f747cee200e113158c85fda953344bdc02d43b02207b86e6b2862aca49b727afee0a6ff7d52795d19cae4d357419f31fd987ec7b220121034087874436d20c49f5afdf14f7cbf6b8c03f28629ef299e4cb454070d563e6e9feffffff028cb7d31b000000001976a9144df845f26149b78004fa15bd9afbe6a70895a1a488ac80c3c901000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac28fb0500';
-        $priv = PrivateKeyFactory::fromWif('cQnFidqYxEoi8xZz1hDtFRcEkzpXF5tbofpWbgWdEk9KHhAo7RxD', $ecAdapter, $network);
+        $priv = PrivateKeyFactory::fromWif('cQnFidqYxEoi8xZz1hDtFRcEkzpXF5tbofpWbgWdEk9KHhAo7RxD', $ecAdapter);
 
         $tx = TransactionFactory::fromHex($spend);
 
-        $builder = new TransactionBuilder($ecAdapter);
+        $b = new TxBuilder();
+        $new = $b
+            ->spendOutputFrom($tx, 1)
+            ->payToAddress($priv->getAddress(), 15000000)
+            ->payToAddress(\BitWasp\Bitcoin\Address\AddressFactory::fromString('moFRKYGsQWQfDPmRUNrzsGwqTzdBNyaKfe', $network), 10000000)
+            ->get();
 
-        $builder->spendOutput($tx, 1);
-        $builder->payToAddress($priv->getAddress(), 15000000);
-        $builder->payToAddress(\BitWasp\Bitcoin\Address\AddressFactory::fromString('moFRKYGsQWQfDPmRUNrzsGwqTzdBNyaKfe', $network), 10000000);
-
-        $single = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_SINGLE;
-        $builder->signInputWithKey($priv, $tx->getOutputs()->getOutput(1)->getScript(), 0, null, $single);
+        $builder = new TxSigner($ecAdapter, $new);
+        $single = \BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface::SIGHASH_SINGLE;
+        $builder->sign(0, $priv, $tx->getOutputs()->get(1)->getScript(), null, $single);
 
         $expected = '01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a010000006b483045022100dad4bd28448e626ecb1ade42a09c43559d50b61b57a06fac992a5ecdd73deb740220524082f83560e2df9afaa283c699dec4c5b01687484d73e7b280e5a506caf1c4032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff02c0e1e400000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac80969800000000001976a91454d0e925d5ee0ee26768a237067dee793d01a70688ac00000000';
         //  bitcoin-cli -testnet=1 signrawtransaction "01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a0100000000ffffffff0140787d01000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac00000000" '[{"txid":"2a61a399351922ab1e3b5d6f5f8fe0fcc6a3edbb7f267cc330ad2835d529fb2f","vout":1,"scriptPubKey":"76a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac"}]' '["cQnFidqYxEoi8xZz1hDtFRcEkzpXF5tbofpWbgWdEk9KHhAo7RxD"]' SINGLE
-        $this->assertEquals($expected, $builder->getTransaction()->getHex());
+        $this->assertEquals($expected, $builder->get()->getHex());
     }
 
     public function testSigHashTypes()
@@ -132,43 +127,43 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $regressionSigSingle = '01000000037db7f0b2a345ded6ddf28da3211a7d7a95a2943e9a879493d6481b7d69613f04010000006b483045022100e822f152bb15a1d623b91913cd0fb915e9f85a8dc6c26d51948208bbc0218e800220255f78549d9614c88eac9551429bc00224f22cdcb41a3af70d52138f7e98d333032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d400000000652c491e5a781a6a3c547fa8d980741acbe4623ae52907278f10e1f064f67e05000000006b48304502210096b797c910fcfcfedfb789a06eca534af89e8b3759e094c1ebe21e2a42f06575022043506b17cbd0b0bbbde51113dde4d38cb7cb56bf25055a0bbfbe300a4166e078032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d400000000b9fa270fa3e4dd8c79f9cbfe5f1953cba071ed081f7c277a49c33466c695db35000000006a47304402203121f1c57c67340c1fbd97dbfce3210dca2c0876f9bbcfcd21fb7f395dfdcc7f022028cca8ce5852d67f269aab748c9b9be7720d110f9e427b886bf2125c3f0e509e032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d40000000003204e0000000000001976a9149ed1f577c60e4be1dbf35318ec12f51d25e8577388ac30750000000000001976a914fb407e88c48921d5547d899e18a7c0a36919f54d88ac50c30000000000001976a91404ccb4eed8cfa9f6e394e945178960f5ccddb38788ac00000000';
 
         // Test builds unsigned transaction
-        $builder = new TransactionBuilder($ecAdapter);
-        $builder
-            ->spendOutput($transaction1, $tx1NOut)
-            ->spendOutput($transaction2, $tx2NOut)
-            ->spendOutput($transaction3, $tx3NOut)
+        $b = new TxBuilder();
+        $b
+            ->spendOutputFrom($transaction1, $tx1NOut)
+            ->spendOutputFrom($transaction2, $tx2NOut)
+            ->spendOutputFrom($transaction3, $tx3NOut)
             ->payToAddress($addr1, 20000)
             ->payToAddress($addr2, 30000)
             ->payToAddress($addr3, 50000);
-        $unsigned = $builder->getTransaction();
+        $unsigned = $b->get();
         $this->assertEquals($expectedUnsignedTx, $unsigned->getHex());
 
         // Test signs sighash_all transaction properly
-        $sighashAll = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ALL;
-        $regularSigning = new TransactionBuilder($ecAdapter, $unsigned);
+        $sighashAll = \BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface::SIGHASH_ALL;
+        $regularSigning = new TxSigner($ecAdapter, $unsigned);
         $regularSigning
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashAll)
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashAll)
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashAll);
-        $this->assertEquals($expectedSigAllTx, $regularSigning->getTransaction()->getHex());
+            ->sign(0, $privateKey, $transaction1->getOutputs()->get($tx1NOut)->getScript(), null, $sighashAll)
+            ->sign(1, $privateKey, $transaction2->getOutputs()->get($tx2NOut)->getScript(), null, $sighashAll)
+            ->sign(2, $privateKey, $transaction3->getOutputs()->get($tx3NOut)->getScript(), null, $sighashAll);
+        $this->assertEquals($expectedSigAllTx, $regularSigning->get()->getHex());
 
         // Test signs SIGHASH_ALL|ANYONECANPAY
-        $regularSigningAnyone = new TransactionBuilder($ecAdapter, $unsigned);
-        $allAnyone = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashAll);
+        $regularSigningAnyone = new TxSigner($ecAdapter, $unsigned);
+        $allAnyone = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashAll);
         $regularSigningAnyone
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $allAnyone)
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $allAnyone)
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $allAnyone);
-        $this->assertEquals($expectedSigAllAnyonecanpayTx, $regularSigningAnyone->getTransaction()->getHex());
+            ->sign(0, $privateKey, $transaction1->getOutputs()->get($tx1NOut)->getScript(), null, $allAnyone)
+            ->sign(1, $privateKey, $transaction2->getOutputs()->get($tx2NOut)->getScript(), null, $allAnyone)
+            ->sign(2, $privateKey, $transaction3->getOutputs()->get($tx3NOut)->getScript(), null, $allAnyone);
+        $this->assertEquals($expectedSigAllAnyonecanpayTx, $regularSigningAnyone->get()->getHex());
 
         // Test signs SIGHASH_SINGLE transaction properly
-        $sighashSingle = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_SINGLE;
-        $singleSigning = new TransactionBuilder($ecAdapter, $unsigned);
+        $sighashSingle = \BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface::SIGHASH_SINGLE;
+        $singleSigning = new TxSigner($ecAdapter, $unsigned);
         $singleSigning
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashSingle)
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashSingle)
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashSingle);
-        $hex = $singleSigning->getTransaction()->getHex();
+            ->sign(0, $privateKey, $transaction1->getOutputs()->get($tx1NOut)->getScript(), null, $sighashSingle)
+            ->sign(1, $privateKey, $transaction2->getOutputs()->get($tx2NOut)->getScript(), null, $sighashSingle)
+            ->sign(2, $privateKey, $transaction3->getOutputs()->get($tx3NOut)->getScript(), null, $sighashSingle);
+        $hex = $singleSigning->get()->getHex();
         if ($hex == $regressionSigSingle) {
             $this->fail('Regression in Sighash Single handling (clone, object references?)');
         }
@@ -178,43 +173,43 @@ class SignatureHashTest extends \PHPUnit_Framework_TestCase
         $buggy = new Transaction(
             $unsigned->getVersion(),
             $unsigned->getInputs(),
-            $unsigned->getOutputs()->slice(0, 2),
+            new TransactionOutputCollection(array_slice($unsigned->getOutputs()->all(), 0, 2)),
             $unsigned->getLockTime()
         );
-        $singleSigningBug = new TransactionBuilder($ecAdapter, $buggy);
+        $singleSigningBug = new TxSigner($ecAdapter, $buggy);
         $singleSigningBug
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashSingle)
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashSingle)
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashSingle);
-        $this->assertEquals($expectedSingleBugTx, $singleSigningBug->getTransaction()->getHex());
+            ->sign(0, $privateKey, $transaction1->getOutputs()->get($tx1NOut)->getScript(), null, $sighashSingle)
+            ->sign(1, $privateKey, $transaction2->getOutputs()->get($tx2NOut)->getScript(), null, $sighashSingle)
+            ->sign(2, $privateKey, $transaction3->getOutputs()->get($tx3NOut)->getScript(), null, $sighashSingle);
+        $this->assertEquals($expectedSingleBugTx, $singleSigningBug->get()->getHex());
 
         // Test handling of SIGHASH_SINGLE|SIGHASH_ANYONECANPAY
-        $singleAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashSingle);
-        $singleAnyone = new TransactionBuilder($ecAdapter, $unsigned);
+        $singleAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashSingle);
+        $singleAnyone = new TxSigner($ecAdapter, $unsigned);
         $singleAnyone
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $singleAny)
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $singleAny)
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $singleAny);
-        $this->assertEquals($expectedSigSingleAnyoneTx, $singleAnyone->getTransaction()->getHex());
+            ->sign(0, $privateKey, $transaction1->getOutputs()->get($tx1NOut)->getScript(), null, $singleAny)
+            ->sign(1, $privateKey, $transaction2->getOutputs()->get($tx2NOut)->getScript(), null, $singleAny)
+            ->sign(2, $privateKey, $transaction3->getOutputs()->get($tx3NOut)->getScript(), null, $singleAny);
+        $this->assertEquals($expectedSigSingleAnyoneTx, $singleAnyone->get()->getHex());
 
         // Test signs SIGHASH_NONE transaction properly
-        $sighashNone = \BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_NONE;
-        $noneSigning = new TransactionBuilder($ecAdapter, $unsigned);
+        $sighashNone = \BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface::SIGHASH_NONE;
+        $noneSigning = new TxSigner($ecAdapter, $unsigned);
         $noneSigning
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $sighashNone)
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $sighashNone)
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $sighashNone);
-        $this->assertEquals($expectedSigNoneTx, $noneSigning->getTransaction()->getHex());
+            ->sign(0, $privateKey, $transaction1->getOutputs()->get($tx1NOut)->getScript(), null, $sighashNone)
+            ->sign(1, $privateKey, $transaction2->getOutputs()->get($tx2NOut)->getScript(), null, $sighashNone)
+            ->sign(2, $privateKey, $transaction3->getOutputs()->get($tx3NOut)->getScript(), null, $sighashNone);
+        $this->assertEquals($expectedSigNoneTx, $noneSigning->get()->getHex());
 
 
         // Test signs SIGHASH_NONE transaction properly
-        $noneAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashNone);
-        $noneAnyone = new TransactionBuilder($ecAdapter, $unsigned);
+        $noneAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface::SIGHASH_ANYONECANPAY, $sighashNone);
+        $noneAnyone = new TxSigner($ecAdapter, $unsigned);
         $noneAnyone
-            ->signInputWithKey($privateKey, $transaction1->getOutputs()->getOutput($tx1NOut)->getScript(), 0, null, $noneAny)
-            ->signInputWithKey($privateKey, $transaction2->getOutputs()->getOutput($tx2NOut)->getScript(), 1, null, $noneAny)
-            ->signInputWithKey($privateKey, $transaction3->getOutputs()->getOutput($tx3NOut)->getScript(), 2, null, $noneAny);
+            ->sign(0, $privateKey, $transaction1->getOutputs()->get($tx1NOut)->getScript(), null, $noneAny)
+            ->sign(1, $privateKey, $transaction2->getOutputs()->get($tx2NOut)->getScript(), null, $noneAny)
+            ->sign(2, $privateKey, $transaction3->getOutputs()->get($tx3NOut)->getScript(), null, $noneAny);
 
-        $this->assertEquals($expectedSigNoneAnyTx, $noneAnyone->getTransaction()->getHex());
+        $this->assertEquals($expectedSigNoneAnyTx, $noneAnyone->get()->getHex());
     }
 }

@@ -13,8 +13,6 @@ class BlockHeaderFactory
      */
     public static function fromHex($string)
     {
-        $serializer = new BlockHeaderSerializer();
-        $block = $serializer->parse($string);
-        return $block;
+        return (new BlockHeaderSerializer())->parse($string);
     }
 }

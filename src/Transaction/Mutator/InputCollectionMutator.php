@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 
 class InputCollectionMutator
@@ -17,7 +17,7 @@ class InputCollectionMutator
      */
     public function __construct(TransactionInputCollection $inputs)
     {
-        $this->inputs = $inputs->getInputs();
+        $this->inputs = $inputs->all();
     }
 
     /**

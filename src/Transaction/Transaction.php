@@ -3,6 +3,9 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
@@ -52,8 +55,13 @@ class Transaction extends Serializable implements TransactionInterface
             throw new \InvalidArgumentException('Transaction locktime must be numeric');
         }
 
-        if (Bitcoin::getMath()->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
+        $math = Bitcoin::getMath();
+        if ($math->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
             throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
+        }
+
+        if ($math->cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
+            throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 
         $this->version = $version;
@@ -96,16 +104,6 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @param TransactionInputCollection $inputs
-     * @return $this
-     */
-    public function setInputs(TransactionInputCollection $inputs)
-    {
-        $this->inputs = $inputs;
-        return $this;
-    }
-
-    /**
      * Get the array of inputs in the transaction
      *
      * @return TransactionInputCollection
@@ -116,22 +114,12 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @param int $i
+     * @param int $index
      * @return TransactionInputInterface
      */
-    public function getInput($i)
+    public function getInput($index)
     {
-        return $this->inputs->getInput($i);
-    }
-
-    /**
-     * @param TransactionOutputCollection $outputs
-     * @return $this
-     */
-    public function setOutputs(TransactionOutputCollection $outputs)
-    {
-        $this->outputs = $outputs;
-        return $this;
+        return $this->inputs->get($index);
     }
 
     /**
@@ -145,12 +133,12 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @param int $i
+     * @param int $index
      * @return TransactionOutputInterface
      */
-    public function getOutput($i)
+    public function getOutput($index)
     {
-        return $this->outputs->getOutput($i);
+        return $this->outputs->get($index);
     }
 
     /**
@@ -164,27 +152,11 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * Set Lock Time
-     * @param int $lockTime
-     * @return $this
-     * @throws \Exception
-     */
-    public function setLockTime($lockTime)
-    {
-        if (Bitcoin::getMath()->cmp($lockTime, TransactionInterface::MAX_LOCKTIME) > 0) {
-            throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
-        }
-
-        $this->lockTime = $lockTime;
-        return $this;
-    }
-
-    /**
-     * @return SignatureHash
+     * @return Hasher
      */
     public function getSignatureHash()
     {
-        return new SignatureHash($this);
+        return new Hasher($this);
     }
 
     /**
@@ -192,13 +164,13 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getValueOut()
     {
-        $outputs = $this->outputs->getOutputs();
-        $nOutputs = count($outputs);
+        $nOutputs = count($this->outputs);
         $math = Bitcoin::getMath();
         $value = 0;
         for ($i = 0; $i < $nOutputs; $i++) {
-            $value = $math->add($value, $outputs[$i]->getValue());
+            $value = $math->add($value, $this->outputs->get($i)->getValue());
         }
+
         return $value;
     }
 

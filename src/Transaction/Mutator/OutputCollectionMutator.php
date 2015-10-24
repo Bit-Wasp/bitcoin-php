@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
 class OutputCollectionMutator
@@ -17,7 +17,7 @@ class OutputCollectionMutator
      */
     public function __construct(TransactionOutputCollection $outputs)
     {
-        $this->outputs = $outputs->getOutputs();
+        $this->outputs = $outputs->all();
     }
 
     /**
