@@ -33,12 +33,6 @@ interface TransactionInputInterface
     public function getSequence();
 
     /**
-     * @param integer|string $sequence
-     * @return $this
-     */
-    public function setSequence($sequence);
-
-    /**
      * Get the script in this transaction
      *
      * @return Script
