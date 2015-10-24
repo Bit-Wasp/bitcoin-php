@@ -15,9 +15,7 @@ use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1Adapter;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
-use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Transaction\Factory\TxSignerContext;
 use BitWasp\Buffertools\Buffer;
 
 class TxSigner
@@ -48,7 +46,7 @@ class TxSigner
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx)
     {
-        $this->transaction = $tx ?: new Transaction();
+        $this->transaction = $tx;
         $this->ecAdapter = $ecAdapter;
     }
 
@@ -199,8 +197,7 @@ class TxSigner
             });
         }
 
-        $transaction = $mutator->inputs($inputs->get())->get();
-        return $transaction;
+        return $mutator->get();
     }
 
     /**

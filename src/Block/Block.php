@@ -28,6 +28,11 @@ class Block extends Serializable implements BlockInterface
     private $transactions;
 
     /**
+     * @var MerkleRoot
+     */
+    private $merkleRoot;
+
+    /**
      * @param Math $math
      * @param BlockHeaderInterface $header
      * @param TransactionCollection $transactions
@@ -55,13 +60,16 @@ class Block extends Serializable implements BlockInterface
      */
     public function getMerkleRoot()
     {
-        $root = new MerkleRoot($this->math, $this->getTransactions());
-        return $root->calculateHash();
+        if (is_null($this->merkleRoot)) {
+            $this->merkleRoot = new MerkleRoot($this->math, $this->getTransactions());
+        }
+
+        return $this->merkleRoot->calculateHash();
     }
 
     /**
-     * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransactions()
+     * @return TransactionCollection
      */
     public function getTransactions()
     {
@@ -70,6 +78,7 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * @param int $i
+     * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransaction()
      * @return \BitWasp\Bitcoin\Transaction\TransactionInterface
      */
     public function getTransaction($i)
@@ -85,17 +94,14 @@ class Block extends Serializable implements BlockInterface
     {
         $vMatch = [];
         $vHashes = [];
-
-        $txns = $this->getTransactions();
-        for ($i = 0, $txCount = count($txns); $i < $txCount; $i++) {
-            $tx = $txns->get($i);
+        foreach ($this->getTransactions() as $tx) {
             $vMatch[] = $filter->isRelevantAndUpdate($tx);
             $vHashes[] = $tx->getTxHash();
         }
 
         return new FilteredBlock(
             $this->getHeader(),
-            PartialMerkleTree::create($txCount, $vHashes, $vMatch)
+            PartialMerkleTree::create(count($this->getTransactions()), $vHashes, $vMatch)
         );
     }
 

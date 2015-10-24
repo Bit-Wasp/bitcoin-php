@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
 use BitWasp\Bitcoin\Transaction\Mutator\OutputMutator;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
@@ -64,13 +63,11 @@ class Hasher implements SignatureHashInterface
         for ($i = 0; $i < $this->nInputs; $i++) {
             $vin->applyTo($i, function (InputMutator $m) {
                 $m->script(new Script);
-
             });
         }
 
         $vin->applyTo($inputToSign, function (InputMutator $m) use ($txOutScript) {
             $m->script($txOutScript);
-
         });
 
         if ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_NONE) {
@@ -82,7 +79,6 @@ class Hasher implements SignatureHashInterface
                 if ($i !== $inputToSign) {
                     $vin->applyTo($i, function (InputMutator $m) {
                         $m->sequence(0);
-
                     });
                 }
             }
@@ -100,16 +96,14 @@ class Hasher implements SignatureHashInterface
             for ($i = 0; $i < $nOutput; $i++) {
                 $vout->applyTo($i, function (OutputMutator $m) {
                     $m->null();
-
                 });
             }
 
-            // Let the others update at will. Set sequence of inputs we're not signing to 0.
+            // Let the others update at will. Set sequence of inputs we're not signing to 0
             for ($i = 0; $i < $this->nInputs; $i++) {
                 if ($i != $inputToSign) {
                     $vin->applyTo($i, function (InputMutator $m) {
                         $m->sequence(0);
-
                     });
                 }
             }

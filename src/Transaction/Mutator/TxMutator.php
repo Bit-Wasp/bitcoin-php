@@ -15,6 +15,16 @@ class TxMutator
     private $transaction;
 
     /**
+     * @var InputCollectionMutator
+     */
+    private $inputsMutator;
+
+    /**
+     * @var OutputCollectionMutator
+     */
+    private $outputsMutator;
+
+    /**
      * @param TransactionInterface $transaction
      */
     public function __construct(TransactionInterface $transaction)
@@ -27,7 +37,11 @@ class TxMutator
      */
     public function inputsMutator()
     {
-        return new InputCollectionMutator($this->transaction->getInputs());
+        if (is_null($this->inputsMutator)) {
+            $this->inputsMutator = new InputCollectionMutator($this->transaction->getInputs());
+        }
+
+        return $this->inputsMutator;
     }
 
     /**
@@ -35,7 +49,11 @@ class TxMutator
      */
     public function outputsMutator()
     {
-        return new OutputCollectionMutator($this->transaction->getOutputs());
+        if (is_null($this->outputsMutator)) {
+            $this->outputsMutator = new OutputCollectionMutator($this->transaction->getOutputs());
+        }
+
+        return $this->outputsMutator;
     }
 
     /**
@@ -43,6 +61,14 @@ class TxMutator
      */
     public function get()
     {
+        if (!is_null($this->inputsMutator)) {
+            $this->inputs($this->inputsMutator->get());
+        }
+
+        if (!is_null($this->outputsMutator)) {
+            $this->outputs($this->outputsMutator->get());
+        }
+
         return $this->transaction;
     }
 

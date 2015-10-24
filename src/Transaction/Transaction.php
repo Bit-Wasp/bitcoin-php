@@ -164,11 +164,10 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getValueOut()
     {
-        $nOutputs = count($this->outputs);
         $math = Bitcoin::getMath();
         $value = 0;
-        for ($i = 0; $i < $nOutputs; $i++) {
-            $value = $math->add($value, $this->outputs->get($i)->getValue());
+        foreach ($this->outputs as $output) {
+            $value = $math->add($value, $output->getValue());
         }
 
         return $value;
