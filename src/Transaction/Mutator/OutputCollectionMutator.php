@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-
 use BitWasp\Bitcoin\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
@@ -116,7 +115,7 @@ class OutputCollectionMutator
      * @param \Closure $closure
      * @return $this
      */
-    public function apply($i, \Closure $closure)
+    public function applyTo($i, \Closure $closure)
     {
         $mutator = $this->outputMutator($i);
         $closure($mutator);

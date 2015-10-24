@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;

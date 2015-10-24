@@ -4,8 +4,11 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
+use BitWasp\Bitcoin\Transaction\Mutator\OutputMutator;
+use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
@@ -17,11 +20,23 @@ class SignatureHash implements SignatureHashInterface
     private $transaction;
 
     /**
+     * @var int
+     */
+    private $nInputs;
+
+    /**
+     * @var int
+     */
+    private $nOutputs;
+
+    /**
      * @param TransactionInterface $transaction
      */
     public function __construct(TransactionInterface $transaction)
     {
         $this->transaction = $transaction;
+        $this->nInputs = count($this->transaction->getInputs());
+        $this->nOutputs = count($this->transaction->getOutputs());
     }
 
     /**
@@ -38,33 +53,35 @@ class SignatureHash implements SignatureHashInterface
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
     {
-        $copy = clone $this->transaction;
-
-        $inputs = $copy->getInputs();
-        $outputs = $copy->getOutputs();
-
-        if ($inputToSign > count($inputs)) {
-            throw new \Exception('Input does not exist');
-        }
+        $math = Bitcoin::getMath();
+        $tx = new TxMutator($this->transaction);
+        $vin = $tx->inputsMutator();
+        $vout = $tx->outputsMutator();
 
         // Default SIGHASH_ALL procedure: null all input scripts
-        $inputCount = count($inputs);
-        for ($i = 0; $i < $inputCount; $i++) {
-            $inputs->getInput($i)->setScript(new Script());
+        for ($i = 0; $i < $this->nInputs; $i++) {
+            $vin->applyTo($i, function (InputMutator $m) {
+                $m->script(new Script);
+
+            });
         }
 
-        $inputs->getInput($inputToSign)->setScript($txOutScript);
-        $math = Bitcoin::getMath();
+        $vin->applyTo($inputToSign, function (InputMutator $m) use ($txOutScript) {
+            $m->script($txOutScript);
+
+        });
 
         if ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_NONE) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
-            $copy->setOutputs(new TransactionOutputCollection());
+            $vout->null();
 
             // Let the others update at will. Set sequence of inputs we're not signing to 0.
-            $inputCount = count($inputs);
-            for ($i = 0; $i < $inputCount; $i++) {
-                if ($math->cmp($i, $inputToSign) !== 0) {
-                    $inputs->getInput($i)->setSequence(0);
+            for ($i = 0; $i < $this->nInputs; $i++) {
+                if ($i !== $inputToSign) {
+                    $vin->applyTo($i, function (InputMutator $m) {
+                        $m->sequence(0);
+
+                    });
                 }
             }
 
@@ -72,40 +89,45 @@ class SignatureHash implements SignatureHashInterface
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
-
-            if ($math->cmp($nOutput, count($outputs)) >= 0) {
+            if ($nOutput >= $this->nOutputs) {
                 return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
             }
 
-            // Resize..
-            $outputs = $outputs->slice(0, $nOutput + 1)->getOutputs();
-
-            // Set to null
+            // Resize, set to null
+            $vout->slice(0, $nOutput + 1);
             for ($i = 0; $i < $nOutput; $i++) {
-                $outputs[$i] = new TransactionOutput($math->getBinaryMath()->getTwosComplement(-1, 64), new Script());
+                $vout->applyTo($i, function (OutputMutator $m) {
+                    $m->null();
+
+                });
             }
 
-            $copy->setOutputs(new TransactionOutputCollection($outputs));
-
             // Let the others update at will. Set sequence of inputs we're not signing to 0.
-            $inputCount = count($inputs);
-            for ($i = 0; $i < $inputCount; $i++) {
-                if ($math->cmp($i, $inputToSign) != 0) {
-                    $inputs->getInput($i)->setSequence(0);
+            for ($i = 0; $i < $this->nInputs; $i++) {
+                if ($i != $inputToSign) {
+                    $vin->applyTo($i, function (InputMutator $m) {
+                        $m->sequence(0);
+
+                    });
                 }
             }
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
         if ($math->bitwiseAnd($sighashType, SignatureHashInterface::SIGHASH_ANYONECANPAY)) {
-            $input = $inputs->getInput($inputToSign);
-            $copy->setInputs(new TransactionInputCollection([$input]));
+            $input = $vin->getInput($inputToSign);
+            $vin->null()->add($input);
         }
 
-        // Serialize the TxCopy and append the 4 byte hashtype (little endian);
-        $txParser = new Parser($copy->getBuffer());
-        $txParser->writeInt(4, $sighashType, true);
-
-        return Hash::sha256d($txParser->getBuffer());
+        return Hash::sha256d(
+            Buffertools::concat(
+                $tx
+                    ->inputs($vin->get())
+                    ->outputs($vout->get())
+                    ->get()
+                    ->getBuffer(),
+                Buffertools::flipBytes(Buffer::int($sighashType, 4, $math))
+            )
+        );
     }
 }

@@ -68,7 +68,7 @@ class ScriptCountSigOpsTest extends AbstractTestCase
     public function testMultisig()
     {
         $pk = [];
-        for($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; $i++) {
             $pk[] = PrivateKeyFactory::create()->getPublicKey();
         }
 

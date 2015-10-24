@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
