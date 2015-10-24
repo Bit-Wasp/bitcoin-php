@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Collection;
 
-use BitWasp\Bitcoin\Collection\CollectionInterface;
-
 abstract class StaticCollection implements CollectionInterface
 {
     /**
@@ -35,7 +33,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      *
      */
-    function rewind()
+    public function rewind()
     {
         $this->set->rewind();
     }
@@ -43,7 +41,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return array
      */
-    function current()
+    public function current()
     {
         return $this->set->current();
     }
@@ -51,7 +49,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return int
      */
-    function key()
+    public function key()
     {
         return $this->set->key();
     }
@@ -59,7 +57,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      *
      */
-    function next()
+    public function next()
     {
         $this->set->next();
     }
@@ -67,7 +65,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return bool
      */
-    function valid()
+    public function valid()
     {
         return $this->set->valid();
     }
