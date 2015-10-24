@@ -13,6 +13,8 @@ use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
+use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 
@@ -255,8 +257,10 @@ class TransactionBuilder
      */
     public function getTransaction()
     {
-        $transaction = $this->transaction;
-        $inCount = count($transaction->getInputs());
+        $inCount = count($this->transaction->getInputs());
+
+        $mutator = new TxMutator($this->transaction);
+        $inputs = $mutator->inputsMutator();
 
         for ($i = 0; $i < $inCount; $i++) {
             // Call regenerateScript if inputState is set, otherwise defer to previous script.
@@ -266,9 +270,13 @@ class TransactionBuilder
                 $script = $this->transaction->getInputs()->getInput($i)->getScript();
             }
 
-            $transaction->getInputs()->getInput($i)->setScript($script);
+            $inputs->applyTo($i, function (InputMutator $m) use ($script) {
+                $m->script($script);
+
+            });
         }
 
+        $transaction = $mutator->inputs($inputs->get())->get();
         return $transaction;
     }
 

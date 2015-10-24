@@ -19,11 +19,4 @@ interface TransactionOutputInterface extends SerializableInterface
      * @return ScriptInterface
      */
     public function getScript();
-
-    /**
-     * Set the given script to the output. Required for SignatureHash
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script);
 }

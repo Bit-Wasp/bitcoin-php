@@ -40,12 +40,6 @@ interface TransactionInputInterface
     public function getScript();
 
     /**
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script);
-
-    /**
      * Check whether the txid is for a coinbase transaction
      *
      * @return bool

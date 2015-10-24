@@ -59,16 +59,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 
     /**
      * {@inheritdoc}
-     * @see TransactionOutputInterface::setScript()
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
      * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
      */
     public function getBuffer()
