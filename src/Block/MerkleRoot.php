@@ -82,7 +82,7 @@ class MerkleRoot
 
             // Compute hash of each transaction
             $last = '';
-            foreach ($this->transactions->all() as $i => $transaction) {
+            foreach ($this->transactions as $i => $transaction) {
                 $last = $transaction->getBinary();
                 $tree->set($i, $last);
             }
