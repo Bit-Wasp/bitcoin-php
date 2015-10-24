@@ -95,7 +95,7 @@ class MerkleRoot
             $buffer = $tree->hash();
         }
 
-        $hash = Buffertools::flipBytes($buffer)->getHex();
+        $hash = bin2hex(Buffertools::flipBytes($buffer));
 
         $this->setLastHash($hash);
         return $this->getLastHash();
