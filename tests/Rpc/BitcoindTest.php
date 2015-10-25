@@ -235,7 +235,7 @@ class BitcoindTest extends AbstractTestCase
         $hash = '00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048';
         $block = $bitcoind->getblock('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048');
 
-        $this->assertEquals($hash, $block->getHeader()->getBlockHash());
+        $this->assertEquals($hash, $block->getHeader()->getHash()->getHex());
         $this->assertEquals($txHex, $block->getTransactions()->get(0)->getHex());
     }
 

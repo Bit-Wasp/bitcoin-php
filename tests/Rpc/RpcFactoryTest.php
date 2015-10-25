@@ -172,7 +172,7 @@ class RpcFactoryTest extends AbstractTestCase
         $electrum = $this->getElectrumServer($header);
         $call = $electrum->blockGetHeader($height);
         $call->then(function (BlockHeaderInterface $value) use ($header, $hash) {
-            $this->assertEquals($hash, $value->getBlockHash());
+            $this->assertEquals($hash, $value->getHash()->getHex());
             $this->assertEquals('18171a8b', $value->getBits()->getHex());
             $this->assertEquals(3, $value->getVersion());
             $this->assertEquals($header['merkle_root'], $value->getMerkleRoot());

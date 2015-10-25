@@ -16,7 +16,7 @@ $matches = [];
 
 echo
     " Block Information: " . PHP_EOL .
-    "   Hash:        " . $header->getBlockHash() . PHP_EOL .
+    "   Hash:        " . $header->getHash()->getHex() . PHP_EOL .
     "   Merkle Root: " . $header->getMerkleRoot() . PHP_EOL .
     PHP_EOL .
     " Proof: " . PHP_EOL .

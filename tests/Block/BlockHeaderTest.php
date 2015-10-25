@@ -50,40 +50,12 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertEquals($time, $header->getTimestamp());
         $this->assertEquals($nonce, $header->getNonce());
 
-        $nextBlock = '8080808080808080808080808080808080808080808080808080808080808080';
-        $header->setNextBlock($nextBlock);
-
-        $this->assertEquals($nextBlock, $header->getNextBlock());
     }
 
     public function testGetVersionDefault()
     {
         $header = new BlockHeader(BlockHeaderInterface::CURRENT_VERSION, null, null, null, new Buffer(), null);
         $this->assertEquals(BlockHeaderInterface::CURRENT_VERSION, $header->getVersion());
-    }
-
-    public function testSetNonce()
-    {
-        $header = new BlockHeader(1, null, null, null, new Buffer(), '20229302');
-        $this->assertEquals('20229302', $header->getNonce());
-        $this->assertEquals('20229304', $header->setNonce('20229304')->getNonce());
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Next block not known
-     */
-    public function testGetNextBlock()
-    {
-        $header = new BlockHeader(1, null, null, null, new Buffer(), null);
-        $this->assertNull($header->getNextBlock());
-    }
-
-    public function testSetNextBlock()
-    {
-        $header = new BlockHeader(1, null, null, null, new Buffer(), null);
-        $header->setNextBlock('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048');
-        $this->assertEquals('00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048', $header->getNextBlock());
     }
 
     public function testFromParser()
@@ -125,7 +97,7 @@ class BlockHeaderTest extends AbstractTestCase
     public function testGetBlockHash()
     {
         $result = $this->getGenesisBlock()->getHeader();
-        $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $result->getBlockHash());
+        $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $result->getHash()->getHex());
     }
 
     /**
@@ -141,6 +113,6 @@ class BlockHeaderTest extends AbstractTestCase
     public function testFromHex()
     {
         $header = BlockHeaderFactory::fromHex($this->getGenesisHex());
-        $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $header->getBlockHash());
+        $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $header->getHash()->getHex());
     }
 }

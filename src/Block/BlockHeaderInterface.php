@@ -24,21 +24,6 @@ interface BlockHeaderInterface extends SerializableInterface
     public function getPrevBlock();
 
     /**
-     * Return the next block hash. Note this may not always be set.
-     *
-     * @return string
-     */
-    public function getNextBlock();
-
-    /**
-     * Set next block, to the provided $nextBlock hash.
-     *
-     * @param string $nextBlock
-     * @return BlockHeaderInterface
-     */
-    public function setNextBlock($nextBlock);
-
-    /**
      * Return the merkle root of the transactions in the block.
      *
      * @return string
@@ -62,22 +47,12 @@ interface BlockHeaderInterface extends SerializableInterface
     /**
      * Return the nonce of the block header.
      *
-     * @return string
+     * @return int|string
      */
     public function getNonce();
 
     /**
-     * Set the nonce of the block header. Used in mining.
-     *
-     * @param string $nonce
-     * @return BlockHeaderInterface
+     * @return Buffer
      */
-    public function setNonce($nonce);
-
-    /**
-     * Calculate the hash of this header.
-     *
-     * @return string
-     */
-    public function getBlockHash();
+    public function getHash();
 }

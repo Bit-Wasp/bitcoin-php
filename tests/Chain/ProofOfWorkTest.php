@@ -38,7 +38,7 @@ class ProofOfWorkTest extends AbstractTestCase
         $params = new Params();
         $pow = new ProofOfWork(new Math(), $params);
         $bits = '1';
-        $pow->check('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0', $bits);
+        $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
     }
 
     /**
@@ -51,7 +51,7 @@ class ProofOfWorkTest extends AbstractTestCase
         $params = new Params();
         $pow = new ProofOfWork(new Math(), $params);
         $bits = $math->hexDec('181287ba');
-        $pow->check('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0', $bits);
+        $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
     }
 
     /**

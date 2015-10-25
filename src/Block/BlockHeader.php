@@ -40,11 +40,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $nonce;
 
     /**
-     * @var null|string
-     */
-    private $nextBlock;
-
-    /**
      * @param int|string $version
      * @param string $prevBlock
      * @param string $merkleRoot
@@ -67,23 +62,24 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
+     * Get the version for this block
+     *
      * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getBits()
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getVersion()
      */
-    public function getBits()
+    public function getVersion()
     {
-        return $this->bits;
+        return $this->version;
     }
 
     /**
      * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getBlockHash()
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getPrevBlock()
      */
-    public function getBlockHash()
+    public function getPrevBlock()
     {
-        return Hash::sha256d($this->getBuffer())->flip()->getHex();
+        return $this->prevBlock;
     }
-
     /**
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getMerkleRoot()
@@ -95,37 +91,19 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
 
     /**
      * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getPrevBlock()
+     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getBits()
      */
-    public function getPrevBlock()
+    public function getBits()
     {
-        return $this->prevBlock;
+        return $this->bits;
     }
 
     /**
-     * Get the next block hash. Cannot be required at constructor, not always known.
-     *
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getNextBlock()
-     * @throws \RuntimeException
+     * @return Buffer
      */
-    public function getNextBlock()
+    public function getHash()
     {
-        if (null === $this->nextBlock) {
-            throw new \RuntimeException('Next block not known');
-        }
-
-        return $this->nextBlock;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::setNextBlock()
-     */
-    public function setNextBlock($nextBlock)
-    {
-        $this->nextBlock = $nextBlock;
-        return $this;
+        return Hash::sha256d($this->getBuffer())->flip();
     }
 
     /**
@@ -138,16 +116,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::setNonce()
-     */
-    public function setNonce($nonce)
-    {
-        $this->nonce = $nonce;
-        return $this;
-    }
-
-    /**
      * Get the timestamp for this block
      *
      * {@inheritdoc}
@@ -156,17 +124,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     public function getTimestamp()
     {
         return $this->timestamp;
-    }
-
-    /**
-     * Get the version for this block
-     *
-     * {@inheritdoc}
-     * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getVersion()
-     */
-    public function getVersion()
-    {
-        return $this->version;
     }
 
     /**
