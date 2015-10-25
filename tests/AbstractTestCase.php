@@ -12,6 +12,10 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
+    protected $netInterfaceType = 'BitWasp\Bitcoin\Network\NetworkInterface';
+    /**
+     * @var string
+     */
     protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
 
     /**

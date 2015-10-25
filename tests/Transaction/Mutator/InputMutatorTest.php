@@ -56,5 +56,4 @@ class InputMutatorTest extends AbstractTestCase
         $this->assertEquals('0000000000000000000000000000000000000000000000000000000000000000', $new->getTransactionId());
         $this->assertEquals(0xffffffff, $new->getVout());
     }
-
 }
