@@ -62,7 +62,7 @@ class UtxoSet
      */
     private function saveOutputs(TransactionInterface $tx)
     {
-        $txid = $tx->getTransactionId();
+        $txid = $tx->getTxId()->getHex();
         $vout = 0;
 
         foreach ($tx->getOutputs() as $output) {
