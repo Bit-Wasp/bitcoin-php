@@ -39,6 +39,14 @@ class TransactionInputCollection extends StaticCollection
     }
 
     /**
+     * @return TransactionInputInterface
+     */
+    public function current()
+    {
+        return $this->set->current();
+    }
+
+    /**
      * @param int $offset
      * @return TransactionInputInterface
      */

@@ -2,9 +2,10 @@
 
 namespace BitWasp\Bitcoin\Tests\Collection\Transaction;
 
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 class TransactionInputCollectionTest extends AbstractTestCase
 {
@@ -15,5 +16,15 @@ class TransactionInputCollectionTest extends AbstractTestCase
     {
         $collection = new TransactionInputCollection();
         $collection->get(10);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRequiresInputInterface()
+    {
+        new TransactionInputCollection([
+            new TransactionOutput(50, new Script())
+        ]);
     }
 }
