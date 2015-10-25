@@ -57,5 +57,4 @@ class InputMutatorTest extends AbstractTestCase
         $this->assertEquals(0xffffffff, $new->getVout());
     }
 
-
 }

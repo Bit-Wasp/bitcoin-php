@@ -110,7 +110,7 @@ abstract class StaticCollection implements CollectionInterface
 
     /**
      * @param int $index
-     * @return array
+     * @return mixed
      */
     public function get($index)
     {
