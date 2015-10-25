@@ -350,8 +350,8 @@ class BloomFilter extends Serializable
         }
 
         // Check if the txid hash is in the filter
-        $txHash = $tx->getTransactionId();
-        if ($this->containsHash($txHash)) {
+        $txid = $tx->getTxId();
+        if ($this->containsData($txid)) {
             $found = true;
         }
 
@@ -366,11 +366,11 @@ class BloomFilter extends Serializable
                 if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
                     $found = true;
                     if ($this->isUpdateAll()) {
-                        $this->insertOutpoint($txHash, $vout);
+                        $this->insertOutpoint($txid->getHex(), $vout);
                     } else if ($this->isUpdatePubKeyOnly()) {
                         $type = ScriptFactory::scriptPubKey()->classify($script);
                         if ($type->isMultisig() || $type->isPayToPublicKey()) {
-                            $this->insertOutpoint($txHash, $vout);
+                            $this->insertOutpoint($txid->getHex(), $vout);
                         }
                     }
                 }
