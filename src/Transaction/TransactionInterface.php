@@ -43,6 +43,12 @@ interface TransactionInterface extends SerializableInterface
     public function getTxHash();
 
     /**
+     * Get the little-endian sha256d hash.
+     * @return Buffer
+     */
+    public function getTxId();
+
+    /**
      * Get the version of this transaction
      *
      * @return int|string
