@@ -58,7 +58,7 @@ class OutputMutator
      */
     public function value($value)
     {
-        return $this->replace(array('vout' => $value));
+        return $this->replace(array('value' => $value));
     }
 
     /**
