@@ -124,7 +124,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $serialized = $tx->getBuffer()->getHex();
         $this->assertSame($hex, $serialized);
 
-        $this->assertEquals('048254a713f83b2deaecc781c81959fa8816d47138c7eead06c162def42a3236', $tx->getTransactionId());
+        $this->assertEquals('048254a713f83b2deaecc781c81959fa8816d47138c7eead06c162def42a3236', $tx->getTxId()->getHex());
     }
 
     public function testFromHex2()
@@ -141,7 +141,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($hex, $serialized);
 
-        $this->assertEquals('a114b696661d740838d9cf811602efff7aad2abf087506830b37d5f2e43bc72d', $tx->getTransactionId());
+        $this->assertEquals('a114b696661d740838d9cf811602efff7aad2abf087506830b37d5f2e43bc72d', $tx->getTxId()->getHex());
     }
 
     public function testSerialize()
@@ -163,7 +163,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("03681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c", $tx->getInputs()->get(0)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());
-        $this->assertEquals($txId, $tx->getTransactionId());
+        $this->assertEquals($txId, $tx->getTxId()->getHex());
     }
 
     public function testOpReturnTx()
@@ -177,6 +177,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("6a0a6f6d000000468000002a", $tx->getOutputs()->get(1)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());
-        $this->assertEquals($txId, $tx->getTransactionId());
+        $this->assertEquals($txId, $tx->getTxId()->getHex());
     }
 }
