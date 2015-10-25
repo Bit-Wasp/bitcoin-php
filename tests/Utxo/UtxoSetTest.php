@@ -4,10 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Utxo;
 
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Utxo\UtxoSet;
 use Doctrine\Common\Cache\ArrayCache;
@@ -22,7 +19,7 @@ class UtxoSetTest extends AbstractTestCase
             ->input('0000000000000000000000000000000000000000000000000000000000000000', TransactionInterface::MAX_LOCKTIME)
             ->output(100000000, new Script());
         $tx = $builder->get();
-        $txid = $tx->getTransactionId();
+        $txid = $tx->getTxId()->getHex();
 
         $utxoSet = new UtxoSet(new ArrayCache());
         $this->assertFalse($utxoSet->contains($txid, 0));
