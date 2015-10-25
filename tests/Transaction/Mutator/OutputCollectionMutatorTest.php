@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Mutator;
 
-
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -107,5 +106,4 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $mutator = new OutputCollectionMutator($collection);
         $mutator->update(1, new TransactionOutput(1, new Script()));
     }
-
 }

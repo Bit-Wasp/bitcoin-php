@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Collection\Generic;
 
-
 use BitWasp\Bitcoin\Collection\StaticCollection;
 
 class Set extends StaticCollection

@@ -8,7 +8,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Collection;
 
-
 use BitWasp\Bitcoin\Collection\Generic\Set;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Script\Script;

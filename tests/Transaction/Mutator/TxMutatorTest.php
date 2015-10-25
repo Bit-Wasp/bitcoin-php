@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Mutator;
 
-
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Script\Script;
@@ -46,5 +45,4 @@ class TxMutatorTest extends AbstractTestCase
         $this->assertEquals(1, count($newTx->getInputs()));
         $this->assertEquals(1, count($newTx->getOutputs()));
     }
-
 }
