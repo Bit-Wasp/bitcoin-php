@@ -51,7 +51,7 @@ class MerkleRootTest extends AbstractTestCase
         $vectors[] = [
             $math,
             [$txHex1],
-            $tx->getTransactionId()
+            $tx->getTxId()->getHex()
         ];
 
         // Only an even number of transactions
