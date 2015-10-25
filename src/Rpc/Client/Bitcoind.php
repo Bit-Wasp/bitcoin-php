@@ -129,10 +129,6 @@ class Bitcoind
             $blockArray['nonce']
         );
 
-        if (isset($blockArray['nextblockhash'])) {
-            $header->setNextBlock($blockArray['nextblockhash']);
-        }
-
         return new Block(
             Bitcoin::getMath(),
             $header,

@@ -29,18 +29,17 @@ interface TransactionInterface extends SerializableInterface
     public function isCoinbase();
 
     /**
-     * Get the transaction ID
-     *
-     * @return string
-     */
-    public function getTransactionId();
-
-    /**
      * Get the transactions sha256d hash.
      *
      * @return Buffer
      */
     public function getTxHash();
+
+    /**
+     * Get the little-endian sha256d hash.
+     * @return Buffer
+     */
+    public function getTxId();
 
     /**
      * Get the version of this transaction

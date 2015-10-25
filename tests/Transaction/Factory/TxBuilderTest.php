@@ -72,7 +72,7 @@ class TxBuilderTest extends AbstractTestCase
             ])
         );
 
-        $parentHash = $parent->getTransactionId();
+        $parentHash = $parent->getTxId()->getHex();
 
         $builder = new TxBuilder();
         $builder->spendOutputFrom($parent, 0);

@@ -79,11 +79,11 @@ class ProofOfWork
     }
 
     /**
-     * @param string $hash
+     * @param Buffer $hash
      * @param int|string $nBits
      * @return bool
      */
-    public function check($hash, $nBits)
+    public function check(Buffer $hash, $nBits)
     {
         $negative = false;
         $overflow = false;
@@ -92,7 +92,7 @@ class ProofOfWork
             throw new \RuntimeException('nBits below minimum work');
         }
 
-        if ($this->math->cmp($this->math->hexDec($hash), $target) > 0) {
+        if ($this->math->cmp($hash->getInt(), $target) > 0) {
             throw new \RuntimeException("Hash doesn't match nBits");
         }
 
@@ -106,7 +106,7 @@ class ProofOfWork
      */
     public function checkHeader(BlockHeaderInterface $header)
     {
-        return $this->check($header->getBlockHash(), $header->getBits()->getInt());
+        return $this->check($header->getHash(), $header->getBits()->getInt());
     }
 
     /**

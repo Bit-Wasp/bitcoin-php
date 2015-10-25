@@ -86,7 +86,7 @@ class BlockTest extends AbstractTestCase
         $txCollection = new TransactionCollection(array($tx));
         $block = new Block(new Math(), new BlockHeader(1, 1, 1, 1, new Buffer(), 1), $txCollection);
 
-        $this->assertEquals($tx->getTransactionId(), $block->getMerkleRoot());
+        $this->assertEquals($tx->getTxId()->getHex(), $block->getMerkleRoot());
     }
 
     public function testFromParser()

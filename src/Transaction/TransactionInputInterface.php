@@ -9,7 +9,7 @@ interface TransactionInputInterface
     /**
      * The default sequence.
      */
-    const DEFAULT_SEQUENCE = 0xffffffff;
+    const SEQUENCE_FINAL = 0xffffffff;
 
     /**
      * Check whether the txid is for a coinbase transaction

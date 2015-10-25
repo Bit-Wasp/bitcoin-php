@@ -67,7 +67,7 @@ class RpcFactoryTest extends AbstractTestCase
 
         $call = $electrum->transactionGet($txid);
         $call->then(function (Transaction $value) use ($txid, $txHex) {
-            $this->assertEquals($txid, $value->getTransactionId());
+            $this->assertEquals($txid, $value->getTxId()->getHex());
             $this->assertEquals($txHex, $value->getHex());
         });
     }
@@ -172,7 +172,7 @@ class RpcFactoryTest extends AbstractTestCase
         $electrum = $this->getElectrumServer($header);
         $call = $electrum->blockGetHeader($height);
         $call->then(function (BlockHeaderInterface $value) use ($header, $hash) {
-            $this->assertEquals($hash, $value->getBlockHash());
+            $this->assertEquals($hash, $value->getHash()->getHex());
             $this->assertEquals('18171a8b', $value->getBits()->getHex());
             $this->assertEquals(3, $value->getVersion());
             $this->assertEquals($header['merkle_root'], $value->getMerkleRoot());
