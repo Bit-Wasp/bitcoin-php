@@ -195,7 +195,7 @@ class TxBuilder
         // Check TransactionOutput exists in $tx
         $transaction->getOutput($outputToSpend);
         $this->input(
-            $transaction->getTransactionId(),
+            $transaction->getTxId()->getHex(),
             $outputToSpend
         );
 
