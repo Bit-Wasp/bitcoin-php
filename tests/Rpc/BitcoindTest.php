@@ -184,7 +184,7 @@ class BitcoindTest extends AbstractTestCase
 
         $this->assertInstanceof('BitWasp\Bitcoin\Transaction\Transaction', $results);
         $this->assertEquals($tx, $results->getHex());
-        $this->assertEquals($hash, $results->getTransactionId());
+        $this->assertEquals($hash, $results->getTxId()->getHex());
     }
 
     /**

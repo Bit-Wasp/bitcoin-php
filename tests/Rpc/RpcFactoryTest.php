@@ -67,7 +67,7 @@ class RpcFactoryTest extends AbstractTestCase
 
         $call = $electrum->transactionGet($txid);
         $call->then(function (Transaction $value) use ($txid, $txHex) {
-            $this->assertEquals($txid, $value->getTransactionId());
+            $this->assertEquals($txid, $value->getTxId()->getHex());
             $this->assertEquals($txHex, $value->getHex());
         });
     }
