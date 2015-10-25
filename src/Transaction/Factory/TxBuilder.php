@@ -103,7 +103,7 @@ class TxBuilder
      * @param int $nSequence
      * @return $this
      */
-    public function input($hashPrevOut, $nPrevOut, Script $script = null, $nSequence = TransactionInputInterface::DEFAULT_SEQUENCE)
+    public function input($hashPrevOut, $nPrevOut, Script $script = null, $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
     {
         $this->inputs[] = new TransactionInput(
             $hashPrevOut,

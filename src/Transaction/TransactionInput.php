@@ -37,8 +37,16 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      * @param ScriptInterface|Buffer $script
      * @param int $sequence
      */
-    public function __construct($txid, $vout, ScriptInterface $script = null, $sequence = self::DEFAULT_SEQUENCE)
+    public function __construct($txid, $vout, ScriptInterface $script = null, $sequence = self::SEQUENCE_FINAL)
     {
+        if (!is_numeric($vout)) {
+            throw new \InvalidArgumentException('TransactionInput: vout must be numeric');
+        }
+
+        if (!is_numeric($sequence)) {
+            throw new \InvalidArgumentException('TransactionInput: sequence must be numeric');
+        }
+
         $this->txid = $txid;
         $this->vout = $vout;
         $this->script = $script ?: new Script();
@@ -109,7 +117,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function isFinal()
     {
         $math = Bitcoin::getMath();
-        return $math->cmp($this->getSequence(), self::DEFAULT_SEQUENCE) == 0;
+        return $math->cmp($this->getSequence(), self::SEQUENCE_FINAL) == 0;
     }
 
     /**
