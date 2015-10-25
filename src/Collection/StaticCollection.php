@@ -39,7 +39,7 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @return array
+     * @return mixed
      */
     public function current()
     {
@@ -89,7 +89,7 @@ abstract class StaticCollection implements CollectionInterface
 
     /**
      * @param int $offset
-     * @return array
+     * @return mixed
      */
     public function offsetGet($offset)
     {
