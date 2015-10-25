@@ -96,14 +96,6 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return string
-     */
-    public function getTransactionId()
-    {
-        return $this->getTxid()->getHex();
-    }
-
-    /**
      * @inheritdoc
      */
     public function getVersion()
