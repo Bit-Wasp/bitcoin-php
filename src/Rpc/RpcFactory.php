@@ -14,10 +14,10 @@ use React\SocketClient\Connector as SocketConnector;
 class RpcFactory
 {
     /**
-     * @param $host
-     * @param $port
-     * @param $user
-     * @param $password
+     * @param string $host
+     * @param int $port
+     * @param string $user
+     * @param string $password
      * @param int $timeout
      * @param array $headers
      * @return Bitcoind
