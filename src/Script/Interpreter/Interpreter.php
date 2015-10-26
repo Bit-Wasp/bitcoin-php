@@ -73,8 +73,6 @@ class Interpreter implements InterpreterInterface
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
      * @param \BitWasp\Bitcoin\Flags $flags
-     * @internal param Math $math
-     * @internal param GeneratorPoint $generator
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, Flags $flags)
     {
