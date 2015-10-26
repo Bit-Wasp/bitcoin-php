@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Consensus;
 
-use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;

@@ -2,11 +2,8 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Flags;
-use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
-use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class InterpreterFactory
