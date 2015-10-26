@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerial
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 use BitWasp\Buffertools\TemplateFactory;

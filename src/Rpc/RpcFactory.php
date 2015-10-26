@@ -8,14 +8,16 @@ use BitWasp\Bitcoin\Rpc\Client\ElectrumServer;
 use BitWasp\Stratum\Request\RequestFactory;
 use BitWasp\Stratum\Factory;
 use BitWasp\Bitcoin\Rpc\Client\Bitcoind;
+use React\EventLoop\LoopInterface as LoopInterface;
+use React\SocketClient\Connector as SocketConnector;
 
 class RpcFactory
 {
     /**
-     * @param $host
-     * @param $port
-     * @param $user
-     * @param $password
+     * @param string $host
+     * @param int $port
+     * @param string $user
+     * @param string $password
      * @param int $timeout
      * @param array $headers
      * @return Bitcoind
@@ -36,11 +38,11 @@ class RpcFactory
      * @param int $timeout
      * @return ElectrumServer
      */
-    public static function electrum(Math $math, \React\EventLoop\LoopInterface $loop, $host, $port, $timeout = 5)
+    public static function electrum(Math $math, LoopInterface $loop, $host, $port, $timeout = 5)
     {
         $clientFactory = new Factory(
             $loop,
-            new \React\SocketClient\Connector(
+            new SocketConnector(
                 $loop,
                 (new \React\Dns\Resolver\Factory())->create('8.8.8.8', $loop)
             ),

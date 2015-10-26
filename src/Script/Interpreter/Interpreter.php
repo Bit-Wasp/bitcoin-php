@@ -17,6 +17,7 @@ use BitWasp\Bitcoin\Script\Interpreter\Operation\StackOperation;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptStack;
+use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -72,8 +73,6 @@ class Interpreter implements InterpreterInterface
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
      * @param \BitWasp\Bitcoin\Flags $flags
-     * @internal param Math $math
-     * @internal param GeneratorPoint $generator
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, Flags $flags)
     {
@@ -155,7 +154,7 @@ class Interpreter implements InterpreterInterface
     public function isValidSignatureEncoding(Buffer $signature)
     {
         try {
-            \BitWasp\Bitcoin\Signature\TransactionSignature::isDERSignature($signature);
+            TransactionSignature::isDERSignature($signature);
             return true;
         } catch (SignatureNotCanonical $e) {
             return false;
