@@ -32,6 +32,29 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
         $this->assertEquals('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $block->getHeader()->getHash()->getHex());
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testWithInvalidNetBytes()
+    {
+        $math = new Math();
+        $bhs = new BlockHeaderSerializer();
+        $txs = new TransactionSerializer();
+        $bs = new BlockSerializer($math, $bhs, $txs);
+
+        $network = NetworkFactory::bitcoin();
+        $bds = new BitcoindBlockSerializer($network, $bs);
+
+        $buffer = new Buffer('\x00\x00\x00\x00'.substr($this->dataFile('genesis.dat'), 4));
+        //echo $buffer->getHex() . "\n";
+        $parser = new Parser($buffer);
+
+        $block = $bds->fromParser($parser);
+
+        $this->assertEquals('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $block->getHeader()->getHash()->getHex());
+    }
+
+
     public function testParseSerialize()
     {
         $math = new Math();
@@ -44,8 +67,10 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
 
         $buffer = new Buffer($this->dataFile('genesis.dat'));
         $parser = new Parser($buffer);
-
         $block = $bds->fromParser($parser);
+
+        $again = $bds->parse($buffer->getHex());
+        $this->assertEquals($again, $block);
 
         $this->assertEquals($buffer->getBinary(), $bds->serialize($block)->getBinary());
     }
