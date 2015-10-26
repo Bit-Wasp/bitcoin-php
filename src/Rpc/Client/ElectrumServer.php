@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Rpc\Client;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -137,9 +138,9 @@ class ElectrumServer
     public function blockGetHeader($height)
     {
         return $this->client->request('blockchain.block.get_header', [$height])
-            ->then(function (\BitWasp\Stratum\Request\Response $response) {
+            ->then(function (Response $response) {
                 $content = $response->getResult();
-                return new \BitWasp\Bitcoin\Block\BlockHeader(
+                return new BlockHeader(
                     $content['version'],
                     @$content['prev_block_hash'],
                     $content['merkle_root'],
