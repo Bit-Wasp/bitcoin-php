@@ -67,8 +67,10 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
 
         $buffer = new Buffer($this->dataFile('genesis.dat'));
         $parser = new Parser($buffer);
-
         $block = $bds->fromParser($parser);
+
+        $again = $bds->parse($buffer->getHex());
+        $this->assertEquals($again, $block);
 
         $this->assertEquals($buffer->getBinary(), $bds->serialize($block)->getBinary());
     }
