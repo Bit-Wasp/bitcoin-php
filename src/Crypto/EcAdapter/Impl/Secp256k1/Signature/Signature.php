@@ -30,6 +30,8 @@ class Signature extends Serializable implements SignatureInterface
 
     /**
      * @param EcAdapter $adapter
+     * @param int|string $r
+     * @param int|string $s
      * @param resource $secp256k1_ecdsa_signature_t
      */
     public function __construct(EcAdapter $adapter, $r, $s, $secp256k1_ecdsa_signature_t)

@@ -39,9 +39,10 @@ class ArithmeticOperation
      * @var Buffer
      */
     private $_bn1;
-    
+
     /**
      * @param Opcodes $opCodes
+     * @param Flags $flags
      * @param Math $math
      * @param callable $castToBool
      * @param Buffer $_bn0

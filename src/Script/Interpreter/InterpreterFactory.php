@@ -20,6 +20,7 @@ class InterpreterFactory
 
     /**
      * @param EcAdapterInterface $ec
+     * @param Flags $flags
      */
     public function __construct(EcAdapterInterface $ec, Flags $flags)
     {

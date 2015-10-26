@@ -22,9 +22,8 @@ class Script extends Serializable implements ScriptInterface
     protected $script;
 
     /**
-     * Initialize container
-     *
-     * @param Buffer $script
+     * @param Buffer|null $script
+     * @param Opcodes|null $opcodes
      */
     public function __construct(Buffer $script = null, Opcodes $opcodes = null)
     {

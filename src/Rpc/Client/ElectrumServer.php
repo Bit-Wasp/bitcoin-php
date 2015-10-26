@@ -28,6 +28,7 @@ class ElectrumServer
     private $math;
 
     /**
+     * @param Math $math
      * @param Client $client
      */
     public function __construct(Math $math, Client $client)
@@ -58,7 +59,8 @@ class ElectrumServer
     }
 
     /**
-     * @param $txid
+     * @param string $txid
+     * @param int $height
      * @return \React\Promise\Promise
      */
     public function transactionGetMerkle($txid, $height)

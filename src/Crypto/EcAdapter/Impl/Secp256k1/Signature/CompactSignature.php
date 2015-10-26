@@ -42,6 +42,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     /**
      * @param EcAdapter $ecAdapter
      * @param resource $secp256k1_ecdsa_signature_t
+     * @param int $recid
      * @param bool $compressed
      */
     public function __construct(EcAdapter $ecAdapter, $secp256k1_ecdsa_signature_t, $recid, $compressed)

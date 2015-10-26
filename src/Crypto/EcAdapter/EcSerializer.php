@@ -10,7 +10,7 @@ class EcSerializer
     const PATH_SECP256K1 = 'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\\';
 
     /**
-     * @var array
+     * @var string[]
      */
     private static $serializerInterface = [
         'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface',
@@ -20,7 +20,7 @@ class EcSerializer
     ];
 
     /**
-     * @var array
+     * @var string[]
      */
     private static $serializerImpl = [
         'Serializer\Key\PrivateKeySerializer',
@@ -52,7 +52,7 @@ class EcSerializer
     {
         if (empty(self::$map)) {
             if (!in_array($interface, self::$serializerInterface)) {
-                throw new \InvalidArgumentException('Invalid interface');
+                throw new \InvalidArgumentException('Interface not known');
             }
 
             $cInterface = count(self::$serializerInterface);
@@ -61,6 +61,7 @@ class EcSerializer
             }
 
             for ($i = 0; $i < $cInterface; $i++) {
+                /** @var string $iface */
                 $iface = self::$serializerInterface[$i];
                 $ipath = self::$serializerImpl[$i];
                 self::$map[$iface] = $ipath;
@@ -98,8 +99,9 @@ class EcSerializer
 
     /**
      * @param EcAdapterInterface $adapter
-     * @param string $interface
+     * @param $interface
      * @param bool|true $useCache
+     * @return mixed
      */
     public static function getSerializer(EcAdapterInterface $adapter, $interface, $useCache = true)
     {
