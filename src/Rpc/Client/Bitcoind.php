@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -98,42 +99,10 @@ class Bitcoind
      */
     public function getblock($blockhash)
     {
-        $blockArray = $this->client->execute('getblock', [$blockhash, true]);
+        $blockArray = $this->client->execute('getblock', [$blockhash, false]);
         $this->checkNotNull($blockArray);
 
-        // Establish batch query for loading transactions
-        $txs = [];
-        if (count($blockArray['tx']) > 0) {
-            $this->client->batch();
-            foreach ($blockArray['tx'] as $txid) {
-                $this->client->execute('getrawtransaction', array($txid));
-            }
-            $result = $this->client->send();
-
-            // Build the transactions
-            $txs = array_map(
-                function ($value) {
-                    return TransactionFactory::fromHex($value);
-                },
-                $result
-            );
-        }
-
-        // Build block header
-        $header = new BlockHeader(
-            $blockArray['version'],
-            @$blockArray['previousblockhash'], // @ for genesis block.
-            $blockArray['merkleroot'],
-            $blockArray['time'],
-            Buffer::hex($blockArray['bits']),
-            $blockArray['nonce']
-        );
-
-        return new Block(
-            Bitcoin::getMath(),
-            $header,
-            new TransactionCollection($txs)
-        );
+        return BlockFactory::fromHex($blockArray);
     }
 
     /**
