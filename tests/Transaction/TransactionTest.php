@@ -164,6 +164,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTxId()->getHex());
+        $this->assertTrue($tx->isCoinbase());
     }
 
     public function testOpReturnTx()

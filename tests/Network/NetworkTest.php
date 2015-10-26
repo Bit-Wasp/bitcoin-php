@@ -4,10 +4,11 @@ namespace BitWasp\Bitcoin\Tests\Network;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 
-class NetworkTest extends \PHPUnit_Framework_TestCase
+class NetworkTest extends AbstractTestCase
 {
     /**
      *
@@ -15,7 +16,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreatesInstance()
     {
         $network = NetworkFactory::create('00', '05', '80', true);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Network\NetworkInterface', $network);
+        $this->assertInstanceOf($this->netInterfaceType, $network);
     }
 
     /**
@@ -90,7 +91,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreateTestnet()
     {
         $network = $this->getTestNetwork();
-        $this->assertInstanceOf('BitWasp\Bitcoin\Network\NetworkInterface', $network);
+        $this->assertInstanceOf($this->netInterfaceType, $network);
         $this->assertInternalType('bool', $network->isTestnet());
         $this->assertTrue($network->isTestnet());
     }
@@ -98,7 +99,7 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
     public function testCreateLivenet()
     {
         $network = $this->getLiveNetwork();
-        $this->assertInstanceOf('BitWasp\Bitcoin\Network\NetworkInterface', $network);
+        $this->assertInstanceOf($this->netInterfaceType, $network);
         $this->assertInternalType('bool', $network->isTestnet());
         $this->assertFalse($network->isTestnet());
     }
@@ -175,6 +176,8 @@ class NetworkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(NetworkFactory::viacoinTestnet()->getNetMagicBytes(), '92efc5a9');
         $this->assertEquals("2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV", $p2sh->getAddress(NetworkFactory::viacoinTestnet()));
         $this->assertEquals("t7ZKfRypXUd7ByZGLLi5jX3AbD7KQvDj4a", $p2pk->getAddress(NetworkFactory::viacoinTestnet()));
+
+        $this->assertInstanceOf($this->netInterfaceType, NetworkFactory::litecoinTestnet());
     }
 
     public function testGetHDPrivByte()

@@ -27,7 +27,7 @@ class InputCollectionMutator
     public function getInput($i)
     {
         if (!isset($this->inputs[$i])) {
-            throw new \RuntimeException('Input does not exist');
+            throw new \OutOfRangeException('Input does not exist');
         }
 
         return $this->inputs[$i];
@@ -51,15 +51,6 @@ class InputCollectionMutator
     }
 
     /**
-     * @return $this
-     */
-    public function null()
-    {
-        $this->inputs = [];
-        return $this;
-    }
-
-    /**
      * @param int|string $start
      * @param int|string $length
      * @return $this
@@ -72,6 +63,15 @@ class InputCollectionMutator
         }
 
         $this->inputs = array_slice($this->inputs, $start, $length);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function null()
+    {
+        $this->slice(0, 0);
         return $this;
     }
 

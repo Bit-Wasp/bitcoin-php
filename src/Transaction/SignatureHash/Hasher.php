@@ -118,8 +118,6 @@ class Hasher implements SignatureHashInterface
         return Hash::sha256d(
             Buffertools::concat(
                 $tx
-                    ->inputs($vin->get())
-                    ->outputs($vout->get())
                     ->get()
                     ->getBuffer(),
                 Buffertools::flipBytes(Buffer::int($sighashType, 4, $math))

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
@@ -32,6 +33,21 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($in->isFinal());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidVout()
+    {
+        new TransactionInput('a', 'b', new Script);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidSequece()
+    {
+        new TransactionInput('a', 0, new Script, 'b');
+    }
     public function testConstructWithScript()
     {
 

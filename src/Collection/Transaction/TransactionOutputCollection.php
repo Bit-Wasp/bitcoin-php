@@ -19,8 +19,8 @@ class TransactionOutputCollection extends StaticCollection
      */
     public function __construct(array $inputs = [])
     {
-        foreach ($inputs as $input) {
-            if (!$input instanceof TransactionOutputInterface) {
+        foreach ($inputs as $output) {
+            if (!$output instanceof TransactionOutputInterface) {
                 throw new \InvalidArgumentException('Must provide TransactionOutputInterface[] to TransactionOutputCollection');
             }
         }
@@ -36,6 +36,14 @@ class TransactionOutputCollection extends StaticCollection
             },
             $this->set->toArray()
         ));
+    }
+
+    /**
+     * @return TransactionOutputInterface
+     */
+    public function current()
+    {
+        return $this->set->current();
     }
 
     /**

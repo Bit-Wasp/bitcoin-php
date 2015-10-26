@@ -27,7 +27,7 @@ class OutputCollectionMutator
     public function getOutput($i)
     {
         if (!isset($this->outputs[$i])) {
-            throw new \RuntimeException('Input does not exist');
+            throw new \OutOfRangeException('Output does not exist');
         }
 
         return $this->outputs[$i];
@@ -51,15 +51,6 @@ class OutputCollectionMutator
     }
 
     /**
-     * @return $this
-     */
-    public function null()
-    {
-        $this->outputs = [];
-        return $this;
-    }
-
-    /**
      * @param int|string $start
      * @param int|string $length
      * @return $this
@@ -72,6 +63,15 @@ class OutputCollectionMutator
         }
 
         $this->outputs = array_slice($this->outputs, $start, $length);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function null()
+    {
+        $this->slice(0, 0);
         return $this;
     }
 
@@ -103,11 +103,9 @@ class OutputCollectionMutator
      */
     public function update($i, TransactionOutputInterface $output)
     {
-        if (!isset($this->outputs[$i])) {
-            throw new \RuntimeException('Input does not exist');
-        }
-
-        return $this->set($i, $output);
+        $this->getOutput($i);
+        $this->set($i, $output);
+        return $this;
     }
 
     /**
