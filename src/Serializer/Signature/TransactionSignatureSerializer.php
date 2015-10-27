@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Serializer\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 
 class TransactionSignatureSerializer
@@ -29,7 +30,7 @@ class TransactionSignatureSerializer
     {
         $sig = $this->sigSerializer->serialize($txSig->getSignature());
         $parser = new Parser($sig->getHex());
-        $parser->writeInt(1, $txSig->getHashType());
+        $parser->writeBytes(1, Buffer::int($txSig->getHashType(), 1));
         $buffer = $parser->getBuffer();
         return $buffer;
     }
