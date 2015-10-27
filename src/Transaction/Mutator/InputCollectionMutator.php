@@ -2,22 +2,59 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
+use BitWasp\Bitcoin\Collection\MutableCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 
-class InputCollectionMutator
+class InputCollectionMutator extends MutableCollection
 {
     /**
-     * @var TransactionInputInterface[]
+     * @var \SplFixedArray
      */
-    private $inputs;
+    protected $set;
 
     /**
-     * @param TransactionInputCollection $inputs
+     * @param TransactionInputInterface[] $inputs
      */
-    public function __construct(TransactionInputCollection $inputs)
+    public function __construct(array $inputs)
     {
-        $this->inputs = $inputs->all();
+        /** @var InputMutator[] $set */
+        $set = [];
+        foreach ($inputs as $i => $input) {
+            $set[$i] = new InputMutator($input);
+        }
+
+        $this->set = \SplFixedArray::fromArray($set);
+    }
+
+    /**
+     * @return InputMutator
+     */
+    public function current()
+    {
+        return $this->set->current();
+    }
+
+    /**
+     * @param int $offset
+     * @return InputMutator
+     */
+    public function offsetGet($offset)
+    {
+        if (!$this->set->offsetExists($offset)) {
+            throw new \OutOfRangeException('Input does not exist');
+        }
+
+        return $this->set->offsetGet($offset);
+    }
+
+    /**
+     * @param int $index
+     * @return InputMutator
+     */
+    public function get($index)
+    {
+        return $this->offsetGet($index);
     }
 
     /**
@@ -26,28 +63,20 @@ class InputCollectionMutator
      */
     public function getInput($i)
     {
-        if (!isset($this->inputs[$i])) {
-            throw new \OutOfRangeException('Input does not exist');
-        }
-
-        return $this->inputs[$i];
-    }
-
-    /**
-     * @param int|string $i
-     * @return InputMutator
-     */
-    public function inputMutator($i)
-    {
-        return new InputMutator($this->getInput($i));
+        return $this->offsetGet($i)->done();
     }
 
     /**
      * @return TransactionInputCollection
      */
-    public function get()
+    public function done()
     {
-        return new TransactionInputCollection($this->inputs);
+        $set = [];
+        foreach ($this->set as $mutator) {
+            $set[] = $mutator->done();
+        }
+
+        return new TransactionInputCollection($set);
     }
 
     /**
@@ -57,12 +86,12 @@ class InputCollectionMutator
      */
     public function slice($start, $length)
     {
-        $end = count($this->inputs);
+        $end = $this->set->getSize();
         if ($start > $end || $length > $end) {
             throw new \RuntimeException('Invalid start or length');
         }
 
-        $this->inputs = array_slice($this->inputs, $start, $length);
+        $this->set = \SplFixedArray::fromArray(array_slice($this->set->toArray(), $start, $length));
         return $this;
     }
 
@@ -81,7 +110,10 @@ class InputCollectionMutator
      */
     public function add(TransactionInputInterface $input)
     {
-        $this->inputs[] = $input;
+        $size = $this->set->getSize();
+        $this->set->setSize($size + 1);
+
+        $this->set[$size] = new InputMutator($input);
         return $this;
     }
 
@@ -92,7 +124,7 @@ class InputCollectionMutator
      */
     public function set($i, TransactionInputInterface $input)
     {
-        $this->inputs[$i] = $input;
+        $this->set[$i] = new InputMutator($input);
         return $this;
     }
 
@@ -103,8 +135,8 @@ class InputCollectionMutator
      */
     public function update($i, TransactionInputInterface $input)
     {
-        $this->getInput($i);
-        $this->set($i, $input);
+        $this->offsetGet($i);
+        $this->offsetSet($i, $input);
         return $this;
     }
 
@@ -115,9 +147,8 @@ class InputCollectionMutator
      */
     public function applyTo($i, \Closure $closure)
     {
-        $mutator = $this->inputMutator($i);
+        $mutator = $this->offsetGet($i);
         $closure($mutator);
-        $this->update($i, $mutator->get());
         return $this;
     }
 }

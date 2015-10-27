@@ -21,7 +21,7 @@ class OutputMutatorTest extends AbstractTestCase
         $newOutput = $modifier
             ->value($newValue)
             ->script($newScript)
-            ->get();
+            ->done();
 
         $this->assertEquals($newValue, $newOutput->getValue());
         $this->assertEquals($newScript, $newOutput->getScript());
@@ -35,7 +35,7 @@ class OutputMutatorTest extends AbstractTestCase
         $modifier = new OutputMutator($output);
         $newOutput = $modifier
             ->null()
-            ->get();
+            ->done();
 
         $this->assertEquals('18446744073709551615', $newOutput->getValue());
         $this->assertEquals($script, $newOutput->getScript());

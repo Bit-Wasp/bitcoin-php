@@ -197,7 +197,7 @@ class TxSigner
             });
         }
 
-        return $mutator->get();
+        return $mutator->done();
     }
 
     /**

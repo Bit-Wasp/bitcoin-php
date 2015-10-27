@@ -25,7 +25,7 @@ class InputCollectionMutatorTest extends AbstractTestCase
             new TransactionInput('b', 0, new Script()),
         ]);
 
-        $mutator = new InputCollectionMutator($collection);
+        $mutator = new InputCollectionMutator($collection->all());
         $mutator->applyTo(0, function (InputMutator $i) use ($vout1, $script1) {
             $i  ->script($script1)
                 ->vout($vout1);
@@ -36,7 +36,7 @@ class InputCollectionMutatorTest extends AbstractTestCase
                 ->vout($vout2);
         });
 
-        $new = $mutator->get();
+        $new = $mutator->done();
         $this->assertEquals('a', $new->get(0)->getTransactionId());
         $this->assertEquals($vout1, $new->get(0)->getVout());
         $this->assertEquals($script1, $new->get(0)->getScript());
@@ -54,7 +54,7 @@ class InputCollectionMutatorTest extends AbstractTestCase
         $collection = new TransactionInputCollection([
         ]);
 
-        $mutator = new InputCollectionMutator($collection);
+        $mutator = new InputCollectionMutator($collection->all());
         $mutator->slice(0, 1);
     }
 
@@ -65,9 +65,9 @@ class InputCollectionMutatorTest extends AbstractTestCase
             new TransactionInput('b', 10, new Script()),
         ]);
 
-        $mutator = new InputCollectionMutator($collection);
+        $mutator = new InputCollectionMutator($collection->all());
         $mutator->null();
-        $outputs = $mutator->get();
+        $outputs = $mutator->done();
 
         $this->assertEquals(0, count($outputs));
     }
@@ -80,7 +80,7 @@ class InputCollectionMutatorTest extends AbstractTestCase
         $collection = new TransactionInputCollection([
         ]);
 
-        $mutator = new InputCollectionMutator($collection);
+        $mutator = new InputCollectionMutator($collection->all());
         $mutator->update(1, new TransactionInput('a', 1, new Script()));
     }
 }
