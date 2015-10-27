@@ -13,7 +13,7 @@ class BlockFactory
     /**
      * @param \BitWasp\Buffertools\Buffer|string $string
      * @param Math $math
-     * @return Block
+     * @return BlockInterface
      */
     public static function fromHex($string, Math $math = null)
     {
