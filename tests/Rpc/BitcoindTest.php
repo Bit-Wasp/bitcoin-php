@@ -310,7 +310,7 @@ class BitcoindTest extends AbstractTestCase
         $vout = 1;
         $t = TransactionFactory::build()
             ->input($txid, $vout)
-            ->payToAddress(AddressFactory::fromString('1BvGQa7QHK3M4t2DXKePrKEpLRisM8eVys'), '9794466')
+            ->payToAddress('9794466', AddressFactory::fromString('1BvGQa7QHK3M4t2DXKePrKEpLRisM8eVys'))
             ->get();
 
         $o = $t->getOutput(0);

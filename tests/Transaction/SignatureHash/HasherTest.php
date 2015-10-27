@@ -76,8 +76,8 @@ class HasherTest extends AbstractTestCase
         $b = new TxBuilder();
         $new = $b
             ->spendOutputFrom($tx, 1)
-            ->payToAddress($priv->getAddress(), 15000000)
-            ->payToAddress(\BitWasp\Bitcoin\Address\AddressFactory::fromString('moFRKYGsQWQfDPmRUNrzsGwqTzdBNyaKfe', $network), 10000000)
+            ->payToAddress(15000000, $priv->getAddress())
+            ->payToAddress(10000000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('moFRKYGsQWQfDPmRUNrzsGwqTzdBNyaKfe', $network))
             ->get();
 
         $builder = new TxSigner($ecAdapter, $new);
@@ -132,9 +132,9 @@ class HasherTest extends AbstractTestCase
             ->spendOutputFrom($transaction1, $tx1NOut)
             ->spendOutputFrom($transaction2, $tx2NOut)
             ->spendOutputFrom($transaction3, $tx3NOut)
-            ->payToAddress($addr1, 20000)
-            ->payToAddress($addr2, 30000)
-            ->payToAddress($addr3, 50000);
+            ->payToAddress(20000, $addr1)
+            ->payToAddress(30000, $addr2)
+            ->payToAddress(50000, $addr3);
         $unsigned = $b->get();
         $this->assertEquals($expectedUnsignedTx, $unsigned->getHex());
 

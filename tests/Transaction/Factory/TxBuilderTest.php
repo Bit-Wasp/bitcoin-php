@@ -90,7 +90,7 @@ class TxBuilderTest extends AbstractTestCase
         $value = 50;
 
         $builder = new TxBuilder();
-        $builder->payToAddress($address, $value);
+        $builder->payToAddress($value, $address);
         $tx = $builder->get();
 
         $output = $tx->getOutput(0);
@@ -153,7 +153,7 @@ class TxBuilderTest extends AbstractTestCase
 
         $ecAdapter = $this->safeEcAdapter();
         $builder = new TxBuilder($ecAdapter);
-        $builder->payToAddress($address, 50);
+        $builder->payToAddress(50, $address);
 
         $this->assertEquals($expectedScript, $builder->get()->getOutput(0)->getScript());
     }

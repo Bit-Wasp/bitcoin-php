@@ -205,11 +205,11 @@ class TxBuilder
     /**
      * Create an output paying $value to an Address.
      *
-     * @param AddressInterface $address
      * @param int $value
+     * @param AddressInterface $address
      * @return $this
      */
-    public function payToAddress(AddressInterface $address, $value)
+    public function payToAddress($value, AddressInterface $address)
     {
         // Create Script from address, then create an output.
         $this->output(
