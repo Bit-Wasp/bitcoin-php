@@ -111,6 +111,7 @@ class TxBuilder
             $script ?: new Script(),
             $nSequence
         );
+
         return $this;
     }
 

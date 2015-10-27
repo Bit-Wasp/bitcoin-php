@@ -3,12 +3,14 @@
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\Block;
+use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -102,9 +104,9 @@ class Params implements ParamsInterface
             '1',
             '0000000000000000000000000000000000000000000000000000000000000000',
             '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
-            1231006505,
+            '1231006505',
             Buffer::hex('1d00ffff', 4, $this->math),
-            2083236893
+            '2083236893'
         );
     }
 
@@ -117,7 +119,7 @@ class Params implements ParamsInterface
         $publicKey = Buffer::hex('04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f', null, $this->math);
 
         $inputScript = ScriptFactory::create()
-            ->push(Buffer::int('486604799', 4, $this->math))
+            ->push(Buffer::int('486604799', 4, $this->math)->flip())
             ->push(Buffer::int('4', null, $this->math))
             ->push($timestamp)
             ->getScript();
@@ -131,18 +133,12 @@ class Params implements ParamsInterface
             $this->math,
             $this->getGenesisBlockHeader(),
             new TransactionCollection([
-                new Transaction(
-                    '1',
-                    new TransactionInputCollection([new TransactionInput(
-                        '0000000000000000000000000000000000000000000000000000000000000000',
-                        0xffffffff,
-                        $inputScript
-                    )]),
-                    new TransactionOutputCollection([new TransactionOutput(
-                        50,
-                        $outputScript
-                    )])
-                )
+                (new TxBuilder)
+                    ->version('1')
+                    ->input('0000000000000000000000000000000000000000000000000000000000000000', 0xffffffff, $inputScript)
+                    ->output(5000000000, $outputScript)
+                    ->locktime(0)
+                    ->get()
             ])
         );
     }
