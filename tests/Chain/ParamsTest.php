@@ -3,13 +3,15 @@
 namespace BitWasp\Bitcoin\Tests\Chain;
 
 use BitWasp\Bitcoin\Chain\Params;
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ParamsTest extends AbstractTestCase
 {
     public function testParams()
     {
-        $params = new Params();
+        $math = new Math();
+        $params = new Params($math);
         $this->assertEquals(486604799, $params->powBitsLimit());
         $this->assertEquals('26959946667150639794667015087019630673637144422540572481103610249215', $params->powTargetLimit());
         $this->assertEquals(2016, $params->powRetargetInterval());
@@ -25,6 +27,9 @@ class ParamsTest extends AbstractTestCase
         $this->assertEquals(1000000, $params->maxBlockSizeBytes());
         $this->assertEquals(21000000, $params->maxMoney());
         $this->assertEquals(1333238400, $params->p2shActivateTime());
+
+        $this->assertEquals(20000, $params->getMaxBlockSigOps());
+        $this->assertEquals(4000, $params->getMaxTxSigOps());
 
     }
 }

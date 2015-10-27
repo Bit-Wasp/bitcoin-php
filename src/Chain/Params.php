@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
+use BitWasp\Bitcoin\Math\Math;
+
 class Params implements ParamsInterface
 {
     /**
@@ -66,6 +68,20 @@ class Params implements ParamsInterface
      * @var int
      */
     protected static $majorityEnforceBlockUpgrade = 750;
+
+
+    /**
+     * @var Math
+     */
+    protected $math;
+
+    /**
+     * @param Math $math
+     */
+    public function __construct(Math $math)
+    {
+        $this->math = $math;
+    }
 
     /**
      * @return int
@@ -161,5 +177,20 @@ class Params implements ParamsInterface
     public function p2shActivateTime()
     {
         return static::$p2shActivateTime;
+    }
+
+    /**
+     * @return int|string
+     */
+    public function getMaxBlockSigOps()
+    {
+        return $this->math->div($this->maxBlockSizeBytes(), 50);
+    }
+    /**
+     * @return int|string
+     */
+    public function getMaxTxSigOps()
+    {
+        return $this->math->div($this->getMaxBlockSigOps(), 5);
     }
 }
