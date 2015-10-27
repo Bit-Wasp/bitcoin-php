@@ -44,7 +44,8 @@ class DifficultyTest extends AbstractTestCase
             ]
         ];
 
-        $params = new Params();
+        $math = $this->safeMath();
+        $params = new Params($math);
         $difficulty = new ProofOfWork($this->math, $params);
 
         foreach ($vectors as $v) {
@@ -58,11 +59,12 @@ class DifficultyTest extends AbstractTestCase
         $f = file_get_contents(__DIR__.'/../Data/difficulty.json');
 
         $json = json_decode($f);
+
+        $math = $this->safeMath();
+        $params = new Params($math);
+        $difficulty = new ProofOfWork($this->math, $params);
         foreach ($json->test as $test) {
-            $default = Buffer::hex($test->defaultBits);
             $bits = Buffer::hex($test->bits);
-            $params = new Params();
-            $difficulty = new ProofOfWork($this->math, $params);
 
             $this->assertEquals($test->targetHash, $difficulty->getTargetHash($bits)->getHex());
             $this->assertEquals($test->difficulty, $difficulty->getDifficulty($bits));

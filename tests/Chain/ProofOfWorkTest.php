@@ -15,7 +15,8 @@ class ProofOfWorkTest extends AbstractTestCase
 
     public function getHistoricData()
     {
-        $params = new Params();
+        $math = $this->safeMath();
+        $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
         $data = json_decode(file_get_contents(__DIR__ . '/../Data/pow'), true);
 
@@ -35,7 +36,8 @@ class ProofOfWorkTest extends AbstractTestCase
      */
     public function testWhereBitsBelowMinimum()
     {
-        $params = new Params();
+        $math = $this->safeMath();
+        $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
         $bits = '1';
         $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
@@ -48,7 +50,7 @@ class ProofOfWorkTest extends AbstractTestCase
     public function testWhereHashTooLow()
     {
         $math = new Math();
-        $params = new Params();
+        $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
         $bits = $math->hexDec('181287ba');
         $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
