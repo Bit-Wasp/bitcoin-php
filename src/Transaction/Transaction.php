@@ -34,6 +34,21 @@ class Transaction extends Serializable implements TransactionInterface
     private $lockTime;
 
     /**
+     * @var null|Buffer
+     */
+    private $cacheHash;
+
+    /**
+     * @var null|Buffer
+     */
+    private $cacheTxid;
+
+    /**
+     * @var null|Buffer
+     */
+    private $cacheBuffer;
+
+    /**
      * @param int|string $version
      * @param TransactionInputCollection $inputs
      * @param TransactionOutputCollection $outputs
@@ -84,7 +99,11 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxHash()
     {
-        return Hash::sha256d($this->getBuffer());
+        if (is_null($this->cacheHash)) {
+            $this->cacheHash = Hash::sha256d($this->getBuffer());
+        }
+
+        return $this->cacheHash;
     }
 
     /**
@@ -92,7 +111,11 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxId()
     {
-        return $this->getTxHash()->flip();
+        if (is_null($this->cacheTxid)) {
+            $this->cacheTxid = $this->getTxHash()->flip();
+        }
+
+        return $this->cacheTxid;
     }
 
     /**
@@ -186,6 +209,10 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
-        return (new TransactionSerializer())->serialize($this);
+        if (is_null($this->cacheBuffer)) {
+            $this->cacheBuffer = (new TransactionSerializer)->serialize($this);
+        }
+
+        return $this->cacheBuffer;
     }
 }
