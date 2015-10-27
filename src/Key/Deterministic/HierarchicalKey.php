@@ -10,6 +10,7 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -194,7 +195,6 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
-        $parser = new Parser();
         $hardened = $this->ecAdapter->getMath()->getBinaryMath()->isNegative($sequence, 32);
 
         if ($hardened) {
@@ -202,16 +202,13 @@ class HierarchicalKey
                 throw new \Exception("Can't derive a hardened key without the private key");
             }
 
-            $parser
-                ->writeBytes(1, '00')
-                ->writeBytes(32, $this->getPrivateKey()->getBuffer());
-
+            $buffer = Buffertools::concat(new Buffer("\x00"), $this->getPrivateKey()->getBuffer());
         } else {
-            $parser->writeBytes(33, $this->getPublicKey()->getBuffer());
+            $buffer = $this->getPublicKey()->getBuffer();
         }
 
-        return $parser
-            ->writeInt(4, $sequence)
+        return (new Parser($buffer))
+            ->writeBytes(4, Buffer::int($sequence, 4))
             ->getBuffer();
     }
 

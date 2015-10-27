@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
 class ScriptCreator
@@ -66,21 +67,22 @@ class ScriptCreator
         /** Note that larger integers are serialized without flipping bits - Big endian */
 
         if ($length < $this->opcodes->getOpByName('OP_PUSHDATA1')) {
-            $parsed = $parsed->writeWithLength($data);
-
-        } elseif ($length <= 0xff) {
-            $parsed->writeInt(1, $this->opcodes->getOpByName('OP_PUSHDATA1'))
-                ->writeInt(1, $length, false)
-                ->writeBytes($length, $data);
-
-        } elseif ($length <= 0xffff) {
-            $parsed->writeInt(1, $this->opcodes->getOpByName('OP_PUSHDATA2'))
-                ->writeInt(2, $length, true)
-                ->writeBytes($length, $data);
-
+            $varInt = Buffertools::numToVarInt($length);
+            $data = new Buffer($varInt->getBinary() . $data->getBinary(), null, $this->math);
+            $parsed->writeBytes($data->getSize(), $data);
         } else {
-            $parsed->writeInt(1, $this->opcodes->getOpByName('OP_PUSHDATA4'))
-                ->writeInt(4, $length, true)
+            if ($length <= 0xff) {
+                $lengthSize = 1;
+            } elseif ($length <= 0xffff) {
+                $lengthSize = 2;
+            } else {
+                $lengthSize = 4;
+            }
+
+            $op = $this->opcodes->getOpByName('OP_PUSHDATA' . $lengthSize);
+            $parsed
+                ->writeBytes(1, Buffer::int($op))
+                ->writeBytes($lengthSize, Buffer::int($length), true)
                 ->writeBytes($length, $data);
         }
 
