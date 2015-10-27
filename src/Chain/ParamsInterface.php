@@ -2,8 +2,21 @@
 
 namespace BitWasp\Bitcoin\Chain;
 
+use BitWasp\Bitcoin\Block\BlockHeaderInterface;
+use BitWasp\Bitcoin\Block\BlockInterface;
+
 interface ParamsInterface
 {
+    /**
+     * @return BlockHeaderInterface
+     */
+    public function getGenesisBlockHeader();
+
+    /**
+     * @return BlockInterface
+     */
+    public function getGenesisBlock();
+
     /**
      * @return int
      */
@@ -60,5 +73,18 @@ interface ParamsInterface
      */
     public function majorityWindow();
 
+    /**
+     * @return int
+     */
     public function p2shActivateTime();
+
+    /**
+     * @return int|string
+     */
+    public function getMaxBlockSigOps();
+
+    /**
+     * @return int|string
+     */
+    public function getMaxTxSigOps();
 }
