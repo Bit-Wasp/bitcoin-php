@@ -68,7 +68,9 @@ class TransactionSerializer
      */
     public function fromParser(Parser & $parser)
     {
-        list ($version, $inputArray, $outputArray, $locktime) = $this->getTemplate()->parse($parser);
+        $p  = $this->getTemplate()->parse($parser);
+
+        list ($version, $inputArray, $outputArray, $locktime) = $p;
 
         return (new TxBuilder())
             ->version($version)
