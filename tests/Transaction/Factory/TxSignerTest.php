@@ -267,7 +267,7 @@ class TxSignerTest extends AbstractTestCase
 
         $forBuilder = (new TxBuilder())
             ->spendOutputFrom($spendTx, 0)
-            ->payToAddress($pk1->getAddress(), 50)
+            ->payToAddress(50, $pk1->getAddress())
             ->get();
 
         // Take the built transaction, pass it to a new TransactionBuilder class, and manually create input state
@@ -295,7 +295,7 @@ class TxSignerTest extends AbstractTestCase
 
         $forBuilder = (new TxBuilder())
             ->spendOutputFrom($spendTx, 0)
-            ->payToAddress($pk1->getAddress(), 50)
+            ->payToAddress(50, $pk1->getAddress())
             ->get();
 
         // Now we build a transaction spending it
@@ -335,7 +335,7 @@ class TxSignerTest extends AbstractTestCase
 
         $forBuilder = (new TxBuilder())
             ->spendOutputFrom($spendTx, 0)
-            ->payToAddress($pk1->getAddress(), 50)
+            ->payToAddress(50, $pk1->getAddress())
             ->get();
 
         // Now we build a transaction spending it
