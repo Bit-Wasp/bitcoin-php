@@ -40,6 +40,11 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $nonce;
 
     /**
+     * @var null|Buffer
+     */
+    private $cacheHash;
+
+    /**
      * @param int|string $version
      * @param string $prevBlock
      * @param string $merkleRoot
@@ -59,6 +64,18 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
         $this->timestamp = $timestamp;
         $this->bits = $bits;
         $this->nonce = $nonce;
+    }
+
+    /**
+     * @return Buffer
+     */
+    public function getHash()
+    {
+        if (is_null($this->cacheHash)) {
+            $this->cacheHash = Hash::sha256d($this->getBuffer())->flip();
+        }
+
+        return $this->cacheHash;
     }
 
     /**
@@ -96,14 +113,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     public function getBits()
     {
         return $this->bits;
-    }
-
-    /**
-     * @return Buffer
-     */
-    public function getHash()
-    {
-        return Hash::sha256d($this->getBuffer())->flip();
     }
 
     /**
