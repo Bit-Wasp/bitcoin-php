@@ -39,7 +39,7 @@ class TxMutatorTest extends AbstractTestCase
             new TransactionOutput(50, new Script())
         ]));
 
-        $newTx = $mutator->get();
+        $newTx = $mutator->done();
         $this->assertEquals($newVersion, $newTx->getVersion());
         $this->assertEquals($newLockTime, $newTx->getLockTime());
         $this->assertEquals(1, count($newTx->getInputs()));

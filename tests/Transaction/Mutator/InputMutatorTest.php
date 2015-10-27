@@ -30,7 +30,7 @@ class InputMutatorTest extends AbstractTestCase
             ->vout($newVout)
             ->script($newScript)
             ->sequence($newSequence)
-            ->get();
+            ->done();
 
         $this->assertEquals($newTxid, $new->getTransactionId());
         $this->assertEquals($newVout, $new->getVout());
@@ -50,7 +50,7 @@ class InputMutatorTest extends AbstractTestCase
         $mutator = new InputMutator($input);
         $new = $mutator
             ->null()
-            ->get();
+            ->done();
 
         $this->assertEquals('0000000000000000000000000000000000000000000000000000000000000000', $new->getTransactionId());
         $this->assertEquals(0xffffffff, $new->getVout());

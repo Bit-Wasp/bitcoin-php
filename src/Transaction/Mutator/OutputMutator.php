@@ -25,7 +25,7 @@ class OutputMutator
     /**
      * @return TransactionOutputInterface
      */
-    public function get()
+    public function done()
     {
         return $this->output;
     }

@@ -24,7 +24,7 @@ class InputMutator
     /**
      * @return TransactionInputInterface
      */
-    public function get()
+    public function done()
     {
         return $this->input;
     }
