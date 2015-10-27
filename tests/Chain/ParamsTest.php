@@ -30,6 +30,6 @@ class ParamsTest extends AbstractTestCase
 
         $this->assertEquals(20000, $params->getMaxBlockSigOps());
         $this->assertEquals(4000, $params->getMaxTxSigOps());
-
+        $this->assertEquals('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $params->getGenesisBlock()->getHeader()->getHash()->getHex());
     }
 }
