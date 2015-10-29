@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aeonium
- * Date: 25/10/15
- * Time: 18:08
- */
 
 namespace BitWasp\Bitcoin\Tests\Collection;
 
