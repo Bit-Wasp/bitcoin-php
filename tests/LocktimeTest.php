@@ -4,19 +4,9 @@ namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Locktime;
-use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class LocktimeTest extends AbstractTestCase
 {
-    /**
-     * @var Locktime
-     */
-    private $locktime;
-
-    public function fromTimestampVectors()
-    {
-
-    }
 
     public function testToTimestamp()
     {

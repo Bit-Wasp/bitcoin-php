@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Bip39\WordList;
 
-use BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\EnglishWordList;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class JapaneseWordListTest extends AbstractTestCase

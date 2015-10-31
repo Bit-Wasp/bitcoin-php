@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Bip39;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39Mnemonic;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\EnglishWordList;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

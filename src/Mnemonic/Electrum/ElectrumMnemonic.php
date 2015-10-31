@@ -46,9 +46,9 @@ class ElectrumMnemonic implements MnemonicInterface
             $index2 = $math->mod($math->add($math->div($x, $n), $index1), $n);
             $index3 = $math->mod($math->add($math->div($math->div($x, $n), $n), $index2), $n);
 
-            array_push($wordArray, $this->wordList->getWord($index1));
-            array_push($wordArray, $this->wordList->getWord($index2));
-            array_push($wordArray, $this->wordList->getWord($index3));
+            $wordArray[] = $this->wordList->getWord($index1);
+            $wordArray[] = $this->wordList->getWord($index2);
+            $wordArray[] = $this->wordList->getWord($index3);
         }
 
         return $wordArray;

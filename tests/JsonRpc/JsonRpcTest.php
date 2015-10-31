@@ -36,8 +36,9 @@ class JsonRpcTest extends AbstractTestCase
     }
 
     /**
-     * @dataProvider getResult
+     * @param $flag
      * @param $payload
+     * @dataProvider getResult
      */
     public function testGetResult($flag, $payload)
     {

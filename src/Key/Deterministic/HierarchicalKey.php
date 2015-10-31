@@ -269,13 +269,16 @@ class HierarchicalKey
      */
     public function decodePath($path)
     {
+        if ($path === '') {
+            throw new \InvalidArgumentException('Invalid path passed to decodePath()');
+        }
+
         $pathPieces = explode('/', $path);
-        if (strlen($path) === 0 || count($pathPieces) === 0) {
+        if (count($pathPieces) === 0) {
             throw new \InvalidArgumentException('Invalid path passed to decodePath()');
         }
 
         $newPath = array();
-
         $helper = new HierarchicalKeySequence($this->ecAdapter->getMath());
         foreach ($pathPieces as $c => $sequence) {
             $newPath[] = $helper->fromNode($sequence);

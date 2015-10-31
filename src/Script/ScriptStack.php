@@ -34,7 +34,7 @@ class ScriptStack
      */
     public function push($value)
     {
-        array_push($this->stack, $value);
+        $this->stack[] = $value;
         return $this;
     }
 

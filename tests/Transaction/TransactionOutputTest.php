@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Script\Script;

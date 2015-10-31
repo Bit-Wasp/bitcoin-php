@@ -57,10 +57,11 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
     }
 
     /**
-     * @dataProvider getScripts
      * @param ScriptInterface $script
-     * @param RedeemScript $rs
-     * @param string $outputType
+     * @param $outputType
+     * @param $nReqSig
+     * @param RedeemScript|null $rs
+     * @dataProvider getScripts
      */
     public function testCreateFromScripts(ScriptInterface $script, $outputType, $nReqSig, RedeemScript $rs = null)
     {

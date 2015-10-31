@@ -19,7 +19,6 @@ use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;

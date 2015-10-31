@@ -10,25 +10,6 @@ use Mdanter\Ecc\Math\MathAdapterInterface;
 
 class DifficultyTest extends AbstractTestCase
 {
-    /**
-     * @var \BitWasp\Bitcoin\Math\Math
-     */
-    protected $math;
-
-    /**
-     * @var string
-     */
-    protected $targetHash = '00000000ffff0000000000000000000000000000000000000000000000000000';
-
-    /**
-     * @var Buffer
-     */
-    protected $bits;
-
-    public function __construct()
-    {
-        $this->math = $this->safeMath();
-    }
 
     public function getLowestBits(MathAdapterInterface $math)
     {
@@ -46,7 +27,7 @@ class DifficultyTest extends AbstractTestCase
 
         $math = $this->safeMath();
         $params = new Params($math);
-        $difficulty = new ProofOfWork($this->math, $params);
+        $difficulty = new ProofOfWork($math, $params);
 
         foreach ($vectors as $v) {
             $this->assertEquals($v[1], $difficulty->getWork($v[0]));
@@ -62,7 +43,7 @@ class DifficultyTest extends AbstractTestCase
 
         $math = $this->safeMath();
         $params = new Params($math);
-        $difficulty = new ProofOfWork($this->math, $params);
+        $difficulty = new ProofOfWork($math, $params);
         foreach ($json->test as $test) {
             $bits = Buffer::hex($test->bits);
 

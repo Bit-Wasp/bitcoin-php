@@ -141,6 +141,8 @@ class EcAdapterTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
     public function testPrivateKeySign(EcAdapterInterface $ecAdapter)
     {

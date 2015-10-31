@@ -134,8 +134,8 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @dataProvider getBip32Vectors
      * @param EcAdapterInterface $ecAdapter
      * @param Buffer $entropy
-     * @param object $details
-     * @throws \Exception
+     * @param $details
+     * @param $derivs
      */
     public function testTestVectors(EcAdapterInterface $ecAdapter, Buffer $entropy, $details, $derivs)
     {
@@ -154,7 +154,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         // need to init a HierarchicalKey to be able to call the method :/
         $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU', $this->network);
 
-        $this->assertEquals("2147483648/2147483649/444/2147526030", $key->decodePath("0'/1'/444/42382'"));
+        $this->assertEquals('2147483648/2147483649/444/2147526030', $key->decodePath("0'/1'/444/42382'"));
     }
 
     public function testDerivePath()

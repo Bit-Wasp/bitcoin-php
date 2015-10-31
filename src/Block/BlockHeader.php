@@ -71,7 +71,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getHash()
     {
-        if (is_null($this->cacheHash)) {
+        if (null === $this->cacheHash) {
             $this->cacheHash = Hash::sha256d($this->getBuffer())->flip();
         }
 

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;

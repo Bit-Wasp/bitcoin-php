@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;

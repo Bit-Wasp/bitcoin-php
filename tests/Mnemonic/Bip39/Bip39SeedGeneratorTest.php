@@ -9,6 +9,10 @@ use BitWasp\Buffertools\Buffer;
 class Bip39SeedGeneratorTest extends AbstractBip39Case
 {
     /**
+     * @param Bip39Mnemonic $bip39
+     * @param Buffer $entropy
+     * @param $mnemonic
+     * @param Buffer $eSeed
      * @dataProvider getBip39Vectors
      */
     public function testMnemonicToSeed(Bip39Mnemonic $bip39, Buffer $entropy, $mnemonic, Buffer $eSeed)

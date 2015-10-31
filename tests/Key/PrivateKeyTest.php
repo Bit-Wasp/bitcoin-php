@@ -69,6 +69,7 @@ class PrivateKeyTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @expectedException \Exception
+     * @param EcAdapterInterface $ecAdapter
      */
     public function testCreatePrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
