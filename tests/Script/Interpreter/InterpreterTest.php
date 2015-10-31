@@ -262,6 +262,12 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider ChecksigVectors
+     * @param bool $eVerifyResult
+     * @param EcAdapterInterface $ec
+     * @param Flags $flags
+     * @param PrivateKeyInterface $privateKey
+     * @param ScriptInterface $outputScript
+     * @param RedeemScript $rs
      */
     public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, Flags $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, RedeemScript $rs = null)
     {
@@ -316,6 +322,8 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
      * @param Flags $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
+     * @param bool $result
+     * @param string $description
      */
     public function testScript(Flags $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result, $description, $tx)
     {

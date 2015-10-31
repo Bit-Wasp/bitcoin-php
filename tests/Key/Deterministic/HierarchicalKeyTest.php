@@ -253,6 +253,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
     public function testFromExtended(EcAdapterInterface $ecAdapter)
     {
@@ -280,6 +281,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
     public function testMasterKeyDepthIsZero(EcAdapterInterface $ecAdapter)
     {
@@ -373,6 +375,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      * @expectedException \Exception
      */
     public function testDeriveFailure(EcAdapterInterface $ecAdapter)

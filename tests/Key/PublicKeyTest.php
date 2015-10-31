@@ -172,6 +172,9 @@ class PublicKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getPublicVectors
+     * @param EcAdapterInterface $ecAdapter
+     * @param string $eCompressed
+     * @param string $eUncompressed
      */
     public function testSerializeHex(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
     {

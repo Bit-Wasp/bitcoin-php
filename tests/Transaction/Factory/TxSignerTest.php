@@ -165,6 +165,7 @@ class TxSignerTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @throws BuilderNoInputState
+     * @param EcAdapterInterface $ecAdapter
      */
     public function testDoPayToPubkey(EcAdapterInterface $ecAdapter)
     {
