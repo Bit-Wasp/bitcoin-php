@@ -42,7 +42,7 @@ class JsonRpcClient extends Client
      * @param array $error
      * @throws JsonRpcError
      */
-    public function handleRpcErrors(array $error)
+    public function handleRpcErrors($error)
     {
         switch ($error['code']) {
             case -32601:

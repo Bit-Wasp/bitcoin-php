@@ -229,8 +229,8 @@ class EcAdapter implements EcAdapterInterface
         $math = $this->getMath();
         $G = $this->getGenerator();
 
-        $isYEven = $math->bitwiseAnd($signature->getRecoveryId(), 1) !== 0;
-        $isSecondKey = $math->bitwiseAnd($signature->getRecoveryId(), 2) !== 0;
+        $isYEven = $math->cmp($math->bitwiseAnd($signature->getRecoveryId(), 1), 0) !== 0;
+        $isSecondKey = $math->cmp($math->bitwiseAnd($signature->getRecoveryId(), 2), 0) !== 0;
         $curve = $G->getCurve();
 
         // Precalculate (p + 1) / 4 where p is the field order
@@ -371,7 +371,7 @@ class EcAdapter implements EcAdapterInterface
      */
     public function publicKeyFromBuffer(Buffer $publicKey)
     {
-        $compressed = $publicKey->getSize() === PublicKey::LENGTH_COMPRESSED;
+        $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
         $xCoord = $publicKey->slice(1, 32)->getInt();
 
         return new PublicKey(
@@ -396,7 +396,7 @@ class EcAdapter implements EcAdapterInterface
      */
     public function recoverYfromX($xCoord, $prefix)
     {
-        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN), true)) {
+        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
         }
 
@@ -419,7 +419,7 @@ class EcAdapter implements EcAdapterInterface
 
         // Depending on the byte, we expect the Y value to be even or odd.
         // We only calculate the second y root if it's needed.
-        return (($prefix === PublicKey::KEY_COMPRESSED_EVEN) === $math->isEven($root0))
+        return (($prefix == PublicKey::KEY_COMPRESSED_EVEN) == $math->isEven($root0))
             ? $root0
             : $math->sub($prime, $root0);
     }
