@@ -35,7 +35,7 @@ class PaymentRequestSigner
      */
     public function __construct($type = 'none', $keyFile = '', $certFile = '')
     {
-        if (false === in_array($type, ['none','x509+sha1', 'x509+sha256'])) {
+        if (false === in_array($type, ['none','x509+sha1', 'x509+sha256'], true)) {
             throw new \InvalidArgumentException('Invalid BIP70 signature type');
         }
 
@@ -101,7 +101,7 @@ class PaymentRequestSigner
      */
     public function signData($data)
     {
-        if ($this->type == 'none') {
+        if ($this->type === 'none') {
             throw new \RuntimeException('signData called when Signer is not configured for signatures');
         }
 

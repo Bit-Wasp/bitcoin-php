@@ -41,7 +41,7 @@ class PaymentRequestBuilder
      */
     public function __construct(PaymentRequestSigner $signer, $network, $time)
     {
-        if (!in_array($network, ['main','test'])) {
+        if (!in_array($network, ['main','test'], true)) {
             throw new \InvalidArgumentException('Network must be main or test');
         }
 

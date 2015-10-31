@@ -70,7 +70,7 @@ class InputClassifier implements ScriptClassifierInterface
         return false === in_array($type->classify(), [
             self::UNKNOWN,
             self::PAYTOSCRIPTHASH
-        ]);
+        ], true);
     }
 
     /**

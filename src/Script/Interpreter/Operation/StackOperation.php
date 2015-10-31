@@ -110,7 +110,7 @@ class StackOperation
             $vch = $mainStack->top(-2);
             $mainStack->push($vch);
             return;
-        } else if (in_array($opName, ['OP_PICK', 'OP_ROLL'])) {
+        } else if (in_array($opName, ['OP_PICK', 'OP_ROLL'], true)) {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_PICK');
             }

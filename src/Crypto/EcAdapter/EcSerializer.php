@@ -51,7 +51,7 @@ class EcSerializer
     public static function getImplRelPath($interface)
     {
         if (0 === count(self::$map)) {
-            if (!in_array($interface, self::$serializerInterface)) {
+            if (!in_array($interface, self::$serializerInterface, true)) {
                 throw new \InvalidArgumentException('Interface not known');
             }
 

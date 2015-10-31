@@ -59,7 +59,7 @@ class FlowControlOperation
         $opName = $opCodes->getOp($opCode);
         if ($opName === 'OP_NOP') {
             return;
-        } elseif (in_array($opName, ['OP_IF', 'OP_NOTIF'])) { // cscriptnum
+        } elseif (in_array($opName, ['OP_IF', 'OP_NOTIF'], true)) { // cscriptnum
             // <expression> if [statements] [else [statements]] endif
             $value = false;
             if ($fExec) {
@@ -101,7 +101,7 @@ class FlowControlOperation
             $mainStack->pop();
             return;
 
-        } else if ($opName == 'OP_RETURN') {
+        } else if ($opName === 'OP_RETURN') {
             throw new \Exception('Error: OP_RETURN');
         }
 

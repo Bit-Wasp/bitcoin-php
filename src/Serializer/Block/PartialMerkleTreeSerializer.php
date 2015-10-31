@@ -78,7 +78,7 @@ class PartialMerkleTreeSerializer
         for ($p = 0; $p < $size; $p++) {
             $byteIndex = (int)floor($p / 8);
             $byte = ord($vBytes[$byteIndex]->getBinary());
-            $vBits[$p] = ($byte & (1 << ($p % 8))) != 0;
+            $vBits[$p] = ($byte & (1 << ($p % 8))) !== 0;
         }
 
         return array_slice($vBits, 0, $last);

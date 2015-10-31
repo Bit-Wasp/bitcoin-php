@@ -89,7 +89,7 @@ class Math extends Gmp
      */
     public function isEven($integer)
     {
-        return $this->mod($integer, 2) == 0;
+        return $this->cmp($this->mod($integer, 2), 0) === 0;
     }
 
     /**

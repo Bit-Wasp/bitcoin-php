@@ -371,7 +371,7 @@ class EcAdapter implements EcAdapterInterface
      */
     public function publicKeyFromBuffer(Buffer $publicKey)
     {
-        $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
+        $compressed = $publicKey->getSize() === PublicKey::LENGTH_COMPRESSED;
         $xCoord = $publicKey->slice(1, 32)->getInt();
 
         return new PublicKey(
@@ -396,7 +396,7 @@ class EcAdapter implements EcAdapterInterface
      */
     public function recoverYfromX($xCoord, $prefix)
     {
-        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
+        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN), true)) {
             throw new \RuntimeException('Incorrect byte for a public key');
         }
 

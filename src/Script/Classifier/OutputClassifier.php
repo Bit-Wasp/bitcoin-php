@@ -38,19 +38,23 @@ class OutputClassifier implements ScriptClassifierInterface
             return false;
         }
 
-        if (strlen($script) === 35
-            && $this->evalScript[0]->getSize() === 33
-            && $this->evalScript[1] === 'OP_CHECKSIG'
+        if (strlen($script) == 35
+            && $this->evalScript[0]->getSize() == 33
+            && $this->evalScript[1] == 'OP_CHECKSIG'
             && in_array(ord($script[1]), array(PublicKey::KEY_COMPRESSED_EVEN, PublicKey::KEY_COMPRESSED_ODD))
         ) {
             return true;
         }
 
-        return (strlen($script) === 67
-            && $this->evalScript[0]->getSize() === 65
-            && $this->evalScript[1] === 'OP_CHECKSIG'
-            && bin2hex($script[1]) === PublicKey::KEY_UNCOMPRESSED
-        );
+        if (strlen($script) == 67
+            && $this->evalScript[0]->getSize() == 65
+            && $this->evalScript[1] == 'OP_CHECKSIG'
+            && bin2hex($script[1]) == PublicKey::KEY_UNCOMPRESSED
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -64,7 +68,7 @@ class OutputClassifier implements ScriptClassifierInterface
             && is_string($this->evalScript[1])
             && $this->evalScript[1] === 'OP_HASH160'
             && $this->evalScript[2] instanceof Buffer
-            && $this->evalScript[2]->getSize() === 20 // hex string
+            && $this->evalScript[2]->getSize() == 20 // hex string
             && is_string($this->evalScript[3])
             && $this->evalScript[3] === 'OP_EQUALVERIFY'
             && is_string($this->evalScript[4])
@@ -112,7 +116,7 @@ class OutputClassifier implements ScriptClassifierInterface
             && is_string($mOp) && is_string($nOp) && is_string($lastOp)
             && $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
             && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
-            && $this->evalScript[$count - 1] === 'OP_CHECKMULTISIG'
+            && $this->evalScript[$count - 1] == 'OP_CHECKMULTISIG'
             && $keysValid();
     }
 

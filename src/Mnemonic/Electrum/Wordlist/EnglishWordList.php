@@ -271,7 +271,7 @@ class EnglishWordList extends WordList implements ElectrumWordListInterface
     public function getIndex($word)
     {
         // create a flipped word list to speed up the searching of words
-        if (null == $this->wordsFlipped) {
+        if (null === $this->wordsFlipped) {
             $this->wordsFlipped = array_flip($this->getWords());
         }
 
