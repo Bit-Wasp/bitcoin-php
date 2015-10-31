@@ -19,6 +19,8 @@ class AmountTest extends AbstractTestCase
     }
 
     /**
+     * @param $btc
+     * @param $satoshis
      * @dataProvider getVectors
      */
     public function testAmount($btc, $satoshis)

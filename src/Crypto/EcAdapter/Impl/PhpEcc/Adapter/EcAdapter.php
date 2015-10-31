@@ -101,7 +101,7 @@ class EcAdapter implements EcAdapterInterface
                 $verify = $this->verify($messageHash, $key, $signature);
                 if ($verify) {
                     $linked[$key->getPubKeyHash()->getHex()][] = $signature;
-                    if (count($linked) == $sigCount) {
+                    if (count($linked) === $sigCount) {
                         break 2;
                     } else {
                         break;
@@ -138,7 +138,7 @@ class EcAdapter implements EcAdapterInterface
         $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
         $v = $math->mod($xy->getX(), $n);
 
-        return $math->cmp($v, $signature->getR()) == 0;
+        return $math->cmp($v, $signature->getR()) === 0;
     }
 
     /**
@@ -172,7 +172,7 @@ class EcAdapter implements EcAdapterInterface
         $k = $math->mod($randomK->getInt(), $n);
         $r = $generator->mul($k)->getX();
 
-        if ($math->cmp($r, 0) == 0) {
+        if ($math->cmp($r, 0) === 0) {
             throw new \RuntimeException('Random number r = 0');
         }
 
@@ -193,7 +193,7 @@ class EcAdapter implements EcAdapterInterface
             $n
         );
 
-        if ($math->cmp($s, 0) == 0) {
+        if ($math->cmp($s, 0) === 0) {
             throw new \RuntimeException('Signature s = 0');
         }
 
@@ -229,8 +229,8 @@ class EcAdapter implements EcAdapterInterface
         $math = $this->getMath();
         $G = $this->getGenerator();
 
-        $isYEven = $math->bitwiseAnd($signature->getRecoveryId(), 1) != 0;
-        $isSecondKey = $math->bitwiseAnd($signature->getRecoveryId(), 2) != 0;
+        $isYEven = $math->cmp($math->bitwiseAnd($signature->getRecoveryId(), 1), 0) !== 0;
+        $isSecondKey = $math->cmp($math->bitwiseAnd($signature->getRecoveryId(), 2), 0) !== 0;
         $curve = $G->getCurve();
 
         // Precalculate (p + 1) / 4 where p is the field order
@@ -249,7 +249,7 @@ class EcAdapter implements EcAdapterInterface
 
         // If beta is even, but y isn't or vice versa, then convert it,
         // otherwise we're done and y == beta.
-        if ($math->isEven($beta) == $isYEven) {
+        if ($math->isEven($beta) === $isYEven) {
             $y = $math->sub($curve->getPrime(), $beta);
         } else {
             $y = $beta;
@@ -300,7 +300,7 @@ class EcAdapter implements EcAdapterInterface
             }
         }
 
-        throw new \Exception("Failed to find valid recovery factor");
+        throw new \Exception('Failed to find valid recovery factor');
     }
 
     /**

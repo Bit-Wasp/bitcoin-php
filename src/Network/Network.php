@@ -50,20 +50,20 @@ class Network implements NetworkInterface
      */
     public function __construct($addressByte, $p2shByte, $privByte, $testnet = false)
     {
-        if (!(ctype_xdigit($addressByte) && strlen($addressByte) == 2)) {
-            throw new \Exception("address byte must be 1 hexadecimal byte");
+        if (!(ctype_xdigit($addressByte) && strlen($addressByte) === 2)) {
+            throw new \InvalidArgumentException('address byte must be 1 hexadecimal byte');
         }
 
-        if (!(ctype_xdigit($p2shByte) && strlen($p2shByte) == 2)) {
-            throw new \Exception("p2sh byte must be 1 hexadecimal byte");
+        if (!(ctype_xdigit($p2shByte) && strlen($p2shByte) === 2)) {
+            throw new \InvalidArgumentException('p2sh byte must be 1 hexadecimal byte');
         }
 
-        if (!(ctype_xdigit($privByte) && strlen($privByte) == 2)) {
-            throw new \Exception("priv byte must be 1 hexadecimal byte");
+        if (!(ctype_xdigit($privByte) && strlen($privByte) === 2)) {
+            throw new \InvalidArgumentException('priv byte must be 1 hexadecimal byte');
         }
 
         if (!is_bool($testnet)) {
-            throw new \Exception("Testnet parameter must be a boolean");
+            throw new \InvalidArgumentException('Testnet parameter must be a boolean');
         }
 
         $this->addressByte = $addressByte;
@@ -122,13 +122,13 @@ class Network implements NetworkInterface
     /**
      * Set version bytes for XPUB key
      *
-     * @param string $byte
+     * @param string $bytes
      * @return $this
      */
-    public function setHDPubByte($byte)
+    public function setHDPubByte($bytes)
     {
-        if (!empty($byte) && ctype_xdigit($byte) === true) {
-            $this->xpubByte = $byte;
+        if (strlen($bytes) === 8 && ctype_xdigit($bytes) === true) {
+            $this->xpubByte = $bytes;
         }
 
         return $this;
@@ -157,7 +157,7 @@ class Network implements NetworkInterface
      */
     public function setHDPrivByte($bytes)
     {
-        if (!empty($bytes) && ctype_xdigit($bytes) === true) {
+        if (strlen($bytes) === 8 && ctype_xdigit($bytes) === true) {
             $this->xprivByte = $bytes;
         }
 

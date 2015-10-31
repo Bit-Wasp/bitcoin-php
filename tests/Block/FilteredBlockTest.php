@@ -61,6 +61,7 @@ class FilteredBlockTest extends AbstractTestCase
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($tx9);
 
         $filtered = $block->filter($filter);
+        /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
@@ -73,6 +74,7 @@ class FilteredBlockTest extends AbstractTestCase
 
         $filter->insertHash($tx8);
         $filtered = $block->filter($filter);
+        /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
         $this->assertEquals($blockMerkleRoot, $root->getHex());
@@ -99,6 +101,7 @@ class FilteredBlockTest extends AbstractTestCase
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($expectedTx[0]);
         $filtered = $block->filter($filter);
+        /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
@@ -108,13 +111,14 @@ class FilteredBlockTest extends AbstractTestCase
 
         $filter->insertData(Buffer::hex('044a656f065871a353f216ca26cef8dde2f03e8c16202d2e8ad769f02032cb86a5eb5e56842e92e19141d60a01928f8dd2c875a390f67c1f6c94cfc617c0ea45af'));
         $filtered = $block->filter($filter);
+        /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
         $this->assertEquals($blockMerkleRoot, $root->getHex());
         $this->assertEquals(4, count($matched));
-
-        for ($i = 0; $i < count($expectedTx); $i++) {
+        $cETx = count($expectedTx);
+        for ($i = 0; $i < $cETx; $i++) {
             $this->assertEquals($expectedTx[$i], $matched[$i]->getHex());
         }
     }
@@ -136,6 +140,7 @@ class FilteredBlockTest extends AbstractTestCase
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($expectedTx[0]);
         $filtered = $block->filter($filter);
+        /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
@@ -150,7 +155,8 @@ class FilteredBlockTest extends AbstractTestCase
 
         $this->assertEquals($blockMerkleRoot, $root->getHex());
         $this->assertEquals(3, count($matched));
-        for ($i = 0; $i < count($expectedTx); $i++) {
+        $cETx = count($expectedTx);
+        for ($i = 0; $i < $cETx; $i++) {
             $this->assertEquals($expectedTx[$i], $matched[$i]->getHex());
         }
     }
@@ -168,6 +174,7 @@ class FilteredBlockTest extends AbstractTestCase
         $tx = '63194f18be0af63f2c6bc9dc0f777cbefed3d9415c4af83f3ee3a3d669c00cb5';
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($tx);
         $filtered = $block->filter($filter);
+        /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 

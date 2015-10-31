@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Signature\SignatureFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpeccAdapter;
 
 /**
  * Class SignatureTest
@@ -20,7 +21,7 @@ class SignatureTest extends AbstractTestCase
 
     public function getPhpEcc()
     {
-        return new \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter($this->safeMath(), $this->safeGenerator());
+        return new PhpeccAdapter($this->safeMath(), $this->safeGenerator());
     }
 
     public function testCreatesSignature()

@@ -59,7 +59,7 @@ class PaymentHandler
         $outputs = $details->getOutputsList();
         $requirements = [];
         foreach ($outputs as $out) {
-            if (isset($requirements[$out->getScript()])) {
+            if (array_key_exists($out->getScript(), $requirements)) {
                 $requirements[$out->getScript()] += $out->getAmount();
             } else {
                 $requirements[$out->getScript()] = $out->getAmount();
@@ -69,25 +69,19 @@ class PaymentHandler
         $parsed = [];
 
         // Check that regardless of the other outputs, that each specific output was paid.
-        $txs = $this->getTransactions();
-        $nTx = count($txs);
-        for ($i = 0; $i < $nTx; $i++) {
-            $tx = $txs->get($i);
-            $outs = $tx->getOutputs()->all();
-            $nOut = count($outs);
-            for ($j = 0; $j < $nOut; $j++) {
-                $txOut = $outs[$j];
-                $scriptBin = $txOut->getScript()->getBinary();
-                if (isset($parsed[$scriptBin])) {
-                    $parsed[$scriptBin] += $txOut->getValue();
+        foreach ($this->getTransactions() as $tx) {
+            foreach ($tx->getOutputs() as $output) {
+                $scriptBin = $output->getScript()->getBinary();
+                if (array_key_exists($scriptBin, $parsed)) {
+                    $parsed[$scriptBin] += $output->getValue();
                 } else {
-                    $parsed[$scriptBin] = $txOut->getValue();
+                    $parsed[$scriptBin] = $output->getValue();
                 }
             }
         }
 
         foreach ($requirements as $script => $value) {
-            if (!isset($parsed[$script])) {
+            if (!array_key_exists($script, $parsed)) {
                 return false;
             }
             if ($parsed[$script] < $value) {
@@ -117,7 +111,7 @@ class PaymentHandler
     public function sendAck($response = null)
     {
         $ack = $this->getAck($response)->serialize();
-        $filename = "r" . (string)time() . ".bitcoinpaymentACK";
+        $filename = 'r' . (string)time() . '.bitcoinpaymentACK';
         header('Content-Type: application/bitcoin-paymentack');
 
         header('Content-Disposition: inline; filename=' . $filename);

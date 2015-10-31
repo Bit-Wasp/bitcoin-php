@@ -30,7 +30,7 @@ class PartialMerkleTreeSerializer
      * @param Parser $parser
      * @return PartialMerkleTree
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         list ($txCount, $vHash, $vBits) = $this->getTemplate()->parse($parser);
 
@@ -66,6 +66,7 @@ class PartialMerkleTreeSerializer
     }
 
     /**
+     * @param int $last
      * @param Buffer[] $vBytes
      * @return array
      */
@@ -77,7 +78,7 @@ class PartialMerkleTreeSerializer
         for ($p = 0; $p < $size; $p++) {
             $byteIndex = (int)floor($p / 8);
             $byte = ord($vBytes[$byteIndex]->getBinary());
-            $vBits[$p] = ($byte & (1 << ($p % 8))) != 0;
+            $vBits[$p] = ($byte & (1 << ($p % 8))) !== 0;
         }
 
         return array_slice($vBits, 0, $last);

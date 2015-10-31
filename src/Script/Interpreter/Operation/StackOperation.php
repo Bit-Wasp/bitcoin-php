@@ -57,19 +57,19 @@ class StackOperation
         $opName = $this->opCodes->getOp($opCode);
         $castToBool = $this->castToBool;
 
-        if ($opName == 'OP_TOALTSTACK') {
+        if ($opName === 'OP_TOALTSTACK') {
             if ($mainStack->size() < 1) {
                 throw new \Exception('Invalid stack operation OP_TOALTSTACK');
             }
             $altStack->push($mainStack->pop());
             return;
-        } else if ($opName == 'OP_FROMALTSTACK') {
+        } else if ($opName === 'OP_FROMALTSTACK') {
             if ($altStack->size() < 1) {
                 throw new \Exception('Invalid alt-stack operation OP_FROMALTSTACK');
             }
             $mainStack->push($altStack->pop());
             return;
-        } else if ($opName == 'OP_IFDUP') {
+        } else if ($opName === 'OP_IFDUP') {
             // If top value not zero, duplicate it.
             if ($mainStack->size() < 1) {
                 throw new \Exception('Invalid stack operation OP_IFDUP');
@@ -79,38 +79,38 @@ class StackOperation
                 $mainStack->push($vch);
             }
             return;
-        } else if ($opName == 'OP_DEPTH') {
+        } else if ($opName === 'OP_DEPTH') {
             $num = $mainStack->size();
             $bin = Buffer::int($num, null, $this->math);
             $mainStack->push($bin);
             return;
-        } else if ($opName == 'OP_DROP') {
+        } else if ($opName === 'OP_DROP') {
             if ($mainStack->size() < 1) {
                 throw new \Exception('Invalid stack operation OP_DROP');
             }
             $mainStack->pop();
             return;
-        } else if ($opName == 'OP_DUP') {
+        } else if ($opName === 'OP_DUP') {
             if ($mainStack->size() < 1) {
                 throw new \Exception('Invalid stack operation OP_DUP');
             }
             $vch = $mainStack->top(-1);
             $mainStack->push($vch);
             return;
-        } else if ($opName == 'OP_NIP') {
+        } else if ($opName === 'OP_NIP') {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_NIP');
             }
             $mainStack->erase(-2);
             return;
-        } else if ($opName == 'OP_OVER') {
+        } else if ($opName === 'OP_OVER') {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_OVER');
             }
             $vch = $mainStack->top(-2);
             $mainStack->push($vch);
             return;
-        } else if (in_array($opName, ['OP_PICK', 'OP_ROLL'])) {
+        } else if (in_array($opName, ['OP_PICK', 'OP_ROLL'], true)) {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_PICK');
             }
@@ -128,34 +128,34 @@ class StackOperation
             }
             $mainStack->push($vch);
             return;
-        } else if ($opName == 'OP_ROT') {
+        } else if ($opName === 'OP_ROT') {
             if ($mainStack->size() < 3) {
                 throw new \Exception('Invalid stack operation OP_ROT');
             }
             $mainStack->swap(-3, -2);
             $mainStack->swap(-2, -1);
             return;
-        } else if ($opName == 'OP_SWAP') {
+        } else if ($opName === 'OP_SWAP') {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_SWAP');
             }
             $mainStack->swap(-2, -1);
             return;
-        } else if ($opName == 'OP_TUCK') {
+        } else if ($opName === 'OP_TUCK') {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_TUCK');
             }
             $vch = $mainStack->top(-1);
             $mainStack->insert($mainStack->end() - 2, $vch);
             return;
-        } else if ($opName == 'OP_2DROP') {
+        } else if ($opName === 'OP_2DROP') {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_2DROP');
             }
             $mainStack->pop();
             $mainStack->pop();
             return;
-        } else if ($opName == 'OP_2DUP') {
+        } else if ($opName === 'OP_2DUP') {
             if ($mainStack->size() < 2) {
                 throw new \Exception('Invalid stack operation OP_2DUP');
             }
@@ -164,7 +164,7 @@ class StackOperation
             $mainStack->push($string1);
             $mainStack->push($string2);
             return;
-        } else if ($opName == 'OP_3DUP') {
+        } else if ($opName === 'OP_3DUP') {
             if ($mainStack->size() < 3) {
                 throw new \Exception('Invalid stack operation OP_3DUP');
             }
@@ -175,7 +175,7 @@ class StackOperation
             $mainStack->push($string2);
             $mainStack->push($string3);
             return;
-        } else if ($opName == 'OP_2OVER') {
+        } else if ($opName === 'OP_2OVER') {
             if ($mainStack->size() < 4) {
                 throw new \Exception('Invalid stack operation OP_2OVER');
             }
@@ -184,7 +184,7 @@ class StackOperation
             $mainStack->push($string1);
             $mainStack->push($string2);
             return;
-        } else if ($opName == 'OP_2ROT') {
+        } else if ($opName === 'OP_2ROT') {
             if ($mainStack->size() < 6) {
                 throw new \Exception('Invalid stack operation OP_2ROT');
             }
@@ -195,7 +195,7 @@ class StackOperation
             $mainStack->push($string1);
             $mainStack->push($string2);
             return;
-        } else if ($opName == 'OP_2SWAP') {
+        } else if ($opName === 'OP_2SWAP') {
             if ($mainStack->size() < 4) {
                 throw new \Exception('Invalid stack operation OP_2SWAP');
             }

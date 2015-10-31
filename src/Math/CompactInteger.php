@@ -25,7 +25,7 @@ class CompactInteger
      * @param bool|false $isOverflow
      * @return int|string
      */
-    public function set($compact, &$isNegative = false, &$isOverflow = false)
+    public function set($compact, &$isNegative, &$isOverflow)
     {
         $math = $this->math;
         $size = $math->rightShift($compact, 24);
@@ -38,8 +38,8 @@ class CompactInteger
 
         // isNegative: $word != 0 && $uint32 & 0x00800000 != 0
         // isOverflow: $word != 0 && (($size > 34) || ($word > 0xff && $size > 33) || ($word > 0xffff && $size  >32))
-        $isNegative = (($math->cmp($word, 0) != 0) && ($math->cmp($math->bitwiseAnd($compact, $math->hexDec('0x00800000')), 0) == 1));
-        $isOverflow = $math->cmp($word, 0) != 0 && (
+        $isNegative = (($math->cmp($word, 0) !== 0) && ($math->cmp($math->bitwiseAnd($compact, $math->hexDec('0x00800000')), 0) === 1));
+        $isOverflow = $math->cmp($word, 0) !== 0 && (
             ($math->cmp($size, 34) > 0)
             || ($math->cmp($word, 0xff) > 0 && $math->cmp($size, 33) > 0)
             || ($math->cmp($word, 0xffff) > 0 && $math->cmp($size, 32) > 0)
@@ -71,9 +71,9 @@ class CompactInteger
         $math = $this->math;
         $size = (int) NumberSize::bnNumBytes($math, $integer);
         if ($math->cmp($size, 3) <= 0) {
-            $compact = $math->leftShift($this->getLow64($integer), $math->mul(8, $math->Sub(3, $size)));
+            $compact = $math->leftShift($this->getLow64($integer), $math->mul(8, $math->sub(3, $size)));
         } else {
-            $compact = $math->rightShift($integer, $math->mul(8, $math->Sub($size, 3)));
+            $compact = $math->rightShift($integer, $math->mul(8, $math->sub($size, 3)));
             $compact = $this->getLow64($compact);
         }
 

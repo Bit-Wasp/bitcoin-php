@@ -66,17 +66,17 @@ class TransactionSerializer
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         $p  = $this->getTemplate()->parse($parser);
 
-        list ($version, $inputArray, $outputArray, $locktime) = $p;
+        list ($nVersion, $inputArray, $outputArray, $nLockTime) = $p;
 
         return (new TxBuilder())
-            ->version($version)
+            ->version($nVersion)
             ->inputs($inputArray)
             ->outputs($outputArray)
-            ->locktime($locktime)
+            ->locktime($nLockTime)
             ->get();
     }
 

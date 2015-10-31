@@ -92,6 +92,7 @@ class ScriptCountSigOpsTest extends AbstractTestCase
 
     /**
      * @param Script $script
+     * @param $fAccurate
      * @param $eSigOpCount
      * @dataProvider getCountTestVectors
      */

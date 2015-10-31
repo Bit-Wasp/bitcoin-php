@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Block;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\MerkleRoot;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

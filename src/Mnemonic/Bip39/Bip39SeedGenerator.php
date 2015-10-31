@@ -28,8 +28,8 @@ class Bip39SeedGenerator
     private function normalize($string)
     {
         if (!class_exists('Normalizer')) {
-            if (mb_detect_encoding($string) == "UTF-8") {
-                throw new \Exception("UTF-8 passphrase is not supported without the PECL intl extension installed.");
+            if (mb_detect_encoding($string) === 'UTF-8') {
+                throw new \Exception('UTF-8 passphrase is not supported without the PECL intl extension installed.');
             } else {
                 return new Buffer($string);
             }

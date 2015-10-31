@@ -8,10 +8,6 @@ use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 
 class InputCollectionMutator extends MutableCollection
 {
-    /**
-     * @var \SplFixedArray
-     */
-    protected $set;
 
     /**
      * @param TransactionInputInterface[] $inputs
@@ -147,8 +143,7 @@ class InputCollectionMutator extends MutableCollection
      */
     public function applyTo($i, \Closure $closure)
     {
-        $mutator = $this->offsetGet($i);
-        $closure($mutator);
+        $closure($this->offsetGet($i));
         return $this;
     }
 }

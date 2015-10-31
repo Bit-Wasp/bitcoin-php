@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-class X509Certificates extends \DrSlump\Protobuf\Message
+use \DrSlump\Protobuf\Message;
+
+class X509Certificates extends Message
 {
 
     /**  @var string[] */
@@ -19,7 +21,7 @@ class X509Certificates extends \DrSlump\Protobuf\Message
         // REPEATED BYTES certificate = 1
         $f = new \DrSlump\Protobuf\Field();
         $f->number = 1;
-        $f->name = "certificate";
+        $f->name = 'certificate';
         $f->type = \DrSlump\Protobuf::TYPE_BYTES;
         $f->rule = \DrSlump\Protobuf::RULE_REPEATED;
         $descriptor->addField($f);

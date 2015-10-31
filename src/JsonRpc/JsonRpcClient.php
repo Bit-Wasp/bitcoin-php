@@ -39,7 +39,7 @@ class JsonRpcClient extends Client
      * Throw an exception according the RPC error
      *
      * @access public
-     * @param $error
+     * @param array $error
      * @throws JsonRpcError
      */
     public function handleRpcErrors($error)

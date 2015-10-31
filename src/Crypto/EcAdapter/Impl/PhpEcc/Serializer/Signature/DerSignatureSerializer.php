@@ -75,12 +75,12 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         // Pad R and S if their highest bit is flipped, ie,
         // they are negative.
         $rt = $rBin[0] & pack('H*', '80');
-        if (ord($rt) == 128) {
+        if (ord($rt) === 128) {
             $rBin = pack('H*', '00') . $rBin;
         }
 
         $st = $sBin[0] & pack('H*', '80');
-        if (ord($st) == 128) {
+        if (ord($st) === 128) {
             $sBin = pack('H*', '00') . $sBin;
         }
 
@@ -88,9 +88,9 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
             0x30,
             $this->getInnerTemplate()->write([
                 0x02,
-                new Buffer($rBin),
+                new Buffer($rBin, null, $math),
                 0x02,
-                new Buffer($sBin)
+                new Buffer($sBin, null, $math)
             ])
         ]);
     }
@@ -100,7 +100,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      * @return Signature
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         try {
             list (, $inner) = $this->getOuterTemplate()->parse($parser);

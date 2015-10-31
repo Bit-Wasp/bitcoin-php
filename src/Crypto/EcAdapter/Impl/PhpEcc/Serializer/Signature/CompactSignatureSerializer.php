@@ -67,7 +67,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @return CompactSignature
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         $math = $this->ecAdapter->getMath();
 
@@ -79,7 +79,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
                 throw new \InvalidArgumentException('invalid signature type');
             }
 
-            $isCompressed = ($math->bitwiseAnd($recoveryFlags, 4) != 0);
+            $isCompressed = $math->cmp($math->bitwiseAnd($recoveryFlags, 4), 0) !== 0;
             $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');

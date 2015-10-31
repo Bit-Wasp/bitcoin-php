@@ -19,13 +19,13 @@ class Opcodes
      */
     public function opNameExists($name)
     {
-        if (!isset($this->getOpsByName()[$name])) {
+        if (!array_key_exists($name, $this->getOpsByName())) {
             throw new \RuntimeException("Opcode by that name not found");
         }
     }
 
     /**
-     * @param $op
+     * @param int $op
      * @return mixed
      */
     public function getOp($op)

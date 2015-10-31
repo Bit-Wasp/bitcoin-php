@@ -4,16 +4,12 @@ namespace BitWasp\Bitcoin\Rpc\Client;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Amount;
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockFactory;
-use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;

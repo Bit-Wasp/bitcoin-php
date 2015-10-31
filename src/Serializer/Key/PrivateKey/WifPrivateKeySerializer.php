@@ -65,7 +65,7 @@ class WifPrivateKeySerializer
         if (33 === $size) {
             $compressed = true;
             $payload = $payload->slice(0, 32);
-        } else if (32 == $size) {
+        } else if (32 === $size) {
             $compressed = false;
         } else {
             throw new InvalidPrivateKey("Private key should be always be 32 or 33 bytes (depending on if it's compressed)");

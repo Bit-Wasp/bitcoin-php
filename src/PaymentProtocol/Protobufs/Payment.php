@@ -2,11 +2,13 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-class Payment extends \DrSlump\Protobuf\Message
+use \DrSlump\Protobuf\Message;
+
+class Payment extends Message
 {
 
     /**  @var string */
-    public $merchant_data = null;
+    public $merchant_data;
 
     /**  @var string[] */
     public $transactions = array();
@@ -15,7 +17,7 @@ class Payment extends \DrSlump\Protobuf\Message
     public $refund_to = array();
 
     /**  @var string */
-    public $memo = null;
+    public $memo;
 
 
     /** @var \Closure[] */
@@ -28,7 +30,7 @@ class Payment extends \DrSlump\Protobuf\Message
         // OPTIONAL BYTES merchant_data = 1
         $f = new \DrSlump\Protobuf\Field();
         $f->number = 1;
-        $f->name = "merchant_data";
+        $f->name = 'merchant_data';
         $f->type = \DrSlump\Protobuf::TYPE_BYTES;
         $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
@@ -36,7 +38,7 @@ class Payment extends \DrSlump\Protobuf\Message
         // REPEATED BYTES transactions = 2
         $f = new \DrSlump\Protobuf\Field();
         $f->number = 2;
-        $f->name = "transactions";
+        $f->name = 'transactions';
         $f->type = \DrSlump\Protobuf::TYPE_BYTES;
         $f->rule = \DrSlump\Protobuf::RULE_REPEATED;
         $descriptor->addField($f);
@@ -44,7 +46,7 @@ class Payment extends \DrSlump\Protobuf\Message
         // REPEATED MESSAGE refund_to = 3
         $f = new \DrSlump\Protobuf\Field();
         $f->number = 3;
-        $f->name = "refund_to";
+        $f->name = 'refund_to';
         $f->type = \DrSlump\Protobuf::TYPE_MESSAGE;
         $f->rule = \DrSlump\Protobuf::RULE_REPEATED;
         $f->reference = '\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output';
@@ -53,7 +55,7 @@ class Payment extends \DrSlump\Protobuf\Message
         // OPTIONAL STRING memo = 4
         $f = new \DrSlump\Protobuf\Field();
         $f->number = 4;
-        $f->name = "memo";
+        $f->name = 'memo';
         $f->type = \DrSlump\Protobuf::TYPE_STRING;
         $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);

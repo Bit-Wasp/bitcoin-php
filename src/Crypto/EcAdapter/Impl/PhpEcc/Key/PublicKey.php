@@ -96,15 +96,15 @@ class PublicKey extends Key implements PublicKeyInterface
             return false;
         }
 
-        if (ord($vchPubKey[0]) == 0x04) {
-            if ($publicKey->getSize() != 65) {
+        if (ord($vchPubKey[0]) === 0x04) {
+            if ($publicKey->getSize() !== 65) {
                 // Invalid length for uncompressed key
                 return false;
             }
         } elseif (in_array($vchPubKey[0], array(
             hex2bin(self::KEY_COMPRESSED_EVEN),
             hex2bin(self::KEY_COMPRESSED_ODD)))) {
-            if ($publicKey->getSize() != 33) {
+            if ($publicKey->getSize() !== 33) {
                 return false;
             }
         } else {

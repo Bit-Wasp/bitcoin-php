@@ -38,17 +38,17 @@ class ElectrumKeyFactory
     public static function generateMasterKey(Buffer $seed, EcAdapterInterface $ecAdapter = null)
     {
         // Really weird, did electrum actually hash hex string seeds?
-        $seed = $oldseed = $seed->getHex();
+        $binary = $oldseed = $seed->getHex();
 
         // Perform sha256 hash 5 times per iteration
         for ($i = 0; $i < 5*20000; $i++) {
             // Hash should return binary data
-            $seed = hash('sha256', $seed . $oldseed, true);
+            $binary = hash('sha256', $binary . $oldseed, true);
         }
 
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         // Convert binary data to hex.
-        $str = new Buffer($seed, 32, $ecAdapter->getMath());
+        $str = new Buffer($binary, 32, $ecAdapter->getMath());
 
         return self::fromSecretExponent(
             $str->getInt(),

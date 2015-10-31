@@ -11,10 +11,6 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 
-/**
- * Class Bitcoin
- * @package Bitcoin
- */
 class Bitcoin
 {
     /**
@@ -64,7 +60,7 @@ class Bitcoin
      */
     public static function getNetwork()
     {
-        if (is_null(self::$network)) {
+        if (null === self::$network) {
             self::$network = self::getDefaultNetwork();
         }
 

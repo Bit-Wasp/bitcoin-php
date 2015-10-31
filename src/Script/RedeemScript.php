@@ -14,11 +14,6 @@ class RedeemScript extends Script
     private $m;
 
     /**
-     * @var string
-     */
-    protected $script;
-
-    /**
      * @var array
      */
     private $keys = [];
@@ -79,7 +74,7 @@ class RedeemScript extends Script
             $publicKeys[] = PublicKeyFactory::fromHex($item->getHex());
         }
 
-        if (count($publicKeys) == 0) {
+        if (count($publicKeys) === 0) {
             throw new \LogicException('No public keys found in script');
         }
 

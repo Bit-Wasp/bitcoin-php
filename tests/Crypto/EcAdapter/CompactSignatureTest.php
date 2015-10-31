@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
@@ -28,8 +27,8 @@ class CompactSignatureTest extends AbstractTestCase
 
         $vectors[] = [
             Bitcoin::getEcAdapter(),
-            PrivateKeyFactory::fromHex("87c1015da1645affba1041f9d77ff5956288194604567fb9b76a9e36e8f9ab06", true),
-            hex2bin("67050eeb5f95abf57449d92629dcf69f80c26247e207ad006a862d1e4e6498ff")
+            PrivateKeyFactory::fromHex('87c1015da1645affba1041f9d77ff5956288194604567fb9b76a9e36e8f9ab06', true),
+            hex2bin('67050eeb5f95abf57449d92629dcf69f80c26247e207ad006a862d1e4e6498ff')
         ];
 
         for ($i = 0; $i < 2; $i++) {

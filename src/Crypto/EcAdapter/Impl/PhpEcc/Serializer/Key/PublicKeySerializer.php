@@ -80,7 +80,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     public function parse($data)
     {
         $buffer = (new Parser($data))->getBuffer();
-        if (!in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED])) {
+        if (!in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED], true)) {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 

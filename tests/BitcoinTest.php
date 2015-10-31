@@ -4,10 +4,8 @@ namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use Mdanter\Ecc\EccFactory;
-use Mdanter\Ecc\Math\Gmp;
 
 class BitcoinTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,7 +16,6 @@ class BitcoinTest extends \PHPUnit_Framework_TestCase
 
     public function testGetMath()
     {
-        $default = Bitcoin::getMath();
         $this->assertEquals(new Math(), Bitcoin::getMath());
     }
 

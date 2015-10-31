@@ -120,7 +120,7 @@ class PartialMerkleTree extends Serializable
     public function calculateHash($height, $position, array $vTxid)
     {
 
-        if ($height == 0) {
+        if ($height === 0) {
             return $vTxid[$position];
         } else {
             $left = $this->calculateHash($height - 1, $position * 2, $vTxid);
@@ -151,7 +151,7 @@ class PartialMerkleTree extends Serializable
 
         $this->vFlagBits[] = $parent;
 
-        if (0 == $height || !$parent) {
+        if (0 === $height || !$parent) {
             $this->vHashes[] = $this->calculateHash($height, $position, $vTxid);
         } else {
             $this->traverseAndBuild($height - 1, $position * 2, $vTxid, $vMatch);
@@ -179,13 +179,13 @@ class PartialMerkleTree extends Serializable
         }
 
         $parent = $this->vFlagBits[$nBitsUsed++];
-        if (0 == $height || !$parent) {
+        if (0 === $height || !$parent) {
             if ($nHashUsed >= count($this->vHashes)) {
                 $this->fBad = true;
                 return new Buffer();
             }
             $hash = $this->vHashes[$nHashUsed++];
-            if ($height == 0 && $parent) {
+            if ($height === 0 && $parent) {
                 $vMatch[] = $hash->flip();
             }
             return $hash;
@@ -193,7 +193,7 @@ class PartialMerkleTree extends Serializable
             $left = $this->traverseAndExtract($height - 1, $position * 2, $nBitsUsed, $nHashUsed, $vMatch);
             if (($position * 2 + 1) < $this->calcTreeWidth($height - 1)) {
                 $right = $this->traverseAndExtract($height - 1, ($position * 2 + 1), $nBitsUsed, $nHashUsed, $vMatch);
-                if ($right == $left) {
+                if ($right === $left) {
                     $this->fBad = true;
                 }
             } else {
@@ -214,7 +214,7 @@ class PartialMerkleTree extends Serializable
     public function extractMatches(array &$vMatch)
     {
         $nTx = $this->getTxCount();
-        if (0 == $nTx) {
+        if (0 === $nTx) {
             throw new \Exception('ntx = 0');
         }
 
@@ -239,7 +239,7 @@ class PartialMerkleTree extends Serializable
             throw new \Exception('bad data');
         }
 
-        if (($nBitsUsed + 7) / 8 != (count($this->vFlagBits)+7)/8) {
+        if (($nBitsUsed + 7) / 8 !== (count($this->vFlagBits)+7)/8) {
             throw new \Exception('Not all bits consumed');
         }
 

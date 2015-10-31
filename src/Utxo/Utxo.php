@@ -9,28 +9,28 @@ class Utxo
     /**
      * @var string
      */
-    private $txid;
+    private $hashPrevOut;
 
     /**
      * @var int|string
      */
-    private $vout;
+    private $nPrevOut;
 
     /**
      * @var TransactionOutputInterface
      */
-    private $txOut;
+    private $prevOut;
 
     /**
-     * @param string $txid
-     * @param int|string $vout
-     * @param TransactionOutputInterface $txOut
+     * @param string $hashPrevOut
+     * @param int|string $nPrevOut
+     * @param TransactionOutputInterface $prevOut
      */
-    public function __construct($txid, $vout, TransactionOutputInterface $txOut)
+    public function __construct($hashPrevOut, $nPrevOut, TransactionOutputInterface $prevOut)
     {
-        $this->txid = $txid;
-        $this->vout = $vout;
-        $this->txOut = $txOut;
+        $this->hashPrevOut = $hashPrevOut;
+        $this->nPrevOut = $nPrevOut;
+        $this->prevOut = $prevOut;
     }
 
     /**
@@ -38,7 +38,7 @@ class Utxo
      */
     public function getTransactionId()
     {
-        return $this->txid;
+        return $this->hashPrevOut;
     }
 
     /**
@@ -46,7 +46,7 @@ class Utxo
      */
     public function getVout()
     {
-        return $this->vout;
+        return $this->nPrevOut;
     }
 
     /**
@@ -54,6 +54,6 @@ class Utxo
      */
     public function getOutput()
     {
-        return $this->txOut;
+        return $this->prevOut;
     }
 }

@@ -43,13 +43,13 @@ class SignedMessageSerializer
     }
 
     /**
-     * @param $content
+     * @param string $content
      * @return SignedMessage
      */
     public function parse($content)
     {
         if (0 !== strpos($content, self::HEADER)) {
-            throw new \RuntimeException('Message must begin with -----BEGIN BITCOIN SIGNED MESSAGE-----');
+            throw new \RuntimeException('Message must begin with ' . self::HEADER);
         }
 
         $sigHeaderPos = strpos($content, self::SIG_START);
@@ -59,7 +59,7 @@ class SignedMessageSerializer
 
         $sigEnd = strlen($content) - strlen(self::FOOTER);
         if (strpos($content, self::FOOTER) !== $sigEnd) {
-            throw new \RuntimeException('Message must end with -----END BITCOIN SIGNED MESSAGE-----');
+            throw new \RuntimeException('Message must end with ' . self::FOOTER);
         }
 
         $messageStartPos = strlen(self::HEADER) + 1;

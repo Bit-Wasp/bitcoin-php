@@ -69,11 +69,7 @@ class ScriptParser
     public function validateSize($size)
     {
         $pdif = ($this->getEndPos() - $this->getPosition());
-        if (($pdif < 0) || ($pdif < $size)) {
-            return false;
-        }
-
-        return true;
+        return ! ($pdif < 0 || $pdif < $size);
     }
 
     /**
@@ -113,11 +109,11 @@ class ScriptParser
             if ($opcodes->cmp($opCode, 'OP_PUSHDATA1') < 0) {
                 $size = $opCode;
             } else if ($opcodes->isOp($opCode, 'OP_PUSHDATA1')) {
-                $size = $this->unpackSize("C", 1);
+                $size = $this->unpackSize('C', 1);
             } else if ($opcodes->isOp($opCode, 'OP_PUSHDATA2')) {
-                $size = $this->unpackSize("v", 2);
+                $size = $this->unpackSize('v', 2);
             } else {
-                $size = $this->unpackSize("V", 4);
+                $size = $this->unpackSize('V', 4);
             }
 
             if ($size === false || $this->validateSize($size) === false) {
@@ -156,7 +152,7 @@ class ScriptParser
                 $push = $pushData;
             } else {
                 // None of these are pushdatas, so just an opcode
-                $push = $this->script->getOpCodes()->getOp($opCode);
+                $push = $this->script->getOpcodes()->getOp($opCode);
             }
 
             $data[] = $push;
@@ -176,14 +172,13 @@ class ScriptParser
 
         $array = array_map(
             function ($value) {
-                $r = ($value instanceof Buffer)
+                return ($value instanceof Buffer)
                     ? $value->getHex()
                     : $value;
-                return $r;
             },
             $parse
         );
 
-        return implode(" ", $array);
+        return implode(' ', $array);
     }
 }

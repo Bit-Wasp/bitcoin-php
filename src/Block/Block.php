@@ -60,7 +60,7 @@ class Block extends Serializable implements BlockInterface
      */
     public function getMerkleRoot()
     {
-        if (is_null($this->merkleRoot)) {
+        if (null === $this->merkleRoot) {
             $this->merkleRoot = new MerkleRoot($this->math, $this->getTransactions());
         }
 

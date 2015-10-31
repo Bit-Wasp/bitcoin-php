@@ -83,7 +83,7 @@ class HexExtendedKeySerializer
      * @return HierarchicalKey
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         try {
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->getTemplate()->parse($parser);
@@ -95,10 +95,10 @@ class HexExtendedKeySerializer
         }
 
         if ($bytes !== $this->network->getHDPubByte() && $bytes !== $this->network->getHDPrivByte()) {
-            throw new \InvalidArgumentException("HD key magic bytes do not match network magic bytes");
+            throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
         }
 
-        $key = ($this->network->getHDPrivByte() == $bytes)
+        $key = ($this->network->getHDPrivByte() === $bytes)
             ? PrivateKeyFactory::fromHex($keyData->slice(1)->getHex(), true, $this->ecAdapter)
             : PublicKeyFactory::fromHex($keyData->getHex(), $this->ecAdapter);
 

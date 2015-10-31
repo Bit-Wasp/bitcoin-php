@@ -4,12 +4,9 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Bitcoin\Tests\Mnemonic\Bip39\AbstractBip39Case;
 use BitWasp\Buffertools\Buffer;
@@ -17,6 +14,7 @@ use BitWasp\Buffertools\Buffer;
 class WifPrivateKeySerializerTest extends AbstractBip39Case
 {
     /**
+     * @param EcAdapterInterface $ecAdapter
      * @dataProvider getEcAdapters
      * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidPrivateKey
      * @expectedExceptionMessage Private key should be always be 32 or 33 bytes (depending on if it's compressed)

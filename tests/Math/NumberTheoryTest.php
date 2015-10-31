@@ -2,10 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Math;
 
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Math\NumberTheory;
 

@@ -6,10 +6,6 @@ use BitWasp\Bitcoin\Collection\StaticCollection;
 
 class Set extends StaticCollection
 {
-    /**
-     * @var \SplFixedArray
-     */
-    protected $set;
 
     /**
      * @param array $values

@@ -18,7 +18,6 @@ class Bip39MnemonicTest extends AbstractBip39Case
      */
     public function testEntropyToMnemonic(Bip39Mnemonic $bip39, Buffer $entropy, $eMnemonic, Buffer $eSeed)
     {
-        unset($eSeed);
         $mnemonic = $bip39->entropyToMnemonic($entropy);
         $this->assertEquals($eMnemonic, $mnemonic);
     }
@@ -32,7 +31,6 @@ class Bip39MnemonicTest extends AbstractBip39Case
      */
     public function testMnemonicToEntropy(Bip39Mnemonic $bip39, Buffer $eEntropy, $mnemonic, Buffer $eSeed)
     {
-        unset($eSeed);
         $entropy = $bip39->mnemonicToEntropy($mnemonic);
         $this->assertEquals($eEntropy->getBinary(), $entropy->getBinary());
     }

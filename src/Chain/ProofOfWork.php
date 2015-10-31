@@ -36,7 +36,9 @@ class ProofOfWork
      */
     public function getTarget(Buffer $bits)
     {
-        return $this->math->compact()->set($bits->getInt());
+        $negative = false;
+        $overflow = false;
+        return $this->math->compact()->set($bits->getInt(), $negative, $overflow);
     }
 
     /**
@@ -88,7 +90,7 @@ class ProofOfWork
         $negative = false;
         $overflow = false;
         $target = $this->math->compact()->set($nBits, $negative, $overflow);
-        if ($negative || $this->math->cmp($target, 0) == 0 || $overflow || $this->math->cmp($target, $this->getMaxTarget()) > 0) {
+        if ($negative || $overflow || $this->math->cmp($target, 0) === 0 ||  $this->math->cmp($target, $this->getMaxTarget()) > 0) {
             throw new \RuntimeException('nBits below minimum work');
         }
 

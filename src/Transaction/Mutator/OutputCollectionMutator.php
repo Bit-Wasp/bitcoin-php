@@ -9,11 +9,6 @@ use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 class OutputCollectionMutator extends MutableCollection
 {
     /**
-     * @var \SplFixedArray
-     */
-    protected $set;
-
-    /**
      * @param TransactionOutputInterface[] $outputs
      */
     public function __construct(array $outputs)
@@ -44,6 +39,7 @@ class OutputCollectionMutator extends MutableCollection
         if (!$this->set->offsetExists($offset)) {
             throw new \OutOfRangeException('Nothing found at this offset');
         }
+
         return $this->set->offsetGet($offset);
     }
 
@@ -57,12 +53,12 @@ class OutputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @param int|string $i
+     * @param int $i
      * @return OutputMutator
      */
     public function outputMutator($i)
     {
-        if (!isset($this->set[$i])) {
+        if (!$this->set->offsetExists($i)) {
             throw new \OutOfRangeException('Input does not exist');
         }
 
@@ -161,8 +157,7 @@ class OutputCollectionMutator extends MutableCollection
      */
     public function applyTo($i, \Closure $closure)
     {
-        $mutator = $this->offsetGet($i);
-        $closure($mutator);
+        $closure($this->offsetGet($i));
         return $this;
     }
 }

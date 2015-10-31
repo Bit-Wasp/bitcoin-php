@@ -45,7 +45,7 @@ class TransactionInputSerializer
      * @return TransactionInput
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         $parse = $this->getTemplate()->parse($parser);
         /** @var Buffer $txidBuf */

@@ -34,7 +34,7 @@ class ScriptStack
      */
     public function push($value)
     {
-        array_push($this->stack, $value);
+        $this->stack[] = $value;
         return $this;
     }
 
@@ -137,7 +137,7 @@ class ScriptStack
     public function end()
     {
         $count = $this->size();
-        if ($count == 0) {
+        if ($count === 0) {
             return 0;
         }
 

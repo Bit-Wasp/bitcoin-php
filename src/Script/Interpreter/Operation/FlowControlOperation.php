@@ -57,9 +57,9 @@ class FlowControlOperation
         $castToBool = $this->castToBool;
 
         $opName = $opCodes->getOp($opCode);
-        if ($opName == 'OP_NOP') {
+        if ($opName === 'OP_NOP') {
             return;
-        } elseif (in_array($opName, ['OP_IF', 'OP_NOTIF'])) { // cscriptnum
+        } elseif (in_array($opName, ['OP_IF', 'OP_NOTIF'], true)) { // cscriptnum
             // <expression> if [statements] [else [statements]] endif
             $value = false;
             if ($fExec) {
@@ -76,21 +76,21 @@ class FlowControlOperation
             $vfStack->push($value);
             return;
 
-        } else if ($opName == 'OP_ELSE') {
-            if ($vfStack->size() == 0) {
+        } else if ($opName === 'OP_ELSE') {
+            if ($vfStack->size() === 0) {
                 throw new \Exception('Unbalanced conditional');
             }
             $vfStack->set($vfStack->end() - 1, !$vfStack->end());
             return;
 
-        } else if ($opName == 'OP_ENDIF') {
-            if ($vfStack->size() == 0) {
+        } else if ($opName === 'OP_ENDIF') {
+            if ($vfStack->size() === 0) {
                 throw new \Exception('Unbalanced conditional');
             }
             // todo
             return;
 
-        } else if ($opName == 'OP_VERIFY') {
+        } else if ($opName === 'OP_VERIFY') {
             if ($mainStack->size() < 1) {
                 throw new \Exception('Invalid stack operation');
             }
@@ -101,7 +101,7 @@ class FlowControlOperation
             $mainStack->pop();
             return;
 
-        } else if ($opName == 'OP_RETURN') {
+        } else if ($opName === 'OP_RETURN') {
             throw new \Exception('Error: OP_RETURN');
         }
 

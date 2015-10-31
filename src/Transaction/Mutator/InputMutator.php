@@ -36,10 +36,10 @@ class InputMutator
     private function replace(array $array = [])
     {
         $this->input = new TransactionInput(
-            isset($array['txid']) ? $array['txid'] : $this->input->getTransactionId(),
-            isset($array['vout']) ? $array['vout'] : $this->input->getVout(),
-            isset($array['script']) ? $array['script'] : $this->input->getScript(),
-            isset($array['nSequence']) ? $array['nSequence'] : $this->input->getSequence()
+            array_key_exists('txid', $array) ? $array['txid'] : $this->input->getTransactionId(),
+            array_key_exists('vout', $array) ? $array['vout'] : $this->input->getVout(),
+            array_key_exists('script', $array) ? $array['script'] : $this->input->getScript(),
+            array_key_exists('nSequence', $array) ? $array['nSequence'] : $this->input->getSequence()
         );
 
         return $this;

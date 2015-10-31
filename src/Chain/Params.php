@@ -3,17 +3,11 @@
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\Block;
-use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
-use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
 class Params implements ParamsInterface

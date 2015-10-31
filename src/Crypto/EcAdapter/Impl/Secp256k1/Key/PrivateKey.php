@@ -107,15 +107,15 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function getPublicKey()
     {
-        if ($this->publicKey == null) {
+        if (null === $this->publicKey) {
             $context = $this->ecAdapter->getContext();
-            $pubkey_t = '';
-            /** @var resource $pubkey_t */
-            if (1 !== secp256k1_ec_pubkey_create($context, $this->getBinary(), $pubkey_t)) {
+            $publicKey_t = '';
+            /** @var resource $publicKey_t */
+            if (1 !== secp256k1_ec_pubkey_create($context, $this->getBinary(), $publicKey_t)) {
                 throw new \RuntimeException('Failed to create public key');
             }
 
-            $this->publicKey = new PublicKey($this->ecAdapter, $pubkey_t, $this->compressed);
+            $this->publicKey = new PublicKey($this->ecAdapter, $publicKey_t, $this->compressed);
         }
 
         return $this->publicKey;
@@ -123,6 +123,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     /**
      * @param int $tweak
+     * @var string $tweak
      * @return PrivateKey
      */
     public function tweakAdd($tweak)
@@ -131,7 +132,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $math = $adapter->getMath();
         $context = $adapter->getContext();
         $privKey = $this->getBinary(); // mod by reference
-        $tweak = pack("H*", str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
+        $tweak = Buffer::int($tweak, 32, $math)->getBinary();
         $ret = \secp256k1_ec_privkey_tweak_add(
             $context,
             $privKey,

@@ -38,13 +38,13 @@ class HashOperation
         $buffer = $mainStack->top(-1);
 
         if ($opCodes->cmp($opCode, 'OP_RIPEMD160') >= 0 && $opCodes->cmp($opCode, 'OP_HASH256') <= 0) {
-            if ($opName == 'OP_RIPEMD160') {
+            if ($opName === 'OP_RIPEMD160') {
                 $hash = Hash::ripemd160($buffer);
-            } elseif ($opName == 'OP_SHA1') {
+            } elseif ($opName === 'OP_SHA1') {
                 $hash = Hash::sha1($buffer);
-            } elseif ($opName == 'OP_SHA256') {
+            } elseif ($opName === 'OP_SHA256') {
                 $hash = Hash::sha256($buffer);
-            } elseif ($opName == 'OP_HASH160') {
+            } elseif ($opName === 'OP_HASH160') {
                 $hash = Hash::sha256ripe160($buffer);
             } else { // is hash256
                 $hash = Hash::sha256d($buffer);

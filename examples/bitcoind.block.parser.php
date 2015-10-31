@@ -12,7 +12,7 @@ if (!isset($argv[1])) {
     . "Usage: php ".$argv[0]." /home/you/.bitcoin/\n");
 }
 
-$directory = $argv[1] . ('/' == substr($argv[1], -1) ? '' : '/') . 'blocks/';
+$directory = $argv[1] . ('/' === substr($argv[1], -1) ? '' : '/') . 'blocks/';
 
 $ec = Bitcoin::getEcAdapter();
 $math = $ec->getMath();
@@ -38,7 +38,7 @@ $c = 0;
 $files = [];
 if ($handle = opendir($directory)) {
     while (false !== ($entry = readdir($handle))) {
-        if (substr($entry, 0, 3) == 'blk') {
+        if (substr($entry, 0, 3) === 'blk') {
             $files[] = $entry;
         }
     }

@@ -14,12 +14,12 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     /**
      * @var string
      */
-    private $txid;
+    private $hashPrevOut;
 
     /**
      * @var string|int
      */
-    private $vout;
+    private $nPrevOut;
 
     /**
      * @var ScriptInterface
@@ -32,14 +32,14 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $sequence;
 
     /**
-     * @param string $txid
-     * @param string $vout
+     * @param string $hashPrevOut
+     * @param string $nPrevOut
      * @param ScriptInterface|Buffer $script
      * @param int $sequence
      */
-    public function __construct($txid, $vout, ScriptInterface $script = null, $sequence = self::SEQUENCE_FINAL)
+    public function __construct($hashPrevOut, $nPrevOut, ScriptInterface $script = null, $sequence = self::SEQUENCE_FINAL)
     {
-        if (!is_numeric($vout)) {
+        if (!is_numeric($nPrevOut)) {
             throw new \InvalidArgumentException('TransactionInput: vout must be numeric');
         }
 
@@ -47,8 +47,8 @@ class TransactionInput extends Serializable implements TransactionInputInterface
             throw new \InvalidArgumentException('TransactionInput: sequence must be numeric');
         }
 
-        $this->txid = $txid;
-        $this->vout = $vout;
+        $this->hashPrevOut = $hashPrevOut;
+        $this->nPrevOut = $nPrevOut;
         $this->script = $script ?: new Script();
         $this->sequence = $sequence;
     }
@@ -68,7 +68,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getTransactionId()
     {
-        return $this->txid;
+        return $this->hashPrevOut;
     }
 
     /**
@@ -76,7 +76,15 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getVout()
     {
-        return $this->vout;
+        return $this->nPrevOut;
+    }
+
+    /**
+     * @return Script
+     */
+    public function getScript()
+    {
+        return $this->script;
     }
 
     /**
@@ -88,27 +96,15 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * Return an initialized script. Checks if already has a script
-     * object. If not, returns script from scriptBuf (which can simply
-     * be null).
-     *
-     * @return Script
-     */
-    public function getScript()
-    {
-        return $this->script;
-    }
-
-    /**
-     * Check whether this transaction is a coinbase transaction
+     * Check whether this transaction is a Coinbase transaction
      *
      * @return boolean
      */
     public function isCoinbase()
     {
         $math = Bitcoin::getMath();
-        return $this->getTransactionId() == '0000000000000000000000000000000000000000000000000000000000000000'
-            && $math->cmp($this->getVout(), $math->hexDec('ffffffff')) == 0;
+        return $this->getTransactionId() === '0000000000000000000000000000000000000000000000000000000000000000'
+            && $math->cmp($this->getVout(), $math->hexDec('ffffffff')) === 0;
     }
 
     /**
@@ -117,7 +113,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function isFinal()
     {
         $math = Bitcoin::getMath();
-        return $math->cmp($this->getSequence(), self::SEQUENCE_FINAL) == 0;
+        return $math->cmp($this->getSequence(), self::SEQUENCE_FINAL) === 0;
     }
 
     /**

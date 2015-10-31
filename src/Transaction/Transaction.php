@@ -49,40 +49,40 @@ class Transaction extends Serializable implements TransactionInterface
     private $cacheBuffer;
 
     /**
-     * @param int|string $version
+     * @param int|string $nVersion
      * @param TransactionInputCollection $inputs
      * @param TransactionOutputCollection $outputs
-     * @param int|string $locktime
+     * @param int|string $nLockTime
      * @throws \Exception
      */
     public function __construct(
-        $version = TransactionInterface::DEFAULT_VERSION,
+        $nVersion = TransactionInterface::DEFAULT_VERSION,
         TransactionInputCollection $inputs = null,
         TransactionOutputCollection $outputs = null,
-        $locktime = '0'
+        $nLockTime = '0'
     ) {
 
-        if (!is_numeric($version)) {
+        if (!is_numeric($nVersion)) {
             throw new \InvalidArgumentException('Transaction version must be numeric');
         }
 
-        if (!is_numeric($locktime)) {
+        if (!is_numeric($nLockTime)) {
             throw new \InvalidArgumentException('Transaction locktime must be numeric');
         }
 
         $math = Bitcoin::getMath();
-        if ($math->cmp($version, TransactionInterface::MAX_VERSION) > 0) {
-            throw new \Exception('Version must be less than ' . TransactionInterface::MAX_VERSION);
+        if ($math->cmp($nVersion, TransactionInterface::MAX_VERSION) > 0) {
+            throw new \InvalidArgumentException('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
 
-        if ($math->cmp($locktime, TransactionInterface::MAX_LOCKTIME) > 0) {
-            throw new \Exception('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
+        if ($math->cmp($nLockTime, TransactionInterface::MAX_LOCKTIME) > 0) {
+            throw new \InvalidArgumentException('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 
-        $this->version = $version;
+        $this->version = $nVersion;
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
-        $this->lockTime = $locktime;
+        $this->lockTime = $nLockTime;
     }
 
     /**
@@ -99,7 +99,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxHash()
     {
-        if (is_null($this->cacheHash)) {
+        if (null === $this->cacheHash) {
             $this->cacheHash = Hash::sha256d($this->getBuffer());
         }
 
@@ -111,7 +111,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxId()
     {
-        if (is_null($this->cacheTxid)) {
+        if (null === $this->cacheTxid) {
             $this->cacheTxid = $this->getTxHash()->flip();
         }
 
@@ -119,7 +119,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @inheritdoc
+     * @return int|string
      */
     public function getVersion()
     {
@@ -201,7 +201,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function isCoinbase()
     {
-        return count($this->inputs) == 1 && $this->getInput(0)->isCoinBase();
+        return count($this->inputs) === 1 && $this->getInput(0)->isCoinBase();
     }
 
     /**
@@ -209,7 +209,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
-        if (is_null($this->cacheBuffer)) {
+        if (null === $this->cacheBuffer) {
             $this->cacheBuffer = (new TransactionSerializer)->serialize($this);
         }
 

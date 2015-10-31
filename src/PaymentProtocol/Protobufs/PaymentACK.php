@@ -6,10 +6,10 @@ class PaymentACK extends \DrSlump\Protobuf\Message
 {
 
     /**  @var \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment */
-    public $payment = null;
+    public $payment;
 
     /**  @var string */
-    public $memo = null;
+    public $memo;
 
 
     /** @var \Closure[] */
@@ -22,7 +22,7 @@ class PaymentACK extends \DrSlump\Protobuf\Message
         // REQUIRED MESSAGE payment = 1
         $f = new \DrSlump\Protobuf\Field();
         $f->number = 1;
-        $f->name = "payment";
+        $f->name = 'payment';
         $f->type = \DrSlump\Protobuf::TYPE_MESSAGE;
         $f->rule = \DrSlump\Protobuf::RULE_REQUIRED;
         $f->reference = '\BitWasp\Bitcoin\Payments\Protobufs\Payment';
@@ -31,7 +31,7 @@ class PaymentACK extends \DrSlump\Protobuf\Message
         // OPTIONAL STRING memo = 2
         $f = new \DrSlump\Protobuf\Field();
         $f->number = 2;
-        $f->name = "memo";
+        $f->name = 'memo';
         $f->type = \DrSlump\Protobuf::TYPE_STRING;
         $f->rule = \DrSlump\Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);

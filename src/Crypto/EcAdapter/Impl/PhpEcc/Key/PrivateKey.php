@@ -136,7 +136,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
      */
     public function getPublicKey()
     {
-        if ($this->publicKey == null) {
+        if (null === $this->publicKey) {
             $adapter = $this->ecAdapter;
             $this->publicKey = $adapter->getPublicKey(
                 $adapter
