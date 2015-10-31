@@ -38,8 +38,8 @@ class CompactInteger
 
         // isNegative: $word != 0 && $uint32 & 0x00800000 != 0
         // isOverflow: $word != 0 && (($size > 34) || ($word > 0xff && $size > 33) || ($word > 0xffff && $size  >32))
-        $isNegative = (($math->cmp($word, 0) != 0) && ($math->cmp($math->bitwiseAnd($compact, $math->hexDec('0x00800000')), 0) == 1));
-        $isOverflow = $math->cmp($word, 0) != 0 && (
+        $isNegative = (($math->cmp($word, 0) !== 0) && ($math->cmp($math->bitwiseAnd($compact, $math->hexDec('0x00800000')), 0) === 1));
+        $isOverflow = $math->cmp($word, 0) !== 0 && (
             ($math->cmp($size, 34) > 0)
             || ($math->cmp($word, 0xff) > 0 && $math->cmp($size, 33) > 0)
             || ($math->cmp($word, 0xffff) > 0 && $math->cmp($size, 32) > 0)

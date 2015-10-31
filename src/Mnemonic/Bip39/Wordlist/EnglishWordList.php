@@ -35,7 +35,7 @@ class EnglishWordList extends WordList implements Bip39WordListInterface
     public function getIndex($word)
     {
         // create a flipped word list to speed up the searching of words
-        if ($this->wordsFlipped == null) {
+        if ($this->wordsFlipped === null) {
             $this->wordsFlipped = array_flip($this->getWords());
         }
 

@@ -132,9 +132,9 @@ class ArithmeticOperation
         } elseif ($opName === 'OP_BOOLOR') {
             $num = $math->cmp($num1, $this->_bn0->getInt()) !== 0 || $math->cmp($num2, $this->_bn0->getInt()) !== 0;
         } elseif ($opName === 'OP_NUMEQUAL') { // cscriptnum
-            $num = $math->cmp($num1, $num2) == 0;
+            $num = $math->cmp($num1, $num2) === 0;
         } elseif ($opName === 'OP_NUMEQUALVERIFY') { // cscriptnum
-            $num = $math->cmp($num1, $num2) == 0;
+            $num = $math->cmp($num1, $num2) === 0;
         } elseif ($opName === 'OP_NUMNOTEQUAL') {
             $num = $math->cmp($num1, $num2) !== 0;
         } elseif ($opName === 'OP_LESSTHAN') { // cscriptnum

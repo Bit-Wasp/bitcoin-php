@@ -41,7 +41,6 @@ class PublicKeyTest extends AbstractTestCase
      */
     public function testFromHex(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
     {
-        unset($eUncompressed);
         $publicKey = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
 
         $this->assertSame($eCompressed, $publicKey->getBuffer()->getHex());
@@ -57,7 +56,6 @@ class PublicKeyTest extends AbstractTestCase
      */
     public function testFromHexUncompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
     {
-        unset($eCompressed);
         $publicKey = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
         $this->assertSame($eUncompressed, $publicKey->getBuffer()->getHex());
         $this->assertSame($publicKey->getBuffer()->getHex(), $eUncompressed);
@@ -152,7 +150,6 @@ class PublicKeyTest extends AbstractTestCase
      */
     public function testIsNotCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
     {
-        unset($eCompressed);
         $pub = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
         $this->assertFalse($pub->isCompressed());
     }

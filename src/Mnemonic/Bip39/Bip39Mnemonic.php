@@ -106,7 +106,7 @@ class Bip39Mnemonic implements MnemonicInterface
         $math = $this->ecAdapter->getMath();
         $words = explode(' ', $mnemonic);
 
-        if ($math->mod(count($words), 3) != 0) {
+        if ($math->cmp($math->mod(count($words), 3), 0) !== 0) {
             throw new \InvalidArgumentException('Invalid mnemonic');
         }
 

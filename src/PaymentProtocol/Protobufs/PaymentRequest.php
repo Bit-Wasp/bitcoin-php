@@ -17,13 +17,13 @@ class PaymentRequest extends Message
     public $pki_type = 'none';
 
     /**  @var string */
-    public $pki_data = null;
+    public $pki_data ;
 
     /**  @var string */
-    public $serialized_payment_details = null;
+    public $serialized_payment_details ;
 
     /**  @var string */
-    public $signature = null;
+    public $signature ;
 
     /** @var \Closure[] */
     protected static $__extensions = array();

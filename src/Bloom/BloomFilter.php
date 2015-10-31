@@ -115,7 +115,7 @@ class BloomFilter extends Serializable
      */
     public function checkFlag($flag)
     {
-        return $this->math->cmp($this->math->bitwiseAnd($this->flags->getFlags(), self::UPDATE_MASK), $flag) == 0;
+        return $this->math->cmp($this->math->bitwiseAnd($this->flags->getFlags(), self::UPDATE_MASK), $flag) === 0;
     }
 
     /**
@@ -407,8 +407,8 @@ class BloomFilter extends Serializable
         $full = true;
         $empty = true;
         for ($i = 0, $size = count($this->vFilter); $i < $size; $i++) {
-            $full &= ($this->vFilter[$i] == 0xff);
-            $empty &= ($this->vFilter[$i] == 0x0);
+            $full &= ($this->vFilter[$i] === 0xff);
+            $empty &= ($this->vFilter[$i] === 0x0);
         }
 
         $this->isFull = $full;

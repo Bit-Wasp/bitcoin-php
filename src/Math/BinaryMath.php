@@ -35,7 +35,7 @@ class BinaryMath
      */
     public function isNegative($integer, $bitSize)
     {
-        return $this->math->cmp($this->math->rightShift($integer, $this->fixSize($bitSize)), '1') == 0;
+        return $this->math->cmp($this->math->rightShift($integer, $this->fixSize($bitSize)), '1') === 0;
     }
 
     /**

@@ -14,7 +14,7 @@ class Output extends Message
     public $amount = 0;
 
     /**  @var string */
-    public $script = null;
+    public $script;
 
 
     /** @var \Closure[] */

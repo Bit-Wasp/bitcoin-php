@@ -38,23 +38,19 @@ class OutputClassifier implements ScriptClassifierInterface
             return false;
         }
 
-        if (strlen($script) == 35
-            && $this->evalScript[0]->getSize() == 33
-            && $this->evalScript[1] == 'OP_CHECKSIG'
+        if (strlen($script) === 35
+            && $this->evalScript[0]->getSize() === 33
+            && $this->evalScript[1] === 'OP_CHECKSIG'
             && in_array(ord($script[1]), array(PublicKey::KEY_COMPRESSED_EVEN, PublicKey::KEY_COMPRESSED_ODD))
         ) {
             return true;
         }
 
-        if (strlen($script) == 67
-            && $this->evalScript[0]->getSize() == 65
-            && $this->evalScript[1] == 'OP_CHECKSIG'
-            && bin2hex($script[1]) == PublicKey::KEY_UNCOMPRESSED
-        ) {
-            return true;
-        }
-
-        return false;
+        return (strlen($script) === 67
+            && $this->evalScript[0]->getSize() === 65
+            && $this->evalScript[1] === 'OP_CHECKSIG'
+            && bin2hex($script[1]) === PublicKey::KEY_UNCOMPRESSED
+        );
     }
 
     /**

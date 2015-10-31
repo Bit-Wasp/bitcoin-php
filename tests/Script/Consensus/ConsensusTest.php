@@ -66,12 +66,7 @@ class ConsensusTest
         $consensus = $factory->getConsensus($factory->flags($flags));
         $r = $consensus->verify($tx, $scriptPubKey, $nInput);
 
-        if ($r !== $result) {
-            $parser = $scriptPubKey->getScriptParser();
-        } else {
             $this->assertEquals($result, $r);
-        }
-
 
     }
 }

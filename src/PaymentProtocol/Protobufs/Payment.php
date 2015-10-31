@@ -8,7 +8,7 @@ class Payment extends Message
 {
 
     /**  @var string */
-    public $merchant_data = null;
+    public $merchant_data;
 
     /**  @var string[] */
     public $transactions = array();
@@ -17,7 +17,7 @@ class Payment extends Message
     public $refund_to = array();
 
     /**  @var string */
-    public $memo = null;
+    public $memo;
 
 
     /** @var \Closure[] */

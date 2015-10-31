@@ -170,7 +170,7 @@ class TxSignerTest extends AbstractTestCase
     public function testDoPayToPubkey(EcAdapterInterface $ecAdapter)
     {
         $privateKey = PrivateKeyFactory::fromHex('f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b', false, $ecAdapter);
-        $outputScript = ScriptFactory::scriptPubKey()->paytoPubKey($privateKey->getPublicKey());
+        $outputScript = ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey());
 
         $sampleSpendTx = (new TxBuilder())
             ->input('4141414141414141414141414141414141414141414141414141414141414141', 0)

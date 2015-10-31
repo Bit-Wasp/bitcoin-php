@@ -6,10 +6,10 @@ class PaymentACK extends \DrSlump\Protobuf\Message
 {
 
     /**  @var \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment */
-    public $payment = null;
+    public $payment;
 
     /**  @var string */
-    public $memo = null;
+    public $memo;
 
 
     /** @var \Closure[] */

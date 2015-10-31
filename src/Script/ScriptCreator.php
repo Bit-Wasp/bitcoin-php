@@ -31,7 +31,7 @@ class ScriptCreator
      */
     public function __construct(Math $math, Opcodes $opcodes, Buffer $buffer = null)
     {
-        if ($buffer != null) {
+        if ($buffer !== null) {
             $this->script = $buffer->getBinary();
         }
 

@@ -253,14 +253,14 @@ class Interpreter implements InterpreterInterface
         $binary = $pushData->getBinary();
 
         $opcodes = $this->script->getOpCodes();
-        if ($pushSize == 0) {
+        if ($pushSize === 0) {
             return $opcodes->isOp($opCode, 'OP_0');
-        } elseif ($pushSize == 1 && ord($binary[0]) >= 1 && ord($binary[0]) <= 16) {
+        } elseif ($pushSize === 1 && ord($binary[0]) >= 1 && ord($binary[0]) <= 16) {
             return $opCode == $opcodes->getOpByName('OP_1') + (ord($binary[0]) - 1);
-        } elseif ($pushSize == 1 && ord($binary[0]) == 0x81) {
+        } elseif ($pushSize === 1 && ord($binary[0]) == 0x81) {
             return $opcodes->isOp($opCode, 'OP_1NEGATE');
         } elseif ($pushSize <= 75) {
-            return $opCode == $pushSize;
+            return $opCode === $pushSize;
         } elseif ($pushSize <= 255) {
             return $opcodes->isOp($opCode, 'OP_PUSHDATA1');
         } elseif ($pushSize <= 65535) {
@@ -351,7 +351,7 @@ class Interpreter implements InterpreterInterface
 
             // Restore mainStack to how it was after evaluating scriptSig
             $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
-            if ($mainStack->size() == 0) {
+            if ($mainStack->size() === 0) {
                 return false;
             }
 
@@ -382,8 +382,8 @@ class Interpreter implements InterpreterInterface
         $this->hashStartPos = 0;
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
-        $_bn0 = Buffer::hex('00');
-        $_bn1 = Buffer::hex('01');
+        $_bn0 = new Buffer("\x00", 1, $math);
+        $_bn1 = new Buffer("\x01", 1, $math);
 
         if ($this->script->getBuffer()->getSize() > 10000) {
             return false;
@@ -393,7 +393,7 @@ class Interpreter implements InterpreterInterface
             $c = 0;
             $len = $vfStack->end();
             for ($i = 0; $i < $len; $i++) {
-                if ($vfStack->top(0 - $len - $i) == true) {
+                if ($vfStack->top(0 - $len - $i) === true) {
                     $c++;
                 }
             }

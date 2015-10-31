@@ -18,7 +18,6 @@ class Bip39SeedGeneratorTest extends AbstractBip39Case
     public function testMnemonicToSeed(Bip39Mnemonic $bip39, Buffer $entropy, $mnemonic, Buffer $eSeed)
     {
         $password = 'TREZOR';
-        unset($entropy);
         $seedGenerator = new Bip39SeedGenerator($bip39);
         $seed = $seedGenerator->getSeed($mnemonic, $password);
         $this->assertEquals($eSeed->getBinary(), $seed->getBinary());
