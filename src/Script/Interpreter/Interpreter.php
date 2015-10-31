@@ -257,12 +257,12 @@ class Interpreter implements InterpreterInterface
             return $opcodes->isOp($opCode, 'OP_0');
         } elseif ($pushSize === 1) {
             $first = ord($binary[0]);
-            if ( $first >= 1 && $first <= 16) {
+            if ($first >= 1 && $first <= 16) {
                 return $opCode === $opcodes->getOpByName('OP_1') + ($first - 1);
             } elseif ($first === 0x81) {
                 return $opcodes->isOp($opCode, 'OP_1NEGATE');
             }
-        }  elseif ($pushSize <= 75) {
+        } elseif ($pushSize <= 75) {
             return $opCode === $pushSize;
         } elseif ($pushSize <= 255) {
             return $opcodes->isOp($opCode, 'OP_PUSHDATA1');
