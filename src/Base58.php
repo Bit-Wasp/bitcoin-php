@@ -11,7 +11,7 @@ class Base58
     /**
      * @var string
      */
-    private static $base58chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    private static $base58chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
     /**
      * Encode a given hex string in base58
@@ -23,7 +23,7 @@ class Base58
     public static function encode(Buffer $binary)
     {
         $size = $binary->getSize();
-        if ($size == 0) {
+        if ($binary->getBinary() === '') {
             return '';
         }
 
@@ -32,16 +32,16 @@ class Base58
         $orig = $binary->getBinary();
         $decimal = $binary->getInt();
 
-        $return = "";
+        $return = '';
         while ($math->cmp($decimal, 0) > 0) {
             list($decimal, $rem) = $math->divQr($decimal, 58);
-            $return = $return . self::$base58chars[$rem];
+            $return .= self::$base58chars[$rem];
         }
         $return = strrev($return);
 
         //leading zeros
-        for ($i = 0; $i < $size && $orig[$i] == "\x00"; $i++) {
-            $return = "1" . $return;
+        for ($i = 0; $i < $size && $orig[$i] === "\x00"; $i++) {
+            $return = '1' . $return;
         }
 
         return $return;
@@ -56,23 +56,23 @@ class Base58
     public static function decode($base58)
     {
         $math = Bitcoin::getMath();
-        if (strlen($base58) == 0) {
+        if ($base58 === '') {
             return new Buffer('', 0, $math);
         }
 
         $original = $base58;
-        $strlen = strlen($base58);
+        $length = strlen($base58);
         $return = '0';
-        for ($i = 0; $i < $strlen; $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
         }
 
-        $hex = ($return == '0') ? '' : $math->decHex($return);
-        for ($i = 0; $i < $strlen && $original[$i] == "1"; $i++) {
-            $hex = "00" . $hex;
+        $binary = $math->cmp($return, '0') === 0 ? '' : hex2bin($math->decHex($return));
+        for ($i = 0; $i < $length && $original[$i] === '1'; $i++) {
+            $binary = "\x00" . $binary;
         }
 
-        return Buffer::hex($hex);
+        return new Buffer($binary, null, $math);
     }
 
     /**
@@ -96,11 +96,10 @@ class Base58
     public static function decodeCheck($base58)
     {
         $hex = self::decode($base58);
-        $csVerify = $hex->slice(-4);
         $data = $hex->slice(0, -4);
-        $checksum = self::checksum($data);
+        $csVerify = $hex->slice(-4);
 
-        if ($checksum != $csVerify) {
+        if (self::checksum($data)->getBinary() !== $csVerify->getBinary()) {
             throw new Base58ChecksumFailure('Failed to verify checksum');
         }
 
