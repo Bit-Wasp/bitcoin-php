@@ -66,6 +66,7 @@ class PartialMerkleTreeSerializer
     }
 
     /**
+     * @param int $last
      * @param Buffer[] $vBytes
      * @return array
      */

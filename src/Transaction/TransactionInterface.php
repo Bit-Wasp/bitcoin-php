@@ -56,6 +56,7 @@ interface TransactionInterface extends SerializableInterface
     public function getInputs();
 
     /**
+     * @param int $index
      * @return TransactionInputInterface
      */
     public function getInput($index);
