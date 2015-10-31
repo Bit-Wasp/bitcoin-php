@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 
 class Base58
 {
@@ -116,6 +117,6 @@ class Base58
      */
     public static function encodeCheck(Buffer $data)
     {
-        return self::encode(Buffer::hex($data->getHex() . self::checksum($data)->getHex()));
+        return self::encode(Buffertools::concat($data, self::checksum($data)));
     }
 }
