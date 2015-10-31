@@ -68,12 +68,12 @@ class MerkleRoot
 
         $txCount = count($this->transactions);
 
-        if ($txCount == 0) {
+        if ($txCount === 0) {
             // TODO: Probably necessary. Should always have a coinbase at least.
             throw new MerkleTreeEmpty('Cannot compute Merkle root of an empty tree');
         }
 
-        if ($txCount == 1) {
+        if ($txCount === 1) {
             $buffer = $hashFxn($this->transactions->get(0)->getBinary());
 
         } else {

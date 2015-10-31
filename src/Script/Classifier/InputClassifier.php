@@ -36,7 +36,7 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        return count($this->evalScript) == 1
+        return count($this->evalScript) === 1
             && $this->evalScript[0] instanceof Buffer
             && $this->evalScript[0]->getSize() <= self::MAXSIGLEN;
     }
@@ -46,7 +46,7 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKeyHash()
     {
-        return count($this->evalScript) == 2
+        return count($this->evalScript) === 2
             && $this->evalScript[0] instanceof Buffer && $this->evalScript[1] instanceof Buffer
             && $this->evalScript[0]->getSize() <= self::MAXSIGLEN
             && PublicKey::isCompressedOrUncompressed($this->evalScript[1]);
@@ -57,7 +57,7 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToScriptHash()
     {
-        if (count($this->evalScript) == 0) {
+        if (count($this->evalScript) === 0) {
             return false;
         }
 

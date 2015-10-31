@@ -22,7 +22,7 @@ class RpcFactory
      * @param array $headers
      * @return Bitcoind
      */
-    public static function bitcoind($host, $port, $user, $password, $timeout = 5, $headers = array())
+    public static function bitcoind($host, $port, $user, $password, $timeout = 5, array $headers = array())
     {
         $jsonRPCclient = new JsonRpcClient($host, $port, $timeout, $headers);
         $jsonRPCclient->authentication($user, $password);

@@ -30,7 +30,7 @@ class EcAdapterFactory
             throw new \RuntimeException('Secp256k1 not installed');
         }
 
-        if (self::$context == null) {
+        if (self::$context === null) {
             self::$context = secp256k1_context_create($flags ?: SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
         }
 

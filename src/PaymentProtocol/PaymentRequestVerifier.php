@@ -40,11 +40,11 @@ class PaymentRequestVerifier
      */
     public function verifySignature()
     {
-        if ($this->request->getPkiType() == 'none') {
+        if ($this->request->getPkiType() === 'none') {
             return true;
         }
 
-        $algorithm = $this->request->getPkiType() == 'x509+sha256'
+        $algorithm = $this->request->getPkiType() === 'x509+sha256'
             ? OPENSSL_ALGO_SHA256
             : OPENSSL_ALGO_SHA1;
 
@@ -60,6 +60,6 @@ class PaymentRequestVerifier
         $certificate = $this->der2pem($certificates->getCertificate(0));
         $pubkeyid = openssl_pkey_get_public($certificate);
 
-        return 1 == openssl_verify($data, $signature, $pubkeyid, $algorithm);
+        return 1 === openssl_verify($data, $signature, $pubkeyid, $algorithm);
     }
 }

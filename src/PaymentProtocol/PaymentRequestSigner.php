@@ -70,12 +70,12 @@ class PaymentRequestSigner
             throw new \InvalidArgumentException('Certificate file does not exist');
         }
 
-        if ('x509+sha256' == $this->type && !$this->supportsSha256()) {
+        if ('x509+sha256' === $this->type && !$this->supportsSha256()) {
             throw new \Exception('Server does not support x.509+SHA256');
         }
 
         $chain = $this->fetchChain($certFile);
-        if (!is_array($chain) || count($chain) == 0) {
+        if (!is_array($chain) || count($chain) === 0) {
             throw new \RuntimeException('Certificate file contains no certificates');
         }
 
@@ -89,7 +89,7 @@ class PaymentRequestSigner
         }
 
         $this->privateKey = $pkeyid;
-        $this->algoConst = $this->type == 'x509+sha256'
+        $this->algoConst = $this->type === 'x509+sha256'
             ? OPENSSL_ALGO_SHA256
             : OPENSSL_ALGO_SHA1;
     }
@@ -144,7 +144,7 @@ class PaymentRequestSigner
      */
     private function isRoot($certificate)
     {
-        return $certificate['issuer'] == $certificate['subject'];
+        return $certificate['issuer'] === $certificate['subject'];
     }
 
     /**
@@ -159,7 +159,7 @@ class PaymentRequestSigner
         $matches = array();
 
         $nMatches = preg_match_all($pattern, $leafCertificate['extensions']['authorityInfoAccess'], $matches);
-        if ($nMatches == 0) {
+        if ($nMatches === 0) {
             return false;
         }
         foreach ($matches[1] as $url) {

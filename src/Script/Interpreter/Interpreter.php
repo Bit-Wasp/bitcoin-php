@@ -212,7 +212,7 @@ class Interpreter implements InterpreterInterface
      */
     public function checkSignatureEncoding(Buffer $signature)
     {
-        if ($signature->getSize() == 0) {
+        if ($signature->getSize() === 0) {
             return $this;
         }
 
@@ -674,7 +674,7 @@ class Interpreter implements InterpreterInterface
                 }
             }
 
-            if (!$vfStack->end() == 0) {
+            if (!$vfStack->end() === 0) {
                 throw new \Exception('Unbalanced conditional at script end');
             }
 

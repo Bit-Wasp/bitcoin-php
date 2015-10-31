@@ -78,20 +78,20 @@ class ArithmeticOperation
 
 
 
-        if ($opName == 'OP_1ADD') { // cscriptnum
+        if ($opName === 'OP_1ADD') { // cscriptnum
             $num = $math->add($num, '1');
-        } elseif ($opName == 'OP_1SUB') {
+        } elseif ($opName === 'OP_1SUB') {
             $num = $math->sub($num, '1');
-        } elseif ($opName == 'OP_2MUL') {
+        } elseif ($opName === 'OP_2MUL') {
             $num = $math->mul(2, $num);
-        } elseif ($opName == 'OP_NEGATE') {
+        } elseif ($opName === 'OP_NEGATE') {
             $num = $math->sub(0, $num);
-        } elseif ($opName == 'OP_ABS') {
+        } elseif ($opName === 'OP_ABS') {
             if ($math->cmp($num, '0') < 0) {
                 $num = $math->sub(0, $num);
             }
-        } elseif ($opName == 'OP_NOT') {
-            $num = ($math->cmp($num, '0') == 0);
+        } elseif ($opName === 'OP_NOT') {
+            $num = ($math->cmp($num, '0') === 0);
         } else {
             // is OP_0NOTEQUAL
             $num = ($math->cmp($num, '0') !== 0);
@@ -123,29 +123,29 @@ class ArithmeticOperation
         $math = $this->math;
         $castToBool = $this->castToBool;
 
-        if ($opName == 'OP_ADD') {
+        if ($opName === 'OP_ADD') {
             $num = $math->add($num1, $num2);
-        } elseif ($opName == 'OP_SUB') { // cscriptnum
+        } elseif ($opName === 'OP_SUB') { // cscriptnum
             $num = $math->sub($num1, $num2);
-        } elseif ($opName == 'OP_BOOLAND') { // cscriptnum
+        } elseif ($opName === 'OP_BOOLAND') { // cscriptnum
             $num = $math->cmp($num1, $this->_bn0->getInt()) !== 0 && $math->cmp($num2, $this->_bn0->getInt()) !== 0;
-        } elseif ($opName == 'OP_BOOLOR') {
+        } elseif ($opName === 'OP_BOOLOR') {
             $num = $math->cmp($num1, $this->_bn0->getInt()) !== 0 || $math->cmp($num2, $this->_bn0->getInt()) !== 0;
-        } elseif ($opName == 'OP_NUMEQUAL') { // cscriptnum
+        } elseif ($opName === 'OP_NUMEQUAL') { // cscriptnum
             $num = $math->cmp($num1, $num2) == 0;
-        } elseif ($opName == 'OP_NUMEQUALVERIFY') { // cscriptnum
+        } elseif ($opName === 'OP_NUMEQUALVERIFY') { // cscriptnum
             $num = $math->cmp($num1, $num2) == 0;
-        } elseif ($opName == 'OP_NUMNOTEQUAL') {
+        } elseif ($opName === 'OP_NUMNOTEQUAL') {
             $num = $math->cmp($num1, $num2) !== 0;
-        } elseif ($opName == 'OP_LESSTHAN') { // cscriptnum
+        } elseif ($opName === 'OP_LESSTHAN') { // cscriptnum
             $num = $math->cmp($num1, $num2) < 0;
-        } elseif ($opName == 'OP_GREATERTHAN') {
+        } elseif ($opName === 'OP_GREATERTHAN') {
             $num = $math->cmp($num1, $num2) > 0;
-        } elseif ($opName == 'OP_LESSTHANOREQUAL') { // cscriptnum
+        } elseif ($opName === 'OP_LESSTHANOREQUAL') { // cscriptnum
             $num = $math->cmp($num1, $num2) <= 0;
-        } elseif ($opName == 'OP_GREATERTHANOREQUAL') {
+        } elseif ($opName === 'OP_GREATERTHANOREQUAL') {
             $num = $math->cmp($num1, $num2) >= 0;
-        } elseif ($opName == 'OP_MIN') {
+        } elseif ($opName === 'OP_MIN') {
             $num = ($math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
         } else {
             // is OP_MAX
@@ -177,7 +177,7 @@ class ArithmeticOperation
         $opName = $this->opCodes->getOp($opCode);
         $math = $this->math;
 
-        if ($opName == 'OP_WITHIN') { //cscriptnum
+        if ($opName === 'OP_WITHIN') { //cscriptnum
             if ($mainStack->size() < 3) {
                 throw new \Exception('Invalid stack operation');
             }
