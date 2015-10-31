@@ -14,11 +14,6 @@ class RedeemScript extends Script
     private $m;
 
     /**
-     * @var string
-     */
-    protected $script;
-
-    /**
      * @var array
      */
     private $keys = [];

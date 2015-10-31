@@ -60,7 +60,7 @@ class ElectrumMnemonic implements MnemonicInterface
      */
     public function entropyToMnemonic(Buffer $entropy)
     {
-        return implode(" ", $this->entropyToWords($entropy));
+        return implode(' ', $this->entropyToWords($entropy));
     }
 
     /**
@@ -72,7 +72,7 @@ class ElectrumMnemonic implements MnemonicInterface
         $math = $this->ecAdapter->getMath();
         $wordList = $this->wordList;
 
-        $words = explode(" ", $mnemonic);
+        $words = explode(' ', $mnemonic);
         $n = count($wordList);
         $out = '';
 

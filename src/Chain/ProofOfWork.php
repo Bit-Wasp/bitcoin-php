@@ -36,7 +36,9 @@ class ProofOfWork
      */
     public function getTarget(Buffer $bits)
     {
-        return $this->math->compact()->set($bits->getInt());
+        $negative = false;
+        $overflow = false;
+        return $this->math->compact()->set($bits->getInt(), $negative, $overflow);
     }
 
     /**

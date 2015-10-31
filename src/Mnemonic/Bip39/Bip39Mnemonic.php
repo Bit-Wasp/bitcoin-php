@@ -94,7 +94,7 @@ class Bip39Mnemonic implements MnemonicInterface
      */
     public function entropyToMnemonic(Buffer $entropy)
     {
-        return implode(" ", $this->entropyToWords($entropy));
+        return implode(' ', $this->entropyToWords($entropy));
     }
 
     /**
@@ -104,7 +104,7 @@ class Bip39Mnemonic implements MnemonicInterface
     public function mnemonicToEntropy($mnemonic)
     {
         $math = $this->ecAdapter->getMath();
-        $words = explode(" ", $mnemonic);
+        $words = explode(' ', $mnemonic);
 
         if ($math->mod(count($words), 3) != 0) {
             throw new \InvalidArgumentException('Invalid mnemonic');
@@ -116,7 +116,7 @@ class Bip39Mnemonic implements MnemonicInterface
             $bits[] = str_pad($math->baseConvert($idx, 10, 2), 11, '0', STR_PAD_LEFT);
         }
 
-        $bits = implode("", $bits);
+        $bits = implode('', $bits);
 
         $CS = strlen($bits) / 33;
         $ENT = strlen($bits) - $CS;

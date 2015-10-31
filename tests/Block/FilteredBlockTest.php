@@ -61,6 +61,7 @@ class FilteredBlockTest extends AbstractTestCase
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($tx9);
 
         $filtered = $block->filter($filter);
+        /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 

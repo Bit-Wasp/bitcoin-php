@@ -11,25 +11,25 @@ class PaymentDetails extends Message
 {
 
     /**  @var string */
-    public $network = "main";
+    public $network = 'main';
 
     /**  @var \BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output[] */
     public $outputs = array();
 
     /**  @var int */
-    public $time = null;
+    public $time;
 
     /**  @var int */
-    public $expires = null;
+    public $expires;
 
     /**  @var string */
-    public $memo = null;
+    public $memo;
 
     /**  @var string */
-    public $payment_url = null;
+    public $payment_url;
 
     /**  @var string */
-    public $merchant_data = null;
+    public $merchant_data;
 
 
     /** @var \Closure[] */
@@ -42,16 +42,16 @@ class PaymentDetails extends Message
         // OPTIONAL STRING network = 1
         $f = new Field();
         $f->number = 1;
-        $f->name = "network";
+        $f->name = 'network';
         $f->type = Protobuf::TYPE_STRING;
         $f->rule = Protobuf::RULE_OPTIONAL;
-        $f->default = "main";
+        $f->default = 'main';
         $descriptor->addField($f);
 
         // REPEATED MESSAGE outputs = 2
         $f = new Field();
         $f->number = 2;
-        $f->name = "outputs";
+        $f->name = 'outputs';
         $f->type = Protobuf::TYPE_MESSAGE;
         $f->rule = Protobuf::RULE_REPEATED;
         $f->reference = '\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output';
@@ -60,7 +60,7 @@ class PaymentDetails extends Message
         // REQUIRED UINT64 time = 3
         $f = new Field();
         $f->number = 3;
-        $f->name = "time";
+        $f->name = 'time';
         $f->type = Protobuf::TYPE_UINT64;
         $f->rule = Protobuf::RULE_REQUIRED;
         $descriptor->addField($f);
@@ -68,7 +68,7 @@ class PaymentDetails extends Message
         // OPTIONAL UINT64 expires = 4
         $f = new Field();
         $f->number = 4;
-        $f->name = "expires";
+        $f->name = 'expires';
         $f->type = Protobuf::TYPE_UINT64;
         $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
@@ -76,7 +76,7 @@ class PaymentDetails extends Message
         // OPTIONAL STRING memo = 5
         $f = new Field();
         $f->number = 5;
-        $f->name = "memo";
+        $f->name = 'memo';
         $f->type = Protobuf::TYPE_STRING;
         $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
@@ -84,7 +84,7 @@ class PaymentDetails extends Message
         // OPTIONAL STRING payment_url = 6
         $f = new Field();
         $f->number = 6;
-        $f->name = "payment_url";
+        $f->name = 'payment_url';
         $f->type = Protobuf::TYPE_STRING;
         $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
@@ -92,7 +92,7 @@ class PaymentDetails extends Message
         // OPTIONAL BYTES merchant_data = 7
         $f = new Field();
         $f->number = 7;
-        $f->name = "merchant_data";
+        $f->name = 'merchant_data';
         $f->type = Protobuf::TYPE_BYTES;
         $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);

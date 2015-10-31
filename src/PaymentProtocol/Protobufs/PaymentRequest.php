@@ -14,7 +14,7 @@ class PaymentRequest extends Message
     public $payment_details_version = 1;
 
     /**  @var string */
-    public $pki_type = "none";
+    public $pki_type = 'none';
 
     /**  @var string */
     public $pki_data = null;
@@ -35,7 +35,7 @@ class PaymentRequest extends Message
         // OPTIONAL UINT32 payment_details_version = 1
         $f = new Field();
         $f->number = 1;
-        $f->name = "payment_details_version";
+        $f->name = 'payment_details_version';
         $f->type = Protobuf::TYPE_UINT32;
         $f->rule = Protobuf::RULE_OPTIONAL;
         $f->default = 1;
@@ -44,16 +44,16 @@ class PaymentRequest extends Message
         // OPTIONAL STRING pki_type = 2
         $f = new Field();
         $f->number = 2;
-        $f->name = "pki_type";
+        $f->name = 'pki_type';
         $f->type = Protobuf::TYPE_STRING;
         $f->rule = Protobuf::RULE_OPTIONAL;
-        $f->default = "none";
+        $f->default = 'none';
         $descriptor->addField($f);
 
         // OPTIONAL BYTES pki_data = 3
         $f = new Field();
         $f->number = 3;
-        $f->name = "pki_data";
+        $f->name = 'pki_data';
         $f->type = Protobuf::TYPE_BYTES;
         $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);
@@ -61,7 +61,7 @@ class PaymentRequest extends Message
         // REQUIRED BYTES serialized_payment_details = 4
         $f = new Field();
         $f->number = 4;
-        $f->name = "serialized_payment_details";
+        $f->name = 'serialized_payment_details';
         $f->type = Protobuf::TYPE_BYTES;
         $f->rule = Protobuf::RULE_REQUIRED;
         $descriptor->addField($f);
@@ -69,7 +69,7 @@ class PaymentRequest extends Message
         // OPTIONAL BYTES signature = 5
         $f = new Field();
         $f->number = 5;
-        $f->name = "signature";
+        $f->name = 'signature';
         $f->type = Protobuf::TYPE_BYTES;
         $f->rule = Protobuf::RULE_OPTIONAL;
         $descriptor->addField($f);

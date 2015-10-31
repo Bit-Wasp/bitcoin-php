@@ -618,7 +618,7 @@ class Interpreter implements InterpreterInterface
                                 // Decrement $i, since we are consuming stack values.
                                 $i -= 2;
 
-                                if ($this->checksig($scriptCode, $sig, $pubkey)) {
+                                if ($this->checkSig($scriptCode, $sig, $pubkey)) {
                                     $isig++;
                                     $sigCount--;
                                 }

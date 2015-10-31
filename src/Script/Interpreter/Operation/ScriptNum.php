@@ -12,16 +12,6 @@ use BitWasp\Buffertools\Buffer;
 class ScriptNum extends Buffer
 {
     /**
-     * @var Math
-     */
-    protected $math;
-
-    /**
-     * @var
-     */
-    protected $buffer;
-
-    /**
      * @param Math $math
      * @param Flags $flags
      * @param Buffer $vch

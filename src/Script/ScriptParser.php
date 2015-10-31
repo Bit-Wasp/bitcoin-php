@@ -152,7 +152,7 @@ class ScriptParser
                 $push = $pushData;
             } else {
                 // None of these are pushdatas, so just an opcode
-                $push = $this->script->getOpCodes()->getOp($opCode);
+                $push = $this->script->getOpcodes()->getOp($opCode);
             }
 
             $data[] = $push;
