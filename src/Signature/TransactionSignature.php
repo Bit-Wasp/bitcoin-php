@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
@@ -21,7 +20,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     /**
      * @var SignatureInterface
      */
-    private $sig;
+    private $signature;
 
     /**
      * @var int|string
@@ -29,13 +28,14 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     private $hashType;
 
     /**
+     * @param EcAdapterInterface $ecAdapter
      * @param SignatureInterface $signature
      * @param $hashType
      */
     public function __construct(EcAdapterInterface $ecAdapter, SignatureInterface $signature, $hashType)
     {
         $this->ecAdapter = $ecAdapter;
-        $this->sig = $signature;
+        $this->signature = $signature;
         $this->hashType = $hashType;
     }
 
@@ -44,7 +44,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      */
     public function getSignature()
     {
-        return $this->sig;
+        return $this->signature;
     }
 
     /**
@@ -63,7 +63,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     public static function isDERSignature(Buffer $sig)
     {
         $checkVal = function ($fieldName, $start, $length, $binaryString) {
-            if ($length == 0) {
+            if ($length === 0) {
                 throw new SignatureNotCanonical('Signature ' . $fieldName . ' length is zero');
             }
             $typePrefix = ord(substr($binaryString, $start - 2, 1));
@@ -71,11 +71,11 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
                 throw new SignatureNotCanonical('Signature ' . $fieldName . ' value type mismatch');
             }
             $val = substr($binaryString, $start, $length);
-            $vAnd = $val[0] & pack("H*", '80');
+            $vAnd = $val[0] & chr(0x80);
             if (ord($vAnd) === 128) {
                 throw new SignatureNotCanonical('Signature ' . $fieldName . ' value is negative');
             }
-            if ($length > 1 && ord($val[0]) == 0x00 && !ord(($val[1] & pack('H*', '80')))) {
+            if ($length > 1 && $val[0] === "\x00" && !ord(($val[1] & chr(0x80)))) {
                 throw new SignatureNotCanonical('Signature ' . $fieldName . ' value excessively padded');
             }
         };

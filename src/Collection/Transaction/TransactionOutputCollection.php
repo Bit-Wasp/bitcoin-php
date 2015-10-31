@@ -7,10 +7,6 @@ use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
 class TransactionOutputCollection extends StaticCollection
 {
-    /**
-     * @var \SplFixedArray
-     */
-    protected $set;
 
     /**
      * Initialize a new collection with a list of outputs.

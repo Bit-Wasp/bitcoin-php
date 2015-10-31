@@ -12,7 +12,8 @@ interface TransactionInputInterface
     const SEQUENCE_FINAL = 0xffffffff;
 
     /**
-     * Check whether the txid is for a coinbase transaction
+     * Check whether the transaction is the Coinbase, ie, it has
+     * one input which spends the `null` outpoint
      *
      * @return bool
      */
@@ -30,7 +31,7 @@ interface TransactionInputInterface
     public function getTransactionId();
 
     /**
-     * Return the vout for the transaction being spent
+     * Return the nPrevOut for the transaction being spent
      *
      * @return int
      */

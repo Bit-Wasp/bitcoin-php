@@ -300,7 +300,7 @@ class EcAdapter implements EcAdapterInterface
             }
         }
 
-        throw new \Exception("Failed to find valid recovery factor");
+        throw new \Exception('Failed to find valid recovery factor');
     }
 
     /**

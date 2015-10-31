@@ -7,10 +7,10 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 interface InterpreterInterface
 {
     const MAX_SCRIPT_ELEMENT_SIZE = 520;
-    const SCRIPT_ERR_BAD_OPCODE = "";
-    const SCRIPT_ERR_PUSH_SIZE = "";
-    const SCRIPT_ERR_OP_COUNT = "";
-    const SCRIPT_ERR_MINIMALDATA = "";
+    const SCRIPT_ERR_BAD_OPCODE = '';
+    const SCRIPT_ERR_PUSH_SIZE = '';
+    const SCRIPT_ERR_OP_COUNT = '';
+    const SCRIPT_ERR_MINIMALDATA = '';
 
     const VERIFY_NONE = 0;
 

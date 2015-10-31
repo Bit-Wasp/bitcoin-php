@@ -100,7 +100,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      * @return Signature
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         try {
             list (, $inner) = $this->getOuterTemplate()->parse($parser);

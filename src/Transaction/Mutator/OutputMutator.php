@@ -37,8 +37,8 @@ class OutputMutator
     private function replace(array $array)
     {
         $this->output = new TransactionOutput(
-            isset($array['value']) ? $array['value'] : $this->output->getValue(),
-            isset($array['script']) ? $array['script'] : $this->output->getScript()
+            array_key_exists('value', $array) ? $array['value'] : $this->output->getValue(),
+            array_key_exists('script', $array) ? $array['script'] : $this->output->getScript()
         );
 
         return $this;

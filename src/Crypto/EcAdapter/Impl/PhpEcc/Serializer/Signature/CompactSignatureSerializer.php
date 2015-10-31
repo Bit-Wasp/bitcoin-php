@@ -67,7 +67,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @return CompactSignature
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         $math = $this->ecAdapter->getMath();
 

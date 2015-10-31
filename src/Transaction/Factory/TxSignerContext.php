@@ -67,7 +67,7 @@ class TxSignerContext
         $this->scriptType = $this->prevOutType = $classifier->classify();
 
         // Reclassify if the output is P2SH, so we know how to sign it.
-        if ($this->scriptType == OutputClassifier::PAYTOSCRIPTHASH) {
+        if ($this->scriptType === OutputClassifier::PAYTOSCRIPTHASH) {
             if (null === $redeemScript) {
                 throw new \InvalidArgumentException('Redeem script is required when output is P2SH');
             }
@@ -223,7 +223,7 @@ class TxSignerContext
         switch ($this->getScriptType()) {
             case OutputClassifier::PAYTOPUBKEYHASH:
                 // Supply signature and public key in scriptSig
-                if ($size == 2) {
+                if ($size === 2) {
                     $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)]);
                     $this->setPublicKeys([PublicKeyFactory::fromHex($parsed[1]->getHex(), $this->ecAdapter)]);
                 }
@@ -231,7 +231,7 @@ class TxSignerContext
                 break;
             case OutputClassifier::PAYTOPUBKEY:
                 // Only has a signature in the scriptSig
-                if ($size == 1) {
+                if ($size === 1) {
                     $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)]);
                 }
 
@@ -295,12 +295,12 @@ class TxSignerContext
         $signatures = array_filter($this->getSignatures());
         $script = $this->execForInputTypes(
             function () use (&$signatures) {
-                return count($signatures) == 1
+                return count($signatures) === 1
                     ? ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $this->publicKeys[0])
                     : new Script();
             },
             function () use (&$signatures) {
-                return count($signatures) == 1
+                return count($signatures) === 1
                     ? ScriptFactory::scriptSig()->payToPubKey($signatures[0])
                     : new Script;
             },
@@ -349,15 +349,15 @@ class TxSignerContext
         // Compare the number of signatures with the required sig count
         return $this->execForInputTypes(
             function () {
-                    return (count($this->publicKeys) == 1);
+                    return (count($this->publicKeys) === 1);
             },
             function () {
-                    return (count($this->publicKeys) == 1);
+                    return (count($this->publicKeys) === 1);
             },
             function () {
                     return true;
             }
-        ) && (count($this->signatures) == $this->getRequiredSigCount());
+        ) && (count($this->signatures) === $this->getRequiredSigCount());
 
     }
 }

@@ -59,7 +59,7 @@ class HierarchicalKey
     public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
     {
         if (!$key->isCompressed()) {
-            throw new \Exception('A HierarchicalKey must always be compressed');
+            throw new \InvalidArgumentException('A HierarchicalKey must always be compressed');
         }
 
         $this->ecAdapter = $ecAdapter;
@@ -100,7 +100,7 @@ class HierarchicalKey
      */
     public function getFingerprint()
     {
-        if ($this->getDepth() == 0) {
+        if ($this->getDepth() === 0) {
             return 0;
         }
 
@@ -254,7 +254,7 @@ class HierarchicalKey
         $path = $this->decodePath($path);
 
         $key = $this;
-        foreach (explode("/", $path) as $chunk) {
+        foreach (explode('/', $path) as $chunk) {
             $key = $key->deriveChild($chunk);
         }
 
@@ -269,8 +269,8 @@ class HierarchicalKey
      */
     public function decodePath($path)
     {
-        $pathPieces = explode("/", $path);
-        if (strlen($path) == 0 || count($pathPieces) == 0) {
+        $pathPieces = explode('/', $path);
+        if (strlen($path) === 0 || count($pathPieces) === 0) {
             throw new \InvalidArgumentException('Invalid path passed to decodePath()');
         }
 
@@ -281,7 +281,7 @@ class HierarchicalKey
             $newPath[] = $helper->fromNode($sequence);
         }
 
-        $path = implode("/", $newPath);
+        $path = implode('/', $newPath);
         return $path;
     }
 

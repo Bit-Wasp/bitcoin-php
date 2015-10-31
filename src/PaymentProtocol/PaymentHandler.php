@@ -117,7 +117,7 @@ class PaymentHandler
     public function sendAck($response = null)
     {
         $ack = $this->getAck($response)->serialize();
-        $filename = "r" . (string)time() . ".bitcoinpaymentACK";
+        $filename = 'r' . (string)time() . '.bitcoinpaymentACK';
         header('Content-Type: application/bitcoin-paymentack');
 
         header('Content-Disposition: inline; filename=' . $filename);

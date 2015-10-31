@@ -26,8 +26,8 @@ class PaymentRequestVerifier
      */
     private function der2pem($certData)
     {
-        $begin = "-----BEGIN CERTIFICATE-----";
-        $end = "-----END CERTIFICATE-----";
+        $begin = '-----BEGIN CERTIFICATE-----';
+        $end = '-----END CERTIFICATE-----';
 
         $d = $begin . "\n";
         $d .= chunk_split(base64_encode($certData));

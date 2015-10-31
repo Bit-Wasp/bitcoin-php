@@ -11,7 +11,6 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 
-
 class Bitcoin
 {
     /**

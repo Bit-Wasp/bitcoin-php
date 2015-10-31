@@ -30,10 +30,10 @@ class MultisigHDTest extends AbstractTestCase
         $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
 
         $sequences = new HierarchicalKeySequence($ec->getMath());
-        $hd = new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', $keys, $sequences, true);
+        $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
 
-        $this->assertEquals('m', $hd->getPath(), "confirm path set via constructor");
-        $this->assertEquals($keys, $hd->getKeys(), "confirm keys has same order");
+        $this->assertEquals('m', $hd->getPath(), 'confirm path set via constructor');
+        $this->assertEquals($keys, $hd->getKeys(), 'confirm keys has same order');
     }
 
     public function testSortedKeysAsSideEffect()
@@ -41,11 +41,11 @@ class MultisigHDTest extends AbstractTestCase
         $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
         $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
 
-        $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
+        $ec = $this->safeEcAdapter();
         $sequences = new HierarchicalKeySequence($ec->getMath());
-        $hd = new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', $keys, $sequences, true);
-
-        $this->assertNotEquals($keys, $hd->getKeys(), "these cases should not match input since they will be sorted");
+        $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
+        
+        $this->assertNotEquals($keys, $hd->getKeys(), 'these cases should not match input since they will be sorted');
     }
 
     public function testNoSideEffectWhenNotSorting()
@@ -57,16 +57,16 @@ class MultisigHDTest extends AbstractTestCase
         $sequences = new HierarchicalKeySequence($ec->getMath());
         $hd = new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', $keys, $sequences, false);
 
-        $this->assertEquals($keys, $hd->getKeys(), "keys should match input when not sorting");
+        $this->assertEquals($keys, $hd->getKeys(), 'keys should match input when not sorting');
     }
 
     public function testGetRedeemScript()
     {
         $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
         $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
-        $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
+        $ec = $this->safeEcAdapter();
         $sequences = new HierarchicalKeySequence($ec->getMath());
-        $hd = new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', $keys, $sequences, true);
+        $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
         $script = $hd->getRedeemScript();
 
         // note the indexes - we know these keys will be of reversed order.

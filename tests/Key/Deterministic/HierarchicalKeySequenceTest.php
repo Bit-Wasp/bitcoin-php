@@ -11,11 +11,11 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
     public function getSequenceVectors()
     {
         return [
-            ["0", '0'],
-            ["0h", '2147483648'],
+            ['0', '0'],
+            ['0h', '2147483648'],
             ["0'", '2147483648'],
-            ["1h", '2147483649'],
-            ["2147483647h", '4294967295'],
+            ['1h', '2147483649'],
+            ['2147483647h', '4294967295'],
         ];
     }
 
@@ -30,7 +30,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
         $this->assertEquals($eSeq, $sequence->fromNode($node));
 
         // canonicalize the sequence - library returns h.
-        $eSeq = str_replace("'", "h", $node);
+        $eSeq = str_replace("'", 'h', $node);
         $this->assertEquals($eSeq, $sequence->getNode($sequence->fromNode($node)));
     }
 
@@ -39,7 +39,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
      */
     public function testHardenedSequenceFailure()
     {
-        $sequence = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence(new Math());
+        $sequence = new HierarchicalKeySequence(new Math());
 
         // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
         $sequence->getHardened(HierarchicalKeySequence::START_HARDENED);

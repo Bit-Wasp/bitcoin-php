@@ -270,7 +270,7 @@ class BloomFilter extends Serializable
      */
     public function insertOutpoint($txid, $vout)
     {
-        return $this->insertData(new Buffer(pack("H64N", $txid, $vout)));
+        return $this->insertData(new Buffer(pack('H64N', $txid, $vout)));
     }
 
     /**
@@ -314,7 +314,7 @@ class BloomFilter extends Serializable
      */
     public function containsUtxo($txid, $vout)
     {
-        return $this->containsData(new Buffer(pack("H64N", $txid, $vout), 36, $this->math));
+        return $this->containsData(new Buffer(pack('H64N', $txid, $vout), 36, $this->math));
     }
 
     /**
@@ -350,8 +350,8 @@ class BloomFilter extends Serializable
         }
 
         // Check if the txid hash is in the filter
-        $txid = $tx->getTxId();
-        if ($this->containsData($txid)) {
+        $txHash = $tx->getTxId();
+        if ($this->containsData($txHash)) {
             $found = true;
         }
 
@@ -366,11 +366,11 @@ class BloomFilter extends Serializable
                 if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
                     $found = true;
                     if ($this->isUpdateAll()) {
-                        $this->insertOutpoint($txid->getHex(), $vout);
+                        $this->insertOutpoint($txHash->getHex(), $vout);
                     } else if ($this->isUpdatePubKeyOnly()) {
                         $type = ScriptFactory::scriptPubKey()->classify($script);
                         if ($type->isMultisig() || $type->isPayToPublicKey()) {
-                            $this->insertOutpoint($txid->getHex(), $vout);
+                            $this->insertOutpoint($txHash->getHex(), $vout);
                         }
                     }
                 }

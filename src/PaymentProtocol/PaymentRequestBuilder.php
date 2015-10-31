@@ -168,7 +168,7 @@ class PaymentRequestBuilder
     public function send()
     {
         $data = $this->getPaymentRequest()->serialize();
-        $filename = "payment" . (string)time() . ".bitcoinpaymentrequest";
+        $filename = 'payment' . (string)time() . '.bitcoinpaymentrequest';
 
         header('Content-Type: application/bitcoin-paymentrequest');
         header('Content-Disposition: inline; filename=' . $filename);

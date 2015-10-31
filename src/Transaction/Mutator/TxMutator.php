@@ -37,7 +37,7 @@ class TxMutator
      */
     public function inputsMutator()
     {
-        if (is_null($this->inputsMutator)) {
+        if (null === $this->inputsMutator) {
             $this->inputsMutator = new InputCollectionMutator($this->transaction->getInputs()->all());
         }
 
@@ -49,7 +49,7 @@ class TxMutator
      */
     public function outputsMutator()
     {
-        if (is_null($this->outputsMutator)) {
+        if (null === $this->outputsMutator) {
             $this->outputsMutator = new OutputCollectionMutator($this->transaction->getOutputs()->all());
         }
 
@@ -61,11 +61,11 @@ class TxMutator
      */
     public function done()
     {
-        if (!is_null($this->inputsMutator)) {
+        if (null !== $this->inputsMutator) {
             $this->inputs($this->inputsMutator->done());
         }
 
-        if (!is_null($this->outputsMutator)) {
+        if (null !== $this->outputsMutator) {
             $this->outputs($this->outputsMutator->done());
         }
 
@@ -79,10 +79,10 @@ class TxMutator
     private function replace(array $array = [])
     {
         $this->transaction = new Transaction(
-            isset($array['version']) ? $array['version'] : $this->transaction->getVersion(),
-            isset($array['inputs']) ? $array['inputs'] : $this->transaction->getInputs(),
-            isset($array['outputs']) ? $array['outputs'] : $this->transaction->getOutputs(),
-            isset($array['nLockTime']) ? $array['nLockTime'] : $this->transaction->getLockTime()
+            array_key_exists('version', $array) ? $array['version'] : $this->transaction->getVersion(),
+            array_key_exists('inputs', $array) ? $array['inputs'] : $this->transaction->getInputs(),
+            array_key_exists('outputs', $array) ? $array['outputs'] : $this->transaction->getOutputs(),
+            array_key_exists('nLockTime', $array) ? $array['nLockTime'] : $this->transaction->getLockTime()
         );
 
         return $this;

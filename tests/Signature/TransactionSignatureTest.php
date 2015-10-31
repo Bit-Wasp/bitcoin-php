@@ -40,7 +40,7 @@ class TransactionSignatureTest extends AbstractTestCase
             try {
                 $sigBuf = Buffer::hex($test[1]);
                 TransactionSignature::isDERSignature($sigBuf);
-                throw new \Exception("Failed testing for case: " . $test[0]);
+                throw new \Exception('Failed testing for case: ' . $test[0]);
             } catch (SignatureNotCanonical $e) {
                 $this->assertTrue(true);
             }

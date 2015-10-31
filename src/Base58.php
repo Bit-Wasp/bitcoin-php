@@ -72,7 +72,7 @@ class Base58
             $binary = "\x00" . $binary;
         }
 
-        return new Buffer($binary, null, $math);
+        return new Buffer($binary);
     }
 
     /**

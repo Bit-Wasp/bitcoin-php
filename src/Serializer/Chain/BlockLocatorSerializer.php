@@ -25,7 +25,7 @@ class BlockLocatorSerializer
      * @param Parser $parser
      * @return BlockLocator
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         list($hashes, $hashStop) = $this->getTemplate()->parse($parser);
 

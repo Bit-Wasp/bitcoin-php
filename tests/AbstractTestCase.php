@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\EccFactory;
+use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +46,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
     public static function getContext()
     {
-        if (self::$context == null) {
+        if (null === self::$context) {
             self::$context = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
         }
 
@@ -131,6 +132,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     {
         $math = $this->safeMath();
         $generator = $this->safeGenerator();
-        return extension_loaded('secp256k1') ? EcAdapterFactory::getSecp256k1($math, $generator): new \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter($math, $generator);
+        return extension_loaded('secp256k1') ? EcAdapterFactory::getSecp256k1($math, $generator): new PhpEccAdapter($math, $generator);
     }
 }

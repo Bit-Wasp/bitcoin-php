@@ -31,10 +31,11 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     private function doSerialize(PublicKey $publicKey)
     {
         $serialized = '';
+        $isCompressed = $publicKey->isCompressed();
         if (!secp256k1_ec_pubkey_serialize(
             $this->ecAdapter->getContext(),
             $publicKey->getResource(),
-            $publicKey->isCompressed(),
+            $isCompressed,
             $serialized
         )) {
             throw new \RuntimeException('Secp256k1: Failed to serialize public key');
@@ -42,9 +43,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
 
         return new Buffer(
             $serialized,
-            $publicKey->isCompressed()
-            ? PublicKey::LENGTH_COMPRESSED
-            : PublicKey::LENGTH_UNCOMPRESSED,
+            $isCompressed ? PublicKey::LENGTH_COMPRESSED : PublicKey::LENGTH_UNCOMPRESSED,
             $this->ecAdapter->getMath()
         );
     }

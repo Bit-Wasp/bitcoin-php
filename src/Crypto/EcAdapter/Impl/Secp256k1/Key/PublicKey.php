@@ -104,7 +104,7 @@ class PublicKey extends Key implements PublicKeyInterface
     {
         $context = $this->ecAdapter->getContext();
         $math = $this->ecAdapter->getMath();
-        $bin = pack("H*", str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
+        $bin = pack('H*', str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
 
         $clone = $this->clonePubkey();
         if (1 !== secp256k1_ec_pubkey_tweak_add($context, $clone, $bin)) {
@@ -123,7 +123,7 @@ class PublicKey extends Key implements PublicKeyInterface
     {
         $context = $this->ecAdapter->getContext();
         $math = $this->ecAdapter->getMath();
-        $bin = pack("H*", str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
+        $bin = pack('H*', str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
 
         $clone = $this->clonePubkey();
         if (1 !== secp256k1_ec_pubkey_tweak_mul($context, $clone, $bin)) {

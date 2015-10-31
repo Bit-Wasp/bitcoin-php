@@ -163,26 +163,26 @@ class TxBuilder
     }
 
     /**
-     * @param Locktime $locktime
+     * @param Locktime $lockTime
      * @param int $nTimestamp
      * @return $this
      * @throws \Exception
      */
-    public function lockToTimestamp(Locktime $locktime, $nTimestamp)
+    public function lockToTimestamp(Locktime $lockTime, $nTimestamp)
     {
-        $this->locktime($locktime->fromTimestamp($nTimestamp));
+        $this->locktime($lockTime->fromTimestamp($nTimestamp));
         return $this;
     }
 
     /**
-     * @param Locktime $locktime
+     * @param Locktime $lockTime
      * @param int $blockHeight
      * @return $this
      * @throws \Exception
      */
-    public function lockToBlockHeight(Locktime $locktime, $blockHeight)
+    public function lockToBlockHeight(Locktime $lockTime, $blockHeight)
     {
-        $this->locktime($locktime->fromBlockHeight($blockHeight));
+        $this->locktime($lockTime->fromBlockHeight($blockHeight));
         return $this;
     }
 

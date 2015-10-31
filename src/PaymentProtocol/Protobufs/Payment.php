@@ -2,7 +2,9 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-class Payment extends \DrSlump\Protobuf\Message
+use \DrSlump\Protobuf\Message;
+
+class Payment extends Message
 {
 
     /**  @var string */

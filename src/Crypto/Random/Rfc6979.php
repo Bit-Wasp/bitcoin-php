@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\Crypto\Key\PrivateKey as MdPrivateKey;
 use Mdanter\Ecc\Random\HmacRandomNumberGenerator;
+use Mdanter\Ecc\Random\RandomGeneratorFactory;
 
 class Rfc6979 implements RbgInterface
 {
@@ -35,7 +36,7 @@ class Rfc6979 implements RbgInterface
     ) {
         $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey->getInt());
         $this->ecAdapter = $ecAdapter;
-        $this->hmac = new HmacRandomNumberGenerator($ecAdapter->getMath(), $mdPk, $messageHash->getInt(), $algo);
+        $this->hmac = RandomGeneratorFactory::getHmacRandomGenerator($mdPk, $messageHash->getInt(), $algo);
     }
 
     /**

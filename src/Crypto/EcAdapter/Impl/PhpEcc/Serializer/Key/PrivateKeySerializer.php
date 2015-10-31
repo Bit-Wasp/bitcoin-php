@@ -55,7 +55,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      * @param Parser $parser
      * @return PrivateKey
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         $compressed = $this->haveNextCompressed;
         $this->haveNextCompressed = false;

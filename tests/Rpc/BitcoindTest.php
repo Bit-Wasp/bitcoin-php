@@ -31,14 +31,14 @@ class BitcoindTest extends AbstractTestCase
      */
     public function testBitcoind()
     {
-        $json = new JsonRpcClient("127.0.0.1", 30929);
+        $json = new JsonRpcClient('127.0.0.1', 30929);
         $bitcoind = new Bitcoind($json);
         $bitcoind->getinfo();
     }
 
     public function testGetRpcClient()
     {
-        $json = new JsonRpcClient("127.0.0.1", 30929);
+        $json = new JsonRpcClient('127.0.0.1', 30929);
         $bitcoind = new Bitcoind($json);
         $this->assertEquals($json, $bitcoind->getRpcClient());
     }

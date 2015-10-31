@@ -70,8 +70,8 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new \RuntimeException('Invalid signature type');
         }
 
-        $isCompressed = ($math->bitwiseAnd($recoveryFlags, 4) != 0);
-        $recoveryId = (int)$recoveryFlags - ($isCompressed ? 4 : 0);
+        $isCompressed = $math->cmp($math->bitwiseAnd($recoveryFlags, 4), 0) !== 0;
+        $recoveryId = $math->sub($recoveryFlags, $isCompressed ? 4 : 0);
 
         $sig_t = '';
         /** @var resource $sig_t */

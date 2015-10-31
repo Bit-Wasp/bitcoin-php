@@ -106,7 +106,7 @@ class TxSigner
     public function inputState($input)
     {
         $this->transaction->getInputs()->get($input);
-        if (!isset($this->inputStates[$input])) {
+        if (!array_key_exists($input, $this->inputStates)) {
             throw new BuilderNoInputState('State not found for this input');
         }
 
@@ -211,7 +211,7 @@ class TxSigner
         $total = 0;
         $signed = 0;
         for ($i = 0; $i < $inCount; $i++) {
-            if (isset($this->inputStates[$i])) {
+            if (array_key_exists($i, $this->inputStates)) {
                 /** @var TxSignerContext $state */
                 $state = $this->inputStates[$i];
                 $total += $state->getRequiredSigCount();
@@ -219,6 +219,6 @@ class TxSigner
             }
         }
 
-        return $signed == $total;
+        return $signed === $total;
     }
 }

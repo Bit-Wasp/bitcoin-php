@@ -47,7 +47,7 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $this->assertSame($message, $signed->getMessage());
         $this->assertSame('11884306385941066859834558634967777927278716082145975036347303871472774300855', $signed->getCompactSignature()->getR());
         $this->assertSame('38787429741286654786942380905403782954160859974631158035207591010286944440307', $signed->getCompactSignature()->getS());
-        $this->assertSame(1, $signed->getCompactSignature()->getRecoveryId());
+        $this->assertEquals(1, $signed->getCompactSignature()->getRecoveryId());
         $this->assertSame(true, $signed->getCompactSignature()->isCompressed());
         $this->assertTrue($signer->verify($signed, $address));
         $this->assertSame($content, $signed->getBuffer()->getBinary());

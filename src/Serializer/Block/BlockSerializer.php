@@ -58,7 +58,7 @@ class BlockSerializer
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         try {
             return new Block(

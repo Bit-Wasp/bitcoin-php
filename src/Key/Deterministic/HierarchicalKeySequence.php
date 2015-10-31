@@ -61,7 +61,7 @@ class HierarchicalKeySequence
     public function fromNode($node)
     {
         $hardened = false;
-        if (in_array(substr(strtolower($node), -1), array("h", "'")) === true) {
+        if (in_array(substr(strtolower($node), -1), array('h', "'")) === true) {
             $intEnd = strlen($node) - 1;
             $node = substr($node, 0, $intEnd);
             $hardened = true;

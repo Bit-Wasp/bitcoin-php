@@ -179,8 +179,8 @@ class PaymentRequestSigner
      */
     private function parseCertificate($certData)
     {
-        $begin = "-----BEGIN CERTIFICATE-----";
-        $end = "-----END CERTIFICATE-----";
+        $begin = '-----BEGIN CERTIFICATE-----';
+        $end = '-----END CERTIFICATE-----';
 
         if (strpos($certData, $begin) !== false) {
             return openssl_x509_parse($certData);
@@ -198,8 +198,8 @@ class PaymentRequestSigner
      */
     private function pem2der($pem_data)
     {
-        $begin = "CERTIFICATE-----";
-        $end = "-----END";
+        $begin = 'CERTIFICATE-----';
+        $end = '-----END';
         if (strpos($pem_data, $begin) === false) {
             return $pem_data;
         }

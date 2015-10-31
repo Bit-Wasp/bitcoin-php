@@ -67,7 +67,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      * @return PrivateKey
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         $compressed = $this->haveNextCompressed;
         $this->haveNextCompressed = false;

@@ -30,7 +30,7 @@ class PartialMerkleTreeSerializer
      * @param Parser $parser
      * @return PartialMerkleTree
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         list ($txCount, $vHash, $vBits) = $this->getTemplate()->parse($parser);
 

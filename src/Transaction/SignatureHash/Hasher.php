@@ -54,29 +54,29 @@ class Hasher implements SignatureHashInterface
     {
         $math = Bitcoin::getMath();
         $tx = new TxMutator($this->transaction);
-        $vin = $tx->inputsMutator();
-        $vout = $tx->outputsMutator();
+        $inputs = $tx->inputsMutator();
+        $outputs = $tx->outputsMutator();
 
         // Default SIGHASH_ALL procedure: null all input scripts
-        foreach ($vin as $input) {
+        foreach ($inputs as $input) {
             $input->script(new Script);
         }
 
-        $vin->offsetGet($inputToSign)
+        $inputs->offsetGet($inputToSign)
             ->script($txOutScript);
 
-        if ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_NONE) {
+        if ($math->cmp($math->bitwiseAnd($sighashType, 31), SignatureHashInterface::SIGHASH_NONE) === 0) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
-            $vout->null();
+            $outputs->null();
 
             // Let the others update at will. Set sequence of inputs we're not signing to 0.
-            foreach ($vin as $i => $input) {
+            foreach ($inputs as $i => $input) {
                 if ($i !== $inputToSign) {
                     $input->sequence(0);
                 }
             }
 
-        } elseif ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_SINGLE) {
+        } elseif ($math->cmp($math->bitwiseAnd($sighashType, 31), SignatureHashInterface::SIGHASH_SINGLE) === 0) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
@@ -85,23 +85,23 @@ class Hasher implements SignatureHashInterface
             }
 
             // Resize, set to null
-            $vout->slice(0, $nOutput + 1);
+            $outputs->slice(0, $nOutput + 1);
             for ($i = 0; $i < $nOutput; $i++) {
-                $vout[$i]->null();
+                $outputs[$i]->null();
             }
 
             // Let the others update at will. Set sequence of inputs we're not signing to 0
-            foreach ($vin as $i => $input) {
-                if ($i != $inputToSign) {
+            foreach ($inputs as $i => $input) {
+                if ($i !== $inputToSign) {
                     $input->sequence(0);
                 }
             }
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
-        if ($math->bitwiseAnd($sighashType, SignatureHashInterface::SIGHASH_ANYONECANPAY)) {
-            $input = $vin->offsetGet($inputToSign)->done();
-            $vin->null()->add($input);
+        if ($math->cmp($math->bitwiseAnd($sighashType, SignatureHashInterface::SIGHASH_ANYONECANPAY), 0) > 0) {
+            $input = $inputs->offsetGet($inputToSign)->done();
+            $inputs->null()->add($input);
         }
 
         return Hash::sha256d(

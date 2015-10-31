@@ -108,7 +108,7 @@ class MultisigHD
     {
         return new self(
             $this->m,
-            $this->path . "/" . $this->sequences->getNode($sequence),
+            $this->path . '/' . $this->sequences->getNode($sequence),
             array_map(
                 function (HierarchicalKey $hk) use ($sequence) {
                     return $hk->deriveChild($sequence);
@@ -128,7 +128,7 @@ class MultisigHD
      */
     public function derivePath($path)
     {
-        $decoded = explode("/", $this->keys[0]->decodePath($path));
+        $decoded = explode('/', $this->keys[0]->decodePath($path));
 
         $child = $this;
         foreach ($decoded as $p) {

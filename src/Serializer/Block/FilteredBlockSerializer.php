@@ -33,7 +33,7 @@ class FilteredBlockSerializer
      * @param Parser $parser
      * @return FilteredBlock
      */
-    public function fromParser(Parser & $parser)
+    public function fromParser(Parser $parser)
     {
         $header = $this->headerSerializer->fromParser($parser);
         $partialTree = $this->treeSerializer->fromParser($parser);

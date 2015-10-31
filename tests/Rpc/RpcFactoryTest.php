@@ -102,7 +102,7 @@ class RpcFactoryTest extends AbstractTestCase
     {
         $txid = '1262da2920ee12066ea72b0714c03e7becc5ac2f2fa023ce727cd597fbb6838c';
         $height = '357161';
-        $merkle = ["f9a3cf50d5fc2b2b851c1a7dab04fa21cdc4131af75ef1c8e1625d2fe511e5ac","7b646c556cd845991cb6c03fad1f9098a19f2a3c428c4a37d4d8a3ffaba0a251","faf5d8c9751fa88e29aa025226cc86a78375c3b50fae55655b58cd2fb0786c90","b91ac95ccf069adf04c7e3f17d863c38ac361e14e26ee6f1320c233ca198db40","e4f3809c4d7b0d6cf18802fcf3ad0f4c12d9bfefa84ab135e0ff3c6eb28c9939","64639472c76e14afa9707db048052c77393730e66edab3db9b2b6f7cc73c7d44", "f4956efc898718ea4facce304271f96c4d9e150a944df518d2719922a626aa52","b2e8f4a56ebc1410c1d6026b8de7f658399a56aa289323d0fdc4c9dae299748e", "3f74b9ab84da94ccf9fd13663cb8eb6e1c37d0dfe8daa024bf953fd8a7e59c18", "24cb640cd9c766413efccfc05efc4708c5370b863bb3f5a47c6445587fc7df30", "dbf717087013bc32922f023c00af630b9d530d0998a397c00450ca6b29e2c647"];
+        $merkle = ['f9a3cf50d5fc2b2b851c1a7dab04fa21cdc4131af75ef1c8e1625d2fe511e5ac','7b646c556cd845991cb6c03fad1f9098a19f2a3c428c4a37d4d8a3ffaba0a251','faf5d8c9751fa88e29aa025226cc86a78375c3b50fae55655b58cd2fb0786c90','b91ac95ccf069adf04c7e3f17d863c38ac361e14e26ee6f1320c233ca198db40','e4f3809c4d7b0d6cf18802fcf3ad0f4c12d9bfefa84ab135e0ff3c6eb28c9939','64639472c76e14afa9707db048052c77393730e66edab3db9b2b6f7cc73c7d44', 'f4956efc898718ea4facce304271f96c4d9e150a944df518d2719922a626aa52','b2e8f4a56ebc1410c1d6026b8de7f658399a56aa289323d0fdc4c9dae299748e', '3f74b9ab84da94ccf9fd13663cb8eb6e1c37d0dfe8daa024bf953fd8a7e59c18', '24cb640cd9c766413efccfc05efc4708c5370b863bb3f5a47c6445587fc7df30', 'dbf717087013bc32922f023c00af630b9d530d0998a397c00450ca6b29e2c647'];
         $electrum = $this->getElectrumServer([
             'merkle' => $merkle,
             'pos' => 679,
@@ -138,7 +138,7 @@ class RpcFactoryTest extends AbstractTestCase
         $address = AddressFactory::fromString($addr);
         $txid = '3e593a0ba05e7adc3e9363127ccb4d8151cd469e6b9ab51a1d6bec4ba2235685';
         $utxos = [
-            ["tx_hash" => $txid , 'tx_pos' => 1, 'value' => '999']
+            ['tx_hash' => $txid , 'tx_pos' => 1, 'value' => '999']
         ];
 
         $electrum = $this->getElectrumServer($utxos);

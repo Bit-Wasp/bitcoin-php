@@ -109,7 +109,7 @@ class Hash
      */
     public static function murmur3(Buffer $data, $seed)
     {
-        return new Buffer(pack("N", murmurhash3_int($data->getBinary(), (int)$seed)));
+        return new Buffer(pack('N', murmurhash3_int($data->getBinary(), (int)$seed)));
     }
 
     /**

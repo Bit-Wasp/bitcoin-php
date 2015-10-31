@@ -8,11 +8,6 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 class TransactionCollection extends StaticCollection
 {
     /**
-     * @var \SplFixedArray
-     */
-    protected $set;
-
-    /**
      * Initialize a new collection with a list of transactions.
      *
      * @param TransactionInterface[] $transactions
