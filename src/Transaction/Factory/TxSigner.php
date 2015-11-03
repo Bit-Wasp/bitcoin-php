@@ -99,7 +99,7 @@ class TxSigner
     }
 
     /**
-     * @param $input
+     * @param integer $input
      * @return TxSignerContext
      * @throws BuilderNoInputState
      */
@@ -130,7 +130,7 @@ class TxSigner
     }
 
     /**
-     * @param $inputToSign
+     * @param integer $inputToSign
      * @param PrivateKeyInterface $privateKey
      * @param ScriptInterface $outputScript
      * @param RedeemScript $redeemScript
@@ -152,7 +152,7 @@ class TxSigner
         }
 
         // If it's PayToPubkey / PayToPubkeyHash, TransactionBuilderInputState needs to know the public key.
-        if (in_array($inputState->getPrevOutType(), [OutputClassifier::PAYTOPUBKEYHASH], true)) {
+        if ($inputState->getPrevOutType() === OutputClassifier::PAYTOPUBKEYHASH) {
             $inputState->setPublicKeys([$privateKey->getPublicKey()]);
         }
 
