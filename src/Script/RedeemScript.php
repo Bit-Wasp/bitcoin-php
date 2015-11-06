@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Buffer;
@@ -79,6 +80,14 @@ class RedeemScript extends Script
         }
 
         return new self($m, $publicKeys);
+    }
+
+    /**
+     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
+     */
+    public function getAddress()
+    {
+        return AddressFactory::fromScript($this);
     }
 
     /**

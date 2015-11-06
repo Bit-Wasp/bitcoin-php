@@ -8,9 +8,11 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Buffertools\Buffer;
 use Symfony\Component\Yaml\Yaml;
 
 class AddressTest extends AbstractTestCase
@@ -58,7 +60,7 @@ class AddressTest extends AbstractTestCase
         if ($type == 'pubkeyhash') {
             $obj = PublicKeyFactory::fromHex($data)->getAddress();
         } else if ($type == 'script') {
-            $obj = ScriptFactory::fromHex($data)->getAddress();
+            $obj = RedeemScript::fromScript(new Script(Buffer::hex($data)))->getAddress();
         } else {
             throw new \Exception('Unknown address type');
         }
