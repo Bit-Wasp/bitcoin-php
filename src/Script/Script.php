@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 
@@ -37,14 +36,6 @@ class Script extends Serializable implements ScriptInterface
     public function getBuffer()
     {
         return new Buffer($this->script);
-    }
-
-    /**
-     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
-     */
-    public function getAddress()
-    {
-        return AddressFactory::fromScript($this);
     }
 
     /**

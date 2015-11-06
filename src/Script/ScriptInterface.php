@@ -13,11 +13,6 @@ interface ScriptInterface extends SerializableInterface
     public function getScriptHash();
 
     /**
-     * @return Address
-     */
-    public function getAddress();
-
-    /**
      * @return ScriptParser
      */
     public function getScriptParser();
