@@ -3,17 +3,13 @@
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\Interpreter\Operation\ArithmeticOperation;
-use BitWasp\Bitcoin\Script\Interpreter\Operation\FlowControlOperation;
-use BitWasp\Bitcoin\Script\Interpreter\Operation\HashOperation;
-use BitWasp\Bitcoin\Script\Interpreter\Operation\PushIntOperation;
-use BitWasp\Bitcoin\Script\Interpreter\Operation\StackOperation;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptStack;
@@ -437,9 +433,24 @@ class Interpreter implements InterpreterInterface
 
                     switch ($opCode) {
                         case $opcodes->getOpByName('OP_1NEGATE'):
-                        case $opcodes->cmp($opCode, 'OP_1') >= 0 && $opcodes->cmp($opCode, 'OP_16') <= 0:
-                            $pushInt = new PushIntOperation($opcodes, $math);
-                            $pushInt->op($opCode, $mainStack);
+                        case $opcodes->getOpByName('OP_1'):
+                        case $opcodes->getOpByName('OP_2'):
+                        case $opcodes->getOpByName('OP_3'):
+                        case $opcodes->getOpByName('OP_4'):
+                        case $opcodes->getOpByName('OP_5'):
+                        case $opcodes->getOpByName('OP_6'):
+                        case $opcodes->getOpByName('OP_7'):
+                        case $opcodes->getOpByName('OP_8'):
+                        case $opcodes->getOpByName('OP_9'):
+                        case $opcodes->getOpByName('OP_10'):
+                        case $opcodes->getOpByName('OP_11'):
+                        case $opcodes->getOpByName('OP_12'):
+                        case $opcodes->getOpByName('OP_13'):
+                        case $opcodes->getOpByName('OP_14'):
+                        case $opcodes->getOpByName('OP_15'):
+                        case $opcodes->getOpByName('OP_16'):
+                            $num = $opCode - ($opcodes->getOpByName('OP_1') - 1);
+                            $mainStack->push(new Buffer(chr($num), 1, $math));
                             break;
 
                         case $opcodes->cmp($opCode, 'OP_NOP1') >= 0 && $opcodes->cmp($opCode, 'OP_NOP10') <= 0:
@@ -449,20 +460,48 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case $opcodes->getOpByName('OP_NOP'):
-                        case $opcodes->isOp($opCode, 'OP_IF') || $opcodes->isOp($opCode, 'OP_NOTIF'):
-                        case $opcodes->isOp($opCode, 'OP_ELSE') || $opcodes->isOp($opCode, 'OP_ENDIF'):
-                        case $opcodes->getOpByName('OP_VERIFY'):
-                        case $opcodes->getOpByName('OP_RETURN'):
-                            $flowControl = new FlowControlOperation(
-                                $opcodes,
-                                $math,
-                                $flags,
-                                function (Buffer $buffer) {
-                                    return $this->castToBool($buffer);
-                                }
-                            );
+                            break;
 
-                            $flowControl->op($opCode, $mainStack, $vfStack, $fExec);
+                        case $opcodes->getOpByName('OP_IF'):
+                        case $opcodes->getOpByName('OP_NOTIF'):
+                            // <expression> if [statements] [else [statements]] endif
+                            $value = false;
+                            if ($fExec) {
+                                if ($mainStack->size() < 1) {
+                                    throw new \Exception('Unbalanced conditional');
+                                }
+                                // todo
+                                $buffer = new ScriptNum($math, $this->flags, $mainStack->pop(), 4);
+                                $value = $this->castToBool($buffer);
+                                if ($opcodes->isOp($opCode, 'OP_NOTIF')) {
+                                    $value = !$value;
+                                }
+                            }
+                            $vfStack->push($value);
+                            break;
+
+                        case $opcodes->getOpByName('OP_ELSE'):
+                            if ($vfStack->size() === 0) {
+                                throw new \Exception('Unbalanced conditional');
+                            }
+                            $vfStack->set($vfStack->end() - 1, !$vfStack->end());
+                            break;
+
+                        case $opcodes->getOpByName('OP_ENDIF'):
+                            if ($vfStack->size() === 0) {
+                                throw new \Exception('Unbalanced conditional');
+                            }
+                            break;
+
+                        case $opcodes->getOpByName('OP_VERIFY'):
+                            if ($mainStack->size() < 1) {
+                                throw new \Exception('Invalid stack operation');
+                            }
+                            $value = $this->castToBool($mainStack->top(-1));
+                            if (!$value) {
+                                throw new \Exception('Error: verify');
+                            }
+                            $mainStack->pop();
                             break;
 
                         case $opcodes->getOpByName('OP_RESERVED'):
@@ -470,18 +509,167 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case $opcodes->getOpByName('OP_TOALTSTACK'):
+                            if ($mainStack->size() < 1) {
+                                throw new \Exception('Invalid stack operation OP_TOALTSTACK');
+                            }
+                            $altStack->push($mainStack->pop());
+                            break;
+
                         case $opcodes->getOpByName('OP_FROMALTSTACK'):
-                        case $opcodes->cmp($opCode, 'OP_IFDUP') >= 0 && $opcodes->cmp($opCode, 'OP_TUCK') <= 0:
-                        case $opcodes->cmp($opCode, 'OP_2DROP') >= 0 && $opcodes->cmp($opCode, 'OP_2SWAP') <= 0:
-                            $stackOper = new StackOperation(
-                                $opcodes,
-                                $math,
-                                $flags,
-                                function (Buffer $buffer) {
-                                    return $this->castToBool($buffer);
-                                }
-                            );
-                            $stackOper->op($opCode, $mainStack, $altStack);
+                            if ($altStack->size() < 1) {
+                                throw new \Exception('Invalid alt-stack operation OP_FROMALTSTACK');
+                            }
+                            $mainStack->push($altStack->pop());
+                            break;
+
+                        case $opcodes->getOpByName('OP_IFDUP'):
+                            // If top value not zero, duplicate it.
+                            if ($mainStack->size() < 1) {
+                                throw new \Exception('Invalid stack operation OP_IFDUP');
+                            }
+                            $vch = $mainStack->top(-1);
+                            if ($this->castToBool($vch)) {
+                                $mainStack->push($vch);
+                            }
+                            break;
+
+                        case $opcodes->getOpByName('OP_DEPTH'):
+                            $num = $mainStack->size();
+                            $bin = Buffer::int($num, null, $math);
+                            $mainStack->push($bin);
+                            break;
+
+                        case $opcodes->getOpByName('OP_DROP'):
+                            if ($mainStack->size() < 1) {
+                                throw new \Exception('Invalid stack operation OP_DROP');
+                            }
+                            $mainStack->pop();
+                            break;
+                        case $opcodes->getOpByName('OP_DUP'):
+                            if ($mainStack->size() < 1) {
+                                throw new \Exception('Invalid stack operation OP_DUP');
+                            }
+                            $vch = $mainStack->top(-1);
+                            $mainStack->push($vch);
+                            break;
+
+                        case $opcodes->getOpByName('OP_NIP'):
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation OP_NIP');
+                            }
+                            $mainStack->erase(-2);
+                            break;
+
+                        case $opcodes->getOpByName('OP_OVER'):
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation OP_OVER');
+                            }
+                            $vch = $mainStack->top(-2);
+                            $mainStack->push($vch);
+                            break;
+
+                        case $opcodes->getOpByName('OP_ROT'):
+                            if ($mainStack->size() < 3) {
+                                throw new \Exception('Invalid stack operation OP_ROT');
+                            }
+                            $mainStack->swap(-3, -2);
+                            $mainStack->swap(-2, -1);
+                            break;
+
+                        case $opcodes->getOpByName('OP_SWAP'):
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation OP_SWAP');
+                            }
+                            $mainStack->swap(-2, -1);
+                            break;
+
+                        case $opcodes->getOpByName('OP_TUCK'):
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation OP_TUCK');
+                            }
+                            $vch = $mainStack->top(-1);
+                            $mainStack->insert($mainStack->end() - 2, $vch);
+                            break;
+
+
+                        case $opcodes->getOpByName('OP_PICK'):
+                        case $opcodes->getOpByName('OP_ROLL'):
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation OP_PICK');
+                            }
+                            $top = $mainStack->top(-1);
+                            $n = (new ScriptNum($math, $this->flags, $top, 4))->getInt();
+                            $mainStack->pop();
+                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, $mainStack->size()) >= 0) {
+                                throw new \Exception('Invalid stack operation OP_PICK');
+                            }
+
+                            $pos = $math->sub($math->sub(0, $n), 1);
+                            $vch = $mainStack->top($pos);
+                            if ($opcodes->isOp($opCode, 'OP_ROLL')) {
+                                $mainStack->erase($pos);
+                            }
+                            $mainStack->push($vch);
+                            break;
+
+                        case $opcodes->getOpByName('OP_2DROP'):
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation OP_2DROP');
+                            }
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            break;
+
+                        case $opcodes->getOpByName('OP_2DUP'):
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation OP_2DUP');
+                            }
+                            $string1 = $mainStack->top(-2);
+                            $string2 = $mainStack->top(-1);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
+                            break;
+
+                        case $opcodes->getOpByName('OP_3DUP'):
+                            if ($mainStack->size() < 3) {
+                                throw new \Exception('Invalid stack operation OP_3DUP');
+                            }
+                            $string1 = $mainStack->top(-3);
+                            $string2 = $mainStack->top(-2);
+                            $string3 = $mainStack->top(-1);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
+                            $mainStack->push($string3);
+                            break;
+
+                        case $opcodes->getOpByName('OP_2OVER'):
+                            if ($mainStack->size() < 4) {
+                                throw new \Exception('Invalid stack operation OP_2OVER');
+                            }
+                            $string1 = $mainStack->top(-4);
+                            $string2 = $mainStack->top(-3);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
+                            break;
+
+                        case $opcodes->getOpByName('OP_2ROT'):
+                            if ($mainStack->size() < 6) {
+                                throw new \Exception('Invalid stack operation OP_2ROT');
+                            }
+                            $string1 = $mainStack->top(-6);
+                            $string2 = $mainStack->top(-5);
+                            $mainStack->erase(-6);
+                            $mainStack->erase(-5);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
+                            break;
+
+                        case $opcodes->getOpByName('OP_2SWAP'):
+                            if ($mainStack->size() < 4) {
+                                throw new \Exception('Invalid stack operation OP_2SWAP');
+                            }
+                            $mainStack->swap(-3, -1);
+                            $mainStack->swap(-4, -2);
                             break;
 
                         case $opcodes->getOpByName('OP_SIZE'):
@@ -496,7 +684,6 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case $opcodes->getOpByName('OP_EQUAL'):
-                            // cscriptnum
                         case $opcodes->getOpByName('OP_EQUALVERIFY'):
                         //case $this->isOp($opCode, 'OP_NOTEQUAL'): // use OP_NUMNOTEQUAL
                             if ($mainStack->size() < 2) {
@@ -526,24 +713,125 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         // Arithmetic operations
-                        case $opcodes->cmp($opCode, 'OP_1ADD') >= 0 && $opcodes->cmp($opCode, 'OP_WITHIN') <= 0:
-                            $arithmetic = new ArithmeticOperation(
-                                $opcodes,
-                                $flags,
-                                $math,
-                                function (Buffer $buffer) {
-                                    return $this->castToBool($buffer);
-                                },
-                                $_bn0,
-                                $_bn1
-                            );
-                            $arithmetic->op($opCode, $mainStack);
+                        case $opcodes->cmp($opCode, 'OP_1ADD') >= 0 && $opcodes->cmp($opCode, 'OP_0NOTEQUAL') <= 0:
+                            $num = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+
+                            $opName = $opcodes->getOp($opCode);
+
+                            if ($opName === 'OP_1ADD') { // cscriptnum
+                                $num = $math->add($num, '1');
+                            } elseif ($opName === 'OP_1SUB') {
+                                $num = $math->sub($num, '1');
+                            } elseif ($opName === 'OP_2MUL') {
+                                $num = $math->mul(2, $num);
+                            } elseif ($opName === 'OP_NEGATE') {
+                                $num = $math->sub(0, $num);
+                            } elseif ($opName === 'OP_ABS') {
+                                if ($math->cmp($num, '0') < 0) {
+                                    $num = $math->sub(0, $num);
+                                }
+                            } elseif ($opName === 'OP_NOT') {
+                                $num = ($math->cmp($num, '0') === 0);
+                            } else {
+                                // is OP_0NOTEQUAL
+                                $num = ($math->cmp($num, '0') !== 0);
+                            }
+
+                            $mainStack->pop();
+
+                            $buffer = Buffer::int($num, null, $math);
+                            $mainStack->push($buffer);
                             break;
 
-                        // Hash operations
-                        case $opcodes->cmp($opCode, 'OP_RIPEMD160') >= 0 && $opcodes->cmp($opCode, 'OP_HASH256') <= 0:
-                            $hash = new HashOperation($opcodes);
-                            $hash->op($opCode, $mainStack);
+                        case $opcodes->cmp($opCode, 'OP_ADD') >= 0 && $opcodes->cmp($opCode, 'OP_MAX') <= 0:
+                            $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-2), 4))->getInt();
+                            $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+
+                            $opName = $opcodes->getOp($opCode);
+
+                            if ($opName === 'OP_ADD') {
+                                $num = $math->add($num1, $num2);
+                            } elseif ($opName === 'OP_SUB') { // cscriptnum
+                                $num = $math->sub($num1, $num2);
+                            } elseif ($opName === 'OP_BOOLAND') { // cscriptnum
+                                $num = $math->cmp($num1, $_bn0->getInt()) !== 0 && $math->cmp($num2, $_bn0->getInt()) !== 0;
+                            } elseif ($opName === 'OP_BOOLOR') {
+                                $num = $math->cmp($num1, $_bn0->getInt()) !== 0 || $math->cmp($num2, $_bn0->getInt()) !== 0;
+                            } elseif ($opName === 'OP_NUMEQUAL') { // cscriptnum
+                                $num = $math->cmp($num1, $num2) === 0;
+                            } elseif ($opName === 'OP_NUMEQUALVERIFY') { // cscriptnum
+                                $num = $math->cmp($num1, $num2) === 0;
+                            } elseif ($opName === 'OP_NUMNOTEQUAL') {
+                                $num = $math->cmp($num1, $num2) !== 0;
+                            } elseif ($opName === 'OP_LESSTHAN') { // cscriptnum
+                                $num = $math->cmp($num1, $num2) < 0;
+                            } elseif ($opName === 'OP_GREATERTHAN') {
+                                $num = $math->cmp($num1, $num2) > 0;
+                            } elseif ($opName === 'OP_LESSTHANOREQUAL') { // cscriptnum
+                                $num = $math->cmp($num1, $num2) <= 0;
+                            } elseif ($opName === 'OP_GREATERTHANOREQUAL') {
+                                $num = $math->cmp($num1, $num2) >= 0;
+                            } elseif ($opName === 'OP_MIN') {
+                                $num = ($math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
+                            } else {
+                                // is OP_MAX
+                                $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
+                            }
+
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $buffer = Buffer::int($num, null, $math);
+                            $mainStack->push($buffer);
+
+                            if ($opcodes->isOp($opCode, 'OP_NUMEQUALVERIFY')) {
+                                if ($this->castToBool($mainStack->top(-1))) {
+                                    $mainStack->pop();
+                                } else {
+                                    throw new \Exception('NUM EQUAL VERIFY error');
+                                }
+                            }
+                            break;
+                        case $opcodes->getOpByName('OP_WITHIN'):
+                            if ($mainStack->size() < 3) {
+                                throw new \Exception('Invalid stack operation');
+                            }
+                            $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+                            $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+                            $num3 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+
+                            $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push($value ? $_bn1 : $_bn0);
+                            break;
+                        
+                        case $opcodes->getOpByName('OP_RIPEMD160'):
+                        case $opcodes->getOpByName('OP_SHA1'):
+                        case $opcodes->getOpByName('OP_SHA256'):
+                        case $opcodes->getOpByName('OP_HASH160'):
+                        case $opcodes->getOpByName('OP_HASH256'):
+                            if ($mainStack->size() < 1) {
+                                throw new \Exception('Invalid stack operation');
+                            }
+
+                            $opName = $opcodes->getOp($opCode);
+                            $buffer = $mainStack->top(-1);
+
+                            if ($opName === 'OP_RIPEMD160') {
+                                $hash = Hash::ripemd160($buffer);
+                            } elseif ($opName === 'OP_SHA1') {
+                                $hash = Hash::sha1($buffer);
+                            } elseif ($opName === 'OP_SHA256') {
+                                $hash = Hash::sha256($buffer);
+                            } elseif ($opName === 'OP_HASH160') {
+                                $hash = Hash::sha256ripe160($buffer);
+                            } else { // is hash256
+                                $hash = Hash::sha256d($buffer);
+                            }
+
+                            $mainStack->pop();
+                            $mainStack->push($hash);
                             break;
 
                         case $opcodes->getOpByName('OP_CODESEPARATOR'):
