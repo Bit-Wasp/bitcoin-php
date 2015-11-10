@@ -21,7 +21,7 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
     public function testGetOpByNameFail()
     {
         $op = new Opcodes();
-        $op->opNameExists('OP_DEADBEEF');
+        $op->getOpByName('OP_DEADBEEF');
     }
 
     public function testGetOp()

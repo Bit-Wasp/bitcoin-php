@@ -151,7 +151,7 @@ class RedeemScriptTest extends AbstractTestCase
         $hash = hash('ripemd160', hash('sha256', $script->getBinary(), true), true);
         $this->assertEquals($hash, $script->getScriptHash()->getBinary());
 
-        $rs = RedeemScript::FromSCript($script);
+        $rs = RedeemScript::fromScript($script);
         $outputScript = $rs->getOutputScript();
         $parsed = $outputScript->getScriptParser()->parse();
         $this->assertEquals($hash, $parsed[1]->getBinary());

@@ -47,7 +47,7 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * Get all opcodes (OP_X => opcode)
+     * Get all opcodes
      *
      * @return Opcodes
      */
@@ -75,7 +75,7 @@ class Script extends Serializable implements ScriptInterface
         $count = 0;
         $ops = $this->opcodes;
         $parser = $this->getScriptParser();
-        $op = 0xff;
+        $op = Opcodes::OP_INVALIDOPCODE;
         $pushData = new Buffer();
         $lastOp = 0xff;
         while ($parser->next($op, $pushData)) {
@@ -113,7 +113,7 @@ class Script extends Serializable implements ScriptInterface
         }
 
         $parsed = $scriptSig->getScriptParser();
-        $op = 0xff;
+        $op = Opcodes::OP_INVALIDOPCODE;
         $push = new Buffer();
         $data = null;
         while ($parsed->next($op, $push)) {

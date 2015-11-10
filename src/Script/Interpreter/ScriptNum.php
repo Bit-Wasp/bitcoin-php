@@ -1,7 +1,7 @@
 <?php
 
 
-namespace BitWasp\Bitcoin\Script\Interpreter\Operation;
+namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Exceptions\ScriptStackException;
 use BitWasp\Bitcoin\Flags;
