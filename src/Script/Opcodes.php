@@ -136,7 +136,7 @@ class Opcodes
     const OP_NOP10 = 185;
 
     private static $names = [
-        self::OP_0    => 'OP_0',
+        self::OP_0 => 'OP_0',
         self::OP_PUSHDATA1 => 'OP_PUSHDATA1',
         self::OP_PUSHDATA2 => 'OP_PUSHDATA2',
         self::OP_PUSHDATA4 => 'OP_PUSHDATA4',
