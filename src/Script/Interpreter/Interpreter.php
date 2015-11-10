@@ -63,8 +63,17 @@ class Interpreter implements InterpreterInterface
      */
     private $state;
 
+    /**
+     * @var array
+     */
+    private $disabledOps = [
+        Opcodes::OP_CAT, Opcodes::OP_SUBSTR, Opcodes::OP_LEFT, Opcodes::OP_RIGHT,
+        Opcodes::OP_INVERT, Opcodes::OP_AND, Opcodes::OP_OR, Opcodes::OP_XOR,
+        Opcodes::OP_2MUL, Opcodes::OP_2DIV, Opcodes::OP_MUL, Opcodes::OP_DIV,
+        Opcodes::OP_MOD, Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
+    ];
+
     public $checkDisabledOpcodes = true;
-    public $maxBytes = 10000;
 
     /**
      * @param EcAdapterInterface $ecAdapter
@@ -99,37 +108,20 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @return string[]
-     */
-    public function getDisabledOpcodes()
-    {
-        return array('OP_CAT', 'OP_SUBSTR', 'OP_LEFT', 'OP_RIGHT',
-            'OP_INVERT', 'OP_AND', 'OP_OR', 'OP_XOR', 'OP_2MUL',
-            'OP_2DIV', 'OP_MUL', 'OP_DIV', 'OP_MOD', 'OP_LSHIFT',
-            'OP_RSHIFT'
-        );
-    }
-
-    /**
      * @return array
      */
     public function getDisabledOps()
     {
-        return array_map(
-            function ($value) {
-                return $this->script->getOpCodes()->getOpByName($value);
-            },
-            $this->getDisabledOpcodes()
-        );
+        return $this->disabledOps;
     }
 
     /**
-     * @param $op
+     * @param int $op
      * @return bool
      */
     public function isDisabledOp($op)
     {
-        return in_array($op, $this->getDisabledOps(), true);
+        return in_array($op, $this->disabledOps, true);
     }
 
     /**
