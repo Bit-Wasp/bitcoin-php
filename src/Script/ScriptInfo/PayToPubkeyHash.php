@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Buffertools\Buffer;
 
 class PayToPubkeyHash implements ScriptInfoInterface
 {
@@ -27,7 +28,13 @@ class PayToPubkeyHash implements ScriptInfoInterface
     {
         $this->script = $script;
         $chunks = $this->script->getScriptParser()->parse();
-        $this->hash = $chunks[2];
+        if (count($chunks) < 5 || !$chunks[2] instanceof Buffer) {
+            throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
+        }
+
+        /** @var Buffer $hash */
+        $hash = $chunks[2];
+        $this->hash = $hash;
     }
 
     /**
@@ -71,6 +78,11 @@ class PayToPubkeyHash implements ScriptInfoInterface
         return [];
     }
 
+    /**
+     * @param array $signatures
+     * @param array $publicKeys
+     * @return Script|ScriptInterface
+     */
     public function makeScriptSig(array $signatures = [], array $publicKeys = [])
     {
         $newScript = new Script();
