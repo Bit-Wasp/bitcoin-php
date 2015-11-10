@@ -2,8 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Factory;
 
-use BitWasp\Bitcoin\Script\RedeemScript;
-use BitWasp\Bitcoin\Script\Script;
+
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;

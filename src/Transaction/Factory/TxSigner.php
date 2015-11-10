@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Exceptions\BuilderNoInputState;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
@@ -138,7 +137,7 @@ class TxSigner
      * @param integer $inputToSign
      * @param PrivateKeyInterface $privateKey
      * @param ScriptInterface $outputScript
-     * @param RedeemScript $redeemScript
+     * @param ScriptInterface $redeemScript
      * @param int $sigHashType
      * @return $this
      */

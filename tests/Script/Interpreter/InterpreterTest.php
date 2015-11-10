@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
-use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;

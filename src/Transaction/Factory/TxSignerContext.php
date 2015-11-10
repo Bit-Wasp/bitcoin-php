@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\ScriptHash;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -101,7 +100,7 @@ class TxSignerContext
     }
 
     /**
-     * @return RedeemScript
+     * @return ScriptInterface
      * @throws \RuntimeException
      */
     public function getRedeemScript()
