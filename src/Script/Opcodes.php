@@ -135,6 +135,9 @@ class Opcodes
     const OP_NOP9 = 184;
     const OP_NOP10 = 185;
 
+    /**
+     * @var array
+     */
     private static $names = [
         self::OP_0 => 'OP_0',
         self::OP_PUSHDATA1 => 'OP_PUSHDATA1',
@@ -266,6 +269,11 @@ class Opcodes
         self::OP_NOP9 => 'OP_NOP9',
         self::OP_NOP10 => 'OP_NOP10',
     ];
+
+    /**
+     * @var array
+     */
+    private $known = [];
 
     public function __construct()
     {
