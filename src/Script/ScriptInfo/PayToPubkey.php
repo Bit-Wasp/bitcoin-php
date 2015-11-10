@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Buffertools\Buffer;
 
 class PayToPubkey implements ScriptInfoInterface
 {
@@ -28,6 +29,9 @@ class PayToPubkey implements ScriptInfoInterface
     {
         $this->script = $script;
         $chunks = $script->getScriptParser()->parse();
+        if (count($chunks) < 1 || !$chunks[0] instanceof Buffer) {
+            throw new \InvalidArgumentException('Malformed pay-to-pubkey script');
+        }
         $this->publicKey = PublicKeyFactory::fromHex($chunks[0]);
     }
 
@@ -65,7 +69,7 @@ class PayToPubkey implements ScriptInfoInterface
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[]
+     * @return PublicKeyInterface[]
      */
     public function getKeys()
     {
