@@ -101,7 +101,7 @@ class ScriptCreator
     }
 
     /**
-     * @return Script
+     * @return ScriptInterface
      */
     public function getScript()
     {
