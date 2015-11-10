@@ -59,6 +59,11 @@ class Interpreter implements InterpreterInterface
     private $ecAdapter;
 
     /**
+     * @var \BitWasp\Bitcoin\Math\Math
+     */
+    private $math;
+
+    /**
      * @var State
      */
     private $state;
