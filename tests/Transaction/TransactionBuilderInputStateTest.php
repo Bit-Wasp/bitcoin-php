@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -15,22 +14,13 @@ use BitWasp\Buffertools\Buffer;
 
 class TransactionBuilderInputStateTest extends AbstractTestCase
 {
-    public function getScripts()
+
+    private function getRandomOutputScript()
     {
-        $privateKey = PrivateKeyFactory::create();
-        $pkh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
-
-        $rs = $this->getRedeemScript();
-        $os = ScriptFactory::scriptPubKey()->payToScriptHash($rs);
-
-        return [
-            [$pkh, OutputClassifier::PAYTOPUBKEYHASH, 1, null],
-            [$os, OutputClassifier::PAYTOSCRIPTHASH, 2, $rs],
-            [ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey()), OutputClassifier::PAYTOPUBKEY, 1, null]
-        ];
+        return ScriptFactory::scriptPubKey()->payToAddress(PrivateKeyFactory::create()->getAddress());
     }
 
-    private function getRedeemScript()
+    private function getRandomRedeemScript()
     {
         $script = ScriptFactory::multisigNew(2, [
             PrivateKeyFactory::create()->getPublicKey(),
@@ -41,12 +31,19 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
         return $script;
     }
 
-    private function getOutputScript()
+    public function getScripts()
     {
-        $script = ScriptFactory::scriptPubKey()
-            ->payToAddress(PrivateKeyFactory::create()->getAddress());
+        $privateKey = PrivateKeyFactory::create();
+        $pkh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
 
-        return $script;
+        $rs = $this->getRandomRedeemScript();
+        $os = ScriptFactory::scriptPubKey()->payToScriptHash($rs);
+
+        return [
+            [$pkh, OutputClassifier::PAYTOPUBKEYHASH, 1, null],
+            [$os, OutputClassifier::PAYTOSCRIPTHASH, 2, $rs],
+            [ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey()), OutputClassifier::PAYTOPUBKEY, 1, null]
+        ];
     }
 
     /**
@@ -79,7 +76,7 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
 
     public function testCreateState()
     {
-        $rs = $this->getRedeemScript();
+        $rs = $this->getRandomRedeemScript();
         $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($rs);
 
         $state = $this->createState($outputScript, $rs);
@@ -94,14 +91,14 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      */
     public function testFailsWithoutRedeemScript()
     {
-        $outputScript = $this->getOutputScript();
+        $outputScript = $this->getRandomOutputScript();
         $state = $this->createState($outputScript);
         $state->getRedeemScript();
     }
 
     public function testGetEmptyValues()
     {
-        $outputScript = $this->getOutputScript();
+        $outputScript = $this->getRandomOutputScript();
         $state = $this->createState($outputScript);
         $this->assertEquals(0, $state->getSigCount());
 
@@ -119,7 +116,7 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      */
     public function testRedeemScriptPassedWhenRequired()
     {
-        $rs = $this->getRedeemScript();
+        $rs = $this->getRandomRedeemScript();
         $script = ScriptFactory::scriptPubKey()->payToScriptHash($rs);
 
         $this->createState($script);

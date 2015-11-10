@@ -207,7 +207,7 @@ class TxSignerContext
                     $this->setSignature($idx, null);
                 }
 
-                if ($size > 2 && $size <= $redeemScript->getKeyCount() + 2) {
+                if ($size > 2 && $size <= $this->scriptInfo->getKeyCount() + 2) {
                     $sigs = [];
                     foreach ($keys as $key) {
                         $sigs[$key->getPubKeyHash()->getHex()] = [];

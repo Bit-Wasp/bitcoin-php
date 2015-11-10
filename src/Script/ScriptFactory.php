@@ -36,7 +36,7 @@ class ScriptFactory
             $keys = Buffertools::sort($keys);
         }
 
-        return new RedeemScript($m, $keys);
+        return self::scriptPubKey()->multisig($m, $keys);
     }
 
     /**

@@ -253,7 +253,7 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
             $ec,
             $standard,
             $privateKey,
-            $rs->getOutputScript(),
+            ScriptFactory::scriptPubKey()->payToScriptHash($rs),
             $rs,
         ];
 
@@ -267,9 +267,9 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
      * @param Flags $flags
      * @param PrivateKeyInterface $privateKey
      * @param ScriptInterface $outputScript
-     * @param RedeemScript $rs
+     * @param ScriptInterface $rs
      */
-    public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, Flags $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, RedeemScript $rs = null)
+    public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, Flags $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, ScriptInterface $rs = null)
     {
         // Create a fake tx to spend - an output script we supposedly can spend.
         $builder = new TxBuilder();

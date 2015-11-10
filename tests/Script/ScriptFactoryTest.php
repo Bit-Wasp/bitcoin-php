@@ -22,17 +22,23 @@ class ScriptFactoryTest extends AbstractTestCase
 
     public function testMultisig()
     {
-        $pk1 = PrivateKeyFactory::create();
-        $pk2 = PrivateKeyFactory::create();
+        $pk1 = PrivateKeyFactory::fromInt('4');
+        $pk2 = PrivateKeyFactory::fromInt('50000000');
 
         $m = 2;
         $arbitrary = [$pk1->getPublicKey(), $pk2->getPublicKey()];
 
-        $unsorted = ScriptFactory::multisig($m, $arbitrary, false)->getKeys();
-        $this->assertEquals($unsorted, $arbitrary, 'verify false flag disables sorting');
+        $redeemScript = ScriptFactory::multisig($m, $arbitrary, false);
+        $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
+        $info = ScriptFactory::info($outputScript, $redeemScript);
+        $keys = $info->getKeys();
+        foreach ($keys as $i => $key) {
+            $this->assertEquals($arbitrary[$i]->getBinary(), $key->getBinary(), 'verify false flag disables sorting');
+        }
 
         $sorted = ScriptFactory::multisig($m, $arbitrary, true);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\RedeemScript', $sorted);
+        $this->assertInstanceOf('BitWasp\Bitcoin\Script\ScriptInterface', $sorted);
+        $this->assertNotEquals($sorted->getBinary(), $redeemScript->getBinary());
     }
 
     public function testCreate()

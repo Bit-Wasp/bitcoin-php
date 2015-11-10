@@ -49,11 +49,11 @@ class InputScriptFactory
     }
 
     /**
-     * @param RedeemScript $redeemScript
+     * @param ScriptInterface $redeemScript
      * @param TransactionSignatureInterface[] $signatures
      * @return ScriptInterface
      */
-    public function multisigP2sh(RedeemScript $redeemScript, $signatures)
+    public function multisigP2sh(ScriptInterface $redeemScript, $signatures)
     {
         $script = ScriptFactory::create()->op('OP_0');
         foreach ($signatures as $signature) {
