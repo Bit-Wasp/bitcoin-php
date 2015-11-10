@@ -67,10 +67,10 @@ class Interpreter implements InterpreterInterface
      * @var array
      */
     private $disabledOps = [
-        Opcodes::OP_CAT, Opcodes::OP_SUBSTR, Opcodes::OP_LEFT, Opcodes::OP_RIGHT,
-        Opcodes::OP_INVERT, Opcodes::OP_AND, Opcodes::OP_OR, Opcodes::OP_XOR,
-        Opcodes::OP_2MUL, Opcodes::OP_2DIV, Opcodes::OP_MUL, Opcodes::OP_DIV,
-        Opcodes::OP_MOD, Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
+        Opcodes::OP_CAT,    Opcodes::OP_SUBSTR, Opcodes::OP_LEFT,  Opcodes::OP_RIGHT,
+        Opcodes::OP_INVERT, Opcodes::OP_AND,    Opcodes::OP_OR,    Opcodes::OP_XOR,
+        Opcodes::OP_2MUL,   Opcodes::OP_2DIV,   Opcodes::OP_MUL,   Opcodes::OP_DIV,
+        Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
 
     public $checkDisabledOpcodes = true;
@@ -83,6 +83,7 @@ class Interpreter implements InterpreterInterface
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, Flags $flags)
     {
         $this->ecAdapter = $ecAdapter;
+        $this->math = $ecAdapter->getMath();
         $this->transaction = $transaction;
         $this->flags = $flags;
         $this->script = new Script();
@@ -133,7 +134,7 @@ class Interpreter implements InterpreterInterface
     public function castToBool(Buffer $value)
     {
         // Since we're using buffers, lets try ensuring the contents are not 0.
-        return $this->ecAdapter->getMath()->cmp($value->getInt(), 0) > 0; // cscriptNum or edge case.
+        return $this->math->cmp($value->getInt(), 0) > 0; // cscriptNum or edge case.
     }
 
     /**
@@ -187,7 +188,7 @@ class Interpreter implements InterpreterInterface
         $binary = $signature->getBinary();
         $nHashType = ord(substr($binary, -1)) & (~(SignatureHashInterface::SIGHASH_ANYONECANPAY));
 
-        $math = $this->ecAdapter->getMath();
+        $math = $this->math;
         return ! ($math->cmp($nHashType, SignatureHashInterface::SIGHASH_ALL) < 0 || $math->cmp($nHashType, SignatureHashInterface::SIGHASH_SINGLE) > 0);
     }
 
@@ -264,7 +265,7 @@ class Interpreter implements InterpreterInterface
      */
     private function checkOpcodeCount()
     {
-        if ($this->ecAdapter->getMath()->cmp($this->opCount, 201) > 0) {
+        if ($this->math->cmp($this->opCount, 201) > 0) {
             throw new \RuntimeException('Error: Script op code count');
         }
 
@@ -361,9 +362,25 @@ class Interpreter implements InterpreterInterface
     /**
      * @return bool
      */
+    private function checkExec()
+    {
+        $vfStack = $this->state->getVfStack();
+        $c = 0;
+        $len = $vfStack->end();
+        for ($i = 0; $i < $len; $i++) {
+            if ($vfStack->top(0 - $len - $i) === true) {
+                $c++;
+            }
+        }
+        return !(bool)$c;
+    }
+
+    /**
+     * @return bool
+     */
     public function run()
     {
-        $math = $this->ecAdapter->getMath();
+        $math = $this->math;
         $opcodes = $this->script->getOpCodes();
 
         $flags = $this->flags;
@@ -381,22 +398,11 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        $checkFExec = function () use (&$vfStack) {
-            $c = 0;
-            $len = $vfStack->end();
-            for ($i = 0; $i < $len; $i++) {
-                if ($vfStack->top(0 - $len - $i) === true) {
-                    $c++;
-                }
-            }
-            return (bool)$c;
-        };
-
         $pushData = new Buffer('', 0, $math);
 
         try {
             while ($parser->next($opCode, $pushData) === true) {
-                $fExec = !$checkFExec();
+                $fExec = $this->checkExec();
 
                 // If pushdata was written to,
                 if ($pushData instanceof Buffer && $pushData->getSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
@@ -439,7 +445,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
                             $num = $opCode - (Opcodes::OP_1 - 1);
-                            $mainStack->push(new Buffer(chr($num), 1, $math));
+                            $mainStack->push(new Buffer(chr($num), 1, $this->math));
                             break;
 
                         case $opcodes->cmp($opCode, 'OP_NOP1') >= 0 && $opcodes->cmp($opCode, 'OP_NOP10') <= 0:
@@ -944,7 +950,6 @@ class Interpreter implements InterpreterInterface
                     if ($mainStack->size() + $altStack->size() > 1000) {
                         throw new \RuntimeException('Invalid stack size, exceeds 1000');
                     }
-
                 }
             }
 
