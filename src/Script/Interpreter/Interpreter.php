@@ -152,6 +152,7 @@ class Interpreter implements InterpreterInterface
             TransactionSignature::isDERSignature($signature);
             return true;
         } catch (SignatureNotCanonical $e) {
+            /* In any case, we will return false outside this block */
         }
 
         return false;
