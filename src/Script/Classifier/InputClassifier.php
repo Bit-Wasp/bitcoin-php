@@ -92,17 +92,26 @@ class InputClassifier implements ScriptClassifierInterface
         $count = count($parsed);
         $opCodes = $script->getOpCodes();
 
+        /** @var string $mOp */
         $mOp = $parsed[0];
+        /** @var string $nOp */
         $nOp = $parsed[$count - 2];
+        if ($mOp instanceof Buffer || $nOp instanceof Buffer){
+            return false;
+        }
+        $mOp = $opCodes->getOpByName($mOp);
+        $nOp = $opCodes->getOpByName($nOp);
+        if ($opCodes->cmp($mOp, 'OP_0') < 0 || $opCodes->cmp($nOp, 'OP_16') > 0) {
+            return false;
+        }
+
         $keys = array_slice($parsed, 1, -2);
         $keysValid = true;
         foreach ($keys as $key) {
             $keysValid &= ($key instanceof Buffer) && PublicKey::isCompressedOrUncompressed($key);
         }
 
-        return $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
-            && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
-            && $keysValid;
+        return $keysValid;
     }
 
     /**
