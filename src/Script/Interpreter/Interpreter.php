@@ -314,7 +314,7 @@ class Interpreter implements InterpreterInterface
     /**
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
-     * @param $nInputToSign
+     * @param int $nInputToSign
      * @return bool
      * @throws \Exception
      */

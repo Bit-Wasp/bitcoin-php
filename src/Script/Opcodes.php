@@ -275,17 +275,17 @@ class Opcodes
     /**
      * @param $op
      */
-    public function opExists($op)
+    private function opExists($op)
     {
-        if (!isset(self::$names[$op])) {
+        if (!array_key_exists($op, self::$names)) {
             throw new \RuntimeException("Opcode not found");
         }
     }
 
     /**
-     * @param $name
+     * @param string $name
      */
-    public function opNameExists($name)
+    private function opNameExists($name)
     {
         if (!array_key_exists($name, $this->known)) {
             throw new \RuntimeException("Opcode by that name not found");
@@ -294,7 +294,7 @@ class Opcodes
 
     /**
      * @param int $op
-     * @return mixed
+     * @return string
      */
     public function getOp($op)
     {
@@ -303,8 +303,8 @@ class Opcodes
     }
 
     /**
-     * @param $name
-     * @return mixed
+     * @param string $name
+     * @return int
      */
     public function getOpByName($name)
     {
@@ -313,8 +313,8 @@ class Opcodes
     }
 
     /**
-     * @param $op
-     * @param $opCodeStr
+     * @param int $op
+     * @param string $opCodeStr
      * @return bool
      */
     public function isOp($op, $opCodeStr)
