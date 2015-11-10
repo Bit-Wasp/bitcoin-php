@@ -20,6 +20,17 @@ class InputScriptFactory
     }
 
     /**
+     * @param TransactionSignatureInterface $signature
+     * @return ScriptInterface
+     */
+    public function payToPubKey(TransactionSignatureInterface $signature)
+    {
+        return ScriptFactory::create()
+            ->push($signature->getBuffer())
+            ->getScript();
+    }
+
+    /**
      * @param \BitWasp\Bitcoin\Signature\TransactionSignatureInterface $signature
      * @param PublicKeyInterface $publicKey
      * @return ScriptInterface
@@ -47,26 +58,6 @@ class InputScriptFactory
     }
 
     /**
-     * @param ScriptInterface $redeemScript
-     * @param TransactionSignatureInterface[] $signatures
-     * @return ScriptInterface
-     */
-    public function multisigP2sh(ScriptInterface $redeemScript, $signatures)
-    {
-        foreach ($signatures as $sig) {
-            if (!$sig instanceof TransactionSignatureInterface) {
-                throw new \InvalidArgumentException('Must pass TransactionSignatureInterface[]');
-            }
-        }
-
-        return ScriptFactory::create()
-            ->op('OP_0')
-            ->pushSerializableArray($signatures)
-            ->push($redeemScript->getBuffer())
-            ->getScript();
-    }
-
-    /**
      * @param ScriptInterface $inputScript
      * @param ScriptInterface $redeemScript
      * @return ScriptInterface
@@ -75,17 +66,6 @@ class InputScriptFactory
     {
         return ScriptFactory::create($inputScript->getBuffer())
             ->push($redeemScript->getBuffer())
-            ->getScript();
-    }
-
-    /**
-     * @param TransactionSignatureInterface $signature
-     * @return ScriptInterface
-     */
-    public function payToPubKey(TransactionSignatureInterface $signature)
-    {
-        return ScriptFactory::create()
-            ->push($signature->getBuffer())
             ->getScript();
     }
 }
