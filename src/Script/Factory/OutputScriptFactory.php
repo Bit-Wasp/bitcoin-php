@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -88,6 +89,33 @@ class OutputScriptFactory
             ->push($script->getScriptHash())
             ->op('OP_EQUAL')
             ->getScript();
+    }
+
+    public function multisig($m, array $keys = [])
+    {
+        $n = count($keys);
+        if ($m > $n) {
+            throw new \LogicException('Required number of sigs exceeds number of public keys');
+        }
+        if ($n > 16) {
+            throw new \LogicException('Number of public keys is greater than 16');
+        }
+
+        $opM = Opcodes::OP_1 - 1 + $m;
+        $opN = Opcodes::OP_1 - 1 + $n;
+
+        $script = ScriptFactory::create();
+        foreach ($keys as $key) {
+            if (!$key instanceof PublicKeyInterface) {
+                throw new \LogicException('Values in $keys[] must be a PublicKey');
+            }
+
+            $script->push($key->getBuffer());
+        }
+        $keyBuf = $script->getScript()->getBuffer();
+
+        $script = new Script(new Buffer(chr($opM) . $keyBuf->getBinary() . chr($opN) . chr(Opcodes::OP_CHECKMULTISIG)));
+        return $script;
     }
 
     /**

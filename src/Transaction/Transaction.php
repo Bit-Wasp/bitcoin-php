@@ -2,14 +2,15 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
+
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
+use BitWasp\Buffertools\Buffer;
 
 class Transaction extends Serializable implements TransactionInterface
 {
@@ -175,7 +176,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Hasher
+     * @return \BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface
      */
     public function getSignatureHash()
     {

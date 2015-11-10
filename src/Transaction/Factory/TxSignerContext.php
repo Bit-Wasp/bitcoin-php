@@ -7,8 +7,8 @@ use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInfo\ScriptHash;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
@@ -19,7 +19,12 @@ use BitWasp\Buffertools\Buffer;
 class TxSignerContext
 {
     /**
-     * @var null|RedeemScript
+     * @var \BitWasp\Bitcoin\Script\ScriptInfo\ScriptInfoInterface
+     */
+    private $scriptInfo;
+
+    /**
+     * @var null|ScriptInterface
      */
     private $redeemScript;
 
@@ -34,7 +39,7 @@ class TxSignerContext
     private $prevOutType;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $scriptType;
 
@@ -56,66 +61,43 @@ class TxSignerContext
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param ScriptInterface $outputScript
-     * @param RedeemScript $redeemScript
+     * @param ScriptInterface $redeemScript
      */
     public function __construct(
         EcAdapterInterface $ecAdapter,
         ScriptInterface $outputScript,
-        RedeemScript $redeemScript = null
+        ScriptInterface $redeemScript = null
     ) {
+/*
         $classifier = new OutputClassifier($outputScript);
         $this->scriptType = $this->prevOutType = $classifier->classify();
 
-        // Reclassify if the output is P2SH, so we know how to sign it.
+        // Get the handler for this script type, and reclassify p2sh
         if ($this->scriptType === OutputClassifier::PAYTOSCRIPTHASH) {
             if (null === $redeemScript) {
                 throw new \InvalidArgumentException('Redeem script is required when output is P2SH');
             }
-            $rsClassifier = new OutputClassifier($redeemScript);
-            $this->scriptType = $rsClassifier->classify();
+
+            $handler = new ScriptHash($redeemScript);
+            $this->scriptType = $handler->classification();
+        } else {
+            $handler = ScriptFactory::info($outputScript);
+        }
+*/
+        $handler = ScriptFactory::info($outputScript, $redeemScript);
+        $this->scriptType = $this->prevOutType = $handler->classification();
+        if ($handler instanceof ScriptHash) {
+            $this->scriptType = $handler->getInfo()->classification();
         }
 
         // Gather public keys from redeemScript / outputScript
         $this->ecAdapter = $ecAdapter;
         $this->redeemScript = $redeemScript;
         $this->prevOutScript = $outputScript;
+        $this->scriptInfo = $handler;
 
         // According to scriptType, extract public keys
-        $this->execForInputTypes(
-            function () {
-            // For pay to pub key hash - nothing useful in output script
-                $this->publicKeys = [];
-            },
-            function () {
-            // For pay to pub key - we can extract this from the output script
-                $chunks = $this->prevOutScript->getScriptParser()->parse();
-                $this->publicKeys = [PublicKeyFactory::fromHex($chunks[0]->getHex(), $this->ecAdapter)];
-            },
-            function () {
-            // Multisig - refer to the redeemScript
-                $this->publicKeys = $this->redeemScript->getKeys();
-            }
-        );
-    }
-
-    /**
-     * @param callable $forPayToPubKeyHash
-     * @param callable $forPayToPubKey
-     * @param callable $forMultisig
-     * @return mixed
-     */
-    private function execForInputTypes(callable $forPayToPubKeyHash, callable $forPayToPubKey, callable $forMultisig)
-    {
-        switch ($this->scriptType) {
-            case OutputClassifier::PAYTOPUBKEYHASH:
-                return $forPayToPubKeyHash();
-            case OutputClassifier::PAYTOPUBKEY:
-                return $forPayToPubKey();
-            case OutputClassifier::MULTISIG:
-                return $forMultisig();
-            default:
-                throw new \InvalidArgumentException('Unsupported script type');
-        }
+        $this->publicKeys = $this->scriptInfo->getKeys();
     }
 
     /**
@@ -129,14 +111,6 @@ class TxSignerContext
         }
 
         return $this->redeemScript;
-    }
-
-    /**
-     * @return ScriptInterface
-     */
-    public function getPrevOutScript()
-    {
-        return $this->prevOutScript;
     }
 
     /**
@@ -173,16 +147,6 @@ class TxSignerContext
     public function getPublicKeys()
     {
         return $this->publicKeys;
-    }
-
-    /**
-     * @param TransactionSignatureInterface[] $signatures
-     * @return $this
-     */
-    public function setSignatures($signatures)
-    {
-        $this->signatures = $signatures;
-        return $this;
     }
 
     /**
@@ -224,25 +188,26 @@ class TxSignerContext
             case OutputClassifier::PAYTOPUBKEYHASH:
                 // Supply signature and public key in scriptSig
                 if ($size === 2) {
-                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)]);
-                    $this->setPublicKeys([PublicKeyFactory::fromHex($parsed[1]->getHex(), $this->ecAdapter)]);
+                    $this->signatures = [TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)];
+                    $this->publicKeys = [PublicKeyFactory::fromHex($parsed[1]->getHex(), $this->ecAdapter)];
                 }
 
                 break;
             case OutputClassifier::PAYTOPUBKEY:
                 // Only has a signature in the scriptSig
                 if ($size === 1) {
-                    $this->setSignatures([TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)]);
+                    $this->signatures = [TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)];
                 }
 
                 break;
             case OutputClassifier::MULTISIG:
-                $keys = $this->getRedeemScript()->getKeys();
+                $redeemScript = $this->getRedeemScript();
+                $keys = $this->scriptInfo->getKeys();
                 foreach ($keys as $idx => $key) {
                     $this->setSignature($idx, null);
                 }
 
-                if ($size > 2 && $size <= $this->getRedeemScript()->getKeyCount() + 2) {
+                if ($size > 2 && $size <= $redeemScript->getKeyCount() + 2) {
                     $sigs = [];
                     foreach ($keys as $key) {
                         $sigs[$key->getPubKeyHash()->getHex()] = [];
@@ -257,11 +222,11 @@ class TxSignerContext
                             $linked = $this->ecAdapter->associateSigs(
                                 [$txSig->getSignature()],
                                 $sigHash->calculate(
-                                    $this->getRedeemScript(),
+                                    $redeemScript,
                                     $inputToExtract,
                                     $txSig->getHashType()
                                 ),
-                                $this->getRedeemScript()->getKeys()
+                                $keys
                             );
 
                             if (count($linked)) {
@@ -291,27 +256,8 @@ class TxSignerContext
      */
     public function regenerateScript()
     {
-        // todo: this is worrisome, should have some way to fail and defer to the original script
         $signatures = array_filter($this->getSignatures());
-        $script = $this->execForInputTypes(
-            function () use (&$signatures) {
-                return count($signatures) === 1
-                    ? ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $this->publicKeys[0])
-                    : new Script();
-            },
-            function () use (&$signatures) {
-                return count($signatures) === 1
-                    ? ScriptFactory::scriptSig()->payToPubKey($signatures[0])
-                    : new Script;
-            },
-            function () use (&$signatures) {
-                return count($signatures) > 0
-                    ? ScriptFactory::scriptSig()->multisigP2sh($this->getRedeemScript(), array_filter($this->signatures))
-                    : new Script();
-            }
-        );
-
-        return $script;
+        return $this->scriptInfo->makeScriptSig($signatures, $this->publicKeys);
     }
 
     /**
@@ -319,17 +265,7 @@ class TxSignerContext
      */
     public function getRequiredSigCount()
     {
-        return $this->execForInputTypes(
-            function () {
-                return 1;
-            },
-            function () {
-                return 1;
-            },
-            function () {
-                return $this->redeemScript->getRequiredSigCount();
-            }
-        );
+        return $this->scriptInfo->getRequiredSigCount();
     }
 
     /**
@@ -345,19 +281,7 @@ class TxSignerContext
      */
     public function isFullySigned()
     {
-        // First check that public keys are set up as required, then
         // Compare the number of signatures with the required sig count
-        return $this->execForInputTypes(
-            function () {
-                    return (count($this->publicKeys) === 1);
-            },
-            function () {
-                    return (count($this->publicKeys) === 1);
-            },
-            function () {
-                    return true;
-            }
-        ) && (count($this->signatures) === $this->getRequiredSigCount());
-
+        return $this->getSigCount() === $this->getRequiredSigCount();
     }
 }

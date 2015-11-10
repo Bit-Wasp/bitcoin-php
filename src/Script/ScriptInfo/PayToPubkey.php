@@ -1,9 +1,11 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script\ScriptHashInfo;
+namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 
@@ -68,5 +70,20 @@ class PayToPubkey implements ScriptInfoInterface
     public function getKeys()
     {
         return [$this->publicKey];
+    }
+
+    /**
+     * @param array $signatures
+     * @param array $publicKeys
+     * @return Script|ScriptInterface
+     */
+    public function makeScriptSig(array $signatures = [], array $publicKeys = [])
+    {
+        $newScript = new Script();
+        if (count($signatures) === $this->getRequiredSigCount()) {
+            $newScript = ScriptFactory::scriptSig()->payToPubKey($signatures[0]);
+        }
+
+        return $newScript;
     }
 }

@@ -11,7 +11,6 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Transaction\Mutator\InputMutator;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1Adapter;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
@@ -24,6 +23,11 @@ class TxSigner
      * @var TransactionInterface
      */
     private $transaction;
+
+    /**
+     * @var \BitWasp\Bitcoin\Transaction\SignatureHash\Hasher
+     */
+    private $signatureHash;
 
     /**
      * @var bool
@@ -47,6 +51,7 @@ class TxSigner
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx)
     {
         $this->transaction = $tx;
+        $this->signatureHash = $tx->getSignatureHash();
         $this->ecAdapter = $ecAdapter;
     }
 
@@ -116,10 +121,10 @@ class TxSigner
     /**
      * @param integer $inputToSign
      * @param ScriptInterface $outputScript
-     * @param RedeemScript $redeemScript
+     * @param ScriptInterface $redeemScript
      * @return TxSignerContext
      */
-    private function createInputState($inputToSign, $outputScript, RedeemScript $redeemScript = null)
+    private function createInputState($inputToSign, $outputScript, ScriptInterface $redeemScript = null)
     {
         $state = (new TxSignerContext($this->ecAdapter, $outputScript, $redeemScript))
             ->extractSigs($this->transaction, $inputToSign);
@@ -141,7 +146,7 @@ class TxSigner
         $inputToSign,
         PrivateKeyInterface $privateKey,
         ScriptInterface $outputScript,
-        RedeemScript $redeemScript = null,
+        ScriptInterface $redeemScript = null,
         $sigHashType = SignatureHashInterface::SIGHASH_ALL
     ) {
         // If the input state hasn't been set up, do so now.
@@ -159,16 +164,13 @@ class TxSigner
         // loop over the publicKeys to find the key to sign with
         foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
             if ($privateKey->getPublicKey()->getBinary() === $publicKey->getBinary()) {
-                $inputState->setSignature(
-                    $idx,
-                    $this->makeSignature(
-                        $privateKey,
-                        $this->transaction
-                            ->getSignatureHash()
-                            ->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType),
-                        $sigHashType
-                    )
+                $signature = $this->makeSignature(
+                    $privateKey,
+                    $this->signatureHash->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType),
+                    $sigHashType
                 );
+
+                $inputState->setSignature($idx, $signature);
             }
         }
 
@@ -192,9 +194,7 @@ class TxSigner
                 $script = $this->transaction->getInputs()->get($i)->getScript();
             }
 
-            $inputs->applyTo($i, function (InputMutator $m) use ($script) {
-                $m->script($script);
-            });
+            $inputs[$i]->script($script);
         }
 
         return $mutator->done();
@@ -205,20 +205,16 @@ class TxSigner
      */
     public function isFullySigned()
     {
-        $transaction = $this->transaction;
-        $inCount = count($transaction->getInputs());
-
-        $total = 0;
-        $signed = 0;
-        for ($i = 0; $i < $inCount; $i++) {
+        foreach ($this->transaction->getInputs() as $i => $input) {
             if (array_key_exists($i, $this->inputStates)) {
                 /** @var TxSignerContext $state */
                 $state = $this->inputStates[$i];
-                $total += $state->getRequiredSigCount();
-                $signed += $state->getSigCount();
+                if (!$state->isFullySigned()) {
+                    return false;
+                }
             }
         }
 
-        return $signed === $total;
+        return true;
     }
 }

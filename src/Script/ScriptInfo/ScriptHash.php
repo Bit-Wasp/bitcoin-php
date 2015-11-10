@@ -1,14 +1,16 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\ScriptHashInfo\Multisig;
-use BitWasp\Bitcoin\Script\ScriptHashInfo\PayToPubkey;
-use BitWasp\Bitcoin\Script\ScriptHashInfo\PayToPubkeyHash;
-use BitWasp\Bitcoin\Script\ScriptHashInfo\ScriptInfoInterface;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
+use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkey;
+use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
+use BitWasp\Bitcoin\Script\ScriptInfo\ScriptInfoInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class ScriptHash implements ScriptInfoInterface
 {
@@ -63,6 +65,14 @@ class ScriptHash implements ScriptInfoInterface
     }
 
     /**
+     * @return ScriptInfoInterface
+     */
+    public function getInfo()
+    {
+        return $this->handler;
+    }
+
+    /**
      * @return ScriptInterface
      */
     public function getOutputScript()
@@ -108,7 +118,7 @@ class ScriptHash implements ScriptInfoInterface
      */
     public function classification()
     {
-        return $this->handler->classification();
+        return OutputClassifier::PAYTOSCRIPTHASH;
     }
 
     /**
@@ -117,5 +127,18 @@ class ScriptHash implements ScriptInfoInterface
     public function getKeys()
     {
         return $this->handler->getKeys();
+    }
+
+    /**
+     * @param array $signatures
+     * @param array $publicKeys
+     * @return ScriptInterface
+     */
+    public function makeScriptSig(array $signatures = [], array $publicKeys = [])
+    {
+        $inputScript = $this->handler->makeScriptSig($signatures, $publicKeys);
+        return ScriptFactory::create($inputScript->getBuffer())
+            ->push($this->redeemScript->getBuffer())
+            ->getScript();
     }
 }

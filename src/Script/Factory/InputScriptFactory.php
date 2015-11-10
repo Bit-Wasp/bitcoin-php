@@ -35,6 +35,20 @@ class InputScriptFactory
     }
 
     /**
+     * @param TransactionSignatureInterface[] $signatures
+     * @return ScriptInterface
+     */
+    public function multisig(array $signatures)
+    {
+        $script = ScriptFactory::create()->op('OP_0');
+        foreach ($signatures as $signature) {
+            $script->push($signature->getBuffer());
+        }
+
+        return $script->getScript();
+    }
+
+    /**
      * @param RedeemScript $redeemScript
      * @param TransactionSignatureInterface[] $signatures
      * @return ScriptInterface
