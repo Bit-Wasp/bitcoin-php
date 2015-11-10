@@ -281,7 +281,7 @@ class Opcodes
     }
 
     /**
-     * @param $op
+     * @param integer $op
      */
     private function opExists($op)
     {
@@ -331,8 +331,8 @@ class Opcodes
     }
 
     /**
-     * @param $op
-     * @param $opCodeStr
+     * @param integer $op
+     * @param string $opCodeStr
      * @return int
      */
     public function cmp($op, $opCodeStr)

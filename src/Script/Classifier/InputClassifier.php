@@ -96,7 +96,7 @@ class InputClassifier implements ScriptClassifierInterface
         $mOp = $parsed[0];
         /** @var string $nOp */
         $nOp = $parsed[$count - 2];
-        if ($mOp instanceof Buffer || $nOp instanceof Buffer){
+        if ($mOp instanceof Buffer || $nOp instanceof Buffer) {
             return false;
         }
         $mOp = $opCodes->getOpByName($mOp);
