@@ -36,7 +36,7 @@ class RedeemScript extends Script
 
         $ops = $this->getOpCodes();
         $opM = $ops->getOp(Opcodes::OP_1 - 1 + $m);
-        $opN = $ops->getOp($ops->getOpByName('OP_1') - 1 + $n);
+        $opN = $ops->getOp(Opcodes::OP_1 - 1 + $n);
 
         $script = ScriptFactory::create();
         $script->op($opM);
