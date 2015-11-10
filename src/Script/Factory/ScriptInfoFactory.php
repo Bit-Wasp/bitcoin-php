@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Factory;
 
-
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\ScriptHash;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;

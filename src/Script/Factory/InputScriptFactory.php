@@ -55,13 +55,29 @@ class InputScriptFactory
      */
     public function multisigP2sh(ScriptInterface $redeemScript, $signatures)
     {
-        $script = ScriptFactory::create()->op('OP_0');
-        foreach ($signatures as $signature) {
-            $script->push($signature->getBuffer());
+        foreach ($signatures as $sig) {
+            if (!$sig instanceof TransactionSignatureInterface) {
+                throw new \InvalidArgumentException('Must pass TransactionSignatureInterface[]');
+            }
         }
-        $script->push($redeemScript->getBuffer());
 
-        return $script->getScript();
+        return ScriptFactory::create()
+            ->op('OP_0')
+            ->pushSerializableArray($signatures)
+            ->push($redeemScript->getBuffer())
+            ->getScript();
+    }
+
+    /**
+     * @param ScriptInterface $inputScript
+     * @param ScriptInterface $redeemScript
+     * @return ScriptInterface
+     */
+    public function payToScriptHash(ScriptInterface $inputScript, ScriptInterface $redeemScript)
+    {
+        return ScriptFactory::create($inputScript->getBuffer())
+            ->push($redeemScript->getBuffer())
+            ->getScript();
     }
 
     /**
