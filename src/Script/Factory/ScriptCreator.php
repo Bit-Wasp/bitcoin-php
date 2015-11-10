@@ -1,8 +1,11 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Factory;
 
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;

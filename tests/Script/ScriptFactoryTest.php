@@ -11,13 +11,13 @@ class ScriptFactoryTest extends AbstractTestCase
     public function testScriptPubKey()
     {
         $outputScripts = ScriptFactory::scriptPubKey();
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Factory\OutputScriptFactory', $outputScripts);
+        $this->assertInstanceOf($this->outScriptFactoryType, $outputScripts);
     }
 
     public function testScriptSig()
     {
         $inputScripts = ScriptFactory::scriptSig();
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Factory\InputScriptFactory', $inputScripts);
+        $this->assertInstanceOf($this->inScriptFactoryType, $inputScripts);
     }
 
     public function testMultisig()
@@ -37,14 +37,14 @@ class ScriptFactoryTest extends AbstractTestCase
         }
 
         $sorted = ScriptFactory::multisig($m, $arbitrary, true);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\ScriptInterface', $sorted);
+        $this->assertInstanceOf($this->scriptInterfaceType, $sorted);
         $this->assertNotEquals($sorted->getBinary(), $redeemScript->getBinary());
     }
 
     public function testCreate()
     {
         $script = ScriptFactory::create(null);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\ScriptCreator', $script);
+        $this->assertInstanceOf($this->scriptCreatorType, $script);
         $this->assertEmpty($script->getScript()->getBinary());
     }
 }
