@@ -24,7 +24,7 @@ class InputScriptFactory
     /**
      * @param \BitWasp\Bitcoin\Signature\TransactionSignatureInterface $signature
      * @param PublicKeyInterface $publicKey
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKeyHash(TransactionSignatureInterface $signature, PublicKeyInterface $publicKey)
     {
@@ -37,7 +37,7 @@ class InputScriptFactory
     /**
      * @param RedeemScript $redeemScript
      * @param TransactionSignatureInterface[] $signatures
-     * @return Script
+     * @return ScriptInterface
      */
     public function multisigP2sh(RedeemScript $redeemScript, $signatures)
     {
@@ -52,7 +52,7 @@ class InputScriptFactory
 
     /**
      * @param TransactionSignatureInterface $signature
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKey(TransactionSignatureInterface $signature)
     {

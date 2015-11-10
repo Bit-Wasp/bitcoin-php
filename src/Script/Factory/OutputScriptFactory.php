@@ -25,7 +25,7 @@ class OutputScriptFactory
 
     /**
      * @param AddressInterface $address
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToAddress(AddressInterface $address)
     {
@@ -48,7 +48,7 @@ class OutputScriptFactory
      * Create a Pay to pubkey output
      *
      * @param PublicKeyInterface  $public_key
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKey(PublicKeyInterface $public_key)
     {
@@ -62,7 +62,7 @@ class OutputScriptFactory
      * Create a P2PKH output script
      *
      * @param PublicKeyInterface $public_key
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKeyHash(PublicKeyInterface $public_key)
     {
@@ -79,7 +79,7 @@ class OutputScriptFactory
      * Create a P2SH output script
      *
      * @param ScriptInterface $script
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToScriptHash(ScriptInterface $script)
     {
@@ -96,7 +96,7 @@ class OutputScriptFactory
      * @param PublicKeyInterface $a2
      * @param PublicKeyInterface $b1
      * @param PublicKeyInterface $b2
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToLightningChannel(
         Buffer $secret,
