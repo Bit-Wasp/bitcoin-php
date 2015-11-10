@@ -28,7 +28,7 @@ class ScriptFactory
      * @param int               $m
      * @param KeyInterface[]    $keys
      * @param bool              $sort
-     * @return RedeemScript
+     * @return ScriptInterface
      */
     public static function multisig($m, array $keys = array(), $sort = true)
     {
@@ -43,7 +43,7 @@ class ScriptFactory
      * @param int               $m
      * @param KeyInterface[]    $keys
      * @param bool              $sort
-     * @return RedeemScript
+     * @return ScriptInterface
      */
     public static function multisigNew($m, array $keys = array(), $sort = true)
     {
