@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
@@ -96,6 +97,14 @@ class MultisigHD
                 $this->keys
             )
         );
+    }
+
+    /**
+     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
+     */
+    public function getAddress()
+    {
+        return AddressFactory::fromScript($this->getRedeemScript());
     }
 
     /**
