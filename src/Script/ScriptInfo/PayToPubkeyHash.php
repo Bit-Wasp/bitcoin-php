@@ -28,7 +28,7 @@ class PayToPubkeyHash implements ScriptInfoInterface
     {
         $this->script = $script;
         $chunks = $this->script->getScriptParser()->parse();
-        if (!$chunks[2] instanceof Buffer) {
+        if (count($chunks) < 5 || !$chunks[2] instanceof Buffer) {
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
         }
 
