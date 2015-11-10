@@ -1,8 +1,12 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Factory;
 
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
@@ -91,6 +95,29 @@ class ScriptCreator
     }
 
     /**
+     * @param Serializable $object
+     * @return $this
+     */
+    public function pushSerializable(Serializable $object)
+    {
+        $this->push($object->getBuffer());
+        return $this;
+    }
+
+    /**
+     * @param Serializable[] $serializable
+     * @return $this
+     */
+    public function pushSerializableArray(array $serializable)
+    {
+        foreach ($serializable as $object) {
+            $this->pushSerializable($object);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param ScriptInterface $script
      * @return $this
      */
@@ -101,7 +128,7 @@ class ScriptCreator
     }
 
     /**
-     * @return Script
+     * @return ScriptInterface
      */
     public function getScript()
     {

@@ -24,12 +24,12 @@ class AddressFactory
     }
 
     /**
-     * @param ScriptInterface $script
+     * @param ScriptInterface $p2shScript
      * @return ScriptHashAddress
      */
-    public static function fromScript(ScriptInterface $script)
+    public static function fromScript(ScriptInterface $p2shScript)
     {
-        return new ScriptHashAddress($script->getScriptHash());
+        return new ScriptHashAddress($p2shScript->getScriptHash());
     }
 
     /**

@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Factory;
 
-use BitWasp\Bitcoin\Script\RedeemScript;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
@@ -24,7 +22,7 @@ class InputScriptFactory
     /**
      * @param \BitWasp\Bitcoin\Signature\TransactionSignatureInterface $signature
      * @param PublicKeyInterface $publicKey
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKeyHash(TransactionSignatureInterface $signature, PublicKeyInterface $publicKey)
     {
@@ -35,24 +33,54 @@ class InputScriptFactory
     }
 
     /**
-     * @param RedeemScript $redeemScript
      * @param TransactionSignatureInterface[] $signatures
-     * @return Script
+     * @return ScriptInterface
      */
-    public function multisigP2sh(RedeemScript $redeemScript, $signatures)
+    public function multisig(array $signatures)
     {
         $script = ScriptFactory::create()->op('OP_0');
         foreach ($signatures as $signature) {
             $script->push($signature->getBuffer());
         }
-        $script->push($redeemScript->getBuffer());
 
         return $script->getScript();
     }
 
     /**
+     * @param ScriptInterface $redeemScript
+     * @param TransactionSignatureInterface[] $signatures
+     * @return ScriptInterface
+     */
+    public function multisigP2sh(ScriptInterface $redeemScript, $signatures)
+    {
+        foreach ($signatures as $sig) {
+            if (!$sig instanceof TransactionSignatureInterface) {
+                throw new \InvalidArgumentException('Must pass TransactionSignatureInterface[]');
+            }
+        }
+
+        return ScriptFactory::create()
+            ->op('OP_0')
+            ->pushSerializableArray($signatures)
+            ->push($redeemScript->getBuffer())
+            ->getScript();
+    }
+
+    /**
+     * @param ScriptInterface $inputScript
+     * @param ScriptInterface $redeemScript
+     * @return ScriptInterface
+     */
+    public function payToScriptHash(ScriptInterface $inputScript, ScriptInterface $redeemScript)
+    {
+        return ScriptFactory::create($inputScript->getBuffer())
+            ->push($redeemScript->getBuffer())
+            ->getScript();
+    }
+
+    /**
      * @param TransactionSignatureInterface $signature
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKey(TransactionSignatureInterface $signature)
     {

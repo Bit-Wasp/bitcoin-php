@@ -97,7 +97,8 @@ class MultisigHDTest extends AbstractTestCase
         $this->assertEquals('02d5514b338973151bdedf58a08cb0c912807ac9c7e026e6dc0f11abf8073be99e', $childKeys[0]->getPublicKey()->getHex());
         $this->assertEquals('0318c49f3d850f37d93314cb9b08ed3e864af991dc109da5b3e23a0ef4c518e5d2', $childKeys[1]->getPublicKey()->getHex());
         $this->assertEquals('522102d5514b338973151bdedf58a08cb0c912807ac9c7e026e6dc0f11abf8073be99e210318c49f3d850f37d93314cb9b08ed3e864af991dc109da5b3e23a0ef4c518e5d252ae', $child->getRedeemScript()->getHex());
-        $this->assertEquals('3GX7j2puUbkyMiWu3YYYEczJQ1ZPS9vdam', $child->getRedeemScript()->getAddress()->getAddress());
+        $address = $child->getAddress();
+        $this->assertEquals('3GX7j2puUbkyMiWu3YYYEczJQ1ZPS9vdam', $address->getAddress());
 
     }
 
@@ -121,6 +122,7 @@ class MultisigHDTest extends AbstractTestCase
         // The public keys were SORTED. Therefore, the 0th may not have anything to do with the initial 0th key.
         $this->assertEquals('02a52960d39bede34b4c3583043d82fb2e781e83d8b7670ecee50973b95eab1199', $childKeys[0]->getPublicKey()->getHex());
         $this->assertEquals('03e53cb62d2d720b8827e214d5f306022696f0efe6efaad99dac79107e2b2f624b', $childKeys[1]->getPublicKey()->getHex());
-        $this->assertEquals('3MJdxK3kTy1THdE1mU66jR6ypUJqYkRqit', $child->getRedeemScript()->getAddress()->getAddress());
+        $address = $child->getAddress();
+        $this->assertEquals('3MJdxK3kTy1THdE1mU66jR6ypUJqYkRqit', $address->getAddress());
     }
 }

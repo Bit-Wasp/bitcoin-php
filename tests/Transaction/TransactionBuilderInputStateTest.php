@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -15,23 +14,15 @@ use BitWasp\Buffertools\Buffer;
 
 class TransactionBuilderInputStateTest extends AbstractTestCase
 {
-    public function getScripts()
+
+    private function getRandomOutputScript()
     {
-        $privateKey = PrivateKeyFactory::create();
-        $pkh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
-
-        $rs = $this->getRedeemScript();
-
-        return [
-            [$pkh, OutputClassifier::PAYTOPUBKEYHASH, 1, null],
-            [$rs->getOutputScript(), OutputClassifier::PAYTOSCRIPTHASH, 2, $rs],
-            [ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey()), OutputClassifier::PAYTOPUBKEY, 1, null]
-        ];
+        return ScriptFactory::scriptPubKey()->payToAddress(PrivateKeyFactory::create()->getAddress());
     }
 
-    private function getRedeemScript()
+    private function getRandomRedeemScript()
     {
-        $script = ScriptFactory::multisig(2, [
+        $script = ScriptFactory::multisigNew(2, [
             PrivateKeyFactory::create()->getPublicKey(),
             PrivateKeyFactory::create()->getPublicKey(),
             PrivateKeyFactory::create()->getPublicKey()
@@ -40,15 +31,27 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
         return $script;
     }
 
-    private function getOutputScript()
+    public function getScripts()
     {
-        $script = ScriptFactory::scriptPubKey()
-            ->payToAddress(PrivateKeyFactory::create()->getAddress());
+        $privateKey = PrivateKeyFactory::create();
+        $pkh = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
 
-        return $script;
+        $rs = $this->getRandomRedeemScript();
+        $os = ScriptFactory::scriptPubKey()->payToScriptHash($rs);
+
+        return [
+            [$pkh, OutputClassifier::PAYTOPUBKEYHASH, 1, null],
+            [$os, OutputClassifier::PAYTOSCRIPTHASH, 2, $rs],
+            [ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey()), OutputClassifier::PAYTOPUBKEY, 1, null]
+        ];
     }
 
-    private function createState(ScriptInterface $script, RedeemScript $rs = null)
+    /**
+     * @param ScriptInterface $script
+     * @param ScriptInterface|null $rs
+     * @return TxSignerContext
+     */
+    private function createState(ScriptInterface $script, ScriptInterface $rs = null)
     {
         $math = $this->safeMath();
         $G = $this->safeGenerator();
@@ -60,10 +63,10 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      * @param ScriptInterface $script
      * @param $outputType
      * @param $nReqSig
-     * @param RedeemScript|null $rs
+     * @param ScriptInterface|null $rs
      * @dataProvider getScripts
      */
-    public function testCreateFromScripts(ScriptInterface $script, $outputType, $nReqSig, RedeemScript $rs = null)
+    public function testCreateFromScripts(ScriptInterface $script, $outputType, $nReqSig, ScriptInterface $rs = null)
     {
         $state = $this->createState($script, $rs);
         $this->assertEquals($outputType, $state->getPrevOutType());
@@ -73,11 +76,10 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
 
     public function testCreateState()
     {
-        $rs = $this->getRedeemScript();
-        $outputScript = $rs->getOutputScript();
+        $rs = $this->getRandomRedeemScript();
+        $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($rs);
 
         $state = $this->createState($outputScript, $rs);
-        $this->assertSame($outputScript, $state->getPrevOutScript());
         $this->assertSame($rs, $state->getRedeemScript());
         $this->assertEquals(OutputClassifier::PAYTOSCRIPTHASH, $state->getPrevOutType());
         $this->assertEquals(OutputClassifier::MULTISIG, $state->getScriptType());
@@ -89,14 +91,14 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      */
     public function testFailsWithoutRedeemScript()
     {
-        $outputScript = $this->getOutputScript();
+        $outputScript = $this->getRandomOutputScript();
         $state = $this->createState($outputScript);
         $state->getRedeemScript();
     }
 
     public function testGetEmptyValues()
     {
-        $outputScript = $this->getOutputScript();
+        $outputScript = $this->getRandomOutputScript();
         $state = $this->createState($outputScript);
         $this->assertEquals(0, $state->getSigCount());
 
@@ -114,8 +116,8 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
      */
     public function testRedeemScriptPassedWhenRequired()
     {
-        $rs = $this->getRedeemScript();
-        $script = $rs->getOutputScript();
+        $rs = $this->getRandomRedeemScript();
+        $script = ScriptFactory::scriptPubKey()->payToScriptHash($rs);
 
         $this->createState($script);
     }

@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Buffertools\Buffer;
 
 interface TransactionInterface extends SerializableInterface
@@ -87,7 +87,7 @@ interface TransactionInterface extends SerializableInterface
     public function getValueOut();
 
     /**
-     * @return Hasher
+     * @return SignatureHashInterface
      */
     public function getSignatureHash();
 }

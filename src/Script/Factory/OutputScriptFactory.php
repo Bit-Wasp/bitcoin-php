@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -25,7 +26,7 @@ class OutputScriptFactory
 
     /**
      * @param AddressInterface $address
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToAddress(AddressInterface $address)
     {
@@ -48,7 +49,7 @@ class OutputScriptFactory
      * Create a Pay to pubkey output
      *
      * @param PublicKeyInterface  $public_key
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKey(PublicKeyInterface $public_key)
     {
@@ -62,7 +63,7 @@ class OutputScriptFactory
      * Create a P2PKH output script
      *
      * @param PublicKeyInterface $public_key
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToPubKeyHash(PublicKeyInterface $public_key)
     {
@@ -79,7 +80,7 @@ class OutputScriptFactory
      * Create a P2SH output script
      *
      * @param ScriptInterface $script
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToScriptHash(ScriptInterface $script)
     {
@@ -90,13 +91,40 @@ class OutputScriptFactory
             ->getScript();
     }
 
+    public function multisig($m, array $keys = [])
+    {
+        $n = count($keys);
+        if ($m > $n) {
+            throw new \LogicException('Required number of sigs exceeds number of public keys');
+        }
+        if ($n > 16) {
+            throw new \LogicException('Number of public keys is greater than 16');
+        }
+
+        $opM = Opcodes::OP_1 - 1 + $m;
+        $opN = Opcodes::OP_1 - 1 + $n;
+
+        $script = ScriptFactory::create();
+        foreach ($keys as $key) {
+            if (!$key instanceof PublicKeyInterface) {
+                throw new \LogicException('Values in $keys[] must be a PublicKey');
+            }
+
+            $script->push($key->getBuffer());
+        }
+        $keyBuf = $script->getScript()->getBuffer();
+
+        $script = new Script(new Buffer(chr($opM) . $keyBuf->getBinary() . chr($opN) . chr(Opcodes::OP_CHECKMULTISIG)));
+        return $script;
+    }
+
     /**
      * @param Buffer $secret
      * @param PublicKeyInterface $a1
      * @param PublicKeyInterface $a2
      * @param PublicKeyInterface $b1
      * @param PublicKeyInterface $b2
-     * @return Script
+     * @return ScriptInterface
      */
     public function payToLightningChannel(
         Buffer $secret,

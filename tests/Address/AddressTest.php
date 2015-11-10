@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Script\RedeemScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -57,10 +56,10 @@ class AddressTest extends AbstractTestCase
      */
     public function testAddress($type, NetworkInterface $network, $data, $address)
     {
-        if ($type == 'pubkeyhash') {
+        if ($type === 'pubkeyhash') {
             $obj = PublicKeyFactory::fromHex($data)->getAddress();
-        } else if ($type == 'script') {
-            $obj = RedeemScript::fromScript(new Script(Buffer::hex($data)))->getAddress();
+        } else if ($type === 'script') {
+            $obj = AddressFactory::fromScript(new Script(Buffer::hex($data)));
         } else {
             throw new \Exception('Unknown address type');
         }

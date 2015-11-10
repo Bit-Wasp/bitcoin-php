@@ -130,11 +130,10 @@ class TxSignerTest extends AbstractTestCase
     {
         $pk1 = PrivateKeyFactory::create(false, $ecAdapter);
         $pk2 = PrivateKeyFactory::create(false, $ecAdapter);
-        $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
-
-
+        $redeemScript = ScriptFactory::multisigNew(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
+        $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
         $sampleSpendTx = (new TxBuilder())
-            ->output(50, $redeemScript->getOutputScript())
+            ->output(50, $outputScript)
             ->get()
         ;
 
@@ -142,19 +141,19 @@ class TxSignerTest extends AbstractTestCase
             ->spendOutputFrom($sampleSpendTx, 0)
             ->get();
 
-        $builder = new TxSigner($ecAdapter, $forBuilder);
+        $signer = new TxSigner($ecAdapter, $forBuilder);
         $reachedException = false;
         try {
-            $builder->inputState(0);
+            $signer->inputState(0);
         } catch (BuilderNoInputState $e) {
             $reachedException = true;
         }
         $this->assertTrue($reachedException, 'threw exception when there was no input state');
 
-        $builder->sign(0, $pk1, $redeemScript->getOutputScript(), $redeemScript);
+        $signer->sign(0, $pk1, $outputScript, $redeemScript);
         $reachedException = false;
         try {
-            $builder->inputState(0);
+            $signer->inputState(0);
         } catch (BuilderNoInputState $e) {
             $reachedException = true;
         }
@@ -231,7 +230,7 @@ class TxSignerTest extends AbstractTestCase
         $pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb81e5aa0422402f048162', false, $ecAdapter);
 
         $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
-        $outputScript = $redeemScript->getOutputScript();
+        $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
 
         $sampleSpendTx = (new TxBuilder())
             ->input('4141414141414141414141414141414141414141414141414141414141414141', 0)
@@ -326,7 +325,7 @@ class TxSignerTest extends AbstractTestCase
         $pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb81e5aa0422402f048162');
 
         $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
-        $outputScript = $redeemScript->getOutputScript();
+        $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
 
         // this is the transaction we are pretending exists in the blockchain
         $spendTx = (new TxBuilder())
