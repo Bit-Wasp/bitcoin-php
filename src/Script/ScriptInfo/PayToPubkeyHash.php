@@ -71,6 +71,11 @@ class PayToPubkeyHash implements ScriptInfoInterface
         return [];
     }
 
+    /**
+     * @param array $signatures
+     * @param array $publicKeys
+     * @return Script|ScriptInterface
+     */
     public function makeScriptSig(array $signatures = [], array $publicKeys = [])
     {
         $newScript = new Script();
