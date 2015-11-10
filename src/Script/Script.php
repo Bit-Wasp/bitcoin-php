@@ -56,7 +56,7 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * Get all opcodes (OP_X => opcode)
+     * Get all opcodes
      *
      * @return Opcodes
      */
