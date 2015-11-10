@@ -83,7 +83,7 @@ class MultisigHD
     /**
      * Returns the redeemScript. Note - keys are already sorted in the constructor, so this is not required in ScriptFactory.
      *
-     * @return \BitWasp\Bitcoin\Script\RedeemScript
+     * @return \BitWasp\Bitcoin\Script\ScriptInterface
      */
     public function getRedeemScript()
     {
