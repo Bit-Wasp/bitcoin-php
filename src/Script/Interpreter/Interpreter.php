@@ -146,7 +146,6 @@ class Interpreter implements InterpreterInterface
             TransactionSignature::isDERSignature($signature);
             return true;
         } catch (SignatureNotCanonical $e) {
-
         }
 
         return false;
@@ -421,7 +420,6 @@ class Interpreter implements InterpreterInterface
                     $mainStack->push($pushData);
                     //echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
-
                     switch ($opCode) {
                         case Opcodes::OP_0:
                         case Opcodes::OP_1:
