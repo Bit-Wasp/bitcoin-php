@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Address\Address;
 
 interface ScriptInterface extends SerializableInterface
 {

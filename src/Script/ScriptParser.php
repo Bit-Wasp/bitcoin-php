@@ -97,7 +97,7 @@ class ScriptParser
     public function next(&$opCode, Buffer &$pushData)
     {
         $opcodes = $this->script->getOpcodes();
-        $opCode = $opcodes->getOpByName('OP_INVALIDOPCODE');
+        $opCode = Opcodes::OP_INVALIDOPCODE;
 
         if ($this->math->cmp($this->getPosition(), $this->getEndPos()) >= 0) {
             return false;
@@ -105,12 +105,12 @@ class ScriptParser
 
         $opCode = $this->getNextOp();
 
-        if ($opcodes->cmp($opCode, 'OP_PUSHDATA4') <= 0) {
-            if ($opcodes->cmp($opCode, 'OP_PUSHDATA1') < 0) {
+        if ($opCode <= Opcodes::OP_PUSHDATA4) {
+            if ($opCode < Opcodes::OP_PUSHDATA1) {
                 $size = $opCode;
-            } else if ($opcodes->isOp($opCode, 'OP_PUSHDATA1')) {
+            } else if ($opCode === Opcodes::OP_PUSHDATA1) {
                 $size = $this->unpackSize('C', 1);
-            } else if ($opcodes->isOp($opCode, 'OP_PUSHDATA2')) {
+            } else if ($opCode === Opcodes::OP_PUSHDATA2) {
                 $size = $this->unpackSize('v', 2);
             } else {
                 $size = $this->unpackSize('V', 4);

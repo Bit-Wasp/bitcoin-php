@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Classifier;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 
@@ -114,9 +115,9 @@ class OutputClassifier implements ScriptClassifierInterface
 
         return $count >= 2
             && is_string($mOp) && is_string($nOp) && is_string($lastOp)
-            && $opCodes->cmp($opCodes->getOpByName($mOp), 'OP_0') >= 0
-            && $opCodes->cmp($opCodes->getOpByName($nOp), 'OP_16') <= 0
-            && $this->evalScript[$count - 1] == 'OP_CHECKMULTISIG'
+            && $opCodes->getOpByName($mOp) >= Opcodes::OP_0
+            && $opCodes->getOpByName($nOp) <= Opcodes::OP_16
+            && $this->evalScript[$count - 1] === $opCodes->getOp(Opcodes::OP_CHECKMULTISIG)
             && $keysValid();
     }
 
