@@ -74,7 +74,7 @@ class MerkleRoot
         }
 
         if ($txCount === 1) {
-            $buffer = $hashFxn($this->transactions->get(0)->getBinary());
+            $buffer = $hashFxn($this->transactions[0]->getBinary());
 
         } else {
             // Create a fixed size Merkle Tree

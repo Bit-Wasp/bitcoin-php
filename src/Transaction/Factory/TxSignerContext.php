@@ -174,9 +174,8 @@ class TxSignerContext
      */
     public function extractSigs(TransactionInterface $tx, $inputToExtract)
     {
-        $parsed = $tx
-            ->getInputs()
-            ->get($inputToExtract)
+        $inputs = $tx->getInputs();
+        $parsed = $inputs[$inputToExtract]
             ->getScript()
             ->getScriptParser()
             ->parse();

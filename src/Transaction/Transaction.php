@@ -142,7 +142,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getInput($index)
     {
-        return $this->inputs->get($index);
+        return $this->inputs[$index];
     }
 
     /**
@@ -161,7 +161,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getOutput($index)
     {
-        return $this->outputs->get($index);
+        return $this->outputs[$index];
     }
 
     /**

@@ -10,11 +10,6 @@ abstract class MutableCollection implements CollectionInterface
     protected $set;
 
     /**
-     * @param array $values
-     */
-    abstract public function __construct(array $values);
-
-    /**
      * @return array
      */
     public function all()
@@ -110,14 +105,5 @@ abstract class MutableCollection implements CollectionInterface
     public function offsetSet($offset, $value)
     {
         $this->set->offsetSet($offset, $value);
-    }
-
-    /**
-     * @param int $index
-     * @return mixed
-     */
-    public function get($index)
-    {
-        return $this->offsetGet($index);
     }
 }

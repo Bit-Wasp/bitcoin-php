@@ -31,7 +31,7 @@ $spendTx = (new TxBuilder())
 
 echo "Sign transaction\n";
 $signer = new TxSigner($ecAdapter, $spendTx);
-$signer->sign(0, $privateKey, $myTx->getOutputs()->get($spendOutput)->getScript());
+$signer->sign(0, $privateKey, $myTx->getOutput($spendOutput)->getScript());
 
 echo "Generate transaction: \n";
 $new = $signer->get();

@@ -29,9 +29,10 @@ class NativeConsensus
      */
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign)
     {
+        $inputs = $tx->getInputs();
         return $this->factory->create($tx)
             ->verify(
-                $tx->getInputs()->get($nInputToSign)->getScript(),
+                $inputs[$nInputToSign]->getScript(),
                 $scriptPubKey,
                 $nInputToSign
             );

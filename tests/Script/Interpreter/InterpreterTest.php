@@ -281,7 +281,7 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
         $signer->sign(0, $privateKey, $outputScript, $rs);
 
         $spendTx = $signer->get();
-        $scriptSig = $spendTx->getInputs()->get(0)->getScript();
+        $scriptSig = $spendTx->getInput(0)->getScript();
 
         $i = new Interpreter($ec, $spendTx, $flags);
         $this->assertEquals($eVerifyResult, $i->verify($scriptSig, $outputScript, 0));

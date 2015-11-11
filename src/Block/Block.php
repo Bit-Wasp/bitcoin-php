@@ -78,12 +78,11 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * @param int $i
-     * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransaction()
      * @return \BitWasp\Bitcoin\Transaction\TransactionInterface
      */
     public function getTransaction($i)
     {
-        return $this->transactions->get($i);
+        return $this->transactions[$i];
     }
 
     /**

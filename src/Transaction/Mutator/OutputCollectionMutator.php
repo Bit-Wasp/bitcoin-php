@@ -44,39 +44,6 @@ class OutputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @param int $index
-     * @return OutputMutator
-     */
-    public function get($index)
-    {
-        return $this->offsetGet($index);
-    }
-
-    /**
-     * @param int $i
-     * @return OutputMutator
-     */
-    public function outputMutator($i)
-    {
-        if (!$this->set->offsetExists($i)) {
-            throw new \OutOfRangeException('Input does not exist');
-        }
-
-        /** @var OutputMutator $mutator */
-        $mutator = $this->set[$i];
-        return $mutator;
-    }
-
-    /**
-     * @param int $i
-     * @return \BitWasp\Bitcoin\Transaction\TransactionOutputInterface
-     */
-    public function getInput($i)
-    {
-        return $this->outputMutator($i)->done();
-    }
-
-    /**
      * @return TransactionOutputCollection
      */
     public function done()
@@ -135,29 +102,6 @@ class OutputCollectionMutator extends MutableCollection
     public function set($i, TransactionOutputInterface $output)
     {
         $this->set[$i] = new OutputMutator($output);
-        return $this;
-    }
-
-    /**
-     * @param int $i
-     * @param TransactionOutputInterface $output
-     * @return $this
-     */
-    public function update($i, TransactionOutputInterface $output)
-    {
-        $this->offsetGet($i);
-        $this->offsetSet($i, $output);
-        return $this;
-    }
-
-    /**
-     * @param int $i
-     * @param \Closure $closure
-     * @return $this
-     */
-    public function applyTo($i, \Closure $closure)
-    {
-        $closure($this->offsetGet($i));
         return $this;
     }
 }

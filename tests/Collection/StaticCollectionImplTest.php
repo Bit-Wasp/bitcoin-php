@@ -128,6 +128,15 @@ class StaticCollectionImplTest extends AbstractTestCase
     {
         $all = ['1','2'];
         $set = new Set($all);
-        $this->assertEquals('1', $set->get(0));
+        $this->assertEquals('1', $set[0]);
+    }
+
+    /**
+     * @expectedException \OutOfRangeException
+     */
+    public function testGetInvalid()
+    {
+        $set = new Set([]);
+        $set[0];
     }
 }

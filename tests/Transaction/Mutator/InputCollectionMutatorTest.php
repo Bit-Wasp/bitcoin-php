@@ -26,23 +26,17 @@ class InputCollectionMutatorTest extends AbstractTestCase
         ]);
 
         $mutator = new InputCollectionMutator($collection->all());
-        $mutator->applyTo(0, function (InputMutator $i) use ($vout1, $script1) {
-            $i  ->script($script1)
-                ->vout($vout1);
-        });
+        $mutator[0]->script($script1)->vout($vout1);
 
-        $mutator->applyTo(1, function (InputMutator $i) use ($vout2, $script2) {
-            $i  ->script($script2)
-                ->vout($vout2);
-        });
+        $mutator[1]->script($script2)->vout($vout2);
 
         $new = $mutator->done();
-        $this->assertEquals('a', $new->get(0)->getTransactionId());
-        $this->assertEquals($vout1, $new->get(0)->getVout());
-        $this->assertEquals($script1, $new->get(0)->getScript());
-        $this->assertEquals('b', $new->get(1)->getTransactionId());
-        $this->assertEquals($vout2, $new->get(1)->getVout());
-        $this->assertEquals($script2, $new->get(1)->getScript());
+        $this->assertEquals('a', $new[0]->getTransactionId());
+        $this->assertEquals($vout1, $new[0]->getVout());
+        $this->assertEquals($script1, $new[0]->getScript());
+        $this->assertEquals('b', $new[1]->getTransactionId());
+        $this->assertEquals($vout2, $new[1]->getVout());
+        $this->assertEquals($script2, $new[1]->getScript());
     }
 
 
@@ -70,17 +64,5 @@ class InputCollectionMutatorTest extends AbstractTestCase
         $outputs = $mutator->done();
 
         $this->assertEquals(0, count($outputs));
-    }
-
-    /**
-     * @expectedException \OutOfRangeException
-     */
-    public function testRejectsInvalidIndex()
-    {
-        $collection = new TransactionInputCollection([
-        ]);
-
-        $mutator = new InputCollectionMutator($collection->all());
-        $mutator->update(1, new TransactionInput('a', 1, new Script()));
     }
 }

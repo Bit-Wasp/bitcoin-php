@@ -45,24 +45,6 @@ class InputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @param int $index
-     * @return InputMutator
-     */
-    public function get($index)
-    {
-        return $this->offsetGet($index);
-    }
-
-    /**
-     * @param int $i
-     * @return \BitWasp\Bitcoin\Transaction\TransactionInputInterface
-     */
-    public function getInput($i)
-    {
-        return $this->offsetGet($i)->done();
-    }
-
-    /**
      * @return TransactionInputCollection
      */
     public function done()
@@ -121,29 +103,6 @@ class InputCollectionMutator extends MutableCollection
     public function set($i, TransactionInputInterface $input)
     {
         $this->set[$i] = new InputMutator($input);
-        return $this;
-    }
-
-    /**
-     * @param int $i
-     * @param TransactionInputInterface $input
-     * @return $this
-     */
-    public function update($i, TransactionInputInterface $input)
-    {
-        $this->offsetGet($i);
-        $this->offsetSet($i, $input);
-        return $this;
-    }
-
-    /**
-     * @param int $i
-     * @param \Closure $closure
-     * @return $this
-     */
-    public function applyTo($i, \Closure $closure)
-    {
-        $closure($this->offsetGet($i));
         return $this;
     }
 }

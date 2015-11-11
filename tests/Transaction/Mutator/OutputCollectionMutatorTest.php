@@ -24,21 +24,16 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         ]);
 
         $mutator = new OutputCollectionMutator($collection->all());
-        $mutator->applyTo(0, function (OutputMutator $o) use ($value1, $script1) {
-            $o  ->script($script1)
+        $mutator[0]->script($script1)
                 ->value($value1);
-        });
 
-        $mutator->applyTo(1, function (OutputMutator $o) use ($value2, $script2) {
-            $o  ->script($script2)
-                ->value($value2);
-        });
+        $mutator[1]->script($script2)->value($value2);
 
         $new = $mutator->done();
-        $this->assertEquals($value1, $new->get(0)->getValue());
-        $this->assertEquals($script1, $new->get(0)->getScript());
-        $this->assertEquals($value2, $new->get(1)->getValue());
-        $this->assertEquals($script2, $new->get(1)->getScript());
+        $this->assertEquals($value1, $new[0]->getValue());
+        $this->assertEquals($script1, $new[0]->getScript());
+        $this->assertEquals($value2, $new[1]->getValue());
+        $this->assertEquals($script2, $new[1]->getScript());
     }
 
     public function testAdds()
@@ -95,15 +90,25 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $this->assertEquals(0, count($outputs));
     }
 
-    /**
-     * @expectedException \OutOfRangeException
-     */
-    public function testRejectsInvalidIndex()
+    public function testSet()
     {
         $collection = new TransactionOutputCollection([
+            new TransactionOutput(5, new Script()),
+            new TransactionOutput(10, new Script()),
         ]);
 
         $mutator = new OutputCollectionMutator($collection->all());
-        $mutator->update(1, new TransactionOutput(1, new Script()));
+        $mutator->set(0, new TransactionOutput(1, new Script()));
+        $newCollection = $mutator->done();
+        $this->assertEquals(1, $newCollection[0]->getValue());
+    }
+
+    /**
+     * @expectedException \OutOfRangeException
+     */
+    public function testInvalidIndex()
+    {
+        $mutator = new OutputCollectionMutator([]);
+        $mutator->offsetGet(10);
     }
 }
