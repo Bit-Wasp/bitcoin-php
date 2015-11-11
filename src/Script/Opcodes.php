@@ -335,7 +335,7 @@ class Opcodes implements \ArrayAccess
      */
     public function offsetExists($opcode)
     {
-        return isset(self::$names[$opcode]);
+        return array_key_exists($opcode, self::$names);
     }
 
     private function errorNoWrite()
