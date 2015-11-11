@@ -88,7 +88,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     {
         return $this->prevBlock;
     }
-    
+
     /**
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getMerkleRoot()
