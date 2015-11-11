@@ -359,5 +359,4 @@ class Opcodes implements \ArrayAccess
     {
         $this->errorNoWrite();
     }
-
 }
