@@ -10,11 +10,6 @@ abstract class StaticCollection implements CollectionInterface
     protected $set;
 
     /**
-     * @param array $values
-     */
-    abstract public function __construct(array $values);
-
-    /**
      * @return array
      */
     public function all()
@@ -106,14 +101,5 @@ abstract class StaticCollection implements CollectionInterface
     public function offsetSet($offset, $value)
     {
         throw new \RuntimeException('Cannot add to a Static Collection');
-    }
-
-    /**
-     * @param int $index
-     * @return mixed
-     */
-    public function get($index)
-    {
-        return $this->offsetGet($index);
     }
 }

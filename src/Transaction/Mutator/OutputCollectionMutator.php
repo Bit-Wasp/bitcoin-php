@@ -44,15 +44,6 @@ class OutputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @param int $index
-     * @return OutputMutator
-     */
-    public function get($index)
-    {
-        return $this->offsetGet($index);
-    }
-
-    /**
      * @param int $i
      * @return OutputMutator
      */
@@ -65,15 +56,6 @@ class OutputCollectionMutator extends MutableCollection
         /** @var OutputMutator $mutator */
         $mutator = $this->set[$i];
         return $mutator;
-    }
-
-    /**
-     * @param int $i
-     * @return \BitWasp\Bitcoin\Transaction\TransactionOutputInterface
-     */
-    public function getInput($i)
-    {
-        return $this->outputMutator($i)->done();
     }
 
     /**

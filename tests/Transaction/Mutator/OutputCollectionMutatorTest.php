@@ -35,10 +35,10 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         });
 
         $new = $mutator->done();
-        $this->assertEquals($value1, $new->get(0)->getValue());
-        $this->assertEquals($script1, $new->get(0)->getScript());
-        $this->assertEquals($value2, $new->get(1)->getValue());
-        $this->assertEquals($script2, $new->get(1)->getScript());
+        $this->assertEquals($value1, $new[0]->getValue());
+        $this->assertEquals($script1, $new[0]->getScript());
+        $this->assertEquals($value2, $new[1]->getValue());
+        $this->assertEquals($script2, $new[1]->getScript());
     }
 
     public function testAdds()
@@ -105,5 +105,18 @@ class OutputCollectionMutatorTest extends AbstractTestCase
 
         $mutator = new OutputCollectionMutator($collection->all());
         $mutator->update(1, new TransactionOutput(1, new Script()));
+    }
+
+    public function testUpdate()
+    {
+        $collection = new TransactionOutputCollection([
+            new TransactionOutput(5, new Script()),
+            new TransactionOutput(10, new Script()),
+        ]);
+
+        $mutator = new OutputCollectionMutator($collection->all());
+        $mutator->set(0, new TransactionOutput(1, new Script()));
+        $newCollection = $mutator->done();
+        //$this->assertEquals(1, $newCollection[0]->getValue());
     }
 }

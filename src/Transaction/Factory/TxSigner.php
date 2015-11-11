@@ -109,7 +109,7 @@ class TxSigner
      */
     public function inputState($input)
     {
-        $this->transaction->getInputs()->get($input);
+        $this->transaction->getInput($input);
         if (!array_key_exists($input, $this->inputStates)) {
             throw new BuilderNoInputState('State not found for this input');
         }
@@ -185,12 +185,13 @@ class TxSigner
         $mutator = new TxMutator($this->transaction);
         $inputs = $mutator->inputsMutator();
 
+        $txInputs = $this->transaction->getInputs();
         for ($i = 0; $i < $inCount; $i++) {
             // Call regenerateScript if inputState is set, otherwise defer to previous script.
             try {
                 $script = $this->inputState($i)->regenerateScript();
             } catch (BuilderNoInputState $e) {
-                $script = $this->transaction->getInputs()->get($i)->getScript();
+                $script = $txInputs[$i]->getScript();
             }
 
             $inputs[$i]->script($script);

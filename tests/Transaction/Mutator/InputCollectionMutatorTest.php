@@ -37,12 +37,12 @@ class InputCollectionMutatorTest extends AbstractTestCase
         });
 
         $new = $mutator->done();
-        $this->assertEquals('a', $new->get(0)->getTransactionId());
-        $this->assertEquals($vout1, $new->get(0)->getVout());
-        $this->assertEquals($script1, $new->get(0)->getScript());
-        $this->assertEquals('b', $new->get(1)->getTransactionId());
-        $this->assertEquals($vout2, $new->get(1)->getVout());
-        $this->assertEquals($script2, $new->get(1)->getScript());
+        $this->assertEquals('a', $new[0]->getTransactionId());
+        $this->assertEquals($vout1, $new[0]->getVout());
+        $this->assertEquals($script1, $new[0]->getScript());
+        $this->assertEquals('b', $new[1]->getTransactionId());
+        $this->assertEquals($vout2, $new[1]->getVout());
+        $this->assertEquals($script2, $new[1]->getScript());
     }
 
 

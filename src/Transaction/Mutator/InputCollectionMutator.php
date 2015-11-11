@@ -45,24 +45,6 @@ class InputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @param int $index
-     * @return InputMutator
-     */
-    public function get($index)
-    {
-        return $this->offsetGet($index);
-    }
-
-    /**
-     * @param int $i
-     * @return \BitWasp\Bitcoin\Transaction\TransactionInputInterface
-     */
-    public function getInput($i)
-    {
-        return $this->offsetGet($i)->done();
-    }
-
-    /**
      * @return TransactionInputCollection
      */
     public function done()

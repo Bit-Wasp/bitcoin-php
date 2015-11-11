@@ -15,7 +15,7 @@ class TransactionInputCollectionTest extends AbstractTestCase
     public function testOutOfRange()
     {
         $collection = new TransactionInputCollection();
-        $collection->get(10);
+        $collection[10];
     }
 
     /**

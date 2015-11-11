@@ -55,11 +55,11 @@ class TxSignerTest extends AbstractTestCase
     {
         $firstBuilder = clone ($builder);
         $firstBuilder->sign(0, $privateKey, $outputScript);
-        $firstScript = $firstBuilder->get()->getInputs()->get(0)->getScript();
+        $firstScript = $firstBuilder->get()->getInput(0)->getScript();
 
         $anotherDetBuilder = clone ($builder);
         $anotherDetBuilder->sign(0, $privateKey, $outputScript);
-        $anotherDetScript = $anotherDetBuilder->get()->getInputs()->get(0)->getScript();
+        $anotherDetScript = $anotherDetBuilder->get()->getInput(0)->getScript();
 
         $this->assertTrue($expectedComparisonResult === ($firstScript->getBinary() === $anotherDetScript->getBinary()));
     }

@@ -15,14 +15,14 @@ class TransactionCollectionTest extends AbstractTestCase
     public function testOutOfRange()
     {
         $collection = new TransactionCollection();
-        $collection->get(10);
+        $collection[10];
     }
 
     public function testGetTransaction()
     {
         $t = new Transaction();
         $collection = new TransactionCollection([$t]);
-        $this->assertSame($t, $collection->get(0));
+        $this->assertSame($t, $collection[0]);
 
         $this->assertEquals([$t], $collection->all());
     }
@@ -41,6 +41,6 @@ class TransactionCollectionTest extends AbstractTestCase
         $c = new TransactionCollection([$t]);
 
         $n = clone $c;
-        $this->assertNotSame($c->get(0), $n->get(0));
+        $this->assertNotSame($c[0], $n[0]);
     }
 }

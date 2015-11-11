@@ -81,7 +81,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testGetInputException()
     {
         $tx = new Transaction();
-        $tx->getInputs()->get(0);
+        $tx->getInput(0);
     }
 
     /**
@@ -108,7 +108,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     public function testGetOutputException()
     {
         $tx = new Transaction();
-        $tx->getOutputs()->get(0);
+        $tx->getOutput(0);
     }
 
     public function testFromHex()
@@ -158,9 +158,9 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
 
         $tx = TransactionFactory::fromHex($raw);
 
-        $this->assertTrue($tx->getInputs()->get(0)->isCoinBase());
-        $this->assertEquals(0, $tx->getInputs()->get(0)->getSequence());
-        $this->assertEquals('03681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c', $tx->getInputs()->get(0)->getScript()->getHex());
+        $this->assertTrue($tx->getInput(0)->isCoinBase());
+        $this->assertEquals(0, $tx->getInput(0)->getSequence());
+        $this->assertEquals('03681e05062f503253482f048dcc9854087400023054c704000d4254434368696e6120506f6f6c', $tx->getInput(0)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTxId()->getHex());
@@ -175,7 +175,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $tx = TransactionFactory::fromHex($raw);
 
         $this->assertEquals(3, $tx->getOutputs()->count());
-        $this->assertEquals('6a0a6f6d000000468000002a', $tx->getOutputs()->get(1)->getScript()->getHex());
+        $this->assertEquals('6a0a6f6d000000468000002a', $tx->getOutput(1)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTxId()->getHex());
