@@ -44,21 +44,6 @@ class OutputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @param int $i
-     * @return OutputMutator
-     */
-    public function outputMutator($i)
-    {
-        if (!$this->set->offsetExists($i)) {
-            throw new \OutOfRangeException('Input does not exist');
-        }
-
-        /** @var OutputMutator $mutator */
-        $mutator = $this->set[$i];
-        return $mutator;
-    }
-
-    /**
      * @return TransactionOutputCollection
      */
     public function done()
