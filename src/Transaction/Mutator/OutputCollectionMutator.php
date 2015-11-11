@@ -104,27 +104,4 @@ class OutputCollectionMutator extends MutableCollection
         $this->set[$i] = new OutputMutator($output);
         return $this;
     }
-
-    /**
-     * @param int $i
-     * @param TransactionOutputInterface $output
-     * @return $this
-     */
-    public function update($i, TransactionOutputInterface $output)
-    {
-        $this->offsetGet($i);
-        $this->offsetSet($i, $output);
-        return $this;
-    }
-
-    /**
-     * @param int $i
-     * @param \Closure $closure
-     * @return $this
-     */
-    public function applyTo($i, \Closure $closure)
-    {
-        $closure($this->offsetGet($i));
-        return $this;
-    }
 }
