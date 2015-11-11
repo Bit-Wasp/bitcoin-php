@@ -40,11 +40,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $nonce;
 
     /**
-     * @var null|Buffer
-     */
-    private $cacheHash;
-
-    /**
      * @param int|string $version
      * @param string $prevBlock
      * @param string $merkleRoot
@@ -71,11 +66,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getHash()
     {
-        if (null === $this->cacheHash) {
-            $this->cacheHash = Hash::sha256d($this->getBuffer())->flip();
-        }
-
-        return $this->cacheHash;
+        return Hash::sha256d($this->getBuffer())->flip();
     }
 
     /**
@@ -97,6 +88,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     {
         return $this->prevBlock;
     }
+    
     /**
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getMerkleRoot()
