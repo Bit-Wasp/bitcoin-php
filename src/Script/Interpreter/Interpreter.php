@@ -416,7 +416,7 @@ class Interpreter implements InterpreterInterface
                 }
 
                 // OP_RESERVED should not count towards opCount
-                if ($this->script->getOpcodes()->cmp($opCode, 'OP_16') > 0 && ++$this->opCount) {
+                if ($opCode > Opcodes::OP_16 && ++$this->opCount) {
                     $this->checkOpcodeCount();
                 }
 
@@ -454,7 +454,7 @@ class Interpreter implements InterpreterInterface
                             $mainStack->push(new Buffer(chr($num), 1, $this->math));
                             break;
 
-                        case $opcodes->cmp($opCode, 'OP_NOP1') >= 0 && $opcodes->cmp($opCode, 'OP_NOP10') <= 0:
+                        case $opCode >= Opcodes::OP_NOP1 && $opCode <= Opcodes::OP_NOP10:
                             if ($flags->checkFlags(InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
                                 throw new ScriptRuntimeException(InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOPS found - this is discouraged');
                             }
@@ -713,7 +713,7 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         // Arithmetic operations
-                        case $opcodes->cmp($opCode, 'OP_1ADD') >= 0 && $opcodes->cmp($opCode, 'OP_0NOTEQUAL') <= 0:
+                        case $opCode >= Opcodes::OP_1ADD && $opCode <= Opcodes::OP_0NOTEQUAL:
                             $num = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
 
                             if ($opCode === Opcodes::OP_1ADD) { // cscriptnum
@@ -741,7 +741,7 @@ class Interpreter implements InterpreterInterface
                             $mainStack->push($buffer);
                             break;
 
-                        case $opcodes->cmp($opCode, 'OP_ADD') >= 0 && $opcodes->cmp($opCode, 'OP_MAX') <= 0:
+                        case $opCode >= Opcodes::OP_ADD && $opCode <= Opcodes::OP_MAX:
                             $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-2), 4))->getInt();
                             $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
 

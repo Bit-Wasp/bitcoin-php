@@ -46,14 +46,4 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
         $op = new OpCodes;
         $op->getOp(3);
     }
-
-    /**
-     *
-     */
-    public function testIsOp()
-    {
-        $op = new Opcodes();
-        $this->assertTrue($op->isOp(0xae, 'OP_CHECKMULTISIG'));
-        $this->assertFalse($op->isOp(0xad, 'OP_CHECKMULTISIG'));
-    }
 }

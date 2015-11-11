@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Classifier;
 
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Script;
@@ -101,7 +102,7 @@ class InputClassifier implements ScriptClassifierInterface
         }
         $mOp = $opCodes->getOpByName($mOp);
         $nOp = $opCodes->getOpByName($nOp);
-        if ($opCodes->cmp($mOp, 'OP_0') < 0 || $opCodes->cmp($nOp, 'OP_16') > 0) {
+        if ($mOp < Opcodes::OP_0 || $nOp > Opcodes::OP_16) {
             return false;
         }
 

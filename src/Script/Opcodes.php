@@ -321,16 +321,6 @@ class Opcodes implements \ArrayAccess
     }
 
     /**
-     * @param int $op
-     * @param string $opCodeStr
-     * @return bool
-     */
-    public function isOp($op, $opCodeStr)
-    {
-        return $op === $this->getOpByName($opCodeStr);
-    }
-
-    /**
      * @param int $opcode
      * @return string
      */
@@ -370,20 +360,4 @@ class Opcodes implements \ArrayAccess
         $this->errorNoWrite();
     }
 
-    /**
-     * @param integer $op
-     * @param string $opCodeStr
-     * @return int
-     */
-    public function cmp($op, $opCodeStr)
-    {
-        $specifiedOp = $this->getOpByName($opCodeStr);
-        if ($op === $specifiedOp) {
-            return 0;
-        }
-
-        return ($op < $specifiedOp)
-            ? -1
-            : 1;
-    }
 }

@@ -81,11 +81,11 @@ class Script extends Serializable implements ScriptInterface
         while ($parser->next($op, $pushData)) {
             if ($op > 78) {
                 // None of these are pushdatas, so just an opcode
-                if ($ops->isOp($op, 'OP_CHECKSIG') || $ops->isOp($op, 'OP_CHECKSIGVERIFY')) {
+                if ($op === Opcodes::OP_CHECKSIG || $op === Opcodes::OP_CHECKSIGVERIFY) {
                     $count++;
-                } elseif ($ops->isOp($op, 'OP_CHECKMULTISIG') || $ops->isOp($op, 'OP_CHECKMULTISIGVERIFY')) {
-                    if ($accurate && ($ops->cmp($lastOp, 'OP_1') >= 0 && $ops->cmp($lastOp, 'OP_16') <= 0)) {
-                        $c = ($lastOp - ($ops->getOpByName('OP_1') - 1));
+                } elseif ($op === Opcodes::OP_CHECKMULTISIG || $op === Opcodes::OP_CHECKMULTISIGVERIFY) {
+                    if ($accurate && ($lastOp >= Opcodes::OP_1 && $lastOp <= Opcodes::OP_16)) {
+                        $c = ($lastOp - (Opcodes::OP_1 - 1));
                         $count += $c;
                     } else {
                         $count += 20;
@@ -117,7 +117,7 @@ class Script extends Serializable implements ScriptInterface
         $push = new Buffer();
         $data = null;
         while ($parsed->next($op, $push)) {
-            if ($this->opcodes->cmp($op, 'OP_16') > 0) {
+            if ($op > Opcodes::OP_16) {
                 return 0;
             }
 
