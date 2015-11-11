@@ -90,7 +90,7 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $this->assertEquals(0, count($outputs));
     }
 
-    public function testUpdate()
+    public function testSet()
     {
         $collection = new TransactionOutputCollection([
             new TransactionOutput(5, new Script()),
@@ -100,6 +100,15 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $mutator = new OutputCollectionMutator($collection->all());
         $mutator->set(0, new TransactionOutput(1, new Script()));
         $newCollection = $mutator->done();
-        //$this->assertEquals(1, $newCollection[0]->getValue());
+        $this->assertEquals(1, $newCollection[0]->getValue());
+    }
+
+    /**
+     * @expectedException \OutOfRangeException
+     */
+    public function testInvalidIndex()
+    {
+        $mutator = new OutputCollectionMutator([]);
+        $mutator->offsetGet(10);
     }
 }
