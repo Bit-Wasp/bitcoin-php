@@ -49,6 +49,11 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertEquals($merkleRoot, $header->getMerkleRoot());
         $this->assertEquals($time, $header->getTimestamp());
         $this->assertEquals($nonce, $header->getNonce());
+        $this->assertEquals($version, $header['version']);
+        $this->assertEquals($prevBlock, $header['prevBlock']);
+        $this->assertEquals($merkleRoot, $header['merkleRoot']);
+        $this->assertEquals($time, $header['timestamp']);
+        $this->assertEquals($nonce, $header['nonce']);
 
     }
 
