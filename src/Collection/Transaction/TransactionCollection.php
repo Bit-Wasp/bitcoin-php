@@ -55,15 +55,6 @@ class TransactionCollection extends StaticCollection
     }
 
     /**
-     * @param int $offset
-     * @return TransactionInterface
-     */
-    public function get($offset)
-    {
-        return $this->offsetGet($offset);
-    }
-
-    /**
      * Returns all the transactions in the collection.
      *
      * @return TransactionInterface[]

@@ -54,13 +54,4 @@ class TransactionOutputCollection extends StaticCollection
 
         return $this->set->offsetGet($offset);
     }
-
-    /**
-     * @param int $offset
-     * @return TransactionOutputInterface
-     */
-    public function get($offset)
-    {
-        return $this->offsetGet($offset);
-    }
 }
