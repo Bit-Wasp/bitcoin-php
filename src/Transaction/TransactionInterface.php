@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Buffertools\Buffer;
 
-interface TransactionInterface extends SerializableInterface
+interface TransactionInterface extends SerializableInterface, \ArrayAccess
 {
     const DEFAULT_VERSION = 1;
 

@@ -12,7 +12,7 @@ use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
-class Transaction extends Serializable implements TransactionInterface, \ArrayAccess
+class Transaction extends Serializable implements TransactionInterface
 {
     use FunctionAliasArrayAccess;
 

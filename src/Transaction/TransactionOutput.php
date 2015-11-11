@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
-class TransactionOutput extends Serializable implements TransactionOutputInterface, \ArrayAccess
+class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
     use FunctionAliasArrayAccess;
 

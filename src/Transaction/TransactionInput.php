@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
-class TransactionInput extends Serializable implements TransactionInputInterface, \ArrayAccess
+class TransactionInput extends Serializable implements TransactionInputInterface
 {
     use FunctionAliasArrayAccess;
 

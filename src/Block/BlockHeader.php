@@ -6,9 +6,12 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
+use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class BlockHeader extends Serializable implements BlockHeaderInterface
 {
+    use FunctionAliasArrayAccess;
+
     /**
      * @var int|string
      */
@@ -59,6 +62,14 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
         $this->timestamp = $timestamp;
         $this->bits = $bits;
         $this->nonce = $nonce;
+
+        $this
+            ->initFunctionAlias('version', 'getVersion')
+            ->initFunctionAlias('prevBlock', 'getPrevBlock')
+            ->initFunctionAlias('merkleRoot', 'getMerkleRoot')
+            ->initFunctionAlias('timestamp', 'getTimestamp')
+            ->initFunctionAlias('bits', 'getBits')
+            ->initFunctionAlias('nonce', 'getNonce');
     }
 
     /**
