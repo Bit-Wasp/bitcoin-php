@@ -15,6 +15,10 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      */
     protected $netInterfaceType = 'BitWasp\Bitcoin\Network\NetworkInterface';
 
+    /**
+     * @var string
+     */
+    protected $scriptType = 'BitWasp\Bitcoin\Script\Script';
     protected $scriptInterfaceType = 'BitWasp\Bitcoin\Script\ScriptInterface';
     protected $outScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\OutputScriptFactory';
     protected $inScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\InputScriptFactory';
@@ -23,7 +27,10 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @var string
      */
     protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
-
+    /**
+     * @var string
+     */
+    protected $txOutType = 'BitWasp\Bitcoin\Transaction\TransactionOutput';
     /**
      * @var string
      */

@@ -10,9 +10,12 @@ use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
-class Transaction extends Serializable implements TransactionInterface
+class Transaction extends Serializable implements TransactionInterface, \ArrayAccess
 {
+    use FunctionAliasArrayAccess;
+
     /**
      * @var int|string
      */
@@ -68,6 +71,12 @@ class Transaction extends Serializable implements TransactionInterface
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
         $this->lockTime = $nLockTime;
+
+        $this
+            ->initFunctionAlias('version', 'getVersion')
+            ->initFunctionAlias('inputs', 'getInputs')
+            ->initFunctionAlias('outputs', 'getOutputs')
+            ->initFunctionAlias('locktime', 'getLockTime');
     }
 
     /**

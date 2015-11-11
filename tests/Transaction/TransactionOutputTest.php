@@ -3,32 +3,14 @@
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 
-class TransactionOutputTest extends \PHPUnit_Framework_TestCase
+class TransactionOutputTest extends AbstractTestCase
 {
-    /**
-     * @var string
-     */
-    private $txOutType = 'BitWasp\Bitcoin\Transaction\TransactionOutput';
-    /**
-     * @var string
-     */
-    private $scriptType = 'BitWasp\Bitcoin\Script\Script';
-
-    /**
-     * @var TransactionOutputSerializer
-     */
-    protected $serializer;
-
-    public function setUp()
-    {
-
-        $this->serializer = new TransactionOutputSerializer();
-    }
 
     public function testGetValueDefault()
     {
@@ -37,14 +19,17 @@ class TransactionOutputTest extends \PHPUnit_Framework_TestCase
 
         $out = new TransactionOutput(10901, new Script());
         $this->assertSame(10901, $out->getValue());
+        $this->assertSame(10901, $out['value']);
+
     }
 
     public function testGetScript()
     {
-        $out = new TransactionOutput(1, new Script());
+        $testScript = new Script(Buffer::hex('414141'));
+        $out = new TransactionOutput(1, $testScript);
         $script = $out->getScript();
         $this->assertInstanceOf($this->scriptType, $script);
-        $this->assertEmpty($script->getBuffer()->getBinary());
+        $this->assertSame($testScript, $out['script']);
     }
 
     public function testFromParser()
