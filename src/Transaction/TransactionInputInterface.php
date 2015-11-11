@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-interface TransactionInputInterface
+interface TransactionInputInterface extends \ArrayAccess
 {
     /**
      * The default sequence.

@@ -8,9 +8,12 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
+use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class TransactionInput extends Serializable implements TransactionInputInterface
 {
+    use FunctionAliasArrayAccess;
+
     /**
      * @var string
      */
@@ -51,6 +54,11 @@ class TransactionInput extends Serializable implements TransactionInputInterface
         $this->nPrevOut = $nPrevOut;
         $this->script = $script ?: new Script();
         $this->sequence = $sequence;
+        $this
+            ->initFunctionAlias('txid', 'getTransactionId')
+            ->initFunctionAlias('vout', 'getVout')
+            ->initFunctionAlias('script', 'getScript')
+            ->initFunctionAlias('sequence', 'getSequence');
     }
 
     /**

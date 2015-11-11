@@ -10,9 +10,12 @@ use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class Transaction extends Serializable implements TransactionInterface
 {
+    use FunctionAliasArrayAccess;
+
     /**
      * @var int|string
      */
@@ -32,21 +35,6 @@ class Transaction extends Serializable implements TransactionInterface
      * @var int|string
      */
     private $lockTime;
-
-    /**
-     * @var null|Buffer
-     */
-    private $cacheHash;
-
-    /**
-     * @var null|Buffer
-     */
-    private $cacheTxid;
-
-    /**
-     * @var null|Buffer
-     */
-    private $cacheBuffer;
 
     /**
      * @param int|string $nVersion
@@ -83,6 +71,12 @@ class Transaction extends Serializable implements TransactionInterface
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
         $this->lockTime = $nLockTime;
+
+        $this
+            ->initFunctionAlias('version', 'getVersion')
+            ->initFunctionAlias('inputs', 'getInputs')
+            ->initFunctionAlias('outputs', 'getOutputs')
+            ->initFunctionAlias('locktime', 'getLockTime');
     }
 
     /**
@@ -99,11 +93,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxHash()
     {
-        if (null === $this->cacheHash) {
-            $this->cacheHash = Hash::sha256d($this->getBuffer());
-        }
-
-        return $this->cacheHash;
+        return Hash::sha256d($this->getBuffer());
     }
 
     /**
@@ -111,11 +101,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxId()
     {
-        if (null === $this->cacheTxid) {
-            $this->cacheTxid = $this->getTxHash()->flip();
-        }
-
-        return $this->cacheTxid;
+        return $this->getTxHash()->flip();
     }
 
     /**
@@ -209,10 +195,6 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
-        if (null === $this->cacheBuffer) {
-            $this->cacheBuffer = (new TransactionSerializer)->serialize($this);
-        }
-
-        return $this->cacheBuffer;
+        return (new TransactionSerializer)->serialize($this);
     }
 }

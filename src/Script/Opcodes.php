@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-class Opcodes
+class Opcodes implements \ArrayAccess
 {
 
     const OP_0 = 0;
@@ -328,6 +328,46 @@ class Opcodes
     public function isOp($op, $opCodeStr)
     {
         return $op === $this->getOpByName($opCodeStr);
+    }
+
+    /**
+     * @param int $opcode
+     * @return string
+     */
+    public function offsetGet($opcode)
+    {
+        return $this->getOp($opcode);
+    }
+
+    /**
+     * @param int $opcode
+     * @return bool
+     */
+    public function offsetExists($opcode)
+    {
+        return isset(self::$names[$opcode]);
+    }
+
+    private function errorNoWrite()
+    {
+        throw new \RuntimeException('Cannot write to Opcodes');
+    }
+
+    /**
+     * @param int $opcode
+     */
+    public function offsetUnset($opcode)
+    {
+        $this->errorNoWrite();
+    }
+
+    /**
+     * @param int $opcode
+     * @param mixed $value
+     */
+    public function offsetSet($opcode, $value)
+    {
+        $this->errorNoWrite();
     }
 
     /**

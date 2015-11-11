@@ -10,8 +10,11 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
     {
         $op = new OpCodes;
         $expected = 0;
+        $lookupOpName = 'OP_0';
         $val = $op->getOpByName('OP_0');
         $this->assertSame($expected, $val);
+        $this->assertTrue(isset($op[Opcodes::OP_0]));
+        $this->assertSame($lookupOpName, $op[Opcodes::OP_0]);
     }
 
     /**

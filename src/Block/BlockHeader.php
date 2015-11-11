@@ -6,9 +6,12 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
+use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class BlockHeader extends Serializable implements BlockHeaderInterface
 {
+    use FunctionAliasArrayAccess;
+
     /**
      * @var int|string
      */
@@ -40,11 +43,6 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $nonce;
 
     /**
-     * @var null|Buffer
-     */
-    private $cacheHash;
-
-    /**
      * @param int|string $version
      * @param string $prevBlock
      * @param string $merkleRoot
@@ -64,6 +62,14 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
         $this->timestamp = $timestamp;
         $this->bits = $bits;
         $this->nonce = $nonce;
+
+        $this
+            ->initFunctionAlias('version', 'getVersion')
+            ->initFunctionAlias('prevBlock', 'getPrevBlock')
+            ->initFunctionAlias('merkleRoot', 'getMerkleRoot')
+            ->initFunctionAlias('timestamp', 'getTimestamp')
+            ->initFunctionAlias('bits', 'getBits')
+            ->initFunctionAlias('nonce', 'getNonce');
     }
 
     /**
@@ -71,11 +77,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function getHash()
     {
-        if (null === $this->cacheHash) {
-            $this->cacheHash = Hash::sha256d($this->getBuffer())->flip();
-        }
-
-        return $this->cacheHash;
+        return Hash::sha256d($this->getBuffer())->flip();
     }
 
     /**
@@ -97,6 +99,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     {
         return $this->prevBlock;
     }
+
     /**
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockHeaderInterface::getMerkleRoot()

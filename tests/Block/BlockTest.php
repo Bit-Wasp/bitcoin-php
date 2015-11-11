@@ -55,8 +55,11 @@ class BlockTest extends AbstractTestCase
     public function testSetHeader()
     {
         $header = $this->getBlockHeader();
-        $block = new Block(new Math(), $header, new TransactionCollection());
+        $txs = new TransactionCollection();
+        $block = new Block(new Math(), $header, $txs);
         $this->assertSame($header, $block->getHeader());
+        $this->assertSame($header, $block['header']);
+        $this->assertSame($txs, $block['tx']);
     }
 
     public function testGetTransactions()
@@ -87,6 +90,7 @@ class BlockTest extends AbstractTestCase
         $block = new Block(new Math(), new BlockHeader(1, 1, 1, 1, new Buffer(), 1), $txCollection);
 
         $this->assertEquals($tx->getTxId()->getHex(), $block->getMerkleRoot());
+        $this->assertEquals($tx->getTxId()->getHex(), $block['merkleRoot']);
     }
 
     public function testFromParser()
