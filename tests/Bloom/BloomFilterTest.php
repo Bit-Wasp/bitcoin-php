@@ -206,10 +206,7 @@ class BloomFilterTest extends AbstractTestCase
     {
         $pubkey = PrivateKeyFactory::create()->getPublicKey();
 
-        $spends = TransactionFactory::build()
-            ->input('0000000000000000000000000000000000000000000000000000000000000000', 0)
-            ->output(50 * Amount::COIN, ScriptFactory::scriptPubKey()->payToPubKey($pubkey))
-            ->get();
+        $spends = $this->getPayToPubkeyTxVector($pubkey);
 
         $filter = $this->getEmptyFilterVector();
         $this->assertFalse($filter->isRelevantAndUpdate($spends));
@@ -308,7 +305,6 @@ class BloomFilterTest extends AbstractTestCase
 
     public function testIsEmpty()
     {
-
         $emptyFilter = $this->getEmptyFilterVector();
         $this->assertFalse($emptyFilter->isFull());
         $this->assertTrue($emptyFilter->isEmpty());
