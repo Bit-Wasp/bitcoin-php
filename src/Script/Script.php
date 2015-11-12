@@ -73,7 +73,6 @@ class Script extends Serializable implements ScriptInterface
     public function countSigOps($accurate = true)
     {
         $count = 0;
-        $ops = $this->opcodes;
         $parser = $this->getScriptParser();
         $op = Opcodes::OP_INVALIDOPCODE;
         $pushData = new Buffer();
