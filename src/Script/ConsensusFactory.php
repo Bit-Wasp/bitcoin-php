@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Script;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
+use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
@@ -74,7 +75,7 @@ class ConsensusFactory
 
     /**
      * @param Flags $flags
-     * @return BitcoinConsensus|NativeConsensus
+     * @return ConsensusInterface
      */
     public function getConsensus(Flags $flags)
     {
