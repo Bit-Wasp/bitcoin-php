@@ -119,5 +119,4 @@ class ProofOfWork
     {
         return bcdiv($this->math->pow(2, 256), $this->getTarget($bits));
     }
-
 }
