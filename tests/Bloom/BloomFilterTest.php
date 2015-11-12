@@ -51,6 +51,13 @@ class BloomFilterTest extends AbstractTestCase
             ->get();
     }
 
+    private function getPayToMultisigTxVector(PublicKeyInterface $publicKey)
+    {
+        return TransactionFactory::build()
+            ->input('0000000000000000000000000000000000000000000000000000000000000000', 0)
+            ->output(50 * Amount::COIN, ScriptFactory::multisig(1, [$publicKey]))
+            ->get();
+    }
     public function testBasics()
     {
         $math = new Math();
@@ -243,6 +250,18 @@ class BloomFilterTest extends AbstractTestCase
         $pubkey = PrivateKeyFactory::create()->getPublicKey();
 
         $tx = $this->getPayToPubkeyTxVector($pubkey);
+
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_P2PUBKEY_ONLY));
+        $filter->insertData($pubkey->getBuffer());
+        $this->assertTrue($filter->isRelevantAndUpdate($tx));
+    }
+
+    public function testTxMatchesPayToMultisig()
+    {
+        $math = $this->safeMath();
+        $pubkey = PrivateKeyFactory::create()->getPublicKey();
+
+        $tx = $this->getPayToMultisigTxVector($pubkey);
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_P2PUBKEY_ONLY));
         $filter->insertData($pubkey->getBuffer());
