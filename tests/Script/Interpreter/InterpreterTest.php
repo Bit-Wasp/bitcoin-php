@@ -15,6 +15,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\ScriptStack;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
@@ -22,7 +23,7 @@ use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;
 
-class InterpreterTest extends \PHPUnit_Framework_TestCase
+class InterpreterTest extends AbstractTestCase
 {
     /**
      * @param $flagStr
@@ -289,12 +290,12 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
 
     public function getScripts()
     {
-        $f = file_get_contents(__DIR__ . '/../../Data/scriptinterpreter.simple.json');
+        $f = $this->dataFile('scriptinterpreter.simple.json');
         $json = json_decode($f);
 
         $vectors = [];
         foreach ($json->test as $c => $test) {
-            $flags = $this->setFlags($test->flags);
+            $flags = $this->getInterpreterFlags($test->flags);
             $scriptSig = ScriptFactory::fromHex($test->scriptSig);
             $scriptPubKey = ScriptFactory::fromHex($test->scriptPubKey);
             $vectors[] = [
