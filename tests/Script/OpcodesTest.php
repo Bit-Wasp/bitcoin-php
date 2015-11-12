@@ -64,5 +64,4 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
         $op = new Opcodes();
         unset($op[Opcodes::OP_1]);
     }
-
 }

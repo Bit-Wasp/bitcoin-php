@@ -107,7 +107,6 @@ class ScriptParser
         if ($opCode == Opcodes::OP_0) {
             $pushData = new Buffer('', 0);
         } elseif ($opCode <= Opcodes::OP_PUSHDATA4) {
-
             if ($opCode < Opcodes::OP_PUSHDATA1) {
                 $size = $opCode;
             } else if ($opCode === Opcodes::OP_PUSHDATA1) {

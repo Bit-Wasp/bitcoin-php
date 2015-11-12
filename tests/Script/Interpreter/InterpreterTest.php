@@ -436,5 +436,4 @@ class InterpreterTest extends AbstractTestCase
             $this->assertFalse($i->checkMinimalPush($opcode, $buffer));
         }
     }
-
 }
