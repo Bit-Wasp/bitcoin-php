@@ -14,32 +14,6 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class BlockTest extends AbstractTestCase
 {
-
-    /**
-     * @var string
-     */
-    protected $blockType = 'BitWasp\Bitcoin\Block\Block';
-
-    /**
-     * @var string
-     */
-    protected $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
-
-    /**
-     * @var string
-     */
-    protected $bufferType = 'BitWasp\Buffertools\Buffer';
-
-    /**
-     * @var string
-     */
-    protected $txColType = 'BitWasp\Bitcoin\Collection\Transaction\TransactionCollection';
-
-    /**
-     * @var string
-     */
-    protected $txInterfaceType = 'BitWasp\Bitcoin\Transaction\TransactionInterface';
-
     private function getBlockHeader()
     {
         return new BlockHeader(
@@ -126,44 +100,6 @@ class BlockTest extends AbstractTestCase
         $this->assertSame($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
     }
 
-
-  /*
-    /**
-     * @expectedException ParserOutOfRange
-     * public function testFromParserFailure()
-    {
-        $txHex = '01000000'.
-            '01'.
-            '0000000000000000000000000000000000000000000000000000000000000000FFFFFFFF'.
-            '4D'.
-            '04FFFF001D0104455468652054696D65732030332F4A616E2F32303039204368616E63656C6C6F72206F6E206272696E6B206F66207365636F6E64206261696C6F757420666F722062616E6B73'.
-            'FFFFFFFF'.
-            '01'.
-            '00F2052A01000000'.
-            '43'.
-            '4104678AFDB0FE5548271967F1A67130B7105CD6A828E03909A67962E0EA1F61DEB649F6BC3F4CEF38C4F35504E51EC112DE5C384DF7BA0B8D578A4C702B6BF11D5FAC'.
-            '00000000';
-
-        $blockHex = '01000000'.
-            '0000000000000000000000000000000000000000000000000000000000000000' .
-            '3BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A' .
-            '29AB5F49'.
-            'FFFF001D'.
-            '1DAC2B7C'.
-            '01'.
-            $txHex;
-
-        $parser = new Parser($blockHex);
-        $block = new Block;
-        $newBlock = $block->fromParser($parser);
-
-        $this->assertInstanceOf($this->blockType, $newBlock);
-
-        $this->assertInternalType('array', $newBlock->getTransactions());
-        $this->assertEquals(1, count($newBlock->getTransactions()));
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
-    }*/
-
     public function testFromHex()
     {
         $txHex = '01000000'.
@@ -190,7 +126,6 @@ class BlockTest extends AbstractTestCase
         $newBlock = BlockFactory::fromHex($blockHex);
 
         $this->assertInstanceOf($this->blockType, $newBlock);
-
         $this->assertSame($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
         $this->assertSame($blockHex, $newBlock->getBuffer()->getHex());
     }

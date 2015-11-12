@@ -10,6 +10,22 @@ use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAda
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
+
+    /**
+     * @var string
+     */
+    protected $bufferType = 'BitWasp\Buffertools\Buffer';
+
+    /**
+     * @var string
+     */
+    protected $blockType = 'BitWasp\Bitcoin\Block\Block';
+
+    /**
+     * @var string
+     */
+    protected $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
+
     /**
      * @var string
      */
@@ -19,18 +35,47 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @var string
      */
     protected $scriptType = 'BitWasp\Bitcoin\Script\Script';
+
+    /**
+     * @var string
+     */
     protected $scriptInterfaceType = 'BitWasp\Bitcoin\Script\ScriptInterface';
+
+    /**
+     * @var string
+     */
     protected $outScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\OutputScriptFactory';
+
+    /**
+     * @var string
+     */
     protected $inScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\InputScriptFactory';
+
+    /**
+     * @var string
+     */
     protected $scriptCreatorType = 'BitWasp\Bitcoin\Script\Factory\ScriptCreator';
+
     /**
      * @var string
      */
     protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
+
+    /**
+     * @var string
+     */
+    protected $txInterfaceType = 'BitWasp\Bitcoin\Transaction\TransactionInterface';
+
     /**
      * @var string
      */
     protected $txOutType = 'BitWasp\Bitcoin\Transaction\TransactionOutput';
+
+    /**
+     * @var string
+     */
+    protected $txColType = 'BitWasp\Bitcoin\Collection\Transaction\TransactionCollection';
+
     /**
      * @var string
      */

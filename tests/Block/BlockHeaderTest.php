@@ -10,15 +10,6 @@ use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
 class BlockHeaderTest extends AbstractTestCase
 {
-    /**
-     * @var string
-     */
-    private $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
-
-    /**
-     * @var string
-     */
-    private $bufferType = 'BitWasp\Buffertools\Buffer';
 
     private function getGenesisHex()
     {
