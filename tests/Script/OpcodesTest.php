@@ -46,4 +46,23 @@ class OpcodesTest extends \PHPUnit_Framework_TestCase
         $op = new OpCodes;
         $op->getOp(3);
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testNoWriteSet()
+    {
+        $op = new Opcodes();
+        $op[1] = 2;
+    }
+    
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testNoWriteUnSet()
+    {
+        $op = new Opcodes();
+        unset($op[Opcodes::OP_1]);
+    }
+
 }
