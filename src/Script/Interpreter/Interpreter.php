@@ -387,7 +387,6 @@ class Interpreter implements InterpreterInterface
     public function run()
     {
         $math = $this->math;
-        $opcodes = $this->script->getOpCodes();
 
         $flags = $this->flags;
         $mainStack = $this->state->getMainStack();

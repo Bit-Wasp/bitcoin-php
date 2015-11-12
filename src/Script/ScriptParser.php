@@ -96,9 +96,7 @@ class ScriptParser
      */
     public function next(&$opCode, Buffer &$pushData)
     {
-        $opcodes = $this->script->getOpcodes();
         $opCode = Opcodes::OP_INVALIDOPCODE;
-
         if ($this->math->cmp($this->getPosition(), $this->getEndPos()) >= 0) {
             return false;
         }
