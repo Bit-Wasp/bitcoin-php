@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\EccFactory;
 use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
+use BitWasp\Bitcoin\Flags;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
