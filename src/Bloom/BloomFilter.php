@@ -32,12 +32,12 @@ class BloomFilter extends Serializable
     /**
      * @var bool
      */
-    private $isEmpty = true;
+    private $empty = true;
 
     /**
      * @var bool
      */
-    private $isFull = false;
+    private $full = false;
 
     /**
      * @var int
@@ -140,6 +140,22 @@ class BloomFilter extends Serializable
     public function isUpdatePubKeyOnly()
     {
         return $this->checkFlag(self::UPDATE_P2PUBKEY_ONLY);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return $this->empty;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFull()
+    {
+        return $this->full;
     }
 
     /**
@@ -250,7 +266,7 @@ class BloomFilter extends Serializable
      */
     public function insertData(Buffer $data)
     {
-        if ($this->isFull) {
+        if ($this->isFull()) {
             return $this;
         }
 
@@ -288,11 +304,11 @@ class BloomFilter extends Serializable
      */
     public function containsData(Buffer $data)
     {
-        if ($this->isFull) {
+        if ($this->isFull()) {
             return true;
         }
 
-        if ($this->isEmpty) {
+        if ($this->isEmpty()) {
             return false;
         }
 
@@ -318,15 +334,6 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param string $hash
-     * @return bool
-     */
-    public function containsHash($hash)
-    {
-        return $this->containsData(Buffer::hex($hash, 32, $this->math));
-    }
-
-    /**
      * @return bool
      */
     public function hasAcceptableSize()
@@ -340,12 +347,13 @@ class BloomFilter extends Serializable
      */
     public function isRelevantAndUpdate(TransactionInterface $tx)
     {
+        $this->updateEmptyFull();
         $found = false;
-        if ($this->isFull) {
+        if ($this->isFull()) {
             return true;
         }
 
-        if ($this->isEmpty) {
+        if ($this->isEmpty()) {
             return false;
         }
 
@@ -407,12 +415,13 @@ class BloomFilter extends Serializable
         $full = true;
         $empty = true;
         for ($i = 0, $size = count($this->vFilter); $i < $size; $i++) {
-            $full &= ($this->vFilter[$i] === 0xff);
-            $empty &= ($this->vFilter[$i] === 0x0);
+            $byte = (int) $this->vFilter[$i];
+            $full &= ($byte === 0xff);
+            $empty &= ($byte === 0x0);
         }
 
-        $this->isFull = $full;
-        $this->isEmpty = $empty;
+        $this->full = (bool)$full;
+        $this->empty = (bool)$empty;
     }
 
     /**

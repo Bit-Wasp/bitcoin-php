@@ -2,10 +2,14 @@
 
 namespace BitWasp\Bitcoin\Tests\Bloom;
 
+use BitWasp\Bitcoin\Amount;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
@@ -14,6 +18,46 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class BloomFilterTest extends AbstractTestCase
 {
+    /**
+     * @param string $hex
+     * @return BloomFilter
+     */
+    private function parseFilter($hex)
+    {
+        return (new BloomFilterSerializer)->parse($hex);
+    }
+
+    /**
+     * @return BloomFilter
+     */
+    private function getEmptyFilterVector()
+    {
+        return $this->parseFilter('2200000000000000000000000000000000000000000000000000000000000000000000120000000000000001');
+    }
+
+    /**
+     * @return BloomFilter
+     */
+    private function getFullFilterVector()
+    {
+        return $this->parseFilter('22FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF120000000000000001');
+    }
+
+    private function getPayToPubkeyTxVector(PublicKeyInterface $publicKey)
+    {
+        return TransactionFactory::build()
+            ->input('0000000000000000000000000000000000000000000000000000000000000000', 0)
+            ->output(50 * Amount::COIN, ScriptFactory::scriptPubKey()->payToPubKey($publicKey))
+            ->get();
+    }
+
+    private function getPayToMultisigTxVector(PublicKeyInterface $publicKey)
+    {
+        return TransactionFactory::build()
+            ->input('0000000000000000000000000000000000000000000000000000000000000000', 0)
+            ->output(50 * Amount::COIN, ScriptFactory::multisig(1, [$publicKey]))
+            ->get();
+    }
     public function testBasics()
     {
         $math = new Math();
@@ -165,6 +209,65 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertEquals('038fc16b080000000000000001', $filter->getBuffer()->getHex());
     }
 
+    public function testEmptyFilterNeverMatches()
+    {
+        $pubkey = PrivateKeyFactory::create()->getPublicKey();
+
+        $spends = $this->getPayToPubkeyTxVector($pubkey);
+
+        $filter = $this->getEmptyFilterVector();
+        $this->assertFalse($filter->isRelevantAndUpdate($spends));
+    }
+
+    public function testFullFilterAlwaysRelevant()
+    {
+        $pubkey = PrivateKeyFactory::create()->getPublicKey();
+        $tx = $this->getPayToPubkeyTxVector($pubkey);
+        $filter = $this->getFullFilterVector();
+        $this->assertTrue($filter->isRelevantAndUpdate($tx));
+    }
+
+    public function testFullFilterAlwaysContainsData()
+    {
+        $filter = $this->getFullFilterVector();
+        $this->assertTrue($filter->containsData(new Buffer('totally unrelated')));
+    }
+
+    public function testFullFilterNeverChanges()
+    {
+        $filter = $this->getFullFilterVector();
+        $serialized = $filter->getBinary();
+
+        $filter->insertData(new Buffer('new data'));
+
+        $serialized2 = $filter->getBinary();
+        $this->assertEquals($serialized, $serialized2);
+    }
+
+    public function testTxMatchesPayToPubkey()
+    {
+        $math = $this->safeMath();
+        $pubkey = PrivateKeyFactory::create()->getPublicKey();
+
+        $tx = $this->getPayToPubkeyTxVector($pubkey);
+
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_P2PUBKEY_ONLY));
+        $filter->insertData($pubkey->getBuffer());
+        $this->assertTrue($filter->isRelevantAndUpdate($tx));
+    }
+
+    public function testTxMatchesPayToMultisig()
+    {
+        $math = $this->safeMath();
+        $pubkey = PrivateKeyFactory::create()->getPublicKey();
+
+        $tx = $this->getPayToMultisigTxVector($pubkey);
+
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_P2PUBKEY_ONLY));
+        $filter->insertData($pubkey->getBuffer());
+        $this->assertTrue($filter->isRelevantAndUpdate($tx));
+    }
+
     public function testTxMatches()
     {
         $math = new Math();
@@ -217,5 +320,17 @@ class BloomFilterTest extends AbstractTestCase
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
         $filter->insertOutpoint('41c1d247b5f6ef9952cd711beba91ba216982fb6ba58f3bdaab65e7341414141', '0');
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
+    }
+
+    public function testIsEmpty()
+    {
+        $emptyFilter = $this->getEmptyFilterVector();
+        $this->assertFalse($emptyFilter->isFull());
+        $this->assertTrue($emptyFilter->isEmpty());
+
+        $fullFilter = $this->getFullFilterVector();
+        $this->assertTrue($fullFilter->isFull());
+        $this->assertFalse($fullFilter->isEmpty());
+
     }
 }

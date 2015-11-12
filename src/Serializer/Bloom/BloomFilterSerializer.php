@@ -37,8 +37,7 @@ class BloomFilterSerializer
 
         $vBuf = [];
         foreach ($filter->getData() as $i) {
-            $hex = $math->decHex($i);
-            $vBuf[] = Buffer::hex($hex, 1);
+            $vBuf[] = Buffer::int($i, 1, $math);
         }
 
         return $this->getTemplate()->write([
