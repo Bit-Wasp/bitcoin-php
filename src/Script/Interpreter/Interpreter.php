@@ -138,6 +138,10 @@ class Interpreter implements InterpreterInterface
      */
     public function castToBool(Buffer $value)
     {
+        if ($value->getSize() === 0) {
+            return true;
+        }
+
         // Since we're using buffers, lets try ensuring the contents are not 0.
         return $this->math->cmp($value->getInt(), 0) > 0; // cscriptNum or edge case.
     }
@@ -408,8 +412,10 @@ class Interpreter implements InterpreterInterface
         $this->hashStartPos = 0;
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
-        $_bn0 = new Buffer("\x00", 1, $math);
-        $_bn1 = new Buffer("\x01", 1, $math);
+        $vchFalse = new Buffer("", 0, $math);
+        $vchTrue = new Buffer("\x01", 1, $math);
+        $int0 = new ScriptNum($this->math, new Flags(0), $vchFalse, 4);
+        $int1 = new ScriptNum($this->math, new Flags(0), $vchTrue, 1);
 
         if ($this->script->getBuffer()->getSize() > 10000) {
             return false;
@@ -440,12 +446,13 @@ class Interpreter implements InterpreterInterface
                     if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
+
                     $mainStack->push($pushData);
-                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
+                     //echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
-                    // echo $this->script->getOpCodes()->getOp($opCode) . "\n";
+                     //echo "OPCODE - " . $this->script->getOpCodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
-                        case Opcodes::OP_0:
+
                         case Opcodes::OP_1:
                         case Opcodes::OP_2:
                         case Opcodes::OP_3:
@@ -463,7 +470,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
                             $num = $opCode - (Opcodes::OP_1 - 1);
-                            $mainStack->push(new Buffer(chr($num), 1, $this->math));
+                            $mainStack->push(new ScriptNum($this->math, new Flags(0), new Buffer(chr($num), 4), 4));
                             break;
 
                         case $opCode >= Opcodes::OP_NOP1 && $opCode <= Opcodes::OP_NOP10:
@@ -548,8 +555,13 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_DEPTH:
                             $num = $mainStack->size();
-                            $depth = (new ScriptNum($math, $this->flags, Buffer::int(), 4));
-                            $mainStack->push($bin);
+                            if ($num === 0) {
+                                $depth = $vchFalse;
+                            } else {
+                                $depth = (new ScriptNum($math, $this->flags, Buffer::int($num), 4));
+                            }
+
+                            $mainStack->push($depth);
                             break;
 
                         case Opcodes::OP_DROP:
@@ -697,7 +709,6 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_EQUAL:
                         case Opcodes::OP_EQUALVERIFY:
-                            //case $this->isOp($opCode, 'OP_NOTEQUAL: // use OP_NUMNOTEQUAL
                             if ($mainStack->size() < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_EQUAL');
                             }
@@ -706,14 +717,9 @@ class Interpreter implements InterpreterInterface
 
                             $equal = ($vch1->getBinary() === $vch2->getBinary());
 
-                            // OP_NOTEQUAL is disabled
-                            //if ($this->isOp($opCode, 'OP_NOTEQUAL')) {
-                            //    $equal = !$equal;
-                            //}
-
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push(($equal ? $_bn1 : $_bn0));
+                            $mainStack->push(($equal ? $vchTrue : $vchFalse));
                             if ($opCode === Opcodes::OP_EQUALVERIFY) {
                                 if ($equal) {
                                     $mainStack->pop();
@@ -753,7 +759,7 @@ class Interpreter implements InterpreterInterface
 
                             $mainStack->pop();
 
-                            $buffer = Buffer::int($num, null, $math);
+                            $buffer = Buffer::int($num, 4, $math);
                             $mainStack->push($buffer);
                             break;
 
@@ -770,9 +776,9 @@ class Interpreter implements InterpreterInterface
                             } else if ($opCode === Opcodes::OP_SUB) {
                                 $num = $math->sub($num1, $num2);
                             } else if ($opCode === Opcodes::OP_BOOLAND) {
-                                $num = $math->cmp($num1, $_bn0->getInt()) !== 0 && $math->cmp($num2, $_bn0->getInt()) !== 0;
+                                $num = $math->cmp($num1, $int0->getInt()) !== 0 && $math->cmp($num2, $int0->getInt()) !== 0;
                             } else if ($opCode === Opcodes::OP_BOOLOR) {
-                                $num = $math->cmp($num1, $_bn0->getInt()) !== 0 || $math->cmp($num2, $_bn0->getInt()) !== 0;
+                                $num = $math->cmp($num1, $int0->getInt()) !== 0 || $math->cmp($num2, $int0->getInt()) !== 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUAL) {
                                 $num = $math->cmp($num1, $num2) === 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -795,7 +801,7 @@ class Interpreter implements InterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $buffer = Buffer::int($num, null, $math);
+                            $buffer = Buffer::int($num, 4, $math);
                             $mainStack->push($buffer);
 
                             if ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -812,15 +818,15 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
-                            $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+                            $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-3), 4))->getInt();
+                            $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-2), 4))->getInt();
                             $num3 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
 
                             $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push($value ? $_bn1 : $_bn0);
+                            $mainStack->push($value ? $vchFalse : $vchTrue);
                             break;
 
                         // Hash operation
@@ -869,7 +875,7 @@ class Interpreter implements InterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push($success ? $_bn1 : $_bn0);
+                            $mainStack->push($success ? $vchTrue : $vchFalse);
 
                             if ($opCode === Opcodes::OP_CHECKSIGVERIFY) {
                                 if ($success) {
@@ -959,7 +965,7 @@ class Interpreter implements InterpreterInterface
                             }
 
                             $mainStack->pop();
-                            $mainStack->push($fSuccess ? $_bn1 : $_bn0);
+                            $mainStack->push($fSuccess ? $vchTrue : $vchFalse);
 
                             if ($opCode === Opcodes::OP_CHECKMULTISIGVERIFY) {
                                 if ($fSuccess) {

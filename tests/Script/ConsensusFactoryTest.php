@@ -84,6 +84,41 @@ class ConsensusFactoryTest extends AbstractTestCase
         $this->assertInstanceOf($this->getExpectedAdapter(), $factory->getConsensus($factory->defaultFlags()));
     }
 
+    public function getVerifyVectors()
+    {
+        $f = file_get_contents('tests/Data/scriptinterpreter.simple.json');
+        $json = json_decode($f);
+
+        $consensusFactory = new \BitWasp\Bitcoin\Script\ConsensusFactory(\BitWasp\Bitcoin\Bitcoin::getEcAdapter());
+        $vectors = [];
+        foreach ($json->test as $c => $test) {
+            $flags = $this->getInterpreterFlags($test->flags);
+
+            $interpreter = $consensusFactory->getNativeConsensus($flags);
+            $vectors[] = [$interpreter, $test->scriptSig, $test->scriptPubKey, $test->result];
+            if (extension_loaded('bitcoinconsensus')) {
+                $interpreter = $consensusFactory->getBitcoinConsensus($flags);
+                $vectors[] = [$interpreter, $test->scriptSig, $test->scriptPubKey, $test->result];
+            }
+        }
+
+        return $vectors;
+    }
+
+    /**
+     * @dataProvider getVerifyVectors
+     */
+    public function testVerify(ConsensusInterface $consensus, $scriptSig, $scriptPubKey, $expected)
+    {
+        $scriptSig = ScriptFactory::fromHex($scriptSig);
+        $scriptPubKey = ScriptFactory::fromHex($scriptPubKey);
+        $tx = TransactionFactory::build()
+            ->input('0000000000000000000000000000000000000000000000000000000000000002', 0, $scriptSig)
+            ->get();
+
+        $this->assertEquals($expected, $consensus->verify($tx, $scriptPubKey, 0), ScriptFactory::fromHex($scriptSig->getHex().$scriptPubKey->getHex())->getScriptParser()->getHumanReadable());
+    }
+/*
     public function testVerifyVectors()
     {
 
@@ -111,5 +146,5 @@ class ConsensusFactoryTest extends AbstractTestCase
             }
         }
     }
-
+*/
 }

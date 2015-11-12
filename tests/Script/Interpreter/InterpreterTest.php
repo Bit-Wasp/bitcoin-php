@@ -323,7 +323,7 @@ class InterpreterTest extends AbstractTestCase
      * @param $result
      * @param $tx
      * @dataProvider getScripts
-     */
+     *
     public function testScript(Flags $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result,  $tx)
     {
         $i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter(Bitcoin::getEcAdapter(), $tx, $flags);
@@ -436,4 +436,5 @@ class InterpreterTest extends AbstractTestCase
             $this->assertFalse($i->checkMinimalPush($opcode, $buffer));
         }
     }
+
 }

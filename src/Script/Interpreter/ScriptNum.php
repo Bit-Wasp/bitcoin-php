@@ -27,16 +27,20 @@ class ScriptNum extends Buffer
 
         $bufferSize = $vch->getSize();
         if ($bufferSize > $size) {
-            throw new ScriptStackException(InterpreterInterface::VERIFY_MINIMALDATA, 'Script number overflow');
+            throw new ScriptStackException('a'.InterpreterInterface::VERIFY_MINIMALDATA);//, 'Script number overflow');
         }
 
         $str = $vch->getBinary();
         if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && $bufferSize > 0) {
             if ((ord($str[0]) & 0x7f) === 0) {
                 if ($bufferSize <= 1 || (ord($str[1]) & 0x7f) === 0) {
-                    throw new ScriptStackException(InterpreterInterface::VERIFY_MINIMALDATA, 'Non-minimally encoded integer');
+                    throw new ScriptStackException('b'.InterpreterInterface::VERIFY_MINIMALDATA);//, 'Non-minimally encoded integer');
                 }
             }
+        }
+
+        if ($bufferSize === 0) {
+            $str = "\x00";
         }
 
         $this->math = $math;

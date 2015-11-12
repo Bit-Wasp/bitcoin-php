@@ -226,7 +226,7 @@
     },
     {
       "scriptSig": "0100010001006f",
-      "scriptPubKey": "74010687",
+      "scriptPubKey": "745687",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "00 00 00 OP_3DUP OP_DEPTH 06 OP_EQUAL"
@@ -296,10 +296,10 @@
     },
     {
       "scriptSig": "01010102",
-      "scriptPubKey": "7774010187",
+      "scriptPubKey": "77745187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "01 02 OP_NIP OP_DEPTH 01 OP_EQUAL"
+      "desc": "01 02 OP_NIP OP_DEPTH OP_1 OP_EQUAL"
     },
     {
       "scriptSig": "01010102",
@@ -324,7 +324,7 @@
     },
     {
       "scriptSig": "01010102",
-      "scriptPubKey": "7874010387",
+      "scriptPubKey": "78745387",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "01 02 OP_OVER OP_DEPTH 03 OP_EQUAL"
@@ -344,11 +344,11 @@
       "desc": "01 02 03 04 OP_2OVER 02 OP_EQUALVERIFY 01 OP_EQUALVERIFY 04 OP_EQUALVERIFY 03 OP_EQUALVERIFY 02 OP_EQUALVERIFY 01 OP_EQUAL"
     },
     {
-      "scriptSig": "0101010201030104",
-      "scriptPubKey": "7074010688",
+      "scriptSig": "51525354",
+      "scriptPubKey": "70745687",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "01 02 OP_OVER OP_DEPTH 03 OP_EQUALVERIFY"
+      "desc": "OP_1 OP_2 OP_3 OP_4 OP_2OVER OP_DEPTH OP_6 OP_EQUAL"
     },
     {
       "scriptSig": "01010102",
@@ -456,11 +456,11 @@
       "desc": "OP_IFDUP"
     },
     {
-      "scriptSig": "0101",
-      "scriptPubKey": "7374010288010188010187",
+      "scriptSig": "51",
+      "scriptPubKey": "73745287",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "01 OP_IFDUP OP_DEPTH 02 OP_EQUAL"
+      "desc": "OP_1 OP_IFDUP OP_DEPTH 02 OP_EQUAL"
     },
     {
       "scriptSig": "",
@@ -512,18 +512,18 @@
       "desc": "OP_1ADD"
     },
     {
-      "scriptSig": "0101",
-      "scriptPubKey": "8b010287",
+      "scriptSig": "51",
+      "scriptPubKey": "8b5287",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "01 OP_1ADD 02 OP_EQUAL"
+      "desc": "OP_1 OP_1ADD OP_2 OP_EQUAL"
     },
     {
-      "scriptSig": "0102",
-      "scriptPubKey": "8c010187",
+      "scriptSig": "52",
+      "scriptPubKey": "8c5187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "01 OP_1SUB 00 OP_EQUAL"
+      "desc": "OP_2 OP_1SUB OP_1 OP_EQUAL"
     },
     {
       "scriptSig": "0101",
@@ -540,8 +540,8 @@
       "desc": "OP_ADD"
     },
     {
-      "scriptSig": "01010101",
-      "scriptPubKey": "9374010188010287",
+      "scriptSig": "5151",
+      "scriptPubKey": "937451885287",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "1 1 OP_ADD OP_DEPTH 01 OP_EQUALVERIFY 02 OP_EQUAL"
@@ -568,11 +568,19 @@
       "desc": "OP_NUMEQUAL"
     },
     {
-      "scriptSig": "01010101",
-      "scriptPubKey": "9c010187",
+      "scriptSig": "5151",
+      "scriptPubKey": "9c5187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "1 1 OP_NUMEQUAL 00 OP_EQUAL"
+      "desc": "1 1 OP_NUMEQUAL OP_1 OP_EQUAL"
+    },
+
+    {
+      "scriptSig": "5100",
+      "scriptPubKey": "9c0087",
+      "result": true,
+      "flags": "VERIFY_STRICTENC",
+      "desc": "1 0 OP_NUMEQUAL OP_0 OP_EQUAL"
     },
     {
       "scriptSig": "",
@@ -589,8 +597,8 @@
       "desc": "1 1 OP_NUMEQUAL 00 OP_NUMEQUAL"
     },
     {
-      "scriptSig": "01010100",
-      "scriptPubKey": "a4010187",
+      "scriptSig": "5100",
+      "scriptPubKey": "a45187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "1 0 OP_MAX 01 OP_EQUAL"
@@ -603,18 +611,18 @@
       "desc": "OP_1 OP_0 OP_MIN OP_0 OP_EQUAL"
     },
     {
-      "scriptSig": "01010100",
-      "scriptPubKey": "9e010187",
+      "scriptSig": "5100",
+      "scriptPubKey": "9e5187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "1 0 OP_NUMNOTEQUAL 01 OP_EQUAL"
+      "desc": "OP_1 OP_0 OP_NUMNOTEQUAL 01 OP_EQUAL"
     },
     {
-      "scriptSig": "012e0111",
+      "scriptSig": "5857",
       "scriptPubKey": "9f0087",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "46 17 OP_LESSTHAN OP_0 OP_EQUAL"
+      "desc": "OP_8 OP_7 OP_LESSTHAN OP_0 OP_EQUAL"
     },
     {
       "scriptSig": "5100",
@@ -638,32 +646,32 @@
       "desc": "46 17 OP_GREATERTHAN OP_0 OP_EQUAL"
     },
     {
-      "scriptSig": "0111012e",
-      "scriptPubKey": "a1010187",
+      "scriptSig": "5758",
+      "scriptPubKey": "a15187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "46 17 OP_LESSTHANEQUALTO 01 OP_EQUAL"
+      "desc": "OP_8 OP_7 OP_LESSTHANEQUALTO OP_1 OP_EQUAL"
     },
     {
-      "scriptSig": "012e0111",
-      "scriptPubKey": "a2010187",
+      "scriptSig": "5856",
+      "scriptPubKey": "a25187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "46 17 OP_GREATERTHANEQUALTO 01 OP_EQUAL"
     },
     {
-      "scriptSig": "012e012e",
-      "scriptPubKey": "a2010187",
+      "scriptSig": "5252",
+      "scriptPubKey": "a25187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "46 46 OP_GREATERTHANEQUALTO 01 OP_EQUAL"
     },
     {
-      "scriptSig": "012e012e",
-      "scriptPubKey": "a1010187",
+      "scriptSig": "5858",
+      "scriptPubKey": "a15187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "46 46 OP_LESSTHANEQUALTO 01 OP_EQUAL"
+      "desc": "OP_8 OP_8 OP_LESSTHANEQUALTO OP_1 OP_EQUAL"
     },
     {
       "scriptSig": "012e",
@@ -673,11 +681,11 @@
       "desc": "46 OP_NOT OP_0 OP_EQUAL"
     },
     {
-      "scriptSig": "0100",
-      "scriptPubKey": "91010187",
+      "scriptSig": "00",
+      "scriptPubKey": "915187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "00 OP_NOT 01 OP_EQUAL"
+      "desc": "OP_0 OP_NOT OP_1 OP_EQUAL"
     },
     {
       "scriptSig": "51",
@@ -687,11 +695,11 @@
       "desc": "OP_1 OP_NOT OP_0 OP_EQUAL"
     },
     {
-      "scriptSig": "012e",
-      "scriptPubKey": "92010187",
+      "scriptSig": "51",
+      "scriptPubKey": "925187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "46 OP_0NOTEQUAL 01 OP_EQUAL"
+      "desc": "OP_0 OP_0NOTEQUAL OP_1 OP_EQUAL"
     },
     {
       "scriptSig": "00",
@@ -708,8 +716,8 @@
       "desc": "00 01 OP_BOOLAND 00 OP_EQUAL"
     },
     {
-      "scriptSig": "01010101",
-      "scriptPubKey": "9a010187",
+      "scriptSig": "5151",
+      "scriptPubKey": "9a5187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "01 01 OP_BOOLAND 01 OP_EQUAL"
@@ -722,15 +730,15 @@
       "desc": "OP_0 OP_0 OP_BOOLOR OP_0 OP_EQUAL"
     },
     {
-      "scriptSig": "01000101",
-      "scriptPubKey": "9b010187",
+      "scriptSig": "0051",
+      "scriptPubKey": "9b5187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
-      "desc": "00 01 OP_BOOLOR 01 OP_EQUAL"
+      "desc": "OP_0 OP_1 OP_BOOLOR OP_1 OP_EQUAL"
     },
     {
-      "scriptSig": "01010100",
-      "scriptPubKey": "9b010187",
+      "scriptSig": "5151",
+      "scriptPubKey": "9b5187",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "01 00 OP_BOOLOR 01 OP_EQUAL"
