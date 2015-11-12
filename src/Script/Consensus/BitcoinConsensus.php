@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
-class BitcoinConsensus
+class BitcoinConsensus implements ConsensusInterface
 {
     /**
      * @var Flags
