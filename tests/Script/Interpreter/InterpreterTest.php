@@ -299,7 +299,7 @@ class InterpreterTest extends AbstractTestCase
             $scriptSig = ScriptFactory::fromHex($test->scriptSig);
             $scriptPubKey = ScriptFactory::fromHex($test->scriptPubKey);
             $vectors[] = [
-                $flags, $scriptSig, $scriptPubKey, $test->result, $test->desc, new Transaction
+                $flags, $scriptSig, $scriptPubKey, $test->result, new Transaction
             ];
         }
 
@@ -309,7 +309,6 @@ class InterpreterTest extends AbstractTestCase
             new Script(new Buffer()),
             ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../../Data/10010bytes.hex")))->getScript(),
             false,
-            'fails with >10000 bytes',
             new Transaction
         ];
 
@@ -318,21 +317,21 @@ class InterpreterTest extends AbstractTestCase
 
 
     /**
-     * @dataProvider getScripts
      * @param Flags $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
-     * @param bool $result
-     * @param string $description
+     * @param $result
+     * @param $tx
+     * @dataProvider getScripts
      */
-    public function testScript(Flags $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result, $description, $tx)
+    public function testScript(Flags $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result,  $tx)
     {
         $i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter(Bitcoin::getEcAdapter(), $tx, $flags);
 
         $i->setScript($scriptSig)->run();
         $testResult = $i->setScript($scriptPubKey)->run();
 
-        $this->assertEquals($result, $testResult, $description);
+        $this->assertEquals($result, $testResult, ScriptFactory::fromHex($scriptSig->getHex() . $scriptPubKey->getHex())->getScriptParser()->getHumanReadable());
     }/**/
 
 

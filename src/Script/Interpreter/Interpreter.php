@@ -381,6 +381,18 @@ class Interpreter implements InterpreterInterface
         return !(bool)$c;
     }
 
+    private function pushInt($integer)
+    {
+        if ($integer == 0) {
+            return new Buffer("\x00");
+        } else if ($integer > 0 && $integer <= 16) {
+            $opcode = Opcodes::OP_1 - 1 + $integer;
+            return Buffer::int($opcode);
+        } else {
+            return new ScriptNum($this->math, $this->flags, Buffer::int($integer));
+        }
+    }
+
     /**
      * @return bool
      */
@@ -429,8 +441,9 @@ class Interpreter implements InterpreterInterface
                         throw new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
                     $mainStack->push($pushData);
-                    //echo " - [pushed '" . $pushData->getHex() . "']\n";
+                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
+                    // echo $this->script->getOpCodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_0:
                         case Opcodes::OP_1:
@@ -535,7 +548,7 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_DEPTH:
                             $num = $mainStack->size();
-                            $bin = Buffer::int($num, null, $math);
+                            $depth = (new ScriptNum($math, $this->flags, Buffer::int(), 4));
                             $mainStack->push($bin);
                             break;
 
@@ -701,7 +714,6 @@ class Interpreter implements InterpreterInterface
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->push(($equal ? $_bn1 : $_bn0));
-
                             if ($opCode === Opcodes::OP_EQUALVERIFY) {
                                 if ($equal) {
                                     $mainStack->pop();
@@ -709,10 +721,15 @@ class Interpreter implements InterpreterInterface
                                     throw new \RuntimeException('Error EQUALVERIFY');
                                 }
                             }
+
                             break;
 
                         // Arithmetic operations
                         case $opCode >= Opcodes::OP_1ADD && $opCode <= Opcodes::OP_0NOTEQUAL:
+                            if ($mainStack->size() < 1) {
+                                throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
+                            }
+
                             $num = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
 
                             if ($opCode === Opcodes::OP_1ADD) { // cscriptnum
@@ -741,6 +758,10 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case $opCode >= Opcodes::OP_ADD && $opCode <= Opcodes::OP_MAX:
+                            if ($mainStack->size() < 2) {
+                                throw new \Exception('Invalid stack operation (OP_ADD - OP_MAX)');
+                            }
+
                             $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-2), 4))->getInt();
                             $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
 
@@ -790,6 +811,7 @@ class Interpreter implements InterpreterInterface
                             if ($mainStack->size() < 3) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
+
                             $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
                             $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
                             $num3 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
@@ -964,11 +986,11 @@ class Interpreter implements InterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            //echo "\n Runtime: " . $e->getMessage() . "\n";
+            // echo "\n Runtime: " . $e->getMessage() . "\n";
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            //echo "\n General: " . $e->getMessage() ;
+            // echo "\n General: " . $e->getMessage() ;
             return false;
         }
     }

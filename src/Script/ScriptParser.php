@@ -144,7 +144,7 @@ class ScriptParser
         $data = array();
         $pushData = new Buffer('', 0, $this->math);
         while ($this->next($opCode, $pushData)) {
-            if ($opCode < 1) {
+            if ($opCode == 0) {
                 $push = Buffer::hex('00', 1, $this->math);
             } elseif ($opCode <= 78) {
                 $push = $pushData;
