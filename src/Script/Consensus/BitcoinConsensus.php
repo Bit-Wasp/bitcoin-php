@@ -30,16 +30,12 @@ class BitcoinConsensus implements ConsensusInterface
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign)
     {
         $error = 0;
-        $result = (bool) bitcoinconsensus_verify_script(
+        return (bool) bitcoinconsensus_verify_script(
             $scriptPubKey->getBinary(),
             $tx->getBinary(),
             $nInputToSign,
             $this->flags->getFlags(),
             $error
         );
-        if ($error !== 0) {
-            var_dump($error);
-        }
-        return $result;
     }
 }
