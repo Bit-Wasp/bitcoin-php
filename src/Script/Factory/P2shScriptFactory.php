@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Factory;
 
-
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
