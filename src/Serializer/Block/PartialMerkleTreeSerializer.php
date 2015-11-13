@@ -26,6 +26,26 @@ class PartialMerkleTreeSerializer
             ->getTemplate();
     }
 
+
+    /**
+     * @param int $last
+     * @param Buffer[] $vBytes
+     * @return array
+     */
+    private function buffersToBitArray($last, array $vBytes)
+    {
+        $size = count($vBytes) * 8;
+        $vBits = [];
+
+        for ($p = 0; $p < $size; $p++) {
+            $byteIndex = (int)floor($p / 8);
+            $byte = ord($vBytes[$byteIndex]->getBinary());
+            $vBits[$p] = (int) (($byte & (1 << ($p % 8))) !== 0);
+        }
+
+        return array_slice($vBits, 0, $last);
+    }
+
     /**
      * @param Parser $parser
      * @return PartialMerkleTree
@@ -42,55 +62,35 @@ class PartialMerkleTreeSerializer
     }
 
     /**
-     * @param array $bits
-     * @return array
-     */
-    public function bitsToBuffers(array $bits)
-    {
-        $math = Bitcoin::getMath();
-        $vBytes = str_split(str_pad('', (count($bits)+7)/8, '0', STR_PAD_LEFT));
-        $nBits = count($bits);
-
-        for ($p = 0; $p < $nBits; $p++) {
-            $index = (int)floor($p / 8);
-            $vBytes[$index] |= $bits[$p] << ($p % 8);
-        }
-
-        $results = array_map(
-            function ($value) use ($math) {
-                return Buffer::int($value, null, $math);
-            },
-            $vBytes
-        );
-        return $results;
-    }
-
-    /**
-     * @param int $last
-     * @param Buffer[] $vBytes
-     * @return array
-     */
-    public function buffersToBitArray($last, array $vBytes)
-    {
-        $size = count($vBytes) * 8;
-        $vBits = [];
-
-        for ($p = 0; $p < $size; $p++) {
-            $byteIndex = (int)floor($p / 8);
-            $byte = ord($vBytes[$byteIndex]->getBinary());
-            $vBits[$p] = ($byte & (1 << ($p % 8))) !== 0;
-        }
-
-        return array_slice($vBits, 0, $last);
-    }
-
-    /**
      * @param $data
      * @return PartialMerkleTree
      */
     public function parse($data)
     {
         return $this->fromParser(new Parser($data));
+    }
+
+    /**
+     * @param array $bits
+     * @return array
+     */
+    private function bitsToBuffers(array $bits)
+    {
+        $math = Bitcoin::getMath();
+        $vBuffers = str_split(str_pad('', (count($bits)+7)/8, '0', STR_PAD_LEFT));
+        $nBits = count($bits);
+
+        for ($p = 0; $p < $nBits; $p++) {
+            $index = (int)floor($p / 8);
+            $vBuffers[$index] |= $bits[$p] << ($p % 8);
+        }
+
+        foreach ($vBuffers as &$value) {
+            $value = Buffer::int($value, null, $math);
+        }
+        unset($value);
+
+        return $vBuffers;
     }
 
     /**
