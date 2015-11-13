@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Script\Interpreter\InterpreterFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
-class NativeConsensus
+class NativeConsensus implements ConsensusInterface
 {
     /**
      * @var InterpreterFactory

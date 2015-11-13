@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\EccFactory;
 use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
+use BitWasp\Bitcoin\Flags;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -174,6 +175,24 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
         return $adapters;
     }
+
+    /**
+     * @param $flagStr
+     * @return Flags
+     */
+    public function getInterpreterFlags($flagStr)
+    {
+        $array = explode(",", $flagStr);
+        $int = 0;
+        $checkdisabled = false;
+        foreach ($array as $activeFlag) {
+            $f = constant('\BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::'.$activeFlag);
+            $int |= $f;
+        }
+
+        return new Flags($int, $checkdisabled);
+    }
+
 
     public function safeMath()
     {

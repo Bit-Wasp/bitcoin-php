@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
+use BitWasp\Bitcoin\Script\Interpreter\ScriptNum;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Math\Math;
 
@@ -103,7 +104,9 @@ class ScriptParser
 
         $opCode = $this->getNextOp();
 
-        if ($opCode <= Opcodes::OP_PUSHDATA4) {
+        if ($opCode == Opcodes::OP_0) {
+            $pushData = new Buffer('', 0);
+        } elseif ($opCode <= Opcodes::OP_PUSHDATA4) {
             if ($opCode < Opcodes::OP_PUSHDATA1) {
                 $size = $opCode;
             } else if ($opCode === Opcodes::OP_PUSHDATA1) {
@@ -120,6 +123,7 @@ class ScriptParser
 
             $pushData = new Buffer(substr($this->scriptRaw, $this->ptr, $size), $size, $this->math);
             $this->ptr += $size;
+
         }
 
         return true;
@@ -144,7 +148,7 @@ class ScriptParser
         $data = array();
         $pushData = new Buffer('', 0, $this->math);
         while ($this->next($opCode, $pushData)) {
-            if ($opCode < 1) {
+            if ($opCode == 0) {
                 $push = Buffer::hex('00', 1, $this->math);
             } elseif ($opCode <= 78) {
                 $push = $pushData;
