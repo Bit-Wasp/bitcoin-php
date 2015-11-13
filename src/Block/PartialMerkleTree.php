@@ -244,7 +244,7 @@ class PartialMerkleTree extends Serializable
         }
 
         if ($nHashesUsed !== count($this->vHashes)) {
-            throw new \Exception('Not al hashes consumed');
+            throw new \Exception('Not all hashes consumed');
         }
 
         return $merkleRoot;
