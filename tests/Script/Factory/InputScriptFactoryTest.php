@@ -51,7 +51,7 @@ class InputScriptFactoryTest extends AbstractTestCase
     {
         // Script::payToScriptHash should produce a ScriptHash type script, from a different script
         $private = PrivateKeyFactory::create();
-        $script = ScriptFactory::multisig(1, [$private->getPublicKey()]);
+        $script = ScriptFactory::scriptPubKey()->multisig(1, [$private->getPublicKey()]);
 
         $sigHex = '3045022100dbc87baa1b3a0225566728a0e01b8aaeedfc5a94368708bfa221302302f5458a022032df06bc5b894f848e62197d3aab328e5c8ce97ac3119ba5caacac5221d4534901';
         $sig = TransactionSignatureFactory::fromHex($sigHex);

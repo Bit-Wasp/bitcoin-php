@@ -130,7 +130,7 @@ class TxSignerTest extends AbstractTestCase
     {
         $pk1 = PrivateKeyFactory::create(false, $ecAdapter);
         $pk2 = PrivateKeyFactory::create(false, $ecAdapter);
-        $redeemScript = ScriptFactory::multisigNew(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
+        $redeemScript = ScriptFactory::scriptPubKey()->multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
         $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
         $sampleSpendTx = (new TxBuilder())
             ->output(50, $outputScript)
@@ -229,7 +229,7 @@ class TxSignerTest extends AbstractTestCase
         $pk1 = PrivateKeyFactory::fromHex('421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87', false, $ecAdapter);
         $pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb81e5aa0422402f048162', false, $ecAdapter);
 
-        $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
+        $redeemScript = ScriptFactory::scriptPubKey()->multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
         $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
 
         $sampleSpendTx = (new TxBuilder())
@@ -324,7 +324,7 @@ class TxSignerTest extends AbstractTestCase
         $pk1 = PrivateKeyFactory::fromHex('421c76d77563afa1914846b010bd164f395bd34c2102e5e99e0cb9cf173c1d87');
         $pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb81e5aa0422402f048162');
 
-        $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
+        $redeemScript = ScriptFactory::scriptPubKey()->multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
         $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
 
         // this is the transaction we are pretending exists in the blockchain

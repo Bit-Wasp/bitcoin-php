@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 
 class OutputScriptFactory
 {
@@ -91,7 +92,13 @@ class OutputScriptFactory
             ->getScript();
     }
 
-    public function multisig($m, array $keys = [])
+    /**
+     * @param int $m
+     * @param PublicKeyInterface[] $keys
+     * @param bool|true $sort
+     * @return ScriptCreator|Script
+     */
+    public function multisig($m, array $keys = [], $sort = true)
     {
         $n = count($keys);
         if ($m > $n) {
@@ -99,6 +106,10 @@ class OutputScriptFactory
         }
         if ($n > 16) {
             throw new \LogicException('Number of public keys is greater than 16');
+        }
+
+        if ($sort) {
+            $keys = Buffertools::sort($keys);
         }
 
         $opM = Opcodes::OP_1 - 1 + $m;
@@ -141,9 +152,9 @@ class OutputScriptFactory
                 ->op('OP_HASH160')
                 ->push(Hash::sha256ripe160($secret))
                 ->op('OP_EQUALVERIFY')
-                ->concat(ScriptFactory::multisig(2, [$a1, $b1]))
+                ->concat(ScriptFactory::scriptPubKey()->multisig(2, [$a1, $b1]))
             ->op('OP_ELSE')
-                ->concat(ScriptFactory::multisig(2, [$a2, $b2]))
+                ->concat(ScriptFactory::scriptPubKey()->multisig(2, [$a2, $b2]))
             ->op('OP_ENDIF')
             ->getScript();
     }

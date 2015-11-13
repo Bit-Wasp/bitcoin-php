@@ -26,36 +26,6 @@ class ScriptFactory
     }
 
     /**
-     * @param int               $m
-     * @param KeyInterface[]    $keys
-     * @param bool              $sort
-     * @return ScriptInterface
-     */
-    public static function multisig($m, array $keys = array(), $sort = true)
-    {
-        if ($sort) {
-            $keys = Buffertools::sort($keys);
-        }
-
-        return self::scriptPubKey()->multisig($m, $keys);
-    }
-
-    /**
-     * @param int               $m
-     * @param KeyInterface[]    $keys
-     * @param bool              $sort
-     * @return ScriptInterface
-     */
-    public static function multisigNew($m, array $keys = array(), $sort = true)
-    {
-        if ($sort) {
-            $keys = Buffertools::sort($keys);
-        }
-
-        return self::scriptPubKey()->multisig($m, $keys);
-    }
-
-    /**
      * @return InputScriptFactory
      */
     public static function scriptSig()

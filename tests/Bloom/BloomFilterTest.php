@@ -55,7 +55,7 @@ class BloomFilterTest extends AbstractTestCase
     {
         return TransactionFactory::build()
             ->input('0000000000000000000000000000000000000000000000000000000000000000', 0)
-            ->output(50 * Amount::COIN, ScriptFactory::multisig(1, [$publicKey]))
+            ->output(50 * Amount::COIN, ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]))
             ->get();
     }
     public function testBasics()
