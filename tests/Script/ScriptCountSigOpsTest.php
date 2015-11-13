@@ -72,7 +72,7 @@ class ScriptCountSigOpsTest extends AbstractTestCase
             $pk[] = PrivateKeyFactory::create()->getPublicKey();
         }
 
-        $p2shScript = ScriptFactory::multisig(1, $pk);
+        $p2shScript = ScriptFactory::scriptPubKey()->multisig(1, $pk);
         $this->assertEquals(3, $p2shScript->countSigOps(true));
         $this->assertEquals(20, $p2shScript->countSigOps(false));
 

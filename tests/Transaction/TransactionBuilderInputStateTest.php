@@ -22,7 +22,7 @@ class TransactionBuilderInputStateTest extends AbstractTestCase
 
     private function getRandomRedeemScript()
     {
-        $script = ScriptFactory::multisigNew(2, [
+        $script = ScriptFactory::scriptPubKey()->multisig(2, [
             PrivateKeyFactory::create()->getPublicKey(),
             PrivateKeyFactory::create()->getPublicKey(),
             PrivateKeyFactory::create()->getPublicKey()

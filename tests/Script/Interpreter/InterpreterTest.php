@@ -247,7 +247,7 @@ class InterpreterTest extends AbstractTestCase
             null,               // redeemscript
         ];
 
-        $rs = ScriptFactory::multisig(1, [$privateKey->getPublicKey()]);
+        $rs = ScriptFactory::scriptPubKey()->multisig(1, [$privateKey->getPublicKey()]);
         $vectors[] = [
             true,
             $ec,

@@ -220,4 +220,10 @@ class TxBuilder
 
         return $this;
     }
+
+    public function randomizeBip69()
+    {
+        $outputs = $this->outputs;
+
+    }
 }

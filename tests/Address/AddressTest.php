@@ -90,7 +90,7 @@ class AddressTest extends AbstractTestCase
         $publicKey = $privateKey->getPublicKey();
 
         $pubkeyHash = $outputScriptFactory->payToPubKeyHash($publicKey);
-        $scriptHash = $outputScriptFactory->payToScriptHash(ScriptFactory::multisig(1, [$publicKey]));
+        $scriptHash = $outputScriptFactory->payToScriptHash($outputScriptFactory->multisig(1, [$publicKey]));
 
         $p2pkhAddress = AddressFactory::fromOutputScript($pubkeyHash);
         $this->assertInstanceOf('BitWasp\Bitcoin\Address\PayToPubKeyHashAddress', $p2pkhAddress);

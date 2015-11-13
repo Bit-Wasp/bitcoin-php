@@ -16,8 +16,8 @@ $pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb8
 
 
 // They exchange public keys, and a multisignature address is made.
-$redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
-$outputScript = $redeemScript->getOutputScript();
+$redeemScript = ScriptFactory::scriptPubKey()->multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
+$outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
 
 
 // The address is funded with a transaction (fake, for the purposes of this script).
