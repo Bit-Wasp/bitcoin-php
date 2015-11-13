@@ -238,7 +238,7 @@ class PartialMerkleTree extends Serializable
         if ($this->fBad) {
             throw new \Exception('bad data');
         }
-        
+
         if (ceil(($nBitsUsed + 7) / 8) !== ceil((count($this->vFlagBits)+7)/8)) {
             throw new \Exception('Not all bits consumed');
         }

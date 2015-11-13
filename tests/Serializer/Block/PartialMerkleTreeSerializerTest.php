@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Serializer\Block;
 
-
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Flags;
