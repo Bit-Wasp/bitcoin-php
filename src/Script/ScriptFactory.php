@@ -6,11 +6,10 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Factory\InputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
+use BitWasp\Bitcoin\Script\Factory\P2shScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
 use BitWasp\Bitcoin\Script\Factory\ScriptInfoFactory;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
-use BitWasp\Buffertools\Buffertools;
 
 class ScriptFactory
 {
@@ -39,6 +38,14 @@ class ScriptFactory
     public static function scriptPubKey()
     {
         return new OutputScriptFactory();
+    }
+
+    /**
+     * @return P2shScriptFactory
+     */
+    public static function p2sh()
+    {
+        return new P2shScriptFactory(self::scriptPubKey());
     }
 
     /**
