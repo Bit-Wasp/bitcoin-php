@@ -239,12 +239,12 @@ class PartialMerkleTree extends Serializable
             throw new \Exception('bad data');
         }
 
-        if (($nBitsUsed + 7) / 8 !== (count($this->vFlagBits)+7)/8) {
+        if (ceil(($nBitsUsed + 7) / 8) !== ceil((count($this->vFlagBits)+7)/8)) {
             throw new \Exception('Not all bits consumed');
         }
 
         if ($nHashesUsed !== count($this->vHashes)) {
-            throw new \Exception('Not al hashes consumed');
+            throw new \Exception('Not all hashes consumed');
         }
 
         return $merkleRoot;

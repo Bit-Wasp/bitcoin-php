@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class HexBlockSerializerTest extends AbstractTestCase
+class BlockSerializerTest extends AbstractTestCase
 {
     /**
      * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
