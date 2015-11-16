@@ -422,7 +422,8 @@ class Interpreter implements InterpreterInterface
         }
 
         try {
-            foreach (new ScriptIterator($this->script) as $exec) {
+            $iterator = $this->script->getScriptParser();
+            foreach ($iterator as $exec) {
                 $opCode = $exec->getOp();
                 $pushData = $exec->getData();
                 $fExec = $this->checkExec();

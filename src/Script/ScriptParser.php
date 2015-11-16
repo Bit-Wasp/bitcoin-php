@@ -2,108 +2,93 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Script\ScriptExec;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Buffertools\Buffer;
 
-class ScriptParser
+class ScriptParser implements \Iterator
 {
     /**
-     * @var Math
+     * @var int
      */
-    private $math;
-
-    /**
-     * @var ScriptInterface
-     */
-    private $script;
+    private $position = 0;
 
     /**
      * @var int
      */
-    private $ptr = 0;
+    private $end = 0;
+
+    /**
+     * @var int
+     */
+    private $execPtr = 0;
 
     /**
      * @var string
      */
-    private $scriptRaw;
+    private $data = '';
 
     /**
+     * @var ScriptExec[]
+     */
+    private $array = array();
+
+    /**
+     * ScriptParser constructor.
      * @param Math $math
      * @param ScriptInterface $script
      */
     public function __construct(Math $math, ScriptInterface $script)
     {
-        $this->math = $math;
+        $this->math = Bitcoin::getMath();
+        $buffer = $script->getBuffer();
+        $this->data = $buffer->getBinary();
+        $this->end = $buffer->getSize();
         $this->script = $script;
-        $this->scriptRaw = $script->getBuffer()->getBinary();
     }
 
     /**
-     * @return int
+     * @param string $packFormat
+     * @param integer $strSize
+     * @return array|bool
      */
-    private function getNextOp()
+    private function unpackSize($packFormat, $strSize)
     {
-        return ord($this->scriptRaw[$this->ptr++]);
-    }
+        if ($this->end - $this->position < $strSize) {
+            return false;
+        }
+        $size = unpack($packFormat, substr($this->data, $this->position, $strSize));
+        $size = $size[1];
+        $this->position += $strSize;
 
-    /**
-     * @return int
-     */
-    public function getPosition()
-    {
-        return $this->ptr;
-    }
-
-    /**
-     * @return int
-     */
-    public function getEndPos()
-    {
-        return $this->script->getBuffer()->getSize();
+        return $size;
     }
 
     /**
      * @param int $size
      * @return bool
      */
-    public function validateSize($size)
+    private function validateSize($size)
     {
-        $pdif = ($this->getEndPos() - $this->getPosition());
+        $pdif = ($this->end - $this->position);
         return ! ($pdif < 0 || $pdif < $size);
     }
 
     /**
-     * @param string $format
-     * @param integer $strSize
-     * @return array|bool
+     * @param int $ptr
+     * @return ScriptExec
      */
-    private function unpackSize($format, $strSize)
+    private function doNext($ptr)
     {
-        if ($this->getEndPos() - $this->getPosition() < $strSize) {
-            return false;
-        }
-        $size = unpack($format, substr($this->scriptRaw, $this->getPosition(), $strSize));
-        $size = $size[1];
-        $this->ptr += $strSize;
-
-        return $size;
-    }
-
-    /**
-     * @param $opCode
-     * @param Buffer $pushData
-     * @return bool
-     */
-    public function next(&$opCode, Buffer &$pushData)
-    {
-        $opCode = Opcodes::OP_INVALIDOPCODE;
-        if ($this->math->cmp($this->getPosition(), $this->getEndPos()) >= 0) {
-            return false;
+        if ($this->math->cmp($this->position, $this->end) >= 0) {
+            throw new \RuntimeException('Position exceeds end of script!');
         }
 
-        $opCode = $this->getNextOp();
+        $opCode = ord($this->data[$this->position++]);
+        $pushData = null;
 
-        if ($opCode == Opcodes::OP_0) {
+        if ($opCode === Opcodes::OP_0) {
             $pushData = new Buffer('', 0);
         } elseif ($opCode <= Opcodes::OP_PUSHDATA4) {
             if ($opCode < Opcodes::OP_PUSHDATA1) {
@@ -117,24 +102,68 @@ class ScriptParser
             }
 
             if ($size === false || $this->validateSize($size) === false) {
-                return false;
+                throw new \RuntimeException('Failed to unpack data from Script');
             }
 
-            $pushData = new Buffer(substr($this->scriptRaw, $this->ptr, $size), $size, $this->math);
-            $this->ptr += $size;
-
+            $pushData = new Buffer(substr($this->data, $this->position, $size), $size, $this->math);
+            $this->position += $size;
         }
 
-        return true;
+        $this->array[$ptr] = $result = new ScriptExec($opCode, $pushData);
+
+        return $result;
     }
 
     /**
-     * @return $this
+     *
      */
-    public function resetPosition()
+    public function rewind()
     {
-        $this->ptr = 0;
-        return $this;
+        $this->execPtr = 0;
+    }
+
+    /**
+     * @return ScriptExec
+     */
+    public function current()
+    {
+        if (isset($this->array[$this->execPtr])) {
+            $exec = $this->array[$this->execPtr];
+        } else {
+            $exec = $this->doNext($this->execPtr);
+        }
+
+        return $exec;
+    }
+
+    /**
+     * @return int
+     */
+    public function key()
+    {
+        return $this->execPtr;
+    }
+
+    /**
+     * @return ScriptExec
+     */
+    public function next()
+    {
+        $ptr = $this->execPtr;
+        if (isset($this->array[$ptr])) {
+            $this->execPtr++;
+            return $this->array[$ptr];
+        }
+
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function valid()
+    {
+        return isset($this->array[$this->execPtr]) || $this->position < $this->end;
     }
 
     /**
@@ -145,12 +174,14 @@ class ScriptParser
     public function parse()
     {
         $data = array();
-        $pushData = new Buffer('', 0, $this->math);
-        while ($this->next($opCode, $pushData)) {
+
+        $it = $this;
+        foreach ($it as $exec) {
+            $opCode = $exec->getOp();
             if ($opCode == 0) {
                 $push = Buffer::hex('00', 1, $this->math);
             } elseif ($opCode <= 78) {
-                $push = $pushData;
+                $push = $exec->getData();
             } else {
                 // None of these are pushdatas, so just an opcode
                 $push = $this->script->getOpcodes()->getOp($opCode);
@@ -158,8 +189,6 @@ class ScriptParser
 
             $data[] = $push;
         }
-
-        $this->resetPosition();
 
         return $data;
     }

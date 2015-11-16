@@ -1,8 +1,7 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script\Interpreter;
+namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Buffertools\Buffer;
 
 class ScriptExec
