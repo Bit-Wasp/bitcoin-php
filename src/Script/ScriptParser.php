@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Script\Interpreter\ScriptNum;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Math\Math;
 
@@ -64,7 +63,7 @@ class ScriptParser
     }
 
     /**
-     * @param $size
+     * @param int $size
      * @return bool
      */
     public function validateSize($size)
