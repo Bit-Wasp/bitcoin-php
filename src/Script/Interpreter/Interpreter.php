@@ -421,10 +421,10 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        $pushData = new Buffer('', 0, $math);
-
         try {
-            while ($parser->next($opCode, $pushData) === true) {
+            foreach (new ScriptIterator($this->script) as $exec) {
+                $opCode = $exec->getOp();
+                $pushData = $exec->getData();
                 $fExec = $this->checkExec();
 
                 // If pushdata was written to,
