@@ -49,6 +49,14 @@ class ScriptParser implements \Iterator
     }
 
     /**
+     * @return int
+     */
+    public function getPosition()
+    {
+        return $this->position;
+    }
+
+    /**
      * @param string $packFormat
      * @param integer $strSize
      * @return array|bool

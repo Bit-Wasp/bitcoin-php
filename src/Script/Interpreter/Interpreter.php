@@ -385,18 +385,6 @@ class Interpreter implements InterpreterInterface
         return !(bool)$c;
     }
 
-    private function pushInt($integer)
-    {
-        if ($integer == 0) {
-            return new Buffer("\x00");
-        } else if ($integer > 0 && $integer <= 16) {
-            $opcode = Opcodes::OP_1 - 1 + $integer;
-            return Buffer::int($opcode);
-        } else {
-            return new ScriptNum($this->math, $this->flags, Buffer::int($integer));
-        }
-    }
-
     /**
      * @return bool
      */
@@ -422,8 +410,7 @@ class Interpreter implements InterpreterInterface
         }
 
         try {
-            $iterator = $this->script->getScriptParser();
-            foreach ($iterator as $exec) {
+            foreach ($parser as $exec) {
                 $opCode = $exec->getOp();
                 $pushData = $exec->getData();
                 $fExec = $this->checkExec();
