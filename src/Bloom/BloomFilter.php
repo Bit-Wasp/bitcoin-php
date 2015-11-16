@@ -365,13 +365,10 @@ class BloomFilter extends Serializable
 
         // Check for relevant output scripts. We add the outpoint to the filter if found.
         foreach ($tx->getOutputs() as $vout => $output) {
-            $opCode = null;
-            $pushData = new Buffer('', 0, $this->math);
-
             $script = $output->getScript();
             $parser = $script->getScriptParser();
-            while ($parser->next($opCode, $pushData)) {
-                if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
+            foreach ($parser as $exec) {
+                if ($exec->isPush() && $this->containsData($exec->getData())) {
                     $found = true;
                     if ($this->isUpdateAll()) {
                         $this->insertOutpoint($txHash->getHex(), $vout);
@@ -395,10 +392,8 @@ class BloomFilter extends Serializable
             }
 
             $parser = $txIn->getScript()->getScriptParser();
-            $opCode = null;
-            $pushData = new Buffer('', 0, $this->math);
-            while ($parser->next($opCode, $pushData)) {
-                if ($pushData->getSize() > 0 && $this->containsData($pushData)) {
+            foreach ($parser as $exec) {
+                if ($exec->isPush() > 0 && $this->containsData($exec->getData())) {
                     return true;
                 }
             }

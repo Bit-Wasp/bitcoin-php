@@ -13,7 +13,7 @@ class Script extends Serializable implements ScriptInterface
     /**
      * @var Opcodes
      */
-    private $opcodes;
+    private $opCodes;
 
     /**
      * @var null|string
@@ -22,12 +22,12 @@ class Script extends Serializable implements ScriptInterface
 
     /**
      * @param Buffer|null $script
-     * @param Opcodes|null $opcodes
+     * @param Opcodes|null $opCodes
      */
-    public function __construct(Buffer $script = null, Opcodes $opcodes = null)
+    public function __construct(Buffer $script = null, Opcodes $opCodes = null)
     {
         $this->script = $script instanceof Buffer ? $script->getBinary() : '';
-        $this->opcodes = $opcodes ?: new Opcodes();
+        $this->opCodes = $opCodes ?: new Opcodes();
     }
 
     /**
@@ -53,7 +53,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function getOpCodes()
     {
-        return $this->opcodes;
+        return $this->opCodes;
     }
 
     /**
@@ -74,11 +74,15 @@ class Script extends Serializable implements ScriptInterface
     {
         $count = 0;
         $parser = $this->getScriptParser();
-        $op = Opcodes::OP_INVALIDOPCODE;
-        $pushData = new Buffer();
+
         $lastOp = 0xff;
-        while ($parser->next($op, $pushData)) {
-            if ($op > 78) {
+        foreach ($parser as $exec) {
+            if ($exec->isPush()) {
+                continue;
+            }
+
+            $op = $exec->getOp();
+            if ($op > Opcodes::OP_PUSHDATA4) {
                 // None of these are pushdatas, so just an opcode
                 if ($op === Opcodes::OP_CHECKSIG || $op === Opcodes::OP_CHECKSIGVERIFY) {
                     $count++;
@@ -111,17 +115,16 @@ class Script extends Serializable implements ScriptInterface
             return $this->countSigOps(true);
         }
 
-        $parsed = $scriptSig->getScriptParser();
-        $op = Opcodes::OP_INVALIDOPCODE;
-        $push = new Buffer();
+        $parser = $scriptSig->getScriptParser();
+
         $data = null;
-        while ($parsed->next($op, $push)) {
-            if ($op > Opcodes::OP_16) {
+        foreach ($parser as $exec) {
+            if ($exec->getOp() > Opcodes::OP_16) {
                 return 0;
             }
 
-            if ($push instanceof Buffer) {
-                $data = $push;
+            if ($exec->isPush()) {
+                $data = $exec->getData();
             }
         }
 
@@ -129,7 +132,7 @@ class Script extends Serializable implements ScriptInterface
             return 0;
         }
 
-        return (new Script($push))->countSigOps(true);
+        return (new Script($data))->countSigOps(true);
     }
 
     /**
