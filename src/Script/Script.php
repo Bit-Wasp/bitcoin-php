@@ -13,7 +13,7 @@ class Script extends Serializable implements ScriptInterface
     /**
      * @var Opcodes
      */
-    private $opcodes;
+    private $opCodes;
 
     /**
      * @var null|string
@@ -22,12 +22,12 @@ class Script extends Serializable implements ScriptInterface
 
     /**
      * @param Buffer|null $script
-     * @param Opcodes|null $opcodes
+     * @param Opcodes|null $opCodes
      */
-    public function __construct(Buffer $script = null, Opcodes $opcodes = null)
+    public function __construct(Buffer $script = null, Opcodes $opCodes = null)
     {
         $this->script = $script instanceof Buffer ? $script->getBinary() : '';
-        $this->opcodes = $opcodes ?: new Opcodes();
+        $this->opCodes = $opCodes ?: new Opcodes();
     }
 
     /**
@@ -53,7 +53,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function getOpCodes()
     {
-        return $this->opcodes;
+        return $this->opCodes;
     }
 
     /**
