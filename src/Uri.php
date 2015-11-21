@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin;
 
-
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 

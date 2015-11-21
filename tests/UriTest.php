@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
-
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Uri;
@@ -89,5 +88,4 @@ class UriTest extends AbstractTestCase
 
         $this->assertEquals('bitcoin:?r=https%3A%2F%2Fexample.com%2Frequest', $uri->uri());
     }
-
 }
