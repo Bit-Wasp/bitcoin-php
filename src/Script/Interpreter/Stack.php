@@ -86,7 +86,23 @@ class Stack extends \SplDoublyLinkedList
     public function add($index, $value)
     {
         $this->typeCheck($value);
-        parent::add($index, $value);
+
+        if (getenv('HHVM_VERSION') || version_compare(phpversion(), '5.5.0', 'lt')) {
+            $size = count($this);
+            $temp = [];
+            for ($i = $size; $i >= $index; $i++) {
+                $value = $this->pop();
+                if ($i !== $index) {
+                    array_unshift($temp, $value);
+                }
+            }
+
+            foreach ($temp as $value) {
+                $this->push($value);
+            }
+        } else {
+            parent::add($index, $value);
+        }
     }
 
     /**
