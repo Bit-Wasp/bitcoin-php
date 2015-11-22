@@ -16,7 +16,8 @@ class OutputCollectionMutator extends MutableCollection
         /** @var OutputMutator[] $set */
         $this->set = new \SplFixedArray(count($outputs));
         foreach ($outputs as $i => $output) {
-            $this->set->offsetSet($i, new OutputMutator($output));
+            /** @var int $i */
+            $this->set[$i] = new OutputMutator($output);
         }
     }
 
