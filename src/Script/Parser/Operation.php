@@ -1,10 +1,11 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Parser;
 
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Buffertools\Buffer;
 
-class ScriptExec
+class Operation
 {
     /**
      * @var bool

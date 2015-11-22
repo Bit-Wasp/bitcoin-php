@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Script\Parser\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
@@ -39,11 +40,11 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * @return ScriptParser
+     * @return Parser
      */
     public function getScriptParser()
     {
-        return new ScriptParser(Bitcoin::getMath(), $this);
+        return new Parser(Bitcoin::getMath(), $this);
     }
 
     /**

@@ -7,32 +7,32 @@ use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 
 class TransactionInputCollection extends StaticCollection
 {
-
     /**
-     * Initialize a new collection with a list of inputs.
+     * Initialize a new collection with a list of Inputs.
      *
      * @param TransactionInputInterface[] $inputs
      */
     public function __construct(array $inputs = [])
     {
-        foreach ($inputs as $input) {
+        $this->set = new \SplFixedArray(count($inputs));
+        foreach ($inputs as $idx => $input) {
             if (!$input instanceof TransactionInputInterface) {
                 throw new \InvalidArgumentException('Must provide TransactionInputInterface[] to TransactionInputCollection');
             }
+            $this->set->offsetSet($idx, $input);
         }
-
-        $this->set = \SplFixedArray::fromArray($inputs);
     }
 
     public function __clone()
     {
-        $this->set = \SplFixedArray::fromArray(array_map(
-            function (TransactionInputInterface $txIn) {
-                return clone $txIn;
-            },
-            $this->set->toArray()
-        ));
+        $inputs = $this->set;
+        $this->set = new \SplFixedArray(count($inputs));
+
+        foreach ($inputs as $idx => $input) {
+            $this->set->offsetSet($idx, $input);
+        }
     }
+
 
     /**
      * @return TransactionInputInterface

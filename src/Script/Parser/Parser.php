@@ -1,13 +1,15 @@
 <?php
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Parser;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Script\ScriptExec;
+use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 
-class ScriptParser implements \Iterator
+class Parser implements \Iterator
 {
     /**
      * @var int
@@ -30,7 +32,7 @@ class ScriptParser implements \Iterator
     private $data = '';
 
     /**
-     * @var ScriptExec[]
+     * @var Operation[]
      */
     private $array = array();
 
@@ -80,12 +82,16 @@ class ScriptParser implements \Iterator
     private function validateSize($size)
     {
         $pdif = ($this->end - $this->position);
-        return ! ($pdif < 0 || $pdif < $size);
+        $a = $pdif < 0;
+        $b = $pdif < $size;
+        $r = !($a || $b);
+
+        return $r;
     }
 
     /**
      * @param int $ptr
-     * @return ScriptExec
+     * @return Operation
      */
     private function doNext($ptr)
     {
@@ -109,15 +115,18 @@ class ScriptParser implements \Iterator
                 $size = $this->unpackSize('V', 4);
             }
 
-            if ($size === false || $this->validateSize($size) === false) {
-                throw new \RuntimeException('Failed to unpack data from Script');
+            if ($size === false) {
+                throw new \RuntimeException('Failed to unpack data from Script1');
+            }
+            if ($this->validateSize($size) === false) {
+                throw new \RuntimeException('Failed to unpack data from Script2');
             }
 
             $pushData = new Buffer(substr($this->data, $this->position, $size), $size, $this->math);
             $this->position += $size;
         }
 
-        $this->array[$ptr] = $result = new ScriptExec($opCode, $pushData);
+        $this->array[$ptr] = $result = new Operation($opCode, $pushData);
 
         return $result;
     }
@@ -131,7 +140,7 @@ class ScriptParser implements \Iterator
     }
 
     /**
-     * @return ScriptExec
+     * @return Operation
      */
     public function current()
     {
@@ -153,7 +162,7 @@ class ScriptParser implements \Iterator
     }
 
     /**
-     * @return ScriptExec
+     * @return Operation
      */
     public function next()
     {
