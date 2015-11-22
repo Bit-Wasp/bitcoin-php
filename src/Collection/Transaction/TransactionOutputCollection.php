@@ -11,27 +11,27 @@ class TransactionOutputCollection extends StaticCollection
     /**
      * Initialize a new collection with a list of outputs.
      *
-     * @param TransactionOutputInterface[] $inputs
+     * @param TransactionOutputInterface[] $outputs
      */
-    public function __construct(array $inputs = [])
+    public function __construct(array $outputs = [])
     {
-        foreach ($inputs as $output) {
+        $this->set = new \SplFixedArray(count($outputs));
+        foreach ($outputs as $idx => $output) {
             if (!$output instanceof TransactionOutputInterface) {
                 throw new \InvalidArgumentException('Must provide TransactionOutputInterface[] to TransactionOutputCollection');
             }
+            $this->set->offsetSet($idx, $output);
         }
-
-        $this->set = \SplFixedArray::fromArray($inputs);
     }
 
     public function __clone()
     {
-        $this->set = \SplFixedArray::fromArray(array_map(
-            function (TransactionOutputInterface $txIn) {
-                return clone $txIn;
-            },
-            $this->set->toArray()
-        ));
+        $outputs = $this->set;
+        $this->set = new \SplFixedArray(count($outputs));
+
+        foreach ($outputs as $idx => $output) {
+            $this->set->offsetSet($idx, $output);
+        }
     }
 
     /**

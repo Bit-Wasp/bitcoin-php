@@ -14,12 +14,10 @@ class OutputCollectionMutator extends MutableCollection
     public function __construct(array $outputs)
     {
         /** @var OutputMutator[] $set */
-        $set = [];
+        $this->set = new \SplFixedArray(count($outputs));
         foreach ($outputs as $i => $output) {
-            $set[$i] = new OutputMutator($output);
+            $this->set->offsetSet($i, new OutputMutator($output));
         }
-
-        $this->set = \SplFixedArray::fromArray($set);
     }
 
     /**

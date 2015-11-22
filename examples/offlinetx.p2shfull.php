@@ -17,14 +17,14 @@ $pk2 = PrivateKeyFactory::fromHex('f7225388c1d69d57e6251c9fda50cbbf9e05131e5adb8
 
 // They exchange public keys, and a multisignature address is made.
 $redeemScript = ScriptFactory::scriptPubKey()->multisig(2, [$pk1->getPublicKey(), $pk2->getPublicKey()]);
-$outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
+$os = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
 
 
 // The address is funded with a transaction (fake, for the purposes of this script).
 // You would do getrawtransaction normall
 $fundTx = (new TxBuilder())
     ->input('4141414141414141414141414141414141414141414141414141414141414141', 0)
-    ->output(50, $outputScript)
+    ->output(50, $os)
     ->get();
 
 
@@ -38,8 +38,8 @@ $spendTx = (new TxBuilder())
 // Two parties sign the transaction (can be done in steps)
 $signer = new TxSigner($ecAdapter, $spendTx);
 $signer
-    ->sign(0, $pk1, $outputScript, $redeemScript)
-    ->sign(0, $pk2, $outputScript, $redeemScript);
+    ->sign(0, $pk1, $os, $redeemScript)
+    ->sign(0, $pk2, $os, $redeemScript);
 
 $rawTx = $signer->get()->getHex();
 

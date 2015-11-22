@@ -93,7 +93,7 @@ class Interpreter implements InterpreterInterface
         $this->script = new Script();
         $this->state = new State();
         $this->vchFalse = new Buffer("", 0, $this->math);
-        $this->vchTrue = new Buffer("\x01", 1, $this->math);
+        $this->vchTrue = Buffer::hex("01", 1, $this->math);
         $this->int0 = new ScriptNum($this->math, new Flags(0), $this->vchFalse, 4);
         $this->int1 = new ScriptNum($this->math, new Flags(0), $this->vchTrue, 1);
     }
@@ -362,8 +362,9 @@ class Interpreter implements InterpreterInterface
             }
 
             // Load redeemscript as the scriptPubKey
-            $scriptPubKey = new Script($mainStack[-1]);
+            $scriptPubKey = new Script($mainStack->bottom());
             $mainStack->pop();
+
             if (!$this->setScript($scriptPubKey)->run()) {
                 return false;
             }

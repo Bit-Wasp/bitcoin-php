@@ -82,7 +82,11 @@ class Parser implements \Iterator
     private function validateSize($size)
     {
         $pdif = ($this->end - $this->position);
-        return ! ($pdif < 0 || $pdif < $size);
+        $a = $pdif < 0;
+        $b = $pdif < $size;
+        $r = !($a || $b);
+
+        return $r;
     }
 
     /**
@@ -111,8 +115,11 @@ class Parser implements \Iterator
                 $size = $this->unpackSize('V', 4);
             }
 
-            if ($size === false || $this->validateSize($size) === false) {
-                throw new \RuntimeException('Failed to unpack data from Script');
+            if ($size === false) {
+                throw new \RuntimeException('Failed to unpack data from Script1');
+            }
+            if ( $this->validateSize($size) === false) {
+                throw new \RuntimeException('Failed to unpack data from Script2');
             }
 
             $pushData = new Buffer(substr($this->data, $this->position, $size), $size, $this->math);
