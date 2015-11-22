@@ -2,37 +2,34 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
-use BitWasp\Bitcoin\Script\ScriptStack;
+use BitWasp\Bitcoin\Script\Interpreter\Stack;
 
 class State
 {
     /**
-     * @var ScriptStack
+     * @var Stack
      */
     private $mainStack;
 
     /**
-     * @var ScriptStack
+     * @var Stack
      */
     private $vfStack;
 
     /**
-     * @var ScriptStack
+     * @var Stack
      */
     private $altStack;
 
-    /**
-     *
-     */
     public function __construct()
     {
-        $this->mainStack = new ScriptStack();
-        $this->vfStack = new ScriptStack();
-        $this->altStack = new ScriptStack();
+        $this->mainStack = new Stack();
+        $this->vfStack = new Stack();
+        $this->altStack = new Stack();
     }
 
     /**
-     * @return ScriptStack
+     * @return Stack
      */
     public function cloneMainStack()
     {
@@ -40,17 +37,17 @@ class State
     }
 
     /**
-     * @param ScriptStack $mainStack
+     * @param Stack $mainStack
      * @return $this
      */
-    public function restoreMainStack(ScriptStack $mainStack)
+    public function restoreMainStack(Stack $mainStack)
     {
         $this->mainStack = $mainStack;
         return $this;
     }
 
     /**
-     * @return ScriptStack
+     * @return Stack
      */
     public function getMainStack()
     {
@@ -58,7 +55,7 @@ class State
     }
 
     /**
-     * @return ScriptStack
+     * @return Stack
      */
     public function getVfStack()
     {
@@ -66,7 +63,7 @@ class State
     }
 
     /**
-     * @return ScriptStack
+     * @return Stack
      */
     public function getAltStack()
     {

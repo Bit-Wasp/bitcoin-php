@@ -9,11 +9,11 @@ use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\ScriptStack;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
@@ -328,7 +328,7 @@ class Interpreter implements InterpreterInterface
         }
 
         $mainStack = $this->state->getMainStack();
-        $stackCopy = new ScriptStack;
+        $stackCopy = new Stack;
         if ($this->flags->checkFlags(InterpreterInterface::VERIFY_P2SH)) {
             $stackCopy = $this->state->cloneMainStack();
         }
@@ -337,11 +337,11 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        if ($mainStack->size() === 0) {
+        if (count($mainStack) === 0) {
             return false;
         }
 
-        if (false === $this->castToBool($mainStack->top(-1))) {
+        if (false === $this->castToBool($mainStack[-1])) {
             return false;
         }
 
@@ -354,12 +354,12 @@ class Interpreter implements InterpreterInterface
 
             // Restore mainStack to how it was after evaluating scriptSig
             $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
-            if ($mainStack->size() === 0) {
+            if (count($mainStack) === 0) {
                 return false;
             }
 
             // Load redeemscript as the scriptPubKey
-            $scriptPubKey = new Script($mainStack->top(-1));
+            $scriptPubKey = new Script($mainStack[-1]);
             $mainStack->pop();
             if (!$this->setScript($scriptPubKey)->run()) {
                 return false;
@@ -436,9 +436,9 @@ class Interpreter implements InterpreterInterface
                     }
 
                     $mainStack->push($pushData);
-                     //echo " - [pushed '" . $pushData->getHex() . "']\n";
+                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
-                     //echo "OPCODE - " . $this->script->getOpCodes()->getOp($opCode) . "\n";
+                    // echo "OPCODE - " . $this->script->getOpCodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1:
                         case Opcodes::OP_2:
@@ -474,7 +474,7 @@ class Interpreter implements InterpreterInterface
                             // <expression> if [statements] [else [statements]] endif
                             $value = false;
                             if ($fExec) {
-                                if ($mainStack->size() < 1) {
+                                if (count($mainStack) < 1) {
                                     throw new \RuntimeException('Unbalanced conditional');
                                 }
                                 // todo
@@ -484,27 +484,27 @@ class Interpreter implements InterpreterInterface
                                     $value = !$value;
                                 }
                             }
-                            $vfStack->push($value);
+                            $vfStack->push($value ? $vchTrue : $vchFalse);
                             break;
 
                         case Opcodes::OP_ELSE:
-                            if ($vfStack->size() === 0) {
+                            if (count($vfStack) === 0) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
-                            $vfStack->set($vfStack->end() - 1, !$vfStack->end());
+                            $vfStack[-1] = !$vfStack->end() ? $vchTrue : $vchFalse;
                             break;
 
                         case Opcodes::OP_ENDIF:
-                            if ($vfStack->size() === 0) {
+                            if (count($vfStack) === 0) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
                             break;
 
                         case Opcodes::OP_VERIFY:
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
-                            $value = $this->castToBool($mainStack->top(-1));
+                            $value = $this->castToBool($mainStack[-1]);
                             if (!$value) {
                                 throw new \RuntimeException('Error: verify');
                             }
@@ -516,14 +516,14 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_TOALTSTACK:
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation OP_TOALTSTACK');
                             }
                             $altStack->push($mainStack->pop());
                             break;
 
                         case Opcodes::OP_FROMALTSTACK:
-                            if ($altStack->size() < 1) {
+                            if (count($altStack) < 1) {
                                 throw new \RuntimeException('Invalid alt-stack operation OP_FROMALTSTACK');
                             }
                             $mainStack->push($altStack->pop());
@@ -531,17 +531,17 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_IFDUP:
                             // If top value not zero, duplicate it.
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation OP_IFDUP');
                             }
-                            $vch = $mainStack->top(-1);
+                            $vch = $mainStack[-1];
                             if ($this->castToBool($vch)) {
                                 $mainStack->push($vch);
                             }
                             break;
 
                         case Opcodes::OP_DEPTH:
-                            $num = $mainStack->size();
+                            $num = count($mainStack);
                             if ($num === 0) {
                                 $depth = $vchFalse;
                             } else {
@@ -552,36 +552,36 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_DROP:
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation OP_DROP');
                             }
                             $mainStack->pop();
                             break;
                         case Opcodes::OP_DUP:
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation OP_DUP');
                             }
-                            $vch = $mainStack->top(-1);
+                            $vch = $mainStack[-1];
                             $mainStack->push($vch);
                             break;
 
                         case Opcodes::OP_NIP:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_NIP');
                             }
-                            $mainStack->erase(-2);
+                            unset($mainStack[-2]);
                             break;
 
                         case Opcodes::OP_OVER:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_OVER');
                             }
-                            $vch = $mainStack->top(-2);
+                            $vch = $mainStack[-2];
                             $mainStack->push($vch);
                             break;
-
+    
                         case Opcodes::OP_ROT:
-                            if ($mainStack->size() < 3) {
+                            if (count($mainStack) < 3) {
                                 throw new \RuntimeException('Invalid stack operation OP_ROT');
                             }
                             $mainStack->swap(-3, -2);
@@ -589,42 +589,42 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_SWAP:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_SWAP');
                             }
                             $mainStack->swap(-2, -1);
                             break;
 
                         case Opcodes::OP_TUCK:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_TUCK');
                             }
-                            $vch = $mainStack->top(-1);
-                            $mainStack->insert($mainStack->end() - 2, $vch);
+                            $vch = $mainStack[-1];
+                            $mainStack->add(count($mainStack) - 1 - 2, $vch);
                             break;
 
                         case Opcodes::OP_PICK:
                         case Opcodes::OP_ROLL:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
-                            $top = $mainStack->top(-1);
+                            $top = $mainStack[-1];
                             $n = (new ScriptNum($math, $this->flags, $top, 4))->getInt();
                             $mainStack->pop();
-                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, $mainStack->size()) >= 0) {
+                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, count($mainStack)) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $pos = $math->sub($math->sub(0, $n), 1);
-                            $vch = $mainStack->top($pos);
+                            $pos = (int) $math->sub($math->sub(0, $n), 1);
+                            $vch = $mainStack[$pos];
                             if ($opCode === Opcodes::OP_ROLL) {
-                                $mainStack->erase($pos);
+                                unset($mainStack[$pos]);
                             }
                             $mainStack->push($vch);
                             break;
 
                         case Opcodes::OP_2DROP:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_2DROP');
                             }
                             $mainStack->pop();
@@ -632,51 +632,50 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_2DUP:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_2DUP');
                             }
-                            $string1 = $mainStack->top(-2);
-                            $string2 = $mainStack->top(-1);
+                            $string1 = $mainStack[-2];
+                            $string2 = $mainStack[-1];
                             $mainStack->push($string1);
                             $mainStack->push($string2);
                             break;
 
                         case Opcodes::OP_3DUP:
-                            if ($mainStack->size() < 3) {
+                            if (count($mainStack) < 3) {
                                 throw new \RuntimeException('Invalid stack operation OP_3DUP');
                             }
-                            $string1 = $mainStack->top(-3);
-                            $string2 = $mainStack->top(-2);
-                            $string3 = $mainStack->top(-1);
+                            $string1 = $mainStack[-3];
+                            $string2 = $mainStack[-2];
+                            $string3 = $mainStack[-1];
                             $mainStack->push($string1);
                             $mainStack->push($string2);
                             $mainStack->push($string3);
                             break;
 
                         case Opcodes::OP_2OVER:
-                            if ($mainStack->size() < 4) {
+                            if (count($mainStack) < 4) {
                                 throw new \RuntimeException('Invalid stack operation OP_2OVER');
                             }
-                            $string1 = $mainStack->top(-4);
-                            $string2 = $mainStack->top(-3);
+                            $string1 = $mainStack[-4];
+                            $string2 = $mainStack[-3];
                             $mainStack->push($string1);
                             $mainStack->push($string2);
                             break;
 
                         case Opcodes::OP_2ROT:
-                            if ($mainStack->size() < 6) {
+                            if (count($mainStack) < 6) {
                                 throw new \RuntimeException('Invalid stack operation OP_2ROT');
                             }
-                            $string1 = $mainStack->top(-6);
-                            $string2 = $mainStack->top(-5);
-                            $mainStack->erase(-6);
-                            $mainStack->erase(-5);
+                            $string1 = $mainStack[-6];
+                            $string2 = $mainStack[-5];
+                            unset($mainStack[-6], $mainStack[-5]);
                             $mainStack->push($string1);
                             $mainStack->push($string2);
                             break;
 
                         case Opcodes::OP_2SWAP:
-                            if ($mainStack->size() < 4) {
+                            if (count($mainStack) < 4) {
                                 throw new \RuntimeException('Invalid stack operation OP_2SWAP');
                             }
                             $mainStack->swap(-3, -1);
@@ -684,11 +683,11 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_SIZE:
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation OP_SIZE');
                             }
                             // todo: Int sizes?
-                            $vch = $mainStack->top(-1);
+                            $vch = $mainStack[-1];
                             $size = Buffer::int($vch->getSize(), null, $math);
 
                             $mainStack->push($size);
@@ -696,11 +695,11 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_EQUAL:
                         case Opcodes::OP_EQUALVERIFY:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_EQUAL');
                             }
-                            $vch1 = $mainStack->top(-2);
-                            $vch2 = $mainStack->top(-1);
+                            $vch1 = $mainStack[-2];
+                            $vch2 = $mainStack[-1];
 
                             $equal = ($vch1->getBinary() === $vch2->getBinary());
 
@@ -719,11 +718,11 @@ class Interpreter implements InterpreterInterface
 
                         // Arithmetic operations
                         case $opCode >= Opcodes::OP_1ADD && $opCode <= Opcodes::OP_0NOTEQUAL:
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
                             }
 
-                            $num = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+                            $num = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
 
                             if ($opCode === Opcodes::OP_1ADD) { // cscriptnum
                                 $num = $math->add($num, '1');
@@ -751,12 +750,12 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case $opCode >= Opcodes::OP_ADD && $opCode <= Opcodes::OP_MAX:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \Exception('Invalid stack operation (OP_ADD - OP_MAX)');
                             }
 
-                            $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-2), 4))->getInt();
-                            $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+                            $num1 = (new ScriptNum($math, $this->flags, $mainStack[-2], 4))->getInt();
+                            $num2 = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
 
                             if ($opCode === Opcodes::OP_ADD) {
                                 $num = $math->add($num1, $num2);
@@ -792,7 +791,7 @@ class Interpreter implements InterpreterInterface
                             $mainStack->push($buffer);
 
                             if ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
-                                if ($this->castToBool($mainStack->top(-1))) {
+                                if ($this->castToBool($mainStack[-1])) {
                                     $mainStack->pop();
                                 } else {
                                     throw new \RuntimeException('NUM EQUAL VERIFY error');
@@ -801,13 +800,13 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_WITHIN:
-                            if ($mainStack->size() < 3) {
+                            if (count($mainStack) < 3) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $num1 = (new ScriptNum($math, $this->flags, $mainStack->top(-3), 4))->getInt();
-                            $num2 = (new ScriptNum($math, $this->flags, $mainStack->top(-2), 4))->getInt();
-                            $num3 = (new ScriptNum($math, $this->flags, $mainStack->top(-1), 4))->getInt();
+                            $num1 = (new ScriptNum($math, $this->flags, $mainStack[-3], 4))->getInt();
+                            $num2 = (new ScriptNum($math, $this->flags, $mainStack[-2], 4))->getInt();
+                            $num3 = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
 
                             $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
                             $mainStack->pop();
@@ -822,11 +821,11 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_SHA256:
                         case Opcodes::OP_HASH160:
                         case Opcodes::OP_HASH256:
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $buffer = $mainStack->top(-1);
+                            $buffer = $mainStack[-1];
                             if ($opCode === Opcodes::OP_RIPEMD160) {
                                 $hash = Hash::ripemd160($buffer);
                             } elseif ($opCode === Opcodes::OP_SHA1) {
@@ -849,12 +848,12 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_CHECKSIG:
                         case Opcodes::OP_CHECKSIGVERIFY:
-                            if ($mainStack->size() < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $vchPubKey = $mainStack->top(-1);
-                            $vchSig = $mainStack->top(-2);
+                            $vchPubKey = $mainStack[-1];
+                            $vchSig = $mainStack[-2];
 
                             $scriptCode = new Script($this->script->getBuffer()->slice($this->hashStartPos));
 
@@ -877,11 +876,11 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_CHECKMULTISIG:
                         case Opcodes::OP_CHECKMULTISIGVERIFY:
                             $i = 1;
-                            if ($mainStack->size() < $i) {
+                            if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $keyCount = $mainStack->top(-$i)->getInt();
+                            $keyCount = $mainStack[-$i]->getInt();
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
                                 throw new \RuntimeException('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
@@ -890,12 +889,12 @@ class Interpreter implements InterpreterInterface
 
                             // Extract positions of the keys, and signatures, from the stack.
                             $ikey = ++$i;
-                            $i += $keyCount;
-                            if ($mainStack->size() < $i) {
+                            $i += $keyCount; /** @var int $i */
+                            if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $sigCount = $mainStack->top(-$i)->getInt(); // cscriptnum
+                            $sigCount = $mainStack[-$i]->getInt(); // cscriptnum
                             if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
                                 throw new \RuntimeException('Invalid Signature count');
                             }
@@ -908,12 +907,11 @@ class Interpreter implements InterpreterInterface
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
                                 // Fetch the signature and public key
-                                $sig = $mainStack->top(-$isig);
-                                $pubkey = $mainStack->top(-$ikey);
+                                $sig = $mainStack[-$isig];
+                                $pubkey = $mainStack[-$ikey];
 
                                 // Erase the signature and public key.
-                                $mainStack->erase(-$isig);
-                                $mainStack->erase(-$ikey);
+                                unset($mainStack[-$isig], $mainStack[-$ikey]);
 
                                 // Decrement $i, since we are consuming stack values.
                                 $i -= 2;
@@ -922,6 +920,7 @@ class Interpreter implements InterpreterInterface
                                     $isig++;
                                     $sigCount--;
                                 }
+
                                 $ikey++;
                                 $keyCount--;
 
@@ -943,11 +942,11 @@ class Interpreter implements InterpreterInterface
                             // Unfortunately this is a potential source of mutability,
                             // so optionally verify it is exactly equal to zero prior
                             // to removing it from the stack.
-                            if ($mainStack->size() < 1) {
+                            if (count($mainStack) < 1) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            if ($flags->checkFlags(InterpreterInterface::VERIFY_NULL_DUMMY) && $mainStack->top(-1)->getSize()) {
+                            if ($flags->checkFlags(InterpreterInterface::VERIFY_NULL_DUMMY) && $mainStack[-1]->getSize()) {
                                 throw new ScriptRuntimeException(InterpreterInterface::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
                             }
 
@@ -967,7 +966,7 @@ class Interpreter implements InterpreterInterface
                             throw new \RuntimeException('Opcode not found');
                     }
 
-                    if ($mainStack->size() + $altStack->size() > 1000) {
+                    if (count($mainStack) + count($altStack) > 1000) {
                         throw new \RuntimeException('Invalid stack size, exceeds 1000');
                     }
                 }
