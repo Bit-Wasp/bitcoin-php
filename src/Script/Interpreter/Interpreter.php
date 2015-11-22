@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -93,6 +92,10 @@ class Interpreter implements InterpreterInterface
         $this->flags = $flags;
         $this->script = new Script();
         $this->state = new State();
+        $this->vchFalse = new Buffer("", 0, $this->math);
+        $this->vchTrue = new Buffer("\x01", 1, $this->math);
+        $this->int0 = new ScriptNum($this->math, new Flags(0), $this->vchFalse, 4);
+        $this->int1 = new ScriptNum($this->math, new Flags(0), $this->vchTrue, 1);
     }
 
     /**
@@ -337,7 +340,7 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        if (count($mainStack) === 0) {
+        if ($mainStack->isEmpty()) {
             return false;
         }
 
@@ -354,7 +357,7 @@ class Interpreter implements InterpreterInterface
 
             // Restore mainStack to how it was after evaluating scriptSig
             $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
-            if (count($mainStack) === 0) {
+            if ($mainStack->isEmpty()) {
                 return false;
             }
 
@@ -378,7 +381,7 @@ class Interpreter implements InterpreterInterface
         $c = 0;
         $len = $vfStack->end();
         for ($i = 0; $i < $len; $i++) {
-            if ($vfStack->top(0 - $len - $i) === true) {
+            if ($vfStack[0 - $len - $i] === true) {
                 $c++;
             }
         }
@@ -400,10 +403,7 @@ class Interpreter implements InterpreterInterface
         $this->hashStartPos = 0;
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
-        $vchFalse = new Buffer("", 0, $math);
-        $vchTrue = new Buffer("\x01", 1, $math);
-        $int0 = new ScriptNum($this->math, new Flags(0), $vchFalse, 4);
-        $int1 = new ScriptNum($this->math, new Flags(0), $vchTrue, 1);
+        
 
         if ($this->script->getBuffer()->getSize() > 10000) {
             return false;
@@ -457,7 +457,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
                             $num = $opCode - (Opcodes::OP_1 - 1);
-                            $mainStack->push(new ScriptNum($this->math, new Flags(0), new Buffer(chr($num), 4), 4));
+                            $mainStack->push(new ScriptNum($math, new Flags(0), new Buffer(chr($num), 4), 4));
                             break;
 
                         case $opCode >= Opcodes::OP_NOP1 && $opCode <= Opcodes::OP_NOP10:
@@ -474,7 +474,7 @@ class Interpreter implements InterpreterInterface
                             // <expression> if [statements] [else [statements]] endif
                             $value = false;
                             if ($fExec) {
-                                if (count($mainStack) < 1) {
+                                if ($mainStack->isEmpty()) {
                                     throw new \RuntimeException('Unbalanced conditional');
                                 }
                                 // todo
@@ -484,24 +484,24 @@ class Interpreter implements InterpreterInterface
                                     $value = !$value;
                                 }
                             }
-                            $vfStack->push($value ? $vchTrue : $vchFalse);
+                            $vfStack->push($value ? $this->vchTrue : $this->vchFalse);
                             break;
 
                         case Opcodes::OP_ELSE:
-                            if (count($vfStack) === 0) {
+                            if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
-                            $vfStack[-1] = !$vfStack->end() ? $vchTrue : $vchFalse;
+                            $vfStack[-1] = !$vfStack->end() ? $this->vchTrue : $this->vchFalse;
                             break;
 
                         case Opcodes::OP_ENDIF:
-                            if (count($vfStack) === 0) {
+                            if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
                             break;
 
                         case Opcodes::OP_VERIFY:
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
                             $value = $this->castToBool($mainStack[-1]);
@@ -516,14 +516,14 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_TOALTSTACK:
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_TOALTSTACK');
                             }
                             $altStack->push($mainStack->pop());
                             break;
 
                         case Opcodes::OP_FROMALTSTACK:
-                            if (count($altStack) < 1) {
+                            if ($altStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid alt-stack operation OP_FROMALTSTACK');
                             }
                             $mainStack->push($altStack->pop());
@@ -531,7 +531,7 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_IFDUP:
                             // If top value not zero, duplicate it.
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_IFDUP');
                             }
                             $vch = $mainStack[-1];
@@ -543,7 +543,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_DEPTH:
                             $num = count($mainStack);
                             if ($num === 0) {
-                                $depth = $vchFalse;
+                                $depth = $this->vchFalse;
                             } else {
                                 $depth = (new ScriptNum($math, $this->flags, Buffer::int($num), 4));
                             }
@@ -552,13 +552,13 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_DROP:
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_DROP');
                             }
                             $mainStack->pop();
                             break;
                         case Opcodes::OP_DUP:
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_DUP');
                             }
                             $vch = $mainStack[-1];
@@ -608,8 +608,8 @@ class Interpreter implements InterpreterInterface
                             if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
-                            $top = $mainStack[-1];
-                            $n = (new ScriptNum($math, $this->flags, $top, 4))->getInt();
+
+                            $n = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
                             $mainStack->pop();
                             if ($math->cmp($n, 0) < 0 || $math->cmp($n, count($mainStack)) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
@@ -683,7 +683,7 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_SIZE:
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_SIZE');
                             }
                             // todo: Int sizes?
@@ -705,7 +705,7 @@ class Interpreter implements InterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push(($equal ? $vchTrue : $vchFalse));
+                            $mainStack->push(($equal ? $this->vchTrue : $this->vchFalse));
                             if ($opCode === Opcodes::OP_EQUALVERIFY) {
                                 if ($equal) {
                                     $mainStack->pop();
@@ -718,7 +718,7 @@ class Interpreter implements InterpreterInterface
 
                         // Arithmetic operations
                         case $opCode >= Opcodes::OP_1ADD && $opCode <= Opcodes::OP_0NOTEQUAL:
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
                             }
 
@@ -762,9 +762,9 @@ class Interpreter implements InterpreterInterface
                             } else if ($opCode === Opcodes::OP_SUB) {
                                 $num = $math->sub($num1, $num2);
                             } else if ($opCode === Opcodes::OP_BOOLAND) {
-                                $num = $math->cmp($num1, $int0->getInt()) !== 0 && $math->cmp($num2, $int0->getInt()) !== 0;
+                                $num = $math->cmp($num1, $this->int0->getInt()) !== 0 && $math->cmp($num2, $this->int0->getInt()) !== 0;
                             } else if ($opCode === Opcodes::OP_BOOLOR) {
-                                $num = $math->cmp($num1, $int0->getInt()) !== 0 || $math->cmp($num2, $int0->getInt()) !== 0;
+                                $num = $math->cmp($num1, $this->int0->getInt()) !== 0 || $math->cmp($num2, $this->int0->getInt()) !== 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUAL) {
                                 $num = $math->cmp($num1, $num2) === 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -812,7 +812,7 @@ class Interpreter implements InterpreterInterface
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push($value ? $vchFalse : $vchTrue);
+                            $mainStack->push($value ? $this->vchFalse : $this->vchTrue);
                             break;
 
                         // Hash operation
@@ -821,7 +821,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_SHA256:
                         case Opcodes::OP_HASH160:
                         case Opcodes::OP_HASH256:
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
@@ -861,7 +861,7 @@ class Interpreter implements InterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push($success ? $vchTrue : $vchFalse);
+                            $mainStack->push($success ? $this->vchTrue : $this->vchFalse);
 
                             if ($opCode === Opcodes::OP_CHECKSIGVERIFY) {
                                 if ($success) {
@@ -942,7 +942,7 @@ class Interpreter implements InterpreterInterface
                             // Unfortunately this is a potential source of mutability,
                             // so optionally verify it is exactly equal to zero prior
                             // to removing it from the stack.
-                            if (count($mainStack) < 1) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
@@ -951,7 +951,7 @@ class Interpreter implements InterpreterInterface
                             }
 
                             $mainStack->pop();
-                            $mainStack->push($fSuccess ? $vchTrue : $vchFalse);
+                            $mainStack->push($fSuccess ? $this->vchTrue : $this->vchFalse);
 
                             if ($opCode === Opcodes::OP_CHECKMULTISIGVERIFY) {
                                 if ($fSuccess) {
