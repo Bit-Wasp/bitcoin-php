@@ -404,7 +404,6 @@ class Interpreter implements InterpreterInterface
         $this->hashStartPos = 0;
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
-        
 
         if ($this->script->getBuffer()->getSize() > 10000) {
             return false;
@@ -417,7 +416,7 @@ class Interpreter implements InterpreterInterface
                 $fExec = $this->checkExec();
 
                 // If pushdata was written to,
-                if ($pushData instanceof Buffer && $pushData->getSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
+                if ($pushData instanceof Buffer && $exec->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
                     throw new \RuntimeException('Error - push size');
                 }
 
@@ -430,7 +429,7 @@ class Interpreter implements InterpreterInterface
                     throw new \RuntimeException('Disabled Opcode');
                 }
 
-                if ($fExec && $opCode >= 0 && $opCode <= Opcodes::OP_PUSHDATA4) {
+                if ($fExec && $exec->isPush()) {
                     // In range of a pushdata opcode
                     if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
@@ -690,7 +689,6 @@ class Interpreter implements InterpreterInterface
                             // todo: Int sizes?
                             $vch = $mainStack[-1];
                             $size = Buffer::int($vch->getSize(), null, $math);
-
                             $mainStack->push($size);
                             break;
 

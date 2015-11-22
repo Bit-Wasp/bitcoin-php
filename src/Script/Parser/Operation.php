@@ -23,15 +23,22 @@ class Operation
     private $pushData;
 
     /**
-     * ScriptExec constructor.
-     * @param $opCode
-     * @param Buffer|null $pushData
+     * @var int
      */
-    public function __construct($opCode, Buffer $pushData = null)
+    private $pushDataSize;
+
+    /**
+     * Operation constructor.
+     * @param int $opCode
+     * @param Buffer|null $pushData
+     * @param int $pushDataSize
+     */
+    public function __construct($opCode, Buffer $pushData = null, $pushDataSize = 0)
     {
         $this->push = $opCode >= 0 && $opCode <= Opcodes::OP_PUSHDATA4;
         $this->opCode = $opCode;
         $this->pushData = $pushData;
+        $this->pushDataSize = $pushDataSize;
     }
 
     /**
@@ -56,5 +63,17 @@ class Operation
     public function getData()
     {
         return $this->pushData;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDataSize()
+    {
+        if (!$this->push) {
+            throw new \RuntimeException("Op wasn't a push operation");
+        }
+
+        return $this->pushDataSize;
     }
 }
