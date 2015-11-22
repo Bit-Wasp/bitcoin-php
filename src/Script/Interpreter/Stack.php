@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Buffertools\Buffer;
 
-class Stack extends \SplDoublyLinkedList
+class Stack extends \SplDoublyLinkedList implements StackInterface
 {
     public function __construct()
     {
