@@ -118,7 +118,7 @@ class Parser implements \Iterator
             if ($size === false) {
                 throw new \RuntimeException('Failed to unpack data from Script1');
             }
-            if ( $this->validateSize($size) === false) {
+            if ($this->validateSize($size) === false) {
                 throw new \RuntimeException('Failed to unpack data from Script2');
             }
 
