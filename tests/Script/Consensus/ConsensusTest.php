@@ -1,6 +1,6 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
+namespace BitWasp\Bitcoin\Tests\Script\Consensus;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
