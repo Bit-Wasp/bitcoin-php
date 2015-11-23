@@ -436,7 +436,7 @@ class Interpreter implements InterpreterInterface
                     throw new \RuntimeException('Disabled Opcode');
                 }
 
-                if ($fExec && $exec->isPush() && $exec->getData() !== null) {
+                if ($fExec && $exec->isPush()) {
                     // In range of a pushdata opcode
                     if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');

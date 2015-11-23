@@ -18,7 +18,7 @@ class Operation
     private $opCode;
 
     /**
-     * @var Buffer|null
+     * @var Buffer
      */
     private $pushData;
 
@@ -30,10 +30,10 @@ class Operation
     /**
      * Operation constructor.
      * @param int $opCode
-     * @param Buffer|null $pushData
+     * @param Buffer $pushData
      * @param int $pushDataSize
      */
-    public function __construct($opCode, Buffer $pushData = null, $pushDataSize = 0)
+    public function __construct($opCode, Buffer $pushData, $pushDataSize = 0)
     {
         $this->push = $opCode >= 0 && $opCode <= Opcodes::OP_PUSHDATA4;
         $this->opCode = $opCode;
@@ -58,7 +58,7 @@ class Operation
     }
 
     /**
-     * @return Buffer|null
+     * @return Buffer
      */
     public function getData()
     {
