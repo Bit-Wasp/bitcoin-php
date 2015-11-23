@@ -13,14 +13,14 @@ class Number extends Serializable
     const MAX_NUM_SIZE = 4;
 
     /**
-     * @var int
+     * @var Math
      */
-    protected $number;
+    private $math;
 
     /**
-     * @var Flags
+     * @var int
      */
-    protected $flags;
+    private $number;
 
     /**
      * Number constructor.
