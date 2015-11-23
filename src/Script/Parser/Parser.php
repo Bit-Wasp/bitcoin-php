@@ -209,6 +209,19 @@ class Parser implements \Iterator
     }
 
     /**
+     * @return Operation[]
+     */
+    public function decode()
+    {
+        $result = [];
+        foreach ($this as $operation) {
+            $result[] = $operation;
+        }
+
+        return $result;
+    }
+
+    /**
      * @return string
      */
     public function getHumanReadable()
