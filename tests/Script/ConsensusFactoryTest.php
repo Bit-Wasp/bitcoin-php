@@ -45,15 +45,6 @@ class ConsensusFactoryTest extends AbstractTestCase
         }
     }
 
-    public function testGetInterpreterFactory()
-    {
-        $factory = $this->getConsensusFactory();
-        $interpreterFactory = $factory->interpreterFactory($factory->defaultFlags());
-
-        $interpreter = $interpreterFactory->create(new Transaction);
-        $this->assertInstanceOf($this->interpreterInstance, $interpreter);
-    }
-
     public function testGetNativeConsensus()
     {
         $factory = $this->getConsensusFactory();
