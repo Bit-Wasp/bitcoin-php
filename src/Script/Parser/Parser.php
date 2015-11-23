@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Parser;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -10,6 +9,16 @@ use BitWasp\Buffertools\Buffer;
 
 class Parser implements \Iterator
 {
+    /**
+     * @var Math
+     */
+    private $math;
+
+    /**
+     * @var Buffer
+     */
+    private $empty;
+
     /**
      * @var int
      */
@@ -42,11 +51,12 @@ class Parser implements \Iterator
      */
     public function __construct(Math $math, ScriptInterface $script)
     {
-        $this->math = Bitcoin::getMath();
+        $this->math = $math;
         $buffer = $script->getBuffer();
         $this->data = $buffer->getBinary();
         $this->end = $buffer->getSize();
         $this->script = $script;
+        $this->empty = new Buffer('', 0, $math);
     }
 
     /**
@@ -99,12 +109,10 @@ class Parser implements \Iterator
         }
 
         $opCode = ord($this->data[$this->position++]);
-        $pushData = null;
+        $pushData = $this->empty;
         $dataSize = 0;
 
-        if ($opCode === Opcodes::OP_0) {
-            $pushData = new Buffer('', 0);
-        } elseif ($opCode <= Opcodes::OP_PUSHDATA4) {
+        if ($opCode <= Opcodes::OP_PUSHDATA4) {
             if ($opCode < Opcodes::OP_PUSHDATA1) {
                 $dataSize = $opCode;
             } else if ($opCode === Opcodes::OP_PUSHDATA1) {
@@ -124,9 +132,9 @@ class Parser implements \Iterator
             $this->position += $dataSize;
         }
 
-        $this->array[$ptr] = $result = new Operation($opCode, $pushData, $dataSize);
+        $this->array[$ptr] = new Operation($opCode, $pushData, $dataSize);
 
-        return $result;
+        return $this->array[$ptr];
     }
 
     /**

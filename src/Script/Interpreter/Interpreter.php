@@ -68,6 +68,11 @@ class Interpreter implements InterpreterInterface
     private $state;
 
     /**
+     * @var bool
+     */
+    private $minimalPush;
+
+    /**
      * @var array
      */
     private $disabledOps = [
@@ -91,11 +96,13 @@ class Interpreter implements InterpreterInterface
         $this->transaction = $transaction;
         $this->flags = $flags;
         $this->script = new Script();
+        $this->minimalPush = $this->flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) === true;
         $this->state = new State();
         $this->vchFalse = new Buffer("", 0, $this->math);
-        $this->vchTrue = Buffer::hex("01", 1, $this->math);
-        $this->int0 = new ScriptNum($this->math, new Flags(0), $this->vchFalse, 4);
-        $this->int1 = new ScriptNum($this->math, new Flags(0), $this->vchTrue, 1);
+        $this->vchTrue = new Buffer("\x01", 1, $this->math);
+
+        $this->int0 = Number::buffer($this->vchFalse, false, 4, $this->math)->getBuffer();
+        $this->int1 = Number::buffer($this->vchTrue, false, 1, $this->math)->getBuffer();
     }
 
     /**
@@ -146,7 +153,7 @@ class Interpreter implements InterpreterInterface
         }
 
         // Since we're using buffers, lets try ensuring the contents are not 0.
-        return $this->math->cmp($value->getInt(), 0) > 0; // cscriptNum or edge case.
+        return $this->math->cmp($value->getInt(), 0) > 0;
     }
 
     /**
@@ -416,7 +423,7 @@ class Interpreter implements InterpreterInterface
                 $fExec = $this->checkExec();
 
                 // If pushdata was written to,
-                if ($pushData instanceof Buffer && $exec->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
+                if ($exec->isPush() && $exec->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
                     throw new \RuntimeException('Error - push size');
                 }
 
@@ -429,7 +436,7 @@ class Interpreter implements InterpreterInterface
                     throw new \RuntimeException('Disabled Opcode');
                 }
 
-                if ($fExec && $exec->isPush() && $exec->getData() !== null) {
+                if ($fExec && $exec->isPush()) {
                     // In range of a pushdata opcode
                     if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
@@ -457,7 +464,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
                             $num = $opCode - (Opcodes::OP_1 - 1);
-                            $mainStack->push(new ScriptNum($math, new Flags(0), new Buffer(chr($num), 4), 4));
+                            $mainStack->push(Number::int($num)->getBuffer());
                             break;
 
                         case $opCode >= Opcodes::OP_NOP1 && $opCode <= Opcodes::OP_NOP10:
@@ -478,7 +485,7 @@ class Interpreter implements InterpreterInterface
                                     throw new \RuntimeException('Unbalanced conditional');
                                 }
                                 // todo
-                                $buffer = new ScriptNum($math, $this->flags, $mainStack->pop(), 4);
+                                $buffer = Number::buffer($mainStack->pop(), $this->minimalPush)->getBuffer();
                                 $value = $this->castToBool($buffer);
                                 if ($opCode === Opcodes::OP_NOTIF) {
                                     $value = !$value;
@@ -545,7 +552,7 @@ class Interpreter implements InterpreterInterface
                             if ($num === 0) {
                                 $depth = $this->vchFalse;
                             } else {
-                                $depth = (new ScriptNum($math, $this->flags, Buffer::int($num), 4));
+                                $depth = Number::int($num)->getBuffer();
                             }
 
                             $mainStack->push($depth);
@@ -610,7 +617,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $n = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
+                            $n = Number::buffer($mainStack[-1], $this->minimalPush, 4)->getInt();
                             $mainStack->pop();
                             if ($math->cmp($n, 0) < 0 || $math->cmp($n, count($mainStack)) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
@@ -689,8 +696,7 @@ class Interpreter implements InterpreterInterface
                             }
                             // todo: Int sizes?
                             $vch = $mainStack[-1];
-                            $size = Buffer::int($vch->getSize(), null, $math);
-                            $mainStack->push($size);
+                            $mainStack->push(Number::int($vch->getSize())->getBuffer());
                             break;
 
                         case Opcodes::OP_EQUAL:
@@ -722,9 +728,9 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
                             }
 
-                            $num = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
+                            $num = Number::buffer($mainStack[-1], $this->minimalPush)->getInt();
 
-                            if ($opCode === Opcodes::OP_1ADD) { // cscriptnum
+                            if ($opCode === Opcodes::OP_1ADD) {
                                 $num = $math->add($num, '1');
                             } elseif ($opCode === Opcodes::OP_1SUB) {
                                 $num = $math->sub($num, '1');
@@ -737,15 +743,16 @@ class Interpreter implements InterpreterInterface
                                     $num = $math->sub(0, $num);
                                 }
                             } elseif ($opCode === Opcodes::OP_NOT) {
-                                $num = ($math->cmp($num, '0') === 0);
+                                $num = (int) $math->cmp($num, '0') === 0;
                             } else {
                                 // is OP_0NOTEQUAL
-                                $num = ($math->cmp($num, '0') !== 0);
+                                $num = (int) ($math->cmp($num, '0') !== 0);
                             }
 
                             $mainStack->pop();
 
-                            $buffer = Buffer::int($num, 4, $math);
+                            $buffer = Number::int($num)->getBuffer();
+
                             $mainStack->push($buffer);
                             break;
 
@@ -754,8 +761,8 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation (OP_ADD - OP_MAX)');
                             }
 
-                            $num1 = (new ScriptNum($math, $this->flags, $mainStack[-2], 4))->getInt();
-                            $num2 = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
+                            $num1 = Number::buffer($mainStack[-2], $this->minimalPush)->getInt();
+                            $num2 = Number::buffer($mainStack[-1], $this->minimalPush)->getInt();
 
                             if ($opCode === Opcodes::OP_ADD) {
                                 $num = $math->add($num1, $num2);
@@ -771,11 +778,11 @@ class Interpreter implements InterpreterInterface
                                 $num = $math->cmp($num1, $num2) === 0;
                             } elseif ($opCode === Opcodes::OP_NUMNOTEQUAL) {
                                 $num = $math->cmp($num1, $num2) !== 0;
-                            } elseif ($opCode === Opcodes::OP_LESSTHAN) { // cscriptnum
+                            } elseif ($opCode === Opcodes::OP_LESSTHAN) {
                                 $num = $math->cmp($num1, $num2) < 0;
                             } elseif ($opCode === Opcodes::OP_GREATERTHAN) {
                                 $num = $math->cmp($num1, $num2) > 0;
-                            } elseif ($opCode === Opcodes::OP_LESSTHANOREQUAL) { // cscriptnum
+                            } elseif ($opCode === Opcodes::OP_LESSTHANOREQUAL) {
                                 $num = $math->cmp($num1, $num2) <= 0;
                             } elseif ($opCode === Opcodes::OP_GREATERTHANOREQUAL) {
                                 $num = $math->cmp($num1, $num2) >= 0;
@@ -787,7 +794,7 @@ class Interpreter implements InterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $buffer = Buffer::int($num, 4, $math);
+                            $buffer = Number::int($num)->getBuffer();
                             $mainStack->push($buffer);
 
                             if ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -804,9 +811,9 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $num1 = (new ScriptNum($math, $this->flags, $mainStack[-3], 4))->getInt();
-                            $num2 = (new ScriptNum($math, $this->flags, $mainStack[-2], 4))->getInt();
-                            $num3 = (new ScriptNum($math, $this->flags, $mainStack[-1], 4))->getInt();
+                            $num1 = Number::buffer($mainStack[-3], $this->minimalPush)->getInt();
+                            $num2 = Number::buffer($mainStack[-2], $this->minimalPush)->getInt();
+                            $num3 = Number::buffer($mainStack[-1], $this->minimalPush)->getInt();
 
                             $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
                             $mainStack->pop();
@@ -856,7 +863,6 @@ class Interpreter implements InterpreterInterface
                             $vchSig = $mainStack[-2];
 
                             $scriptCode = new Script($this->script->getBuffer()->slice($this->hashStartPos));
-
                             $success = $this->checkSig($scriptCode, $vchSig, $vchPubKey);
 
                             $mainStack->pop();
@@ -879,7 +885,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $keyCount = $mainStack[-$i]->getInt();
+                            $keyCount = Number::buffer($mainStack[-$i], $this->minimalPush)->getInt();
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
                                 throw new \RuntimeException('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
@@ -893,7 +899,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $sigCount = $mainStack[-$i]->getInt(); // cscriptnum
+                            $sigCount = Number::buffer($mainStack[-$i], $this->minimalPush)->getInt();
                             if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
                                 throw new \RuntimeException('Invalid Signature count');
                             }
