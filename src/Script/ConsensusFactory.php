@@ -48,20 +48,11 @@ class ConsensusFactory
 
     /**
      * @param Flags $flags
-     * @return InterpreterFactory
-     */
-    public function interpreterFactory(Flags $flags)
-    {
-        return new InterpreterFactory($this->ecAdapter, $flags);
-    }
-
-    /**
-     * @param Flags $flags
      * @return NativeConsensus
      */
     public function getNativeConsensus(Flags $flags)
     {
-        return new NativeConsensus($this->interpreterFactory($flags));
+        return new NativeConsensus($this->ecAdapter, $flags);
     }
 
     /**
