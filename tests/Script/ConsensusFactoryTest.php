@@ -3,16 +3,13 @@
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class ConsensusFactoryTest extends AbstractTestCase
 {
@@ -46,15 +43,6 @@ class ConsensusFactoryTest extends AbstractTestCase
                  ] as $flag) {
             $this->assertTrue($flags->checkFlags($flag));
         }
-    }
-
-    public function testGetInterpreterFactory()
-    {
-        $factory = $this->getConsensusFactory();
-        $interpreterFactory = $factory->interpreterFactory($factory->defaultFlags());
-
-        $interpreter = $interpreterFactory->create(new Transaction);
-        $this->assertInstanceOf($this->interpreterInstance, $interpreter);
     }
 
     public function testGetNativeConsensus()
