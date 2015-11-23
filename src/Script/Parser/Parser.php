@@ -10,6 +10,16 @@ use BitWasp\Buffertools\Buffer;
 class Parser implements \Iterator
 {
     /**
+     * @var Math
+     */
+    private $math;
+
+    /**
+     * @var Buffer
+     */
+    private $empty;
+
+    /**
      * @var int
      */
     private $position = 0;
