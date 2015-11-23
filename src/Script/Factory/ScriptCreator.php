@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Factory;
 
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -52,7 +53,7 @@ class ScriptCreator
     public function op($name)
     {
         $code = $this->opcodes->getOpByName($name);
-        $this->script .= pack('H*', dechex($code));
+        $this->script .= chr($code);
         return $this;
     }
 
@@ -91,6 +92,23 @@ class ScriptCreator
         }
 
         $this->script .= $parsed->getBuffer()->getBinary();
+        return $this;
+    }
+
+    /**
+     * @param int $n
+     * @return $this
+     */
+    public function int($n)
+    {
+        if ($n === 0) {
+            $this->script .= chr(Opcodes::OP_0);
+        } else if ($n === -1 || ($n >= 1 && $n <= 16)) {
+            $this->script .= chr($n + (Opcodes::OP_1 - 1));
+        } else {
+            $this->script .= Number::int($n)->getBinary();
+        }
+
         return $this;
     }
 
