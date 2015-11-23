@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Script\Parser;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
@@ -101,32 +100,31 @@ class Parser implements \Iterator
 
         $opCode = ord($this->data[$this->position++]);
         $pushData = null;
+        $dataSize = 0;
 
         if ($opCode === Opcodes::OP_0) {
             $pushData = new Buffer('', 0);
         } elseif ($opCode <= Opcodes::OP_PUSHDATA4) {
             if ($opCode < Opcodes::OP_PUSHDATA1) {
-                $size = $opCode;
+                $dataSize = $opCode;
             } else if ($opCode === Opcodes::OP_PUSHDATA1) {
-                $size = $this->unpackSize('C', 1);
+                $dataSize = $this->unpackSize('C', 1);
             } else if ($opCode === Opcodes::OP_PUSHDATA2) {
-                $size = $this->unpackSize('v', 2);
+                $dataSize = $this->unpackSize('v', 2);
             } else {
-                $size = $this->unpackSize('V', 4);
+                $dataSize = $this->unpackSize('V', 4);
             }
 
-            if ($size === false) {
-                throw new \RuntimeException('Failed to unpack data from Script1');
-            }
-            if ($this->validateSize($size) === false) {
-                throw new \RuntimeException('Failed to unpack data from Script2');
+            if ($dataSize === false || $this->validateSize($dataSize) === false) {
+                throw new \RuntimeException('Failed to unpack data from Script');
             }
 
-            $pushData = new Buffer(substr($this->data, $this->position, $size), $size, $this->math);
-            $this->position += $size;
+            $pushData = new Buffer(substr($this->data, $this->position, $dataSize), $dataSize, $this->math);
+
+            $this->position += $dataSize;
         }
 
-        $this->array[$ptr] = $result = new Operation($opCode, $pushData);
+        $this->array[$ptr] = $result = new Operation($opCode, $pushData, $dataSize);
 
         return $result;
     }
@@ -208,6 +206,19 @@ class Parser implements \Iterator
         }
 
         return $data;
+    }
+
+    /**
+     * @return Operation[]
+     */
+    public function decode()
+    {
+        $result = [];
+        foreach ($this as $operation) {
+            $result[] = $operation;
+        }
+
+        return $result;
     }
 
     /**

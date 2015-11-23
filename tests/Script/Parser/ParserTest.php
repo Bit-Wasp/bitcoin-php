@@ -1,12 +1,13 @@
 <?php
 
-namespace BitWasp\Bitcoin\Tests\Script;
+namespace BitWasp\Bitcoin\Tests\Script\Parser;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
-class ScriptParserTest extends \PHPUnit_Framework_TestCase
+class ParserTest extends AbstractTestCase
 {
     /**
      * @var ScriptInterface
@@ -122,7 +123,7 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
 
     public function testParseScripts()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/script.asm.json');
+        $f = $this->dataFile('script.asm.json');
         $json = json_decode($f);
 
         // Pay to pubkey hash
@@ -199,5 +200,17 @@ class ScriptParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($script8[3], 'OP_VERIFY');
         $this->assertSame($script8[4], 'OP_2OVER');
         $this->assertSame($script8[5], 'OP_DEPTH');
+    }
+
+    public function testDataSize()
+    {
+        $buffer = new Buffer('', 40);
+        $script = ScriptFactory::create()->push($buffer)->op('OP_HASH160')->getScript();
+        $parsed = $script->getScriptParser();
+
+        for ($i = 0; $i < 1; $i++) {
+            $operation = $parsed->current();
+            $this->assertEquals($operation->getData()->getSize(), $operation->getDataSize());
+        }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Script\Classifier;
 
-use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
@@ -12,14 +12,9 @@ class InputClassifier implements ScriptClassifierInterface
 {
 
     /**
-     * @var ScriptInterface
+     * @var Operation[]
      */
-    private $script;
-
-    /**
-     * @var array
-     */
-    private $evalScript;
+    private $decoded;
 
     const MAXSIGLEN = 0x48;
 
@@ -28,8 +23,7 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function __construct(ScriptInterface $script)
     {
-        $this->script = $script;
-        $this->evalScript = $script->getScriptParser()->parse();
+        $this->decoded = $script->getScriptParser()->decode();
     }
 
     /**
@@ -37,9 +31,9 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        return count($this->evalScript) === 1
-            && $this->evalScript[0] instanceof Buffer
-            && $this->evalScript[0]->getSize() <= self::MAXSIGLEN;
+        return count($this->decoded) === 1
+        && $this->decoded[0]->isPush()
+        && $this->decoded[0]->getDataSize() <= self::MAXSIGLEN;
     }
 
     /**
@@ -47,10 +41,15 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKeyHash()
     {
-        return count($this->evalScript) === 2
-            && $this->evalScript[0] instanceof Buffer && $this->evalScript[1] instanceof Buffer
-            && $this->evalScript[0]->getSize() <= self::MAXSIGLEN
-            && PublicKey::isCompressedOrUncompressed($this->evalScript[1]);
+        if (count($this->decoded) !== 2) {
+            return false;
+        }
+
+        $signature = $this->decoded[0];
+        $publicKey = $this->decoded[1];
+
+        return $signature->isPush() && $signature->getDataSize() <= self::MAXSIGLEN
+            && $publicKey->isPush() && PublicKey::isCompressedOrUncompressed($publicKey->getData());
     }
 
     /**
@@ -58,16 +57,16 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isPayToScriptHash()
     {
-        if (count($this->evalScript) === 0) {
+        if (count($this->decoded) < 1) {
             return false;
         }
 
-        $final = end($this->evalScript);
-        if (!$final || !$final instanceof Buffer) {
+        $final = end($this->decoded);
+        if (!$final || !$final->isPush()) {
             return false;
         }
 
-        $type = new OutputClassifier(new Script($final));
+        $type = new OutputClassifier(new Script($final->getData()));
         return false === in_array($type->classify(), [
             self::UNKNOWN,
             self::PAYTOSCRIPTHASH
@@ -79,37 +78,34 @@ class InputClassifier implements ScriptClassifierInterface
      */
     public function isMultisig()
     {
-        if (count($this->evalScript) < 3) {
+        if (count($this->decoded) < 3) {
             return false;
         }
 
-        $final = end($this->evalScript);
-        if (!$final || !$final instanceof Buffer) {
+        $final = end($this->decoded);
+        if (!$final || !$final->isPush()) {
             return false;
         }
 
-        $script = new Script($final);
-        $parsed = $script->getScriptParser()->parse();
-        $count = count($parsed);
-        $opCodes = $script->getOpCodes();
+        $script = new Script($final->getData());
+        $decoded = $script->getScriptParser()->decode();
+        $count = count($decoded);
 
-        /** @var string $mOp */
-        $mOp = $parsed[0];
-        /** @var string $nOp */
-        $nOp = $parsed[$count - 2];
-        if ($mOp instanceof Buffer || $nOp instanceof Buffer) {
-            return false;
-        }
-        $mOp = $opCodes->getOpByName($mOp);
-        $nOp = $opCodes->getOpByName($nOp);
-        if ($mOp < Opcodes::OP_0 || $nOp > Opcodes::OP_16) {
+        $mOp = $decoded[0];
+        $nOp = $decoded[$count - 2];
+        if ($mOp->isPush() || $nOp->isPush()) {
             return false;
         }
 
-        $keys = array_slice($parsed, 1, -2);
+        if ($mOp->getOp() < Opcodes::OP_0 || $nOp->getOp() > Opcodes::OP_16) {
+            return false;
+        }
+
+        /** @var Operation[] $keys */
+        $keys = array_slice($decoded, 1, -2);
         $keysValid = true;
         foreach ($keys as $key) {
-            $keysValid &= ($key instanceof Buffer) && PublicKey::isCompressedOrUncompressed($key);
+            $keysValid &= $key->isPush() && PublicKey::isCompressedOrUncompressed($key->getData());
         }
 
         return $keysValid;
