@@ -77,7 +77,7 @@ class Number extends Serializable
 
     /**
      * @param Buffer $buffer
-     * @return int|string
+     * @return int
      */
     private function parseBuffer(Buffer $buffer)
     {
