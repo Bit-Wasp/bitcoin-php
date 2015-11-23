@@ -443,7 +443,7 @@
     },
     {
       "scriptSig": "",
-      "scriptPubKey": "03010203820103880301020387",
+      "scriptPubKey": "030102038253880301020387",
       "result": true,
       "flags": "VERIFY_STRICTENC",
       "desc": "010203 OP_SIZE 03 OP_EQUALVERIFY 010203 OP_EQUAL"
