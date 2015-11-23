@@ -2,31 +2,24 @@
 
 namespace BitWasp\Bitcoin\Script\Classifier;
 
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Buffertools\Buffer;
 
 class OutputClassifier implements ScriptClassifierInterface
 {
-
     /**
-     * @var ScriptInterface
+     * @var \BitWasp\Bitcoin\Script\Parser\Operation[]
      */
-    private $script;
-
-    /**
-     * @var array
-     */
-    private $evalScript;
+    private $decoded;
 
     /**
      * @param ScriptInterface $script
      */
     public function __construct(ScriptInterface $script)
     {
-        $this->script = $script;
-        $this->evalScript = $script->getScriptParser()->parse();
+        $this->decoded = $script->getScriptParser()->decode();
     }
 
     /**
@@ -34,25 +27,16 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKey()
     {
-        $script = $this->script->getBuffer()->getBinary();
-        if (!isset($this->evalScript[0]) || !$this->evalScript[0] instanceof Buffer) {
+        if (count($this->decoded) < 1 || !$this->decoded[0]->isPush()) {
             return false;
         }
 
-        if (strlen($script) == 35
-            && $this->evalScript[0]->getSize() == 33
-            && $this->evalScript[1] == 'OP_CHECKSIG'
-            && in_array(ord($script[1]), array(PublicKey::KEY_COMPRESSED_EVEN, PublicKey::KEY_COMPRESSED_ODD))
-        ) {
-            return true;
-        }
-
-        if (strlen($script) == 67
-            && $this->evalScript[0]->getSize() == 65
-            && $this->evalScript[1] == 'OP_CHECKSIG'
-            && bin2hex($script[1]) == PublicKey::KEY_UNCOMPRESSED
-        ) {
-            return true;
+        $size = $this->decoded[0]->getDataSize();
+        if ($size === 33 || $size === 65) {
+            $op = $this->decoded[1];
+            if (!$op->isPush() && $op->getOp() === Opcodes::OP_CHECKSIG) {
+                return true;
+            }
         }
 
         return false;
@@ -63,17 +47,28 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToPublicKeyHash()
     {
-        return count($this->evalScript) === 5
-            && is_string($this->evalScript[0])
-            && $this->evalScript[0] === 'OP_DUP'
-            && is_string($this->evalScript[1])
-            && $this->evalScript[1] === 'OP_HASH160'
-            && $this->evalScript[2] instanceof Buffer
-            && $this->evalScript[2]->getSize() == 20 // hex string
-            && is_string($this->evalScript[3])
-            && $this->evalScript[3] === 'OP_EQUALVERIFY'
-            && is_string($this->evalScript[4])
-            && $this->evalScript[4] === 'OP_CHECKSIG';
+        if (count($this->decoded) !== 5) {
+            return false;
+        }
+
+        $dup = $this->decoded[0];
+        $hash = $this->decoded[1];
+        $buf = $this->decoded[2];
+        $eq = $this->decoded[3];
+        $checksig = $this->decoded[4];
+
+        foreach ([$dup, $hash, $eq, $checksig] as $op) {
+            /** @var Operation $op */
+            if ($op->isPush()) {
+                return false;
+            }
+        }
+
+        return $dup->getOp() === Opcodes::OP_DUP
+        && $hash->getOp() === Opcodes::OP_HASH160
+        && $buf->isPush() && $buf->getDataSize() === 20
+        && $eq->getOp() === Opcodes::OP_EQUALVERIFY
+        && $checksig->getOp() === Opcodes::OP_CHECKSIG;
     }
 
     /**
@@ -81,13 +76,22 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isPayToScriptHash()
     {
-        return $this->script->getBuffer()->getSize() === 23
-            && count($this->evalScript) === 3
-            && is_string($this->evalScript[0]) && is_string($this->evalScript[2])
-            && $this->evalScript[0] === 'OP_HASH160'
-            && $this->evalScript[1] instanceof Buffer
-            && $this->evalScript[1]->getSize() === 20
-            && $this->evalScript[2] === 'OP_EQUAL';
+        if (count($this->decoded) !== 3) {
+            return false;
+        }
+
+        $hash = $this->decoded[0];
+        if ($hash->isPush() || !$hash->getOp() === Opcodes::OP_HASH160) {
+            return false;
+        }
+
+        $buffer = $this->decoded[1];
+        if (!$buffer->isPush() || $buffer->getDataSize() !== 20) {
+            return false;
+        }
+
+        $eq = $this->decoded[2];
+        return !$eq->isPush() && $eq->getOp() === Opcodes::OP_EQUAL;
     }
 
     /**
@@ -95,30 +99,29 @@ class OutputClassifier implements ScriptClassifierInterface
      */
     public function isMultisig()
     {
-        $opCodes = $this->script->getOpcodes();
-        $count = count($this->evalScript);
+        $count = count($this->decoded);
         if ($count <= 3) {
             return false;
         }
-        $mOp = $this->evalScript[0];
-        $nOp = $this->evalScript[$count - 2];
-        $lastOp = $this->evalScript[$count - 1];
 
-        $keys = array_slice($this->evalScript, 1, -2);
-        $keysValid = function () use ($keys) {
-            $valid = true;
-            foreach ($keys as $key) {
-                $valid &= ($key instanceof Buffer) && PublicKey::isCompressedOrUncompressed($key);
+        $mOp = $this->decoded[0];
+        $nOp = $this->decoded[$count - 2];
+        $checksig = $this->decoded[$count - 1];
+        if ($mOp->isPush() || $nOp->isPush() || $checksig->isPush()) {
+            return false;
+        }
+
+        /** @var Operation[] $vKeys */
+        $vKeys = array_slice($this->decoded, 1, -2);
+        foreach ($vKeys as $key) {
+            if (!$key->isPush() || !PublicKey::isCompressedOrUncompressed($key->getData())) {
+                return false;
             }
-            return $valid;
-        };
+        }
 
-        return $count >= 2
-            && is_string($mOp) && is_string($nOp) && is_string($lastOp)
-            && $opCodes->getOpByName($mOp) >= Opcodes::OP_0
-            && $opCodes->getOpByName($nOp) <= Opcodes::OP_16
-            && $this->evalScript[$count - 1] === $opCodes->getOp(Opcodes::OP_CHECKMULTISIG)
-            && $keysValid();
+        return $mOp->getOp() >= Opcodes::OP_0
+            && $nOp->getOp() <= Opcodes::OP_16
+            && $checksig->getOp() === Opcodes::OP_CHECKMULTISIG;
     }
 
     /**
