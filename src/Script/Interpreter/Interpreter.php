@@ -557,6 +557,7 @@ class Interpreter implements InterpreterInterface
                             }
                             $mainStack->pop();
                             break;
+
                         case Opcodes::OP_DUP:
                             if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_DUP');
@@ -869,7 +870,6 @@ class Interpreter implements InterpreterInterface
                                     throw new \RuntimeException('Checksig verify');
                                 }
                             }
-
                             break;
 
                         case Opcodes::OP_CHECKMULTISIG:
