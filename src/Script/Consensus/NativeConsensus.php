@@ -16,6 +16,11 @@ class NativeConsensus implements ConsensusInterface
     private $adapter;
 
     /**
+     * @var Flags
+     */
+    private $flags;
+
+    /**
      * NativeConsensus constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param Flags $flags
