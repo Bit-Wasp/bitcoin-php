@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Tests\Collection\Transaction;
 
+use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
@@ -32,7 +34,7 @@ class TransactionCollectionTest extends AbstractTestCase
      */
     public function testInvalidValue()
     {
-        new TransactionCollection([new Transaction(), new TransactionInput('a', 1)]);
+        new TransactionCollection([new Transaction(), new TransactionInput('a', 1, new Script())]);
     }
 
     public function testClonesAreDistinguisable()
