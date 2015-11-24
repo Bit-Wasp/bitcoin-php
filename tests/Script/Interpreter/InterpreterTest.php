@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -21,7 +20,6 @@ use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;
-use BitWasp\Bitcoin\Script\Interpreter\Stack;
 
 class InterpreterTest extends AbstractTestCase
 {
@@ -231,14 +229,14 @@ class InterpreterTest extends AbstractTestCase
             null,               // redeemscript
         ];
 
-        list ($rs, $os) = ScriptFactory::p2sh()->multisig(1, [$privateKey->getPublicKey()]);
+        $rs = ScriptFactory::p2sh()->multisig(1, [$privateKey->getPublicKey()]);
         $vectors[] = [
             true,
             $ec,
             $standard,
             $privateKey,
-            $os,
-            $rs,
+            $rs->getOutputScript(),
+            $rs
         ];
 
         return $vectors;
