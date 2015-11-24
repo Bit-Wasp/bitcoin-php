@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Script\Consensus;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
@@ -61,12 +62,14 @@ class ConsensusTest
             return;
         }
 
-        ob_start();
         $factory = new ConsensusFactory(Bitcoin::getEcAdapter());
-        $consensus = $factory->getConsensus($factory->flags($flags));
+        $consensus = $factory->getNativeConsensus($factory->flags($flags));
         $r = $consensus->verify($tx, $scriptPubKey, $nInput);
-
-            $this->assertEquals($result, $r);
+        if ($result !== $r) {
+            //echo $scriptPubKey->getScriptParser()->getHumanReadable() . "\n";
+            //die();
+        }
+        $this->assertEquals($result, $r);
 
     }
 }
