@@ -128,7 +128,9 @@ class Parser implements \Iterator
                 throw new \RuntimeException('Failed to unpack data from Script');
             }
 
-            $pushData = ($dataSize === 0) ? $this->empty : new Buffer(substr($this->data, $this->position, $dataSize), $dataSize, $this->math);
+            if ($dataSize > 0) {
+                $pushData = new Buffer(substr($this->data, $this->position, $dataSize), $dataSize, $this->math);
+            }
 
             $this->position += $dataSize;
         }
