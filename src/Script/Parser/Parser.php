@@ -234,17 +234,13 @@ class Parser implements \Iterator
      */
     public function getHumanReadable()
     {
-        $parse = $this->parse();
-
-        $array = array_map(
-            function ($value) {
-                return ($value instanceof Buffer)
-                    ? $value->getHex()
-                    : $value;
+        return implode(' ', array_map(
+            function (Operation $operation) {
+                return $operation->isPush()
+                    ? $operation->getData()->getHex()
+                    : $this->script->getOpcodes()->getOp($operation->getOp());
             },
-            $parse
-        );
-
-        return implode(' ', $array);
+            $this->decode()
+        ));
     }
 }
