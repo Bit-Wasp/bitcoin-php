@@ -86,7 +86,7 @@ class PayToPubkeyHash implements ScriptInfoInterface
     public function makeScriptSig(array $signatures = [], array $publicKeys = [])
     {
         $newScript = new Script();
-        if (count($signatures) === $this->getRequiredSigCount() && count($publicKeys) > 0) {
+        if (count($publicKeys) > 0 && count($signatures) === $this->getRequiredSigCount()) {
             $newScript = ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $publicKeys[0]);
         }
 

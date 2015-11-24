@@ -16,7 +16,6 @@ class ParserTest extends AbstractTestCase
      */
     private $script;
 
-/*
     public function getInvalidScripts()
     {
         $start = array(
@@ -61,13 +60,13 @@ class ParserTest extends AbstractTestCase
         return array_merge($this->getValidPushScripts(), $this->getInvalidScripts());
     }
 
-    /*
+    /**
      * @dataProvider getTestPushScripts
      * @param $script
      * @param $expectedOp
      * @param $expectedPushData
      * @param $result
-     *
+     */
     public function testPush($script, $expectedOp, $expectedPushData, $result)
     {
         $parser = ScriptFactory::fromHex($script)->getScriptParser();
@@ -98,11 +97,9 @@ class ParserTest extends AbstractTestCase
         $this->assertFalse($parse[2]->isPush());
         $this->assertSame($parse[2]->getOp(), Opcodes::OP_EQUAL);
     }
-*/
+
     public function testParseNullByte()
     {
-
-        echo "\nNULL!\n";
         $script = ScriptFactory::create()->op('OP_0')->getScript();
         $parse = $script->getScriptParser()->decode();
         $data = $parse[0];
@@ -110,7 +107,7 @@ class ParserTest extends AbstractTestCase
         $this->assertSame(0, $data->getDataSize());
         $this->assertSame('', $data->getData()->getBinary());
     }
-/*
+
     public function testParseScripts()
     {
         $f = $this->dataFile('script.asm.json');
@@ -208,5 +205,5 @@ class ParserTest extends AbstractTestCase
             $this->assertEquals($operation->getData()->getSize(), $operation->getDataSize());
         }
     }
-*/
+
 }
