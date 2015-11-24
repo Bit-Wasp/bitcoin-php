@@ -11,6 +11,8 @@ use BitWasp\Buffertools\Buffer;
 class Number extends Serializable
 {
     const MAX_NUM_SIZE = 4;
+    const MAX= 2**32-1;
+    const MIN= -2**32+1;
 
     /**
      * @var Math
@@ -149,6 +151,12 @@ class Number extends Serializable
      */
     public function getInt()
     {
+        if ($this->math->cmp($this->number, self::MAX) > 0) {
+            return self::MAX;
+        } else if ($this->math->cmp($this->number, self::MIN) < 0) {
+            return self::MIN;
+        }
+
         return $this->number;
     }
 }
