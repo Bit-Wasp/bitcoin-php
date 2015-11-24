@@ -65,11 +65,6 @@ class Interpreter implements InterpreterInterface
     private $math;
 
     /**
-     * @var State
-     */
-    private $state;
-
-    /**
      * @var bool
      */
     private $minimalPush;
@@ -97,20 +92,14 @@ class Interpreter implements InterpreterInterface
         $this->flags = $flags;
         $this->script = new Script();
         $this->minimalPush = $this->flags->checkFlags(self::VERIFY_MINIMALDATA) === true;
-        $this->state = new State();
         $this->vchFalse = new Buffer("", 0, $this->math);
         $this->vchTrue = new Buffer("\x01", 1, $this->math);
+        $this->mainStack = new Stack();
+        $this->altStack = new Stack();
+        $this->vfStack = new Stack();
 
         $this->int0 = Number::buffer($this->vchFalse, false, 4, $this->math)->getBuffer();
         $this->int1 = Number::buffer($this->vchTrue, false, 1, $this->math)->getBuffer();
-    }
-
-    /**
-     * @return State
-     */
-    public function getStackState()
-    {
-        return $this->state;
     }
 
     /**
@@ -374,10 +363,10 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        $mainStack = $this->state->getMainStack();
+        $mainStack = $this->mainStack;
         $stackCopy = new Stack;
         if ($this->flags->checkFlags(self::VERIFY_P2SH)) {
-            $stackCopy = $this->state->cloneMainStack();
+            $stackCopy = clone $this->mainStack;
         }
 
         if (!$this->setScript($scriptPubKey)->run()) {
@@ -392,15 +381,13 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        $verifier = new OutputClassifier($scriptPubKey);
-
-        if ($this->flags->checkFlags(self::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
+        if ($this->flags->checkFlags(self::VERIFY_P2SH) && (new OutputClassifier($scriptPubKey))->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) {
                 return false;
             }
 
             // Restore mainStack to how it was after evaluating scriptSig
-            $mainStack = $this->state->restoreMainStack($stackCopy)->getMainStack();
+            $mainStack = $this->mainStack = $stackCopy;
             if ($mainStack->isEmpty()) {
                 return false;
             }
@@ -422,7 +409,7 @@ class Interpreter implements InterpreterInterface
      */
     private function checkExec()
     {
-        $vfStack = $this->state->getVfStack();
+        $vfStack = $this->vfStack;
         $c = 0;
         $len = $vfStack->end();
         for ($i = 0; $i < $len; $i++) {
@@ -440,11 +427,9 @@ class Interpreter implements InterpreterInterface
     {
         $math = $this->math;
 
-        $flags = $this->flags;
-        $mainStack = $this->state->getMainStack();
-        $altStack = $this->state->getAltStack();
-        $vfStack = $this->state->getVfStack();
-
+        $mainStack = $this->mainStack;
+        $altStack = $this->altStack;
+        $vfStack = $this->vfStack;
         $this->hashStartPos = 0;
         $this->opCount = 0;
         $parser = $this->script->getScriptParser();
@@ -454,13 +439,14 @@ class Interpreter implements InterpreterInterface
         }
 
         try {
-            foreach ($parser as $exec) {
-                $opCode = $exec->getOp();
-                $pushData = $exec->getData();
+            foreach ($parser as $operation) {
+
+                $opCode = $operation->getOp();
+                $pushData = $operation->getData();
                 $fExec = $this->checkExec();
 
                 // If pushdata was written to,
-                if ($exec->isPush() && $exec->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
+                if ($operation->isPush() && $operation->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
                     throw new \RuntimeException('Error - push size');
                 }
 
@@ -473,7 +459,7 @@ class Interpreter implements InterpreterInterface
                     throw new \RuntimeException('Disabled Opcode');
                 }
 
-                if ($fExec && $exec->isPush()) {
+                if ($fExec && $operation->isPush()) {
                     // In range of a pushdata opcode
                     if ($this->minimalPush && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(self::VERIFY_MINIMALDATA, 'Minimal pushdata required');
@@ -536,13 +522,13 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation - CSV');
                             }
 
-                            $sequence = Number::buffer($mainStack[-1], $this->minimalPush, 5, $math)->getInt();
-
-                            if ($math->cmp($sequence, 0) < 0) {
+                            $sequence = Number::buffer($mainStack[-1], $this->minimalPush, 5, $math);
+                            $nSequence = $sequence->getInt();
+                            if ($math->cmp($nSequence, 0) < 0) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
                             }
 
-                            if ($math->cmp($math->bitwiseAnd($sequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), '0') !== 0) {
+                            if ($math->cmp($math->bitwiseAnd($nSequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), '0') !== 0) {
                                 break;
                             }
 
@@ -559,7 +545,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_NOP8:
                         case Opcodes::OP_NOP9:
                         case Opcodes::OP_NOP10:
-                            if ($flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                            if ($this->flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
                                 throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                             }
                             break;
@@ -678,7 +664,7 @@ class Interpreter implements InterpreterInterface
                             $vch = $mainStack[-2];
                             $mainStack->push($vch);
                             break;
-    
+
                         case Opcodes::OP_ROT:
                             if (count($mainStack) < 3) {
                                 throw new \RuntimeException('Invalid stack operation OP_ROT');
@@ -1042,7 +1028,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            if ($flags->checkFlags(self::VERIFY_NULL_DUMMY) && $mainStack[-1]->getSize()) {
+                            if ($this->flags->checkFlags(self::VERIFY_NULL_DUMMY) && $mainStack[-1]->getSize()) {
                                 throw new ScriptRuntimeException(self::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
                             }
 
@@ -1068,7 +1054,7 @@ class Interpreter implements InterpreterInterface
                 }
             }
 
-            if (!$vfStack->end() === 0) {
+            if (!$this->vfStack->end() === 0) {
                 throw new \RuntimeException('Unbalanced conditional at script end');
             }
 
