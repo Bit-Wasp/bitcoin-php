@@ -42,6 +42,10 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function __construct($hashPrevOut, $nPrevOut, ScriptInterface $script = null, $sequence = self::SEQUENCE_FINAL)
     {
+        if (!is_string($hashPrevOut) || strlen($hashPrevOut) !== 64) {
+            throw new \InvalidArgumentException('TransactionInput: hash must be a hex string');
+        }
+
         if (!is_numeric($nPrevOut)) {
             throw new \InvalidArgumentException('TransactionInput: vout must be numeric');
         }

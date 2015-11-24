@@ -13,8 +13,8 @@ class StaticCollectionImplTest extends AbstractTestCase
     public function getInputCollection()
     {
         return new TransactionInputCollection([
-            new TransactionInput('a', 5, new Script()),
-            new TransactionInput('b', 10, new Script()),
+            new TransactionInput('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script()),
+            new TransactionInput('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 10, new Script()),
         ]);
     }
 
@@ -33,7 +33,7 @@ class StaticCollectionImplTest extends AbstractTestCase
     public function testArrayAccessOffsetReplace()
     {
         $collection = $this->getInputCollection();
-        $collection[0] = new TransactionInput('a', 5, new Script());
+        $collection[0] = new TransactionInput('daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script());
     }
 
     /**
@@ -42,7 +42,7 @@ class StaticCollectionImplTest extends AbstractTestCase
     public function testArrayAccessOffsetSet()
     {
         $collection = $this->getInputCollection();
-        $collection[] = new TransactionInput('a', 5, new Script());
+        $collection[] = new TransactionInput('caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script());
     }
 
     /**
