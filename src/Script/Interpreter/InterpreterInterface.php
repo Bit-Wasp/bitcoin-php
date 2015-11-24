@@ -64,6 +64,11 @@ interface InterpreterInterface
     // See BIP65 for details.
     const VERIFY_CHECKLOCKTIMEVERIFY = 512;
 
+    // Verify CHECKSEQUENCEVERIFY
+    //
+    // See BIP112 for details.
+    const VERIFY_CHECKSEQUENCEVERIFY = 1024;
+
     const SIGHASH_ALL          = 0x1;
     const SIGHASH_NONE         = 0x2;
     const SIGHASH_SINGLE       = 0x3;
