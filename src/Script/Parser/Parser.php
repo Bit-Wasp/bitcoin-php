@@ -77,6 +77,7 @@ class Parser implements \Iterator
         if ($this->end - $this->position < $strSize) {
             return false;
         }
+
         $size = unpack($packFormat, substr($this->data, $this->position, $strSize));
         $size = $size[1];
         $this->position += $strSize;
@@ -127,7 +128,7 @@ class Parser implements \Iterator
                 throw new \RuntimeException('Failed to unpack data from Script');
             }
 
-            $pushData = new Buffer(substr($this->data, $this->position, $dataSize), $dataSize, $this->math);
+            $pushData = ($dataSize === 0) ? $this->empty : new Buffer(substr($this->data, $this->position, $dataSize), $dataSize, $this->math);
 
             $this->position += $dataSize;
         }
@@ -187,33 +188,6 @@ class Parser implements \Iterator
     public function valid()
     {
         return isset($this->array[$this->execPtr]) || $this->position < $this->end;
-    }
-
-    /**
-     * returns a mix of Buffer objects and strings
-     *
-     * @return Buffer[]|string[]
-     */
-    public function parse()
-    {
-        $data = array();
-
-        $it = $this;
-        foreach ($it as $exec) {
-            $opCode = $exec->getOp();
-            if ($opCode == 0) {
-                $push = Buffer::hex('00', 1, $this->math);
-            } elseif ($opCode <= 78) {
-                $push = $exec->getData();
-            } else {
-                // None of these are pushdatas, so just an opcode
-                $push = $this->script->getOpcodes()->getOp($opCode);
-            }
-
-            $data[] = $push;
-        }
-
-        return $data;
     }
 
     /**

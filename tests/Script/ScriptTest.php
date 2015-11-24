@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -32,11 +33,10 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
         $script = ScriptFactory::create()->push($buffer)->getScript();
 
-        $parse = new Parser($script->getBuffer());
-        $op = $parse->readBytes(1)->getInt();
-        $this->assertEquals($script->getOpcodes()->getOpByName('OP_PUSHDATA4'), $op);
-        $this->assertEquals($eLen, $parse->readBytes(4, true)->getInt());
-        $this->assertEquals($buffer->getBinary(), ($script->getScriptParser()->parse()[0]->getBinary()));
+        $result = $script->getScriptParser()->decode();
+        $this->assertEquals(Opcodes::OP_PUSHDATA4, $result[0]->getOp());
+        $this->assertEquals($eLen, $result[0]->getDataSize());
+        $this->assertEquals($buffer->getBinary(), $result[0]->getData()->getBinary());
     }
 
     public function testDefaultSerializeBinary()
@@ -129,10 +129,11 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
         $script = ScriptFactory::create()
             ->push($data)
             ->getScript();
-        $scriptBin = $script->getBuffer()->getBinary();
-        $firstOpCode = ord($scriptBin[0]);
-        $this->assertSame($firstOpCode, $script->getOpCodes()->getOpByName('OP_PUSHDATA1'));
-        $script->getScriptParser()->parse();
+
+        $result = $script->getScriptParser()->decode();
+        $this->assertEquals(Opcodes::OP_PUSHDATA1, $result[0]->getOp());
+        $this->assertEquals($data->getBinary(), $result[0]->getData()->getBinary());
+
     }
 
     public function testPushdata2()
@@ -149,10 +150,9 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
             ->push($data)
             ->getScript();
 
-        $scriptBin = $script->getBuffer()->getBinary();
-        $firstOpCode = ord($scriptBin[0]);
-        $this->assertSame($firstOpCode, $script->getOpCodes()->getOpByName('OP_PUSHDATA2'));
-        $script->getScriptParser()->parse();
+        $result = $script->getScriptParser()->decode();
+        $this->assertEquals(Opcodes::OP_PUSHDATA2, $result[0]->getOp());
+        $this->assertEquals($data->getBinary(), $result[0]->getData()->getBinary());
     }
 
     public function testGetScriptHash()
@@ -192,7 +192,7 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     public function getPushOnlyVectors()
     {
         return [
-            [ScriptFactory::create()->push(new Buffer())->getScript(), true],
+            [ScriptFactory::create()->push(new Buffer())->push(new Buffer())->op('OP_0')->getScript(), true],
             [ScriptFactory::create()->op('OP_1')->getScript(), false]
         ];
     }
