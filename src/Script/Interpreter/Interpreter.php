@@ -82,8 +82,6 @@ class Interpreter implements InterpreterInterface
         Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
 
-    public $checkDisabledOpcodes = true;
-
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
@@ -121,23 +119,6 @@ class Interpreter implements InterpreterInterface
     {
         $this->script = $script;
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDisabledOps()
-    {
-        return $this->disabledOps;
-    }
-
-    /**
-     * @param int $op
-     * @return bool
-     */
-    public function isDisabledOp($op)
-    {
-        return in_array($op, $this->disabledOps, true);
     }
 
     /**
@@ -432,7 +413,7 @@ class Interpreter implements InterpreterInterface
                     $this->checkOpcodeCount();
                 }
 
-                if ($this->checkDisabledOpcodes && $this->isDisabledOp($opCode)) {
+                if (in_array($opCode, $this->disabledOps, true)) {
                     throw new \RuntimeException('Disabled Opcode');
                 }
 
