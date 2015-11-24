@@ -88,7 +88,7 @@ class AddressFactory
         $network = $network ?: Bitcoin::getNetwork();
         try {
             if ($classifier->isPayToPublicKey()) {
-                $address = PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0])->getAddress();
+                $address = PublicKeyFactory::fromHex($script->getScriptParser()->decode()[0]->getData())->getAddress();
             } else {
                 $address = self::fromOutputScript($script);
             }
