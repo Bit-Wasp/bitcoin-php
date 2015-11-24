@@ -63,8 +63,8 @@ class Transaction extends Serializable implements TransactionInterface
             throw new \InvalidArgumentException('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
 
-        if ($math->cmp($nLockTime, TransactionInterface::MAX_LOCKTIME) > 0) {
-            throw new \InvalidArgumentException('Locktime must be less than ' . TransactionInterface::MAX_LOCKTIME);
+        if ($math->cmp($nLockTime, 0) < 0 || $math->cmp($nLockTime, TransactionInterface::MAX_LOCKTIME) > 0) {
+            throw new \InvalidArgumentException('Locktime must be positive and less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 
         $this->version = $nVersion;

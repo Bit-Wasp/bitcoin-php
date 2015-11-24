@@ -32,7 +32,7 @@ class TxMutatorTest extends AbstractTestCase
         ;
 
         $mutator->inputs(new TransactionInputCollection([
-            new TransactionInput('a', 1, new Script())
+            new TransactionInput('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1, new Script())
         ]));
 
         $mutator->outputs(new TransactionOutputCollection([

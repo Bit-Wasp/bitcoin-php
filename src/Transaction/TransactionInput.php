@@ -37,11 +37,15 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     /**
      * @param string $hashPrevOut
      * @param string $nPrevOut
-     * @param ScriptInterface|Buffer $script
+     * @param ScriptInterface $script
      * @param int $sequence
      */
-    public function __construct($hashPrevOut, $nPrevOut, ScriptInterface $script = null, $sequence = self::SEQUENCE_FINAL)
+    public function __construct($hashPrevOut, $nPrevOut, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
     {
+        if (!is_string($hashPrevOut) || strlen($hashPrevOut) !== 64) {
+            throw new \InvalidArgumentException('TransactionInput: hash must be a hex string');
+        }
+
         if (!is_numeric($nPrevOut)) {
             throw new \InvalidArgumentException('TransactionInput: vout must be numeric');
         }
@@ -52,7 +56,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
 
         $this->hashPrevOut = $hashPrevOut;
         $this->nPrevOut = $nPrevOut;
-        $this->script = $script ?: new Script();
+        $this->script = $script;
         $this->sequence = $sequence;
         $this
             ->initFunctionAlias('txid', 'getTransactionId')

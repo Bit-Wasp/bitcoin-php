@@ -106,8 +106,8 @@ class TxBuilderTest extends AbstractTestCase
         $builder = new TxBuilder();
         $tx = $builder
             ->version($version)
-            ->input('a', 1)
-            ->input('b', 10)
+            ->input('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1)
+            ->input('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 10)
             ->output(50, new Script(new Buffer('script')))
             ->locktime($locktime)
             ->get();
