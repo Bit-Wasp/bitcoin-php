@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 
-class ConsensusTest 
+class ConsensusTest extends AbstractTestCase
 {
     private function loadExternalTestFiles($dir)
     {
@@ -63,8 +63,12 @@ class ConsensusTest
         }
 
         $factory = new ConsensusFactory(Bitcoin::getEcAdapter());
-        $consensus = $factory->getConsensus($factory->flags($flags));
+        $consensus = $factory->getNativeConsensus($factory->flags($flags));
         $r = $consensus->verify($tx, $scriptPubKey, $nInput);
+        if ($result !== $r) {
+            echo $scriptPubKey->getScriptParser()->getHumanReadable() . "\n";
+            die();
+        }
         $this->assertEquals($result, $r);
 
     }

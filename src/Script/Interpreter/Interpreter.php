@@ -447,6 +447,7 @@ class Interpreter implements InterpreterInterface
                 } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
                     // echo "OPCODE - " . $this->script->getOpCodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
+                        case Opcodes::OP_1NEGATE:
                         case Opcodes::OP_1:
                         case Opcodes::OP_2:
                         case Opcodes::OP_3:
