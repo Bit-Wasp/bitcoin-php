@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 
 class FlagsTest extends AbstractTestCase
 {
@@ -29,8 +30,8 @@ class FlagsTest extends AbstractTestCase
 
     public function testDefaults()
     {
-        $consensus = new ConsensusFactory(Bitcoin::getEcAdapter());
-        $flags = $consensus->defaultFlags();
+        $flags = ScriptFactory::defaultFlags();
+
         $this->assertTrue($flags->checkFlags(InterpreterInterface::VERIFY_P2SH));
         $this->assertTrue($flags->checkFlags(InterpreterInterface::VERIFY_STRICTENC));
         $this->assertTrue($flags->checkFlags(InterpreterInterface::VERIFY_DERSIG));
