@@ -17,6 +17,7 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 
@@ -306,27 +307,57 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param int $lockTime
+     * @param int $txLockTime
+     * @param int $nThreshold
+     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
      * @return bool
      */
-    private function checkLockTime($lockTime)
+    private function verifyLockTime($txLockTime, $nThreshold, Number $lockTime)
     {
-        $txLockTime = $this->transaction->getLockTime();
-        if (($this->math->cmp($txLockTime, Locktime::BLOCK_MAX) < 0 && $this->math->cmp($lockTime, Locktime::BLOCK_MAX) < 0) ||
-            ($this->math->cmp($txLockTime, Locktime::BLOCK_MAX) >= 0 && $this->math->cmp($lockTime, Locktime::BLOCK_MAX) >= 0)
+        $nTime = $lockTime->getInt();
+        if (($this->math->cmp($txLockTime, $nThreshold) < 0 && $this->math->cmp($nTime, $nThreshold) < 0) ||
+            ($this->math->cmp($txLockTime, $nThreshold) >= 0 && $this->math->cmp($nTime, $nThreshold) >= 0)
         ) {
             return false;
         }
 
-        if ($this->math->cmp($lockTime, $txLockTime) > 0) {
-            return false;
-        }
+        return $this->math->cmp($nTime, $txLockTime) >= 0;
+    }
 
+    /**
+     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
+     * @return bool
+     */
+    private function checkLockTime(Number $lockTime)
+    {
         if ($this->transaction->getInput($this->inputToSign)->isFinal()) {
             return false;
         }
 
-        return true;
+        return $this->verifyLockTime($this->transaction->getLockTime(), Locktime::BLOCK_MAX, $lockTime);
+    }
+
+    /**
+     * @param Number $sequence
+     * @return bool
+     */
+    private function checkSequence(Number $sequence)
+    {
+        $txSequence = $this->transaction->getInput($this->inputToSign)->getSequence();
+        if ($this->transaction->getVersion() < 2) {
+            return false;
+        }
+
+        if ($this->math->cmp($this->math->bitwiseAnd($txSequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), 0) !== 0) {
+            return 0;
+        }
+
+        $mask = $this->math->bitwiseOr(TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG, TransactionInputInterface::SEQUENCE_LOCKTIME_MASK);
+        return $this->verifyLockTime(
+            $this->math->bitwiseAnd($txSequence, $mask),
+            TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG,
+            Number::int($this->math->bitwiseAnd($sequence->getInt(), $mask))
+        );
     }
 
     /**
@@ -486,15 +517,41 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation - CLTV');
                             }
 
-                            $lockTime = Number::buffer($mainStack[-1], $this->minimalPush, 5, $math)->getInt();
+                            $lockTime = Number::buffer($mainStack[-1], $this->minimalPush, 5, $math);
                             if (!$this->checkLockTime($lockTime)) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKLOCKTIMEVERIFY, 'Unsatisfied locktime');
                             }
 
                             break;
 
+                        case Opcodes::OP_CHECKSEQUENCEVERIFY:
+                            if (!$this->flags->checkFlags(self::VERIFY_CHECKSEQUENCEVERIFY)) {
+                                if ($this->flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                                    throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
+                                }
+                                break;
+                            }
+
+                            if ($mainStack->isEmpty()) {
+                                throw new \RuntimeException('Invalid stack operation - CSV');
+                            }
+
+                            $sequence = Number::buffer($mainStack[-1], $this->minimalPush, 5, $math)->getInt();
+
+                            if ($math->cmp($sequence, 0) < 0) {
+                                throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
+                            }
+
+                            if ($math->cmp($math->bitwiseAnd($sequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), '0') !== 0) {
+                                break;
+                            }
+
+                            if (!$this->checkSequence($sequence)) {
+                                throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Unsatisfied locktime');
+                            }
+                            break;
+
                         case Opcodes::OP_NOP1:
-                        case Opcodes::OP_NOP3:
                         case Opcodes::OP_NOP4:
                         case Opcodes::OP_NOP5:
                         case Opcodes::OP_NOP6:
