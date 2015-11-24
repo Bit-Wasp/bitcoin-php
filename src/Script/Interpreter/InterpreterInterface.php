@@ -59,6 +59,11 @@ interface InterpreterInterface
     // Note: CLEANSTACK should never be used without P2SH.
     const VERIFY_CLEAN_STACK = 256;
 
+    // Verify CHECKLOCKTIMEVERIFY
+    //
+    // See BIP65 for details.
+    const VERIFY_CHECKLOCKTIMEVERIFY = 512;
+
     const SIGHASH_ALL          = 0x1;
     const SIGHASH_NONE         = 0x2;
     const SIGHASH_SINGLE       = 0x3;

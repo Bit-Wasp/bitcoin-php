@@ -125,7 +125,7 @@ class Opcodes implements \ArrayAccess
     const OP_RESERVED1 = 137;
     const OP_RESERVED2 = 138;
     const OP_NOP1 = 176;
-    const OP_NOP2 = 177;
+    const OP_CHECKLOCKTIMEVERIFY = 177;
     const OP_NOP3 = 178;
     const OP_NOP4 = 179;
     const OP_NOP5 = 180;
@@ -259,7 +259,7 @@ class Opcodes implements \ArrayAccess
         self::OP_RESERVED1 => 'OP_RESERVED1',
         self::OP_RESERVED2 => 'OP_RESERVED2',
         self::OP_NOP1 => 'OP_NOP1',
-        self::OP_NOP2 => 'OP_NOP2',
+        self::OP_CHECKLOCKTIMEVERIFY => 'OP_CHECKLOCKTIMEVERIFY',
         self::OP_NOP3 => 'OP_NOP3',
         self::OP_NOP4 => 'OP_NOP4',
         self::OP_NOP5 => 'OP_NOP5',
