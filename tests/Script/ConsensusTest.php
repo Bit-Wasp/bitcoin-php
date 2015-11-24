@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-
 use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -14,7 +13,6 @@ class ConsensusFactoryTest extends AbstractTestCase
     private $interpreterInstance = 'BitWasp\Bitcoin\Script\Interpreter\Interpreter';
     private $nativeConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\NativeConsensus';
     private $libBitcoinConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus';
-
 
     public function testGetDefaultFlags()
     {
@@ -86,5 +84,4 @@ class ConsensusFactoryTest extends AbstractTestCase
 
         $this->assertEquals($expected, $consensus->verify($tx, $scriptPubKey, 0), ScriptFactory::fromHex($scriptSig->getHex().$scriptPubKey->getHex())->getScriptParser()->getHumanReadable());
     }
-
 }
