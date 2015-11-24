@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 
-class ConsensusTest extends AbstractTestCase
+class ConsensusTest 
 {
     private function loadExternalTestFiles($dir)
     {
