@@ -5,10 +5,6 @@ namespace BitWasp\Bitcoin\Script\ScriptInfo;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
-use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkey;
-use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
-use BitWasp\Bitcoin\Script\ScriptInfo\ScriptInfoInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
