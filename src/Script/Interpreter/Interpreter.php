@@ -463,7 +463,7 @@ class Interpreter implements InterpreterInterface
 
                 if ($fExec && $exec->isPush()) {
                     // In range of a pushdata opcode
-                    if ($flags->checkFlags(self::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
+                    if ($this->minimalPush && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(self::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
 
