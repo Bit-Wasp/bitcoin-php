@@ -5,11 +5,12 @@ namespace BitWasp\Bitcoin\Tests\Script\Consensus;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 
-class ConsensusTest
+class ConsensusTest 
 {
     private function loadExternalTestFiles($dir)
     {
@@ -61,12 +62,10 @@ class ConsensusTest
             return;
         }
 
-        ob_start();
         $factory = new ConsensusFactory(Bitcoin::getEcAdapter());
         $consensus = $factory->getConsensus($factory->flags($flags));
         $r = $consensus->verify($tx, $scriptPubKey, $nInput);
-
-            $this->assertEquals($result, $r);
+        $this->assertEquals($result, $r);
 
     }
 }
