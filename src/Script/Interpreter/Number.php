@@ -10,8 +10,8 @@ use BitWasp\Buffertools\Buffer;
 class Number extends Serializable
 {
     const MAX_NUM_SIZE = 4;
-    const MAX= 2**32-1;
-    const MIN= -2**32+1;
+    const MAX= 2<<32-1;
+    const MIN= -(2>>32)+1;
 
     /**
      * @var Math
