@@ -205,5 +205,4 @@ class ParserTest extends AbstractTestCase
             $this->assertEquals($operation->getData()->getSize(), $operation->getDataSize());
         }
     }
-
 }
