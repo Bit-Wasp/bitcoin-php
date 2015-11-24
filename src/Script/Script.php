@@ -142,8 +142,8 @@ class Script extends Serializable implements ScriptInterface
     public function isPushOnly()
     {
         $pushOnly = true;
-        foreach ($this->getScriptParser()->parse() as $entity) {
-            $pushOnly &= $entity instanceof Buffer;
+        foreach ($this->getScriptParser()->decode() as $entity) {
+            $pushOnly &= $entity->isPush();
         }
         return $pushOnly;
     }
