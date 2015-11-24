@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Buffertools\Buffer;
 
 class Multisig implements ScriptInfoInterface
 {
@@ -39,31 +38,25 @@ class Multisig implements ScriptInfoInterface
     public function __construct(ScriptInterface $script)
     {
         $publicKeys = [];
-        $parse = $script->getScriptParser()->parse();
-        $opCodes = $script->getOpcodes();
+        $parse = $script->getScriptParser()->decode();
         if (count($parse) < 4) {
             throw new \InvalidArgumentException('Malformed multisig script');
         }
 
-        /** @var string $mCode */
-        $mCode = $parse[0];
-        /** @var string $nCode */
-        $nCode = $parse[count($parse) - 2];
+        $mCode = $parse[0]->getOp();
+        $nCode = $parse[count($parse) - 2]->getOp();
 
-        if (!is_string($mCode) || !is_string($nCode)) {
-            throw new \InvalidArgumentException('Malformed multisig script');
-        }
-
-        $this->m = $opCodes->getOpByName($mCode) - Opcodes::OP_1 + 1 ;
-        foreach (array_slice($parse, 1, -2) as $item) {
-            if (!$item instanceof Buffer) {
+        $this->m = $mCode - Opcodes::OP_1 + 1 ;
+        foreach (array_slice($parse, 1, -2) as $key) {
+            /** @var \BitWasp\Bitcoin\Script\Parser\Operation $key */
+            if (!$key->isPush()) {
                 throw new \RuntimeException('Malformed multisig script');
             }
 
-            $publicKeys[] = PublicKeyFactory::fromHex($item);
+            $publicKeys[] = PublicKeyFactory::fromHex($key->getData());
         }
 
-        $n = $opCodes->getOpByName($nCode) - Opcodes::OP_1 + 1 ;
+        $n = $nCode - Opcodes::OP_1 + 1 ;
         $this->n = count($publicKeys);
         if ($this->n === 0 || $this->n !== $n) {
             throw new \LogicException('No public keys found in script');
