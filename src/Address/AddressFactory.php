@@ -40,15 +40,15 @@ class AddressFactory
     {
         $classifier = new OutputClassifier($outputScript);
         $type = $classifier->classify();
-        $parsed = $outputScript->getScriptParser()->parse();
+        $parsed = $outputScript->getScriptParser()->decode();
 
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
             /** @var \BitWasp\Buffertools\Buffer $hash */
-            $hash = $parsed[2];
+            $hash = $parsed[2]->getData();
             return new PayToPubKeyHashAddress($hash);
         } else if ($type === OutputClassifier::PAYTOSCRIPTHASH) {
             /** @var \BitWasp\Buffertools\Buffer $hash */
-            $hash = $parsed[1];
+            $hash = $parsed[1]->getData();
             return new ScriptHashAddress($hash);
         }
 
@@ -88,7 +88,7 @@ class AddressFactory
         $network = $network ?: Bitcoin::getNetwork();
         try {
             if ($classifier->isPayToPublicKey()) {
-                $address = PublicKeyFactory::fromHex($script->getScriptParser()->parse()[0])->getAddress();
+                $address = PublicKeyFactory::fromHex($script->getScriptParser()->decode()[0]->getData())->getAddress();
             } else {
                 $address = self::fromOutputScript($script);
             }

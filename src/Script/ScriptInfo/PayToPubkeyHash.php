@@ -27,13 +27,13 @@ class PayToPubkeyHash implements ScriptInfoInterface
     public function __construct(ScriptInterface $script)
     {
         $this->script = $script;
-        $chunks = $this->script->getScriptParser()->parse();
-        if (count($chunks) < 5 || !$chunks[2] instanceof Buffer) {
+        $chunks = $this->script->getScriptParser()->decode();
+        if (count($chunks) < 5 || !$chunks[2]->isPush()) {
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
         }
 
         /** @var Buffer $hash */
-        $hash = $chunks[2];
+        $hash = $chunks[2]->getData();
         $this->hash = $hash;
     }
 

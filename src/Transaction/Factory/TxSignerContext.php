@@ -178,7 +178,7 @@ class TxSignerContext
         $parsed = $inputs[$inputToExtract]
             ->getScript()
             ->getScriptParser()
-            ->parse();
+            ->decode();
 
         $size = count($parsed);
 
@@ -186,15 +186,15 @@ class TxSignerContext
             case OutputClassifier::PAYTOPUBKEYHASH:
                 // Supply signature and public key in scriptSig
                 if ($size === 2) {
-                    $this->signatures = [TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)];
-                    $this->publicKeys = [PublicKeyFactory::fromHex($parsed[1]->getHex(), $this->ecAdapter)];
+                    $this->signatures = [TransactionSignatureFactory::fromHex($parsed[0]->getData(), $this->ecAdapter)];
+                    $this->publicKeys = [PublicKeyFactory::fromHex($parsed[1]->getData(), $this->ecAdapter)];
                 }
 
                 break;
             case OutputClassifier::PAYTOPUBKEY:
                 // Only has a signature in the scriptSig
                 if ($size === 1) {
-                    $this->signatures = [TransactionSignatureFactory::fromHex($parsed[0]->getHex(), $this->ecAdapter)];
+                    $this->signatures = [TransactionSignatureFactory::fromHex($parsed[0]->getData(), $this->ecAdapter)];
                 }
 
                 break;
@@ -215,8 +215,9 @@ class TxSignerContext
                     $sigHash = new Hasher($tx);
 
                     foreach (array_slice($parsed, 1, -1) as $item) {
-                        if ($item instanceof Buffer) {
-                            $txSig = TransactionSignatureFactory::fromHex($item, $this->ecAdapter);
+                        /** @var \BitWasp\Bitcoin\Script\Parser\Operation $item */
+                        if ($item->isPush()) {
+                            $txSig = TransactionSignatureFactory::fromHex($item->getData(), $this->ecAdapter);
                             $linked = $this->ecAdapter->associateSigs(
                                 [$txSig->getSignature()],
                                 $sigHash->calculate(
