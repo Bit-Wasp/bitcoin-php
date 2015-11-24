@@ -338,7 +338,7 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param Number $sequence
+     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $sequence
      * @return bool
      */
     private function checkSequence(Number $sequence)
