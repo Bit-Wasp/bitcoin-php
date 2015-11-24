@@ -42,20 +42,6 @@ class InterpreterTest extends AbstractTestCase
         return new Flags($int, $checkdisabled);
     }
 
-    public function testGetStackState()
-    {
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags(0));
-        $testStack = new Stack();
-        $testStack->push('a');
-
-        $this->assertEquals(0, $i->getStackState()->getMainStack()->count());
-        $this->assertEquals(0, $i->getStackState()->getAltStack()->count());
-        $this->assertEquals(0, $i->getStackState()->getAltStack()->count());
-        $i->getStackState()->restoreMainStack($testStack);
-        $this->assertEquals($testStack, $i->getStackState()->getMainStack());
-
-    }
-
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      * @expectedExceptionMessage Signature with incorrect encoding
