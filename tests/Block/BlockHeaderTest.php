@@ -50,7 +50,7 @@ class BlockHeaderTest extends AbstractTestCase
 
     public function testGetVersionDefault()
     {
-        $header = new BlockHeader(BlockHeaderInterface::CURRENT_VERSION, null, null, null, new Buffer(), null);
+        $header = new BlockHeader(BlockHeaderInterface::CURRENT_VERSION, '00000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', '12340000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1, new Buffer(), 1);
         $this->assertEquals(BlockHeaderInterface::CURRENT_VERSION, $header->getVersion());
     }
 
