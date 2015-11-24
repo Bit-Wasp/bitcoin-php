@@ -39,6 +39,21 @@ class Interpreter implements InterpreterInterface
     private $transaction;
 
     /**
+     * @var Stack
+     */
+    private $mainStack;
+
+    /**
+     * @var Stack
+     */
+    private $altStack;
+
+    /**
+     * @var Stack
+     */
+    private $vfStack;
+
+    /**
      * Position of OP_CODESEPARATOR, for calculating SigHash
      * @var int
      */
