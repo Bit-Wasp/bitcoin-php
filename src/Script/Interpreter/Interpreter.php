@@ -96,7 +96,7 @@ class Interpreter implements InterpreterInterface
         $this->transaction = $transaction;
         $this->flags = $flags;
         $this->script = new Script();
-        $this->minimalPush = $this->flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) === true;
+        $this->minimalPush = $this->flags->checkFlags(self::VERIFY_MINIMALDATA) === true;
         $this->state = new State();
         $this->vchFalse = new Buffer("", 0, $this->math);
         $this->vchTrue = new Buffer("\x01", 1, $this->math);
@@ -181,7 +181,7 @@ class Interpreter implements InterpreterInterface
     public function isLowDerSignature(Buffer $signature)
     {
         if (!$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_DERSIG, 'Signature with incorrect encoding');
+            throw new ScriptRuntimeException(self::VERIFY_DERSIG, 'Signature with incorrect encoding');
         }
 
         $binary = $signature->getBinary();
@@ -223,12 +223,12 @@ class Interpreter implements InterpreterInterface
             return $this;
         }
 
-        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_DERSIG | InterpreterInterface::VERIFY_LOW_S | InterpreterInterface::VERIFY_STRICTENC) && !$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        } else if ($this->flags->checkFlags(InterpreterInterface::VERIFY_LOW_S) && !$this->isLowDerSignature($signature)) {
-            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_LOW_S, 'Signature s element was not low');
-        } else if ($this->flags->checkFlags(InterpreterInterface::VERIFY_STRICTENC) && !$this->isDefinedHashtypeSignature($signature)) {
-            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_STRICTENC, 'Signature with invalid hashtype');
+        if ($this->flags->checkFlags(self::VERIFY_DERSIG | self::VERIFY_LOW_S | self::VERIFY_STRICTENC) && !$this->isValidSignatureEncoding($signature)) {
+            throw new ScriptRuntimeException(self::VERIFY_DERSIG, 'Signature with incorrect encoding');
+        } else if ($this->flags->checkFlags(self::VERIFY_LOW_S) && !$this->isLowDerSignature($signature)) {
+            throw new ScriptRuntimeException(self::VERIFY_LOW_S, 'Signature s element was not low');
+        } else if ($this->flags->checkFlags(self::VERIFY_STRICTENC) && !$this->isDefinedHashtypeSignature($signature)) {
+            throw new ScriptRuntimeException(self::VERIFY_STRICTENC, 'Signature with invalid hashtype');
         }
 
         return $this;
@@ -241,8 +241,8 @@ class Interpreter implements InterpreterInterface
      */
     public function checkPublicKeyEncoding(Buffer $publicKey)
     {
-        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
-            throw new ScriptRuntimeException(InterpreterInterface::VERIFY_STRICTENC, 'Public key with incorrect encoding');
+        if ($this->flags->checkFlags(self::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
+            throw new ScriptRuntimeException(self::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 
         return $this;
@@ -339,7 +339,7 @@ class Interpreter implements InterpreterInterface
 
         $mainStack = $this->state->getMainStack();
         $stackCopy = new Stack;
-        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_P2SH)) {
+        if ($this->flags->checkFlags(self::VERIFY_P2SH)) {
             $stackCopy = $this->state->cloneMainStack();
         }
 
@@ -357,7 +357,7 @@ class Interpreter implements InterpreterInterface
 
         $verifier = new OutputClassifier($scriptPubKey);
 
-        if ($this->flags->checkFlags(InterpreterInterface::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
+        if ($this->flags->checkFlags(self::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) {
                 return false;
             }
@@ -438,8 +438,8 @@ class Interpreter implements InterpreterInterface
 
                 if ($fExec && $exec->isPush()) {
                     // In range of a pushdata opcode
-                    if ($flags->checkFlags(InterpreterInterface::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
-                        throw new ScriptRuntimeException(InterpreterInterface::VERIFY_MINIMALDATA, 'Minimal pushdata required');
+                    if ($flags->checkFlags(self::VERIFY_MINIMALDATA) && !$this->checkMinimalPush($opCode, $pushData)) {
+                        throw new ScriptRuntimeException(self::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
 
                     $mainStack->push($pushData);
@@ -467,9 +467,26 @@ class Interpreter implements InterpreterInterface
                             $mainStack->push(Number::int($num)->getBuffer());
                             break;
 
-                        case $opCode >= Opcodes::OP_NOP1 && $opCode <= Opcodes::OP_NOP10:
-                            if ($flags->checkFlags(InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
-                                throw new ScriptRuntimeException(InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOPS found - this is discouraged');
+                        case Opcodes::OP_CHECKLOCKTIMEVERIFY:
+                            if (!$this->flags->checkFlags(self::VERIFY_CHECKLOCKTIMEVERIFY)) {
+                                if ($this->flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                                    throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
+                                }
+                                break;
+                            }
+                            break;
+
+                        case Opcodes::OP_NOP1:
+                        case Opcodes::OP_NOP3:
+                        case Opcodes::OP_NOP4:
+                        case Opcodes::OP_NOP5:
+                        case Opcodes::OP_NOP6:
+                        case Opcodes::OP_NOP7:
+                        case Opcodes::OP_NOP8:
+                        case Opcodes::OP_NOP9:
+                        case Opcodes::OP_NOP10:
+                            if ($flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                                throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                             }
                             break;
 
@@ -951,8 +968,8 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            if ($flags->checkFlags(InterpreterInterface::VERIFY_NULL_DUMMY) && $mainStack[-1]->getSize()) {
-                                throw new ScriptRuntimeException(InterpreterInterface::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
+                            if ($flags->checkFlags(self::VERIFY_NULL_DUMMY) && $mainStack[-1]->getSize()) {
+                                throw new ScriptRuntimeException(self::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
                             }
 
                             $mainStack->pop();
