@@ -392,9 +392,7 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        $verifier = new OutputClassifier($scriptPubKey);
-
-        if ($this->flags->checkFlags(self::VERIFY_P2SH) && $verifier->isPayToScriptHash()) {
+        if ($this->flags->checkFlags(self::VERIFY_P2SH) && (new OutputClassifier($scriptPubKey))->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) {
                 return false;
             }
