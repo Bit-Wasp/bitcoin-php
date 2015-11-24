@@ -24,11 +24,15 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     /**
      * Initialize class
      *
-     * @param int|string $value
+     * @param int $value
      * @param ScriptInterface $script
      */
     public function __construct($value, ScriptInterface $script)
     {
+        if (!is_numeric($value)) {
+            throw new \InvalidArgumentException('TransactionInput: vout must be numeric');
+        }
+
         $this->value = $value;
         $this->script = $script;
         $this
