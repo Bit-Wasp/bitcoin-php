@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -324,6 +325,30 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
+     * @param int $lockTime
+     * @return bool
+     */
+    private function checkLockTime($lockTime)
+    {
+        $txLockTime = $this->transaction->getLockTime();
+        if (($this->math->cmp($txLockTime, Locktime::BLOCK_MAX) < 0 && $this->math->cmp($lockTime, Locktime::BLOCK_MAX) < 0) ||
+            ($this->math->cmp($txLockTime, Locktime::BLOCK_MAX) >= 0 && $this->math->cmp($lockTime, Locktime::BLOCK_MAX) >= 0)
+        ) {
+            return false;
+        }
+
+        if ($this->math->cmp($lockTime, $txLockTime) > 0) {
+            return false;
+        }
+
+        if ($this->transaction->getInput($this->inputToSign)->isFinal()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param int $nInputToSign
@@ -399,7 +424,7 @@ class Interpreter implements InterpreterInterface
     /**
      * @return bool
      */
-    public function run()
+    private function run()
     {
         $math = $this->math;
 
@@ -474,6 +499,16 @@ class Interpreter implements InterpreterInterface
                                 }
                                 break;
                             }
+
+                            if ($mainStack->isEmpty()) {
+                                throw new \RuntimeException('Invalid stack operation - CLTV');
+                            }
+
+                            $lockTime = Number::buffer($mainStack[-1], $this->minimalPush, 5, $math)->getInt();
+                            if (!$this->checkLockTime($lockTime)) {
+                                throw new ScriptRuntimeException(self::VERIFY_CHECKLOCKTIMEVERIFY, 'Unsatisfied locktime');
+                            }
+
                             break;
 
                         case Opcodes::OP_NOP1:
