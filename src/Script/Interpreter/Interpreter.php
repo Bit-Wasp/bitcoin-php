@@ -440,7 +440,6 @@ class Interpreter implements InterpreterInterface
 
         try {
             foreach ($parser as $operation) {
-
                 $opCode = $operation->getOp();
                 $pushData = $operation->getData();
                 $fExec = $this->checkExec();

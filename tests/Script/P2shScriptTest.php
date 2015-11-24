@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
