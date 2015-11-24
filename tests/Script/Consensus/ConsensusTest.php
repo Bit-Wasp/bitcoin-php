@@ -3,8 +3,10 @@
 namespace BitWasp\Bitcoin\Tests\Script\Consensus;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Script\ConsensusFactory;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
@@ -62,8 +64,7 @@ class ConsensusTest
             return;
         }
 
-        $factory = new ConsensusFactory(Bitcoin::getEcAdapter());
-        $consensus = $factory->getNativeConsensus($factory->flags($flags));
+        $consensus = ScriptFactory::getNativeConsensus(new Flags($flags));
         $r = $consensus->verify($tx, $scriptPubKey, $nInput);
         if ($result !== $r) {
             //echo $scriptPubKey->getScriptParser()->getHumanReadable() . "\n";

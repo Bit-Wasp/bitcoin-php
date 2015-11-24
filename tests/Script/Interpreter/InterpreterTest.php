@@ -219,9 +219,8 @@ class InterpreterTest extends AbstractTestCase
     {
         $ec = EcAdapterFactory::getAdapter(new Math(), EccFactory::getSecgCurves()->generator256k1());
         $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ec);
-
-        $consensus = new ConsensusFactory($ec);
-        $standard = $consensus->defaultFlags();
+        
+        $standard = ScriptFactory::defaultFlags();
 
         $vectors = [];
 
