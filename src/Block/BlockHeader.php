@@ -56,11 +56,11 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
             throw new \InvalidArgumentException('Block header version must be numeric');
         }
 
-        if (!is_string($prevBlock)) {
+        if (!is_string($prevBlock) || strlen($prevBlock) !== 64) {
             throw new \InvalidArgumentException('Block header prevBlock must be a string');
         }
 
-        if (!is_string($merkleRoot)) {
+        if (!is_string($merkleRoot) || strlen($merkleRoot) !== 64) {
             throw new \InvalidArgumentException('Block header merkleRoot must be a string');
         }
 
