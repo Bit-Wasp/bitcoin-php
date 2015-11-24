@@ -3,8 +3,9 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\SerializableInterface;
 
-interface TransactionInputInterface extends \ArrayAccess
+interface TransactionInputInterface extends SerializableInterface, \ArrayAccess
 {
     /**
      * The default sequence.
