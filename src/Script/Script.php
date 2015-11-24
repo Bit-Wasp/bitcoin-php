@@ -14,7 +14,7 @@ class Script extends Serializable implements ScriptInterface
     /**
      * @var Opcodes
      */
-    private $opCodes;
+    protected $opCodes;
 
     /**
      * @var null|string
