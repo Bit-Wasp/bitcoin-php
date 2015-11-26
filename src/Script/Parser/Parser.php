@@ -20,6 +20,11 @@ class Parser implements \Iterator
     private $empty;
 
     /**
+     * @var ScriptInterface
+     */
+    private $script;
+
+    /**
      * @var int
      */
     private $position = 0;
@@ -86,20 +91,6 @@ class Parser implements \Iterator
     }
 
     /**
-     * @param int $size
-     * @return bool
-     */
-    private function validateSize($size)
-    {
-        $pdif = ($this->end - $this->position);
-        $a = $pdif < 0;
-        $b = $pdif < $size;
-        $r = !($a || $b);
-
-        return $r;
-    }
-
-    /**
      * @param int $ptr
      * @return Operation
      */
@@ -124,7 +115,8 @@ class Parser implements \Iterator
                 $dataSize = $this->unpackSize('V', 4);
             }
 
-            if ($dataSize === false || $this->validateSize($dataSize) === false) {
+            $delta = ($this->end - $this->position);
+            if ($dataSize === false || $delta < 0 || $delta < $dataSize) {
                 throw new \RuntimeException('Failed to unpack data from Script');
             }
 
