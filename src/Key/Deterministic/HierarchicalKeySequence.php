@@ -87,4 +87,51 @@ class HierarchicalKeySequence
 
         return $sequence;
     }
+
+    /**
+     * @param string $path
+     * @return array
+     */
+    public function decodePath($path)
+    {
+        if ($path === '') {
+            throw new \InvalidArgumentException('Invalid path passed to decodePath()');
+        }
+
+        $list = [];
+        foreach (explode('/', $path) as $segment) {
+            if ($segment !== 'm' || $segment !== 'M') {
+                $list[] = $this->fromNode($segment);
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param array|\stdClass|\Traversable $list
+     * @return string
+     */
+    public function encodePath($list)
+    {
+        self::validateListType($list);
+
+        $path = [];
+        foreach ($list as $sequence) {
+            $path[] = $this->getNode($sequence);
+        }
+
+        return implode('/', $path);
+    }
+
+    /**
+     * @param \stdClass|array|\Traversable $list
+     */
+    public static function validateListType($list)
+    {
+        if (!is_array($list) && !$list instanceof \Traversable && !$list instanceof \stdClass) {
+            throw new \InvalidArgumentException('Sequence list must be an array or \Traversable');
+        }
+
+    }
 }
