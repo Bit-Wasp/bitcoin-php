@@ -4,6 +4,12 @@ namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Math\Math;
 
+/**
+ * NB: Paths returned by this library omit m/M. This is because
+ * some knowledge is lost during derivations, so the full path
+ * is already considered 'meta-data'. It also allows the library
+ * to assume derivations are relative to the current instance.
+ */
 class HierarchicalKeySequence
 {
     /**
@@ -76,6 +82,7 @@ class HierarchicalKeySequence
 
     /**
      * Given a sequence, get the human readable node. Ie, 0 -> 0, 0x80000000 -> 0h
+     *
      * @param $sequence
      * @return string
      */
@@ -89,6 +96,8 @@ class HierarchicalKeySequence
     }
 
     /**
+     * Decodes a human-readable path, into an array of integers (sequences)
+     *
      * @param string $path
      * @return array
      */
@@ -109,6 +118,8 @@ class HierarchicalKeySequence
     }
 
     /**
+     * Encodes a list of sequences to the human-readable path.
+     *
      * @param array|\stdClass|\Traversable $list
      * @return string
      */
@@ -125,6 +136,8 @@ class HierarchicalKeySequence
     }
 
     /**
+     * Check the list, mainly that it works for foreach()
+     *
      * @param \stdClass|array|\Traversable $list
      */
     public static function validateListType($list)
