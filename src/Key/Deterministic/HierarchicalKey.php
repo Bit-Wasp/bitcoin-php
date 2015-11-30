@@ -243,6 +243,24 @@ class HierarchicalKey
     }
 
     /**
+     * @param array|\stdClass|\Traversable $list
+     * @return HierarchicalKey
+     */
+    public function deriveFromList($list)
+    {
+        if (!is_array($list) && !$list instanceof \Traversable && !$list instanceof \stdClass) {
+            throw new \InvalidArgumentException('List must be an array or \Traversable');
+        }
+
+        $key = $this;
+        foreach ($list as $sequence) {
+            $key = $key->deriveChild($sequence);
+        }
+
+        return $key;
+    }
+
+    /**
      * Decodes a BIP32 path into actual 32bit sequence numbers and derives the child key
      *
      * @param string $path
@@ -251,45 +269,12 @@ class HierarchicalKey
      */
     public function derivePath($path)
     {
-        $path = $this->decodePath($path);
-
-        $key = $this;
-        foreach (explode('/', $path) as $chunk) {
-            $key = $key->deriveChild($chunk);
-        }
-
-        return $key;
+        $sequences = new HierarchicalKeySequence($this->ecAdapter->getMath());
+        return $this->deriveFromList($sequences->decodePath($path));
     }
 
     /**
-     * Decodes a BIP32 path into it's actual 32bit sequence numbers: ie, m/0/1'/2/3' -> m/0/2147483649/2/2147483651
-     *
-     * @param string $path
-     * @return string
-     */
-    public function decodePath($path)
-    {
-        if ($path === '') {
-            throw new \InvalidArgumentException('Invalid path passed to decodePath()');
-        }
-
-        $pathPieces = explode('/', $path);
-        if (count($pathPieces) === 0) {
-            throw new \InvalidArgumentException('Invalid path passed to decodePath()');
-        }
-
-        $newPath = array();
-        $helper = new HierarchicalKeySequence($this->ecAdapter->getMath());
-        foreach ($pathPieces as $c => $sequence) {
-            $newPath[] = $helper->fromNode($sequence);
-        }
-
-        $path = implode('/', $newPath);
-        return $path;
-    }
-
-    /**
-     *
+     * Serializes the instance according to whether it wraps a private or public key.
      * @param NetworkInterface $network
      * @return string
      */
@@ -303,6 +288,9 @@ class HierarchicalKey
     }
 
     /**
+     * Explicitly serialize as a private key. Throws an exception if
+     * the key isn't private.
+     *
      * @param NetworkInterface $network
      * @return string
      */
@@ -316,6 +304,8 @@ class HierarchicalKey
     }
 
     /**
+     * Explicitly serialize as a public key. This will always work.
+     *
      * @param NetworkInterface $network
      * @return string
      */

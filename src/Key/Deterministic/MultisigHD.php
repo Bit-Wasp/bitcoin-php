@@ -147,6 +147,22 @@ class MultisigHD
     }
 
     /**
+     * @param array|\stdClass|\Traversable $list
+     * @return MultisigHD
+     */
+    public function deriveFromList($list)
+    {
+        HierarchicalKeySequence::validateListType($list);
+
+        $account = $this;
+        foreach ($list as $sequence) {
+            $account = $account->deriveChild($sequence);
+        }
+
+        return $account;
+    }
+
+    /**
      * Derive a path in the tree of available addresses.
      *
      * @param string $path
@@ -154,13 +170,6 @@ class MultisigHD
      */
     public function derivePath($path)
     {
-        $decoded = explode('/', $this->keys[0]->decodePath($path));
-
-        $child = $this;
-        foreach ($decoded as $p) {
-            $child = $child->deriveChild($p);
-        }
-
-        return $child;
+        return $this->deriveFromList($this->sequences->decodePath($path));
     }
 }
