@@ -91,15 +91,6 @@ class HierarchicalKeyTest extends AbstractTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testDecodePathFailure()
-    {
-        $key = HierarchicalKeyFactory::generateMasterKey(Bitcoin::getEcAdapter());
-        $key->decodePath('');
-    }
-
-    /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
      */
@@ -143,18 +134,9 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->compareToPrivVectors($key, $details);
 
         foreach ($derivs as $childDeriv) {
-            $path = $key->decodePath($childDeriv->path);
-            $key = $key->deriveChild($path);
+            $key = $key->derivePath($childDeriv->path);
             $this->compareToPrivVectors($key, $childDeriv->details);
         }
-    }
-
-    public function testDecodePath()
-    {
-        // need to init a HierarchicalKey to be able to call the method :/
-        $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU', $this->network);
-
-        $this->assertEquals('2147483648/2147483649/444/2147526030', $key->decodePath("0'/1'/444/42382'"));
     }
 
     public function testDerivePath()

@@ -44,4 +44,21 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
         // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
         $sequence->getHardened(HierarchicalKeySequence::START_HARDENED);
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testDecodePathFailure()
+    {
+        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence->decodePath('');
+    }
+
+    public function testDecodePath()
+    {
+        $sequence = new HierarchicalKeySequence(new Math());
+
+        $expected = ['2147483648','2147483649','444','2147526030'];
+        $this->assertEquals($expected, $sequence->decodePath("0'/1'/444/42382'"));
+    }
 }
