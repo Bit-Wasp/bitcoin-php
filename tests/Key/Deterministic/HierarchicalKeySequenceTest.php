@@ -75,7 +75,8 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
         $this->assertEquals($integer, implode("", $sequence->decodePath($node)));
     }
 
-    public function getEncodePathVectors() {
+    public function getEncodePathVectors()
+    {
         $array = ['2147483648','2147483649','444','2147526030'];
         $stdClass = (object) $array;
         $traversable = \SplFixedArray::fromArray($array);
@@ -96,5 +97,4 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
 
         $this->assertEquals("0h/1h/444/42382h", $sequence->encodePath($list));
     }
-
 }
