@@ -1,22 +1,11 @@
 <?php
 
 namespace BitWasp\Bitcoin\Math;
-
-use BitWasp\Buffertools\Buffer;
 use \Mdanter\Ecc\Math\Gmp;
+use Mdanter\Ecc\Util\NumberSize;
 
 class Math extends Gmp
 {
-    /**
-     * @var CompactInteger
-     */
-    private $compact;
-
-    public function __construct()
-    {
-        $this->compact = new CompactInteger($this);
-    }
-
     /**
      * @param int|string $first
      * @param int|string $second
@@ -25,6 +14,16 @@ class Math extends Gmp
     public function notEq($first, $second)
     {
         return $this->cmp($first, $second) !== 0;
+    }
+
+    /**
+     * @param $first
+     * @param $second
+     * @return bool
+     */
+    public function eq($first, $second)
+    {
+        return $this->cmp($first, $second) === 0;
     }
 
     /**
@@ -65,14 +64,6 @@ class Math extends Gmp
     public function lessThanEq($first, $second)
     {
         return $this->cmp($first, $second) >= 0;
-    }
-
-    /**
-     * @return CompactInteger
-     */
-    public function compact()
-    {
-        return $this->compact;
     }
 
     /**
@@ -120,41 +111,73 @@ class Math extends Gmp
     }
 
     /**
-     * @param Buffer $bits
-     * @return array
+     * @param int|string $compact
+     * @param bool|false $isNegative
+     * @param bool|false $isOverflow
+     * @return int|string
      */
-    public function unpackCompact(Buffer $bits)
+    public function writeCompact($compact, &$isNegative, &$isOverflow)
     {
-        $bitStr = $bits->getBinary();
 
-        // Unpack and decode
-        $sci = array_map(
-            function ($value) {
-                return $this->hexDec($value);
-            },
-            unpack('H2exp/H6mul', $bitStr)
-        );
-        return $sci;
+        $size = $this->rightShift($compact, 24);
+        $word = $this->bitwiseAnd($compact, $this->hexDec('007fffff'));
+        if ($this->cmp($size, 3) <= 0) {
+            $word = $this->rightShift($word, $this->mul(8, $this->sub(3, $size)));
+        } else {
+            $word = $this->leftShift($word, $this->mul(8, $this->sub($size, 3)));
+        }
+
+        // isNegative: $word != 0 && $uint32 & 0x00800000 != 0
+        // isOverflow: $word != 0 && (($size > 34) || ($word > 0xff && $size > 33) || ($word > 0xffff && $size  >32))
+        $isNegative = (($this->cmp($word, 0) !== 0) && ($this->cmp($this->bitwiseAnd($compact, $this->hexDec('0x00800000')), 0) === 1));
+        $isOverflow = $this->cmp($word, 0) !== 0 && (
+                ($this->cmp($size, 34) > 0)
+                || ($this->cmp($word, 0xff) > 0 && $this->cmp($size, 33) > 0)
+                || ($this->cmp($word, 0xffff) > 0 && $this->cmp($size, 32) > 0)
+            );
+
+        return $word;
     }
 
     /**
-     * @param $int
-     * @param $pow
+     * @param int|string $integer
      * @return int|string
      */
-    public function mulCompact($int, $pow)
+    public function getLow64($integer)
     {
-        return $this->mul($int, $this->pow(2, $this->mul(8, $this->sub($pow, 3))));
+        $bits = str_pad($this->baseConvert($integer, 10, 2), 64, '0', STR_PAD_LEFT);
+        return $this->baseConvert(substr($bits, 0, 64), 2, 10);
     }
 
     /**
-     * @param Buffer $bits
+     * @param int|string $integer
+     * @param bool $fNegative
      * @return int|string
      */
-    public function getCompact(Buffer $bits)
+    public function parseCompact($integer, $fNegative)
     {
-        $compact = $this->unpackCompact($bits);
-        $int = $this->mulCompact($compact['mul'], $compact['exp']);
-        return $int;
+        if (!is_bool($fNegative)) {
+            throw new \InvalidArgumentException('CompactInteger::read() - flag must be boolean!');
+        }
+
+        $size = (int) NumberSize::bnNumBytes($this, $integer);
+        if ($this->cmp($size, 3) <= 0) {
+            $compact = $this->leftShift($this->getLow64($integer), $this->mul(8, $this->sub(3, $size)));
+        } else {
+            $compact = $this->rightShift($integer, $this->mul(8, $this->sub($size, 3)));
+            $compact = $this->getLow64($compact);
+        }
+
+        if ($this->cmp($this->bitwiseAnd($compact, $this->hexDec('00800000')), 0) > 0) {
+            $compact = $this->rightShift($compact, 8);
+            $size++;
+        }
+
+        $compact = $this->bitwiseOr($compact, $this->leftShift($size, 24));
+        if ($fNegative && $this->cmp($this->bitwiseAnd($compact, $this->hexDec('007fffff')), 0) > 0) { /// ?
+            $compact = $this->bitwiseOr($compact, $this->hexDec('00800000'));
+        }
+
+        return $compact;
     }
 }
