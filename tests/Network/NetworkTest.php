@@ -178,6 +178,28 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals('t7ZKfRypXUd7ByZGLLi5jX3AbD7KQvDj4a', $p2pk->getAddress(NetworkFactory::viacoinTestnet()));
 
         $this->assertInstanceOf($this->netInterfaceType, NetworkFactory::litecoinTestnet());
+
+        $this->assertEquals(NetworkFactory::dogecoin()->getAddressByte(), '1e');
+        $this->assertEquals(NetworkFactory::dogecoin()->getP2shByte(), '16');
+        $this->assertEquals(NetworkFactory::dogecoin()->getPrivByte(), '9e');
+        $this->assertEquals(NetworkFactory::dogecoin()->isTestnet(), false);
+        $this->assertEquals(NetworkFactory::dogecoin()->getHDPrivByte(), '02fac398');
+        $this->assertEquals(NetworkFactory::dogecoin()->getHDPubByte(), '02facafd');
+        $this->assertEquals(NetworkFactory::dogecoin()->getNetMagicBytes(), 'c0c0c0c0');
+
+        $this->assertEquals('9w97HrPBcRhjMLXswZvYk5DrRQQGvT2UeH', $p2sh->getAddress(NetworkFactory::dogecoin()));
+        $this->assertEquals('D5mp9u4seyg7rw2rxeQAhMdrYH7pPs5gNu', $p2pk->getAddress(NetworkFactory::dogecoin()));
+
+        $this->assertEquals(NetworkFactory::dogecoinTestnet()->getAddressByte(), '71');
+        $this->assertEquals(NetworkFactory::dogecoinTestnet()->getP2shByte(), 'c4');
+        $this->assertEquals(NetworkFactory::dogecoinTestnet()->getPrivByte(), 'f1');
+        $this->assertEquals(NetworkFactory::dogecoinTestnet()->isTestnet(), true);
+        $this->assertEquals(NetworkFactory::dogecoinTestnet()->getHDPrivByte(), '0432a243');
+        $this->assertEquals(NetworkFactory::dogecoinTestnet()->getHDPubByte(), '043587cf');
+        $this->assertEquals(NetworkFactory::dogecoinTestnet()->getNetMagicBytes(), 'c0c0c0c0');
+
+        $this->assertEquals('2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV', $p2sh->getAddress(NetworkFactory::dogecoinTestnet()));
+        $this->assertEquals('nUpssuonax8qjuc3zU3cwmE9n9W7QXJjgW', $p2pk->getAddress(NetworkFactory::dogecoinTestnet()));
     }
 
     public function testGetHDPrivByte()
