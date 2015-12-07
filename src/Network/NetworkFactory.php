@@ -102,4 +102,32 @@ class NetworkFactory
 
         return $network;
     }
+
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function dogecoin()
+    {
+        $network = self::create('1e', '16', '9e')
+            ->setHDPubByte('02facafd')
+            ->setHDPrivByte('02fac398')
+            ->setNetMagicBytes('c0c0c0c0');
+
+        return $network;
+    }
+
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function dogecoinTestnet()
+    {
+        $network = self::create('71', 'c4', 'f1', true)
+            ->setHDPubByte('043587cf')
+            ->setHDPrivByte('0432a243')
+            ->setNetMagicBytes('c0c0c0c0');
+
+        return $network;
+    }
 }
