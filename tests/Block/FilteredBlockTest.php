@@ -40,7 +40,7 @@ class FilteredBlockTest extends AbstractTestCase
         /** @var \BitWasp\Buffertools\Buffer[] $matches */
         $matches = [];
         $extracted = $tree->extractMatches($matches);
-        $this->assertEquals($block->getHeader()->getMerkleRoot(), $extracted->getHex());
+        $this->assertEquals($block->getHeader()->getMerkleRoot(), $extracted);
     }
 
 
@@ -64,7 +64,7 @@ class FilteredBlockTest extends AbstractTestCase
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
-        $this->assertEquals($blockMerkleRoot, $root->getHex());
+        $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
         $this->assertEquals($tx9, $matched[0]->getHex());
 
@@ -76,7 +76,7 @@ class FilteredBlockTest extends AbstractTestCase
         /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
-        $this->assertEquals($blockMerkleRoot, $root->getHex());
+        $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(2, count($matched));
         $this->assertEquals($tx8, $matched[0]->getHex());
         $this->assertEquals($tx9, $matched[1]->getHex());
@@ -104,7 +104,7 @@ class FilteredBlockTest extends AbstractTestCase
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
-        $this->assertEquals($blockMerkleRoot, $root->getHex());
+        $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
         $this->assertEquals($expectedTx[0], $matched[0]->getHex());
 
@@ -114,7 +114,7 @@ class FilteredBlockTest extends AbstractTestCase
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
-        $this->assertEquals($blockMerkleRoot, $root->getHex());
+        $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(4, count($matched));
         $cETx = count($expectedTx);
         for ($i = 0; $i < $cETx; $i++) {
@@ -143,7 +143,7 @@ class FilteredBlockTest extends AbstractTestCase
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
-        $this->assertEquals($blockMerkleRoot, $root->getHex());
+        $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
         $this->assertEquals($expectedTx[0], $matched[0]->getHex());
 
@@ -152,7 +152,7 @@ class FilteredBlockTest extends AbstractTestCase
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
-        $this->assertEquals($blockMerkleRoot, $root->getHex());
+        $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(3, count($matched));
         $cETx = count($expectedTx);
         for ($i = 0; $i < $cETx; $i++) {
@@ -177,7 +177,7 @@ class FilteredBlockTest extends AbstractTestCase
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
 
-        $this->assertEquals($blockMerkleRoot, $root->getHex());
+        $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
         $this->assertEquals($tx, $matched[0]->getHex());
 

@@ -43,7 +43,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function __construct(Buffer $hashPrevOut, $nPrevOut, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
     {
         if ($hashPrevOut->getSize() !== 32) {
-            throw new \InvalidArgumentException('TransactionInput: hash must be a hex string');
+            throw new \InvalidArgumentException('TransactionInput: hash must be a 32-byte Buffer');
         }
 
         if (!is_numeric($nPrevOut)) {

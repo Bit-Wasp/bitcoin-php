@@ -144,8 +144,8 @@ class ElectrumServer
                 $content = $response->getResult();
                 return new BlockHeader(
                     $content['version'],
-                    @$content['prev_block_hash'],
-                    $content['merkle_root'],
+                    isset($content['prev_block_hash']) ? Buffer::hex($content['prev_block_hash'], 32) : new Buffer('', 32),
+                    Buffer::hex($content['merkle_root'], 32),
                     $content['timestamp'],
                     Buffer::int($content['bits'], 4, $this->math),
                     $content['nonce']

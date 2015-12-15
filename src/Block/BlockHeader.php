@@ -18,12 +18,12 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $version;
 
     /**
-     * @var string
+     * @var Buffer
      */
     private $prevBlock;
 
     /**
-     * @var string
+     * @var Buffer
      */
     private $merkleRoot;
 
@@ -44,24 +44,24 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
 
     /**
      * @param int|string $version
-     * @param string $prevBlock
-     * @param string $merkleRoot
+     * @param Buffer $prevBlock
+     * @param Buffer $merkleRoot
      * @param int|string $timestamp
      * @param Buffer $bits
      * @param int|string $nonce
      */
-    public function __construct($version, $prevBlock, $merkleRoot, $timestamp, Buffer $bits, $nonce)
+    public function __construct($version, Buffer $prevBlock, Buffer $merkleRoot, $timestamp, Buffer $bits, $nonce)
     {
         if (!is_numeric($version)) {
             throw new \InvalidArgumentException('Block header version must be numeric');
         }
 
-        if (!is_string($prevBlock) || strlen($prevBlock) !== 64) {
-            throw new \InvalidArgumentException('Block header prevBlock must be a string');
+        if ($prevBlock->getSize() !== 32) {
+            throw new \InvalidArgumentException('Block header prevBlock must be a 32-byte Buffer');
         }
 
-        if (!is_string($merkleRoot) || strlen($merkleRoot) !== 64) {
-            throw new \InvalidArgumentException('Block header merkleRoot must be a string');
+        if ($merkleRoot->getSize() !== 32) {
+            throw new \InvalidArgumentException('Block header prevBlock must be a 32-byte Buffer');
         }
 
         if (!is_numeric($timestamp)) {
