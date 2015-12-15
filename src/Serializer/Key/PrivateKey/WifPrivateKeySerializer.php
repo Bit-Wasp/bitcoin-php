@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Buffertools\Buffertools;
 
 class WifPrivateKeySerializer
 {
@@ -42,13 +43,19 @@ class WifPrivateKeySerializer
      */
     public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey)
     {
-        $payload = Buffer::hex(
-            $network->getPrivByte() .
-            $this->hexSerializer->serialize($privateKey)->getHex() .
-            ($privateKey->isCompressed() ? '01' : '')
+        $serialized = Buffertools::concat(
+            Buffer::hex($network->getPrivByte()),
+            $this->hexSerializer->serialize($privateKey)
         );
 
-        return Base58::encodeCheck($payload);
+        if ($privateKey->isCompressed()) {
+            $serialized = Buffertools::concat(
+                $serialized,
+                new Buffer("\x01", 1)
+            );
+        }
+
+        return Base58::encodeCheck($serialized);
     }
 
     /**
