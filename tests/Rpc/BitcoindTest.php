@@ -286,7 +286,7 @@ class BitcoindTest extends AbstractTestCase
         $unspent = $bitcoind->listunspent(0, 100, [AddressFactory::fromString('1Cemh3cKQm6q9qCzgBAgguv17w4dsLNvSH')]);
 
         $expected = new Utxo(
-            'f0802077ad259c7e49257b55851943292235e330e3287a88589f9b2d2c8adb24',
+            Buffer::hex('f0802077ad259c7e49257b55851943292235e330e3287a88589f9b2d2c8adb24', 32),
             0,
             new TransactionOutput(
                 1000000,

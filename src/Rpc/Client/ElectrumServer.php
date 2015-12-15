@@ -110,7 +110,7 @@ class ElectrumServer
                 return array_map(
                     function (array $value) use ($address) {
                         return new Utxo(
-                            $value['tx_hash'],
+                            Buffer::hex($value['tx_hash'], 32),
                             $value['tx_pos'],
                             new TransactionOutput(
                                 $value['value'],

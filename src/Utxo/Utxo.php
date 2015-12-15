@@ -3,11 +3,12 @@
 namespace BitWasp\Bitcoin\Utxo;
 
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
+use BitWasp\Buffertools\Buffer;
 
 class Utxo
 {
     /**
-     * @var string
+     * @var Buffer
      */
     private $hashPrevOut;
 
@@ -22,11 +23,11 @@ class Utxo
     private $prevOut;
 
     /**
-     * @param string $hashPrevOut
+     * @param Buffer $hashPrevOut
      * @param int|string $nPrevOut
      * @param TransactionOutputInterface $prevOut
      */
-    public function __construct($hashPrevOut, $nPrevOut, TransactionOutputInterface $prevOut)
+    public function __construct(Buffer $hashPrevOut, $nPrevOut, TransactionOutputInterface $prevOut)
     {
         $this->hashPrevOut = $hashPrevOut;
         $this->nPrevOut = $nPrevOut;
@@ -34,7 +35,7 @@ class Utxo
     }
 
     /**
-     * @return string
+     * @return Buffer
      */
     public function getTransactionId()
     {

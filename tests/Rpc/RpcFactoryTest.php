@@ -148,7 +148,7 @@ class RpcFactoryTest extends AbstractTestCase
             for ($i = 0; $i < $c; $i++) {
                 /** @var \BitWasp\Bitcoin\Utxo\Utxo $r */
                 $r = $value[$i];
-                $this->assertEquals($utxos[$c]['tx_hash'], $r->getTransactionId());
+                $this->assertEquals($utxos[$c]['tx_hash'], $r->getTransactionId()->getHex());
                 $this->assertEquals($utxos[$c]['tx_pos'], $r->getVout());
                 $this->assertEquals($utxos[$c]['value'], $r->getOutput()->getValue());
             }

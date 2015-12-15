@@ -204,7 +204,7 @@ class Bitcoind
         return array_map(
             function (array $value) use ($amount) {
                 return new Utxo(
-                    $value['txid'],
+                    Buffer::hex($value['txid'], 32),
                     $value['vout'],
                     new TransactionOutput(
                         $amount->toSatoshis($value['amount']),
