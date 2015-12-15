@@ -46,7 +46,7 @@ class PaymentHandlerTest extends AbstractTestCase
         $response = new Transaction(
             1,
             new TransactionInputCollection([
-                new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0, new Script())
+                new TransactionInput(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 0, new Script())
             ]),
             new TransactionOutputCollection([
                 new TransactionOutput(51, new Script()),
@@ -73,7 +73,7 @@ class PaymentHandlerTest extends AbstractTestCase
         $response = new Transaction(
             1,
             new TransactionInputCollection([
-                new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0, new Script())
+                new TransactionInput(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 0, new Script())
             ]),
             new TransactionOutputCollection([
                 new TransactionOutput(49, new Script()),
@@ -100,7 +100,7 @@ class PaymentHandlerTest extends AbstractTestCase
         $response = new Transaction(
             1,
             new TransactionInputCollection([
-                new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0, new Script())
+                new TransactionInput(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 0, new Script())
             ]),
             new TransactionOutputCollection([
                 new TransactionOutput(50, ScriptFactory::scriptPubKey()->payToScriptHash(new Script($pubkey->getBuffer()))),

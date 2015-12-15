@@ -13,13 +13,13 @@ class InputMutatorTest extends AbstractTestCase
     public function testMutatesInputs()
     {
         $input = new TransactionInput(
-            '0000000000000000000000000000000000000000000000000000000000000000',
+            Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'),
             0,
             new Script(),
             0
         );
 
-        $newTxid = '0123456701234567012345670123456701234567012345670123456701234567';
+        $newTxid = Buffer::hex('0123456701234567012345670123456701234567012345670123456701234567', 32);
         $newVout = 10;
         $newScript = new Script(new Buffer('00'));
         $newSequence = 99;
@@ -41,7 +41,7 @@ class InputMutatorTest extends AbstractTestCase
     public function testNull()
     {
         $input = new TransactionInput(
-            '0203000000000000000000000000000000000000000000000000000000000000',
+            Buffer::hex('0203000000000000000000000000000000000000000000000000000000000000'),
             0,
             new Script(),
             0
@@ -52,7 +52,7 @@ class InputMutatorTest extends AbstractTestCase
             ->null()
             ->done();
 
-        $this->assertEquals('0000000000000000000000000000000000000000000000000000000000000000', $new->getTransactionId());
+        $this->assertEquals(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), $new->getTransactionId());
         $this->assertEquals(0xffffffff, $new->getVout());
     }
 }

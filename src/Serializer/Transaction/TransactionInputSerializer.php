@@ -33,7 +33,7 @@ class TransactionInputSerializer
         return $this
             ->getTemplate()
             ->write([
-                Buffer::hex($input->getTransactionId()),
+                $input->getTransactionId(),
                 $input->getVout(),
                 $input->getScript()->getBuffer(),
                 $input->getSequence()
@@ -57,7 +57,7 @@ class TransactionInputSerializer
         /** @var int|string $vout */
         $sequence = $parse[3];
         return new TransactionInput(
-            $txidBuf->getHex(),
+            $txidBuf,
             $vout,
             new Script($scriptBuf),
             $sequence

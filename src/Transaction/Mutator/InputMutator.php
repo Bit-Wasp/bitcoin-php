@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Transaction\Mutator;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
+use BitWasp\Buffertools\Buffer;
 
 class InputMutator
 {
@@ -50,14 +51,14 @@ class InputMutator
      */
     public function null()
     {
-        return $this->replace(array('txid' => '0000000000000000000000000000000000000000000000000000000000000000', 'vout' => 0xffffffff));
+        return $this->replace(array('txid' => Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000', 32), 'vout' => 0xffffffff));
     }
 
     /**
-     * @param string $txid
+     * @param Buffer $txid
      * @return $this
      */
-    public function txid($txid)
+    public function txid(Buffer $txid)
     {
         return $this->replace(array('txid' => $txid));
     }

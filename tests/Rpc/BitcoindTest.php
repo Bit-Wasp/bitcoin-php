@@ -221,7 +221,7 @@ class BitcoindTest extends AbstractTestCase
         ]];
 
         $i = [
-            new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0, new Script)
+            new TransactionInput(Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'), 0, new Script)
         ];
         $o = [
             new TransactionOutput(Amount::COIN, new Script(Buffer::hex('76a9142f14886d6dde16d37e8149f603b18c879f486c5388ac')))

@@ -35,14 +35,14 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $sequence;
 
     /**
-     * @param string $hashPrevOut
+     * @param Buffer $hashPrevOut
      * @param string $nPrevOut
      * @param ScriptInterface $script
      * @param int $sequence
      */
-    public function __construct($hashPrevOut, $nPrevOut, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
+    public function __construct(Buffer $hashPrevOut, $nPrevOut, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
     {
-        if (!is_string($hashPrevOut) || strlen($hashPrevOut) !== 64) {
+        if ($hashPrevOut->getSize() !== 32) {
             throw new \InvalidArgumentException('TransactionInput: hash must be a hex string');
         }
 
@@ -76,7 +76,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     /**
      * Return the transaction ID buffer
      *
-     * @return string
+     * @return Buffer
      */
     public function getTransactionId()
     {
@@ -115,7 +115,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function isCoinbase()
     {
         $math = Bitcoin::getMath();
-        return $this->getTransactionId() === '0000000000000000000000000000000000000000000000000000000000000000'
+        return $this->getTransactionId()->getBinary() === str_pad('', 32, "\x00")
             && $math->cmp($this->getVout(), $math->hexDec('ffffffff')) === 0;
     }
 

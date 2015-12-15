@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Buffertools\Buffer;
 
 interface TransactionInputInterface extends SerializableInterface, \ArrayAccess
 {
@@ -40,7 +41,7 @@ interface TransactionInputInterface extends SerializableInterface, \ArrayAccess
 
     /**
      * Return the txid for the transaction being spent
-     * @return string
+     * @return Buffer
      */
     public function getTransactionId();
 

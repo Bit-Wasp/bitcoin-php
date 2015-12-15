@@ -15,6 +15,7 @@ use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
+use BitWasp\Buffertools\Buffer;
 
 class TxBuilder
 {
@@ -97,7 +98,7 @@ class TxBuilder
     }
 
     /**
-     * @param string $hashPrevOut
+     * @param Buffer|string $hashPrevOut
      * @param int $nPrevOut
      * @param Script|null $script
      * @param int $nSequence
@@ -106,7 +107,7 @@ class TxBuilder
     public function input($hashPrevOut, $nPrevOut, Script $script = null, $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
     {
         $this->inputs[] = new TransactionInput(
-            $hashPrevOut,
+            $hashPrevOut instanceof Buffer ? $hashPrevOut : Buffer::hex($hashPrevOut),
             $nPrevOut,
             $script ?: new Script(),
             $nSequence
@@ -196,7 +197,7 @@ class TxBuilder
         // Check TransactionOutput exists in $tx
         $transaction->getOutput($outputToSpend);
         $this->input(
-            $transaction->getTxId()->getHex(),
+            $transaction->getTxId(),
             $outputToSpend
         );
 

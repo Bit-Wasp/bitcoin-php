@@ -31,7 +31,7 @@ class TxBuilderTest extends AbstractTestCase
     public function testBuildsAndCanReset()
     {
         // Input
-        $hashPrevOut = '0000000000000000000000000000000000000000000000000000000000000000';
+        $hashPrevOut = Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000', 32);
         $nPrevOut = '0';
         $inputScript = new Script(new Buffer('abc'));
         $sequence = 10101;
@@ -72,7 +72,7 @@ class TxBuilderTest extends AbstractTestCase
             ])
         );
 
-        $parentHash = $parent->getTxId()->getHex();
+        $parentHash = $parent->getTxId();
 
         $builder = new TxBuilder();
         $builder->spendOutputFrom($parent, 0);

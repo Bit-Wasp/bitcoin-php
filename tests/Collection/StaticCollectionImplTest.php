@@ -7,14 +7,15 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Buffertools\Buffer;
 
 class StaticCollectionImplTest extends AbstractTestCase
 {
     public function getInputCollection()
     {
         return new TransactionInputCollection([
-            new TransactionInput('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script()),
-            new TransactionInput('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 10, new Script()),
+            new TransactionInput(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5, new Script()),
+            new TransactionInput(Buffer::hex('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'), 10, new Script()),
         ]);
     }
 
@@ -33,7 +34,7 @@ class StaticCollectionImplTest extends AbstractTestCase
     public function testArrayAccessOffsetReplace()
     {
         $collection = $this->getInputCollection();
-        $collection[0] = new TransactionInput('daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script());
+        $collection[0] = new TransactionInput(Buffer::hex('daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5, new Script());
     }
 
     /**
@@ -42,7 +43,7 @@ class StaticCollectionImplTest extends AbstractTestCase
     public function testArrayAccessOffsetSet()
     {
         $collection = $this->getInputCollection();
-        $collection[] = new TransactionInput('caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script());
+        $collection[] = new TransactionInput(Buffer::hex('caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5, new Script());
     }
 
     /**

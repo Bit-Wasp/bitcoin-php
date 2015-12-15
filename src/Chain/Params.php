@@ -129,7 +129,7 @@ class Params implements ParamsInterface
             new TransactionCollection([
                 (new TxBuilder)
                     ->version('1')
-                    ->input('0000000000000000000000000000000000000000000000000000000000000000', 0xffffffff, $inputScript)
+                    ->input(new Buffer('', 32), 0xffffffff, $inputScript)
                     ->output(5000000000, $outputScript)
                     ->locktime(0)
                     ->get()

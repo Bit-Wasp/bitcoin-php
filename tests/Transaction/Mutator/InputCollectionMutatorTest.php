@@ -14,15 +14,17 @@ use BitWasp\Buffertools\Buffer;
 class InputCollectionMutatorTest extends AbstractTestCase
 {
 
-    public function testMutatesOutputCollection()
+    public function testMutatesInputCollection()
     {
+        $txid1 = Buffer::hex('ab', 32);
+        $txid2 = Buffer::hex('aa', 32);
         $vout1 = -1;
         $script1 = new Script(new Buffer('0'));
         $vout2 = -2;
         $script2 = new Script(new Buffer('1'));
         $collection = new TransactionInputCollection([
-            new TransactionInput('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 0, new Script()),
-            new TransactionInput('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 0, new Script()),
+            new TransactionInput($txid1, 0, new Script()),
+            new TransactionInput($txid2, 0, new Script()),
         ]);
 
         $mutator = new InputCollectionMutator($collection->all());
@@ -31,10 +33,10 @@ class InputCollectionMutatorTest extends AbstractTestCase
         $mutator[1]->script($script2)->vout($vout2);
 
         $new = $mutator->done();
-        $this->assertEquals('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $new[0]->getTransactionId());
+        $this->assertEquals($txid1, $new[0]->getTransactionId());
         $this->assertEquals($vout1, $new[0]->getVout());
         $this->assertEquals($script1, $new[0]->getScript());
-        $this->assertEquals('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', $new[1]->getTransactionId());
+        $this->assertEquals($txid2, $new[1]->getTransactionId());
         $this->assertEquals($vout2, $new[1]->getVout());
         $this->assertEquals($script2, $new[1]->getScript());
     }
@@ -55,8 +57,8 @@ class InputCollectionMutatorTest extends AbstractTestCase
     public function testNull()
     {
         $collection = new TransactionInputCollection([
-            new TransactionInput('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script()),
-            new TransactionInput('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 10, new Script()),
+            new TransactionInput(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5, new Script()),
+            new TransactionInput(Buffer::hex('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 10, new Script()),
         ]);
 
         $mutator = new InputCollectionMutator($collection->all());

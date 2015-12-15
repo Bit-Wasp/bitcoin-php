@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 
 class BloomFilter extends Serializable
 {
@@ -324,13 +325,13 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param string $txid
+     * @param Buffer $txid
      * @param int $vout
      * @return bool
      */
-    public function containsUtxo($txid, $vout)
+    public function containsUtxo(Buffer $txid, $vout)
     {
-        return $this->containsData(new Buffer(pack('H64N', $txid, $vout), 36, $this->math));
+        return $this->containsData(Buffertools::concat($txid, new Buffer(pack('N', $vout), 4, $this->math)));
     }
 
     /**

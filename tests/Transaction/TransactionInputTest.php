@@ -23,12 +23,12 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
     public function testGetSequence()
     {
         // test default
-        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0', new Script());
+        $in = new TransactionInput(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32), '0', new Script());
         $this->assertSame(0xffffffff, $in->getSequence());
         $this->assertTrue($in->isFinal());
 
         // test when set
-        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0', new Script(), 23);
+        $in = new TransactionInput(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32), '0', new Script(), 23);
         $this->assertSame(23, $in->getSequence());
         $this->assertFalse($in->isFinal());
     }
@@ -38,20 +38,20 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidVout()
     {
-        new TransactionInput('a', 'b', new Script);
+        new TransactionInput(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32), 'b', new Script);
     }
 
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testInvalidSequece()
+    public function testInvalidSequence()
     {
-        new TransactionInput('a', 0, new Script, 'b');
+        new TransactionInput(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32), 0, new Script, 'b');
     }
     public function testConstructWithScript()
     {
 
-        $txid = '7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33';
+        $txid = Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32);
         $vout = '0';
         $scriptBuf = new Buffer('03010203');
         $script = ScriptFactory::create()->push($scriptBuf)->getScript();
@@ -61,7 +61,7 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($vout, $t->getVout());
         $this->assertSame($script, $t->getScript());
         $this->assertSame($sequence, $t->getSequence());
-        $this->assertSame($txid, $t['txid']);
+        $this->assertEquals($txid, $t['txid']);
         $this->assertSame($vout, $t['vout']);
         $this->assertSame($script, $t['script']);
         $this->assertSame($sequence, $t['sequence']);
@@ -71,7 +71,7 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
     public function testGetScript()
     {
         $script = new Script(Buffer::hex('41'));
-        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0', $script);
+        $in = new TransactionInput(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32), '0', $script);
 
         $this->assertInstanceOf($this->scriptType, $in->getScript());
         $this->assertEquals($script, $in->getScript());
@@ -79,16 +79,16 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
 
     public function testIsCoinbase()
     {
-        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', '0', new Script());
+        $in = new TransactionInput(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33'), '0', new Script());
         $this->assertFalse($in->isCoinbase());
 
-        $in = new TransactionInput('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 4294967295, new Script());
+        $in = new TransactionInput(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33'), 4294967295, new Script());
         $this->assertFalse($in->isCoinbase());
 
-        $in = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0, new Script());
+        $in = new TransactionInput(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 0, new Script());
         $this->assertFalse($in->isCoinbase());
 
-        $in = new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 4294967295, new Script());
+        $in = new TransactionInput(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 4294967295, new Script());
         $this->assertTrue($in->isCoinbase());
     }
 
