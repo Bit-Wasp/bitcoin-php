@@ -70,8 +70,8 @@ class BlockTest extends AbstractTestCase
         $txCollection = new TransactionCollection(array($tx));
         $block = new Block(new Math(), new BlockHeader(1, Buffer::hex('00000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), Buffer::hex('12345678aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1, new Buffer(), 1), $txCollection);
 
-        $this->assertEquals($tx->getTxId()->getHex(), $block->getMerkleRoot());
-        $this->assertEquals($tx->getTxId()->getHex(), $block['merkleRoot']);
+        $this->assertEquals($tx->getTxId(), $block->getMerkleRoot());
+        $this->assertEquals($tx->getTxId(), $block['merkleRoot']);
     }
 
     public function testFromParser()
@@ -104,7 +104,7 @@ class BlockTest extends AbstractTestCase
         $this->assertInstanceOf($this->txColType, $newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
         $this->assertInstanceOf($this->txInterfaceType, $newBlock->getTransaction(0));
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
+        $this->assertEquals($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
     }
 
     public function testFromHex()
@@ -133,8 +133,8 @@ class BlockTest extends AbstractTestCase
         $newBlock = BlockFactory::fromHex($blockHex);
 
         $this->assertInstanceOf($this->blockType, $newBlock);
-        $this->assertSame($newBlock->getHeader()->getMerkleRoot()->getHex(), $newBlock->getMerkleRoot());
-        $this->assertSame($blockHex, $newBlock->getBuffer()->getHex());
+        $this->assertEquals($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
+        $this->assertEquals($blockHex, $newBlock->getHex());
     }
 
     public function testSerialize()
