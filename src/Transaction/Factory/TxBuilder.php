@@ -9,12 +9,15 @@ use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
+use BitWasp\Buffertools\Buffer;
 
 class TxBuilder
 {
@@ -97,7 +100,7 @@ class TxBuilder
     }
 
     /**
-     * @param string $hashPrevOut
+     * @param Buffer|string $hashPrevOut
      * @param int $nPrevOut
      * @param Script|null $script
      * @param int $nSequence
@@ -106,8 +109,10 @@ class TxBuilder
     public function input($hashPrevOut, $nPrevOut, Script $script = null, $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
     {
         $this->inputs[] = new TransactionInput(
-            $hashPrevOut,
-            $nPrevOut,
+            new OutPoint(
+                $hashPrevOut instanceof Buffer ? $hashPrevOut : Buffer::hex($hashPrevOut),
+                $nPrevOut
+            ),
             $script ?: new Script(),
             $nSequence
         );
@@ -187,17 +192,38 @@ class TxBuilder
     }
 
     /**
-     * @param TransactionInterface $transaction
-     * @param int $outputToSpend
+     * @param OutPointInterface $outpoint
+     * @param ScriptInterface|null $script
+     * @param int $nSequence
      * @return $this
      */
-    public function spendOutputFrom(TransactionInterface $transaction, $outputToSpend)
+    public function spendOutPoint(OutPointInterface $outpoint, ScriptInterface $script = null, $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
+    {
+        $this->inputs[] = new TransactionInput(
+            $outpoint,
+            $script ?: new Script(),
+            $nSequence
+        );
+
+        return $this;
+    }
+
+    /**
+     * @param TransactionInterface $transaction
+     * @param int $outputToSpend
+     * @param ScriptInterface|null $script
+     * @param int $nSequence
+     * @return $this
+     */
+    public function spendOutputFrom(TransactionInterface $transaction, $outputToSpend, ScriptInterface $script = null, $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
     {
         // Check TransactionOutput exists in $tx
         $transaction->getOutput($outputToSpend);
         $this->input(
-            $transaction->getTxId()->getHex(),
-            $outputToSpend
+            $transaction->getTxId(),
+            $outputToSpend,
+            $script,
+            $nSequence
         );
 
         return $this;

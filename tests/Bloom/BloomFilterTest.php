@@ -8,9 +8,9 @@ use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
@@ -285,7 +285,7 @@ class BloomFilterTest extends AbstractTestCase
         $spendTx = TransactionFactory::fromHex($spends);
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
-        $filter->insertHash('b4749f017444b051c44dfd2720e88f314ff94f3dd6d56d40ef65854fcd7fff6b');
+        $filter->insertData(Buffer::hex('b4749f017444b051c44dfd2720e88f314ff94f3dd6d56d40ef65854fcd7fff6b', 32));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
@@ -310,7 +310,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
-        $filter->insertOutpoint('90c122d70786e899529d71dbeba91ba216982fb6ba58f3bdaab65e73b7e9260b', '0');
+        $filter->insertOutpoint(new OutPoint(Buffer::hex('90c122d70786e899529d71dbeba91ba216982fb6ba58f3bdaab65e73b7e9260b'), 0));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
@@ -318,7 +318,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
-        $filter->insertOutpoint('41c1d247b5f6ef9952cd711beba91ba216982fb6ba58f3bdaab65e7341414141', '0');
+        $filter->insertOutpoint(new OutPoint(Buffer::hex('41c1d247b5f6ef9952cd711beba91ba216982fb6ba58f3bdaab65e7341414141'), '0'));
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
     }
 

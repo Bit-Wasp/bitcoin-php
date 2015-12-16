@@ -2,19 +2,16 @@
 
 namespace BitWasp\Bitcoin\Utxo;
 
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
 class Utxo
 {
     /**
-     * @var string
+     * @var OutPointInterface
      */
-    private $hashPrevOut;
-
-    /**
-     * @var int|string
-     */
-    private $nPrevOut;
+    private $outPoint;
 
     /**
      * @var TransactionOutputInterface
@@ -22,31 +19,21 @@ class Utxo
     private $prevOut;
 
     /**
-     * @param string $hashPrevOut
-     * @param int|string $nPrevOut
+     * @param OutPointInterface $outPoint
      * @param TransactionOutputInterface $prevOut
      */
-    public function __construct($hashPrevOut, $nPrevOut, TransactionOutputInterface $prevOut)
+    public function __construct(OutPointInterface $outPoint, TransactionOutputInterface $prevOut)
     {
-        $this->hashPrevOut = $hashPrevOut;
-        $this->nPrevOut = $nPrevOut;
+        $this->outPoint = $outPoint;
         $this->prevOut = $prevOut;
     }
 
     /**
-     * @return string
+     * @return OutPoint
      */
-    public function getTransactionId()
+    public function getOutPoint()
     {
-        return $this->hashPrevOut;
-    }
-
-    /**
-     * @return int|string
-     */
-    public function getVout()
-    {
-        return $this->nPrevOut;
+        return $this->outPoint;
     }
 
     /**

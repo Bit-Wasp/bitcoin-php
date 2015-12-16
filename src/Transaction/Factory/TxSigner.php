@@ -181,12 +181,12 @@ class TxSigner
      */
     public function get()
     {
-        $inCount = count($this->transaction->getInputs());
         $mutator = new TxMutator($this->transaction);
         $inputs = $mutator->inputsMutator();
-
         $txInputs = $this->transaction->getInputs();
-        for ($i = 0; $i < $inCount; $i++) {
+
+        $i = 0;
+        foreach ($inputs as $input) {
             // Call regenerateScript if inputState is set, otherwise defer to previous script.
             try {
                 $script = $this->inputState($i)->regenerateScript();
@@ -194,7 +194,8 @@ class TxSigner
                 $script = $txInputs[$i]->getScript();
             }
 
-            $inputs[$i]->script($script);
+            $input->script($script);
+            $i++;
         }
 
         return $mutator->done();

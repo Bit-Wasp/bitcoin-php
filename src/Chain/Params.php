@@ -96,8 +96,8 @@ class Params implements ParamsInterface
     {
         return new BlockHeader(
             '1',
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            '4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b',
+            Buffer::hex('00', 32),
+            Buffer::hex('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', 32),
             '1231006505',
             Buffer::hex('1d00ffff', 4, $this->math),
             '2083236893'
@@ -129,7 +129,7 @@ class Params implements ParamsInterface
             new TransactionCollection([
                 (new TxBuilder)
                     ->version('1')
-                    ->input('0000000000000000000000000000000000000000000000000000000000000000', 0xffffffff, $inputScript)
+                    ->input(new Buffer('', 32), 0xffffffff, $inputScript)
                     ->output(5000000000, $outputScript)
                     ->locktime(0)
                     ->get()

@@ -6,15 +6,17 @@ use BitWasp\Bitcoin\Collection\Generic\Set;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Buffertools\Buffer;
 
 class StaticCollectionImplTest extends AbstractTestCase
 {
     public function getInputCollection()
     {
         return new TransactionInputCollection([
-            new TransactionInput('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script()),
-            new TransactionInput('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 10, new Script()),
+            new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5), new Script()),
+            new TransactionInput(new OutPoint(Buffer::hex('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'), 10), new Script()),
         ]);
     }
 
@@ -23,8 +25,8 @@ class StaticCollectionImplTest extends AbstractTestCase
         $vout1 = 5;
         $vout2 = 10;
         $collection = $this->getInputCollection();
-        $this->assertEquals($vout1, $collection[0]->getVout());
-        $this->assertEquals($vout2, $collection[1]->getVout());
+        $this->assertEquals($vout1, $collection[0]->getOutPoint()->getVout());
+        $this->assertEquals($vout2, $collection[1]->getOutPoint()->getVout());
     }
 
     /**
@@ -33,7 +35,7 @@ class StaticCollectionImplTest extends AbstractTestCase
     public function testArrayAccessOffsetReplace()
     {
         $collection = $this->getInputCollection();
-        $collection[0] = new TransactionInput('daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script());
+        $collection[0] = new TransactionInput(new OutPoint(Buffer::hex('daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5), new Script());
     }
 
     /**
@@ -42,7 +44,7 @@ class StaticCollectionImplTest extends AbstractTestCase
     public function testArrayAccessOffsetSet()
     {
         $collection = $this->getInputCollection();
-        $collection[] = new TransactionInput('caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 5, new Script());
+        $collection[] = new TransactionInput(new OutPoint(Buffer::hex('caaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5), new Script());
     }
 
     /**
@@ -83,7 +85,7 @@ class StaticCollectionImplTest extends AbstractTestCase
         $key = 0;
         for ($iterator->rewind(); $iterator->valid(); $iterator->next()) {
             $value = $iterator->current();
-            $this->assertEquals($vout, $value->getVout());
+            $this->assertEquals($vout, $value->getOutPoint()->getVout());
             $this->assertEquals($key, $iterator->key());
             $key++;
             $vout += 5;

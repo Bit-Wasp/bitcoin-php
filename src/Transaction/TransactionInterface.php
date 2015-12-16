@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 
 interface TransactionInterface extends SerializableInterface, \ArrayAccess
@@ -69,10 +70,22 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     public function getOutputs();
 
     /**
-     * @param int $index
+     * @param int $vout
      * @return TransactionOutputInterface
      */
-    public function getOutput($index);
+    public function getOutput($vout);
+
+    /**
+     * @param int $vout
+     * @return OutPointInterface
+     */
+    public function makeOutPoint($vout);
+
+    /**
+     * @param int $vout
+     * @return Utxo
+     */
+    public function makeUtxo($vout);
 
     /**
      * Return the locktime for this transaction

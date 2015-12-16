@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Rpc\Client\Bitcoind;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -221,7 +222,7 @@ class BitcoindTest extends AbstractTestCase
         ]];
 
         $i = [
-            new TransactionInput('4141414141414141414141414141414141414141414141414141414141414141', 0, new Script)
+            new TransactionInput(new OutPoint(Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'), 0), new Script)
         ];
         $o = [
             new TransactionOutput(Amount::COIN, new Script(Buffer::hex('76a9142f14886d6dde16d37e8149f603b18c879f486c5388ac')))
@@ -286,8 +287,10 @@ class BitcoindTest extends AbstractTestCase
         $unspent = $bitcoind->listunspent(0, 100, [AddressFactory::fromString('1Cemh3cKQm6q9qCzgBAgguv17w4dsLNvSH')]);
 
         $expected = new Utxo(
-            'f0802077ad259c7e49257b55851943292235e330e3287a88589f9b2d2c8adb24',
-            0,
+            new OutPoint(
+                Buffer::hex('f0802077ad259c7e49257b55851943292235e330e3287a88589f9b2d2c8adb24', 32),
+                0
+            ),
             new TransactionOutput(
                 1000000,
                 new Script(Buffer::hex('76a9147fce14745de0888d51abd04ed10a6cca57157c6588ac'))

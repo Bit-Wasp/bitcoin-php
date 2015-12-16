@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Buffertools\Buffer;
 
 interface BlockInterface extends SerializableInterface, \ArrayAccess
 {
@@ -22,7 +23,7 @@ interface BlockInterface extends SerializableInterface, \ArrayAccess
     /**
      * Calculate the merkle root of the transactions in the block.
      *
-     * @return string
+     * @return Buffer
      */
     public function getMerkleRoot();
 

@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
@@ -46,7 +47,7 @@ class PaymentHandlerTest extends AbstractTestCase
         $response = new Transaction(
             1,
             new TransactionInputCollection([
-                new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0, new Script())
+                new TransactionInput(new OutPoint(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 0), new Script())
             ]),
             new TransactionOutputCollection([
                 new TransactionOutput(51, new Script()),
@@ -73,7 +74,7 @@ class PaymentHandlerTest extends AbstractTestCase
         $response = new Transaction(
             1,
             new TransactionInputCollection([
-                new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0, new Script())
+                new TransactionInput(new OutPoint(Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000'), 0), new Script())
             ]),
             new TransactionOutputCollection([
                 new TransactionOutput(49, new Script()),
@@ -100,7 +101,7 @@ class PaymentHandlerTest extends AbstractTestCase
         $response = new Transaction(
             1,
             new TransactionInputCollection([
-                new TransactionInput('0000000000000000000000000000000000000000000000000000000000000000', 0, new Script())
+                new TransactionInput(new OutPoint(new Buffer('', 32), 0), new Script())
             ]),
             new TransactionOutputCollection([
                 new TransactionOutput(50, ScriptFactory::scriptPubKey()->payToScriptHash(new Script($pubkey->getBuffer()))),

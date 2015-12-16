@@ -37,7 +37,7 @@ class BlockHeaderSerializer
     }
 
     /**
-     * @param $parser
+     * @param Parser $parser
      * @return BlockHeader
      * @throws ParserOutOfRange
      */
@@ -46,13 +46,11 @@ class BlockHeaderSerializer
 
         try {
             list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->getTemplate()->parse($parser);
-            /** @var int|string $version */
-            /** @var Buffer $prevHash */
-            /** @var Buffer $merkleHash */
+
             return new BlockHeader(
                 $version,
-                $prevHash->getHex(),
-                $merkleHash->getHex(),
+                $prevHash,
+                $merkleHash,
                 $time,
                 $nBits,
                 $nonce
@@ -71,8 +69,8 @@ class BlockHeaderSerializer
     {
         return $this->getTemplate()->write([
             $header->getVersion(),
-            Buffer::hex($header->getPrevBlock()),
-            Buffer::hex($header->getMerkleRoot()),
+            $header->getPrevBlock(),
+            $header->getMerkleRoot(),
             $header->getTimestamp(),
             $header->getBits(),
             $header->getNonce()

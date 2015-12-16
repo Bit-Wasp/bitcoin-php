@@ -19,14 +19,14 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     /**
      * Return the previous blocks hash.
      *
-     * @return string
+     * @return Buffer
      */
     public function getPrevBlock();
 
     /**
      * Return the merkle root of the transactions in the block.
      *
-     * @return string
+     * @return Buffer
      */
     public function getMerkleRoot();
 

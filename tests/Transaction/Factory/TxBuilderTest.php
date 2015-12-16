@@ -31,7 +31,7 @@ class TxBuilderTest extends AbstractTestCase
     public function testBuildsAndCanReset()
     {
         // Input
-        $hashPrevOut = '0000000000000000000000000000000000000000000000000000000000000000';
+        $hashPrevOut = Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000', 32);
         $nPrevOut = '0';
         $inputScript = new Script(new Buffer('abc'));
         $sequence = 10101;
@@ -46,8 +46,9 @@ class TxBuilderTest extends AbstractTestCase
             ->get();
 
         $input = $tx->getInput(0);
-        $this->assertEquals($hashPrevOut, $input->getTransactionId());
-        $this->assertEquals($nPrevOut, $input->getVout());
+        $outpoint = $input->getOutPoint();
+        $this->assertEquals($hashPrevOut, $outpoint->getTxId());
+        $this->assertEquals($nPrevOut, $outpoint->getVout());
         $this->assertEquals($inputScript, $input->getScript());
         $this->assertEquals($sequence, $input->getSequence());
 
@@ -72,15 +73,15 @@ class TxBuilderTest extends AbstractTestCase
             ])
         );
 
-        $parentHash = $parent->getTxId()->getHex();
+        $parentHash = $parent->getTxId();
 
         $builder = new TxBuilder();
         $builder->spendOutputFrom($parent, 0);
         $tx = $builder->get();
 
         $input = $tx->getInput(0);
-        $this->assertEquals($parentHash, $input->getTransactionId());
-        $this->assertEquals(0, $input->getVout());
+        $this->assertEquals($parentHash, $input->getOutPoint()->getTxId());
+        $this->assertEquals(0, $input->getOutPoint()->getVout());
     }
 
     public function testPayToAddress()

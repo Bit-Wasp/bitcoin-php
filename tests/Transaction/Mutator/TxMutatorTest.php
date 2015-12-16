@@ -7,9 +7,11 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Buffertools\Buffer;
 
 class TxMutatorTest extends AbstractTestCase
 {
@@ -32,7 +34,7 @@ class TxMutatorTest extends AbstractTestCase
         ;
 
         $mutator->inputs(new TransactionInputCollection([
-            new TransactionInput('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1, new Script())
+            new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1), new Script())
         ]));
 
         $mutator->outputs(new TransactionOutputCollection([

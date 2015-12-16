@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -110,8 +111,10 @@ class ElectrumServer
                 return array_map(
                     function (array $value) use ($address) {
                         return new Utxo(
-                            $value['tx_hash'],
-                            $value['tx_pos'],
+                            new OutPoint(
+                                Buffer::hex($value['tx_hash'], 32),
+                                $value['tx_pos']
+                            ),
                             new TransactionOutput(
                                 $value['value'],
                                 ScriptFactory::scriptPubKey()->payToAddress($address)
@@ -144,8 +147,8 @@ class ElectrumServer
                 $content = $response->getResult();
                 return new BlockHeader(
                     $content['version'],
-                    @$content['prev_block_hash'],
-                    $content['merkle_root'],
+                    isset($content['prev_block_hash']) ? Buffer::hex($content['prev_block_hash'], 32) : new Buffer('', 32),
+                    Buffer::hex($content['merkle_root'], 32),
                     $content['timestamp'],
                     Buffer::int($content['bits'], 4, $this->math),
                     $content['nonce']

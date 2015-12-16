@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
@@ -12,13 +13,25 @@ use BitWasp\Buffertools\TemplateFactory;
 class TransactionInputSerializer
 {
     /**
+     * @var OutPointSerializer
+     */
+    private $outpointSerializer;
+
+    /**
+     * TransactionInputSerializer constructor.
+     * @param OutPointSerializer $outPointSerializer
+     */
+    public function __construct(OutPointSerializer $outPointSerializer)
+    {
+        $this->outpointSerializer = $outPointSerializer;
+    }
+
+    /**
      * @return \BitWasp\Buffertools\Template
      */
-    private function getTemplate()
+    private function getInputTemplate()
     {
         return (new TemplateFactory())
-            ->bytestringle(32)
-            ->uint32le()
             ->varstring()
             ->uint32le()
             ->getTemplate();
@@ -30,14 +43,13 @@ class TransactionInputSerializer
      */
     public function serialize(TransactionInputInterface $input)
     {
-        return $this
-            ->getTemplate()
-            ->write([
-                Buffer::hex($input->getTransactionId()),
-                $input->getVout(),
+        return Buffertools::concat(
+            $this->outpointSerializer->serialize($input->getOutPoint()),
+            $this->getInputTemplate()->write([
                 $input->getScript()->getBuffer(),
                 $input->getSequence()
-            ]);
+            ])
+        );
     }
 
     /**
@@ -47,18 +59,16 @@ class TransactionInputSerializer
      */
     public function fromParser(Parser $parser)
     {
-        $parse = $this->getTemplate()->parse($parser);
-        /** @var Buffer $txidBuf */
-        $txidBuf = $parse[0];
-        /** @var int|string $vout */
-        $vout = $parse[1];
-        /** @var Buffer $scriptBuf */
-        $scriptBuf = $parse[2];
-        /** @var int|string $vout */
-        $sequence = $parse[3];
+        $outpoint = $this->outpointSerializer->fromParser($parser);
+
+        /**
+         * @var Buffer $scriptBuf
+         * @var int|string $sequence
+         */
+        list ($scriptBuf, $sequence) = $this->getInputTemplate()->parse($parser);
+
         return new TransactionInput(
-            $txidBuf->getHex(),
-            $vout,
+            $outpoint,
             new Script($scriptBuf),
             $sequence
         );
