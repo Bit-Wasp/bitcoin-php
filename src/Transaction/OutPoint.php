@@ -5,9 +5,12 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class OutPoint extends Serializable implements OutPointInterface
 {
+    use FunctionAliasArrayAccess;
+
     /**
      * @var Buffer
      */
@@ -35,6 +38,10 @@ class OutPoint extends Serializable implements OutPointInterface
 
         $this->hashPrevOutput = $hashPrevOutput;
         $this->nPrevOutput = $nPrevOutput;
+
+        $this
+            ->initFunctionAlias('txid', 'getTxId')
+            ->initFunctionAlias('vout', 'getVout');
     }
 
     /**
