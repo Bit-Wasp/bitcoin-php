@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -15,14 +16,9 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     use FunctionAliasArrayAccess;
 
     /**
-     * @var string
+     * @var OutPointInterface
      */
-    private $hashPrevOut;
-
-    /**
-     * @var string|int
-     */
-    private $nPrevOut;
+    private $outPoint;
 
     /**
      * @var ScriptInterface
@@ -35,34 +31,25 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $sequence;
 
     /**
-     * @param Buffer $hashPrevOut
-     * @param string $nPrevOut
+     * @param OutPointInterface $outPoint
      * @param ScriptInterface $script
      * @param int $sequence
      */
-    public function __construct(Buffer $hashPrevOut, $nPrevOut, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
+    public function __construct(OutPointInterface $outPoint, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
     {
-        if ($hashPrevOut->getSize() !== 32) {
-            throw new \InvalidArgumentException('TransactionInput: hash must be a 32-byte Buffer');
-        }
-
-        if (!is_numeric($nPrevOut)) {
-            throw new \InvalidArgumentException('TransactionInput: vout must be numeric');
-        }
-
         if (!is_numeric($sequence)) {
             throw new \InvalidArgumentException('TransactionInput: sequence must be numeric');
         }
 
-        $this->hashPrevOut = $hashPrevOut;
-        $this->nPrevOut = $nPrevOut;
+        $this->outPoint = $outPoint;
         $this->script = $script;
         $this->sequence = $sequence;
+
         $this
-            ->initFunctionAlias('txid', 'getTransactionId')
-            ->initFunctionAlias('vout', 'getVout')
+            ->initFunctionAlias('outpoint', 'getOutPoint')
             ->initFunctionAlias('script', 'getScript')
             ->initFunctionAlias('sequence', 'getSequence');
+
     }
 
     /**
@@ -74,21 +61,11 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * Return the transaction ID buffer
-     *
-     * @return Buffer
+     * @return OutPointInterface
      */
-    public function getTransactionId()
+    public function getOutPoint()
     {
-        return $this->hashPrevOut;
-    }
-
-    /**
-     * @return int
-     */
-    public function getVout()
-    {
-        return $this->nPrevOut;
+        return $this->outPoint;
     }
 
     /**
@@ -115,8 +92,9 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function isCoinbase()
     {
         $math = Bitcoin::getMath();
-        return $this->getTransactionId()->getBinary() === str_pad('', 32, "\x00")
-            && $math->cmp($this->getVout(), $math->hexDec('ffffffff')) === 0;
+        $outpoint = $this->outPoint;
+        return $outpoint->getTxId()->getBinary() === str_pad('', 32, "\x00")
+            && $math->cmp($outpoint->getVout(), $math->hexDec('ffffffff')) === 0;
     }
 
     /**
@@ -133,6 +111,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function getBuffer()
     {
-        return (new TransactionInputSerializer())->serialize($this);
+        return (new TransactionInputSerializer(new OutPointSerializer()))->serialize($this);
     }
 }

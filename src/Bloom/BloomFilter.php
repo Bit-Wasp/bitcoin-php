@@ -8,9 +8,9 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Buffertools;
 
 class BloomFilter extends Serializable
 {
@@ -281,22 +281,12 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param string $txid
-     * @param int $vout
-     * @return $this
+     * @param OutPointInterface $outPoint
+     * @return BloomFilter
      */
-    public function insertOutpoint($txid, $vout)
+    public function insertOutPoint(OutPointInterface $outPoint)
     {
-        return $this->insertData(new Buffer(pack('H64N', $txid, $vout)));
-    }
-
-    /**
-     * @param string $hash
-     * @return $this
-     */
-    public function insertHash($hash)
-    {
-        return $this->insertData(Buffer::hex($hash));
+        return $this->insertData($outPoint->getBuffer());
     }
 
     /**
@@ -325,13 +315,12 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param Buffer $txid
-     * @param int $vout
+     * @param OutPointInterface $outPoint
      * @return bool
      */
-    public function containsUtxo(Buffer $txid, $vout)
+    public function containsOutPoint(OutPointInterface $outPoint)
     {
-        return $this->containsData(Buffertools::concat($txid, new Buffer(pack('N', $vout), 4, $this->math)));
+        return $this->containsData($outPoint->getBuffer());
     }
 
     /**
@@ -372,11 +361,11 @@ class BloomFilter extends Serializable
                 if ($exec->isPush() && $this->containsData($exec->getData())) {
                     $found = true;
                     if ($this->isUpdateAll()) {
-                        $this->insertOutpoint($txHash->getHex(), $vout);
+                        $this->insertOutPoint($tx->makeOutPoint($vout));
                     } else if ($this->isUpdatePubKeyOnly()) {
                         $type = ScriptFactory::scriptPubKey()->classify($script);
                         if ($type->isMultisig() || $type->isPayToPublicKey()) {
-                            $this->insertOutpoint($txHash->getHex(), $vout);
+                            $this->insertOutPoint($tx->makeOutPoint($vout));
                         }
                     }
                 }
@@ -388,7 +377,7 @@ class BloomFilter extends Serializable
         }
 
         foreach ($tx->getInputs() as $txIn) {
-            if ($this->containsUtxo($txIn->getTransactionId(), $txIn->getVout())) {
+            if ($this->containsOutPoint($txIn->getOutPoint())) {
                 return true;
             }
 

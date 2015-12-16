@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
+use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
@@ -142,12 +143,36 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @param int $index
+     * @param int $vout
      * @return TransactionOutputInterface
      */
-    public function getOutput($index)
+    public function getOutput($vout)
     {
-        return $this->outputs[$index];
+        return $this->outputs[$vout];
+    }
+
+    /**
+     * @param int $vout
+     * @return OutPointInterface
+     */
+    public function makeOutpoint($vout)
+    {
+        $this->getOutput($vout);
+        return new OutPoint($this->getTxId(), $vout);
+    }
+
+    /**
+     * @param int $vout
+     * @return Utxo
+     */
+    public function makeUtxo($vout)
+    {
+        $output = $this->getOutput($vout);
+
+        return new Utxo(
+            new OutPoint($this->getTxId(), $vout),
+            $output
+        );
     }
 
     /**

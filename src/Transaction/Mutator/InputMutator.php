@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Buffertools\Buffer;
@@ -37,8 +39,7 @@ class InputMutator
     private function replace(array $array = [])
     {
         $this->input = new TransactionInput(
-            array_key_exists('txid', $array) ? $array['txid'] : $this->input->getTransactionId(),
-            array_key_exists('vout', $array) ? $array['vout'] : $this->input->getVout(),
+            array_key_exists('outpoint', $array) ? $array['outpoint'] : $this->input->getOutPoint(),
             array_key_exists('script', $array) ? $array['script'] : $this->input->getScript(),
             array_key_exists('nSequence', $array) ? $array['nSequence'] : $this->input->getSequence()
         );
@@ -47,11 +48,21 @@ class InputMutator
     }
 
     /**
+     * @param OutPointInterface $outPoint
+     * @return InputMutator
+     */
+    public function outpoint(OutPointInterface $outPoint)
+    {
+        return $this->replace(array('outpoint' => $outPoint));
+    }
+
+
+    /**
      * @return $this
      */
     public function null()
     {
-        return $this->replace(array('txid' => Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000', 32), 'vout' => 0xffffffff));
+        return $this->replace(array('outpoint' => new OutPoint(new Buffer(str_pad('', 32, "\x00"), 32), 0xffffffff)));
     }
 
     /**

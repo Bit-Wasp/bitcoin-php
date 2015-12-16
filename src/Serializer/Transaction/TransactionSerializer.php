@@ -25,7 +25,7 @@ class TransactionSerializer
      */
     public function __construct()
     {
-        $this->inputSerializer = new TransactionInputSerializer;
+        $this->inputSerializer = new TransactionInputSerializer(new OutPointSerializer());
         $this->outputSerializer = new TransactionOutputSerializer;
     }
 

@@ -22,7 +22,7 @@ class FilteredBlockTest extends AbstractTestCase
         $math = new Math();
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
-        $filter->insertHash('63194f18be0af63f2c6bc9dc0f777cbefed3d9415c4af83f3ee3a3d669c00cb5');
+        $filter->insertData(Buffer::hex('63194f18be0af63f2c6bc9dc0f777cbefed3d9415c4af83f3ee3a3d669c00cb5'));
 
         // Check that FilteredBlock message is serialized correctly
         // since it contains a BlockHeader and a PartialMerkleTree
@@ -54,10 +54,10 @@ class FilteredBlockTest extends AbstractTestCase
         $math = new Math();
         $flags = new Flags(BloomFilter::UPDATE_ALL);
 
-        $tx9 = '74d681e0e03bafa802c8aa084379aa98d9fcd632ddc2ed9782b586ec87451f20';
-        $tx8 = 'dd1fd2a6fc16404faf339881a90adbde7f4f728691ac62e8f168809cdfae1053';
+        $tx9 = Buffer::hex('74d681e0e03bafa802c8aa084379aa98d9fcd632ddc2ed9782b586ec87451f20', 32);
+        $tx8 = Buffer::hex('dd1fd2a6fc16404faf339881a90adbde7f4f728691ac62e8f168809cdfae1053');
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($tx9);
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertData($tx9);
 
         $filtered = $block->filter($filter);
         /** @var Buffer[] $matched */
@@ -66,20 +66,20 @@ class FilteredBlockTest extends AbstractTestCase
 
         $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
-        $this->assertEquals($tx9, $matched[0]->getHex());
+        $this->assertEquals($tx9, $matched[0]);
 
         // Check serialized FilteredBlock matches proof provided by bitcoind
         $this->assertEquals($expectedMerkle, $filtered->getHex());
 
-        $filter->insertHash($tx8);
+        $filter->insertData($tx8);
         $filtered = $block->filter($filter);
         /** @var Buffer[] $matched */
         $matched = [];
         $root = $filtered->getPartialTree()->extractMatches($matched);
         $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(2, count($matched));
-        $this->assertEquals($tx8, $matched[0]->getHex());
-        $this->assertEquals($tx9, $matched[1]->getHex());
+        $this->assertEquals($tx8, $matched[0]);
+        $this->assertEquals($tx9, $matched[1]);
     }
 
     public function testMerkleBlock2()
@@ -88,17 +88,19 @@ class FilteredBlockTest extends AbstractTestCase
         $block = BlockFactory::fromHex($hex);
         $blockMerkleRoot = $block->getHeader()->getMerkleRoot();
 
-        $expectedTx = [
+        $expectedTx = array_map(function ($value) {
+            return Buffer::hex($value, 32);
+        }, [
             'e980fe9f792d014e73b95203dc1335c5f9ce19ac537a419e6df5b47aecb93b70',
             '28204cad1d7fc1d199e8ef4fa22f182de6258a3eaafe1bbe56ebdcacd3069a5f',
             '6b0f8a73a56c04b519f1883e8aafda643ba61a30bd1439969df21bea5f4e27e2',
             '3c1d7e82342158e4109df2e0b6348b6e84e403d8b4046d7007663ace63cddb23'
-        ];
+        ]);
 
         $math = new Math();
         $flags = new Flags(BloomFilter::UPDATE_ALL);
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($expectedTx[0]);
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertData($expectedTx[0]);
         $filtered = $block->filter($filter);
         /** @var Buffer[] $matched */
         $matched = [];
@@ -106,7 +108,7 @@ class FilteredBlockTest extends AbstractTestCase
 
         $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
-        $this->assertEquals($expectedTx[0], $matched[0]->getHex());
+        $this->assertEquals($expectedTx[0], $matched[0]);
 
         $filter->insertData(Buffer::hex('044a656f065871a353f216ca26cef8dde2f03e8c16202d2e8ad769f02032cb86a5eb5e56842e92e19141d60a01928f8dd2c875a390f67c1f6c94cfc617c0ea45af'));
         $filtered = $block->filter($filter);
@@ -118,7 +120,7 @@ class FilteredBlockTest extends AbstractTestCase
         $this->assertEquals(4, count($matched));
         $cETx = count($expectedTx);
         for ($i = 0; $i < $cETx; $i++) {
-            $this->assertEquals($expectedTx[$i], $matched[$i]->getHex());
+            $this->assertEquals($expectedTx[$i], $matched[$i]);
         }
     }
 
@@ -128,16 +130,18 @@ class FilteredBlockTest extends AbstractTestCase
         $block = BlockFactory::fromHex($hex);
         $blockMerkleRoot = $block->getHeader()->getMerkleRoot();
 
-        $expectedTx = [
+        $expectedTx = array_map(function ($value) {
+            return Buffer::hex($value, 32);
+        }, [
             'e980fe9f792d014e73b95203dc1335c5f9ce19ac537a419e6df5b47aecb93b70',
             '28204cad1d7fc1d199e8ef4fa22f182de6258a3eaafe1bbe56ebdcacd3069a5f',
             '3c1d7e82342158e4109df2e0b6348b6e84e403d8b4046d7007663ace63cddb23'
-        ];
+        ]);
 
         $math = new Math();
         $flags = new Flags(BloomFilter::UPDATE_NONE);
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($expectedTx[0]);
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertData($expectedTx[0]);
         $filtered = $block->filter($filter);
         /** @var Buffer[] $matched */
         $matched = [];
@@ -145,7 +149,7 @@ class FilteredBlockTest extends AbstractTestCase
 
         $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
-        $this->assertEquals($expectedTx[0], $matched[0]->getHex());
+        $this->assertEquals($expectedTx[0], $matched[0]);
 
         $filter->insertData(Buffer::hex('044a656f065871a353f216ca26cef8dde2f03e8c16202d2e8ad769f02032cb86a5eb5e56842e92e19141d60a01928f8dd2c875a390f67c1f6c94cfc617c0ea45af'));
         $filtered = $block->filter($filter);
@@ -156,7 +160,7 @@ class FilteredBlockTest extends AbstractTestCase
         $this->assertEquals(3, count($matched));
         $cETx = count($expectedTx);
         for ($i = 0; $i < $cETx; $i++) {
-            $this->assertEquals($expectedTx[$i], $matched[$i]->getHex());
+            $this->assertEquals($expectedTx[$i], $matched[$i]);
         }
     }
 
@@ -170,8 +174,8 @@ class FilteredBlockTest extends AbstractTestCase
         $math = new Math();
         $flags = new Flags(BloomFilter::UPDATE_NONE);
 
-        $tx = '63194f18be0af63f2c6bc9dc0f777cbefed3d9415c4af83f3ee3a3d669c00cb5';
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertHash($tx);
+        $tx = Buffer::hex('63194f18be0af63f2c6bc9dc0f777cbefed3d9415c4af83f3ee3a3d669c00cb5');
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertData($tx);
         $filtered = $block->filter($filter);
         /** @var Buffer[] $matched */
         $matched = [];
@@ -179,7 +183,7 @@ class FilteredBlockTest extends AbstractTestCase
 
         $this->assertEquals($blockMerkleRoot, $root);
         $this->assertEquals(1, count($matched));
-        $this->assertEquals($tx, $matched[0]->getHex());
+        $this->assertEquals($tx, $matched[0]);
 
         $serialized = $filtered->getBuffer()->getHex();
         $this->assertEquals($expectedMerkle, $serialized);

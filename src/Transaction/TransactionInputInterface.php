@@ -40,17 +40,9 @@ interface TransactionInputInterface extends SerializableInterface, \ArrayAccess
     public function isFinal();
 
     /**
-     * Return the txid for the transaction being spent
-     * @return Buffer
+     * @return OutPointInterface
      */
-    public function getTransactionId();
-
-    /**
-     * Return the nPrevOut for the transaction being spent
-     *
-     * @return int
-     */
-    public function getVout();
+    public function getOutPoint();
 
     /**
      * Get the script in this transaction

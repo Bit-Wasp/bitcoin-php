@@ -46,8 +46,9 @@ class TxBuilderTest extends AbstractTestCase
             ->get();
 
         $input = $tx->getInput(0);
-        $this->assertEquals($hashPrevOut, $input->getTransactionId());
-        $this->assertEquals($nPrevOut, $input->getVout());
+        $outpoint = $input->getOutPoint();
+        $this->assertEquals($hashPrevOut, $outpoint->getTxId());
+        $this->assertEquals($nPrevOut, $outpoint->getVout());
         $this->assertEquals($inputScript, $input->getScript());
         $this->assertEquals($sequence, $input->getSequence());
 
@@ -79,8 +80,8 @@ class TxBuilderTest extends AbstractTestCase
         $tx = $builder->get();
 
         $input = $tx->getInput(0);
-        $this->assertEquals($parentHash, $input->getTransactionId());
-        $this->assertEquals(0, $input->getVout());
+        $this->assertEquals($parentHash, $input->getOutPoint()->getTxId());
+        $this->assertEquals(0, $input->getOutPoint()->getVout());
     }
 
     public function testPayToAddress()

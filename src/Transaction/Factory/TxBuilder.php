@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
@@ -107,8 +108,10 @@ class TxBuilder
     public function input($hashPrevOut, $nPrevOut, Script $script = null, $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
     {
         $this->inputs[] = new TransactionInput(
-            $hashPrevOut instanceof Buffer ? $hashPrevOut : Buffer::hex($hashPrevOut),
-            $nPrevOut,
+            new OutPoint(
+                $hashPrevOut instanceof Buffer ? $hashPrevOut : Buffer::hex($hashPrevOut),
+                $nPrevOut
+            ),
             $script ?: new Script(),
             $nSequence
         );

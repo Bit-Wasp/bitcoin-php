@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\JsonRpc\JsonRpcClient;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -204,8 +205,10 @@ class Bitcoind
         return array_map(
             function (array $value) use ($amount) {
                 return new Utxo(
-                    Buffer::hex($value['txid'], 32),
-                    $value['vout'],
+                    new OutPoint(
+                        Buffer::hex($value['txid'], 32),
+                        $value['vout']
+                    ),
                     new TransactionOutput(
                         $amount->toSatoshis($value['amount']),
                         new Script(Buffer::hex($value['scriptPubKey']))
