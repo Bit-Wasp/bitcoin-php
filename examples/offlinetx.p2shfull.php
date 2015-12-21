@@ -5,8 +5,7 @@ require "../vendor/autoload.php";
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
-use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 $ecAdapter = Bitcoin::getEcAdapter();
 
@@ -22,26 +21,26 @@ $os = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
 
 // The address is funded with a transaction (fake, for the purposes of this script).
 // You would do getrawtransaction normall
-$fundTx = (new TxBuilder())
+$fundTx = TransactionFactory::build()
     ->input('4141414141414141414141414141414141414141414141414141414141414141', 0)
     ->output(50, $os)
     ->get();
 
 
 // One party wants to spend funds. He creates a transaction spending the funding tx to his address.
-$spendTx = (new TxBuilder())
+$spendTx = TransactionFactory::build()
     ->spendOutputFrom($fundTx, 0)
     ->payToAddress(50, $pk1->getAddress())
     ->get();
 
 
 // Two parties sign the transaction (can be done in steps)
-$signer = new TxSigner($ecAdapter, $spendTx);
+$signer = TransactionFactory::sign($spendTx);
 $signer
     ->sign(0, $pk1, $os, $redeemScript)
     ->sign(0, $pk2, $os, $redeemScript);
 
-$rawTx = $signer->get()->getHex();
+$signed = $signer->get();
 
-echo "Fully signed transaction: " . $signer->get()->getHex() . "\n";
+echo "Fully signed transaction: " . $signed->getHex() . "\n";
 

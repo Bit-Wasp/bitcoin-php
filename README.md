@@ -19,6 +19,8 @@
   Besides classes for interfacing with Bitcoind's RPC, and Stratum servers, this
   library does NOT contain any code to interact with the network, or any API's.
 
+  See below, or [here](https://github.com/Bit-Wasp/bitcoin-php) for examples.
+
   Other repositories which are part of this project:
   - [Secp256k1 PHP extension](https://github.com/Bit-Wasp/secp256k1-php)
   - [Bitcoinconsensus PHP extension](https://github.com/Bit-Wasp/bitcoinconsensus-php)
@@ -28,6 +30,7 @@
   - [Testing package](https://github.com/Bit-Wasp/testing-php) - a composer package to pull CI and development tools
 
 ## Requirements:
+
  * PHP 5.4+
  * Composer
  * ext-gmp
@@ -36,6 +39,7 @@
  * ext-mcrypt
 
 ## Optional:
+
  * [[secp256k1-php](https://github.com/Bit-Wasp/secp256k1-php)] - Install the secp256k1 PHP extension for blazing speeds.
  * [[bitcoinconsensus-php](https://github.com/Bit-Wasp/bitcoin-consensus-php)] - Install libbitcoinconsensus for script validation
 
@@ -162,25 +166,25 @@ $redeemScript = ScriptFactory::multisig(2, [$pk1->getPublicKey(), $pk2->getPubli
 $outputScript = $redeemScript->getOutputScript();
 
 // The address is funded with a transaction (fake, for the purposes of this script).
-// You would do getrawtransaction normally
-$spendTx = new Transaction();
-$spendTx->getInputs()->addInput(new TransactionInput(
-    '4141414141414141414141414141414141414141414141414141414141414141',
-    0
-));
-$spendTx->getOutputs()->addOutput(new TransactionOutput(
-    50,
-    $outputScript
-));
+// You would do getrawtransaction, or construct it elsewhere in your application
+$spendTx = TransactionFactory::create()
+    ->input('4141414141414141414141414141414141414141414141414141414141414141', 0)
+    ->output(50, $outputScript)
+    ->get();
 
-// One party wants to spend funds. He creates a transaction spending the funding tx to his address.
-$builder = new TransactionBuilder($ecAdapter);
-$builder->spendOutput($spendTx, 0)
-    ->payToAddress($pk1->getAddress(), 50)
+// Someone wants to spend the funds. He creates a transaction spending them..
+$new = TransactionFactory::create()
+    ->spendOutput($spendTx, 0)
+    ->payToAddress(50, $pk1->getAddress())
+    ->get();
+    
+// And both parties sign
+$signed = TransactionFactory::sign()
     ->signInputWithKey($pk1, $outputScript, 0, $redeemScript)
-    ->signInputWithKey($pk2, $outputScript, 0, $redeemScript);
+    ->signInputWithKey($pk2, $outputScript, 0, $redeemScript)
+    ->get();
 
-$rawTx = $builder->getTransaction()->getHex();
+$rawTx = $signed->getHex();
 
 echo "Fully signed transaction: " . $builder->getTransaction()->getHex() . "\n";
 
@@ -236,20 +240,21 @@ $bip32 = \BitWasp\Bitcoin\Key\HierarchicalKeyFactory::fromEntropy($seed);
 
 ## Write/interpret bitcoin scripts
 ```php
+
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\Interpreter\Native\Interpreter;
-use BitWasp\Bitcoin\Script\Interpreter\Flags;
+use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Transaction\Transaction;
 
 $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
 
-$script = ScriptFactory::create()->op('OP_1')->op('OP_1')->op('OP_ADD');
+$script = ScriptFactory::create()->op('OP_1')->op('OP_1')->op('OP_ADD')->getScript();
 
-echo "Formed script: " . $script . "\n";
-print_r($script->getScriptParser()->parse());
+echo "Formed script: " . $script->getHex() . "\n";
+print_r($script->getScriptParser()->decode());
 
-$i = new Interpreter($ec, new Transaction(), new Flags(0));
-$i->setScript($script)->run();
+$i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter($ec, new Transaction(), new Flags(0));
+$i->evaluate($script);
 
-print_r($i->getStackState());
+print_r($i);
+
 ```

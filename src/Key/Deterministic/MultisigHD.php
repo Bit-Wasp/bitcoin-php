@@ -57,8 +57,15 @@ class MultisigHD
 
         $this->m = $m;
         $this->path = $path;
-        $this->sequences = $sequences;
         $this->sort = $sort;
+        $this->sequences = $sequences;
+        $this->redeemScript = ScriptFactory::p2sh()->multisig($m, array_map(
+            function (HierarchicalKey $key) {
+                return $key->getPublicKey();
+            },
+            $this->keys
+        ));
+
     }
 
     /**
@@ -98,16 +105,7 @@ class MultisigHD
      */
     public function getRedeemScript()
     {
-        return ScriptFactory::scriptPubKey()
-            ->multisig(
-                $this->m,
-                array_map(
-                    function (HierarchicalKey $key) {
-                        return $key->getPublicKey();
-                    },
-                    $this->keys
-                )
-            );
+        return $this->redeemScript;
     }
 
     /**
