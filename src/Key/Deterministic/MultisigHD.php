@@ -29,6 +29,11 @@ class MultisigHD
     private $sequences;
 
     /**
+     * @var \BitWasp\Bitcoin\Script\P2shScript
+     */
+    private $redeemScript;
+
+    /**
      * @var bool
      */
     private $sort;
@@ -101,7 +106,7 @@ class MultisigHD
     /**
      * Returns the redeemScript. Note - keys are already sorted in the constructor, so this is not required in ScriptFactory.
      *
-     * @return \BitWasp\Bitcoin\Script\ScriptInterface
+     * @return \BitWasp\Bitcoin\Script\P2shScript
      */
     public function getRedeemScript()
     {
