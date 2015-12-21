@@ -6,8 +6,6 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
-use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 
 Bitcoin::setNetwork(\BitWasp\Bitcoin\Network\NetworkFactory::bitcoinTestnet());
 $network = Bitcoin::getNetwork();
@@ -24,13 +22,13 @@ $recipient = AddressFactory::fromString('n1b2a9rFvuU9wBgBaoWngNvvMxRV94ke3x');
 echo "[Send to: " . $recipient->getAddress($network) . " \n";
 
 echo "Generate a transaction spending the one above \n";
-$spendTx = (new TxBuilder())
+$spendTx = TransactionFactory::build()
     ->spendOutputFrom($myTx, $spendOutput)
     ->payToAddress(40000, $recipient)
     ->get();
 
 echo "Sign transaction\n";
-$signer = new TxSigner($ecAdapter, $spendTx);
+$signer = TransactionFactory::sign($spendTx);
 $signer->sign(0, $privateKey, $myTx->getOutput($spendOutput)->getScript());
 
 echo "Generate transaction: \n";

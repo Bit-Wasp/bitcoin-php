@@ -13,7 +13,7 @@ function status(\BitWasp\Bitcoin\Key\Deterministic\MultisigHD $hd)
         echo " - " . $key->toExtendedKey() . "\n";
     }
     echo "Script: " . $hd->getRedeemScript()->getScriptParser()->getHumanReadable() . "\n";
-    echo "Address: " . $hd->getRedeemScript()->getAddress()->getAddress() . "\n";
+    echo "Address: " . $hd->getAddress()->getAddress() . "\n";
     echo "\n";
 }
 
