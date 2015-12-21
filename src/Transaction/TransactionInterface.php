@@ -103,4 +103,9 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
      * @return SignatureHashInterface
      */
     public function getSignatureHash();
+
+    /**
+     * @return Validator
+     */
+    public function validator();
 }

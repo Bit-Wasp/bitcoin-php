@@ -216,6 +216,14 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @return Validator
+     */
+    public function validator()
+    {
+        return new Validator($this);
+    }
+
+    /**
      * @return Buffer
      */
     public function getBuffer()

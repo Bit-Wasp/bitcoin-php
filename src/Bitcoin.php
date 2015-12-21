@@ -18,6 +18,8 @@ class Bitcoin
      */
     private static $network;
 
+    private static $adapter;
+
     /**
      * @return Math
      */
@@ -41,10 +43,19 @@ class Bitcoin
      */
     public static function getEcAdapter(Math $math = null, GeneratorPoint $generator = null)
     {
-        return EcAdapterFactory::getAdapter(
-            ($math ?: self::getMath()),
-            ($generator ?: self::getGenerator())
-        );
+        if (null === self::$adapter) {
+            self::$adapter = EcAdapterFactory::getAdapter(
+                ($math ?: self::getMath()),
+                ($generator ?: self::getGenerator())
+            );
+        }
+
+        return self::$adapter;
+    }
+
+    public static function setAdapter(EcAdapterInterface $adapter)
+    {
+        self::$adapter = $adapter;
     }
 
     /**
