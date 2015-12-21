@@ -4,7 +4,6 @@ require_once "../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Script\Script;
 
 $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
 

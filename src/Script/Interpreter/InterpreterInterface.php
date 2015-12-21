@@ -81,4 +81,10 @@ interface InterpreterInterface
      * @return bool
      */
     public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign);
+
+    /**
+     * @param ScriptInterface $script
+     * @return bool
+     */
+    public function evaluate(ScriptInterface $script);
 }

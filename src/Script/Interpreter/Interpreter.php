@@ -29,11 +29,6 @@ class Interpreter implements InterpreterInterface
     private $inputToSign;
 
     /**
-     * @var ScriptInterface
-     */
-    private $script;
-
-    /**
      * @var TransactionInterface
      */
     private $transaction;
@@ -85,6 +80,26 @@ class Interpreter implements InterpreterInterface
     private $minimalPush;
 
     /**
+     * @var Buffer
+     */
+    private $vchFalse;
+
+    /**
+     * @var Buffer
+     */
+    private $vchTrue;
+
+    /**
+     * @var Buffer
+     */
+    private $int0;
+
+    /**
+     * @var Buffer
+     */
+    private $int1;
+
+    /**
      * @var array
      */
     private $disabledOps = [
@@ -105,14 +120,13 @@ class Interpreter implements InterpreterInterface
         $this->math = $ecAdapter->getMath();
         $this->transaction = $transaction;
         $this->flags = $flags;
-        $this->script = new Script();
         $this->minimalPush = $this->flags->checkFlags(self::VERIFY_MINIMALDATA) === true;
-        $this->vchFalse = new Buffer("", 0, $this->math);
-        $this->vchTrue = new Buffer("\x01", 1, $this->math);
         $this->mainStack = new Stack();
         $this->altStack = new Stack();
         $this->vfStack = new Stack();
 
+        $this->vchFalse = new Buffer("", 0, $this->math);
+        $this->vchTrue = new Buffer("\x01", 1, $this->math);
         $this->int0 = Number::buffer($this->vchFalse, false, 4, $this->math)->getBuffer();
         $this->int1 = Number::buffer($this->vchTrue, false, 1, $this->math)->getBuffer();
     }
@@ -374,7 +388,7 @@ class Interpreter implements InterpreterInterface
     public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign)
     {
         $this->inputToSign = $nInputToSign;
-        if (!$this->setScript($scriptSig)->run()) {
+        if (!$this->evaluate($scriptSig)) {
             return false;
         }
 
@@ -383,7 +397,7 @@ class Interpreter implements InterpreterInterface
             $stackCopy = clone $this->mainStack;
         }
 
-        if (!$this->setScript($scriptPubKey)->run()) {
+        if (!$this->evaluate($scriptPubKey)) {
             return false;
         }
 
@@ -410,7 +424,7 @@ class Interpreter implements InterpreterInterface
             $scriptPubKey = new Script($this->mainStack->bottom());
             $this->mainStack->pop();
 
-            if (!$this->setScript($scriptPubKey)->run()) {
+            if (!$this->evaluate($scriptPubKey)) {
                 return false;
             }
         }
@@ -434,16 +448,17 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
+     * @param ScriptInterface $script
      * @return bool
      */
-    private function run()
+    public function evaluate(ScriptInterface $script)
     {
         $math = $this->math;
         $this->hashStartPos = 0;
         $this->opCount = 0;
-        $parser = $this->script->getScriptParser();
+        $parser = $script->getScriptParser();
 
-        if ($this->script->getBuffer()->getSize() > 10000) {
+        if ($script->getBuffer()->getSize() > 10000) {
             return false;
         }
 
@@ -947,7 +962,7 @@ class Interpreter implements InterpreterInterface
                             $vchPubKey = $this->mainStack[-1];
                             $vchSig = $this->mainStack[-2];
 
-                            $scriptCode = new Script($this->script->getBuffer()->slice($this->hashStartPos));
+                            $scriptCode = new Script($script->getBuffer()->slice($this->hashStartPos));
                             $success = $this->checkSig($scriptCode, $vchSig, $vchPubKey);
 
                             $this->mainStack->pop();
@@ -992,7 +1007,7 @@ class Interpreter implements InterpreterInterface
                             $i += $sigCount;
 
                             // Extract the script since the last OP_CODESEPARATOR
-                            $scriptCode = new Script($this->script->getBuffer()->slice($this->hashStartPos));
+                            $scriptCode = new Script($script->getBuffer()->slice($this->hashStartPos));
 
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
