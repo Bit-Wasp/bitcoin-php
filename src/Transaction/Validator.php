@@ -2,11 +2,10 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-
 use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-class Validator
+class Validator implements ValidatorInterface
 {
     /**
      * @var TransactionInterface
@@ -35,21 +34,20 @@ class Validator
 
     /**
      * @param ConsensusInterface $consensus
-     * @param ScriptInterface[] $scriptPubKeys
+     * @param array $scriptPubKeys
      * @return bool
      */
     public function checkSignatures(ConsensusInterface $consensus, array $scriptPubKeys)
     {
-        $nInputs = count($this->transaction->getInputs());
-        if ($nInputs !== count($scriptPubKeys)) {
+        if (count($this->transaction->getInputs()) !== count($scriptPubKeys)) {
             throw new \InvalidArgumentException('Incorrect scriptPubKey count');
         }
 
         $result = true;
-        for ($i = 0; $i < $nInputs; $i++) {
-            $result &= $this->checkSignature($consensus, $i, $scriptPubKeys[$i]);
+        foreach ($scriptPubKeys as $i => $scriptPubKey) {
+            $result = $result && $this->checkSignature($consensus, $i, $scriptPubKey);
         }
 
-        return (bool) $result;
+        return $result;
     }
 }
