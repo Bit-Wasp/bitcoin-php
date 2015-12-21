@@ -132,16 +132,6 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param ScriptInterface $script
-     * @return $this
-     */
-    public function setScript(ScriptInterface $script)
-    {
-        $this->script = $script;
-        return $this;
-    }
-
-    /**
      * Cast the value to a boolean
      *
      * @param $value
@@ -312,10 +302,7 @@ class Interpreter implements InterpreterInterface
             $publicKey = PublicKeyFactory::fromHex($keyBuf->getHex());
 
             return $this->ecAdapter->verify(
-                $this
-                    ->transaction
-                    ->getSignatureHash()
-                    ->calculate($script, $this->inputToSign, $txSignature->getHashType()),
+                $this->transaction->getSignatureHash()->calculate($script, $this->inputToSign, $txSignature->getHashType()),
                 $publicKey,
                 $txSignature->getSignature()
             );
