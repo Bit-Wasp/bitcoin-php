@@ -74,32 +74,6 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param array $signatures
-     * @param Buffer $messageHash
-     * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[] $publicKeys
-     * @return array
-     */
-    public function associateSigs(array $signatures, Buffer $messageHash, array $publicKeys)
-    {
-        $sigCount = count($signatures);
-        $linked = [];
-        foreach ($signatures as $c => $signature) {
-            foreach ($publicKeys as $key) {
-                $verify = $this->verify($messageHash, $key, $signature);
-                if ($verify) {
-                    $linked[$key->getPubKeyHash()->getHex()][] = $signature;
-                    if (count($linked) === $sigCount) {
-                        break 2;
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
-        return $linked;
-    }
-
-    /**
      * @param int|string $element
      * @param bool $half
      * @return bool

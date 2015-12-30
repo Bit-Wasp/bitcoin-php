@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tk
- * Date: 28/12/15
- * Time: 14:54
- */
+
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Buffertools\Buffer;
