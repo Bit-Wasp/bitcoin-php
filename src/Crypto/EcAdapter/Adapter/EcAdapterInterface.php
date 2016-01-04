@@ -71,5 +71,4 @@ interface EcAdapterInterface
      * @return PublicKeyInterface
      */
     public function recover(Buffer $messageHash, CompactSignatureInterface $compactSignature);
-
 }
