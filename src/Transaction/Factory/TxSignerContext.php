@@ -9,11 +9,10 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\ScriptHash;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Signature\SignatureSort;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
-use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Buffertools\Buffer;
 
 class TxSignerContext
 {
@@ -67,22 +66,6 @@ class TxSignerContext
         ScriptInterface $outputScript,
         ScriptInterface $redeemScript = null
     ) {
-/*
-        $classifier = new OutputClassifier($outputScript);
-        $this->scriptType = $this->prevOutType = $classifier->classify();
-
-        // Get the handler for this script type, and reclassify p2sh
-        if ($this->scriptType === OutputClassifier::PAYTOSCRIPTHASH) {
-            if (null === $redeemScript) {
-                throw new \InvalidArgumentException('Redeem script is required when output is P2SH');
-            }
-
-            $handler = new ScriptHash($redeemScript);
-            $this->scriptType = $handler->classification();
-        } else {
-            $handler = ScriptFactory::info($outputScript);
-        }
-*/
         $handler = ScriptFactory::info($outputScript, $redeemScript);
         $this->scriptType = $this->prevOutType = $handler->classification();
         if ($handler instanceof ScriptHash) {
@@ -130,17 +113,6 @@ class TxSignerContext
     }
 
     /**
-     * @param $publicKeys
-     * @return $this
-     */
-    public function setPublicKeys($publicKeys)
-    {
-        $this->publicKeys = $publicKeys;
-
-        return $this;
-    }
-
-    /**
      * @return array|\BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[]
      */
     public function getPublicKeys()
@@ -168,14 +140,23 @@ class TxSignerContext
     }
 
     /**
+     * @param PublicKeyInterface[] $publicKeys
+     * @return $this
+     */
+    public function setPublicKeys(array $publicKeys)
+    {
+        $this->publicKeys = $publicKeys;
+        return $this;
+    }
+
+    /**
      * @param TransactionInterface $tx
-     * @param $inputToExtract
+     * @param int $inputToExtract
      * @return $this
      */
     public function extractSigs(TransactionInterface $tx, $inputToExtract)
     {
-        $inputs = $tx->getInputs();
-        $parsed = $inputs[$inputToExtract]
+        $parsed = $tx->getInput($inputToExtract)
             ->getScript()
             ->getScriptParser()
             ->decode();
@@ -200,47 +181,31 @@ class TxSignerContext
                 break;
             case OutputClassifier::MULTISIG:
                 $redeemScript = $this->getRedeemScript();
-                $keys = $this->scriptInfo->getKeys();
-                foreach ($keys as $idx => $key) {
-                    $this->setSignature($idx, null);
-                }
+                $this->signatures = array_fill(0, count($this->publicKeys), null);
 
                 if ($size > 2 && $size <= $this->scriptInfo->getKeyCount() + 2) {
-                    $sigs = [];
-                    foreach ($keys as $key) {
-                        $sigs[$key->getPubKeyHash()->getHex()] = [];
-                    }
-
-                    // Extract Signatures (as buffers), then compile arrays of [pubkeyHash => signature]
-                    $sigHash = new Hasher($tx);
+                    $sigHash = $tx->getSignatureHash();
+                    $sigSort = new SignatureSort($this->ecAdapter);
+                    $sigs = new \SplObjectStorage;
 
                     foreach (array_slice($parsed, 1, -1) as $item) {
                         /** @var \BitWasp\Bitcoin\Script\Parser\Operation $item */
                         if ($item->isPush()) {
                             $txSig = TransactionSignatureFactory::fromHex($item->getData(), $this->ecAdapter);
-                            $linked = $this->ecAdapter->associateSigs(
-                                [$txSig->getSignature()],
-                                $sigHash->calculate(
-                                    $redeemScript,
-                                    $inputToExtract,
-                                    $txSig->getHashType()
-                                ),
-                                $keys
-                            );
+                            $hash = $sigHash->calculate($redeemScript, $inputToExtract, $txSig->getHashType());
+                            $linked = $sigSort->link([$txSig->getSignature()], $this->publicKeys, $hash);
 
-                            if (count($linked)) {
-                                $key = array_keys($linked)[0];
-                                $sigs[$key] = array_merge($sigs[$key], [$txSig]);
+                            foreach ($this->publicKeys as $key) {
+                                if ($linked->contains($key)) {
+                                    $sigs[$key] = $txSig;
+                                }
                             }
                         }
                     }
 
-                    // We have all the signatures from the tx now. array_shift the sigs for a public key, as it's encountered.
-                    foreach ($keys as $idx => $key) {
-                        $hash = $key->getPubKeyHash()->getHex();
-                        $this->setSignature($idx, isset($sigs[$hash])
-                            ? array_shift($sigs[$hash])
-                            : null);
+                    // We have all the signatures from the input now. array_shift the sigs for a public key, as it's encountered.
+                    foreach ($this->publicKeys as $idx => $key) {
+                        $this->signatures[$idx] = isset($sigs[$key]) ? $sigs[$key] : null;
                     }
                 }
 

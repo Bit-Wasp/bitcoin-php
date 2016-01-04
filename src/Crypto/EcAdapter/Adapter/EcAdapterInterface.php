@@ -71,12 +71,4 @@ interface EcAdapterInterface
      * @return PublicKeyInterface
      */
     public function recover(Buffer $messageHash, CompactSignatureInterface $compactSignature);
-
-    /**
-     * @param SignatureInterface[] $signatures
-     * @param Buffer $messageHash
-     * @param PublicKeyInterface[] $publicKeys
-     * @return array
-     */
-    public function associateSigs(array $signatures, Buffer $messageHash, array $publicKeys);
 }

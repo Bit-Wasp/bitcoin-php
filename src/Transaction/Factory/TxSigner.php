@@ -163,13 +163,11 @@ class TxSigner
         // loop over the publicKeys to find the key to sign with
         foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
             if ($privateKey->getPublicKey()->getBinary() === $publicKey->getBinary()) {
-                $signature = $this->makeSignature(
+                $inputState->setSignature($idx, $this->makeSignature(
                     $privateKey,
                     $this->signatureHash->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType),
                     $sigHashType
-                );
-
-                $inputState->setSignature($idx, $signature);
+                ));
             }
         }
 
