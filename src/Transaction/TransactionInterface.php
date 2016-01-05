@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 interface TransactionInterface extends SerializableInterface, \ArrayAccess
 {
@@ -32,13 +32,13 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     /**
      * Get the transactions sha256d hash.
      *
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getTxHash();
 
     /**
      * Get the little-endian sha256d hash.
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getTxId();
 

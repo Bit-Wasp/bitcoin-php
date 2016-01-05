@@ -61,7 +61,7 @@ class HexExtendedKeySerializer
 
     /**
      * @param HierarchicalKey $key
-     * @return \BitWasp\Buffertools\Buffer
+     * @return BufferInterface
      */
     public function serialize(HierarchicalKey $key)
     {

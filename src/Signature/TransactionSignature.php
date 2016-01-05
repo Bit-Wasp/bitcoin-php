@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class TransactionSignature extends Serializable implements TransactionSignatureInterface
@@ -119,7 +118,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     }
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

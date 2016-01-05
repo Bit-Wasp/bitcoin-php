@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Script\Parser;
 
 use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class Operation
@@ -19,7 +18,7 @@ class Operation
     private $opCode;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $pushData;
 
@@ -59,7 +58,7 @@ class Operation
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getData()
     {

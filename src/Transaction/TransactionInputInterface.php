@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Buffertools\Buffer;
 
 interface TransactionInputInterface extends SerializableInterface, \ArrayAccess
 {

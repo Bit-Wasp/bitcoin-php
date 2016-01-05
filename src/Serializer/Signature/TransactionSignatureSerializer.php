@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 
 class TransactionSignatureSerializer
@@ -24,7 +25,7 @@ class TransactionSignatureSerializer
 
     /**
      * @param TransactionSignature $txSig
-     * @return \BitWasp\Buffertools\Buffer
+     * @return BufferInterface
      */
     public function serialize(TransactionSignature $txSig)
     {

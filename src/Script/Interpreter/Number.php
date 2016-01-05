@@ -109,7 +109,7 @@ class Number extends Serializable
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     private function serialize()
     {
@@ -139,7 +139,7 @@ class Number extends Serializable
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Parser implements \Iterator
 {
@@ -15,7 +16,7 @@ class Parser implements \Iterator
     private $math;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $empty;
 

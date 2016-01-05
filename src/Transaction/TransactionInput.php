@@ -4,11 +4,11 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class TransactionInput extends Serializable implements TransactionInputInterface
@@ -107,7 +107,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Utxo\Utxo;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class Transaction extends Serializable implements TransactionInterface
@@ -90,7 +90,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getTxHash()
     {
@@ -98,7 +98,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getTxId()
     {
@@ -224,7 +224,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {
