@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 interface SignatureSortInterface
 {
