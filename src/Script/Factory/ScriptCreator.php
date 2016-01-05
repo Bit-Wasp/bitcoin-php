@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
@@ -32,9 +33,9 @@ class ScriptCreator
     /**
      * @param Math $math
      * @param Opcodes $opcodes
-     * @param Buffer|null $buffer
+     * @param BufferInterface|null $buffer
      */
-    public function __construct(Math $math, Opcodes $opcodes, Buffer $buffer = null)
+    public function __construct(Math $math, Opcodes $opcodes, BufferInterface $buffer = null)
     {
         if ($buffer !== null) {
             $this->script = $buffer->getBinary();
@@ -64,7 +65,7 @@ class ScriptCreator
      * @return $this
      * @throws \Exception
      */
-    public function push(Buffer $data)
+    public function push(BufferInterface $data)
     {
         $length = $data->getSize();
         $parsed = new Parser('', $this->math);

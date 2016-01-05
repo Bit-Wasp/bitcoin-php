@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 interface PrivateKeyInterface extends KeyInterface
 {
@@ -17,11 +18,11 @@ interface PrivateKeyInterface extends KeyInterface
     public function getSecretMultiplier();
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param RbgInterface $rbg
      * @return SignatureInterface
      */
-    public function sign(Buffer $msg32, RbgInterface $rbg = null);
+    public function sign(BufferInterface $msg32, RbgInterface $rbg = null);
 
     /**
      * Return the public key.

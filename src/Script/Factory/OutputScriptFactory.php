@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class OutputScriptFactory
@@ -131,7 +132,7 @@ class OutputScriptFactory
     }
 
     /**
-     * @param Buffer $secret
+     * @param BufferInterface $secret
      * @param PublicKeyInterface $a1
      * @param PublicKeyInterface $a2
      * @param PublicKeyInterface $b1
@@ -139,7 +140,7 @@ class OutputScriptFactory
      * @return ScriptInterface
      */
     public function payToLightningChannel(
-        Buffer $secret,
+        BufferInterface $secret,
         PublicKeyInterface $a1,
         PublicKeyInterface $a2,
         PublicKeyInterface $b1,

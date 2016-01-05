@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 interface PublicKeyInterface extends KeyInterface
 {
@@ -33,9 +34,9 @@ interface PublicKeyInterface extends KeyInterface
     const KEY_COMPRESSED_ODD = '03';
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param SignatureInterface $signature
      * @return bool
      */
-    public function verify(Buffer $msg32, SignatureInterface $signature);
+    public function verify(BufferInterface $msg32, SignatureInterface $signature);
 }

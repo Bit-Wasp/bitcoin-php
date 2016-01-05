@@ -13,6 +13,7 @@ use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class PrivateKey extends Key implements PrivateKeyInterface
 {
@@ -69,11 +70,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param RbgInterface|null $rbgInterface
      * @return Signature
      */
-    public function sign(Buffer $msg32, RbgInterface $rbgInterface = null)
+    public function sign(BufferInterface $msg32, RbgInterface $rbgInterface = null)
     {
         return $this->ecAdapter->sign($msg32, $this, $rbgInterface);
     }

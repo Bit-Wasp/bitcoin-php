@@ -109,7 +109,7 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param PrivateKey $privateKey
      * @return Signature
      */
@@ -146,12 +146,12 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param PublicKey $publicKey
      * @param Signature $signature
      * @return bool
      */
-    private function doVerify(Buffer $msg32, PublicKey $publicKey, Signature $signature)
+    private function doVerify(BufferInterface $msg32, PublicKey $publicKey, Signature $signature)
     {
         return (bool) secp256k1_ecdsa_verify($this->context, $msg32->getBinary(), $signature->getResource(), $publicKey->getResource());
     }
@@ -170,11 +170,11 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param CompactSignature $compactSig
      * @return PublicKey
      */
-    private function doRecover(Buffer $msg32, CompactSignature $compactSig)
+    private function doRecover(BufferInterface $msg32, CompactSignature $compactSig)
     {
         $publicKey = '';
         /** @var resource $publicKey */
@@ -199,11 +199,11 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param PrivateKey $privateKey
      * @return CompactSignature
      */
-    private function doSignCompact(Buffer $msg32, PrivateKey $privateKey)
+    private function doSignCompact(BufferInterface $msg32, PrivateKey $privateKey)
     {
         $sig_t = '';
         /** @var resource $sig_t */
