@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Stack extends \SplDoublyLinkedList implements StackInterface
 {
@@ -17,7 +18,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      */
     private function typeCheck($value)
     {
-        if (!$value instanceof Buffer) {
+        if (!$value instanceof BufferInterface) {
             throw new \InvalidArgumentException('Value was not of type Buffer');
         }
     }

@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKey extends Key implements PublicKeyInterface
@@ -54,11 +55,11 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param SignatureInterface $signature
      * @return bool
      */
-    public function verify(Buffer $msg32, SignatureInterface $signature)
+    public function verify(BufferInterface $msg32, SignatureInterface $signature)
     {
         return $this->ecAdapter->verify($msg32, $this, $signature);
     }
@@ -86,10 +87,10 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @param Buffer $publicKey
+     * @param BufferInterface $publicKey
      * @return bool
      */
-    public static function isCompressedOrUncompressed(Buffer $publicKey)
+    public static function isCompressedOrUncompressed(BufferInterface $publicKey)
     {
         $vchPubKey = $publicKey->getBinary();
         if ($publicKey->getSize() < 33) {

@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Script\Parser\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Buffertools\BufferInterface;
 
 class Script extends Serializable implements ScriptInterface
 {
@@ -17,22 +18,22 @@ class Script extends Serializable implements ScriptInterface
     protected $opCodes;
 
     /**
-     * @var null|string
+     * @var string
      */
     protected $script;
 
     /**
-     * @param Buffer|null $script
+     * @param BufferInterface $script
      * @param Opcodes|null $opCodes
      */
-    public function __construct(Buffer $script = null, Opcodes $opCodes = null)
+    public function __construct(BufferInterface $script = null, Opcodes $opCodes = null)
     {
-        $this->script = $script instanceof Buffer ? $script->getBinary() : '';
+        $this->script = $script instanceof BufferInterface ? $script->getBinary() : '';
         $this->opCodes = $opCodes ?: new Opcodes();
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {
@@ -60,7 +61,7 @@ class Script extends Serializable implements ScriptInterface
     /**
      * Return a buffer containing the hash of this script.
      *
-     * @return \BitWasp\Buffertools\Buffer
+     * @return BufferInterface
      */
     public function getScriptHash()
     {
@@ -129,7 +130,7 @@ class Script extends Serializable implements ScriptInterface
             }
         }
 
-        if (!$data instanceof Buffer) {
+        if (!$data instanceof BufferInterface) {
             return 0;
         }
 

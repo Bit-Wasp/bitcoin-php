@@ -3,20 +3,17 @@
 namespace BitWasp\Bitcoin\Crypto;
 
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
-/**
- * Class Hash
- * @package Bitcoin
- */
 class Hash
 {
     /**
      * Calculate Sha256(RipeMd160()) on the given data
      *
-     * @param Buffer $data
-     * @return Buffer
+     * @param BufferInterface $data
+     * @return BufferInterface
      */
-    public static function sha256ripe160(Buffer $data)
+    public static function sha256ripe160(BufferInterface $data)
     {
         return new Buffer(hash('ripemd160', hash('sha256', $data->getBinary(), true), true));
     }
@@ -24,10 +21,10 @@ class Hash
     /**
      * Perform SHA256
      *
-     * @param Buffer $data
-     * @return Buffer
+     * @param BufferInterface $data
+     * @return BufferInterface
      */
-    public static function sha256(Buffer $data)
+    public static function sha256(BufferInterface $data)
     {
         return new Buffer(hash('sha256', $data->getBinary(), true));
     }
@@ -35,10 +32,10 @@ class Hash
     /**
      * Perform SHA256 twice
      *
-     * @param Buffer $data
-     * @return Buffer
+     * @param BufferInterface $data
+     * @return BufferInterface
      */
-    public static function sha256d(Buffer $data)
+    public static function sha256d(BufferInterface $data)
     {
         return new Buffer(hash('sha256', hash('sha256', $data->getBinary(), true), true));
     }
@@ -46,10 +43,10 @@ class Hash
     /**
      * RIPEMD160
      *
-     * @param Buffer $data
-     * @return Buffer
+     * @param BufferInterface $data
+     * @return BufferInterface
      */
-    public static function ripemd160(Buffer $data)
+    public static function ripemd160(BufferInterface $data)
     {
         return new Buffer(hash('ripemd160', $data->getBinary(), true));
     }
@@ -57,10 +54,10 @@ class Hash
     /**
      * RIPEMD160 twice
      *
-     * @param Buffer $data
-     * @return Buffer
+     * @param BufferInterface $data
+     * @return BufferInterface
      */
-    public static function ripemd160d(Buffer $data)
+    public static function ripemd160d(BufferInterface $data)
     {
         return new Buffer(hash('ripemd160', hash('ripemd160', $data->getBinary(), true), true));
     }
@@ -68,10 +65,10 @@ class Hash
     /**
      * Calculate a SHA1 hash
      *
-     * @param Buffer $data
-     * @return Buffer
+     * @param BufferInterface $data
+     * @return BufferInterface
      */
-    public static function sha1(Buffer $data)
+    public static function sha1(BufferInterface $data)
     {
         return new Buffer(hash('sha1', $data->getBinary(), true));
     }
@@ -80,14 +77,14 @@ class Hash
      * PBKDF2
      *
      * @param string $algorithm
-     * @param Buffer $password
-     * @param Buffer $salt
+     * @param BufferInterface $password
+     * @param BufferInterface $salt
      * @param integer $count
      * @param integer $keyLength
-     * @return Buffer
+     * @return BufferInterface
      * @throws \Exception
      */
-    public static function pbkdf2($algorithm, Buffer $password, Buffer $salt, $count, $keyLength)
+    public static function pbkdf2($algorithm, BufferInterface $password, BufferInterface $salt, $count, $keyLength)
     {
         $algorithm  = strtolower($algorithm);
 
@@ -103,11 +100,11 @@ class Hash
     }
 
     /**
-     * @param Buffer $data
+     * @param BufferInterface $data
      * @param int $seed
-     * @return Buffer
+     * @return BufferInterface
      */
-    public static function murmur3(Buffer $data, $seed)
+    public static function murmur3(BufferInterface $data, $seed)
     {
         return new Buffer(pack('N', murmurhash3_int($data->getBinary(), (int)$seed)));
     }
@@ -116,11 +113,11 @@ class Hash
      * Do HMAC hashing on $data and $salt
      *
      * @param string $algo
-     * @param Buffer $data
-     * @param Buffer $salt
-     * @return Buffer
+     * @param BufferInterface $data
+     * @param BufferInterface $salt
+     * @return BufferInterface
      */
-    public static function hmac($algo, Buffer $data, Buffer $salt)
+    public static function hmac($algo, BufferInterface $data, BufferInterface $salt)
     {
         return new Buffer(hash_hmac($algo, $data->getBinary(), $salt->getBinary(), true));
     }

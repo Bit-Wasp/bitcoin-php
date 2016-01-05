@@ -15,6 +15,7 @@ use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
 use BitWasp\Bitcoin\Script\Factory\ScriptInfoFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class ScriptFactory
 {
@@ -24,16 +25,16 @@ class ScriptFactory
      */
     public static function fromHex($string)
     {
-        return self::create($string instanceof Buffer ? $string : Buffer::hex($string))->getScript();
+        return self::create($string instanceof BufferInterface ? $string : Buffer::hex($string))->getScript();
     }
 
     /**
-     * @param Buffer|null $buffer
+     * @param BufferInterface|null $buffer
      * @param Opcodes|null $opcodes
      * @param Math|null $math
      * @return ScriptCreator
      */
-    public static function create(Buffer $buffer = null, Opcodes $opcodes = null, Math $math = null)
+    public static function create(BufferInterface $buffer = null, Opcodes $opcodes = null, Math $math = null)
     {
         return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes ?: new Opcodes(), $buffer);
     }

@@ -14,6 +14,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class EcAdapter implements EcAdapterInterface
@@ -65,10 +66,10 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $privateKey
+     * @param BufferInterface $privateKey
      * @return bool
      */
-    public function validatePrivateKey(Buffer $privateKey)
+    public function validatePrivateKey(BufferInterface $privateKey)
     {
         return (bool) secp256k1_ec_seckey_verify($this->context, $privateKey->getBinary());
     }
@@ -112,7 +113,7 @@ class EcAdapter implements EcAdapterInterface
      * @param PrivateKey $privateKey
      * @return Signature
      */
-    private function doSign(Buffer $msg32, PrivateKey $privateKey)
+    private function doSign(BufferInterface $msg32, PrivateKey $privateKey)
     {
         /** @var resource $sig_t */
         $sig_t = '';
@@ -133,12 +134,12 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param PrivateKeyInterface $privateKey
      * @param RbgInterface|null $rbg
      * @return Signature
      */
-    public function sign(Buffer $msg32, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    public function sign(BufferInterface $msg32, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
         /** @var PrivateKey $privateKey */
         return $this->doSign($msg32, $privateKey);
@@ -156,12 +157,12 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param PublicKeyInterface $publicKey
      * @param SignatureInterface $signature
      * @return bool
      */
-    public function verify(Buffer $msg32, PublicKeyInterface $publicKey, SignatureInterface $signature)
+    public function verify(BufferInterface $msg32, PublicKeyInterface $publicKey, SignatureInterface $signature)
     {
         /** @var PublicKey $publicKey */
         /** @var Signature $signature */
@@ -187,11 +188,11 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param CompactSignatureInterface $compactSig
      * @return PublicKey
      */
-    public function recover(Buffer $msg32, CompactSignatureInterface $compactSig)
+    public function recover(BufferInterface $msg32, CompactSignatureInterface $compactSig)
     {
         /** @var CompactSignature $compactSig */
         return $this->doRecover($msg32, $compactSig);
@@ -226,12 +227,12 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $msg32
+     * @param BufferInterface $msg32
      * @param PrivateKeyInterface $privateKey
      * @param RbgInterface|null $rbg
      * @return CompactSignatureInterface
      */
-    public function signCompact(Buffer $msg32, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    public function signCompact(BufferInterface $msg32, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
     {
         /** @var PrivateKey $privateKey */
         return $this->doSignCompact($msg32, $privateKey);
