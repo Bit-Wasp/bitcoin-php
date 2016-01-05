@@ -20,6 +20,7 @@ use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Interpreter implements InterpreterInterface
 {
@@ -134,10 +135,10 @@ class Interpreter implements InterpreterInterface
     /**
      * Cast the value to a boolean
      *
-     * @param $value
+     * @param BufferInterface $value
      * @return bool
      */
-    public function castToBool(Buffer $value)
+    public function castToBool(BufferInterface $value)
     {
         if ($value->getSize() === 0) {
             return true;
@@ -148,10 +149,10 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param Buffer $signature
+     * @param BufferInterface $signature
      * @return bool
      */
-    public function isValidSignatureEncoding(Buffer $signature)
+    public function isValidSignatureEncoding(BufferInterface $signature)
     {
         try {
             TransactionSignature::isDERSignature($signature);
@@ -164,12 +165,12 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param Buffer $signature
+     * @param BufferInterface $signature
      * @return bool
      * @throws ScriptRuntimeException
      * @throws \Exception
      */
-    public function isLowDerSignature(Buffer $signature)
+    public function isLowDerSignature(BufferInterface $signature)
     {
         if (!$this->isValidSignatureEncoding($signature)) {
             throw new ScriptRuntimeException(self::VERIFY_DERSIG, 'Signature with incorrect encoding');
@@ -187,10 +188,10 @@ class Interpreter implements InterpreterInterface
      * Determine whether the sighash byte appended to the signature encodes
      * a valid sighash type.
      *
-     * @param Buffer $signature
+     * @param BufferInterface $signature
      * @return bool
      */
-    public function isDefinedHashtypeSignature(Buffer $signature)
+    public function isDefinedHashtypeSignature(BufferInterface $signature)
     {
         if ($signature->getSize() === 0) {
             return false;
@@ -204,11 +205,11 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param Buffer $signature
+     * @param BufferInterface $signature
      * @return $this
      * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      */
-    public function checkSignatureEncoding(Buffer $signature)
+    public function checkSignatureEncoding(BufferInterface $signature)
     {
         if ($signature->getSize() === 0) {
             return $this;
@@ -226,11 +227,11 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param Buffer $publicKey
+     * @param BufferInterface $publicKey
      * @return $this
      * @throws \Exception
      */
-    public function checkPublicKeyEncoding(Buffer $publicKey)
+    public function checkPublicKeyEncoding(BufferInterface $publicKey)
     {
         if ($this->flags->checkFlags(self::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
             throw new ScriptRuntimeException(self::VERIFY_STRICTENC, 'Public key with incorrect encoding');
@@ -240,12 +241,12 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param $opCode
-     * @param Buffer $pushData
+     * @param int $opCode
+     * @param BufferInterface $pushData
      * @return bool
      * @throws \Exception
      */
-    public function checkMinimalPush($opCode, Buffer $pushData)
+    public function checkMinimalPush($opCode, BufferInterface $pushData)
     {
         $pushSize = $pushData->getSize();
         $binary = $pushData->getBinary();
@@ -285,13 +286,13 @@ class Interpreter implements InterpreterInterface
 
     /**
      * @param ScriptInterface $script
-     * @param Buffer $sigBuf
-     * @param Buffer $keyBuf
+     * @param BufferInterface $sigBuf
+     * @param BufferInterface $keyBuf
      * @return bool
      * @throws ScriptRuntimeException
      * @throws \Exception
      */
-    private function checkSig(ScriptInterface $script, Buffer $sigBuf, Buffer $keyBuf)
+    private function checkSig(ScriptInterface $script, BufferInterface $sigBuf, BufferInterface $keyBuf)
     {
         $this
             ->checkSignatureEncoding($sigBuf)

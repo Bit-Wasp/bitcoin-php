@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Block;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
@@ -49,16 +50,16 @@ class MerkleRoot
     /**
      * Set the last hash. Should only be set by calculateHash()
      *
-     * @param Buffer $lastHash
+     * @param BufferInterface $lastHash
      */
-    private function setLastHash(Buffer $lastHash)
+    private function setLastHash(BufferInterface $lastHash)
     {
         $this->lastHash = $lastHash;
     }
 
     /**
      * @param callable|null $hashFunction
-     * @return Buffer
+     * @return BufferInterface
      * @throws MerkleTreeEmpty
      */
     public function calculateHash(callable $hashFunction = null)

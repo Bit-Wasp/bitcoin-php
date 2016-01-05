@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Mnemonic\Electrum;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Mnemonic\MnemonicInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class ElectrumMnemonic implements MnemonicInterface
 {
@@ -29,11 +30,11 @@ class ElectrumMnemonic implements MnemonicInterface
     }
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @return array
      * @throws \Exception
      */
-    public function entropyToWords(Buffer $entropy)
+    public function entropyToWords(BufferInterface $entropy)
     {
         $math = $this->ecAdapter->getMath();
         $n = count($this->wordList);
@@ -55,17 +56,17 @@ class ElectrumMnemonic implements MnemonicInterface
     }
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @return string
      */
-    public function entropyToMnemonic(Buffer $entropy)
+    public function entropyToMnemonic(BufferInterface $entropy)
     {
         return implode(' ', $this->entropyToWords($entropy));
     }
 
     /**
      * @param string $mnemonic
-     * @return Buffer
+     * @return BufferInterface
      */
     public function mnemonicToEntropy($mnemonic)
     {

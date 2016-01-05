@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class Base58
@@ -51,7 +52,7 @@ class Base58
     /**
      * Decode a base58 string
      *
-     * @param $base58
+     * @param string $base58
      * @return Buffer
      */
     public static function decode($base58)
@@ -79,10 +80,10 @@ class Base58
     /**
      * Calculate a checksum for the given data
      *
-     * @param $data
-     * @return Buffer
+     * @param BufferInterface $data
+     * @return BufferInterface
      */
-    public static function checksum(Buffer $data)
+    public static function checksum(BufferInterface $data)
     {
         return Hash::sha256d($data)->slice(0, 4);
     }
@@ -90,8 +91,8 @@ class Base58
     /**
      * Decode a base58 checksum string and validate checksum
      *
-     * @param $base58
-     * @return Buffer
+     * @param string $base58
+     * @return BufferInterface
      * @throws Base58ChecksumFailure
      */
     public static function decodeCheck($base58)
@@ -110,11 +111,11 @@ class Base58
     /**
      * Encode the given data in base58, with a checksum to check integrity.
      *
-     * @param $data
+     * @param BufferInterface $data
      * @return string
      * @throws \Exception
      */
-    public static function encodeCheck(Buffer $data)
+    public static function encodeCheck(BufferInterface $data)
     {
         return self::encode(Buffertools::concat($data, self::checksum($data)));
     }

@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Number extends Serializable
 {
@@ -48,13 +49,13 @@ class Number extends Serializable
     }
 
     /**
-     * @param Buffer $vch
+     * @param BufferInterface $vch
      * @param bool $fRequireMinimal
      * @param int $maxNumSize
      * @param Math|null $math
      * @return self
      */
-    public static function buffer(Buffer $vch, $fRequireMinimal, $maxNumSize = self::MAX_NUM_SIZE, Math $math = null)
+    public static function buffer(BufferInterface $vch, $fRequireMinimal, $maxNumSize = self::MAX_NUM_SIZE, Math $math = null)
     {
         $size = $vch->getSize();
         if ($size > $maxNumSize) {
@@ -77,10 +78,10 @@ class Number extends Serializable
     }
 
     /**
-     * @param Buffer $buffer
+     * @param BufferInterface $buffer
      * @return int
      */
-    private function parseBuffer(Buffer $buffer)
+    private function parseBuffer(BufferInterface $buffer)
     {
         $size = $buffer->getSize();
         if ($size === 0) {
@@ -108,7 +109,7 @@ class Number extends Serializable
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     private function serialize()
     {
@@ -138,7 +139,7 @@ class Number extends Serializable
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

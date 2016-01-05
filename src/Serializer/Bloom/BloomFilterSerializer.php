@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
@@ -29,7 +30,7 @@ class BloomFilterSerializer
 
     /**
      * @param BloomFilter $filter
-     * @return \BitWasp\Buffertools\Buffer
+     * @return BufferInterface
      */
     public function serialize(BloomFilter $filter)
     {

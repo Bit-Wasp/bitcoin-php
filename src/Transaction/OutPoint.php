@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class OutPoint extends Serializable implements OutPointInterface
@@ -12,7 +12,7 @@ class OutPoint extends Serializable implements OutPointInterface
     use FunctionAliasArrayAccess;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $hashPrevOutput;
 
@@ -23,10 +23,10 @@ class OutPoint extends Serializable implements OutPointInterface
 
     /**
      * OutPoint constructor.
-     * @param Buffer $hashPrevOutput
+     * @param BufferInterface $hashPrevOutput
      * @param int $nPrevOutput
      */
-    public function __construct(Buffer $hashPrevOutput, $nPrevOutput)
+    public function __construct(BufferInterface $hashPrevOutput, $nPrevOutput)
     {
         if ($hashPrevOutput->getSize() !== 32) {
             throw new \InvalidArgumentException('OutPoint: hashPrevOut must be a 32-byte Buffer');
@@ -45,7 +45,7 @@ class OutPoint extends Serializable implements OutPointInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getTxId()
     {
@@ -61,7 +61,7 @@ class OutPoint extends Serializable implements OutPointInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

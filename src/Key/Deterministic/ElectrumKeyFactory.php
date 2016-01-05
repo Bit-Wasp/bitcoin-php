@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Mnemonic\Electrum\ElectrumWordListInterface;
 use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class ElectrumKeyFactory
 {
@@ -31,11 +32,11 @@ class ElectrumKeyFactory
 
     /**
      * Generate a master private key given a
-     * @param Buffer $seed
+     * @param BufferInterface $seed
      * @param EcAdapterInterface $ecAdapter
      * @return ElectrumKey
      */
-    public static function generateMasterKey(Buffer $seed, EcAdapterInterface $ecAdapter = null)
+    public static function generateMasterKey(BufferInterface $seed, EcAdapterInterface $ecAdapter = null)
     {
         // Really weird, did electrum actually hash hex string seeds?
         $binary = $oldseed = $seed->getHex();

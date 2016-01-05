@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Mnemonic\MnemonicInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Bip39Mnemonic implements MnemonicInterface
 {
@@ -46,11 +47,11 @@ class Bip39Mnemonic implements MnemonicInterface
     }
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @param integer $CSlen
      * @return string
      */
-    private function calculateChecksum(Buffer $entropy, $CSlen)
+    private function calculateChecksum(BufferInterface $entropy, $CSlen)
     {
         $entHash = Hash::sha256($entropy);
         $math = $this->ecAdapter->getMath();
@@ -65,10 +66,10 @@ class Bip39Mnemonic implements MnemonicInterface
     }
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @return array
      */
-    public function entropyToWords(Buffer $entropy)
+    public function entropyToWords(BufferInterface $entropy)
     {
         $math = $this->ecAdapter->getMath();
 
@@ -89,17 +90,17 @@ class Bip39Mnemonic implements MnemonicInterface
     }
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @return string
      */
-    public function entropyToMnemonic(Buffer $entropy)
+    public function entropyToMnemonic(BufferInterface $entropy)
     {
         return implode(' ', $this->entropyToWords($entropy));
     }
 
     /**
-     * @param $mnemonic
-     * @return Buffer
+     * @param string $mnemonic
+     * @return BufferInterface
      */
     public function mnemonicToEntropy($mnemonic)
     {

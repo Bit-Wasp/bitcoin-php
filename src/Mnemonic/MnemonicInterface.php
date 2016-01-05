@@ -2,26 +2,26 @@
 
 namespace BitWasp\Bitcoin\Mnemonic;
 
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 interface MnemonicInterface
 {
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @return string[]
      */
-    public function entropyToWords(Buffer $entropy);
+    public function entropyToWords(BufferInterface $entropy);
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @return string
      */
-    public function entropyToMnemonic(Buffer $entropy);
+    public function entropyToMnemonic(BufferInterface $entropy);
 
     /**
-     * @param $mnemonic
-     * @return Buffer
+     * @param string $mnemonic
+     * @return BufferInterface
      */
     public function mnemonicToEntropy($mnemonic);
 }

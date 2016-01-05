@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -45,9 +46,9 @@ class Hasher implements SignatureHashInterface
      * can be used.
      *
      * @param ScriptInterface $txOutScript
-     * @param $inputToSign
+     * @param int $inputToSign
      * @param int $sighashType
-     * @return Buffer
+     * @return BufferInterface
      * @throws \Exception
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)

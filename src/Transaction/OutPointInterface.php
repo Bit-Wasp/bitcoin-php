@@ -3,12 +3,12 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 interface OutPointInterface extends SerializableInterface
 {
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getTxId();
 

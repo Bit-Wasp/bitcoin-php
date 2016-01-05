@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use BitWasp\Buffertools\BufferInterface;
 
 class HierarchicalKeyFactory
 {
@@ -36,11 +37,11 @@ class HierarchicalKeyFactory
     }
 
     /**
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey
      */
-    public static function fromEntropy(Buffer $entropy, EcAdapterInterface $ecAdapter = null)
+    public static function fromEntropy(BufferInterface $entropy, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $hash = Hash::hmac('sha512', $entropy, new Buffer('Bitcoin seed', null, $ecAdapter->getMath()));
@@ -56,7 +57,7 @@ class HierarchicalKeyFactory
     }
 
     /**
-     * @param $extendedKey
+     * @param string $extendedKey
      * @param NetworkInterface $network
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey

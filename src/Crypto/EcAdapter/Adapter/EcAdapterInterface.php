@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 interface EcAdapterInterface
 {
@@ -22,10 +23,10 @@ interface EcAdapterInterface
     public function getGenerator();
 
     /**
-     * @param Buffer $buffer
+     * @param BufferInterface $buffer
      * @return bool
      */
-    public function validatePrivateKey(Buffer $buffer);
+    public function validatePrivateKey(BufferInterface $buffer);
 
     /**
      * @param int|string $element
@@ -35,40 +36,40 @@ interface EcAdapterInterface
     public function validateSignatureElement($element, $halfOrder = false);
 
     /**
-     * @param $scalar
+     * @param int $scalar
      * @param bool|false $compressed
      * @return PrivateKeyInterface
      */
     public function getPrivateKey($scalar, $compressed = false);
 
     /**
-     * @param Buffer $messageHash
+     * @param BufferInterface $messageHash
      * @param PrivateKeyInterface $privateKey
      * @param RbgInterface $rbg
      * @return SignatureInterface
      */
-    public function sign(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
+    public function sign(BufferInterface $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
 
     /**
      * @param PublicKeyInterface $publicKey
      * @param SignatureInterface $signature
-     * @param Buffer $messageHash
+     * @param BufferInterface $messageHash
      * @return bool
      */
-    public function verify(Buffer $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature);
+    public function verify(BufferInterface $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature);
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @param Buffer $messageHash
+     * @param BufferInterface $messageHash
      * @param RbgInterface $rbg
      * @return CompactSignatureInterface
      */
-    public function signCompact(Buffer $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
+    public function signCompact(BufferInterface $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null);
 
     /**
-     * @param Buffer $messageHash
+     * @param BufferInterface $messageHash
      * @param CompactSignatureInterface $compactSignature
      * @return PublicKeyInterface
      */
-    public function recover(Buffer $messageHash, CompactSignatureInterface $compactSignature);
+    public function recover(BufferInterface $messageHash, CompactSignatureInterface $compactSignature);
 }

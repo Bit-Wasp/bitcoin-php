@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class BloomFilter extends Serializable
 {
@@ -250,10 +251,10 @@ class BloomFilter extends Serializable
 
     /**
      * @param int $nHashNum
-     * @param Buffer $data
+     * @param BufferInterface $data
      * @return string
      */
-    public function hash($nHashNum, Buffer $data)
+    public function hash($nHashNum, BufferInterface $data)
     {
         return $this->math->mod(
             Hash::murmur3($data, ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff)->getInt(),
@@ -262,10 +263,10 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param Buffer $data
+     * @param BufferInterface $data
      * @return $this
      */
-    public function insertData(Buffer $data)
+    public function insertData(BufferInterface $data)
     {
         if ($this->isFull()) {
             return $this;
@@ -290,10 +291,10 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param Buffer $data
+     * @param BufferInterface $data
      * @return bool
      */
-    public function containsData(Buffer $data)
+    public function containsData(BufferInterface $data)
     {
         if ($this->isFull()) {
             return true;

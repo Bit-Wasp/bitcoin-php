@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Parser;
 
 use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Operation
 {
@@ -18,7 +18,7 @@ class Operation
     private $opCode;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $pushData;
 
@@ -30,10 +30,10 @@ class Operation
     /**
      * Operation constructor.
      * @param int $opCode
-     * @param Buffer $pushData
+     * @param BufferInterface $pushData
      * @param int $pushDataSize
      */
-    public function __construct($opCode, Buffer $pushData, $pushDataSize = 0)
+    public function __construct($opCode, BufferInterface $pushData, $pushDataSize = 0)
     {
         $this->push = $opCode >= 0 && $opCode <= Opcodes::OP_PUSHDATA4;
         $this->opCode = $opCode;
@@ -58,7 +58,7 @@ class Operation
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getData()
     {

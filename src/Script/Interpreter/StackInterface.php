@@ -2,19 +2,19 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 interface StackInterface extends \ArrayAccess, \Iterator
 {
     /**
      * @see \SplDoublyLinkedList::pop()
-     * @return Buffer
+     * @return BufferInterface
      */
     public function pop();
 
     /**
      * @see \SplDoublyLinkedList::push()
-     * @param Buffer $value
+     * @param BufferInterface $value
      * @return void
      */
     public function push($value);
@@ -22,20 +22,20 @@ interface StackInterface extends \ArrayAccess, \Iterator
     /**
      * @see \SplDoublyLinkedList::add()
      * @param int $offset
-     * @param Buffer $value
+     * @param BufferInterface $value
      * @return void
      */
     public function add($offset, $value);
 
     /**
      * @see \SplDoublyLinkedList::bottom()
-     * @return Buffer
+     * @return BufferInterface
      */
     public function bottom();
 
     /**
      * @see \SplDoublyLinkedList::top()
-     * @return Buffer
+     * @return BufferInterface
      */
     public function top();
 
@@ -53,13 +53,13 @@ interface StackInterface extends \ArrayAccess, \Iterator
 
     /**
      * @see \SplDoublyLinkedList::shift()
-     * @return Buffer
+     * @return BufferInterface
      */
     public function shift();
 
     /**
      * @see \SplDoublyLinkedList::unshift()
-     * @param Buffer $value
+     * @param BufferInterface $value
      * @return void
      */
     public function unshift($value);
@@ -67,7 +67,7 @@ interface StackInterface extends \ArrayAccess, \Iterator
     /**
      * @see \ArrayAccess::offsetGet()
      * @param int $offset
-     * @return Buffer
+     * @return BufferInterface
      */
     public function offsetGet($offset);
 
@@ -88,7 +88,7 @@ interface StackInterface extends \ArrayAccess, \Iterator
     /**
      * @see \ArrayAccess::offsetSet()
      * @param int $offset
-     * @param Buffer $value
+     * @param BufferInterface $value
      * @return void
      */
     public function offsetSet($offset, $value);
@@ -96,7 +96,7 @@ interface StackInterface extends \ArrayAccess, \Iterator
     /**
      * Return the current element
      * @see \Iterator::current()
-     * @return Buffer
+     * @return BufferInterface
      */
     public function current();
 

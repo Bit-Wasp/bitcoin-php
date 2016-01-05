@@ -6,6 +6,7 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class BlockHeader extends Serializable implements BlockHeaderInterface
@@ -44,13 +45,13 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
 
     /**
      * @param int|string $version
-     * @param Buffer $prevBlock
-     * @param Buffer $merkleRoot
+     * @param BufferInterface $prevBlock
+     * @param BufferInterface $merkleRoot
      * @param int|string $timestamp
-     * @param Buffer $bits
+     * @param BufferInterface $bits
      * @param int|string $nonce
      */
-    public function __construct($version, Buffer $prevBlock, Buffer $merkleRoot, $timestamp, Buffer $bits, $nonce)
+    public function __construct($version, BufferInterface $prevBlock, BufferInterface $merkleRoot, $timestamp, BufferInterface $bits, $nonce)
     {
         if (!is_numeric($version)) {
             throw new \InvalidArgumentException('Block header version must be numeric');
@@ -89,7 +90,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getHash()
     {

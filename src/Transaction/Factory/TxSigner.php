@@ -14,7 +14,7 @@ use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1Adapter;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class TxSigner
 {
@@ -78,11 +78,11 @@ class TxSigner
 
     /**
      * @param PrivateKeyInterface $privKey
-     * @param Buffer $hash
-     * @param $sigHashType
+     * @param BufferInterface $hash
+     * @param int $sigHashType
      * @return TransactionSignature
      */
-    public function makeSignature(PrivateKeyInterface $privKey, Buffer $hash, $sigHashType)
+    public function makeSignature(PrivateKeyInterface $privKey, BufferInterface $hash, $sigHashType)
     {
         return new TransactionSignature(
             $this->ecAdapter,

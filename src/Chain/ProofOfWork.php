@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Chain;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class ProofOfWork
 {
@@ -31,10 +32,10 @@ class ProofOfWork
     }
 
     /**
-     * @param Buffer $bits
+     * @param BufferInterface $bits
      * @return int|string
      */
-    public function getTarget(Buffer $bits)
+    public function getTarget(BufferInterface $bits)
     {
         $negative = false;
         $overflow = false;
@@ -50,10 +51,10 @@ class ProofOfWork
     }
 
     /**
-     * @param Buffer $bits
-     * @return Buffer
+     * @param BufferInterface $bits
+     * @return BufferInterface
      */
-    public function getTargetHash(Buffer $bits)
+    public function getTargetHash(BufferInterface $bits)
     {
         return Buffer::int(
             $this->getTarget($bits),
@@ -63,10 +64,10 @@ class ProofOfWork
     }
 
     /**
-     * @param Buffer $bits
+     * @param BufferInterface $bits
      * @return string
      */
-    public function getDifficulty(Buffer $bits)
+    public function getDifficulty(BufferInterface $bits)
     {
         $target = $this->getTarget($bits);
         $lowest = $this->getMaxTarget();
@@ -81,11 +82,11 @@ class ProofOfWork
     }
 
     /**
-     * @param Buffer $hash
+     * @param BufferInterface $hash
      * @param int|string $nBits
      * @return bool
      */
-    public function check(Buffer $hash, $nBits)
+    public function check(BufferInterface $hash, $nBits)
     {
         $negative = false;
         $overflow = false;
@@ -112,10 +113,10 @@ class ProofOfWork
     }
 
     /**
-     * @param Buffer $bits
+     * @param BufferInterface $bits
      * @return int|string
      */
-    public function getWork(Buffer $bits)
+    public function getWork(BufferInterface $bits)
     {
         return bcdiv($this->math->pow(2, 256), $this->getTarget($bits));
     }

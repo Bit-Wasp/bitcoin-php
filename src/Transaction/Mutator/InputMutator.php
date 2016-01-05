@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class InputMutator
 {
@@ -66,10 +67,10 @@ class InputMutator
     }
 
     /**
-     * @param Buffer $txid
+     * @param BufferInterface $txid
      * @return $this
      */
-    public function txid(Buffer $txid)
+    public function txid(BufferInterface $txid)
     {
         return $this->replace(array('txid' => $txid));
     }

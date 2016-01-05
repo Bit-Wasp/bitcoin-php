@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 /**
  * Abstract Class Address
@@ -19,9 +20,9 @@ abstract class Address implements AddressInterface
     private $hash;
 
     /**
-     * @param Buffer $hash
+     * @param BufferInterface $hash
      */
-    public function __construct(Buffer $hash)
+    public function __construct(BufferInterface $hash)
     {
         $this->hash = $hash->getHex();
     }

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Stack extends \SplDoublyLinkedList implements StackInterface
 {
@@ -17,7 +17,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      */
     private function typeCheck($value)
     {
-        if (!$value instanceof Buffer) {
+        if (!$value instanceof BufferInterface) {
             throw new \InvalidArgumentException('Value was not of type Buffer');
         }
     }
@@ -36,7 +36,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
     /**
      * @see \ArrayAccess::offsetSet()
      * @param int $offset
-     * @param Buffer $value
+     * @param BufferInterface $value
      * @throws \InvalidArgumentException
      */
     public function offsetSet($offset, $value)
@@ -81,7 +81,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
 
     /**
      * @param int $index
-     * @param Buffer $value
+     * @param BufferInterface $value
      */
     public function add($index, $value)
     {
