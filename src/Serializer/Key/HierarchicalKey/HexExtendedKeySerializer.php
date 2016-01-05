@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -106,12 +107,12 @@ class HexExtendedKeySerializer
     }
 
     /**
-     * @param Buffer $buffer
+     * @param BufferInterface $buffer
      * @return \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey
      * @throws ParserOutOfRange
      * @throws \Exception
      */
-    public function parse(Buffer $buffer)
+    public function parse(BufferInterface $buffer)
     {
         $parser = new Parser($buffer);
         return $this->fromParser($parser);

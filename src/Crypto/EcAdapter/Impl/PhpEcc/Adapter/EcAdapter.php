@@ -88,12 +88,12 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param Buffer $messageHash
+     * @param BufferInterface $messageHash
      * @param PublicKey $publicKey
      * @param Signature $signature
      * @return bool
      */
-    private function doVerify(Buffer $messageHash, PublicKey $publicKey, Signature $signature)
+    private function doVerify(BufferInterface $messageHash, PublicKey $publicKey, Signature $signature)
     {
         $n = $this->getGenerator()->getOrder();
         $math = $this->getMath();

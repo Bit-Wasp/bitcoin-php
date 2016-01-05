@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class TransactionSignature extends Serializable implements TransactionSignatureInterface
 {
@@ -56,11 +57,11 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     }
 
     /**
-     * @param \BitWasp\Buffertools\Buffer $sig
+     * @param BufferInterface $sig
      * @return bool
      * @throws SignatureNotCanonical
      */
-    public static function isDERSignature(Buffer $sig)
+    public static function isDERSignature(BufferInterface $sig)
     {
         $checkVal = function ($fieldName, $start, $length, $binaryString) {
             if ($length === 0) {

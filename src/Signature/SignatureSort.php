@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class SignatureSort implements SignatureSortInterface
 {
@@ -24,10 +25,10 @@ class SignatureSort implements SignatureSortInterface
     /**
      * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface[] $signatures
      * @param \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[] $publicKeys
-     * @param Buffer $messageHash
+     * @param BufferInterface $messageHash
      * @return \SplObjectStorage
      */
-    public function link(array $signatures, array $publicKeys, Buffer $messageHash)
+    public function link(array $signatures, array $publicKeys, BufferInterface $messageHash)
     {
         $sigCount = count($signatures);
         $storage = new \SplObjectStorage();
