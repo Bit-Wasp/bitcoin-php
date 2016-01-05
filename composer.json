@@ -42,7 +42,7 @@
     "bitwasp/secp256k1-php": "~0.0.6"
   },
   "require-dev": {
-    "bitwasp/testing-php": "~0.0",
+    "bitwasp/testing-php": "~0.1",
     "symfony/yaml": "~2.6"
   }
 }
