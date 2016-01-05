@@ -20,7 +20,7 @@ use BitWasp\Buffertools\BufferInterface;
 class ScriptFactory
 {
     /**
-     * @param Buffer|string $string
+     * @param BufferInterface|string $string
      * @return Script
      */
     public static function fromHex($string)

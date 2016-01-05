@@ -57,7 +57,7 @@ class HierarchicalKeyFactory
     }
 
     /**
-     * @param $extendedKey
+     * @param string $extendedKey
      * @param NetworkInterface $network
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey

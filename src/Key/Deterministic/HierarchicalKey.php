@@ -10,6 +10,7 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -190,7 +191,7 @@ class HierarchicalKey
      * Create a buffer containing data to be hashed hashed to yield the child offset
      *
      * @param integer|string $sequence
-     * @return Buffer
+     * @return BufferInterface
      * @throws \Exception
      */
     public function getHmacSeed($sequence)
