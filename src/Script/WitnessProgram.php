@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Buffertools\BufferInterface;
 
-class WitnessProgram extends Script
+class WitnessProgram
 {
     /**
      * @var int
@@ -12,34 +12,19 @@ class WitnessProgram extends Script
     private $version;
 
     /**
-     * @var ScriptInterface
+     * @var BufferInterface
      */
     private $program;
 
     /**
      * WitnessProgram constructor.
      * @param int $version
-     * @param ScriptInterface $program
-     * @param Opcodes $opcodes
+     * @param BufferInterface $program
      */
-    public function __construct($version, ScriptInterface $program, Opcodes $opcodes = null)
+    public function __construct($version, BufferInterface $program)
     {
-        $internal = ScriptFactory::create()->int($version);
-        switch ($version) {
-            case 0:
-                $internal->push($program->getBuffer());
-                break;
-            case 1:
-                $internal->push(Hash::sha256($program->getBuffer()));
-                break;
-            default:
-                throw new \RuntimeException('Only version 0 and version 1 scripts are supported');
-        }
-
         $this->version = $version;
         $this->program = $program;
-
-        parent::__construct($internal->getScript()->getBuffer(), $opcodes);
     }
 
     /**
@@ -51,7 +36,7 @@ class WitnessProgram extends Script
     }
 
     /**
-     * @return ScriptInterface
+     * @return BufferInterface
      */
     public function getProgram()
     {

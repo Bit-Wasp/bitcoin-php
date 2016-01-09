@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptWitness;
 
 interface InterpreterInterface
 {
@@ -64,10 +65,15 @@ interface InterpreterInterface
     // See BIP65 for details.
     const VERIFY_CHECKLOCKTIMEVERIFY = 512;
 
+    const VERIFY_WITNESS = 1024;
+
+    const VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM = 2048;
+
     // Verify CHECKSEQUENCEVERIFY
     //
     // See BIP112 for details.
-    const VERIFY_CHECKSEQUENCEVERIFY = 1024;
+    const VERIFY_CHECKSEQUENCEVERIFY = 8192;
+
 
     const SIGHASH_ALL          = 0x1;
     const SIGHASH_NONE         = 0x2;
@@ -77,14 +83,18 @@ interface InterpreterInterface
     /**
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
-     * @param $nInputToSign
+     * @param ScriptWitness $witness
+     * @param int $nInputToSign
+     * @param int $flags
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign);
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign, $flags, ScriptWitness $witness = null);
 
     /**
      * @param ScriptInterface $script
+     * @param Stack $stack
+     * @param int $flags
      * @return bool
      */
-    public function evaluate(ScriptInterface $script);
+    public function evaluate(ScriptInterface $script, Stack $stack, $flags);
 }

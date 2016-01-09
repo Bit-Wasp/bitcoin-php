@@ -4,161 +4,161 @@
       "scriptSig": "",
       "scriptPubKey": "740087",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "OP_DEPTH 0 OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "01010102010288010187",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "1 2 2 OP_EQUALVERIFY 1 OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0101",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "1"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "010b010b87",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "11 11 OP_EQUALVERIFY"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "4c0107010787",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "07 07 OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "4d010008010887",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "08 08 OP_EQUAL"
     },
     {
       "scriptSig": "4e0100000009010987",
       "scriptPubKey": "",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "09 09 OP_EQUAL"
     },
     {
       "scriptSig": "0101",
       "scriptPubKey": "61",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "01 OP_NOP"
     },
     {
       "scriptSig": "01010101",
       "scriptPubKey": "69",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "1 1 OP_VERIFY"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "63",
       "result": false ,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "OP_IF"
     },
     {
       "scriptSig": "0100",
       "scriptPubKey": "635067010168",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "0 IF OP_RESERVED OP_ENDIF 1 OP_ENDIF"
     },
     {
       "scriptSig": "0101",
       "scriptPubKey": "645067010168",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "1 OP_NOTIF 1 OP_ENDIF OP_RESERVED OP_ENDIF"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0100aa201406e05881e299367766d313e26c05564ec91bf721d31726bd6e46e60689539a87",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 OP_HASH256 [32 byte hash] OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0100a9149f7fd096d37ed2c0e3f7f0cfc924beef4ffceb6887",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 OP_HASH160 [20 byte hash] OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0100a8206e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d87",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 OP_SHA256 [32 byte hash] OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0100a7145ba93c9db0cff93f52b521d7420e43f6eda2784f87",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 OP_SHA1 [20 byte hash] OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0100a614c81b94933420221a7ac004a90242d8b1d3e5070d87",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 OP_RIPEMD160 [20 byte hash] OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "a6",
       "result": false,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "OP_HASH160"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0100010188",
       "result": false,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 01 OP_EQUALVERIFY"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "010088",
       "result": false,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 OP_EQUALVERIFY"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "0101010288",
       "result": false,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "01 02 OP_EQUALVERIFY"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "01007676768887",
       "result": true,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "00 OP_DUP OP_DUP OP_EQUALVERIFY OP_EQUAL"
     },
     {
       "scriptSig": "",
       "scriptPubKey": "76",
       "result": false,
-      "flags": "VERIFY_P2SH,VERIFY_STRICTENC",
+      "flags": "VERIFY_STRICTENC",
       "desc": "OP_DUP"
     },
     {

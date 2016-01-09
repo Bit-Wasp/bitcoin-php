@@ -148,4 +148,36 @@ class Script extends Serializable implements ScriptInterface
         }
         return $pushOnly;
     }
+
+    /**
+     * @param WitnessProgram|null $program
+     * @return bool
+     */
+    public function isWitness(WitnessProgram & $program = null)
+    {
+        $buffer = $this->getBuffer();
+        $size = $buffer->getSize();
+        if ($size < 4 || $size > 34) {
+            return false;
+        }
+
+        $parser = $this->getScriptParser();
+        $script = $parser->decode();
+        if ($script[0]->isPush() || !$script[1]->isPush()) {
+            return false;
+        }
+
+        $version = $script[0]->getOp();
+        if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
+            return false;
+        }
+
+        $witness = $script[1];
+        if ($size === $witness->getDataSize() + 2) {
+            $program = new WitnessProgram(decodeOpN($version), $witness->getData());
+            return true;
+        }
+
+        return false;
+    }
 }
