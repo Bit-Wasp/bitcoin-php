@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
@@ -71,7 +70,9 @@ class ScriptFactory
      */
     public static function witness(Opcodes $opcodes = null)
     {
-        return new WitnessScriptFactory(self::scriptPubKey(), $opcodes ?: new Opcodes());
+        $scriptPubKey = self::scriptPubKey();
+        $p2sh = self::p2sh();
+        return new WitnessScriptFactory($scriptPubKey, $p2sh, $opcodes ?: new Opcodes());
     }
 
     /**
@@ -85,43 +86,43 @@ class ScriptFactory
     }
 
     /**
-     * @return Flags
+     * @return int
      */
     public static function defaultFlags()
     {
-        return new Flags(
+        return
             InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_STRICTENC | InterpreterInterface::VERIFY_DERSIG |
             InterpreterInterface::VERIFY_LOW_S | InterpreterInterface::VERIFY_NULL_DUMMY | InterpreterInterface::VERIFY_SIGPUSHONLY |
             InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS | InterpreterInterface::VERIFY_CLEAN_STACK |
-            InterpreterInterface::VERIFY_CHECKLOCKTIMEVERIFY
-        );
+            InterpreterInterface::VERIFY_CHECKLOCKTIMEVERIFY | InterpreterInterface::VERIFY_WITNESS
+        ;
     }
 
     /**
-     * @param Flags|null $flags
+     * @param int|null $flags
      * @param EcAdapterInterface|null $ecAdapter
      * @return NativeConsensus
      */
-    public static function getNativeConsensus(Flags $flags = null, EcAdapterInterface $ecAdapter = null)
+    public static function getNativeConsensus($flags = null, EcAdapterInterface $ecAdapter = null)
     {
         return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter(), $flags ?: self::defaultFlags());
     }
 
     /**
-     * @param Flags|null $flags
+     * @param int|null $flags
      * @return BitcoinConsensus
      */
-    public static function getBitcoinConsensus(Flags $flags = null)
+    public static function getBitcoinConsensus($flags = null)
     {
         return new BitcoinConsensus($flags ?: self::defaultFlags());
     }
 
     /**
-     * @param Flags|null $flags
+     * @param int|null $flags
      * @param EcAdapterInterface|null $ecAdapter
      * @return \BitWasp\Bitcoin\Script\Consensus\ConsensusInterface
      */
-    public static function consensus(Flags $flags = null, EcAdapterInterface $ecAdapter = null)
+    public static function consensus($flags = null, EcAdapterInterface $ecAdapter = null)
     {
         if (extension_loaded('bitcoinconsensus')) {
             return self::getBitcoinConsensus($flags);

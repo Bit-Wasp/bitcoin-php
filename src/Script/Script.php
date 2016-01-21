@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\Parser\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -105,6 +107,47 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
+     * @param WitnessProgram $program
+     * @return int
+     */
+    private function witnessSigOps(WitnessProgram $program)
+    {
+        if ($program->getVersion() == 0) {
+            return $program->getOutputScript()->countSigOps(true);
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param ScriptInterface $scriptSig
+     * @param ScriptWitnessInterface $scriptWitness
+     * @param int $flags
+     * @return int
+     */
+    public function countWitnessSigOps(ScriptInterface $scriptSig, ScriptWitnessInterface $scriptWitness, $flags)
+    {
+        if ($flags & InterpreterInterface::VERIFY_WITNESS === 0) {
+            return 0;
+        }
+
+        $program = null;
+        if ($this->isWitness($program)) {
+            return $this->witnessSigOps($program);
+        }
+
+        if ((new OutputClassifier($this))->isPayToScriptHash()) {
+            $parsed = $scriptSig->getScriptParser()->decode();
+            $subscript = new Script(end($parsed)->getData());
+            if ($subscript->isWitness($program)) {
+                return $this->witnessSigOps($program);
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * @param ScriptInterface $scriptSig
      * @return int
      */
@@ -163,7 +206,7 @@ class Script extends Serializable implements ScriptInterface
 
         $parser = $this->getScriptParser();
         $script = $parser->decode();
-        if ($script[0]->isPush() || !$script[1]->isPush()) {
+        if (!$script[1]->isPush()) {
             return false;
         }
 

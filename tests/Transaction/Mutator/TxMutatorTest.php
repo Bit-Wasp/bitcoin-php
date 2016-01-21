@@ -21,6 +21,7 @@ class TxMutatorTest extends AbstractTestCase
             1,
             new TransactionInputCollection(),
             new TransactionOutputCollection(),
+            null,
             20
         );
 

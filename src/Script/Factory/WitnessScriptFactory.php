@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Script\Factory;
 
 use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -24,12 +23,24 @@ class WitnessScriptFactory
     /**
      * WitnessScriptFactory constructor.
      * @param OutputScriptFactory $scriptPubKey
+     * @param P2shScriptFactory $redeemScript
      * @param Opcodes $opcodes
      */
-    public function __construct(OutputScriptFactory $scriptPubKey, Opcodes $opcodes)
+    public function __construct(OutputScriptFactory $scriptPubKey, P2shScriptFactory $redeemScript, Opcodes $opcodes)
     {
         $this->scriptPubKey = $scriptPubKey;
+        $this->redeemScript = $redeemScript;
         $this->opcodes = $opcodes;
+    }
+
+    /**
+     * @param int $version
+     * @param ScriptInterface $script
+     * @return WitnessProgram
+     */
+    public function create($version, ScriptInterface $script)
+    {
+        return new WitnessProgram($version, $script);
     }
 
     /**
@@ -52,43 +63,5 @@ class WitnessScriptFactory
         $program = new Script($witnessPush->getData());
 
         return new WitnessProgram($version, $program, $this->opcodes);
-    }
-
-    /**
-     * Create a multisig witness program
-     *
-     * @param int $version
-     * @param int $m
-     * @param array $keys
-     * @param bool|true $sort
-     * @return WitnessProgram
-     */
-    public function multisig($version, $m, array $keys, $sort = true)
-    {
-        return new WitnessProgram($version, $this->scriptPubKey->multisig($m, $keys, $sort), $this->opcodes);
-    }
-
-    /**
-     * Create a pay-to-pubkey witness program
-     *
-     * @param int $version
-     * @param PublicKeyInterface  $publicKey
-     * @return WitnessProgram
-     */
-    public function payToPubKey($version, PublicKeyInterface $publicKey)
-    {
-        return new WitnessProgram($version, $this->scriptPubKey->payToPubKey($publicKey), $this->opcodes);
-    }
-
-    /**
-     * Create a pay-to-pubkey-hash witness program
-     *
-     * @param int $version
-     * @param PublicKeyInterface  $publicKey
-     * @return WitnessProgram
-     */
-    public function payToPubKeyHash($version, PublicKeyInterface $publicKey)
-    {
-        return new WitnessProgram($version, $this->scriptPubKey->payToPubKeyHash($publicKey), $this->opcodes);
     }
 }

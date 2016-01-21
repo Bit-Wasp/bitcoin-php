@@ -3,9 +3,10 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Collection\StaticCollection;
+use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
 use BitWasp\Buffertools\BufferInterface;
 
-class ScriptWitness extends StaticCollection
+class ScriptWitness extends StaticCollection implements ScriptWitnessInterface
 {
     /**
      * ScriptWitness constructor.
@@ -30,6 +31,14 @@ class ScriptWitness extends StaticCollection
         foreach ($outputs as $idx => $output) {
             $this->set->offsetSet($idx, $output);
         }
+    }
+
+    /**
+     * @return BufferInterface
+     */
+    public function bottom()
+    {
+        return parent::offsetGet(count($this) - 1);
     }
 
     /**
@@ -67,5 +76,13 @@ class ScriptWitness extends StaticCollection
 
         $sliced = array_slice($this->set->toArray(), $start, $length);
         return new self($sliced);
+    }
+
+    /**
+     * @return \BitWasp\Buffertools\BufferInterface
+     */
+    public function getBuffer()
+    {
+        return (new ScriptWitnessSerializer())->serialize($this);
     }
 }

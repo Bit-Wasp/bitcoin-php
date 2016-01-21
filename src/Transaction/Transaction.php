@@ -5,9 +5,13 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Serializer\Transaction\NTransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\WitnessTransactionSerializer;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
@@ -33,22 +37,29 @@ class Transaction extends Serializable implements TransactionInterface
     private $outputs;
 
     /**
+     * @var TransactionWitnessCollection
+     */
+    private $witness;
+
+    /**
      * @var int|string
      */
     private $lockTime;
 
     /**
-     * @param int|string $nVersion
-     * @param TransactionInputCollection $inputs
-     * @param TransactionOutputCollection $outputs
-     * @param int|string $nLockTime
-     * @throws \Exception
+     * Transaction constructor.
+     * @param int $nVersion
+     * @param TransactionInputCollection|null $inputs
+     * @param TransactionOutputCollection|null $outputs
+     * @param TransactionWitnessCollection|null $witness
+     * @param int $nLockTime
      */
     public function __construct(
         $nVersion = TransactionInterface::DEFAULT_VERSION,
         TransactionInputCollection $inputs = null,
         TransactionOutputCollection $outputs = null,
-        $nLockTime = '0'
+        TransactionWitnessCollection $witness = null,
+        $nLockTime = 0
     ) {
 
         if (!is_numeric($nVersion)) {
@@ -71,6 +82,7 @@ class Transaction extends Serializable implements TransactionInterface
         $this->version = $nVersion;
         $this->inputs = $inputs ?: new TransactionInputCollection();
         $this->outputs = $outputs ?: new TransactionOutputCollection();
+        $this->witness = $witness ?: new TransactionWitnessCollection();
         $this->lockTime = $nLockTime;
 
         $this
@@ -152,6 +164,22 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @return TransactionWitnessCollection
+     */
+    public function getWitnesses()
+    {
+        return $this->witness;
+    }
+
+    /**
+     * @return ScriptWitnessInterface
+     */
+    public function getWitness($index)
+    {
+        return $this->witness[$index];
+    }
+
+    /**
      * @param int $vout
      * @return OutPointInterface
      */
@@ -186,7 +214,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface
+     * @return \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash
      */
     public function getSignatureHash()
     {
@@ -229,5 +257,13 @@ class Transaction extends Serializable implements TransactionInterface
     public function getBuffer()
     {
         return (new TransactionSerializer)->serialize($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function getWitnessBuffer()
+    {
+        return (new NTransactionSerializer())->serialize($this);
     }
 }

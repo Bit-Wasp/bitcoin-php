@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
+use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -82,6 +83,7 @@ class TxMutator
             array_key_exists('version', $array) ? $array['version'] : $this->transaction->getVersion(),
             array_key_exists('inputs', $array) ? $array['inputs'] : $this->transaction->getInputs(),
             array_key_exists('outputs', $array) ? $array['outputs'] : $this->transaction->getOutputs(),
+            array_key_exists('witness', $array) ? $array['witness'] : $this->transaction->getWitnesses(),
             array_key_exists('nLockTime', $array) ? $array['nLockTime'] : $this->transaction->getLockTime()
         );
 
@@ -113,6 +115,15 @@ class TxMutator
     public function outputs(TransactionOutputCollection $outputCollection)
     {
         return $this->replace(array('outputs' => $outputCollection));
+    }
+
+    /**
+     * @param TransactionWitnessCollection $witnessCollection
+     * @return $this
+     */
+    public function witness(TransactionWitnessCollection $witnessCollection)
+    {
+        return $this->replace(array('witness' => $witnessCollection));
     }
 
     /**

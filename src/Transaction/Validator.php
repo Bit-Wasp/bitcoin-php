@@ -29,7 +29,7 @@ class Validator implements ValidatorInterface
      */
     public function checkSignature(ConsensusInterface $consensus, $nInput, ScriptInterface $scriptPubKey)
     {
-        return $consensus->verify($this->transaction, $scriptPubKey, $nInput);
+        return $consensus->verify($this->transaction, $scriptPubKey, $nInput, $this->transaction->getWitness($nInput));
     }
 
     /**

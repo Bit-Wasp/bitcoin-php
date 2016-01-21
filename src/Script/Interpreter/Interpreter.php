@@ -6,10 +6,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -18,8 +15,7 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
@@ -27,16 +23,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class Interpreter implements InterpreterInterface
 {
-    /**
-     * @var int|string
-     */
-    private $inputToSign;
-
-    /**
-     * @var TransactionInterface
-     */
-    private $transaction;
-
     /**
      * Position of OP_CODESEPARATOR, for calculating SigHash
      * @var int
@@ -47,11 +33,6 @@ class Interpreter implements InterpreterInterface
      * @var int
      */
     private $opCount;
-
-    /**
-     * @var \BitWasp\Bitcoin\Flags
-     */
-    private $flags;
 
     /**
      * @var EcAdapterInterface
@@ -101,8 +82,6 @@ class Interpreter implements InterpreterInterface
     {
         $this->ecAdapter = $ecAdapter;
         $this->math = $ecAdapter->getMath();
-        $this->transaction = $transaction;
-
         $this->vchFalse = new Buffer("", 0, $this->math);
         $this->vchTrue = new Buffer("\x01", 1, $this->math);
         $this->int0 = Number::buffer($this->vchFalse, false, 4, $this->math)->getBuffer();
@@ -117,12 +96,19 @@ class Interpreter implements InterpreterInterface
      */
     public function castToBool(BufferInterface $value)
     {
-        if ($value->getSize() === 0) {
-            return true;
+        $val = $value->getBinary();
+        for ($i = 0, $size = strlen($val); $i < $size; $i++) {
+            $chr = ord($val[$i]);
+            if ($chr != 0) {
+                if ($i == ($size - 1) && $chr == 0x80) {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
-        // Since we're using buffers, lets try ensuring the contents are not 0.
-        return $this->math->cmp($value->getInt(), 0) > 0;
+        return false;
     }
 
     /**
@@ -175,48 +161,10 @@ class Interpreter implements InterpreterInterface
         }
 
         $binary = $signature->getBinary();
-        $nHashType = ord(substr($binary, -1)) & (~(SignatureHashInterface::SIGHASH_ANYONECANPAY));
+        $nHashType = ord(substr($binary, -1)) & (~(SigHash::ANYONECANPAY));
 
         $math = $this->math;
-        return ! ($math->cmp($nHashType, SignatureHashInterface::SIGHASH_ALL) < 0 || $math->cmp($nHashType, SignatureHashInterface::SIGHASH_SINGLE) > 0);
-    }
-
-    /**
-     * @param BufferInterface $signature
-     * @param int $flags
-     * @return $this
-     * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
-     */
-    public function checkSignatureEncoding(BufferInterface $signature, $flags)
-    {
-        if ($signature->getSize() === 0) {
-            return $this;
-        }
-
-        if ($flags & (self::VERIFY_DERSIG | self::VERIFY_LOW_S | self::VERIFY_STRICTENC) && !$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        } else if ($flags & self::VERIFY_LOW_S && !$this->isLowDerSignature($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_LOW_S, 'Signature s element was not low');
-        } else if ($flags & self::VERIFY_STRICTENC && !$this->isDefinedHashtypeSignature($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_STRICTENC, 'Signature with invalid hashtype');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param BufferInterface $publicKey
-     * @param int $flags
-     * @return $this
-     * @throws \Exception
-     */
-    public function checkPublicKeyEncoding(BufferInterface $publicKey, $flags)
-    {
-        if ($flags & self::VERIFY_STRICTENC && !PublicKey::isCompressedOrUncompressed($publicKey)) {
-            throw new ScriptRuntimeException(self::VERIFY_STRICTENC, 'Public key with incorrect encoding');
-        }
-
-        return $this;
+        return ! ($math->cmp($nHashType, SigHash::ALL) < 0 || $math->cmp($nHashType, SigHash::SINGLE) > 0);
     }
 
     /**
@@ -264,93 +212,41 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param BufferInterface $sigBuf
-     * @param BufferInterface $keyBuf
-     * @param int $flags
-     * @return bool
-     * @throws ScriptRuntimeException
-     * @throws \Exception
-     */
-    private function checkSig(ScriptInterface $script, BufferInterface $sigBuf, BufferInterface $keyBuf, $flags)
-    {
-        $this
-            ->checkSignatureEncoding($sigBuf, $flags)
-            ->checkPublicKeyEncoding($keyBuf, $flags);
-
-        try {
-            $txSignature = TransactionSignatureFactory::fromHex($sigBuf->getHex());
-            $publicKey = PublicKeyFactory::fromHex($keyBuf->getHex());
-
-            return $this->ecAdapter->verify(
-                $this->transaction->getSignatureHash()->calculate($script, $this->inputToSign, $txSignature->getHashType()),
-                $publicKey,
-                $txSignature->getSignature()
-            );
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * @param int $txLockTime
-     * @param int $nThreshold
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
-     * @return bool
-     */
-    private function verifyLockTime($txLockTime, $nThreshold, \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime)
-    {
-        $nTime = $lockTime->getInt();
-        if (($this->math->cmp($txLockTime, $nThreshold) < 0 && $this->math->cmp($nTime, $nThreshold) < 0) ||
-            ($this->math->cmp($txLockTime, $nThreshold) >= 0 && $this->math->cmp($nTime, $nThreshold) >= 0)
-        ) {
-            return false;
-        }
-
-        return $this->math->cmp($nTime, $txLockTime) >= 0;
-    }
-
-    /**
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
-     * @return bool
-     */
-    private function checkLockTime(\BitWasp\Bitcoin\Script\Interpreter\Number $lockTime)
-    {
-        if ($this->transaction->getInput($this->inputToSign)->isFinal()) {
-            return false;
-        }
-
-        return $this->verifyLockTime($this->transaction->getLockTime(), Locktime::BLOCK_MAX, $lockTime);
-    }
-
-    /**
      * @param WitnessProgram $witnessProgram
-     * @param ScriptWitness $witness
+     * @param ScriptWitness $scriptWitness
      * @param int $flags
+     * @param Checker $checker
      * @return bool
      */
-    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitness $witness, $flags)
+    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitness $scriptWitness, $flags, Checker $checker)
     {
-        $version = $witnessProgram->getVersion();
-        if ($version === 0) {
-            $scriptPubKey = new Script($witnessProgram->getProgram());
-            $stackValues = $witness->all();
+        $witnessCount = count($scriptWitness);
+        if ($witnessProgram->getVersion() == 0) {
+            $buffer = $witnessProgram->getProgram();
+            if ($buffer->getSize() === 32) {
+                // Version 0 segregated witness program: SHA256(Script) in program, Script + inputs in witness
+                if ($witnessCount === 0) {
+                    // Must contain script at least
+                    return false;
+                }
 
-        } elseif ($version === 1) {
-            $program = $witnessProgram->getProgram();
-            if ($program->getSize() !== 32) { // SCRIPT_ERR_WITNESS_PROGRAM_WRONG_LENGTH
-                return false;
-            }
+                $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
+                $stackValues = $scriptWitness->slice(0, -1);
+                $hashScriptPubKey = Hash::sha256($scriptWitness[$witnessCount - 1]);
 
-            $count = count($witness);
-            if ($count === 0) { // SCRIPT_ERR_WITNESS_PROGRAM_WITNESS_EMPTY
-                return false;
-            }
+                if ($hashScriptPubKey == $buffer) {
+                    return false;
+                }
+            } elseif ($buffer->getSize() === 20) {
+                // Version 0 special case for pay-to-pubkeyhash
+                if ($witnessCount !== 2) {
+                    // 2 items in witness - <signature> <pubkey>
+                    return false;
+                }
 
-            $scriptPubKey = new Script($witness[$count - 1]);
-            $stackValues = $witness->slice(0, -1);
-            $hashScriptPubKey = Hash::sha256($witness[$count - 1]);
-            if ($hashScriptPubKey->getBinary() == $program) {
+                $scriptPubKey = ScriptFactory::create()->sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $buffer, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG])->getScript();
+                $stackValues = $scriptWitness;
+            } else {
                 return false;
             }
         } elseif ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
@@ -364,7 +260,7 @@ class Interpreter implements InterpreterInterface
             $mainStack->push($value);
         }
 
-        if (!$this->evaluate($scriptPubKey, $mainStack, $flags)) {
+        if (!$this->evaluate($scriptPubKey, $mainStack, 1, $flags, $checker)) {
             return false;
         }
 
@@ -372,7 +268,7 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        if (!$this->castToBool($mainStack[count($mainStack) - 1])) {
+        if (!$this->castToBool($mainStack->bottom())) {
             return false;
         }
 
@@ -380,37 +276,14 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $sequence
-     * @return bool
-     */
-    private function checkSequence(\BitWasp\Bitcoin\Script\Interpreter\Number $sequence)
-    {
-        $txSequence = $this->transaction->getInput($this->inputToSign)->getSequence();
-        if ($this->transaction->getVersion() < 2) {
-            return false;
-        }
-
-        if ($this->math->cmp($this->math->bitwiseAnd($txSequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), 0) !== 0) {
-            return 0;
-        }
-
-        $mask = $this->math->bitwiseOr(TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG, TransactionInputInterface::SEQUENCE_LOCKTIME_MASK);
-        return $this->verifyLockTime(
-            $this->math->bitwiseAnd($txSequence, $mask),
-            TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG,
-            Number::int($this->math->bitwiseAnd($sequence->getInt(), $mask))
-        );
-    }
-
-    /**
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param int $flags
-     * @param ScriptWitness $witness
-     * @param int $nInputToSign
+     * @param Checker $checker
+     * @param ScriptWitness|null $witness
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign, $flags, ScriptWitness $witness = null)
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitness $witness = null)
     {
         static $emptyWitness = null;
         if ($emptyWitness === null) {
@@ -419,10 +292,12 @@ class Interpreter implements InterpreterInterface
 
         $witness = $witness ?: $emptyWitness;
 
-        $this->inputToSign = $nInputToSign;
+        if (($flags & self::VERIFY_SIGPUSHONLY) != 0 && !$scriptSig->isPushOnly()) {
+            return false;
+        }
 
         $stack = new Stack();
-        if (!$this->evaluate($scriptSig, $stack, $flags)) {
+        if (!$this->evaluate($scriptSig, $stack, 0, $flags, $checker)) {
             return false;
         }
 
@@ -431,7 +306,7 @@ class Interpreter implements InterpreterInterface
             $stackCopy = clone $stack;
         }
 
-        if (!$this->evaluate($scriptPubKey, $stack, $flags)) {
+        if (!$this->evaluate($scriptPubKey, $stack, 0, $flags, $checker)) {
             return false;
         }
 
@@ -444,14 +319,16 @@ class Interpreter implements InterpreterInterface
         }
 
         $program = null;
+
         if ($flags & self::VERIFY_WITNESS) {
+
             if ($scriptPubKey->isWitness($program)) {
                 /** @var WitnessProgram $program */
                 if ($scriptSig->getBuffer()->getSize() !== 0) {
                     return false;
                 }
 
-                if (!$this->verifyWitnessProgram($program, $witness, $flags)) {
+                if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
                     return false;
                 }
 
@@ -460,6 +337,7 @@ class Interpreter implements InterpreterInterface
         }
 
         if ($flags & self::VERIFY_P2SH && (new OutputClassifier($scriptPubKey))->isPayToScriptHash()) {
+
             if (!$scriptSig->isPushOnly()) {
                 return false;
             }
@@ -474,7 +352,7 @@ class Interpreter implements InterpreterInterface
             $scriptPubKey = new Script($stack->bottom());
             $stack->pop();
 
-            if (!$this->evaluate($scriptPubKey, $stack, $flags)) {
+            if (!$this->evaluate($scriptPubKey, $stack, 0, $flags, $checker)) {
                 return false;
             }
 
@@ -487,18 +365,19 @@ class Interpreter implements InterpreterInterface
             }
 
             if ($flags & self::VERIFY_WITNESS) {
+
                 if ($scriptPubKey->isWitness($program)) {
+
                     if ($scriptSig != (ScriptFactory::create()->push($scriptPubKey->getBuffer())->getScript())) {
                         return false; // SCRIPT_ERR_WITNESS_MALLEATED_P2SH
                     }
 
-                    if (!$this->verifyWitnessProgram($program, $witness, $flags)) {
+                    if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
                         return false;
                     }
 
                     $stack->resize(1);
                 }
-
             }
         }
 
@@ -544,10 +423,12 @@ class Interpreter implements InterpreterInterface
     /**
      * @param ScriptInterface $script
      * @param Stack $mainStack
+     * @param int $sigVersion
      * @param int $flags
+     * @param Checker $checker
      * @return bool
      */
-    public function evaluate(ScriptInterface $script, Stack $mainStack, $flags)
+    public function evaluate(ScriptInterface $script, Stack $mainStack, $sigVersion, $flags, Checker $checker)
     {
         $math = $this->math;
         $this->hashStartPos = 0;
@@ -625,7 +506,7 @@ class Interpreter implements InterpreterInterface
                             }
 
                             $lockTime = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA, 5, $math);
-                            if (!$this->checkLockTime($lockTime)) {
+                            if (!$checker->checkLockTime($lockTime)) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKLOCKTIMEVERIFY, 'Unsatisfied locktime');
                             }
 
@@ -653,7 +534,7 @@ class Interpreter implements InterpreterInterface
                                 break;
                             }
 
-                            if (!$this->checkSequence($sequence)) {
+                            if (!$checker->checkSequence($sequence)) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Unsatisfied locktime');
                             }
                             break;
@@ -747,12 +628,7 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_DEPTH:
                             $num = count($mainStack);
-                            if ($num === 0) {
-                                $depth = $this->vchFalse;
-                            } else {
-                                $depth = Number::int($num)->getBuffer();
-                            }
-
+                            $depth = Number::int($num)->getBuffer();
                             $mainStack->push($depth);
                             break;
 
@@ -967,9 +843,9 @@ class Interpreter implements InterpreterInterface
                             } else if ($opCode === Opcodes::OP_SUB) {
                                 $num = $math->sub($num1, $num2);
                             } else if ($opCode === Opcodes::OP_BOOLAND) {
-                                $num = $math->cmp($num1, $this->int0->getInt()) !== 0 && $math->cmp($num2, $this->int0->getInt()) !== 0;
+                                $num = $math->cmp($num1, '0') !== 0 && $math->cmp($num2, '0') !== 0;
                             } else if ($opCode === Opcodes::OP_BOOLOR) {
-                                $num = $math->cmp($num1, $this->int0->getInt()) !== 0 || $math->cmp($num2, $this->int0->getInt()) !== 0;
+                                $num = $math->cmp($num1, '0') !== 0 || $math->cmp($num2, '0') !== 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUAL) {
                                 $num = $math->cmp($num1, $num2) === 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -1017,7 +893,7 @@ class Interpreter implements InterpreterInterface
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push($value ? $this->vchFalse : $this->vchTrue);
+                            $mainStack->push($value ? $this->vchTrue : $this->vchFalse);
                             break;
 
                         // Hash operation
@@ -1061,7 +937,7 @@ class Interpreter implements InterpreterInterface
                             $vchSig = $mainStack[-2];
 
                             $scriptCode = new Script($script->getBuffer()->slice($this->hashStartPos));
-                            $success = $this->checkSig($scriptCode, $vchSig, $vchPubKey, $flags);
+                            $success = $checker->checkSig($scriptCode, $vchSig, $vchPubKey, $sigVersion, $flags);
 
                             $mainStack->pop();
                             $mainStack->pop();
@@ -1119,7 +995,7 @@ class Interpreter implements InterpreterInterface
                                 // Decrement $i, since we are consuming stack values.
                                 $i -= 2;
 
-                                if ($this->checkSig($scriptCode, $sig, $pubkey, $flags)) {
+                                if ($checker->checkSig($scriptCode, $sig, $pubkey, $sigVersion, $flags)) {
                                     $isig++;
                                     $sigCount--;
                                 }
@@ -1185,7 +1061,7 @@ class Interpreter implements InterpreterInterface
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            // echo "\n General: " . $e->getMessage() ;
+            // echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString();
             return false;
         }
     }

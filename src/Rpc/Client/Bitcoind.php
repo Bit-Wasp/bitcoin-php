@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -146,7 +146,7 @@ class Bitcoind
         TransactionInterface $tx,
         array $inputs = [],
         array $privateKeys = [],
-        $sighash = SignatureHashInterface::SIGHASH_ALL,
+        $sighash = SigHash::ALL,
         NetworkInterface $network = null
     ) {
         $tx = $this->client->execute('signrawtransaction', [

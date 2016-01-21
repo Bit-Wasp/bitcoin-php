@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Block\BlockFactory;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Serializer\Block\FilteredBlockSerializer;
@@ -21,7 +20,7 @@ class FilteredBlockTest extends AbstractTestCase
         $block = BlockFactory::fromHex($hex);
         $math = new Math();
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('63194f18be0af63f2c6bc9dc0f777cbefed3d9415c4af83f3ee3a3d669c00cb5'));
 
         // Check that FilteredBlock message is serialized correctly
@@ -52,7 +51,7 @@ class FilteredBlockTest extends AbstractTestCase
         $blockMerkleRoot = $block->getHeader()->getMerkleRoot();
 
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
 
         $tx9 = Buffer::hex('74d681e0e03bafa802c8aa084379aa98d9fcd632ddc2ed9782b586ec87451f20', 32);
         $tx8 = Buffer::hex('dd1fd2a6fc16404faf339881a90adbde7f4f728691ac62e8f168809cdfae1053');
@@ -98,7 +97,7 @@ class FilteredBlockTest extends AbstractTestCase
         ]);
 
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertData($expectedTx[0]);
         $filtered = $block->filter($filter);
@@ -139,7 +138,7 @@ class FilteredBlockTest extends AbstractTestCase
         ]);
 
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_NONE);
+        $flags = BloomFilter::UPDATE_NONE;
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertData($expectedTx[0]);
         $filtered = $block->filter($filter);
@@ -172,7 +171,7 @@ class FilteredBlockTest extends AbstractTestCase
         $blockMerkleRoot = $block->getHeader()->getMerkleRoot();
 
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_NONE);
+        $flags = BloomFilter::UPDATE_NONE;
 
         $tx = Buffer::hex('63194f18be0af63f2c6bc9dc0f777cbefed3d9415c4af83f3ee3a3d669c00cb5');
         $filter = BloomFilter::create($math, 10, 0.000001, 0, $flags)->insertData($tx);

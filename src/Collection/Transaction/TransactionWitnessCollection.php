@@ -3,22 +3,22 @@
 namespace BitWasp\Bitcoin\Collection\Transaction;
 
 use BitWasp\Bitcoin\Collection\StaticCollection;
-use BitWasp\Bitcoin\Transaction\TransactionInputWitnessInterface;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 
 class TransactionWitnessCollection extends StaticCollection
 {
     /**
      * Initialize a new collection with a list of Inputs.
      *
-     * @param TransactionInputWitnessInterface[] $inputs
+     * @param ScriptWitnessInterface[] $vScriptWitness
      */
-    public function __construct(array $inputs = [])
+    public function __construct(array $vScriptWitness = [])
     {
-        $this->set = new \SplFixedArray(count($inputs));
+        $this->set = new \SplFixedArray(count($vScriptWitness));
 
-        foreach ($inputs as $idx => $input) {
-            if (!$input instanceof TransactionInputWitnessInterface) {
-                throw new \InvalidArgumentException('Must provide TransactionInputWitnessInterface[] to TransactionWitnessCollection');
+        foreach ($vScriptWitness as $idx => $input) {
+            if (!$input instanceof ScriptWitnessInterface) {
+                throw new \InvalidArgumentException('Must provide ScriptWitnessInterface[] to TransactionWitnessCollection');
             }
 
             $this->set->offsetSet($idx, $input);
@@ -36,7 +36,7 @@ class TransactionWitnessCollection extends StaticCollection
     }
 
     /**
-     * @return TransactionInputWitnessInterface
+     * @return ScriptWitnessInterface
      */
     public function current()
     {
@@ -45,7 +45,7 @@ class TransactionWitnessCollection extends StaticCollection
 
     /**
      * @param int $offset
-     * @return TransactionInputWitnessInterface
+     * @return ScriptWitnessInterface
      */
     public function offsetGet($offset)
     {

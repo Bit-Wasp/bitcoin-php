@@ -42,4 +42,15 @@ class WitnessProgram
     {
         return $this->program;
     }
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getOutputScript()
+    {
+        return ScriptFactory::create()
+            ->int($this->version)
+            ->push($this->program)
+            ->getScript();
+    }
 }

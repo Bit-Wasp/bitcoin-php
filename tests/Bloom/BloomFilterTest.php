@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Tests\Bloom;
 
 use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
@@ -61,7 +60,7 @@ class BloomFilterTest extends AbstractTestCase
     public function testBasics()
     {
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
 
         $buff = [
@@ -84,7 +83,7 @@ class BloomFilterTest extends AbstractTestCase
     public function testEmptyContains()
     {
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
         $this->assertFalse($filter->containsData(new Buffer()));
     }
@@ -92,7 +91,7 @@ class BloomFilterTest extends AbstractTestCase
     public function testEmptyAcceptableSize()
     {
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
         $this->assertTrue($filter->hasAcceptableSize());
     }
@@ -100,7 +99,7 @@ class BloomFilterTest extends AbstractTestCase
     public function testEmptyRelevantAndUpdateTx()
     {
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 0, $flags);
         $this->assertFalse($filter->isRelevantAndUpdate(new Transaction()));
     }
@@ -108,7 +107,7 @@ class BloomFilterTest extends AbstractTestCase
     public function testBasics2()
     {
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flags);
 
         $buff = [
@@ -134,19 +133,19 @@ class BloomFilterTest extends AbstractTestCase
     public function testFlagChecks()
     {
         $math = new Math();
-        $flagsAll = new Flags(BloomFilter::UPDATE_ALL);
+        $flagsAll = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flagsAll);
         $this->assertTrue($filter->isUpdateAll());
         $this->assertFalse($filter->isUpdateNone());
         $this->assertFalse($filter->isUpdatePubKeyOnly());
 
-        $flagsNone = new Flags(BloomFilter::UPDATE_NONE);
+        $flagsNone = BloomFilter::UPDATE_NONE;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flagsNone);
         $this->assertTrue($filter->isUpdateNone());
         $this->assertFalse($filter->isUpdatePubKeyOnly());
         $this->assertFalse($filter->isUpdateAll());
 
-        $flagsP2P = new Flags(BloomFilter::UPDATE_P2PUBKEY_ONLY);
+        $flagsP2P = BloomFilter::UPDATE_P2PUBKEY_ONLY;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flagsP2P);
         $this->assertTrue($filter->isUpdatePubKeyOnly());
         $this->assertFalse($filter->isUpdateNone());
@@ -163,7 +162,7 @@ class BloomFilterTest extends AbstractTestCase
          */
 
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 3, 0.01, 2147483649, $flags);
 
         foreach ([
@@ -199,7 +198,7 @@ class BloomFilterTest extends AbstractTestCase
         $priv = PrivateKeyFactory::fromWif('5Kg1gnAjaLfKiwhhPpGS3QfRg2m6awQvaj98JCZBZQ5SuS2F15C');
         $pub = $priv->getPublicKey();
         $math = new Math();
-        $flags = new Flags(BloomFilter::UPDATE_ALL);
+        $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 2, 0.001, 0, $flags);
 
         $filter->insertData($pub->getBuffer());
@@ -251,7 +250,7 @@ class BloomFilterTest extends AbstractTestCase
 
         $tx = $this->getPayToPubkeyTxVector($pubkey);
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_P2PUBKEY_ONLY));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_P2PUBKEY_ONLY);
         $filter->insertData($pubkey->getBuffer());
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
     }
@@ -263,7 +262,7 @@ class BloomFilterTest extends AbstractTestCase
 
         $tx = $this->getPayToMultisigTxVector($pubkey);
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_P2PUBKEY_ONLY));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_P2PUBKEY_ONLY);
         $filter->insertData($pubkey->getBuffer());
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
     }
@@ -284,40 +283,40 @@ class BloomFilterTest extends AbstractTestCase
         );
         $spendTx = TransactionFactory::fromHex($spends);
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('b4749f017444b051c44dfd2720e88f314ff94f3dd6d56d40ef65854fcd7fff6b', 32));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('b4749f017444b051c44dfd2720e88f314ff94f3dd6d56d40ef65854fcd7fff6b'));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('30450220070aca44506c5cef3a16ed519d7c3c39f8aab192c4e1c90d065f37b8a4af6141022100a8e160b856c2d43d27d8fba71e5aef6405b8643ac4cb7cb3c462aced7f14711a01'));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('046d11fee51b0e60666d5049a9101a72741df480b96ee26488a4d3466b95c9a40ac5eeef87e10a5cd336c19a84565f80fa6c547957b7700ff4dfbdefe76036c339'));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('04943fdd508053c75000106d3bc6e2754dbcff19'));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
         $this->assertTrue($filter->isRelevantAndUpdate($spendTx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('a266436d2965547608b9e15d9032a7b9d64fa431'));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertOutpoint(new OutPoint(Buffer::hex('90c122d70786e899529d71dbeba91ba216982fb6ba58f3bdaab65e73b7e9260b'), 0));
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertData(Buffer::hex('0000006d2965547608b9e15d9032a7b9d64fa431'));
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
 
-        $filter = BloomFilter::create($math, 10, 0.000001, 0, new Flags(BloomFilter::UPDATE_ALL));
+        $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
         $filter->insertOutpoint(new OutPoint(Buffer::hex('41c1d247b5f6ef9952cd711beba91ba216982fb6ba58f3bdaab65e7341414141'), '0'));
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
     }

@@ -25,7 +25,6 @@ class ScriptInfoFactory
             }
 
             $handler = new ScriptHash($redeemScript);
-
         } elseif ($classifier->isMultisig()) {
             $handler = new Multisig($script);
         } elseif ($classifier->isPayToPublicKey()) {
