@@ -12,7 +12,6 @@ use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\P2shScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
 use BitWasp\Bitcoin\Script\Factory\ScriptInfoFactory;
-use BitWasp\Bitcoin\Script\Factory\WitnessScriptFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -62,17 +61,6 @@ class ScriptFactory
     public static function p2sh(Opcodes $opcodes = null)
     {
         return new P2shScriptFactory(self::scriptPubKey(), $opcodes ?: new Opcodes());
-    }
-
-    /**
-     * @param Opcodes|null $opcodes
-     * @return WitnessScriptFactory
-     */
-    public static function witness(Opcodes $opcodes = null)
-    {
-        $scriptPubKey = self::scriptPubKey();
-        $p2sh = self::p2sh();
-        return new WitnessScriptFactory($scriptPubKey, $p2sh, $opcodes ?: new Opcodes());
     }
 
     /**
