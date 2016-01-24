@@ -13,12 +13,12 @@ interface ValidatorInterface
      * @param ScriptInterface $scriptPubKey
      * @return bool
      */
-    public function checkSignature(ConsensusInterface $consensus, $nInput, ScriptInterface $scriptPubKey);
+    public function checkSignature(ConsensusInterface $consensus, $nInput, $amount, ScriptInterface $scriptPubKey);
 
     /**
      * @param ConsensusInterface $consensus
-     * @param array $scriptPubKeys
+     * @param TransactionOutputInterface[] $outputs
      * @return bool
      */
-    public function checkSignatures(ConsensusInterface $consensus, array $scriptPubKeys);
+    public function checkSignatures(ConsensusInterface $consensus, array $outputs);
 }

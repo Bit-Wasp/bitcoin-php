@@ -24,6 +24,7 @@ class NetworkFactory
     public static function bitcoin()
     {
         $network = self::create('00', '05', '80')
+            ->setP2WPKHByte('06')
             ->setHDPubByte('0488b21e')
             ->setHDPrivByte('0488ade4')
             ->setNetMagicBytes('d9b4bef9');

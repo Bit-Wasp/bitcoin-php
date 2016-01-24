@@ -30,14 +30,14 @@ class InterpreterTest extends AbstractTestCase
      */
     public function testIsLowDERFailsWithIncorrectEncoding()
     {
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
-        $i->isLowDerSignature(new Buffer('abcd'));
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $checker->isLowDerSignature(new Buffer('abcd'));
     }
 
     public function testReturnsFalseWithNoSig()
     {
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
-        $this->assertFalse($i->isDefinedHashtypeSignature(new Buffer()));
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $this->assertFalse($checker->isDefinedHashtypeSignature(new Buffer()));
     }
 
     public function testIsDefinedHashType()
@@ -57,15 +57,15 @@ class InterpreterTest extends AbstractTestCase
             255
         ];
 
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction(), 0);
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
         foreach ($valid as $t) {
             $t = new Buffer(chr($t));
-            $this->assertTrue($i->isDefinedHashtypeSignature($t));
+            $this->assertTrue($checker->isDefinedHashtypeSignature($t));
         }
 
         foreach ($invalid as $t) {
             $t = new Buffer(chr($t));
-            $this->assertFalse($i->isDefinedHashtypeSignature($t));
+            $this->assertFalse($checker->isDefinedHashtypeSignature($t));
         }
     }
 

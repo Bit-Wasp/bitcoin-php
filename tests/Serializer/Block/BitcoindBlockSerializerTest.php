@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\MTransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BitcoindBlockSerializer;
 
@@ -18,7 +18,7 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
     {
         $math = new Math();
         $bhs = new BlockHeaderSerializer();
-        $txs = new TransactionSerializer();
+        $txs = new MTransactionSerializer();
         $bs = new BlockSerializer($math, $bhs, $txs);
 
         $network = NetworkFactory::bitcoin();
@@ -39,7 +39,7 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
     {
         $math = new Math();
         $bhs = new BlockHeaderSerializer();
-        $txs = new TransactionSerializer();
+        $txs = new MTransactionSerializer();
         $bs = new BlockSerializer($math, $bhs, $txs);
 
         $network = NetworkFactory::bitcoin();
@@ -59,7 +59,7 @@ class BitcoindBlockSerializerTest extends AbstractTestCase
     {
         $math = new Math();
         $bhs = new BlockHeaderSerializer();
-        $txs = new TransactionSerializer();
+        $txs = new MTransactionSerializer();
         $bs = new BlockSerializer($math, $bhs, $txs);
 
         $network = NetworkFactory::bitcoin();

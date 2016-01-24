@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -15,7 +14,6 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
@@ -23,11 +21,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class Interpreter implements InterpreterInterface
 {
-    /**
-     * Position of OP_CODESEPARATOR, for calculating SigHash
-     * @var int
-     */
-    private $hashStartPos;
 
     /**
      * @var int
@@ -128,46 +121,6 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param BufferInterface $signature
-     * @return bool
-     * @throws ScriptRuntimeException
-     * @throws \Exception
-     */
-    public function isLowDerSignature(BufferInterface $signature)
-    {
-        if (!$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        }
-
-        $binary = $signature->getBinary();
-        $nLenR = ord($binary[3]);
-        $nLenS = ord($binary[5 + $nLenR]);
-        $s = $signature->slice(6 + $nLenR, $nLenS)->getInt();
-
-        return $this->ecAdapter->validateSignatureElement($s, true);
-    }
-
-    /**
-     * Determine whether the sighash byte appended to the signature encodes
-     * a valid sighash type.
-     *
-     * @param BufferInterface $signature
-     * @return bool
-     */
-    public function isDefinedHashtypeSignature(BufferInterface $signature)
-    {
-        if ($signature->getSize() === 0) {
-            return false;
-        }
-
-        $binary = $signature->getBinary();
-        $nHashType = ord(substr($binary, -1)) & (~(SigHash::ANYONECANPAY));
-
-        $math = $this->math;
-        return ! ($math->cmp($nHashType, SigHash::ALL) < 0 || $math->cmp($nHashType, SigHash::SINGLE) > 0);
-    }
-
-    /**
      * @param int $opCode
      * @param BufferInterface $pushData
      * @return bool
@@ -221,6 +174,7 @@ class Interpreter implements InterpreterInterface
     private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitness $scriptWitness, $flags, Checker $checker)
     {
         $witnessCount = count($scriptWitness);
+
         if ($witnessProgram->getVersion() == 0) {
             $buffer = $witnessProgram->getProgram();
             if ($buffer->getSize() === 32) {
@@ -367,12 +321,12 @@ class Interpreter implements InterpreterInterface
             if ($flags & self::VERIFY_WITNESS) {
 
                 if ($scriptPubKey->isWitness($program)) {
-
                     if ($scriptSig != (ScriptFactory::create()->push($scriptPubKey->getBuffer())->getScript())) {
                         return false; // SCRIPT_ERR_WITNESS_MALLEATED_P2SH
                     }
 
                     if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
+                        echo 'wtness fail';
                         return false;
                     }
 
@@ -431,7 +385,7 @@ class Interpreter implements InterpreterInterface
     public function evaluate(ScriptInterface $script, Stack $mainStack, $sigVersion, $flags, Checker $checker)
     {
         $math = $this->math;
-        $this->hashStartPos = 0;
+        $hashStartPos = 0;
         $this->opCount = 0;
         $altStack = new Stack();
         $vfStack = new Stack();
@@ -782,7 +736,6 @@ class Interpreter implements InterpreterInterface
                             $vch2 = $mainStack[-1];
 
                             $equal = ($vch1->getBinary() === $vch2->getBinary());
-
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->push(($equal ? $this->vchTrue : $this->vchFalse));
@@ -924,7 +877,7 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_CODESEPARATOR:
-                            $this->hashStartPos = $parser->getPosition();
+                            $hashStartPos = $parser->getPosition();
                             break;
 
                         case Opcodes::OP_CHECKSIG:
@@ -936,13 +889,13 @@ class Interpreter implements InterpreterInterface
                             $vchPubKey = $mainStack[-1];
                             $vchSig = $mainStack[-2];
 
-                            $scriptCode = new Script($script->getBuffer()->slice($this->hashStartPos));
+                            $scriptCode = new Script($script->getBuffer()->slice($hashStartPos));
+
                             $success = $checker->checkSig($scriptCode, $vchSig, $vchPubKey, $sigVersion, $flags);
 
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->push($success ? $this->vchTrue : $this->vchFalse);
-
                             if ($opCode === Opcodes::OP_CHECKSIGVERIFY) {
                                 if ($success) {
                                     $mainStack->pop();
@@ -981,10 +934,11 @@ class Interpreter implements InterpreterInterface
                             $i += $sigCount;
 
                             // Extract the script since the last OP_CODESEPARATOR
-                            $scriptCode = new Script($script->getBuffer()->slice($this->hashStartPos));
+                            $scriptCode = new Script($script->getBuffer()->slice($hashStartPos));
 
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
+
                                 // Fetch the signature and public key
                                 $sig = $mainStack[-$isig];
                                 $pubkey = $mainStack[-$ikey];

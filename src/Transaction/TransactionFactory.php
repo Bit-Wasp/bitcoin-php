@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\NTransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\MTransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
@@ -48,6 +49,6 @@ class TransactionFactory
      */
     public static function fromHex($string)
     {
-        return (new NTransactionSerializer())->parse($string);
+        return (new TransactionSerializer())->parse($string);
     }
 }

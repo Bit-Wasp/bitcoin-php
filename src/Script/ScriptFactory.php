@@ -39,6 +39,15 @@ class ScriptFactory
     }
 
     /**
+     * @param array $sequence
+     * @return ScriptInterface
+     */
+    public static function sequence(array $sequence)
+    {
+        return self::create()->sequence($sequence)->getScript();
+    }
+
+    /**
      * @return InputScriptFactory
      */
     public static function scriptSig()

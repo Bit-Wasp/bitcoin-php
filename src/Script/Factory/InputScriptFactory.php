@@ -10,14 +10,6 @@ use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 
 class InputScriptFactory
 {
-    /**
-     * @param ScriptInterface $script
-     * @return InputClassifier
-     */
-    public function classify(ScriptInterface $script)
-    {
-        return new InputClassifier($script);
-    }
 
     /**
      * @param TransactionSignatureInterface $signature

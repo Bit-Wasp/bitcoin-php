@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\Script;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
@@ -13,13 +14,10 @@ class ScriptWitnessSerializer
 
     public function fromParser(Parser $parser, $size)
     {
-        echo "parsing script witness\n";
         $varstring = (new TemplateFactory())->varstring()->getTemplate();
-
         $entries = [];
 
         for ($j = 0; $j < $size; $j++) {
-            echo "$j\n";
             list ($data) = $varstring->parse($parser);
             $entries[] = $data;
         }
@@ -30,12 +28,13 @@ class ScriptWitnessSerializer
     public function serialize(ScriptWitnessInterface $witness)
     {
         $varstring = (new TemplateFactory())->varstring()->getTemplate();
+        $vector =  (new TemplateFactory())->vector(function () {
+        })->getTemplate();
 
-        $str = '';
+        $strs= [];
         foreach ($witness as $value) {
-            $str .= $varstring->write([$value])->getBinary();
+            $strs[] = $varstring->write([$value]);
         }
-
-        return new Buffer($str);
+        return $vector->write([$strs]);
     }
 }
