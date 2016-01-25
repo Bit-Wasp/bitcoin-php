@@ -21,29 +21,22 @@ Bitcoin::setNetwork($s);
 $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
 $key = PrivateKeyFactory::fromWif($wif);
 
-echo "Bitcoin address: " . $key->getPublicKey()->getAddress()->getAddress() . PHP_EOL;
+echo $key->getPublicKey()->getAddress()->getAddress() . PHP_EOL;
 
 
-$outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1', 32), 0);
+$outpoint = new OutPoint(Buffer::hex('77d11867bcaaadee13f6f322874d3498d910047d5666dcc02402ff07fc0bec3b', 32), 0);
+$scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
 
-$program = new WitnessProgram(0, $key->getPubKeyHash());
-$scriptPubKey = $program->getOutputScript();
+$redeemScript = $scriptPubKey;
+$destination = new WitnessProgram(0, Hash::sha256($redeemScript->getBuffer()));
 
 $tx = TransactionFactory::build()
     ->spendOutPoint($outpoint)
-    ->payToAddress(98900000, $key->getPublicKey()->getAddress())
+    ->output(99900000, $destination->getOutputScript())
     ->get();
 
 $signed = new \BitWasp\Bitcoin\Transaction\Factory\TxWitnessSigner($tx, $ec);
-$signed->sign(0, 99900000, $key, $scriptPubKey);
+$signed->sign(0, 100000000, $key, $destination->getOutputScript(), null, $scriptPubKey);
 $ss = $signed->get();
 
-$consensus = ScriptFactory::consensus(
-    \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_P2SH |
-    \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_WITNESS
-);
-echo "Script validation result: " . ($ss->validator()->checkSignature($consensus, 0, 99900000, $scriptPubKey) ? "yay\n" : "nay\n");
-
-echo PHP_EOL;
-echo $ss->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;
 echo $ss->getHex() . PHP_EOL;

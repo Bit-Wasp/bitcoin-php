@@ -53,7 +53,7 @@ class TxWitnessSigner
         }
     }
 
-    public function sign($nInput, $amount, PrivateKeyInterface $privateKey, ScriptInterface $scriptPubKey, ScriptInterface $redeemScript = null, $sigHashType = SigHash::ALL)
+    public function sign($nInput, $amount, PrivateKeyInterface $privateKey, ScriptInterface $scriptPubKey, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null, $sigHashType = SigHash::ALL)
     {
 
         if (!isset($this->signatureCreator[$nInput])) {
@@ -91,13 +91,14 @@ class TxWitnessSigner
         if ($sigData->scriptType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $sigVersion = 1;
             $scriptPubKey->isWitness($witness);
-
-            $witnessScript = new Script(end($sigData->witnesses));
-            $sigData->witnesses = $sigData->solution;
+            if (null === $witnessScript) {
+                throw new \RuntimeException('Witness script is required for v0_scripthash');
+            }
 
             $classifier = new OutputClassifier($witnessScript);
-            $sigData->scriptType = $classifier->classify();
-            $scriptSig = ScriptFactory::sequence($this->tx->getWitness($nInput)->all());
+            $classifier->classify($sigData->solution);
+            print_r($sigData->solution);
+            $sigData->witnessScript = $witnessScript;
         }
 
         if ($sigData->scriptType === OutputClassifier::UNKNOWN) {
@@ -110,7 +111,6 @@ class TxWitnessSigner
         }
 
         $sigCreator->signInput($sigData, $privateKey, $redeemScript ?: $scriptPubKey, $sigHashType, $sigVersion);
-        //print_r($sigData);
         return $this;
     }
 
@@ -124,6 +124,7 @@ class TxWitnessSigner
             $witness = null;
             $sig = $sigCreator->serializeSig($sigData, $witness);
             echo $sig->getHex() . "\n";
+            var_dump($witness);
             $input->script($sig);
             $witnesses[$idx] = $witness ?: new ScriptWitness([]);
         }

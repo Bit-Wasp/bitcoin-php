@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\TemplateFactory;
 
-class MTransactionSerializer
+class OldTransactionSerializer
 {
     /**
      * @var TransactionInputSerializer

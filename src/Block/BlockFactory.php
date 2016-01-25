@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\MTransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\OldTransactionSerializer;
 
 class BlockFactory
 {
@@ -20,7 +20,7 @@ class BlockFactory
         return (new BlockSerializer(
             $math ?: Bitcoin::getMath(),
             new BlockHeaderSerializer(),
-            new MTransactionSerializer()
+            new OldTransactionSerializer()
         ))
             ->parse($string);
     }

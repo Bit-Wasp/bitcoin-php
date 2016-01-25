@@ -262,7 +262,6 @@ class TxSigCreator
         $script = ScriptFactory::create();
 
         if (count($sigData->signatures) === $this->requiredSigs) {
-            echo 'signed';
             switch ($sigData->innerScriptType) {
                 case OutputClassifier::PAYTOPUBKEY:
                     $script->push($sigData->signatures[0]);
@@ -308,6 +307,13 @@ class TxSigCreator
             $script = new Script(); // Required, otherwise we introduce malleability.
             $values = $sigData->signatures;
             $values[] = $sigData->publicKeys[0]->getBuffer();
+            $scriptWitness = new ScriptWitness($values);
+        }
+
+        if ($sigData->innerScriptType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+            $script = new Script(); // Required, otherwise we introduce malleability.
+            $values = $sigData->signatures;
+            $values[] = $sigData->witnessScript->getBuffer();
             $scriptWitness = new ScriptWitness($values);
         }
 
