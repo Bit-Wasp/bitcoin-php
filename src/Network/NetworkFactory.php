@@ -131,6 +131,7 @@ class NetworkFactory
         return $network;
     }
 
+    /**
      * @return NetworkInterface
      * @throws \Exception
      */
