@@ -130,4 +130,33 @@ class NetworkFactory
 
         return $network;
     }
+
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function startcoin()
+    {
+        $network = self::create('7d', 'fd', '05')
+            ->setHDPubByte('0488b21e')
+            ->setHDPrivByte('0488ade4')
+            ->setNetMagicBytes('ffc4badf');
+
+        return $network;
+    }
+
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function startcoinTestnet()
+    {
+        $network = self::create('7f', 'f4', 'c4')
+            ->setHDPubByte('043587cf')
+            ->setHDPrivByte('04468394')
+            ->setNetMagicBytes('ffc4b9de');
+
+        return $network;
+    }
+
+
 }
