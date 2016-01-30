@@ -159,5 +159,34 @@ class NetworkFactory
         return $network;
     }
 
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function dash()
+    {
+        $network = self::create('4c', '10', 'cc')
+            ->setHDPubByte('02fe52f8')
+            ->setHDPrivByte('02fe52cc')
+            ->setNetMagicBytes('bd6b0cbf');
+
+        return $network;
+    }
+
+
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function dashTestnet()
+    {
+        $network = self::create('8b', '13', 'ef')
+            ->setHDPubByte('3a8061a0')
+            ->setHDPrivByte('3a805837')
+            ->setNetMagicBytes('ffcae2ce');
+
+        return $network;
+    }
+
 
 }
