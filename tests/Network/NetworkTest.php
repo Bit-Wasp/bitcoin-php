@@ -200,6 +200,28 @@ class NetworkTest extends AbstractTestCase
 
         $this->assertEquals('2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV', $p2sh->getAddress(NetworkFactory::dogecoinTestnet()));
         $this->assertEquals('nUpssuonax8qjuc3zU3cwmE9n9W7QXJjgW', $p2pk->getAddress(NetworkFactory::dogecoinTestnet()));
+
+        // Dash
+        $this->assertEquals(NetworkFactory::dash()->getAddressByte(), '4c');
+        $this->assertEquals(NetworkFactory::dash()->getP2shByte(), '10');
+        $this->assertEquals(NetworkFactory::dash()->getPrivByte(), 'cc');
+        $this->assertEquals(NetworkFactory::dash()->isTestnet(), false);
+        $this->assertEquals(NetworkFactory::dash()->getHDPrivByte(), '02fe52cc');
+        $this->assertEquals(NetworkFactory::dash()->getHDPubByte(), '02fe52f8');
+        $this->assertEquals(NetworkFactory::dash()->getNetMagicBytes(), 'bd6b0cbf');
+        $this->assertEquals('7X7VPCbTMLvUSjhMo3vdqKb8eNrccxgkJ1', $p2sh->getAddress(NetworkFactory::dash()));
+        $this->assertEquals('XbKZStn8KGzRUsSr5wiq18A3VUyD7pdKXX', $p2pk->getAddress(NetworkFactory::dash()));
+
+        // Dash testnet
+        $this->assertEquals(NetworkFactory::dashTestnet()->getAddressByte(), '8b');
+        $this->assertEquals(NetworkFactory::dashTestnet()->getP2shByte(), '13');
+        $this->assertEquals(NetworkFactory::dashTestnet()->getPrivByte(), 'ef');
+        $this->assertEquals(NetworkFactory::dashTestnet()->isTestnet(), true);
+        $this->assertEquals(NetworkFactory::dashTestnet()->getHDPrivByte(), '3a805837');
+        $this->assertEquals(NetworkFactory::dashTestnet()->getHDPubByte(), '3a8061a0');
+        $this->assertEquals(NetworkFactory::dashTestnet()->getNetMagicBytes(), 'ffcae2ce');
+        $this->assertEquals('2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV', $p2sh->getAddress(NetworkFactory::dashTestnet()));
+        $this->assertEquals('mg9fuhDDAbD673KswdNyyWgaX8zDxJT8QY', $p2pk->getAddress(NetworkFactory::dashTestnet()));
     }
 
     public function testGetHDPrivByte()
