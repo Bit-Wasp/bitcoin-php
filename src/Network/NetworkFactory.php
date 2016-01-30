@@ -40,7 +40,7 @@ class NetworkFactory
         $network = self::create('6f', 'c4', 'ef', true)
             ->setHDPubByte('043587cf')
             ->setHDPrivByte('04358394')
-            ->setNetMagicBytes('d9b4bef9');
+            ->setNetMagicBytes('0709110b');
 
         return $network;
     }
