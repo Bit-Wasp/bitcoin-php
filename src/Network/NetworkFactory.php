@@ -187,6 +187,4 @@ class NetworkFactory
 
         return $network;
     }
-
-
 }

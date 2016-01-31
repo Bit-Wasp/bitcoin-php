@@ -220,8 +220,8 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals(NetworkFactory::dashTestnet()->getHDPrivByte(), '3a805837');
         $this->assertEquals(NetworkFactory::dashTestnet()->getHDPubByte(), '3a8061a0');
         $this->assertEquals(NetworkFactory::dashTestnet()->getNetMagicBytes(), 'ffcae2ce');
-        $this->assertEquals('2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV', $p2sh->getAddress(NetworkFactory::dashTestnet()));
-        $this->assertEquals('mg9fuhDDAbD673KswdNyyWgaX8zDxJT8QY', $p2pk->getAddress(NetworkFactory::dashTestnet()));
+        $this->assertEquals('8j8JLXVKUtK6u37csJvbHhQVXtdSmwYhAb', $p2sh->getAddress(NetworkFactory::dashTestnet()));
+        $this->assertEquals('xwcZUjZH3eBd1BEJdNhuZ2Jc9GCduoV5cV', $p2pk->getAddress(NetworkFactory::dashTestnet()));
     }
 
     public function testGetHDPrivByte()
