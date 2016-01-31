@@ -67,17 +67,20 @@ class TxWitnessSigner
         $scriptSig = $this->tx->getInput($nInput)->getScript();
         $witness = null;
 
+        $scriptCode = null;
         if ($sigData->scriptType === null) {
             $classifier = new OutputClassifier($scriptPubKey);
             $sigData->innerScriptType = $sigData->scriptType = $classifier->classify($sigData->solution);
+            var_dump($sigData->innerScriptType);
         }
 
         if ($sigData->scriptType === OutputClassifier::PAYTOSCRIPTHASH) {
             $classifier = new OutputClassifier($redeemScript);
             $sigData->innerScriptType = $classifier->classify();
+            $scriptCode = $redeemScript;
         }
 
-        if ($sigData->scriptType === OutputClassifier::WITNESS_V0_KEYHASH) {
+        if ($sigData->innerScriptType === OutputClassifier::WITNESS_V0_KEYHASH) {
             $sigVersion = 1;
             $scriptPubKey->isWitness($witness);
             $witnessScript = ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $witness->getProgram(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
@@ -86,9 +89,11 @@ class TxWitnessSigner
 
             $sigData->witnessScript = $witnessScript;
             $scriptSig = new Script();
+            $scriptCode = $witnessScript;
         }
 
-        if ($sigData->scriptType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+        if ($sigData->innerScriptType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+            echo "Signing witness scripthash\n";
             $sigVersion = 1;
             $scriptPubKey->isWitness($witness);
             if (null === $witnessScript) {
@@ -96,9 +101,12 @@ class TxWitnessSigner
             }
 
             $classifier = new OutputClassifier($witnessScript);
-            $classifier->classify($sigData->solution);
+            $sigData->innerScriptType = $classifier->classify();
+            echo "Heres some solution thing\n";
             print_r($sigData->solution);
             $sigData->witnessScript = $witnessScript;
+            echo $witnessScript->getScriptParser()->getHumanReadable() . PHP_EOL;
+            $scriptCode = $witnessScript;
         }
 
         if ($sigData->scriptType === OutputClassifier::UNKNOWN) {
@@ -107,10 +115,10 @@ class TxWitnessSigner
 
         if ($sigData->signatures === null) {
             $sigCreator->extractSignatures($sigData, $scriptSig, $redeemScript);
-
         }
 
-        $sigCreator->signInput($sigData, $privateKey, $redeemScript ?: $scriptPubKey, $sigHashType, $sigVersion);
+        $sigCreator->signInput($sigData, $privateKey, $scriptCode ?: $scriptPubKey, $sigHashType, $sigVersion);
+
         return $this;
     }
 
@@ -123,7 +131,10 @@ class TxWitnessSigner
             $sigCreator = $this->signatureCreator[$idx];
             $witness = null;
             $sig = $sigCreator->serializeSig($sigData, $witness);
+            echo "ScriptSig: \n";
             echo $sig->getHex() . "\n";
+
+            echo "Witness data\n";
             var_dump($witness);
             $input->script($sig);
             $witnesses[$idx] = $witness ?: new ScriptWitness([]);

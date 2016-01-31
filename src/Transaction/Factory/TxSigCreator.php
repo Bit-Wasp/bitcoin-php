@@ -215,6 +215,7 @@ class TxSigCreator
                 $sigData->publicKeys[0] = $publicKey;
             }
 
+            echo "Sighashtype: $sigHashType \n";
             $sigData->signatures[0] = $this->makeSignature($privateKey, $scriptPubKey, $sigHashType, $sigVersion)->getBuffer();
         }
 
@@ -237,7 +238,14 @@ class TxSigCreator
                 $scriptType = $sigData->innerScriptType;
             }
 
-            if ($scriptType === OutputClassifier::WITNESS_V0_SCRIPTHASH || $scriptType === OutputClassifier::WITNESS_V0_KEYHASH) {
+            if ($scriptType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+                echo "script hashv0000\n";
+                $sigVersion = 1;
+                $scriptType = (new OutputClassifier($sigData->witnessScript))->classify();
+                echo "Setting it to: " . $scriptType . "\n";
+            }
+
+            if ($scriptType === OutputClassifier::WITNESS_V0_KEYHASH) {
                 $sigVersion = 1;
             }
 
@@ -245,8 +253,9 @@ class TxSigCreator
                 $scriptType === OutputClassifier::PAYTOPUBKEY ||
                 $scriptType === OutputClassifier::PAYTOPUBKEYHASH ||
                 $scriptType === OutputClassifier::WITNESS_V0_KEYHASH) {
-
-                $this->signStep($scriptType, $sigData, $privateKey, $scriptPubKey, $sigHashType, $sigVersion);
+                echo "signing....\n";
+                echo "the type is $scriptType\n";
+                $this->signStep($scriptType, $sigData, $privateKey, $scriptPubKey, $sigVersion, $sigHashType);
             }
         }
 
@@ -257,12 +266,13 @@ class TxSigCreator
      * @param SignatureData $sigData
      * @return ScriptInterface
      */
-    private function makeScript(SignatureData $sigData)
+    private function makeScript($type, SignatureData $sigData)
     {
+        echo "Make script for $type\n";
         $script = ScriptFactory::create();
 
         if (count($sigData->signatures) === $this->requiredSigs) {
-            switch ($sigData->innerScriptType) {
+            switch ($type) {
                 case OutputClassifier::PAYTOPUBKEY:
                     $script->push($sigData->signatures[0]);
                     break;
@@ -285,7 +295,8 @@ class TxSigCreator
 
     public function serializeSig(SignatureData $sigData, & $scriptWitness = null)
     {
-        $script = $this->makeScript($sigData);
+        echo "call serialize\n";
+        $script = $this->makeScript($sigData->scriptType, $sigData);
 
         if ($sigData->scriptType === OutputClassifier::PAYTOSCRIPTHASH) {
             $sig = $script->getBuffer();
@@ -310,11 +321,20 @@ class TxSigCreator
             $scriptWitness = new ScriptWitness($values);
         }
 
-        if ($sigData->innerScriptType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+        var_dump($sigData->innerScriptType);
+        if ($sigData->innerScriptTypew === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+            echo "Serialize script hash sig\n";
             $script = new Script(); // Required, otherwise we introduce malleability.
-            $values = $sigData->signatures;
+            $script2 = $this->makeScript((new OutputClassifier($sigData->witnessScript))->classify(), $sigData);
+            echo "shoudl decode: ".$script2->getScriptParser()->getHumanReadable() . PHP_EOL;
+            $values = array_map(function (Operation $o) {
+                return $o->getData();
+            }, $script2->getScriptParser()->decode());
+
             $values[] = $sigData->witnessScript->getBuffer();
             $scriptWitness = new ScriptWitness($values);
+
+
         }
 
         return $script;
