@@ -151,7 +151,7 @@ class NetworkFactory
      */
     public static function startcoinTestnet()
     {
-        $network = self::create('7f', 'f4', 'c4')
+        $network = self::create('7f', 'f4', 'c4', true)
             ->setHDPubByte('043587cf')
             ->setHDPrivByte('04468394')
             ->setNetMagicBytes('ffc4b9de');
@@ -159,5 +159,32 @@ class NetworkFactory
         return $network;
     }
 
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function dash()
+    {
+        $network = self::create('4c', '10', 'cc')
+            ->setHDPubByte('02fe52f8')
+            ->setHDPrivByte('02fe52cc')
+            ->setNetMagicBytes('bd6b0cbf');
 
+        return $network;
+    }
+
+
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function dashTestnet()
+    {
+        $network = self::create('8b', '13', 'ef', true)
+            ->setHDPubByte('3a8061a0')
+            ->setHDPrivByte('3a805837')
+            ->setNetMagicBytes('ffcae2ce');
+
+        return $network;
+    }
 }
