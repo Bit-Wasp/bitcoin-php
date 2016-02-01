@@ -96,7 +96,7 @@ class TxInputSigning
     /**
      * @param $type
      * @param ScriptInterface $scriptCode
-     * @param BufferInterface[] $stack
+     * @param Operation[] $stack
      * @return mixed
      */
     public function extractWitnessSignature($type, ScriptInterface $scriptCode, array $stack)
@@ -388,12 +388,14 @@ class TxInputSigning
         }
 
         if ($outputType === OutputClassifier::PAYTOSCRIPTHASH) {
+            /** @var BufferInterface $scriptHash */
             $scriptHash = $return;
             $results[] = $scriptHash;
             return true;
         }
 
         if ($outputType === OutputClassifier::WITNESS_V0_KEYHASH) {
+            /** @var BufferInterface $pubKeyHash */
             $pubKeyHash = $return;
             $results[] = $pubKeyHash;
             $this->requiredSigs = 1;
@@ -408,6 +410,7 @@ class TxInputSigning
         }
 
         if ($outputType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+            /** @var BufferInterface $scriptHash */
             $scriptHash = $return;
             $results[] = $scriptHash;
 
