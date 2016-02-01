@@ -83,8 +83,6 @@ class V1Hasher
             $hashOutputs = Hash::sha256($this->transaction->getOutput($inputToSign)->getBuffer());
         }
 
-        echo "Provided script code: " . $txOutScript->getHex() . PHP_EOL;
-
         $input = $this->transaction->getInput($inputToSign);
 
         return Hash::sha256d(new Buffer(

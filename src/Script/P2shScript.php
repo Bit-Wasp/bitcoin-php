@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
-use BitWasp\Bitcoin\Network\NetworkInterface;
 
 class P2shScript extends Script
 {

@@ -110,10 +110,10 @@ class Script extends Serializable implements ScriptInterface
      * @param WitnessProgram $program
      * @return int
      */
-    private function witnessSigOps(WitnessProgram $program)
+    private function witnessSigOps(WitnessProgram $program, ScriptWitnessInterface $scriptWitness)
     {
         if ($program->getVersion() == 0) {
-            return $program->getOutputScript()->countSigOps(true);
+            return $program->getScript()->countSigOps(true);
         }
 
         return 0;
@@ -133,14 +133,14 @@ class Script extends Serializable implements ScriptInterface
 
         $program = null;
         if ($this->isWitness($program)) {
-            return $this->witnessSigOps($program);
+            return $this->witnessSigOps($program, $scriptWitness);
         }
 
         if ((new OutputClassifier($this))->isPayToScriptHash()) {
             $parsed = $scriptSig->getScriptParser()->decode();
             $subscript = new Script(end($parsed)->getData());
             if ($subscript->isWitness($program)) {
-                return $this->witnessSigOps($program);
+                return $this->witnessSigOps($program, $scriptWitness);
             }
         }
 

@@ -275,7 +275,6 @@ class Interpreter implements InterpreterInterface
         $program = null;
 
         if ($flags & self::VERIFY_WITNESS) {
-
             if ($scriptPubKey->isWitness($program)) {
                 /** @var WitnessProgram $program */
                 if ($scriptSig->getBuffer()->getSize() !== 0) {
@@ -326,7 +325,6 @@ class Interpreter implements InterpreterInterface
                     }
 
                     if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
-                        echo 'wtness fail';
                         return false;
                     }
 
@@ -443,7 +441,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_14:
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
-                            $num = decodeOpN($opCode);
+                            $num = \BitWasp\Bitcoin\Script\decodeOpN($opCode);
                             $mainStack->push(Number::int($num)->getBuffer());
                             break;
 
@@ -896,6 +894,7 @@ class Interpreter implements InterpreterInterface
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->push($success ? $this->vchTrue : $this->vchFalse);
+
                             if ($opCode === Opcodes::OP_CHECKSIGVERIFY) {
                                 if ($success) {
                                     $mainStack->pop();

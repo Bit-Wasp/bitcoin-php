@@ -19,13 +19,13 @@ interface ScriptClassifierInterface
      * @param BufferInterface $pubKeyHash
      * @return bool
      */
-    public function isPayToPublicKeyHash(BufferInterface & $pubKeyHash = null);
+    public function isPayToPublicKeyHash(& $pubKeyHash = null);
 
     /**
      * @param BufferInterface $publicKey
      * @return bool
      */
-    public function isPayToPublicKey(BufferInterface & $publicKey = null);
+    public function isPayToPublicKey(& $publicKey = null);
 
     /**
      * @param BufferInterface[] $publicKeys
@@ -37,13 +37,13 @@ interface ScriptClassifierInterface
      * @param BufferInterface $scriptHash
      * @return bool
      */
-    public function isPayToScriptHash(BufferInterface & $scriptHash = null);
+    public function isPayToScriptHash(& $scriptHash = null);
 
     /**
      * @param BufferInterface $witnessHash
      * @return bool
      */
-    public function isWitness(BufferInterface & $witnessHash = null);
+    public function isWitness(& $witnessHash = null);
 
     /**
      * @param BufferInterface|BufferInterface[] $solution

@@ -33,7 +33,7 @@ class OutputClassifier implements ScriptClassifierInterface
      * @param BufferInterface|null $publicKey
      * @return bool
      */
-    public function isPayToPublicKey(BufferInterface & $publicKey = null)
+    public function isPayToPublicKey(& $publicKey = null)
     {
         if (count($this->decoded) < 1 || !$this->decoded[0]->isPush()) {
             return false;
@@ -43,7 +43,7 @@ class OutputClassifier implements ScriptClassifierInterface
         if ($size === 33 || $size === 65) {
             $op = $this->decoded[1];
             if (!$op->isPush() && $op->getOp() === Opcodes::OP_CHECKSIG) {
-                $publicKey = $this->decoded[0];
+                $publicKey = $this->decoded[0]->getData();
                 return true;
             }
         }
@@ -55,7 +55,7 @@ class OutputClassifier implements ScriptClassifierInterface
      * @param BufferInterface|null $pubKeyHash
      * @return bool
      */
-    public function isPayToPublicKeyHash(BufferInterface & $pubKeyHash = null)
+    public function isPayToPublicKeyHash(& $pubKeyHash = null)
     {
         if (count($this->decoded) !== 5) {
             return false;
@@ -90,7 +90,7 @@ class OutputClassifier implements ScriptClassifierInterface
      * @param BufferInterface|null $scriptHash
      * @return bool
      */
-    public function isPayToScriptHash(BufferInterface & $scriptHash = null)
+    public function isPayToScriptHash(& $scriptHash = null)
     {
         if (count($this->decoded) !== 3) {
             return false;
@@ -158,7 +158,7 @@ class OutputClassifier implements ScriptClassifierInterface
      * @param BufferInterface $programHash
      * @return bool
      */
-    public function isWitness(BufferInterface & $programHash = null)
+    public function isWitness(& $programHash = null)
     {
         $buffer = $this->script->getBuffer();
         $size = $buffer->getSize();
@@ -195,26 +195,28 @@ class OutputClassifier implements ScriptClassifierInterface
     {
         $type = self::UNKNOWN;
         $solution = null;
-        if ($this->isPayToScriptHash($solutions)) {
+        if ($this->isPayToScriptHash($solution)) {
             /** @var BufferInterface $solution */
             $type = self::PAYTOSCRIPTHASH;
-        } elseif ($this->isWitness($solutions)) {
+        } elseif ($this->isWitness($solution)) {
             /** @var BufferInterface $solution */
-            if ($solutions->getSize() == 20) {
+            if ($solution->getSize() == 20) {
                 $type = ScriptClassifierInterface::WITNESS_V0_KEYHASH;
             } else {
                 $type = ScriptClassifierInterface::WITNESS_V0_SCRIPTHASH;
             }
-        } elseif ($this->isPayToPublicKey($solutions)) {
+        } elseif ($this->isPayToPublicKey($solution)) {
             /** @var BufferInterface $solution */
-            return self::PAYTOPUBKEY;
-        } elseif ($this->isPayToPublicKeyHash($solutions)) {
+            $type = self::PAYTOPUBKEY;
+        } elseif ($this->isPayToPublicKeyHash($solution)) {
             /** @var BufferInterface $solution */
-            return self::PAYTOPUBKEYHASH;
-        } elseif ($this->isMultisig($solutions)) {
+            $type = self::PAYTOPUBKEYHASH;
+        } elseif ($this->isMultisig($solution)) {
             /** @var BufferInterface[] $solution */
-            return self::MULTISIG;
+            $type = self::MULTISIG;
         }
+
+        $solutions = $solution;
 
         return $type;
     }

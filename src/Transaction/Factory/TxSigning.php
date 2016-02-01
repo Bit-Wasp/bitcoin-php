@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tk
- * Date: 30/01/16
- * Time: 21:52
- */
 
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
-
+use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -29,11 +23,6 @@ class TxSigning
     private $tx;
 
     /**
-     * @var SignatureData
-     */
-    private $signatures = [];
-
-    /**
      * @var TxInputSigning
      */
     private $signatureCreator = [];
@@ -47,10 +36,6 @@ class TxSigning
     {
         $this->tx = $tx;
         $this->ecAdapter = $ecAdapter;
-        $nInputs = count($tx->getInputs());
-        for ($i = 0; $i < $nInputs; $i++) {
-            $this->signatures[] = new SignatureData();
-        }
     }
 
     /**
@@ -67,30 +52,24 @@ class TxSigning
             $this->signatureCreator[$nIn] = new TxInputSigning($this->ecAdapter, $this->tx, $nIn, $txOut);
         }
 
-        if ($this->signatureCreator[$nIn]->sign($key, $txOut->getScript())) {
+        if (!$this->signatureCreator[$nIn]->sign($key, $redeemScript, $witnessScript)) {
             throw new \RuntimeException('Unsignable script');
         }
 
         return $this->signatureCreator[$nIn]->isFullySigned();
     }
 
+    /**
+     * @return TransactionInterface
+     */
     public function get()
     {
         $mutable = TransactionFactory::mutate($this->tx);
         $witnesses = [];
         foreach ($mutable->inputsMutator() as $idx => $input) {
-            $sigData = $this->signatures[$idx];
-            $sigCreator = $this->signatureCreator[$idx];
-            $witness = null;
-
-            $sig = $sigCreator->serializeSig($sigData, $witness);
-            echo "ScriptSig: \n";
-            echo $sig->getHex() . "\n";
-
-            echo "Witness data\n";
-            var_dump($witness);
-            $input->script($sig);
-            $witnesses[$idx] = $witness ?: new ScriptWitness([]);
+            $sig = $this->signatureCreator[$idx]->serializeSignatures();
+            $input->script($sig->getScriptSig());
+            $witnesses[$idx] = $sig->getScriptWitness();
         }
 
         if (count($witnesses) > 0) {

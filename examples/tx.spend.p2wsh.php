@@ -1,6 +1,6 @@
 <?php
 
-require "vendor/autoload.php";
+require "../vendor/autoload.php";
 
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -23,27 +23,31 @@ $key = PrivateKeyFactory::fromWif($wif);
 
 echo "Bitcoin address: " . $key->getPublicKey()->getAddress()->getAddress() . PHP_EOL;
 
+$destScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
+$program = new WitnessProgram(0, Hash::sha256($destScript->getBuffer()));
 
-$outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1', 32), 0);
-
-$program = new WitnessProgram(0, $key->getPubKeyHash());
-$scriptPubKey = $program->getOutputScript();
+$outpoint = new OutPoint(Buffer::hex('c2197f15d510304f1463230c0e61566bfb8dcadb7e1c510d3c0470bcfbca2194', 32), 0);
+$txOut = new \BitWasp\Bitcoin\Transaction\TransactionOutput(
+    99990000,
+    $program->getScript()
+);
 
 $tx = TransactionFactory::build()
     ->spendOutPoint($outpoint)
-    ->payToAddress(98900000, $key->getPublicKey()->getAddress())
+    ->payToAddress(97900000, $key->getPublicKey()->getAddress())
     ->get();
 
-$signed = new \BitWasp\Bitcoin\Transaction\Factory\TxWitnessSigner($tx, $ec);
-$signed->sign(0, 99900000, $key, $scriptPubKey);
+$signed = new \BitWasp\Bitcoin\Transaction\Factory\TxSigning($tx, $ec);
+$signed->sign(0, $key, $txOut, null, $destScript);
+
 $ss = $signed->get();
 
 $consensus = ScriptFactory::consensus(
     \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_P2SH |
     \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_WITNESS
 );
-echo "Script validation result: " . ($ss->validator()->checkSignature($consensus, 0, 99900000, $scriptPubKey) ? "yay\n" : "nay\n");
+echo "Script validation result: " . ($ss->validator()->checkSignature($consensus, 0, 99990000, $txOut->getScript()) ? "yay\n" : "nay\n");
 
 echo PHP_EOL;
 echo $ss->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;
-echo $ss->getHex() . PHP_EOL;
+//echo $ss->getHex() . PHP_EOL;

@@ -150,6 +150,15 @@ class Checker
         return $this;
     }
 
+    /**
+     * @param ScriptInterface $script
+     * @param BufferInterface $sigBuf
+     * @param BufferInterface $keyBuf
+     * @param int $sigVersion
+     * @param int $flags
+     * @return bool
+     * @throws ScriptRuntimeException
+     */
     public function checkSig(ScriptInterface $script, BufferInterface $sigBuf, BufferInterface $keyBuf, $sigVersion, $flags)
     {
         $this
@@ -167,7 +176,6 @@ class Checker
             }
 
             $hash = $hasher->calculate($script, $this->nInput, $txSignature->getHashType());
-            echo $hash->getHex() . PHP_EOL;
             return $this->adapter->verify($hash, $publicKey, $txSignature->getSignature());
 
         } catch (\Exception $e) {

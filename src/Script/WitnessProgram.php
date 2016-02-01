@@ -46,7 +46,7 @@ class WitnessProgram
     /**
      * @return ScriptInterface
      */
-    public function getOutputScript()
+    public function getScript()
     {
         return ScriptFactory::create()
             ->int($this->version)
