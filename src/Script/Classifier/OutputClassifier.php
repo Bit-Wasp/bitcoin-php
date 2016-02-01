@@ -8,8 +8,17 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\BufferInterface;
 
-class OutputClassifier implements ScriptClassifierInterface
+class OutputClassifier
 {
+    const PAYTOPUBKEY = 'pubkey';
+    const PAYTOPUBKEYHASH = 'pubkeyhash';
+    const PAYTOSCRIPTHASH = 'scripthash';
+    const WITNESS_V0_KEYHASH = 'witness_v0_keyhash';
+    const WITNESS_V0_SCRIPTHASH = 'witness_v0_scripthash';
+    const MULTISIG = 'multisig';
+    const UNKNOWN = 'unknown';
+    const NONSTANDARD = 'nonstandard';
+
     /**
      * @var \BitWasp\Bitcoin\Script\Parser\Operation[]
      */
@@ -201,9 +210,9 @@ class OutputClassifier implements ScriptClassifierInterface
         } elseif ($this->isWitness($solution)) {
             /** @var BufferInterface $solution */
             if ($solution->getSize() == 20) {
-                $type = ScriptClassifierInterface::WITNESS_V0_KEYHASH;
+                $type = self::WITNESS_V0_KEYHASH;
             } else {
-                $type = ScriptClassifierInterface::WITNESS_V0_SCRIPTHASH;
+                $type = self::WITNESS_V0_SCRIPTHASH;
             }
         } elseif ($this->isPayToPublicKey($solution)) {
             /** @var BufferInterface $solution */

@@ -443,7 +443,6 @@ class TxInputSigning
 
             $results = []; // ???
             $solved = $solved && $this->doSignature($key, $redeemScript, $type, $results, 0) && $type !== OutputClassifier::PAYTOSCRIPTHASH;
-            echo "p2sh type: $type\n";
             if ($solved) {
                 $this->redeemScript = $redeemScript;
             }
