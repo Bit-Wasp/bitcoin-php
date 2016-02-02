@@ -37,9 +37,12 @@ class WitnessTxFullTest extends AbstractTestCase
         $wp = new \BitWasp\Bitcoin\Script\WitnessProgram(0, \BitWasp\Bitcoin\Crypto\Hash::sha256($multisig->getBuffer()));
         $p2shWitMultisig = ScriptFactory::scriptPubKey()->payToScriptHash($wp->getScript());
 
+        $multisigWpOut = $wp->getScript();
+
         $witnessv0Keyhash = '01000000000101ad3badb68d43ea31034f182ce88e692e0d4e5d43eca5220c626a229b0d4682330000000000ffffffff011097f305000000001976a914b1ae3ceac136e4bdb733663e7a1e2f0961198a1788ac024730440220578b90b2614136d8c48b87bb9548428f39725313108bd4925feaf0e21e2a1e7a02201ce0349a22d6cdc44f46d1bdd7b4228259840233940755e7030a8932ed56917b012103b848ab6ac853cd69baaa750c70eb352ebeadb07da0ff5bbd642cb285895ee43f00000000';
         $witnessv0ScriptHash = '010000000001019421cafbbc70043c0d511c7edbca8dfb6b56610e0c2363144f3010d5157f19c20000000000ffffffff01e0d5d505000000001976a914b1ae3ceac136e4bdb733663e7a1e2f0961198a1788ac0347304402207d61450ec95da65094a3c15fd341d63fe6771e1fb840ae42a3724fd7342698c3022025af44bfb24206e4fceef599136b2977fbceae92f257158673b5aa25fc500c3f012103b848ab6ac853cd69baaa750c70eb352ebeadb07da0ff5bbd642cb285895ee43f1976a914b1ae3ceac136e4bdb733663e7a1e2f0961198a1788ac00000000';
         $p2shKeyHash = '0100000000010113ae35a2063ba413c3a1bb9b3820c76291e40e83bd3f23c8ff83333f0c64d6230000000017160014b1ae3ceac136e4bdb733663e7a1e2f0961198a17ffffffff01f0b7a205000000001976a914b1ae3ceac136e4bdb733663e7a1e2f0961198a1788ac02473044022051a60cbf963c7f2f957fc0c310b2000462f5af65d5af204f5ba3941b5713d71d022042d19811a450ad3b68ee19441457af54b5d4aa9da5cf7ea6047ec8e9920ab3f2012103b848ab6ac853cd69baaa750c70eb352ebeadb07da0ff5bbd642cb285895ee43f00000000';
+        $witMultisigHex = '0100000000010113ae35a2063ba413c3a1bb9b3820c76291e40e83bd3f23c8ff83333f0c64d6230000000000ffffffff0180969800000000001976a914b1ae3ceac136e4bdb733663e7a1e2f0961198a1788ac03004730440220121a629bb5fee3ecaf3e7a0b111101c51de816f427eaedd992b57f49b69b228e0220402ecd144a7321b4bad6ba3bfa5876b755b9c52a8c8ab17a33830d5929a76cbe0125512103b848ab6ac853cd69baaa750c70eb352ebeadb07da0ff5bbd642cb285895ee43f51ae00000000';
 
         $utxo1 = new Utxo(
             new OutPoint(Buffer::hex('3382460d9b226a620c22a5ec435d4e0d2e698ee82c184f0331ea438db6ad3bad'), 0),
@@ -85,17 +88,23 @@ class WitnessTxFullTest extends AbstractTestCase
         );
         $p2shWitMultisigHex = '0100000000010113ae35a2063ba413c3a1bb9b3820c76291e40e83bd3f23c8ff83333f0c64d623000000002322002086b2dcecbf2e0f0e4095ef11bc8834e2e148d245f844f0b8091389fef91b69ffffffffff0180969800000000001976a914b1ae3ceac136e4bdb733663e7a1e2f0961198a1788ac03004730440220121a629bb5fee3ecaf3e7a0b111101c51de816f427eaedd992b57f49b69b228e0220402ecd144a7321b4bad6ba3bfa5876b755b9c52a8c8ab17a33830d5929a76cbe0125512103b848ab6ac853cd69baaa750c70eb352ebeadb07da0ff5bbd642cb285895ee43f51ae00000000';
 
+        $utxo9 = new Utxo(
+            new OutPoint(Buffer::hex('23d6640c3f3383ffc8233fbd830ee49162c720389bbba1c313a43b06a235ae13'), 0),
+            new TransactionOutput(10000000, $multisigWpOut)
+        );
+
         $ecAdapter = Bitcoin::getEcAdapter();
         $vectors = [
             // key, fund.tx, fund.vout, fund.scriptPubKey, fund.value, spendoutvalue, expected tx hex
             [$ecAdapter, $key, $utxo1, 99850000, $witnessv0Keyhash,    null,  null],
             [$ecAdapter, $key, $utxo2, 97900000, $witnessv0ScriptHash, null,  $scriptPubKey],
             [$ecAdapter, $key, $utxo3, 94550000, $p2shKeyHash,         $p2shv0keyhash, null],
-            [$ecAdapter, $key, $utxo4, 99990000, $pubkeyHex,              null, null],
-            [$ecAdapter, $key, $utxo5, 0,        $pubKeyHashHex,          null, null],
-            [$ecAdapter, $key, $utxo6, 10000000, $multisigHex,            null, null],
-            [$ecAdapter, $key, $utxo7, 10000000, $p2shmultisigHex,        $multisig, null],
-            [$ecAdapter, $key, $utxo8, 10000000, $p2shWitMultisigHex,        $wp->getScript(), $multisig],
+            [$ecAdapter, $key, $utxo4, 99990000, $pubkeyHex,           null, null],
+            [$ecAdapter, $key, $utxo5, 0,        $pubKeyHashHex,       null, null],
+            [$ecAdapter, $key, $utxo6, 10000000, $multisigHex,         null, null],
+            [$ecAdapter, $key, $utxo7, 10000000, $p2shmultisigHex,     $multisig, null],
+            [$ecAdapter, $key, $utxo8, 10000000, $p2shWitMultisigHex,  $wp->getScript(), $multisig],
+            [$ecAdapter, $key, $utxo9, 10000000, $witMultisigHex,      null, $multisig],
         ];
 
         return $vectors;

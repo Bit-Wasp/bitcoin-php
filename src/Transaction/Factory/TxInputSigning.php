@@ -184,9 +184,9 @@ class TxInputSigning
                 }
 
                 $internalSig = [];
-                array_walk($decodeSig, function (Operation $operation) use (&$internalSig) {
+                foreach ($decodeSig as $operation) {
                     $internalSig[] = $operation->getData();
-                });
+                }
 
                 $this->redeemScript = $redeemScript;
                 $this->extractFromValues($p2shType, $redeemScript, $internalSig, 0);
@@ -312,9 +312,9 @@ class TxInputSigning
         if ($outputType === OutputClassifier::MULTISIG) {
             $info = new Multisig($scriptPubKey);
 
-            array_walk($info->getKeys(), function (PublicKeyInterface $publicKey) use (&$results) {
+            foreach ($info->getKeys() as $publicKey) {
                 $results[] = $publicKey->getBuffer();
-            });
+            }
 
             $this->publicKeys = $info->getKeys();
             $this->requiredSigs = $info->getKeyCount();
@@ -497,9 +497,11 @@ class TxInputSigning
             $serialized = $this->serializeSimpleSig($outputType, $answer);
 
             if ($serialized) {
-                $data = array_map(function (Operation $o) {
-                    return $o->getData();
-                }, $answer->getScriptSig()->getScriptParser()->decode());
+                $data = [];
+                foreach ($answer->getScriptSig()->getScriptParser()->decode() as $o) {
+                    $data[] = $o->getData();
+                }
+
                 $data[] = $this->witnessScript->getBuffer();
                 $answer = new SigValues($emptyScript, new ScriptWitness($data));
             }
