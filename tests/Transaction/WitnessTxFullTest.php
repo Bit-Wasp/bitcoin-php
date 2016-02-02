@@ -7,10 +7,13 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\Factory\TxInputSigning;
+use BitWasp\Bitcoin\Transaction\Factory\TxSigning;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -108,22 +111,23 @@ class WitnessTxFullTest extends AbstractTestCase
      */
     public function testWitnessSignAndVerify(EcAdapterInterface $ec, PrivateKeyInterface $key, Utxo $utxo, $spendAmount, $expectedTx, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null)
     {
+        // Build unsigned transaction
         $tx = TransactionFactory::build()
             ->spendOutPoint($utxo->getOutPoint())
             ->payToAddress($spendAmount, $key->getPublicKey()->getAddress())
             ->get();
 
-        $signed = new \BitWasp\Bitcoin\Transaction\Factory\TxSigning($tx, $ec);
-        $signed->sign(0, $key, $utxo->getOutput(), $redeemScript, $witnessScript);
-        $ss = $signed->get();
+        $signed = (new TxSigning($tx, $ec))
+            ->sign(0, $key, $utxo->getOutput(), $redeemScript, $witnessScript)
+            ->get();
 
-        $consensus = ScriptFactory::consensus(
-            \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_P2SH |
-            \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_WITNESS
-        );
+        $consensus = ScriptFactory::consensus(InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_WITNESS);
 
-        $check = $ss->validator()->checkSignature($consensus, 0, $utxo->getOutput()->getValue(), $utxo->getOutput()->getScript());
+        $check = $signed->validator()->checkSignature($consensus, 0, $utxo->getOutput()->getValue(), $utxo->getOutput()->getScript());
         $this->assertTrue($check);
-        $this->assertEquals($expectedTx, $ss->getWitnessBuffer()->getHex());
+        $this->assertEquals($expectedTx, $signed->getWitnessBuffer()->getHex());
+
+        $signer = new TxInputSigning($ec, $signed, 0, $utxo->getOutput());
+        $this->assertTrue($signer->isFullySigned());
     }
 }

@@ -44,7 +44,7 @@ class TxSigning
      * @param TransactionOutputInterface $txOut
      * @param ScriptInterface|null $redeemScript
      * @param ScriptInterface|null $witnessScript
-     * @return int
+     * @return $this
      */
     public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null)
     {
@@ -56,7 +56,7 @@ class TxSigning
             throw new \RuntimeException('Unsignable script');
         }
 
-        return $this->signatureCreator[$nIn]->isFullySigned();
+        return $this;
     }
 
     /**
