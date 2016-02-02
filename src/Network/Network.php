@@ -22,7 +22,12 @@ class Network implements NetworkInterface
     /**
      * @var string
      */
-    private $witnessByte;
+    private $witnessV0KeyHash;
+
+    /**
+     * @var string
+     */
+    private $witnessV0ScriptHash;
 
     /**
      * @var bool
@@ -179,7 +184,7 @@ class Network implements NetworkInterface
             throw new \InvalidArgumentException('witness byte must be 1 hexadecimal byte');
         }
 
-        $this->witnessByte = $witnessByte;
+        $this->witnessV0KeyHash = $witnessByte;
         return $this;
     }
 
@@ -189,11 +194,11 @@ class Network implements NetworkInterface
      */
     public function getP2WPKHByte()
     {
-        if ($this->witnessByte === null) {
+        if ($this->witnessV0KeyHash === null) {
             throw new \Exception('No segnet byte was set');
         }
 
-        return $this->witnessByte;
+        return $this->witnessV0KeyHash;
     }
 
     /**
@@ -206,7 +211,7 @@ class Network implements NetworkInterface
             throw new \InvalidArgumentException('witness byte must be 1 hexadecimal byte');
         }
 
-        $this->witnessByte = $witnessByte;
+        $this->witnessV0ScriptHash  = $witnessByte;
         return $this;
     }
 
@@ -216,11 +221,11 @@ class Network implements NetworkInterface
      */
     public function getP2WSHByte()
     {
-        if ($this->witnessByte === null) {
+        if ($this->witnessV0ScriptHash === null) {
             throw new \Exception('No P2WPS was set');
         }
 
-        return $this->witnessByte;
+        return $this->witnessV0ScriptHash;
     }
 
 
