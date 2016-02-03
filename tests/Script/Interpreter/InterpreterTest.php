@@ -265,7 +265,9 @@ class InterpreterTest extends AbstractTestCase
         $scriptSig = $spendTx->getInput(0)->getScript();
 
         $i = new Interpreter($ec, $spendTx);
-        $this->assertEquals($eVerifyResult, $i->verify($scriptSig, $outputScript, $flags, new Checker($ec, $spendTx, 0, 0)));
+
+        $check = $i->verify($scriptSig, $outputScript, $flags, new Checker($ec, $spendTx, 0, 0));
+        $this->assertEquals($eVerifyResult, $check);
     }
 
     public function getScripts()

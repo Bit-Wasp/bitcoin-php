@@ -255,9 +255,11 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
-        $stackCopy = new Stack;
+        $backup = [];
         if ($flags & self::VERIFY_P2SH) {
-            $stackCopy = clone $stack;
+            foreach ($stack as $s) {
+                $backup[] = $s;
+            }
         }
 
         if (!$this->evaluate($scriptPubKey, $stack, 0, $flags, $checker)) {
@@ -290,13 +292,16 @@ class Interpreter implements InterpreterInterface
         }
 
         if ($flags & self::VERIFY_P2SH && (new OutputClassifier($scriptPubKey))->isPayToScriptHash()) {
-
             if (!$scriptSig->isPushOnly()) {
                 return false;
             }
 
+            $stack = new Stack();
+            foreach ($backup as $i) {
+                $stack->push($i);
+            }
+
             // Restore mainStack to how it was after evaluating scriptSig
-            $stack = $stackCopy;
             if ($stack->isEmpty()) {
                 return false;
             }
