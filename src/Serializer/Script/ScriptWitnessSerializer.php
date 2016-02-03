@@ -4,9 +4,7 @@ namespace BitWasp\Bitcoin\Serializer\Script;
 
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
