@@ -114,8 +114,10 @@ class WitnessTxFullTest extends AbstractTestCase
      * @param EcAdapterInterface $ec
      * @param PrivateKeyInterface $key
      * @param Utxo $utxo
-     * @param $spendAmount
-     * @param $expectedTx
+     * @param int $spendAmount
+     * @param int $expectedTx
+     * @param ScriptInterface|null $redeemScript
+     * @param ScriptInterface|null $witnessScript
      * @dataProvider getVectors
      */
     public function testWitnessSignAndVerify(EcAdapterInterface $ec, PrivateKeyInterface $key, Utxo $utxo, $spendAmount, $expectedTx, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null)
