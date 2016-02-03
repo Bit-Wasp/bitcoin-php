@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Block;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\OldTransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class BlockSerializerTest extends AbstractTestCase
@@ -18,7 +18,7 @@ class BlockSerializerTest extends AbstractTestCase
         $serializer = new BlockSerializer(
             new Math,
             new BlockHeaderSerializer,
-            new OldTransactionSerializer
+            new TransactionSerializer()
         );
         $serializer->parse('');
     }

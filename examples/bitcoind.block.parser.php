@@ -4,7 +4,7 @@ require_once "../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\OldTransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 
 if (!isset($argv[1])) {
@@ -23,7 +23,7 @@ $bds = new \BitWasp\Bitcoin\Serializer\Block\BitcoindBlockSerializer(
     new BlockSerializer(
         $math,
         new BlockHeaderSerializer(),
-        new OldTransactionSerializer()
+        new TransactionSerializer()
     )
 );
 $counter = 0;

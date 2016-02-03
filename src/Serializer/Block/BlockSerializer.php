@@ -4,12 +4,12 @@ namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockInterface;
-use BitWasp\Bitcoin\Serializer\Transaction\OldTransactionSerializer;
 use BitWasp\Buffertools\TemplateFactory;
 
 class BlockSerializer
@@ -34,7 +34,7 @@ class BlockSerializer
      * @param BlockHeaderSerializer $headerSerializer
      * @param TransactionSerializer $txSerializer
      */
-    public function __construct(Math $math, BlockHeaderSerializer $headerSerializer, OldTransactionSerializer $txSerializer)
+    public function __construct(Math $math, BlockHeaderSerializer $headerSerializer, TransactionSerializer $txSerializer)
     {
         $this->math = $math;
         $this->headerSerializer = $headerSerializer;

@@ -211,7 +211,7 @@ class TxInputSigning
                 if ($witCount > 0) {
                     $witnessScript = new Script($witness[$witCount - 1]);
                     $vWitness = $witness->all();
-                    if (count($vWitness) > 1    ) {
+                    if (count($vWitness) > 1) {
                         $vWitness = array_slice($witness->all(), 0, -1);
                     }
 
