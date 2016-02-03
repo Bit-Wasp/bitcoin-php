@@ -45,6 +45,12 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     public function getTxId();
 
     /**
+     * Get the little endian sha256d hash including witness data
+     * @return BufferInterface
+     */
+    public function getWitnessTxId();
+
+    /**
      * Get the version of this transaction
      *
      * @return int|string

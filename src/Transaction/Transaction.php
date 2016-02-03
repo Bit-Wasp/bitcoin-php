@@ -118,6 +118,14 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @return \BitWasp\Buffertools\BufferInterface
+     */
+    public function getWitnessTxId()
+    {
+        return Hash::sha256d($this->getWitnessBuffer())->flip();
+    }
+
+    /**
      * @return int|string
      */
     public function getVersion()
@@ -260,7 +268,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return string
+     * @return BufferInterface
      */
     public function getWitnessBuffer()
     {
