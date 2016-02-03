@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\ScriptWitness;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class NativeConsensus implements ConsensusInterface
@@ -36,10 +36,11 @@ class NativeConsensus implements ConsensusInterface
      * @param TransactionInterface $tx
      * @param ScriptInterface $scriptPubKey
      * @param int $nInputToSign
-     * @param ScriptWitness|null $witness
+     * @param int $amount
+     * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign, $amount, ScriptWitness $witness = null)
+    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign, $amount, ScriptWitnessInterface $witness = null)
     {
         $inputs = $tx->getInputs();
         $interpreter = new Interpreter($this->adapter, $tx);

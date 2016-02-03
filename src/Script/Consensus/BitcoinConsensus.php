@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Consensus;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\ScriptWitness;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class BitcoinConsensus implements ConsensusInterface
@@ -26,10 +26,10 @@ class BitcoinConsensus implements ConsensusInterface
      * @param ScriptInterface $scriptPubKey
      * @param int $nInputToSign
      * @param int $amount
-     * @param ScriptWitness|null $witness
+     * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign, $amount, ScriptWitness $witness = null)
+    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign, $amount, ScriptWitnessInterface $witness = null)
     {
         $error = 0;
         return (bool) bitcoinconsensus_verify_script(
