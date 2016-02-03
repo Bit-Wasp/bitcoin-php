@@ -12,8 +12,8 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\Factory\TxInputSigning;
-use BitWasp\Bitcoin\Transaction\Factory\TxSigning;
+use BitWasp\Bitcoin\Transaction\Factory\InputSigner;
+use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
@@ -128,7 +128,7 @@ class WitnessTxFullTest extends AbstractTestCase
             ->payToAddress($spendAmount, $key->getPublicKey()->getAddress())
             ->get();
 
-        $signed = (new TxSigning($tx, $ec))
+        $signed = (new Signer($tx, $ec))
             ->sign(0, $key, $utxo->getOutput(), $redeemScript, $witnessScript)
             ->get();
 
@@ -138,7 +138,7 @@ class WitnessTxFullTest extends AbstractTestCase
         $this->assertTrue($check);
         $this->assertEquals($expectedTx, $signed->getWitnessBuffer()->getHex());
 
-        $signer = new TxInputSigning($ec, $signed, 0, $utxo->getOutput());
+        $signer = new InputSigner($ec, $signed, 0, $utxo->getOutput());
         $this->assertTrue($signer->isFullySigned());
     }
 }

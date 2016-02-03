@@ -33,7 +33,7 @@ $tx = TransactionFactory::build()
     ->output(95590000, $p2sh->getOutputScript())
     ->get();
 
-$signed = new \BitWasp\Bitcoin\Transaction\Factory\TxSigning($tx, $ec);
+$signed = new \BitWasp\Bitcoin\Transaction\Factory\Signer($tx, $ec);
 $signed->sign(0, $key, $txOut);
 $ss = $signed->get();
 

@@ -27,7 +27,7 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\BufferInterface;
 
-class TxInputSigning
+class InputSigner
 {
     /**
      * @var EcAdapterInterface

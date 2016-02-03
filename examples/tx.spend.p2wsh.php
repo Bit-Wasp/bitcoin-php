@@ -37,7 +37,7 @@ $tx = TransactionFactory::build()
     ->payToAddress(97900000, $key->getPublicKey()->getAddress())
     ->get();
 
-$signed = new \BitWasp\Bitcoin\Transaction\Factory\TxSigning($tx, $ec);
+$signed = new \BitWasp\Bitcoin\Transaction\Factory\Signer($tx, $ec);
 $signed->sign(0, $key, $txOut, null, $destScript);
 
 $ss = $signed->get();

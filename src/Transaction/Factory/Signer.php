@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
-class TxSigning
+class Signer
 {
     /**
      * @var EcAdapterInterface
@@ -23,7 +23,7 @@ class TxSigning
     private $tx;
 
     /**
-     * @var TxInputSigning
+     * @var InputSigner
      */
     private $signatureCreator = [];
 
@@ -49,7 +49,7 @@ class TxSigning
     public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null)
     {
         if (!isset($this->signatureCreator[$nIn])) {
-            $this->signatureCreator[$nIn] = new TxInputSigning($this->ecAdapter, $this->tx, $nIn, $txOut);
+            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut);
         }
 
         if (!$this->signatureCreator[$nIn]->sign($key, $redeemScript, $witnessScript)) {
