@@ -4,28 +4,28 @@ namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-interface SignatureHashInterface
+interface SigHash
 {
     /**
      * Default procedure: Sign ALL of the outputs.
      */
-    const SIGHASH_ALL = 1;
+    const ALL = 1;
 
     /**
      * Sign NONE of the outputs, I don't care where the bitcoins go.
      */
-    const SIGHASH_NONE = 2;
+    const NONE = 2;
 
     /**
      * Sign ONE of the outputs, I don't care where the others go.
      */
-    const SIGHASH_SINGLE = 3;
+    const SINGLE = 3;
 
     /**
      * Let other people add inputs to this transaction paying X. I don't
      * care who else pays. (can be used with other sighash flags)
      */
-    const SIGHASH_ANYONECANPAY = 128;
+    const ANYONECANPAY = 128;
 
     /**
      * Calculate the hash of the current transaction, when you are looking to
@@ -38,5 +38,5 @@ interface SignatureHashInterface
      * @param int $sighashType
      * @return \BitWasp\Buffertools\Buffer
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL);
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL);
 }

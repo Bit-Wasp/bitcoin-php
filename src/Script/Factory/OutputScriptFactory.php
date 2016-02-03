@@ -113,8 +113,8 @@ class OutputScriptFactory
             $keys = Buffertools::sort($keys);
         }
 
-        $opM = Opcodes::OP_1 - 1 + $m;
-        $opN = Opcodes::OP_1 - 1 + $n;
+        $opM = encodeOpN($m);
+        $opN = encodeOpN($n);
 
         $script = ScriptFactory::create();
         foreach ($keys as $key) {

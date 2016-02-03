@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
+use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
@@ -12,7 +13,7 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1Adapter;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -118,15 +119,14 @@ class TxSigner
     }
 
     /**
-     * @param integer $inputToSign
+     * @param int $inputToSign
      * @param ScriptInterface $outputScript
-     * @param ScriptInterface $redeemScript
-     * @return TxSignerContext
+     * @param ScriptInterface|null $redeemScript
+     * @return $this
      */
-    private function createInputState($inputToSign, $outputScript, ScriptInterface $redeemScript = null)
+    private function createInputState($inputToSign, ScriptInterface $outputScript, ScriptInterface $redeemScript = null)
     {
-        $state = (new TxSignerContext($this->ecAdapter, $outputScript, $redeemScript))
-            ->extractSigs($this->transaction, $inputToSign);
+        $state = (new TxSignerContext($this->ecAdapter, $outputScript, $redeemScript))->extractSigs($this->transaction, $inputToSign);
 
         $this->inputStates[$inputToSign] = $state;
 
@@ -134,10 +134,10 @@ class TxSigner
     }
 
     /**
-     * @param integer $inputToSign
+     * @param int $inputToSign
      * @param PrivateKeyInterface $privateKey
      * @param ScriptInterface $outputScript
-     * @param ScriptInterface $redeemScript
+     * @param ScriptInterface|null $redeemScript
      * @param int $sigHashType
      * @return $this
      */
@@ -146,7 +146,7 @@ class TxSigner
         PrivateKeyInterface $privateKey,
         ScriptInterface $outputScript,
         ScriptInterface $redeemScript = null,
-        $sigHashType = SignatureHashInterface::SIGHASH_ALL
+        $sigHashType = SigHash::ALL
     ) {
         // If the input state hasn't been set up, do so now.
         try {
@@ -156,18 +156,24 @@ class TxSigner
         }
 
         // If it's PayToPubkey / PayToPubkeyHash, TransactionBuilderInputState needs to know the public key.
-        if ($inputState->getPrevOutType() === OutputClassifier::PAYTOPUBKEYHASH) {
+        if ($inputState->getScriptType() === OutputClassifier::PAYTOPUBKEYHASH) {
             $inputState->setPublicKeys([$privateKey->getPublicKey()]);
         }
 
         // loop over the publicKeys to find the key to sign with
         foreach ($inputState->getPublicKeys() as $idx => $publicKey) {
             if ($privateKey->getPublicKey()->getBinary() === $publicKey->getBinary()) {
-                $inputState->setSignature($idx, $this->makeSignature(
+                $signature = $this->makeSignature(
                     $privateKey,
                     $this->signatureHash->calculate($redeemScript ?: $outputScript, $inputToSign, $sigHashType),
                     $sigHashType
-                ));
+                );
+
+                //if ($inputState->getPrevOutType() === OutputClassifier::WITNESS) {
+                //    $inputState->setWitness($idx, $signature);
+                //} else {
+                    $inputState->setSignature($idx, $signature);
+                //}
             }
         }
 
@@ -195,6 +201,8 @@ class TxSigner
             $input->script($script);
             $i++;
         }
+
+        $mutator->witness(new TransactionWitnessCollection([]));
 
         return $mutator->done();
     }

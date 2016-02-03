@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Bloom;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -57,7 +56,7 @@ class BloomFilter extends Serializable
     private $nTweak;
 
     /**
-     * @var Flags
+     * @var int
      */
     private $flags;
 
@@ -66,9 +65,9 @@ class BloomFilter extends Serializable
      * @param array $vFilter
      * @param int $numHashFuncs
      * @param int|string $nTweak
-     * @param Flags $flags
+     * @param int $flags
      */
-    public function __construct(Math $math, array $vFilter, $numHashFuncs, $nTweak, Flags $flags)
+    public function __construct(Math $math, array $vFilter, $numHashFuncs, $nTweak, $flags)
     {
         $this->math = $math;
         $this->vFilter = $vFilter;
@@ -95,10 +94,10 @@ class BloomFilter extends Serializable
      * @param int $nElements
      * @param float $nFpRate
      * @param int $nTweak
-     * @param Flags $flags
+     * @param int $flags
      * @return BloomFilter
      */
-    public static function create(Math $math, $nElements, $nFpRate, $nTweak, Flags $flags)
+    public static function create(Math $math, $nElements, $nFpRate, $nTweak, $flags)
     {
         $size = self::idealSize($nElements, $nFpRate);
 
@@ -117,7 +116,7 @@ class BloomFilter extends Serializable
      */
     public function checkFlag($flag)
     {
-        return $this->math->cmp($this->math->bitwiseAnd($this->flags->getFlags(), self::UPDATE_MASK), $flag) === 0;
+        return $this->math->cmp($this->math->bitwiseAnd($this->flags, self::UPDATE_MASK), $flag) === 0;
     }
 
     /**
@@ -125,7 +124,7 @@ class BloomFilter extends Serializable
      */
     public function isUpdateNone()
     {
-        return $this->checkFlag(self::UPDATE_NONE);
+        return (($this->flags & self::UPDATE_MASK) == self::UPDATE_NONE);
     }
 
     /**
@@ -133,7 +132,7 @@ class BloomFilter extends Serializable
      */
     public function isUpdateAll()
     {
-        return $this->checkFlag(self::UPDATE_ALL);
+        return (($this->flags & self::UPDATE_MASK) == self::UPDATE_ALL);
     }
 
     /**
@@ -141,7 +140,7 @@ class BloomFilter extends Serializable
      */
     public function isUpdatePubKeyOnly()
     {
-        return $this->checkFlag(self::UPDATE_P2PUBKEY_ONLY);
+        return (($this->flags & self::UPDATE_MASK) == self::UPDATE_P2PUBKEY_ONLY);
     }
 
     /**
@@ -185,7 +184,7 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @return Flags
+     * @return int
      */
     public function getFlags()
     {

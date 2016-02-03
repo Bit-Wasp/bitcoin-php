@@ -20,6 +20,11 @@ class Network implements NetworkInterface
     private $p2shByte;
 
     /**
+     * @var string
+     */
+    private $witnessByte;
+
+    /**
      * @var bool
      */
     private $testnet;
@@ -163,6 +168,61 @@ class Network implements NetworkInterface
 
         return $this;
     }
+
+    /**
+     * @param string $witnessByte
+     * @return $this
+     */
+    public function setP2WPKHByte($witnessByte)
+    {
+        if (!(ctype_xdigit($witnessByte) && strlen($witnessByte) === 2)) {
+            throw new \InvalidArgumentException('witness byte must be 1 hexadecimal byte');
+        }
+
+        $this->witnessByte = $witnessByte;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function getP2WPKHByte()
+    {
+        if ($this->witnessByte === null) {
+            throw new \Exception('No segnet byte was set');
+        }
+
+        return $this->witnessByte;
+    }
+
+    /**
+     * @param string $witnessByte
+     * @return $this
+     */
+    public function setP2WSHByte($witnessByte)
+    {
+        if (!(ctype_xdigit($witnessByte) && strlen($witnessByte) === 2)) {
+            throw new \InvalidArgumentException('witness byte must be 1 hexadecimal byte');
+        }
+
+        $this->witnessByte = $witnessByte;
+        return $this;
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    public function getP2WSHByte()
+    {
+        if ($this->witnessByte === null) {
+            throw new \Exception('No P2WPS was set');
+        }
+
+        return $this->witnessByte;
+    }
+
 
     /**
      * @param string $bytes

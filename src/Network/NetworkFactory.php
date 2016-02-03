@@ -24,6 +24,7 @@ class NetworkFactory
     public static function bitcoin()
     {
         $network = self::create('00', '05', '80')
+            ->setP2WPKHByte('06')
             ->setHDPubByte('0488b21e')
             ->setHDPrivByte('0488ade4')
             ->setNetMagicBytes('d9b4bef9');
@@ -38,6 +39,19 @@ class NetworkFactory
     public static function bitcoinTestnet()
     {
         $network = self::create('6f', 'c4', 'ef', true)
+            ->setHDPubByte('043587cf')
+            ->setHDPrivByte('04358394')
+            ->setNetMagicBytes('0709110b');
+
+        return $network;
+    }
+
+    /**
+     * @return NetworkInterface
+     */
+    public static function bitcoinSegnet()
+    {
+        $network = self::create('1e', '32', '9e', true)
             ->setHDPubByte('043587cf')
             ->setHDPrivByte('04358394')
             ->setNetMagicBytes('0709110b');

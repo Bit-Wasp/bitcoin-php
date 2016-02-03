@@ -3,30 +3,12 @@
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
-use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class ConsensusFactoryTest extends AbstractTestCase
 {
-    private $interpreterInstance = 'BitWasp\Bitcoin\Script\Interpreter\Interpreter';
-    private $nativeConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\NativeConsensus';
-    private $libBitcoinConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus';
-
-    public function testGetDefaultFlags()
-    {
-        $flags = ScriptFactory::defaultFlags();
-        foreach ([
-                     InterpreterInterface::VERIFY_P2SH, InterpreterInterface::VERIFY_STRICTENC,
-                     InterpreterInterface::VERIFY_DERSIG,InterpreterInterface::VERIFY_LOW_S,
-                     InterpreterInterface::VERIFY_NULL_DUMMY, InterpreterInterface::VERIFY_SIGPUSHONLY,
-                     InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, InterpreterInterface::VERIFY_CLEAN_STACK
-                 ] as $flag) {
-            $this->assertTrue($flags->checkFlags($flag));
-        }
-    }
-
     public function testGetNativeConsensus()
     {
         $this->assertInstanceOf($this->nativeConsensusInstance, ScriptFactory::getNativeConsensus(ScriptFactory::defaultFlags()));
@@ -73,6 +55,10 @@ class ConsensusFactoryTest extends AbstractTestCase
 
     /**
      * @dataProvider getVerifyVectors
+     * @param ConsensusInterface $consensus
+     * @param string $scriptSig
+     * @param string $scriptPubKey
+     * @param bool $expected
      */
     public function testVerify(ConsensusInterface $consensus, $scriptSig, $scriptPubKey, $expected)
     {
@@ -82,6 +68,8 @@ class ConsensusFactoryTest extends AbstractTestCase
             ->input('0000000000000000000000000000000000000000000000000000000000000002', 0, $scriptSig)
             ->get();
 
-        $this->assertEquals($expected, $consensus->verify($tx, $scriptPubKey, 0), ScriptFactory::fromHex($scriptSig->getHex().$scriptPubKey->getHex())->getScriptParser()->getHumanReadable());
+        $result = $consensus->verify($tx, $scriptPubKey, 0, 0);
+
+        $this->assertEquals($expected, $result, ScriptFactory::fromHex($scriptSig->getHex().$scriptPubKey->getHex())->getScriptParser()->getHumanReadable());
     }
 }

@@ -4,20 +4,13 @@ namespace BitWasp\Bitcoin\Tests\Script\Factory;
 
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\Classifier\InputClassifier;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class InputScriptFactoryTest extends AbstractTestCase
 {
-    public function testClassify()
-    {
-        $script = new Script();
-        $classifier = ScriptFactory::scriptSig()->classify($script);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Classifier\InputClassifier', $classifier);
-    }
+
 
     public function testPayToPubKey()
     {
@@ -28,7 +21,6 @@ class InputScriptFactoryTest extends AbstractTestCase
         $parsed = $script->getScriptParser()->decode();
         $this->assertSame($txSigHex, $parsed[0]->getData()->getHex());
         $this->assertEquals(1, count($parsed));
-        $this->assertEquals(InputClassifier::PAYTOPUBKEY, ScriptFactory::scriptSig()->classify($script)->classify());
     }
 
     public function testPayToPubKeyHash()
@@ -44,7 +36,6 @@ class InputScriptFactoryTest extends AbstractTestCase
         $this->assertSame($txSigHex, $parsed[0]->getData()->getHex());
         $this->assertSame($publicKeyHex, $parsed[1]->getData()->getHex());
         $this->assertEquals(2, count($parsed));
-        $this->assertEquals(InputClassifier::PAYTOPUBKEYHASH, ScriptFactory::scriptSig()->classify($script)->classify());
     }
 
     public function testPayToScriptHashMultisig()
@@ -64,6 +55,5 @@ class InputScriptFactoryTest extends AbstractTestCase
         $this->assertSame('', $parsed[0]->getData()->getHex());
         $this->assertSame($sigHex, $parsed[1]->getData()->getHex());
         $this->assertSame($script->getHex(), $parsed[2]->getData()->getHex());
-        $this->assertEquals(InputClassifier::MULTISIG, ScriptFactory::scriptSig()->classify($scriptHashSig)->classify());
     }
 }

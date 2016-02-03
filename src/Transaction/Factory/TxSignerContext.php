@@ -42,7 +42,7 @@ class TxSignerContext
     private $scriptType;
 
     /**
-     * @var array
+     * @var TransactionSignatureInterface[]
      */
     private $signatures = [];
 
@@ -57,9 +57,10 @@ class TxSignerContext
     private $ecAdapter;
 
     /**
+     * TxSignerContext constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param ScriptInterface $outputScript
-     * @param ScriptInterface $redeemScript
+     * @param ScriptInterface|null $redeemScript
      */
     public function __construct(
         EcAdapterInterface $ecAdapter,
@@ -67,6 +68,7 @@ class TxSignerContext
         ScriptInterface $redeemScript = null
     ) {
         $handler = ScriptFactory::info($outputScript, $redeemScript);
+        $handler->getKeys();
         $this->scriptType = $this->prevOutType = $handler->classification();
         if ($handler instanceof ScriptHash) {
             $this->scriptType = $handler->getInfo()->classification();

@@ -5,10 +5,12 @@ namespace BitWasp\Bitcoin\Transaction\Factory;
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -38,6 +40,11 @@ class TxBuilder
     private $outputs;
 
     /**
+     * @var array
+     */
+    private $witness;
+
+    /**
      * @var int
      */
     private $nLockTime;
@@ -55,6 +62,7 @@ class TxBuilder
         $this->nVersion = 1;
         $this->inputs = [];
         $this->outputs = [];
+        $this->witness = [];
         $this->nLockTime = 0;
         return $this;
     }
@@ -68,6 +76,7 @@ class TxBuilder
             $this->nVersion,
             new TransactionInputCollection($this->inputs),
             new TransactionOutputCollection($this->outputs),
+            new TransactionWitnessCollection($this->witness),
             $this->nLockTime
         );
     }
@@ -153,6 +162,19 @@ class TxBuilder
     {
         array_walk($outputs, function (TransactionOutputInterface $output) {
             $this->outputs[] = $output;
+        });
+
+        return $this;
+    }
+
+    /**
+     * @param ScriptWitnessInterface[] $witness
+     * @return $this
+     */
+    public function witnesses(array $witness)
+    {
+        array_walk($witness, function (ScriptWitnessInterface $witness) {
+            $this->witness[] = $witness;
         });
 
         return $this;

@@ -12,8 +12,8 @@ $scriptPubKey = ScriptFactory::create()->op('OP_ADD')->int(2)->op('OP_EQUAL')->g
 
 echo "Formed script: " . $scriptSig->getHex() . " " . $scriptPubKey->getHex() . "\n";
 
-$flags = new \BitWasp\Bitcoin\Flags(0);
-$i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter($ec, new Transaction, $flags);
+$flags = 0;
+$i = new \BitWasp\Bitcoin\Script\Interpreter\Interpreter($ec, new Transaction);
 
-$result = $i->verify($scriptSig, $scriptPubKey, 0);
+$result = $i->verify($scriptSig, $scriptPubKey, 0, $flags);
 echo "Script result: " . ($result ? 'true' : 'false') . "\n";

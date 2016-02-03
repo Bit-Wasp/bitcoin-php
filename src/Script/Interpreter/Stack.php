@@ -8,7 +8,12 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
 {
     public function __construct()
     {
-        $this->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_FIFO);
+        $this->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
+    }
+
+    public function bottom()
+    {
+        return parent::offsetGet(count($this) - 1);
     }
 
     /**
@@ -119,5 +124,22 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
         }
 
         return $count - 1;
+    }
+
+    /**
+     * @param $length
+     * @return $this
+     */
+    public function resize($length)
+    {
+        if ($length > count($this)) {
+            throw new \RuntimeException('Invalid start or length');
+        }
+
+        while (count($this) > $length) {
+            $this->pop();
+        }
+
+        return $this;
     }
 }

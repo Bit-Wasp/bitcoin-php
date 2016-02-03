@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\MTransactionSerializer;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
@@ -117,6 +117,6 @@ class Block extends Serializable implements BlockInterface
      */
     public function getBuffer()
     {
-        return (new BlockSerializer($this->math, new BlockHeaderSerializer(), new TransactionSerializer()))->serialize($this);
+        return (new BlockSerializer($this->math, new BlockHeaderSerializer(), new MTransactionSerializer()))->serialize($this);
     }
 }
