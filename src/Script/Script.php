@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\Parser\Parser;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -105,6 +107,47 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
+     * @param WitnessProgram $program
+     * @return int
+     */
+    private function witnessSigOps(WitnessProgram $program)
+    {
+        if ($program->getVersion() == 0) {
+            return $program->getOutputScript()->countSigOps(true);
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param ScriptInterface $scriptSig
+     * @param ScriptWitnessInterface $scriptWitness
+     * @param int $flags
+     * @return int
+     */
+    public function countWitnessSigOps(ScriptInterface $scriptSig, ScriptWitnessInterface $scriptWitness, $flags)
+    {
+        if ($flags & InterpreterInterface::VERIFY_WITNESS === 0) {
+            return 0;
+        }
+
+        $program = null;
+        if ($this->isWitness($program)) {
+            return $this->witnessSigOps($program);
+        }
+
+        if ((new OutputClassifier($this))->isPayToScriptHash()) {
+            $parsed = $scriptSig->getScriptParser()->decode();
+            $subscript = new Script(end($parsed)->getData());
+            if ($subscript->isWitness($program)) {
+                return $this->witnessSigOps($program);
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * @param ScriptInterface $scriptSig
      * @return int
      */
@@ -147,5 +190,37 @@ class Script extends Serializable implements ScriptInterface
             $pushOnly &= $entity->isPush();
         }
         return $pushOnly;
+    }
+
+    /**
+     * @param WitnessProgram|null $program
+     * @return bool
+     */
+    public function isWitness(WitnessProgram & $program = null)
+    {
+        $buffer = $this->getBuffer();
+        $size = $buffer->getSize();
+        if ($size < 4 || $size > 34) {
+            return false;
+        }
+
+        $parser = $this->getScriptParser();
+        $script = $parser->decode();
+        if (!$script[1]->isPush()) {
+            return false;
+        }
+
+        $version = $script[0]->getOp();
+        if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
+            return false;
+        }
+
+        $witness = $script[1];
+        if ($size === $witness->getDataSize() + 2) {
+            $program = new WitnessProgram(decodeOpN($version), $witness->getData());
+            return true;
+        }
+
+        return false;
     }
 }

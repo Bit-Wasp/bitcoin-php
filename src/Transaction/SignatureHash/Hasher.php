@@ -12,7 +12,7 @@ use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-class Hasher implements SignatureHashInterface
+class Hasher implements SigHash
 {
     /**
      * @var TransactionInterface
@@ -51,7 +51,7 @@ class Hasher implements SignatureHashInterface
      * @return BufferInterface
      * @throws \Exception
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SignatureHashInterface::SIGHASH_ALL)
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL)
     {
         $math = Bitcoin::getMath();
         $tx = new TxMutator($this->transaction);
@@ -65,7 +65,7 @@ class Hasher implements SignatureHashInterface
 
         $inputs[$inputToSign]->script($txOutScript);
 
-        if ($math->cmp($math->bitwiseAnd($sighashType, 31), SignatureHashInterface::SIGHASH_NONE) === 0) {
+        if ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHash::NONE) === 0) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
             $outputs->null();
 
@@ -76,7 +76,7 @@ class Hasher implements SignatureHashInterface
                 }
             }
 
-        } elseif ($math->cmp($math->bitwiseAnd($sighashType, 31), SignatureHashInterface::SIGHASH_SINGLE) === 0) {
+        } elseif ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHash::SINGLE) === 0) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
@@ -99,7 +99,7 @@ class Hasher implements SignatureHashInterface
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
-        if ($math->cmp($math->bitwiseAnd($sighashType, SignatureHashInterface::SIGHASH_ANYONECANPAY), 0) > 0) {
+        if ($math->cmp($math->bitwiseAnd($sighashType, SigHash::ANYONECANPAY), 0) > 0) {
             $input = $inputs[$inputToSign]->done();
             $inputs->null()->add($input);
         }

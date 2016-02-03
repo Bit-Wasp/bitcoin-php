@@ -15,10 +15,16 @@ class OutputClassifier implements ScriptClassifierInterface
     private $decoded;
 
     /**
+     * @var ScriptInterface
+     */
+    private $script;
+
+    /**
      * @param ScriptInterface $script
      */
     public function __construct(ScriptInterface $script)
     {
+        $this->script = $script;
         $this->decoded = $script->getScriptParser()->decode();
     }
 
@@ -125,16 +131,49 @@ class OutputClassifier implements ScriptClassifierInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isWitness()
+    {
+        $buffer = $this->script->getBuffer();
+        $size = $buffer->getSize();
+
+        if ($size < 4 || $size > 34) {
+            return false;
+        }
+
+        $parser = $this->script->getScriptParser();
+        $script = $parser->decode();
+        if (count($script) !== 2 || !$script[1]->isPush()) {
+            return false;
+        }
+
+        $version = $script[0]->getOp();
+        if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
+            return false;
+        }
+
+        $witness = $script[1];
+        if ($size === $witness->getDataSize() + 2) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function classify()
     {
-        if ($this->isPayToPublicKey()) {
+        if ($this->isPayToScriptHash()) {
+            return self::PAYTOSCRIPTHASH;
+        } elseif ($this->isWitness()) {
+            return self::WITNESS;
+        } elseif ($this->isPayToPublicKey()) {
             return self::PAYTOPUBKEY;
         } elseif ($this->isPayToPublicKeyHash()) {
             return self::PAYTOPUBKEYHASH;
-        } elseif ($this->isPayToScriptHash()) {
-            return self::PAYTOSCRIPTHASH;
         } elseif ($this->isMultisig()) {
             return self::MULTISIG;
         }

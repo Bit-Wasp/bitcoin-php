@@ -47,6 +47,19 @@ class NetworkFactory
 
     /**
      * @return NetworkInterface
+     */
+    public static function bitcoinSegnet()
+    {
+        $network = self::create('1e', '32', '9e', true)
+            ->setHDPubByte('043587cf')
+            ->setHDPrivByte('04358394')
+            ->setNetMagicBytes('0709110b');
+
+        return $network;
+    }
+
+    /**
+     * @return NetworkInterface
      * @throws \Exception
      */
     public static function litecoin()

@@ -46,6 +46,31 @@ class ScriptCreator
     }
 
     /**
+     * @param array $sequence
+     * @return $this
+     */
+    public function sequence(array $sequence)
+    {
+        $new = new self($this->math, $this->opcodes, null);
+        foreach ($sequence as $operation) {
+            if (is_int($operation)) {
+                if (!$this->opcodes->offsetExists($operation)) {
+                    throw new \RuntimeException('Unknown opcode');
+                }
+
+                $new->script .= chr($operation);
+            } elseif ($operation instanceof BufferInterface) {
+                $new->push($operation);
+            } else {
+                throw new \RuntimeException('Input was neither an opcode or BufferInterfacecc');
+            }
+        }
+
+        $this->concat($new->getScript());
+        return $this;
+    }
+
+    /**
      * Add an opcode to the script
      *
      * @param string $name

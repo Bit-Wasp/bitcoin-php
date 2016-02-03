@@ -57,12 +57,12 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     {
         // Default
         $tx = new Transaction();
-        $this->assertSame('0', $tx->getLockTime());
+        $this->assertEquals('0', $tx->getLockTime());
     }
 
     public function testSetLockTime()
     {
-        $tx = new Transaction(1, null, null, '1093');
+        $tx = new Transaction(1, null, null, null, '1093');
 
         $this->assertSame('1093', $tx->getLockTime());
     }
@@ -72,7 +72,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetLockTimeException()
     {
-        new Transaction(1, null, null, '4294967297');
+        new Transaction(1, null, null, null, '4294967297');
     }
 
     /**
@@ -99,7 +99,7 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
      */
     public function testInvalidLocktime()
     {
-        new Transaction(1, null, null, null);
+        new Transaction(1, null, null, null, null);
     }
 
     /**

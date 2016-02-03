@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Serializer\Bloom;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Flags;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Buffertools\Buffer;
@@ -45,7 +44,7 @@ class BloomFilterSerializer
             $vBuf,
             $filter->getNumHashFuncs(),
             $filter->getTweak(),
-            $filter->getFlags()->getFlags()
+            (string) $filter->getFlags()
         ]);
     }
 
@@ -62,7 +61,7 @@ class BloomFilterSerializer
             $vData,
             $numHashFuncs,
             $nTweak,
-            new Flags($flags)
+            $flags
         );
     }
 
