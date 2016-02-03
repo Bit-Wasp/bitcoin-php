@@ -18,6 +18,14 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isNull()
+    {
+        return count($this->set) === 0;
+    }
+
+    /**
      * @return int
      */
     public function count()
