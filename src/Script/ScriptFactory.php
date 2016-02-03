@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
-use BitWasp\Bitcoin\Script\Factory\InputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\P2shScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
@@ -45,14 +44,6 @@ class ScriptFactory
     public static function sequence(array $sequence)
     {
         return self::create()->sequence($sequence)->getScript();
-    }
-
-    /**
-     * @return InputScriptFactory
-     */
-    public static function scriptSig()
-    {
-        return new InputScriptFactory();
     }
 
     /**

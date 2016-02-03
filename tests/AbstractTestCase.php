@@ -49,11 +49,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $inScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\InputScriptFactory';
-
-    /**
-     * @var string
-     */
     protected $scriptCreatorType = 'BitWasp\Bitcoin\Script\Factory\ScriptCreator';
 
     /**

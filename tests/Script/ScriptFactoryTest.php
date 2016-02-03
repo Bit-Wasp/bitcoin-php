@@ -14,12 +14,6 @@ class ScriptFactoryTest extends AbstractTestCase
         $this->assertInstanceOf($this->outScriptFactoryType, $outputScripts);
     }
 
-    public function testScriptSig()
-    {
-        $inputScripts = ScriptFactory::scriptSig();
-        $this->assertInstanceOf($this->inScriptFactoryType, $inputScripts);
-    }
-
     public function testMultisig()
     {
         $pk1 = PrivateKeyFactory::fromInt('4');

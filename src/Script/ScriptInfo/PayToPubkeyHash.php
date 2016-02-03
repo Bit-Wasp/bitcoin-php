@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
 
 class PayToPubkeyHash implements ScriptInfoInterface
@@ -79,15 +80,15 @@ class PayToPubkeyHash implements ScriptInfoInterface
     }
 
     /**
-     * @param array $signatures
-     * @param array $publicKeys
+     * @param TransactionSignatureInterface[] $signatures
+     * @param PublicKeyInterface[] $publicKeys
      * @return Script|ScriptInterface
      */
     public function makeScriptSig(array $signatures = [], array $publicKeys = [])
     {
         $newScript = new Script();
         if (count($publicKeys) > 0 && count($signatures) === $this->getRequiredSigCount()) {
-            $newScript = ScriptFactory::scriptSig()->payToPubKeyHash($signatures[0], $publicKeys[0]);
+            $newScript = ScriptFactory::sequence([$signatures[0]->getBuffer(), $publicKeys[0]->getBuffer()]);
         }
 
         return $newScript;
