@@ -120,7 +120,7 @@ class TransactionSerializer
 
     /**
      * @param TransactionInterface $transaction
-     * @return Buffer
+     * @return BufferInterface
      */
     public function serialize(TransactionInterface $transaction)
     {

@@ -166,7 +166,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function getBuffer()
     {

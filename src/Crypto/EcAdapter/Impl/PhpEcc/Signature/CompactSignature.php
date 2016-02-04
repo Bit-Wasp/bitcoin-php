@@ -103,7 +103,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function getBuffer()
     {

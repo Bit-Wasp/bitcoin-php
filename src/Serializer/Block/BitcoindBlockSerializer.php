@@ -43,7 +43,7 @@ class BitcoindBlockSerializer
 
     /**
      * @param BlockInterface $block
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function serialize(BlockInterface $block)
     {
@@ -77,7 +77,7 @@ class BitcoindBlockSerializer
     }
 
     /**
-     * @param \BitWasp\Buffertools\Buffer|string $data
+     * @param \BitWasp\Buffertools\BufferInterface|string $data
      * @return \BitWasp\Bitcoin\Block\Block
      */
     public function parse($data)

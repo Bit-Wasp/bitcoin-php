@@ -63,7 +63,7 @@ class TransactionInputSerializer
         $outpoint = $this->outpointSerializer->fromParser($parser);
 
         /**
-         * @var Buffer $scriptBuf
+         * @var BufferInterface $scriptBuf
          * @var int|string $sequence
          */
         list ($scriptBuf, $sequence) = $this->getInputTemplate()->parse($parser);
@@ -76,7 +76,7 @@ class TransactionInputSerializer
     }
 
     /**
-     * @param $string
+     * @param BufferInterface|string $string
      * @return TransactionInput
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */

@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\Block;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\PartialMerkleTree;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
@@ -26,10 +27,9 @@ class PartialMerkleTreeSerializer
             ->getTemplate();
     }
 
-
     /**
      * @param int $last
-     * @param Buffer[] $vBytes
+     * @param BufferInterface[] $vBytes
      * @return array
      */
     private function buffersToBitArray($last, array $vBytes)

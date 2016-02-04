@@ -185,7 +185,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

@@ -37,22 +37,22 @@ class Interpreter implements InterpreterInterface
     private $math;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $vchFalse;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $vchTrue;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $int0;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $int1;
 

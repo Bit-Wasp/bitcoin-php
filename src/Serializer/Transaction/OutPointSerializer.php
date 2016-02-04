@@ -22,7 +22,7 @@ class OutPointSerializer
 
     /**
      * @param OutPointInterface $outpoint
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function serialize(OutPointInterface $outpoint)
     {
@@ -44,7 +44,7 @@ class OutPointSerializer
     }
 
     /**
-     * @param string|\BitWasp\Buffertools\Buffer $data
+     * @param string|\BitWasp\Buffertools\BufferInterface $data
      * @return OutPointInterface
      */
     public function parse($data)

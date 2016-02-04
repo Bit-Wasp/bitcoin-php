@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class MerkleRootTest extends AbstractTestCase
 {
@@ -78,10 +79,10 @@ class MerkleRootTest extends AbstractTestCase
      * @dataProvider getMerkleVectors
      * @param Math $math
      * @param array $txArray
-     * @param Buffer $eMerkleRoot
+     * @param BufferInterface $eMerkleRoot
      * @throws \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      */
-    public function testWholeSet(Math $math, array $txArray, Buffer $eMerkleRoot)
+    public function testWholeSet(Math $math, array $txArray, BufferInterface $eMerkleRoot)
     {
         $transactions = $this->getTransactionCollection($txArray);
         $merkle = new MerkleRoot($math, $transactions);

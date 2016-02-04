@@ -34,9 +34,9 @@ interface SigHash
      * can be used.
      *
      * @param ScriptInterface $txOutScript
-     * @param $inputToSign
+     * @param int $inputToSign
      * @param int $sighashType
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL);
 }

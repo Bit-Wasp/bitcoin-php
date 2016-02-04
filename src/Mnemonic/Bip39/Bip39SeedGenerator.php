@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Mnemonic\Bip39;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Bip39SeedGenerator
 {
@@ -22,7 +23,7 @@ class Bip39SeedGenerator
 
     /**
      * @param $string
-     * @return Buffer
+     * @return BufferInterface
      * @throws \Exception
      */
     private function normalize($string)
@@ -41,7 +42,7 @@ class Bip39SeedGenerator
     /**
      * @param $mnemonic
      * @param $passphrase
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      * @throws \Exception
      */
     public function getSeed($mnemonic, $passphrase = '')

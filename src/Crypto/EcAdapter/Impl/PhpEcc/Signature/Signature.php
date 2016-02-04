@@ -52,7 +52,7 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function getBuffer()
     {

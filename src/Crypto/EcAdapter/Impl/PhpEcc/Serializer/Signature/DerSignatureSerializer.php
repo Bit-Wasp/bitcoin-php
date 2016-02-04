@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Buffer;
@@ -62,7 +63,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
 
     /**
      * @param SignatureInterface $signature
-     * @return Buffer
+     * @return BufferInterface
      */
     public function serialize(SignatureInterface $signature)
     {
@@ -119,7 +120,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param $string
+     * @param BufferInterface|$string
      * @return Signature
      * @throws ParserOutOfRange
      */

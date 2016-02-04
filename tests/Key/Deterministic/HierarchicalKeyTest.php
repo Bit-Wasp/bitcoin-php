@@ -13,6 +13,7 @@ use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\EccFactory;
 
 class HierarchicalKeyTest extends AbstractTestCase
@@ -124,11 +125,11 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      * @dataProvider getBip32Vectors
      * @param EcAdapterInterface $ecAdapter
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @param $details
      * @param $derivs
      */
-    public function testTestVectors(EcAdapterInterface $ecAdapter, Buffer $entropy, $details, $derivs)
+    public function testTestVectors(EcAdapterInterface $ecAdapter, BufferInterface $entropy, $details, $derivs)
     {
         $key = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
         $this->compareToPrivVectors($key, $details);
