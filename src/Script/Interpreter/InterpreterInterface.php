@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitness;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 
 interface InterpreterInterface
 {
@@ -84,10 +85,10 @@ interface InterpreterInterface
      * @param ScriptInterface $scriptPubKey
      * @param int $flags
      * @param Checker $checker
-     * @param ScriptWitness|null $witness
+     * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitness $witness = null);
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitnessInterface $witness = null);
 
     /**
      * @param ScriptInterface $script

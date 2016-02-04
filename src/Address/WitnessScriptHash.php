@@ -16,7 +16,7 @@ class WitnessScriptHash implements AddressInterface
     private $witnessVersion;
 
     /**
-     * @var BufferInterface
+     * @var string
      */
     private $hash;
 
@@ -48,7 +48,7 @@ class WitnessScriptHash implements AddressInterface
     }
 
     /**
-     * @return BufferInterface|string
+     * @return string
      */
     public function getHash()
     {
