@@ -22,8 +22,20 @@ use BitWasp\Buffertools\Types\Vector;
 class TransactionSerializer
 {
     /**
-     *
+     * @var TransactionInputSerializer
      */
+    private $inputSerializer;
+
+    /**
+     * @var TransactionOutputSerializer
+     */
+    private $outputSerializer;
+
+    /**
+     * @var ScriptWitnessSerializer
+     */
+    private $witnessSerializer;
+
     public function __construct()
     {
         $this->inputSerializer = new TransactionInputSerializer(new OutPointSerializer());
