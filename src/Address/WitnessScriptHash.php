@@ -16,7 +16,7 @@ class WitnessScriptHash implements AddressInterface
     private $witnessVersion;
 
     /**
-     * @var BufferInterface
+     * @var string
      */
     private $hash;
 
@@ -35,7 +35,7 @@ class WitnessScriptHash implements AddressInterface
             throw new \RuntimeException('Hash for P2WSH address must be 32 bytes');
         }
 
-        $this->witnessVersion = $witnessVersion;
+        $this->witnessVersion = $witnessVersion;#
         $this->hash = $hash->getHex();
     }
 
@@ -48,7 +48,7 @@ class WitnessScriptHash implements AddressInterface
     }
 
     /**
-     * @return BufferInterface|string
+     * @return string
      */
     public function getHash()
     {
