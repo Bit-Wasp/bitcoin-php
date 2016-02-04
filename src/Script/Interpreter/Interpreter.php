@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitness;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
@@ -232,10 +233,10 @@ class Interpreter implements InterpreterInterface
      * @param ScriptInterface $scriptPubKey
      * @param int $flags
      * @param Checker $checker
-     * @param ScriptWitness|null $witness
+     * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitness $witness = null)
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitnessInterface $witness = null)
     {
         static $emptyWitness = null;
         if ($emptyWitness === null) {

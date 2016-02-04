@@ -35,7 +35,7 @@ class WitnessScriptHash implements AddressInterface
             throw new \RuntimeException('Hash for P2WSH address must be 32 bytes');
         }
 
-        $this->witnessVersion = $witnessVersion;#
+        $this->witnessVersion = $witnessVersion;
         $this->hash = $hash->getHex();
     }
 
