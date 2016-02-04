@@ -69,9 +69,9 @@ class Interpreter implements InterpreterInterface
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param TransactionInterface $transaction
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction)
+    public function __construct
+    (EcAdapterInterface $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
         $this->math = $ecAdapter->getMath();

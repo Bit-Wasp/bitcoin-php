@@ -76,7 +76,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckSignatureEncodingInvalidHashtype()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags($f));
+        $i = new Interpreter(Bitcoin::getEcAdapter(), new Flags($f));
 
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e891');
 
@@ -87,7 +87,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckSignatureSafeWhenFlagNotSet()
     {
         $f = 0;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags($f));
+        $i = new Interpreter(Bitcoin::getEcAdapter(), new Flags($f));
         $buffer = new Buffer('obviously incorrect.....?');
         try {
             $i->checkSignatureEncoding($buffer, $f);
@@ -104,7 +104,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckSignatureEncodingLowS()
     {
         $f = InterpreterInterface::VERIFY_LOW_S;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction(), new Flags($f));
+        $i = new Interpreter(Bitcoin::getEcAdapter(), new Flags($f));
         $buffer = Buffer::hex('30450220377bf4cab9bbdb219f1b0cca56f4a39fbf787d6fa9d04e248101d498de991d30022100b8e0c72dfab9a0d88eb2703c62e0e57ab2cb906e8f156b7641c2f0e24b8bba2b01');
         $i->checkSignatureEncoding($buffer, $f);
     }/**/
@@ -112,7 +112,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckEmptySignatureSafeWhenFlagNotSet()
     {
         $f = 0;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $buffer = new Buffer('');
         try {
             $i->checkSignatureEncoding($buffer, $f);
@@ -129,7 +129,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckSignatureEncodingWhenFlagSet()
     {
         $f = InterpreterInterface::VERIFY_DERSIG;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $buffer = new Buffer('obviously incorrect.....?');
         $i->checkSignatureEncoding($buffer, $f);
     }/**/
@@ -137,7 +137,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckSignatureEncodingWhenLowSFlagSet()
     {
         $f = InterpreterInterface::VERIFY_LOW_S;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e801');
         try {
             $i->checkSignatureEncoding($buffer, $f);
@@ -150,7 +150,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckSignatureEncodingWhenStrictEncFlagSet()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $buffer = Buffer::hex('3044022029ff6008e57d80619edf3b03b9a69ae1f8a659d9c231cde629c22f97d5bbf7e702200362617c577aa586fca20348f55a59f5ba71f3d6839b66fcfe13a84749b776e801');
         try {
             $i->checkSignatureEncoding($buffer, $f);
@@ -163,7 +163,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckPublicKeyEncoding()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $pubkey = Buffer::hex('045e9392308b08d0d663961463b6cd056a66b757a2ced9dde197c21362360237f231b80ea66315898969f5c079f0ba3fc1c0661ed8c853ad15043f22f2b7779c95');
         try {
             $i->checkPublicKeyEncoding($pubkey, $f);
@@ -180,7 +180,7 @@ class InterpreterTest extends AbstractTestCase
     public function testCheckPublicKeyEncodingFail()
     {
         $f = InterpreterInterface::VERIFY_STRICTENC;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction());
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $pubkey = Buffer::hex('045e9392308b08d0d663961463b6cd056a66b757a2ced9dde197c21362360237f231b80ea66315898969f5c079f0ba3fc1c0661ed8c853ad15043f22b7779c95');
         $i->checkPublicKeyEncoding($pubkey, $f);
     }/**/
@@ -264,7 +264,7 @@ class InterpreterTest extends AbstractTestCase
         $spendTx = $signer->get();
         $scriptSig = $spendTx->getInput(0)->getScript();
 
-        $i = new Interpreter($ec, $spendTx);
+        $i = new Interpreter($ec);
 
         $check = $i->verify($scriptSig, $outputScript, $flags, new Checker($ec, $spendTx, 0, 0));
         $this->assertEquals($eVerifyResult, $check);
@@ -422,7 +422,7 @@ class InterpreterTest extends AbstractTestCase
             [0x4d, new Buffer('', 255)]
         ];
 
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction);
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         foreach ($valid as $t) {
             list ($opcode, $buffer) = $t;
             $this->assertTrue($i->checkMinimalPush($opcode, $buffer));
