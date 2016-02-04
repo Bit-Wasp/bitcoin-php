@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\CompactSignature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 
 class CompactSignatureSerializer implements CompactSignatureSerializerInterface
@@ -26,7 +27,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 
     /**
      * @param CompactSignature $signature
-     * @return Buffer
+     * @return BufferInterface
      */
     private function doSerialize(CompactSignature $signature)
     {
@@ -41,7 +42,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 
     /**
      * @param CompactSignatureInterface $signature
-     * @return Buffer
+     * @return BufferInterface
      */
     public function serialize(CompactSignatureInterface $signature)
     {
@@ -50,7 +51,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     }
 
     /**
-     * @param string|Buffer $data
+     * @param string|BufferInterface $data
      * @return CompactSignature
      */
     public function parse($data)

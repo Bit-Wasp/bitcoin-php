@@ -4,12 +4,13 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 interface PrivateKeySerializerInterface
 {
     /**
      * @param PrivateKeyInterface $privateKey
-     * @return Buffer
+     * @return BufferInterface
      */
     public function serialize(PrivateKeyInterface $privateKey);
 
@@ -19,7 +20,7 @@ interface PrivateKeySerializerInterface
     public function setNextCompressed();
 
     /**
-     * @param string|Buffer $data
+     * @param string|BufferInterface $data
      * @return PrivateKeyInterface
      */
     public function parse($data);

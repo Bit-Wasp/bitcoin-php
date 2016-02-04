@@ -17,7 +17,7 @@ abstract class Key extends Serializable implements KeyInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function getPubKeyHash()
     {

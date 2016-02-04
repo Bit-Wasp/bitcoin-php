@@ -5,18 +5,18 @@ namespace BitWasp\Bitcoin\Tests\Mnemonic\Bip39;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39Mnemonic;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\EnglishWordList;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Bip39MnemonicTest extends AbstractBip39Case
 {
     /**
      * @dataProvider getBip39Vectors
      * @param Bip39Mnemonic $bip39
-     * @param Buffer $entropy
+     * @param BufferInterface $entropy
      * @param $eMnemonic
-     * @param Buffer $eSeed
+     * @param BufferInterface $eSeed
      */
-    public function testEntropyToMnemonic(Bip39Mnemonic $bip39, Buffer $entropy, $eMnemonic, Buffer $eSeed)
+    public function testEntropyToMnemonic(Bip39Mnemonic $bip39, BufferInterface $entropy, $eMnemonic, BufferInterface $eSeed)
     {
         $mnemonic = $bip39->entropyToMnemonic($entropy);
         $this->assertEquals($eMnemonic, $mnemonic);
@@ -25,11 +25,11 @@ class Bip39MnemonicTest extends AbstractBip39Case
     /**
      * @dataProvider getBip39Vectors
      * @param Bip39Mnemonic $bip39
-     * @param Buffer $eEntropy
+     * @param BufferInterface $eEntropy
      * @param $mnemonic
-     * @param Buffer $eSeed
+     * @param BufferInterface $eSeed
      */
-    public function testMnemonicToEntropy(Bip39Mnemonic $bip39, Buffer $eEntropy, $mnemonic, Buffer $eSeed)
+    public function testMnemonicToEntropy(Bip39Mnemonic $bip39, BufferInterface $eEntropy, $mnemonic, BufferInterface $eSeed)
     {
         $entropy = $bip39->mnemonicToEntropy($mnemonic);
         $this->assertEquals($eEntropy->getBinary(), $entropy->getBinary());

@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\SerializableInterface;
 interface ScriptInterface extends SerializableInterface
 {
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function getScriptHash();
 

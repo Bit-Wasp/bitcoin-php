@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class MessageSigner
@@ -27,7 +28,7 @@ class MessageSigner
 
     /**
      * @param string $message
-     * @return Buffer
+     * @return BufferInterface
      * @throws \Exception
      */
     private function calculateBody($message)
@@ -37,7 +38,7 @@ class MessageSigner
 
     /**
      * @param string $message
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function calculateMessageHash($message)
     {

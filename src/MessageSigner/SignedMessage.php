@@ -47,7 +47,7 @@ class SignedMessage
     }
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function getBuffer()
     {

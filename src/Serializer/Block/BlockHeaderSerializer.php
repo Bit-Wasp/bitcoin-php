@@ -12,7 +12,7 @@ use BitWasp\Buffertools\TemplateFactory;
 class BlockHeaderSerializer
 {
     /**
-     * @param \BitWasp\Buffertools\Buffer|string $string
+     * @param \BitWasp\Buffertools\BufferInterface|string $string
      * @return BlockHeader
      * @throws ParserOutOfRange
      */
@@ -63,7 +63,7 @@ class BlockHeaderSerializer
 
     /**
      * @param BlockHeaderInterface $header
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function serialize(BlockHeaderInterface $header)
     {

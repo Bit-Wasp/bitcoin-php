@@ -30,7 +30,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
     /**
      * @see \ArrayAccess::offsetGet()
      * @param int $offset
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function offsetGet($offset)
     {

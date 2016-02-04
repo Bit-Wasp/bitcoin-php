@@ -42,7 +42,7 @@ class TransactionFactory
     }
 
     /**
-     * @param \BitWasp\Buffertools\Buffer|string $string
+     * @param \BitWasp\Buffertools\BufferInterface|string $string
      * @return Transaction
      */
     public static function fromHex($string)

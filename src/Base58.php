@@ -18,11 +18,11 @@ class Base58
     /**
      * Encode a given hex string in base58
      *
-     * @param Buffer $binary
+     * @param BufferInterface $binary
      * @return string
      * @throws \Exception
      */
-    public static function encode(Buffer $binary)
+    public static function encode(BufferInterface $binary)
     {
         $size = $binary->getSize();
         if ($binary->getBinary() === '') {
@@ -53,7 +53,7 @@ class Base58
      * Decode a base58 string
      *
      * @param string $base58
-     * @return Buffer
+     * @return BufferInterface
      */
     public static function decode($base58)
     {

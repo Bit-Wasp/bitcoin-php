@@ -19,12 +19,12 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $version;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $prevBlock;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $merkleRoot;
 
@@ -34,7 +34,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $timestamp;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $bits;
 

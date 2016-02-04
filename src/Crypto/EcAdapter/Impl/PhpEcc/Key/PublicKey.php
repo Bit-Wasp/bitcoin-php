@@ -124,7 +124,7 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

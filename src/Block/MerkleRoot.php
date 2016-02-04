@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
 
@@ -23,7 +22,7 @@ class MerkleRoot
     private $math;
 
     /**
-     * @var Buffer
+     * @var BufferInterface
      */
     private $lastHash;
 
@@ -40,30 +39,16 @@ class MerkleRoot
     }
 
     /**
-     * @return Buffer
-     */
-    private function getLastHash()
-    {
-        return $this->lastHash;
-    }
-
-    /**
-     * Set the last hash. Should only be set by calculateHash()
-     *
-     * @param BufferInterface $lastHash
-     */
-    private function setLastHash(BufferInterface $lastHash)
-    {
-        $this->lastHash = $lastHash;
-    }
-
-    /**
      * @param callable|null $hashFunction
      * @return BufferInterface
      * @throws MerkleTreeEmpty
      */
     public function calculateHash(callable $hashFunction = null)
     {
+        if ($this->lastHash instanceof BufferInterface) {
+            return $this->lastHash;
+        }
+
         $hashFxn = $hashFunction ?: function ($value) {
             return hash('sha256', hash('sha256', $value, true), true);
         };
@@ -97,7 +82,7 @@ class MerkleRoot
             $binary = $tree->hash();
         }
 
-        $this->setLastHash((new Buffer($binary))->flip());
-        return $this->getLastHash();
+        $this->lastHash = (new Buffer($binary))->flip();
+        return $this->lastHash;
     }
 }

@@ -17,7 +17,7 @@ class PrivateKeyFactory
      * Generate a buffer containing a valid key
      *
      * @param EcAdapterInterface|null $ecAdapter
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
     public static function generateSecret(EcAdapterInterface $ecAdapter = null)
@@ -78,7 +78,7 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param \BitWasp\Buffertools\Buffer|string $hex
+     * @param \BitWasp\Buffertools\BufferInterface|string $hex
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKey

@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Signature\CompactSignatureSerializer;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class CompactSignature extends Serializable implements CompactSignatureInterface
 {
@@ -136,7 +136,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

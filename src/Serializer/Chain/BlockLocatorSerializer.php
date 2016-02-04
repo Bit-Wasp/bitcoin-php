@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Chain;
 
 use BitWasp\Bitcoin\Chain\BlockLocator;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
@@ -36,7 +37,7 @@ class BlockLocatorSerializer
     }
 
     /**
-     * @param $data
+     * @param BufferInterface|string $data
      * @return BlockLocator
      */
     public function parse($data)
@@ -46,7 +47,7 @@ class BlockLocatorSerializer
 
     /**
      * @param BlockLocator $blockLocator
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function serialize(BlockLocator $blockLocator)
     {

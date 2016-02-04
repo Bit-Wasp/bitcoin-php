@@ -410,7 +410,7 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

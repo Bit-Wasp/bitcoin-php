@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 interface KeyInterface extends SerializableInterface
 {
@@ -24,7 +25,7 @@ interface KeyInterface extends SerializableInterface
     /**
      * Return the hash of the public key.
      *
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getPubKeyHash();
 
@@ -46,7 +47,7 @@ interface KeyInterface extends SerializableInterface
     public function tweakMul($offset);
 
     /**
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function getBuffer();
 }

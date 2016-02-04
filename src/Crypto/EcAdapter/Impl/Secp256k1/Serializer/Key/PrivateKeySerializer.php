@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 
 /**
@@ -34,7 +35,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
 
     /**
      * @param PrivateKey $privateKey
-     * @return Buffer
+     * @return BufferInterface
      */
     private function doSerialize(PrivateKey $privateKey)
     {
@@ -43,7 +44,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
 
     /**
      * @param PrivateKeyInterface $privateKey
-     * @return Buffer
+     * @return BufferInterface
      */
     public function serialize(PrivateKeyInterface $privateKey)
     {
@@ -79,7 +80,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * @param \BitWasp\Buffertools\Buffer|string $data
+     * @param \BitWasp\Buffertools\BufferInterface|string $data
      * @return PrivateKey
      */
     public function parse($data)

@@ -14,12 +14,12 @@ interface DerSignatureSerializerInterface
 
     /**
      * @param SignatureInterface $signature
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function serialize(SignatureInterface $signature);
 
     /**
-     * @param string|\BitWasp\Buffertools\Buffer $data
+     * @param string|\BitWasp\Buffertools\BufferInterface $data
      * @return SignatureInterface
      */
     public function parse($data);

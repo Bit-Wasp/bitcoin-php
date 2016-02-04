@@ -43,11 +43,11 @@ class AddressFactory
         $parsed = $outputScript->getScriptParser()->decode();
 
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
-            /** @var \BitWasp\Buffertools\Buffer $hash */
+            /** @var \BitWasp\Buffertools\BufferInterface $hash */
             $hash = $parsed[2]->getData();
             return new PayToPubKeyHashAddress($hash);
         } else if ($type === OutputClassifier::PAYTOSCRIPTHASH) {
-            /** @var \BitWasp\Buffertools\Buffer $hash */
+            /** @var \BitWasp\Buffertools\BufferInterface $hash */
             $hash = $parsed[1]->getData();
             return new ScriptHashAddress($hash);
         }

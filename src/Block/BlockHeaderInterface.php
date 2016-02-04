@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin\Block;
 
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
 {
@@ -19,14 +19,14 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     /**
      * Return the previous blocks hash.
      *
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getPrevBlock();
 
     /**
      * Return the merkle root of the transactions in the block.
      *
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getMerkleRoot();
 
@@ -40,7 +40,7 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     /**
      * Return the buffer containing the short representation of the difficulty
      *
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBits();
 
@@ -52,7 +52,7 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     public function getNonce();
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getHash();
 }

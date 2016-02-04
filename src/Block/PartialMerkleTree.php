@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\PartialMerkleTreeSerializer;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class PartialMerkleTree extends Serializable
@@ -16,7 +17,7 @@ class PartialMerkleTree extends Serializable
     private $elementCount;
 
     /**
-     * @var Buffer[]
+     * @var BufferInterface[]
      */
     private $vHashes = [];
 
@@ -94,7 +95,7 @@ class PartialMerkleTree extends Serializable
     }
 
     /**
-     * @return Buffer[]
+     * @return BufferInterface[]
      */
     public function getHashes()
     {
@@ -114,8 +115,8 @@ class PartialMerkleTree extends Serializable
      *
      * @param int $height
      * @param int $position
-     * @param \BitWasp\Buffertools\Buffer[] $vTxid
-     * @return \BitWasp\Buffertools\Buffer
+     * @param \BitWasp\Buffertools\BufferInterface[] $vTxid
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function calculateHash($height, $position, array $vTxid)
     {
@@ -168,8 +169,8 @@ class PartialMerkleTree extends Serializable
      * @param int $position
      * @param int $nBitsUsed
      * @param int $nHashUsed
-     * @param Buffer[] $vMatch
-     * @return Buffer
+     * @param BufferInterface[] $vMatch
+     * @return BufferInterface
      */
     public function traverseAndExtract($height, $position, &$nBitsUsed, &$nHashUsed, &$vMatch)
     {
@@ -207,8 +208,8 @@ class PartialMerkleTree extends Serializable
     /**
      * Extract matches from the tree into provided $vMatch reference.
      *
-     * @param Buffer[] $vMatch - reference to array of extracted 'matching' hashes
-     * @return Buffer - this will be the merkle root
+     * @param BufferInterface[] $vMatch - reference to array of extracted 'matching' hashes
+     * @return BufferInterface - this will be the merkle root
      * @throws \Exception
      */
     public function extractMatches(array &$vMatch)
@@ -251,7 +252,7 @@ class PartialMerkleTree extends Serializable
     }
 
     /**
-     * @return Buffer
+     * @return BufferInterface
      */
     public function getBuffer()
     {

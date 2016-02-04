@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\FilteredBlock;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
@@ -45,7 +46,7 @@ class FilteredBlockSerializer
     }
 
     /**
-     * @param $data
+     * @param BufferInterface|string $data
      * @return FilteredBlock
      */
     public function parse($data)
@@ -55,7 +56,7 @@ class FilteredBlockSerializer
 
     /**
      * @param FilteredBlock $merkleBlock
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function serialize(FilteredBlock $merkleBlock)
     {

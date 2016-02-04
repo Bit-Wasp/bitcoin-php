@@ -72,7 +72,7 @@ class BlockSerializer
     }
 
     /**
-     * @param \BitWasp\Buffertools\Buffer|string $string
+     * @param \BitWasp\Buffertools\BufferInterface|string $string
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
@@ -83,7 +83,7 @@ class BlockSerializer
 
     /**
      * @param BlockInterface $block
-     * @return \BitWasp\Buffertools\Buffer
+     * @return \BitWasp\Buffertools\BufferInterface
      */
     public function serialize(BlockInterface $block)
     {
