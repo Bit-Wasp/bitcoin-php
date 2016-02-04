@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 class TransactionSignatureFactory
 {
     /**
-     * @param \BitWasp\Buffertools\Buffer|string $string
+     * @param \BitWasp\Buffertools\BufferInterface|string $string
      * @param EcAdapterInterface $ecAdapter
      * @return TransactionSignatureInterface
      */
