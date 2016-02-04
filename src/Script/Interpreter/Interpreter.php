@@ -392,6 +392,7 @@ class Interpreter implements InterpreterInterface
         $this->opCount = 0;
         $altStack = new Stack();
         $vfStack = new Stack();
+        $minimal = $flags & self::VERIFY_MINIMALDATA;
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
@@ -404,7 +405,7 @@ class Interpreter implements InterpreterInterface
                 $pushData = $operation->getData();
                 $fExec = $this->checkExec($vfStack);
 
-                // If pushdata was written to,
+                // If pushdata was written to
                 if ($operation->isPush() && $operation->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
                     throw new \RuntimeException('Error - push size');
                 }
@@ -420,7 +421,7 @@ class Interpreter implements InterpreterInterface
 
                 if ($fExec && $operation->isPush()) {
                     // In range of a pushdata opcode
-                    if ($flags & self::VERIFY_MINIMALDATA && !$this->checkMinimalPush($opCode, $pushData)) {
+                    if ($minimal && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(self::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
 
@@ -462,7 +463,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation - CLTV');
                             }
 
-                            $lockTime = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA, 5, $math);
+                            $lockTime = Number::buffer($mainStack[-1], $minimal, 5, $math);
                             if (!$checker->checkLockTime($lockTime)) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKLOCKTIMEVERIFY, 'Unsatisfied locktime');
                             }
@@ -481,7 +482,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation - CSV');
                             }
 
-                            $sequence = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA, 5, $math);
+                            $sequence = Number::buffer($mainStack[-1], $minimal, 5, $math);
                             $nSequence = $sequence->getInt();
                             if ($math->cmp($nSequence, 0) < 0) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
@@ -521,7 +522,7 @@ class Interpreter implements InterpreterInterface
                                     throw new \RuntimeException('Unbalanced conditional');
                                 }
                                 // todo
-                                $buffer = Number::buffer($mainStack->pop(), $flags & self::VERIFY_MINIMALDATA)->getBuffer();
+                                $buffer = Number::buffer($mainStack->pop(), $minimal)->getBuffer();
                                 $value = $this->castToBool($buffer);
                                 if ($opCode === Opcodes::OP_NOTIF) {
                                     $value = !$value;
@@ -648,7 +649,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $n = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA, 4)->getInt();
+                            $n = Number::buffer($mainStack[-1], $minimal, 4)->getInt();
                             $mainStack->pop();
                             if ($math->cmp($n, 0) < 0 || $math->cmp($n, count($mainStack)) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
@@ -758,7 +759,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
                             }
 
-                            $num = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $num = Number::buffer($mainStack[-1], $minimal)->getInt();
 
                             if ($opCode === Opcodes::OP_1ADD) {
                                 $num = $math->add($num, '1');
@@ -791,8 +792,8 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation (OP_ADD - OP_MAX)');
                             }
 
-                            $num1 = Number::buffer($mainStack[-2], $flags & self::VERIFY_MINIMALDATA)->getInt();
-                            $num2 = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $num1 = Number::buffer($mainStack[-2], $minimal)->getInt();
+                            $num2 = Number::buffer($mainStack[-1], $minimal)->getInt();
 
                             if ($opCode === Opcodes::OP_ADD) {
                                 $num = $math->add($num1, $num2);
@@ -841,9 +842,9 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $num1 = Number::buffer($mainStack[-3], $flags & self::VERIFY_MINIMALDATA)->getInt();
-                            $num2 = Number::buffer($mainStack[-2], $flags & self::VERIFY_MINIMALDATA)->getInt();
-                            $num3 = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $num1 = Number::buffer($mainStack[-3], $minimal)->getInt();
+                            $num2 = Number::buffer($mainStack[-2], $minimal)->getInt();
+                            $num3 = Number::buffer($mainStack[-1], $minimal)->getInt();
 
                             $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
                             $mainStack->pop();
@@ -916,7 +917,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $keyCount = Number::buffer($mainStack[-$i], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $keyCount = Number::buffer($mainStack[-$i], $minimal)->getInt();
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
                                 throw new \RuntimeException('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
@@ -930,7 +931,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $sigCount = Number::buffer($mainStack[-$i], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $sigCount = Number::buffer($mainStack[-$i], $minimal)->getInt();
                             if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
                                 throw new \RuntimeException('Invalid Signature count');
                             }
