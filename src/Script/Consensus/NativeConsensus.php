@@ -43,7 +43,7 @@ class NativeConsensus implements ConsensusInterface
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign, $amount, ScriptWitnessInterface $witness = null)
     {
         $inputs = $tx->getInputs();
-        $interpreter = new Interpreter($this->adapter, $tx);
+        $interpreter = new Interpreter($this->adapter);
         return $interpreter->verify(
             $inputs[$nInputToSign]->getScript(),
             $scriptPubKey,

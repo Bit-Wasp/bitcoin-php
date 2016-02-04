@@ -55,6 +55,11 @@ class InputSigner
     private $nInput;
 
     /**
+     * @var TransactionOutputInterface
+     */
+    private $txOut;
+
+    /**
      * @var PublicKeyInterface[]
      */
     private $publicKeys = [];
