@@ -72,20 +72,7 @@ You can install this library via Composer: `composer require bitwasp/bitcoin`
 
   The script interpreter has a modest set of test vectors, but these are mostly positive tests, that don't really exercise many of the edge cases. While it works, it's not bug-for-bug compatible yet and should not be relied on for consensus.
   Similarly, the secp256k1-php extension is a wrapper around an experimental library which has not yet been formally released. It's use should not be relied on until the upstream library has made a stable release. 
-
-## Implemented BIPs
-
-  - BIP0011 - M of N standard transactions
-  - BIP0016 / BIP0013 - Pay to Script hash, and corresponding address format.
-  - BIP0014 - Protocol Version and User Agent
-  - BIP0031 - Pong message
-  - BIP0032 - Hierarchical Deterministic Wallets
-  - BIP0035 - Mempool Message
-  - BIP0037 - Blooom Filtering
-  - BIP0039 - Mnemonic code for generating deterministic keys
-  - BIP0066 - Strict DER Signatures
-  - BIP0067 - Deterministic P2SH multi-signature addresses
-  - BIP0070 - Payment Protocol
+  
   
 # Examples  
 ## Generate private keys

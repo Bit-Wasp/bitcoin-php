@@ -6,17 +6,14 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
-use BitWasp\Bitcoin\Flags;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptWitness;
+use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
@@ -24,46 +21,11 @@ use BitWasp\Buffertools\BufferInterface;
 
 class Interpreter implements InterpreterInterface
 {
-    /**
-     * @var int|string
-     */
-    private $inputToSign;
-
-    /**
-     * @var TransactionInterface
-     */
-    private $transaction;
-
-    /**
-     * @var StackInterface
-     */
-    private $mainStack;
-
-    /**
-     * @var StackInterface
-     */
-    private $altStack;
-
-    /**
-     * @var StackInterface
-     */
-    private $vfStack;
-
-    /**
-     * Position of OP_CODESEPARATOR, for calculating SigHash
-     * @var int
-     */
-    private $hashStartPos;
 
     /**
      * @var int
      */
     private $opCount;
-
-    /**
-     * @var \BitWasp\Bitcoin\Flags
-     */
-    private $flags;
 
     /**
      * @var EcAdapterInterface
@@ -74,11 +36,6 @@ class Interpreter implements InterpreterInterface
      * @var \BitWasp\Bitcoin\Math\Math
      */
     private $math;
-
-    /**
-     * @var bool
-     */
-    private $minimalPush;
 
     /**
      * @var Buffer
@@ -113,19 +70,11 @@ class Interpreter implements InterpreterInterface
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
-     * @param \BitWasp\Bitcoin\Flags $flags
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, Flags $flags)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction)
     {
         $this->ecAdapter = $ecAdapter;
         $this->math = $ecAdapter->getMath();
-        $this->transaction = $transaction;
-        $this->flags = $flags;
-        $this->minimalPush = $this->flags->checkFlags(self::VERIFY_MINIMALDATA) === true;
-        $this->mainStack = new Stack();
-        $this->altStack = new Stack();
-        $this->vfStack = new Stack();
-
         $this->vchFalse = new Buffer("", 0, $this->math);
         $this->vchTrue = new Buffer("\x01", 1, $this->math);
         $this->int0 = Number::buffer($this->vchFalse, false, 4, $this->math)->getBuffer();
@@ -140,12 +89,19 @@ class Interpreter implements InterpreterInterface
      */
     public function castToBool(BufferInterface $value)
     {
-        if ($value->getSize() === 0) {
-            return true;
+        $val = $value->getBinary();
+        for ($i = 0, $size = strlen($val); $i < $size; $i++) {
+            $chr = ord($val[$i]);
+            if ($chr != 0) {
+                if ($i == ($size - 1) && $chr == 0x80) {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
-        // Since we're using buffers, lets try ensuring the contents are not 0.
-        return $this->math->cmp($value->getInt(), 0) > 0;
+        return false;
     }
 
     /**
@@ -162,82 +118,6 @@ class Interpreter implements InterpreterInterface
         }
 
         return false;
-    }
-
-    /**
-     * @param BufferInterface $signature
-     * @return bool
-     * @throws ScriptRuntimeException
-     * @throws \Exception
-     */
-    public function isLowDerSignature(BufferInterface $signature)
-    {
-        if (!$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        }
-
-        $binary = $signature->getBinary();
-        $nLenR = ord($binary[3]);
-        $nLenS = ord($binary[5 + $nLenR]);
-        $s = $signature->slice(6 + $nLenR, $nLenS)->getInt();
-
-        return $this->ecAdapter->validateSignatureElement($s, true);
-    }
-
-    /**
-     * Determine whether the sighash byte appended to the signature encodes
-     * a valid sighash type.
-     *
-     * @param BufferInterface $signature
-     * @return bool
-     */
-    public function isDefinedHashtypeSignature(BufferInterface $signature)
-    {
-        if ($signature->getSize() === 0) {
-            return false;
-        }
-
-        $binary = $signature->getBinary();
-        $nHashType = ord(substr($binary, -1)) & (~(SignatureHashInterface::SIGHASH_ANYONECANPAY));
-
-        $math = $this->math;
-        return ! ($math->cmp($nHashType, SignatureHashInterface::SIGHASH_ALL) < 0 || $math->cmp($nHashType, SignatureHashInterface::SIGHASH_SINGLE) > 0);
-    }
-
-    /**
-     * @param BufferInterface $signature
-     * @return $this
-     * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
-     */
-    public function checkSignatureEncoding(BufferInterface $signature)
-    {
-        if ($signature->getSize() === 0) {
-            return $this;
-        }
-
-        if ($this->flags->checkFlags(self::VERIFY_DERSIG | self::VERIFY_LOW_S | self::VERIFY_STRICTENC) && !$this->isValidSignatureEncoding($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        } else if ($this->flags->checkFlags(self::VERIFY_LOW_S) && !$this->isLowDerSignature($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_LOW_S, 'Signature s element was not low');
-        } else if ($this->flags->checkFlags(self::VERIFY_STRICTENC) && !$this->isDefinedHashtypeSignature($signature)) {
-            throw new ScriptRuntimeException(self::VERIFY_STRICTENC, 'Signature with invalid hashtype');
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param BufferInterface $publicKey
-     * @return $this
-     * @throws \Exception
-     */
-    public function checkPublicKeyEncoding(BufferInterface $publicKey)
-    {
-        if ($this->flags->checkFlags(self::VERIFY_STRICTENC) && !PublicKey::isCompressedOrUncompressed($publicKey)) {
-            throw new ScriptRuntimeException(self::VERIFY_STRICTENC, 'Public key with incorrect encoding');
-        }
-
-        return $this;
     }
 
     /**
@@ -285,135 +165,196 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param BufferInterface $sigBuf
-     * @param BufferInterface $keyBuf
+     * @param WitnessProgram $witnessProgram
+     * @param ScriptWitness $scriptWitness
+     * @param int $flags
+     * @param Checker $checker
      * @return bool
-     * @throws ScriptRuntimeException
-     * @throws \Exception
      */
-    private function checkSig(ScriptInterface $script, BufferInterface $sigBuf, BufferInterface $keyBuf)
+    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitness $scriptWitness, $flags, Checker $checker)
     {
-        $this
-            ->checkSignatureEncoding($sigBuf)
-            ->checkPublicKeyEncoding($keyBuf);
+        $witnessCount = count($scriptWitness);
 
-        try {
-            $txSignature = TransactionSignatureFactory::fromHex($sigBuf->getHex());
-            $publicKey = PublicKeyFactory::fromHex($keyBuf->getHex());
+        if ($witnessProgram->getVersion() == 0) {
+            $buffer = $witnessProgram->getProgram();
+            if ($buffer->getSize() === 32) {
+                // Version 0 segregated witness program: SHA256(Script) in program, Script + inputs in witness
+                if ($witnessCount === 0) {
+                    // Must contain script at least
+                    return false;
+                }
 
-            return $this->ecAdapter->verify(
-                $this->transaction->getSignatureHash()->calculate($script, $this->inputToSign, $txSignature->getHashType()),
-                $publicKey,
-                $txSignature->getSignature()
-            );
-        } catch (\Exception $e) {
+                $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
+                $stackValues = $scriptWitness->slice(0, -1);
+                $hashScriptPubKey = Hash::sha256($scriptWitness[$witnessCount - 1]);
+
+                if ($hashScriptPubKey == $buffer) {
+                    return false;
+                }
+            } elseif ($buffer->getSize() === 20) {
+                // Version 0 special case for pay-to-pubkeyhash
+                if ($witnessCount !== 2) {
+                    // 2 items in witness - <signature> <pubkey>
+                    return false;
+                }
+
+                $scriptPubKey = ScriptFactory::create()->sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $buffer, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG])->getScript();
+                $stackValues = $scriptWitness;
+            } else {
+                return false;
+            }
+        } elseif ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
             return false;
-        }
-    }
-
-    /**
-     * @param int $txLockTime
-     * @param int $nThreshold
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
-     * @return bool
-     */
-    private function verifyLockTime($txLockTime, $nThreshold, Number $lockTime)
-    {
-        $nTime = $lockTime->getInt();
-        if (($this->math->cmp($txLockTime, $nThreshold) < 0 && $this->math->cmp($nTime, $nThreshold) < 0) ||
-            ($this->math->cmp($txLockTime, $nThreshold) >= 0 && $this->math->cmp($nTime, $nThreshold) >= 0)
-        ) {
-            return false;
-        }
-
-        return $this->math->cmp($nTime, $txLockTime) >= 0;
-    }
-
-    /**
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
-     * @return bool
-     */
-    private function checkLockTime(Number $lockTime)
-    {
-        if ($this->transaction->getInput($this->inputToSign)->isFinal()) {
+        } else {
             return false;
         }
 
-        return $this->verifyLockTime($this->transaction->getLockTime(), Locktime::BLOCK_MAX, $lockTime);
-    }
+        $mainStack = new Stack();
+        foreach ($stackValues as $value) {
+            $mainStack->push($value);
+        }
 
-    /**
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $sequence
-     * @return bool
-     */
-    private function checkSequence(Number $sequence)
-    {
-        $txSequence = $this->transaction->getInput($this->inputToSign)->getSequence();
-        if ($this->transaction->getVersion() < 2) {
+        if (!$this->evaluate($scriptPubKey, $mainStack, 1, $flags, $checker)) {
             return false;
         }
 
-        if ($this->math->cmp($this->math->bitwiseAnd($txSequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), 0) !== 0) {
-            return 0;
+        if ($mainStack->count() !== 1) {
+            return false;
         }
 
-        $mask = $this->math->bitwiseOr(TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG, TransactionInputInterface::SEQUENCE_LOCKTIME_MASK);
-        return $this->verifyLockTime(
-            $this->math->bitwiseAnd($txSequence, $mask),
-            TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG,
-            Number::int($this->math->bitwiseAnd($sequence->getInt(), $mask))
-        );
+        if (!$this->castToBool($mainStack->bottom())) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
-     * @param int $nInputToSign
+     * @param int $flags
+     * @param Checker $checker
+     * @param ScriptWitness|null $witness
      * @return bool
-     * @throws \Exception
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $nInputToSign)
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitness $witness = null)
     {
-        $this->inputToSign = $nInputToSign;
-        if (!$this->evaluate($scriptSig)) {
+        static $emptyWitness = null;
+        if ($emptyWitness === null) {
+            $emptyWitness = new ScriptWitness([]);
+        }
+
+        $witness = $witness ?: $emptyWitness;
+
+        if (($flags & self::VERIFY_SIGPUSHONLY) != 0 && !$scriptSig->isPushOnly()) {
             return false;
         }
 
-        $stackCopy = new Stack;
-        if ($this->flags->checkFlags(self::VERIFY_P2SH)) {
-            $stackCopy = clone $this->mainStack;
-        }
-
-        if (!$this->evaluate($scriptPubKey)) {
+        $stack = new Stack();
+        if (!$this->evaluate($scriptSig, $stack, 0, $flags, $checker)) {
             return false;
         }
 
-        if ($this->mainStack->isEmpty()) {
+        $backup = [];
+        if ($flags & self::VERIFY_P2SH) {
+            foreach ($stack as $s) {
+                $backup[] = $s;
+            }
+        }
+
+        if (!$this->evaluate($scriptPubKey, $stack, 0, $flags, $checker)) {
             return false;
         }
 
-        if (false === $this->castToBool($this->mainStack[-1])) {
+        if ($stack->isEmpty()) {
             return false;
         }
 
-        if ($this->flags->checkFlags(self::VERIFY_P2SH) && (new OutputClassifier($scriptPubKey))->isPayToScriptHash()) {
+        if (false === $this->castToBool($stack[-1])) {
+            return false;
+        }
+
+        $program = null;
+
+        if ($flags & self::VERIFY_WITNESS) {
+            if ($scriptPubKey->isWitness($program)) {
+                /** @var WitnessProgram $program */
+                if ($scriptSig->getBuffer()->getSize() !== 0) {
+                    return false;
+                }
+
+                if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
+                    return false;
+                }
+
+                $stack->resize(1);
+            }
+        }
+
+        if ($flags & self::VERIFY_P2SH && (new OutputClassifier($scriptPubKey))->isPayToScriptHash()) {
             if (!$scriptSig->isPushOnly()) {
                 return false;
             }
 
+            $stack = new Stack();
+            foreach ($backup as $i) {
+                $stack->push($i);
+            }
+
             // Restore mainStack to how it was after evaluating scriptSig
-            $this->mainStack = $this->mainStack = $stackCopy;
-            if ($this->mainStack->isEmpty()) {
+            if ($stack->isEmpty()) {
                 return false;
             }
 
             // Load redeemscript as the scriptPubKey
-            $scriptPubKey = new Script($this->mainStack->bottom());
-            $this->mainStack->pop();
+            $scriptPubKey = new Script($stack->bottom());
+            $stack->pop();
 
-            if (!$this->evaluate($scriptPubKey)) {
+            if (!$this->evaluate($scriptPubKey, $stack, 0, $flags, $checker)) {
                 return false;
+            }
+
+            if ($stack->isEmpty()) {
+                return false;
+            }
+
+            if (!$this->castToBool($stack->bottom())) {
+                return false;
+            }
+
+            if ($flags & self::VERIFY_WITNESS) {
+
+                if ($scriptPubKey->isWitness($program)) {
+                    if ($scriptSig != (ScriptFactory::create()->push($scriptPubKey->getBuffer())->getScript())) {
+                        return false; // SCRIPT_ERR_WITNESS_MALLEATED_P2SH
+                    }
+
+                    if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
+                        return false;
+                    }
+
+                    $stack->resize(1);
+                }
+            }
+        }
+
+        if ($flags & self::VERIFY_CLEAN_STACK != 0) {
+            if (!($flags & self::VERIFY_P2SH != 0 && $flags & self::VERIFY_WITNESS != 0)) {
+                return false; // implied flags required
+            }
+
+            if (count($stack) != 1) {
+                return false; // Cleanstack
+            }
+        }
+
+        if ($flags & self::VERIFY_WITNESS) {
+            if (!$flags & self::VERIFY_P2SH) {
+                return false; //
+            }
+
+            if ($program === null && !$witness->isNull()) {
+                return false; // SCRIPT_ERR_WITNESS_UNEXPECTED
             }
         }
 
@@ -421,14 +362,15 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
+     * @param Stack $vfStack
      * @return bool
      */
-    private function checkExec()
+    private function checkExec(Stack $vfStack)
     {
         $c = 0;
-        $len = $this->vfStack->end();
+        $len = $vfStack->end();
         for ($i = 0; $i < $len; $i++) {
-            if ($this->vfStack[0 - $len - $i] === true) {
+            if ($vfStack[0 - $len - $i] === true) {
                 $c++;
             }
         }
@@ -437,13 +379,19 @@ class Interpreter implements InterpreterInterface
 
     /**
      * @param ScriptInterface $script
+     * @param Stack $mainStack
+     * @param int $sigVersion
+     * @param int $flags
+     * @param Checker $checker
      * @return bool
      */
-    public function evaluate(ScriptInterface $script)
+    public function evaluate(ScriptInterface $script, Stack $mainStack, $sigVersion, $flags, Checker $checker)
     {
         $math = $this->math;
-        $this->hashStartPos = 0;
+        $hashStartPos = 0;
         $this->opCount = 0;
+        $altStack = new Stack();
+        $vfStack = new Stack();
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
@@ -454,7 +402,7 @@ class Interpreter implements InterpreterInterface
             foreach ($parser as $operation) {
                 $opCode = $operation->getOp();
                 $pushData = $operation->getData();
-                $fExec = $this->checkExec();
+                $fExec = $this->checkExec($vfStack);
 
                 // If pushdata was written to,
                 if ($operation->isPush() && $operation->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
@@ -472,14 +420,14 @@ class Interpreter implements InterpreterInterface
 
                 if ($fExec && $operation->isPush()) {
                     // In range of a pushdata opcode
-                    if ($this->minimalPush && !$this->checkMinimalPush($opCode, $pushData)) {
+                    if ($flags & self::VERIFY_MINIMALDATA && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(self::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
 
-                    $this->mainStack->push($pushData);
+                    $mainStack->push($pushData);
                     // echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
-                    // echo "OPCODE - " . $this->script->getOpCodes()->getOp($opCode) . "\n";
+                    // echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1NEGATE:
                         case Opcodes::OP_1:
@@ -498,42 +446,42 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_14:
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
-                            $num = $opCode - (Opcodes::OP_1 - 1);
-                            $this->mainStack->push(Number::int($num)->getBuffer());
+                            $num = \BitWasp\Bitcoin\Script\decodeOpN($opCode);
+                            $mainStack->push(Number::int($num)->getBuffer());
                             break;
 
                         case Opcodes::OP_CHECKLOCKTIMEVERIFY:
-                            if (!$this->flags->checkFlags(self::VERIFY_CHECKLOCKTIMEVERIFY)) {
-                                if ($this->flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                            if (!$flags & self::VERIFY_CHECKLOCKTIMEVERIFY) {
+                                if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS) {
                                     throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                                 }
                                 break;
                             }
 
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation - CLTV');
                             }
 
-                            $lockTime = Number::buffer($this->mainStack[-1], $this->minimalPush, 5, $math);
-                            if (!$this->checkLockTime($lockTime)) {
+                            $lockTime = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA, 5, $math);
+                            if (!$checker->checkLockTime($lockTime)) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKLOCKTIMEVERIFY, 'Unsatisfied locktime');
                             }
 
                             break;
 
                         case Opcodes::OP_CHECKSEQUENCEVERIFY:
-                            if (!$this->flags->checkFlags(self::VERIFY_CHECKSEQUENCEVERIFY)) {
-                                if ($this->flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                            if (!$flags & self::VERIFY_CHECKSEQUENCEVERIFY) {
+                                if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS) {
                                     throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                                 }
                                 break;
                             }
 
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation - CSV');
                             }
 
-                            $sequence = Number::buffer($this->mainStack[-1], $this->minimalPush, 5, $math);
+                            $sequence = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA, 5, $math);
                             $nSequence = $sequence->getInt();
                             if ($math->cmp($nSequence, 0) < 0) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
@@ -543,7 +491,7 @@ class Interpreter implements InterpreterInterface
                                 break;
                             }
 
-                            if (!$this->checkSequence($sequence)) {
+                            if (!$checker->checkSequence($sequence)) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Unsatisfied locktime');
                             }
                             break;
@@ -556,7 +504,7 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_NOP8:
                         case Opcodes::OP_NOP9:
                         case Opcodes::OP_NOP10:
-                            if ($this->flags->checkFlags(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS)) {
+                            if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS) {
                                 throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                             }
                             break;
@@ -569,41 +517,41 @@ class Interpreter implements InterpreterInterface
                             // <expression> if [statements] [else [statements]] endif
                             $value = false;
                             if ($fExec) {
-                                if ($this->mainStack->isEmpty()) {
+                                if ($mainStack->isEmpty()) {
                                     throw new \RuntimeException('Unbalanced conditional');
                                 }
                                 // todo
-                                $buffer = Number::buffer($this->mainStack->pop(), $this->minimalPush)->getBuffer();
+                                $buffer = Number::buffer($mainStack->pop(), $flags & self::VERIFY_MINIMALDATA)->getBuffer();
                                 $value = $this->castToBool($buffer);
                                 if ($opCode === Opcodes::OP_NOTIF) {
                                     $value = !$value;
                                 }
                             }
-                            $this->vfStack->push($value ? $this->vchTrue : $this->vchFalse);
+                            $vfStack->push($value ? $this->vchTrue : $this->vchFalse);
                             break;
 
                         case Opcodes::OP_ELSE:
-                            if ($this->vfStack->isEmpty()) {
+                            if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
-                            $this->vfStack[-1] = !$this->vfStack->end() ? $this->vchTrue : $this->vchFalse;
+                            $vfStack[-1] = !$vfStack->end() ? $this->vchTrue : $this->vchFalse;
                             break;
 
                         case Opcodes::OP_ENDIF:
-                            if ($this->vfStack->isEmpty()) {
+                            if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
                             break;
 
                         case Opcodes::OP_VERIFY:
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
-                            $value = $this->castToBool($this->mainStack[-1]);
+                            $value = $this->castToBool($mainStack[-1]);
                             if (!$value) {
                                 throw new \RuntimeException('Error: verify');
                             }
-                            $this->mainStack->pop();
+                            $mainStack->pop();
                             break;
 
                         case Opcodes::OP_RESERVED:
@@ -611,198 +559,192 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_TOALTSTACK:
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_TOALTSTACK');
                             }
-                            $this->altStack->push($this->mainStack->pop());
+                            $altStack->push($mainStack->pop());
                             break;
 
                         case Opcodes::OP_FROMALTSTACK:
-                            if ($this->altStack->isEmpty()) {
+                            if ($altStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid alt-stack operation OP_FROMALTSTACK');
                             }
-                            $this->mainStack->push($this->altStack->pop());
+                            $mainStack->push($altStack->pop());
                             break;
 
                         case Opcodes::OP_IFDUP:
                             // If top value not zero, duplicate it.
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_IFDUP');
                             }
-                            $vch = $this->mainStack[-1];
+                            $vch = $mainStack[-1];
                             if ($this->castToBool($vch)) {
-                                $this->mainStack->push($vch);
+                                $mainStack->push($vch);
                             }
                             break;
 
                         case Opcodes::OP_DEPTH:
-                            $num = count($this->mainStack);
-                            if ($num === 0) {
-                                $depth = $this->vchFalse;
-                            } else {
-                                $depth = Number::int($num)->getBuffer();
-                            }
-
-                            $this->mainStack->push($depth);
+                            $num = count($mainStack);
+                            $depth = Number::int($num)->getBuffer();
+                            $mainStack->push($depth);
                             break;
 
                         case Opcodes::OP_DROP:
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_DROP');
                             }
-                            $this->mainStack->pop();
+                            $mainStack->pop();
                             break;
 
                         case Opcodes::OP_DUP:
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_DUP');
                             }
-                            $vch = $this->mainStack[-1];
-                            $this->mainStack->push($vch);
+                            $vch = $mainStack[-1];
+                            $mainStack->push($vch);
                             break;
 
                         case Opcodes::OP_NIP:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_NIP');
                             }
-                            unset($this->mainStack[-2]);
+                            unset($mainStack[-2]);
                             break;
 
                         case Opcodes::OP_OVER:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_OVER');
                             }
-                            $vch = $this->mainStack[-2];
-                            $this->mainStack->push($vch);
+                            $vch = $mainStack[-2];
+                            $mainStack->push($vch);
                             break;
 
                         case Opcodes::OP_ROT:
-                            if (count($this->mainStack) < 3) {
+                            if (count($mainStack) < 3) {
                                 throw new \RuntimeException('Invalid stack operation OP_ROT');
                             }
-                            $this->mainStack->swap(-3, -2);
-                            $this->mainStack->swap(-2, -1);
+                            $mainStack->swap(-3, -2);
+                            $mainStack->swap(-2, -1);
                             break;
 
                         case Opcodes::OP_SWAP:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_SWAP');
                             }
-                            $this->mainStack->swap(-2, -1);
+                            $mainStack->swap(-2, -1);
                             break;
 
                         case Opcodes::OP_TUCK:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_TUCK');
                             }
-                            $vch = $this->mainStack[-1];
-                            $this->mainStack->add(count($this->mainStack) - 1 - 2, $vch);
+                            $vch = $mainStack[-1];
+                            $mainStack->add(count($mainStack) - 1 - 2, $vch);
                             break;
 
                         case Opcodes::OP_PICK:
                         case Opcodes::OP_ROLL:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $n = Number::buffer($this->mainStack[-1], $this->minimalPush, 4)->getInt();
-                            $this->mainStack->pop();
-                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, count($this->mainStack)) >= 0) {
+                            $n = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA, 4)->getInt();
+                            $mainStack->pop();
+                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, count($mainStack)) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
                             $pos = (int) $math->sub($math->sub(0, $n), 1);
-                            $vch = $this->mainStack[$pos];
+                            $vch = $mainStack[$pos];
                             if ($opCode === Opcodes::OP_ROLL) {
-                                unset($this->mainStack[$pos]);
+                                unset($mainStack[$pos]);
                             }
-                            $this->mainStack->push($vch);
+                            $mainStack->push($vch);
                             break;
 
                         case Opcodes::OP_2DROP:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_2DROP');
                             }
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
                             break;
 
                         case Opcodes::OP_2DUP:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_2DUP');
                             }
-                            $string1 = $this->mainStack[-2];
-                            $string2 = $this->mainStack[-1];
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
+                            $string1 = $mainStack[-2];
+                            $string2 = $mainStack[-1];
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
                             break;
 
                         case Opcodes::OP_3DUP:
-                            if (count($this->mainStack) < 3) {
+                            if (count($mainStack) < 3) {
                                 throw new \RuntimeException('Invalid stack operation OP_3DUP');
                             }
-                            $string1 = $this->mainStack[-3];
-                            $string2 = $this->mainStack[-2];
-                            $string3 = $this->mainStack[-1];
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
-                            $this->mainStack->push($string3);
+                            $string1 = $mainStack[-3];
+                            $string2 = $mainStack[-2];
+                            $string3 = $mainStack[-1];
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
+                            $mainStack->push($string3);
                             break;
 
                         case Opcodes::OP_2OVER:
-                            if (count($this->mainStack) < 4) {
+                            if (count($mainStack) < 4) {
                                 throw new \RuntimeException('Invalid stack operation OP_2OVER');
                             }
-                            $string1 = $this->mainStack[-4];
-                            $string2 = $this->mainStack[-3];
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
+                            $string1 = $mainStack[-4];
+                            $string2 = $mainStack[-3];
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
                             break;
 
                         case Opcodes::OP_2ROT:
-                            if (count($this->mainStack) < 6) {
+                            if (count($mainStack) < 6) {
                                 throw new \RuntimeException('Invalid stack operation OP_2ROT');
                             }
-                            $string1 = $this->mainStack[-6];
-                            $string2 = $this->mainStack[-5];
-                            unset($this->mainStack[-6], $this->mainStack[-5]);
-                            $this->mainStack->push($string1);
-                            $this->mainStack->push($string2);
+                            $string1 = $mainStack[-6];
+                            $string2 = $mainStack[-5];
+                            unset($mainStack[-6], $mainStack[-5]);
+                            $mainStack->push($string1);
+                            $mainStack->push($string2);
                             break;
 
                         case Opcodes::OP_2SWAP:
-                            if (count($this->mainStack) < 4) {
+                            if (count($mainStack) < 4) {
                                 throw new \RuntimeException('Invalid stack operation OP_2SWAP');
                             }
-                            $this->mainStack->swap(-3, -1);
-                            $this->mainStack->swap(-4, -2);
+                            $mainStack->swap(-3, -1);
+                            $mainStack->swap(-4, -2);
                             break;
 
                         case Opcodes::OP_SIZE:
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_SIZE');
                             }
                             // todo: Int sizes?
-                            $vch = $this->mainStack[-1];
-                            $this->mainStack->push(Number::int($vch->getSize())->getBuffer());
+                            $vch = $mainStack[-1];
+                            $mainStack->push(Number::int($vch->getSize())->getBuffer());
                             break;
 
                         case Opcodes::OP_EQUAL:
                         case Opcodes::OP_EQUALVERIFY:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_EQUAL');
                             }
-                            $vch1 = $this->mainStack[-2];
-                            $vch2 = $this->mainStack[-1];
+                            $vch1 = $mainStack[-2];
+                            $vch2 = $mainStack[-1];
 
                             $equal = ($vch1->getBinary() === $vch2->getBinary());
-
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->push(($equal ? $this->vchTrue : $this->vchFalse));
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push(($equal ? $this->vchTrue : $this->vchFalse));
                             if ($opCode === Opcodes::OP_EQUALVERIFY) {
                                 if ($equal) {
-                                    $this->mainStack->pop();
+                                    $mainStack->pop();
                                 } else {
                                     throw new \RuntimeException('Error EQUALVERIFY');
                                 }
@@ -812,11 +754,11 @@ class Interpreter implements InterpreterInterface
 
                         // Arithmetic operations
                         case $opCode >= Opcodes::OP_1ADD && $opCode <= Opcodes::OP_0NOTEQUAL:
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
                             }
 
-                            $num = Number::buffer($this->mainStack[-1], $this->minimalPush)->getInt();
+                            $num = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA)->getInt();
 
                             if ($opCode === Opcodes::OP_1ADD) {
                                 $num = $math->add($num, '1');
@@ -837,29 +779,29 @@ class Interpreter implements InterpreterInterface
                                 $num = (int) ($math->cmp($num, '0') !== 0);
                             }
 
-                            $this->mainStack->pop();
+                            $mainStack->pop();
 
                             $buffer = Number::int($num)->getBuffer();
 
-                            $this->mainStack->push($buffer);
+                            $mainStack->push($buffer);
                             break;
 
                         case $opCode >= Opcodes::OP_ADD && $opCode <= Opcodes::OP_MAX:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \Exception('Invalid stack operation (OP_ADD - OP_MAX)');
                             }
 
-                            $num1 = Number::buffer($this->mainStack[-2], $this->minimalPush)->getInt();
-                            $num2 = Number::buffer($this->mainStack[-1], $this->minimalPush)->getInt();
+                            $num1 = Number::buffer($mainStack[-2], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $num2 = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA)->getInt();
 
                             if ($opCode === Opcodes::OP_ADD) {
                                 $num = $math->add($num1, $num2);
                             } else if ($opCode === Opcodes::OP_SUB) {
                                 $num = $math->sub($num1, $num2);
                             } else if ($opCode === Opcodes::OP_BOOLAND) {
-                                $num = $math->cmp($num1, $this->int0->getInt()) !== 0 && $math->cmp($num2, $this->int0->getInt()) !== 0;
+                                $num = $math->cmp($num1, '0') !== 0 && $math->cmp($num2, '0') !== 0;
                             } else if ($opCode === Opcodes::OP_BOOLOR) {
-                                $num = $math->cmp($num1, $this->int0->getInt()) !== 0 || $math->cmp($num2, $this->int0->getInt()) !== 0;
+                                $num = $math->cmp($num1, '0') !== 0 || $math->cmp($num2, '0') !== 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUAL) {
                                 $num = $math->cmp($num1, $num2) === 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -880,14 +822,14 @@ class Interpreter implements InterpreterInterface
                                 $num = ($math->cmp($num1, $num2) >= 0) ? $num1 : $num2;
                             }
 
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
                             $buffer = Number::int($num)->getBuffer();
-                            $this->mainStack->push($buffer);
+                            $mainStack->push($buffer);
 
                             if ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
-                                if ($this->castToBool($this->mainStack[-1])) {
-                                    $this->mainStack->pop();
+                                if ($this->castToBool($mainStack[-1])) {
+                                    $mainStack->pop();
                                 } else {
                                     throw new \RuntimeException('NUM EQUAL VERIFY error');
                                 }
@@ -895,19 +837,19 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_WITHIN:
-                            if (count($this->mainStack) < 3) {
+                            if (count($mainStack) < 3) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $num1 = Number::buffer($this->mainStack[-3], $this->minimalPush)->getInt();
-                            $num2 = Number::buffer($this->mainStack[-2], $this->minimalPush)->getInt();
-                            $num3 = Number::buffer($this->mainStack[-1], $this->minimalPush)->getInt();
+                            $num1 = Number::buffer($mainStack[-3], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $num2 = Number::buffer($mainStack[-2], $flags & self::VERIFY_MINIMALDATA)->getInt();
+                            $num3 = Number::buffer($mainStack[-1], $flags & self::VERIFY_MINIMALDATA)->getInt();
 
                             $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->push($value ? $this->vchFalse : $this->vchTrue);
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push($value ? $this->vchTrue : $this->vchFalse);
                             break;
 
                         // Hash operation
@@ -916,11 +858,11 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_SHA256:
                         case Opcodes::OP_HASH160:
                         case Opcodes::OP_HASH256:
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $buffer = $this->mainStack[-1];
+                            $buffer = $mainStack[-1];
                             if ($opCode === Opcodes::OP_RIPEMD160) {
                                 $hash = Hash::ripemd160($buffer);
                             } elseif ($opCode === Opcodes::OP_SHA1) {
@@ -933,33 +875,34 @@ class Interpreter implements InterpreterInterface
                                 $hash = Hash::sha256d($buffer);
                             }
 
-                            $this->mainStack->pop();
-                            $this->mainStack->push($hash);
+                            $mainStack->pop();
+                            $mainStack->push($hash);
                             break;
 
                         case Opcodes::OP_CODESEPARATOR:
-                            $this->hashStartPos = $parser->getPosition();
+                            $hashStartPos = $parser->getPosition();
                             break;
 
                         case Opcodes::OP_CHECKSIG:
                         case Opcodes::OP_CHECKSIGVERIFY:
-                            if (count($this->mainStack) < 2) {
+                            if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $vchPubKey = $this->mainStack[-1];
-                            $vchSig = $this->mainStack[-2];
+                            $vchPubKey = $mainStack[-1];
+                            $vchSig = $mainStack[-2];
 
-                            $scriptCode = new Script($script->getBuffer()->slice($this->hashStartPos));
-                            $success = $this->checkSig($scriptCode, $vchSig, $vchPubKey);
+                            $scriptCode = new Script($script->getBuffer()->slice($hashStartPos));
 
-                            $this->mainStack->pop();
-                            $this->mainStack->pop();
-                            $this->mainStack->push($success ? $this->vchTrue : $this->vchFalse);
+                            $success = $checker->checkSig($scriptCode, $vchSig, $vchPubKey, $sigVersion, $flags);
+
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push($success ? $this->vchTrue : $this->vchFalse);
 
                             if ($opCode === Opcodes::OP_CHECKSIGVERIFY) {
                                 if ($success) {
-                                    $this->mainStack->pop();
+                                    $mainStack->pop();
                                 } else {
                                     throw new \RuntimeException('Checksig verify');
                                 }
@@ -969,11 +912,11 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_CHECKMULTISIG:
                         case Opcodes::OP_CHECKMULTISIGVERIFY:
                             $i = 1;
-                            if (count($this->mainStack) < $i) {
+                            if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $keyCount = Number::buffer($this->mainStack[-$i], $this->minimalPush)->getInt();
+                            $keyCount = Number::buffer($mainStack[-$i], $flags & self::VERIFY_MINIMALDATA)->getInt();
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
                                 throw new \RuntimeException('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
@@ -983,11 +926,11 @@ class Interpreter implements InterpreterInterface
                             // Extract positions of the keys, and signatures, from the stack.
                             $ikey = ++$i;
                             $i += $keyCount; /** @var int $i */
-                            if (count($this->mainStack) < $i) {
+                            if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $sigCount = Number::buffer($this->mainStack[-$i], $this->minimalPush)->getInt();
+                            $sigCount = Number::buffer($mainStack[-$i], $flags & self::VERIFY_MINIMALDATA)->getInt();
                             if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
                                 throw new \RuntimeException('Invalid Signature count');
                             }
@@ -995,21 +938,22 @@ class Interpreter implements InterpreterInterface
                             $i += $sigCount;
 
                             // Extract the script since the last OP_CODESEPARATOR
-                            $scriptCode = new Script($script->getBuffer()->slice($this->hashStartPos));
+                            $scriptCode = new Script($script->getBuffer()->slice($hashStartPos));
 
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
+
                                 // Fetch the signature and public key
-                                $sig = $this->mainStack[-$isig];
-                                $pubkey = $this->mainStack[-$ikey];
+                                $sig = $mainStack[-$isig];
+                                $pubkey = $mainStack[-$ikey];
 
                                 // Erase the signature and public key.
-                                unset($this->mainStack[-$isig], $this->mainStack[-$ikey]);
+                                unset($mainStack[-$isig], $mainStack[-$ikey]);
 
                                 // Decrement $i, since we are consuming stack values.
                                 $i -= 2;
 
-                                if ($this->checkSig($scriptCode, $sig, $pubkey)) {
+                                if ($checker->checkSig($scriptCode, $sig, $pubkey, $sigVersion, $flags)) {
                                     $isig++;
                                     $sigCount--;
                                 }
@@ -1026,7 +970,7 @@ class Interpreter implements InterpreterInterface
                             }
 
                             while ($i-- > 1) {
-                                $this->mainStack->pop();
+                                $mainStack->pop();
                             }
 
                             // A bug causes CHECKMULTISIG to consume one extra argument
@@ -1035,20 +979,20 @@ class Interpreter implements InterpreterInterface
                             // Unfortunately this is a potential source of mutability,
                             // so optionally verify it is exactly equal to zero prior
                             // to removing it from the stack.
-                            if ($this->mainStack->isEmpty()) {
+                            if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            if ($this->flags->checkFlags(self::VERIFY_NULL_DUMMY) && $this->mainStack[-1]->getSize()) {
+                            if ($flags & self::VERIFY_NULL_DUMMY && $mainStack[-1]->getSize() !== 0) {
                                 throw new ScriptRuntimeException(self::VERIFY_NULL_DUMMY, 'Extra P2SH stack value should be OP_0');
                             }
 
-                            $this->mainStack->pop();
-                            $this->mainStack->push($fSuccess ? $this->vchTrue : $this->vchFalse);
+                            $mainStack->pop();
+                            $mainStack->push($fSuccess ? $this->vchTrue : $this->vchFalse);
 
                             if ($opCode === Opcodes::OP_CHECKMULTISIGVERIFY) {
                                 if ($fSuccess) {
-                                    $this->mainStack->pop();
+                                    $mainStack->pop();
                                 } else {
                                     throw new \RuntimeException('OP_CHECKMULTISIG verify');
                                 }
@@ -1059,13 +1003,13 @@ class Interpreter implements InterpreterInterface
                             throw new \RuntimeException('Opcode not found');
                     }
 
-                    if (count($this->mainStack) + count($this->altStack) > 1000) {
+                    if (count($mainStack) + count($altStack) > 1000) {
                         throw new \RuntimeException('Invalid stack size, exceeds 1000');
                     }
                 }
             }
 
-            if (!$this->vfStack->end() === 0) {
+            if (!$vfStack->end() === 0) {
                 throw new \RuntimeException('Unbalanced conditional at script end');
             }
 
@@ -1075,7 +1019,7 @@ class Interpreter implements InterpreterInterface
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            // echo "\n General: " . $e->getMessage() ;
+            // echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString();
             return false;
         }
     }

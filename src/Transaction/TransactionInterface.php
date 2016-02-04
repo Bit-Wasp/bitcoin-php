@@ -4,8 +4,10 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SignatureHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -43,6 +45,12 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     public function getTxId();
 
     /**
+     * Get the little endian sha256d hash including witness data
+     * @return BufferInterface
+     */
+    public function getWitnessTxId();
+
+    /**
      * Get the version of this transaction
      *
      * @return int|string
@@ -76,6 +84,17 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     public function getOutput($vout);
 
     /**
+     * @param int $index
+     * @return ScriptWitnessInterface
+     */
+    public function getWitness($index);
+
+    /**
+     * @return TransactionWitnessCollection
+     */
+    public function getWitnesses();
+
+    /**
      * @param int $vout
      * @return OutPointInterface
      */
@@ -100,7 +119,7 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     public function getValueOut();
 
     /**
-     * @return SignatureHashInterface
+     * @return SigHash
      */
     public function getSignatureHash();
 
@@ -108,4 +127,9 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
      * @return Validator
      */
     public function validator();
+
+    /**
+     * @return BufferInterface
+     */
+    public function getWitnessBuffer();
 }

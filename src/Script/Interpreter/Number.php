@@ -114,7 +114,7 @@ class Number extends Serializable
     private function serialize()
     {
         if ($this->math->cmp($this->number, '0') === 0) {
-            return new Buffer('', 4);
+            return new Buffer('', 0);
         }
 
         // Using array of integers instead of bytes

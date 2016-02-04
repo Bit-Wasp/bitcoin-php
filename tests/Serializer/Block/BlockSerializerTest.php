@@ -18,7 +18,7 @@ class BlockSerializerTest extends AbstractTestCase
         $serializer = new BlockSerializer(
             new Math,
             new BlockHeaderSerializer,
-            new TransactionSerializer
+            new TransactionSerializer()
         );
         $serializer->parse('');
     }

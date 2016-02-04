@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 
 class Multisig implements ScriptInfoInterface
 {
@@ -115,15 +116,20 @@ class Multisig implements ScriptInfoInterface
     }
 
     /**
-     * @param array $signatures
-     * @param array $publicKeys
+     * @param TransactionSignatureInterface[] $signatures
+     * @param PublicKeyInterface[] $publicKeys
      * @return Script|ScriptInterface
      */
     public function makeScriptSig(array $signatures = [], array $publicKeys = [])
     {
         $newScript = new Script();
         if (count($signatures) > 0) {
-            $newScript = ScriptFactory::scriptSig()->multisig($signatures);
+            $sequence = [Opcodes::OP_0];
+            foreach ($signatures as $sig) {
+                $sequence[] = $sig->getBuffer();
+            }
+
+            $newScript = ScriptFactory::sequence($sequence);
         }
 
         return $newScript;

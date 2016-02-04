@@ -105,6 +105,7 @@ class OutputScriptFactory
         if ($m > $n) {
             throw new \LogicException('Required number of sigs exceeds number of public keys');
         }
+
         if ($n > 16) {
             throw new \LogicException('Number of public keys is greater than 16');
         }
@@ -113,8 +114,8 @@ class OutputScriptFactory
             $keys = Buffertools::sort($keys);
         }
 
-        $opM = Opcodes::OP_1 - 1 + $m;
-        $opN = Opcodes::OP_1 - 1 + $n;
+        $opM = \BitWasp\Bitcoin\Script\encodeOpN($m);
+        $opN = \BitWasp\Bitcoin\Script\encodeOpN($n);
 
         $script = ScriptFactory::create();
         foreach ($keys as $key) {

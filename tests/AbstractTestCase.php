@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Math\Math;
 use Mdanter\Ecc\EccFactory;
 use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
-use BitWasp\Bitcoin\Flags;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -46,11 +45,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @var string
      */
     protected $outScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\OutputScriptFactory';
-
-    /**
-     * @var string
-     */
-    protected $inScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\InputScriptFactory';
 
     /**
      * @var string
@@ -97,6 +91,8 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      */
     protected $txMutatorType = 'BitWasp\Bitcoin\Transaction\Mutator\TxMutator';
 
+    protected $nativeConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\NativeConsensus';
+    protected $libBitcoinConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus';
     /**
      * @var resource
      */
@@ -178,7 +174,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $flagStr
-     * @return Flags
+     * @return int
      */
     public function getInterpreterFlags($flagStr)
     {
@@ -190,7 +186,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
             $int |= $f;
         }
 
-        return new Flags($int, $checkdisabled);
+        return $int;
     }
 
 

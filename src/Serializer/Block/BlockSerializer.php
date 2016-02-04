@@ -4,12 +4,12 @@ namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockInterface;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Buffertools\TemplateFactory;
 
 class BlockSerializer

@@ -24,28 +24,31 @@ class Validator implements ValidatorInterface
     /**
      * @param ConsensusInterface $consensus
      * @param int $nInput
+     * @param int $amount
      * @param ScriptInterface $scriptPubKey
      * @return bool
      */
-    public function checkSignature(ConsensusInterface $consensus, $nInput, ScriptInterface $scriptPubKey)
+    public function checkSignature(ConsensusInterface $consensus, $nInput, $amount, ScriptInterface $scriptPubKey)
     {
-        return $consensus->verify($this->transaction, $scriptPubKey, $nInput);
+        $witnesses = $this->transaction->getWitnesses();
+        $witness = isset($witnesses[$nInput]) ? $witnesses[$nInput] : null;
+        return $consensus->verify($this->transaction, $scriptPubKey, $nInput, $amount, $witness);
     }
 
     /**
      * @param ConsensusInterface $consensus
-     * @param array $scriptPubKeys
+     * @param TransactionOutputInterface[] $outputs
      * @return bool
      */
-    public function checkSignatures(ConsensusInterface $consensus, array $scriptPubKeys)
+    public function checkSignatures(ConsensusInterface $consensus, array $outputs)
     {
-        if (count($this->transaction->getInputs()) !== count($scriptPubKeys)) {
+        if (count($this->transaction->getInputs()) !== count($outputs)) {
             throw new \InvalidArgumentException('Incorrect scriptPubKey count');
         }
 
         $result = true;
-        foreach ($scriptPubKeys as $i => $scriptPubKey) {
-            $result = $result && $this->checkSignature($consensus, $i, $scriptPubKey);
+        foreach ($outputs as $i => $txOut) {
+            $result = $result && $this->checkSignature($consensus, $i, $txOut->getValue(), $txOut->getScript());
         }
 
         return $result;
