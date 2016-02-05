@@ -111,15 +111,6 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param int $flag
-     * @return bool
-     */
-    public function checkFlag($flag)
-    {
-        return $this->math->cmp($this->math->bitwiseAnd($this->flags, self::UPDATE_MASK), $flag) === 0;
-    }
-
-    /**
      * @return bool
      */
     public function isUpdateNone()
