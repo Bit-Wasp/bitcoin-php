@@ -10,10 +10,10 @@ interface ValidatorInterface
     /**
      * @param ConsensusInterface $consensus
      * @param int $nInput
-     * @param ScriptInterface $scriptPubKey
+     * @param TransactionOutputInterface $txOut
      * @return bool
      */
-    public function checkSignature(ConsensusInterface $consensus, $nInput, $amount, ScriptInterface $scriptPubKey);
+    public function checkSignature(ConsensusInterface $consensus, $nInput, TransactionOutputInterface $txOut);
 
     /**
      * @param ConsensusInterface $consensus

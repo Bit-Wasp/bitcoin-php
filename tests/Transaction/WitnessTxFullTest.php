@@ -34,6 +34,7 @@ class WitnessTxFullTest extends AbstractTestCase
         $p2shmultisig = ScriptFactory::scriptPubKey()->payToScriptHash($multisig);
         $p2shv0keyhash = new \BitWasp\Bitcoin\Script\P2shScript($v0destkey->getScript());
 
+        $multisig = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
         $wp = new \BitWasp\Bitcoin\Script\WitnessProgram(0, \BitWasp\Bitcoin\Crypto\Hash::sha256($multisig->getBuffer()));
         $p2shWitMultisig = ScriptFactory::scriptPubKey()->payToScriptHash($wp->getScript());
 
@@ -134,7 +135,7 @@ class WitnessTxFullTest extends AbstractTestCase
 
         $consensus = ScriptFactory::consensus(InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_WITNESS);
 
-        $check = $signed->validator()->checkSignature($consensus, 0, $utxo->getOutput()->getValue(), $utxo->getOutput()->getScript());
+        $check = $signed->validator()->checkSignature($consensus, 0, $utxo->getOutput());
         $this->assertTrue($check);
         $this->assertEquals($expectedTx, $signed->getWitnessBuffer()->getHex());
 

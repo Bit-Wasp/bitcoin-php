@@ -24,15 +24,14 @@ class Validator implements ValidatorInterface
     /**
      * @param ConsensusInterface $consensus
      * @param int $nInput
-     * @param int $amount
-     * @param ScriptInterface $scriptPubKey
+     * @param TransactionOutputInterface $output
      * @return bool
      */
-    public function checkSignature(ConsensusInterface $consensus, $nInput, $amount, ScriptInterface $scriptPubKey)
+    public function checkSignature(ConsensusInterface $consensus, $nInput, TransactionOutputInterface $output)
     {
         $witnesses = $this->transaction->getWitnesses();
         $witness = isset($witnesses[$nInput]) ? $witnesses[$nInput] : null;
-        return $consensus->verify($this->transaction, $scriptPubKey, $nInput, $amount, $witness);
+        return $consensus->verify($this->transaction, $output->getScript(), $nInput, $output->getValue(), $witness);
     }
 
     /**
@@ -48,7 +47,7 @@ class Validator implements ValidatorInterface
 
         $result = true;
         foreach ($outputs as $i => $txOut) {
-            $result = $result && $this->checkSignature($consensus, $i, $txOut->getValue(), $txOut->getScript());
+            $result = $result && $this->checkSignature($consensus, $i, $txOut);
         }
 
         return $result;
