@@ -101,6 +101,37 @@ class InputSigner
     }
 
     /**
+     * @param int $sigVersion
+     * @param $stack
+     * @param ScriptInterface $scriptCode
+     * @return \SplObjectStorage
+     */
+    private function sortMultiSigs($sigVersion, $stack, ScriptInterface $scriptCode)
+    {
+        if ($sigVersion === 1) {
+            $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
+        } else {
+            $hasher = new Hasher($this->tx);
+        }
+
+        $sigSort = new SignatureSort($this->ecAdapter);
+        $sigs = new \SplObjectStorage;
+
+        foreach ($stack as $txSig) {
+            $hash = $hasher->calculate($scriptCode, $this->nInput, $txSig->getHashType());
+            $linked = $sigSort->link([$txSig->getSignature()], $this->publicKeys, $hash);
+
+            foreach ($this->publicKeys as $key) {
+                if ($linked->contains($key)) {
+                    $sigs[$key] = $txSig;
+                }
+            }
+        }
+
+        return $sigs;
+    }
+
+    /**
      * @param string $type
      * @param ScriptInterface $scriptCode
      * @param BufferInterface[] $stack
@@ -131,26 +162,12 @@ class InputSigner
             $this->publicKeys = $info->getKeys();
 
             if ($size > 1) {
-                if ($sigVersion === 1) {
-                    $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
-                } else {
-                    $hasher = new Hasher($this->tx);
+                $vars = [];
+                foreach(array_slice($stack, 1, -1) as $sig) {
+                    $vars[] = TransactionSignatureFactory::fromHex($sig, $this->ecAdapter);
                 }
 
-                $sigSort = new SignatureSort($this->ecAdapter);
-                $sigs = new \SplObjectStorage;
-
-                foreach (array_slice($stack, 1, -1) as $item) {
-                    $txSig = TransactionSignatureFactory::fromHex($item, $this->ecAdapter);
-                    $hash = $hasher->calculate($scriptCode, $this->nInput, $txSig->getHashType());
-                    $linked = $sigSort->link([$txSig->getSignature()], $this->publicKeys, $hash);
-
-                    foreach ($this->publicKeys as $key) {
-                        if ($linked->contains($key)) {
-                            $sigs[$key] = $txSig;
-                        }
-                    }
-                }
+                $sigs = $this->sortMultiSigs($sigVersion, $vars, $scriptCode);
 
                 foreach ($this->publicKeys as $idx => $key) {
                     $this->signatures[$idx] = isset($sigs[$key]) ? $sigs[$key]->getBuffer() : null;
@@ -171,11 +188,12 @@ class InputSigner
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
 
         if ($type === OutputClassifier::PAYTOPUBKEYHASH || $type === OutputClassifier::PAYTOPUBKEY || $type === OutputClassifier::MULTISIG) {
-            $innerSig = array_map(function (Operation $o) {
-                return $o->getData();
-            }, $scriptSig->getScriptParser()->decode());
+            $values = [];
+            foreach ($scriptSig->getScriptParser()->decode() as $o) {
+                $values[] = $o->getData();
+            }
 
-            $this->extractFromValues($type, $scriptPubKey, $innerSig, 0);
+            $this->extractFromValues($type, $scriptPubKey, $values, 0);
         }
 
         if ($type === OutputClassifier::PAYTOSCRIPTHASH) {
@@ -327,8 +345,6 @@ class InputSigner
             foreach ($this->publicKeys as $keyIdx => $publicKey) {
                 if ($publicKey->getBinary() == $key->getPublicKey()->getBinary()) {
                     $this->signatures[$keyIdx] = $this->calculateSignature($key, $scriptPubKey, $sigVersion);
-                } else {
-                    return false;
                 }
             }
 
@@ -455,9 +471,10 @@ class InputSigner
 
         if ($outputType === OutputClassifier::MULTISIG) {
             $sequence = [Opcodes::OP_0];
-            for ($i = 0; $i < $this->requiredSigs; $i++) {
+
+            for ($i = 0; $i < count($this->publicKeys); $i++) {
                 if (isset($this->signatures[$i])) {
-                    $sequence[] =  $this->signatures[$i]->getBuffer();
+                    $sequence[] = $this->signatures[$i]->getBuffer();
                 }
             }
 
