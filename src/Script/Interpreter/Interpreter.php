@@ -322,8 +322,8 @@ class Interpreter implements InterpreterInterface
             }
 
             if ($flags & self::VERIFY_WITNESS) {
-
                 if ($scriptPubKey->isWitness($program)) {
+                    /** @var WitnessProgram $program */
                     if ($scriptSig != (ScriptFactory::create()->push($scriptPubKey->getBuffer())->getScript())) {
                         return false; // SCRIPT_ERR_WITNESS_MALLEATED_P2SH
                     }
