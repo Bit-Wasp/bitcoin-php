@@ -2,8 +2,8 @@
 
 Classes which implement the SerializableInterface expose methods related to serialization. 
 
- - getBuffer(): This method returns the serialized form of the class. 
- - getHex(): Returns the serialized form, but as hex. 
+ - getBuffer(): This method returns the binary representation of the class as a Buffer. 
+ - getHex(): Returns the serialized form, but in hex encoding. 
  - getInt(): Where the number is an unsigned integer, getInt can convert the number to a big-num decimal. 
  - getBinary(): Returns the object serialized, as a byte string.
  
