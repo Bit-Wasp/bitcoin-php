@@ -141,6 +141,7 @@ class Script extends Serializable implements ScriptInterface
 
         $program = null;
         if ($this->isWitness($program)) {
+            /** @var WitnessProgram $program */
             return $this->witnessSigOps($program, $scriptWitness);
         }
 
@@ -148,6 +149,7 @@ class Script extends Serializable implements ScriptInterface
             $parsed = $scriptSig->getScriptParser()->decode();
             $subscript = new Script(end($parsed)->getData());
             if ($subscript->isWitness($program)) {
+                /** @var WitnessProgram $program */
                 return $this->witnessSigOps($program, $scriptWitness);
             }
         }
