@@ -120,7 +120,7 @@ class TxBuilder
     {
         $this->inputs[] = new TransactionInput(
             new OutPoint(
-                $hashPrevOut instanceof BufferInterface ? $hashPrevOut : Buffer::hex($hashPrevOut),
+                $hashPrevOut instanceof BufferInterface ? $hashPrevOut : Buffer::hex($hashPrevOut, 32),
                 $nPrevOut
             ),
             $script ?: new Script(),

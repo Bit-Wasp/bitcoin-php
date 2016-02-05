@@ -81,14 +81,14 @@ class OutputScriptFactory
     /**
      * Create a P2SH output script
      *
-     * @param ScriptInterface $script
+     * @param ScriptInterface $p2shScript
      * @return ScriptInterface
      */
-    public function payToScriptHash(ScriptInterface $script)
+    public function payToScriptHash(ScriptInterface $p2shScript)
     {
         return ScriptFactory::create()
             ->op('OP_HASH160')
-            ->push($script->getScriptHash())
+            ->push($p2shScript->getScriptHash())
             ->op('OP_EQUAL')
             ->getScript();
     }
@@ -128,37 +128,6 @@ class OutputScriptFactory
         $keyBuf = $script->getScript()->getBuffer();
 
         $script = new Script(new Buffer(chr($opM) . $keyBuf->getBinary() . chr($opN) . chr(Opcodes::OP_CHECKMULTISIG)));
-
         return $script;
-    }
-
-    /**
-     * @param BufferInterface $secret
-     * @param PublicKeyInterface $a1
-     * @param PublicKeyInterface $a2
-     * @param PublicKeyInterface $b1
-     * @param PublicKeyInterface $b2
-     * @return ScriptInterface
-     */
-    public function payToLightningChannel(
-        BufferInterface $secret,
-        PublicKeyInterface $a1,
-        PublicKeyInterface $a2,
-        PublicKeyInterface $b1,
-        PublicKeyInterface $b2
-    ) {
-        return ScriptFactory::create()
-            ->op('OP_DEPTH')
-            ->op('OP_3')
-            ->op('OP_EQUAL')
-            ->op('OP_IF')
-                ->op('OP_HASH160')
-                ->push(Hash::sha256ripe160($secret))
-                ->op('OP_EQUALVERIFY')
-                ->concat(ScriptFactory::scriptPubKey()->multisig(2, [$a1, $b1]))
-            ->op('OP_ELSE')
-                ->concat(ScriptFactory::scriptPubKey()->multisig(2, [$a2, $b2]))
-            ->op('OP_ENDIF')
-            ->getScript();
     }
 }

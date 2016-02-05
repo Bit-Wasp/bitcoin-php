@@ -47,7 +47,7 @@ class Multisig implements ScriptInfoInterface
         $mCode = $parse[0]->getOp();
         $nCode = $parse[count($parse) - 2]->getOp();
 
-        $this->m = (int) $mCode - Opcodes::OP_1 + 1 ;
+        $this->m = (int) \BitWasp\Bitcoin\Script\decodeOpN($mCode);
         foreach (array_slice($parse, 1, -2) as $key) {
             /** @var \BitWasp\Bitcoin\Script\Parser\Operation $key */
             if (!$key->isPush()) {

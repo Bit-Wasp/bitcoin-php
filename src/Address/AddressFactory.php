@@ -15,6 +15,8 @@ use BitWasp\Buffertools\Buffer;
 class AddressFactory
 {
     /**
+     * Returns a pay-to-pubkey-hash address for the given public key
+     *
      * @param KeyInterface $key
      * @return PayToPubKeyHashAddress
      */
@@ -24,6 +26,8 @@ class AddressFactory
     }
 
     /**
+     * Takes the $p2shScript and generates the scriptHash address.
+     *
      * @param ScriptInterface $p2shScript
      * @return ScriptHashAddress
      */
