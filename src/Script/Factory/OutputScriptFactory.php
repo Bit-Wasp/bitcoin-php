@@ -130,5 +130,4 @@ class OutputScriptFactory
         $script = new Script(new Buffer(chr($opM) . $keyBuf->getBinary() . chr($opN) . chr(Opcodes::OP_CHECKMULTISIG)));
         return $script;
     }
-
 }

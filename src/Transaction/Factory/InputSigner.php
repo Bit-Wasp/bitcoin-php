@@ -163,7 +163,7 @@ class InputSigner
 
             if ($size > 1) {
                 $vars = [];
-                foreach(array_slice($stack, 1, -1) as $sig) {
+                foreach (array_slice($stack, 1, -1) as $sig) {
                     $vars[] = TransactionSignatureFactory::fromHex($sig, $this->ecAdapter);
                 }
 
