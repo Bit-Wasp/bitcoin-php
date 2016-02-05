@@ -38,7 +38,7 @@ class ScriptFactory
     }
 
     /**
-     * @param array $sequence
+     * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return ScriptInterface
      */
     public static function sequence(array $sequence)

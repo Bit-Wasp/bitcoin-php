@@ -46,7 +46,7 @@ class ScriptCreator
     }
 
     /**
-     * @param array $sequence
+     * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return $this
      */
     public function sequence(array $sequence)
@@ -59,6 +59,8 @@ class ScriptCreator
                 }
 
                 $new->script .= chr($operation);
+            } elseif ($operation instanceof Number) {
+                $new->push($operation->getBuffer());
             } elseif ($operation instanceof BufferInterface) {
                 $new->push($operation);
             } else {
