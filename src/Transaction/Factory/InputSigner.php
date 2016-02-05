@@ -470,8 +470,8 @@ class InputSigner
 
         if ($outputType === OutputClassifier::MULTISIG) {
             $sequence = [Opcodes::OP_0];
-
-            for ($i = 0; $i < count($this->publicKeys); $i++) {
+            $nPubKeys = count($this->publicKeys);
+            for ($i = 0; $i < $nPubKeys; $i++) {
                 if (isset($this->signatures[$i])) {
                     $sequence[] = $this->signatures[$i]->getBuffer();
                 }
