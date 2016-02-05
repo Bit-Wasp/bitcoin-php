@@ -1,0 +1,28 @@
+{
+  "test": [
+    {
+      "script": "00200123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "valid": true
+    },
+    {
+      "script": "00210123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef11",
+      "valid": false
+    },
+    {
+      "script": "00140123456789abcdef0123456789abcdef01234567",
+      "valid": true
+    },
+    {
+      "script": "4c00140123456789abcdef0123456789abcdef01234567",
+      "valid": false
+    },
+    {
+      "script": "00130123456789abcdef0123456789abcdef01234567",
+      "valid": false
+    },
+    {
+      "script": "140123456789abcdef0123456789abcdef01234567",
+      "valid": false
+    }
+  ]
+}
