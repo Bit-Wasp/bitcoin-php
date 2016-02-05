@@ -35,7 +35,7 @@ class OldTransactionSerializer
     private function getTemplate()
     {
         return (new TemplateFactory())
-            ->uint32le()
+            ->int32le()
             ->vector(function (Parser & $parser) {
                 return $this->inputSerializer->fromParser($parser);
             })
