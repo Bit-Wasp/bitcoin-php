@@ -214,9 +214,8 @@ class Script extends Serializable implements ScriptInterface
             return false;
         }
 
-        $parser = $this->getScriptParser();
-        $script = $parser->decode();
-        if (!$script[1]->isPush()) {
+        $script = $this->getScriptParser()->decode();
+        if (!isset($script[0]) || !isset($script[1])) {
             return false;
         }
 
@@ -226,7 +225,7 @@ class Script extends Serializable implements ScriptInterface
         }
 
         $witness = $script[1];
-        if ($size === $witness->getDataSize() + 2) {
+        if ($script[1]->isPush() && $size === $witness->getDataSize() + 2) {
             $program = new WitnessProgram(decodeOpN($version), $witness->getData());
             return true;
         }

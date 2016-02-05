@@ -6,11 +6,12 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
-class ScriptTest extends \PHPUnit_Framework_TestCase
+class ScriptTest extends AbstractTestCase
 {
     /**
      * @var string
@@ -205,5 +206,34 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
     public function testIsPushOnly(ScriptInterface $script, $eResult)
     {
         $this->assertEquals($eResult, $script->isPushOnly());
+    }
+
+    public function getWitnessVectors()
+    {
+        $array = json_decode($this->dataFile('witness.json'), true);
+        $vectors = [];
+        foreach ($array['test'] as $vector) {
+            $script = new Script(Buffer::hex($vector['script']));
+            $valid = $vector['valid'];
+            $vectors[] = [$script, $valid];
+        }
+
+        return $vectors;
+    }
+
+    /**
+     * @dataProvider getWitnessVectors
+     * @param ScriptInterface $script
+     * @param bool $valid
+     */
+    public function testWitnessVectors(ScriptInterface $script, $valid)
+    {
+        $witness = null;
+        $isWitness = $script->isWitness($witness);
+        if ($isWitness) {
+            $this->assertInstanceOf('BitWasp\Bitcoin\Script\WitnessProgram', $witness);
+        }
+
+        $this->assertEquals($valid, $isWitness);
     }
 }
