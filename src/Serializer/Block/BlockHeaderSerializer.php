@@ -26,7 +26,7 @@ class BlockHeaderSerializer
     public function getTemplate()
     {
         return (new TemplateFactory())
-            ->uint32le()
+            ->int32le()
             ->bytestringle(32)
             ->bytestringle(32)
             ->uint32le()
