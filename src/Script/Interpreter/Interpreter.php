@@ -185,7 +185,7 @@ class Interpreter implements InterpreterInterface
 
                 $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
                 $stackValues = $scriptWitness->slice(0, -1);
-                $hashScriptPubKey = Hash::sha256($scriptWitness[$witnessCount - 1]);
+                $hashScriptPubKey = Hash::sha256($scriptPubKey->getBuffer());
 
                 if ($hashScriptPubKey == $buffer) {
                     return false;
@@ -916,10 +916,12 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
+
                             $keyCount = Number::buffer($mainStack[-$i], $minimal)->getInt();
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
                                 throw new \RuntimeException('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
+
                             $this->opCount += $keyCount;
                             $this->checkOpcodeCount();
 
@@ -934,6 +936,7 @@ class Interpreter implements InterpreterInterface
                             if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
                                 throw new \RuntimeException('Invalid Signature count');
                             }
+
                             $isig = ++$i;
                             $i += $sigCount;
 
@@ -946,12 +949,6 @@ class Interpreter implements InterpreterInterface
                                 // Fetch the signature and public key
                                 $sig = $mainStack[-$isig];
                                 $pubkey = $mainStack[-$ikey];
-
-                                // Erase the signature and public key.
-                                unset($mainStack[-$isig], $mainStack[-$ikey]);
-
-                                // Decrement $i, since we are consuming stack values.
-                                $i -= 2;
 
                                 if ($checker->checkSig($scriptCode, $sig, $pubkey, $sigVersion, $flags)) {
                                     $isig++;
