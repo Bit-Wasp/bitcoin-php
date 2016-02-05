@@ -27,7 +27,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param $compressed
+     * @param bool $compressed
      * @param PointInterface $point
      * @return string
      */
