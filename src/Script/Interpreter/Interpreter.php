@@ -322,8 +322,8 @@ class Interpreter implements InterpreterInterface
             }
 
             if ($flags & self::VERIFY_WITNESS) {
-
                 if ($scriptPubKey->isWitness($program)) {
+                    /** @var WitnessProgram $program */
                     if ($scriptSig != (ScriptFactory::create()->push($scriptPubKey->getBuffer())->getScript())) {
                         return false; // SCRIPT_ERR_WITNESS_MALLEATED_P2SH
                     }
@@ -391,7 +391,7 @@ class Interpreter implements InterpreterInterface
         $this->opCount = 0;
         $altStack = new Stack();
         $vfStack = new Stack();
-        $minimal = $flags & self::VERIFY_MINIMALDATA;
+        $minimal = (bool) ($flags & self::VERIFY_MINIMALDATA);
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
