@@ -91,7 +91,7 @@ class Number extends Serializable
         $chars = array_map(function ($binary) {
             return ord($binary);
 
-        }, str_split($buffer->flip()->getBinary(), 1));
+        }, str_split($buffer->getBinary(), 1));
 
         $result = 0;
         for ($i = 0; $i < $size; $i++) {
@@ -100,7 +100,7 @@ class Number extends Serializable
             $result = $this->math->bitwiseOr($result, $byte);
         }
 
-        if ($chars[0] & 0x80) {
+        if ($chars[count($chars)-1] & 0x80) {
             $mask = gmp_strval(gmp_com($this->math->leftShift(0x80, (8 * ($size - 1)))), 10);
             return $this->math->sub(0, $this->math->bitwiseAnd($result, $mask));
         }
@@ -121,20 +121,27 @@ class Number extends Serializable
         $result = [];
         $negative = $this->math->cmp($this->number, 0) < 0;
         $abs = $negative ? $this->math->sub(0, $this->number) : $this->number;
+
         while ($this->math->cmp($abs, 0) > 0) {
-            array_unshift($result, (int)$this->math->bitwiseAnd($abs, 0xff));
+            //array_unshift($result, (int)$this->math->bitwiseAnd($abs, 0xff));
+            $result[] = (int)$this->math->bitwiseAnd($abs, 0xff);
             $abs = $this->math->rightShift($abs, 8);
         }
 
-        if ($result[0] & 0x80) {
-            array_unshift($result, $negative ? 0x80 : 0x00);
+        if ($result[count($result) - 1] & 0x80) {
+            //array_unshift($result, $negative ? 0x80 : 0);
+            $result[] = $negative ? 0x80 : 0;
         } else if ($negative) {
-            array_unshift($result, 0x80);
+            //$result[0] |= 0x80;
+            $result[count($result) - 1] |= 0x80;
         }
 
-        return new Buffer(array_reduce($result, function ($agg, $current) {
-            return $agg . chr($current);
-        }), 4, $this->math);
+        $s = '';
+        foreach ($result as $i) {
+            $s .= chr($i);
+        }
+
+        return new Buffer($s, null, $this->math);
 
     }
 
