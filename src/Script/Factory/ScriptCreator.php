@@ -132,7 +132,7 @@ class ScriptCreator
         if ($n === 0) {
             $this->script .= chr(Opcodes::OP_0);
         } else if ($n === -1 || ($n >= 1 && $n <= 16)) {
-            $this->script .= chr($n + (Opcodes::OP_1 - 1));
+            $this->script .= chr(\BitWasp\Bitcoin\Script\encodeOpN($n));
         } else {
             $this->script .= Number::int($n)->getBinary();
         }
