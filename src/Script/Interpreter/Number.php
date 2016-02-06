@@ -11,8 +11,8 @@ use BitWasp\Buffertools\BufferInterface;
 class Number extends Serializable
 {
     const MAX_NUM_SIZE = 4;
-    const MAX = 4294967295; // 2^32-1
-    const MIN = -4294967295; // -2^32+1
+    const MAX = 2147483647; // 2^31-1
+    const MIN = -2147483647; // -2^31+1
 
     /**
      * @var Math
