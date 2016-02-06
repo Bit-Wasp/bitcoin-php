@@ -46,7 +46,7 @@ class ScriptCreator
     }
 
     /**
-     * @param array $sequence
+     * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return $this
      */
     public function sequence(array $sequence)
@@ -59,6 +59,8 @@ class ScriptCreator
                 }
 
                 $new->script .= chr($operation);
+            } elseif ($operation instanceof Number) {
+                $new->push($operation->getBuffer());
             } elseif ($operation instanceof BufferInterface) {
                 $new->push($operation);
             } else {
@@ -130,7 +132,7 @@ class ScriptCreator
         if ($n === 0) {
             $this->script .= chr(Opcodes::OP_0);
         } else if ($n === -1 || ($n >= 1 && $n <= 16)) {
-            $this->script .= chr($n + (Opcodes::OP_1 - 1));
+            $this->script .= chr(\BitWasp\Bitcoin\Script\encodeOpN($n));
         } else {
             $this->script .= Number::int($n)->getBinary();
         }
