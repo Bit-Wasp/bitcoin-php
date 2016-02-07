@@ -55,10 +55,6 @@ class PrivateKey extends Key implements PrivateKeyInterface
             throw new InvalidPrivateKey('Invalid private key');
         }
 
-        if (false === is_numeric($secret)) {
-            throw new \InvalidArgumentException('PrivateKey: Secret must be an integer');
-        }
-
         if (false === is_bool($compressed)) {
             throw new \InvalidArgumentException('PrivateKey: Compressed argument must be a boolean');
         }

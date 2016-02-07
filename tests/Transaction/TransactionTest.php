@@ -85,24 +85,6 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Transaction version must be numeric
-     */
-    public function testInvalidVersion()
-    {
-        new Transaction(null);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Transaction locktime must be numeric
-     */
-    public function testInvalidLocktime()
-    {
-        new Transaction(1, null, null, null, null);
-    }
-
-    /**
      * @expectedException \Exception
      */
     public function testGetOutputException()

@@ -17,15 +17,6 @@ class OutPointTest extends AbstractTestCase
         new OutPoint(new Buffer('', 8), 1);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage OutPoint: nPrevOut must be numeric
-     */
-    public function testNonNumericVout()
-    {
-        new OutPoint(new Buffer('', 32), 'fail');
-    }
-
     public function testOutPoint()
     {
         $txid = new Buffer('a', 32);
