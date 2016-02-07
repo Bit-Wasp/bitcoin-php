@@ -47,9 +47,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
         if (false === $ecAdapter->validatePrivateKey(Buffer::int($int, 32, $ecAdapter->getMath()))) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
-        if (false === is_numeric($int)) {
-            throw new \InvalidArgumentException('PrivateKey: Secret must be an integer');
-        }
+
         if (false === is_bool($compressed)) {
             throw new \InvalidArgumentException('PrivateKey: Compressed argument must be a boolean');
         }
