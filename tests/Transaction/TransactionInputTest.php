@@ -35,22 +35,6 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($in->isFinal());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidVout()
-    {
-        new TransactionInput(new OutPoint(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32), 'b'), new Script);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testInvalidSequence()
-    {
-        new TransactionInput(new OutPoint(Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32), 0), new Script, 'b');
-    }
-
     public function testConstructWithScript()
     {
         $txid = Buffer::hex('7f8e94bdf85de933d5417145e4b76926777fa2a2d8fe15b684cfd835f43b8b33', 32);

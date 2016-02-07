@@ -89,15 +89,6 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertSame($this->getGenesisHex(), $result->getHex());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Block header version must be numeric
-     */
-    public function testInvalidVersion()
-    {
-        new BlockHeader(null, new Buffer, new Buffer, null, new Buffer(), null);
-    }
-
     public function testGetBlockHash()
     {
         $result = $this->getGenesisBlock()->getHeader();
