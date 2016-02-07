@@ -61,7 +61,7 @@ class Transaction extends Serializable implements TransactionInterface
         TransactionWitnessCollection $witness = null,
         $nLockTime = 0
     ) {
-cd        $math = Bitcoin::getMath();
+        $math = Bitcoin::getMath();
         if ($math->cmp($nVersion, TransactionInterface::MAX_VERSION) > 0) {
             throw new \InvalidArgumentException('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
