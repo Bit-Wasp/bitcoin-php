@@ -31,11 +31,7 @@ class OutPoint extends Serializable implements OutPointInterface
         if ($hashPrevOutput->getSize() !== 32) {
             throw new \InvalidArgumentException('OutPoint: hashPrevOut must be a 32-byte Buffer');
         }
-
-        if (!is_numeric($nPrevOutput)) {
-            throw new \InvalidArgumentException('OutPoint: nPrevOut must be numeric');
-        }
-
+        
         $this->hashPrevOutput = $hashPrevOutput;
         $this->nPrevOutput = $nPrevOutput;
 

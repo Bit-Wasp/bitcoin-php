@@ -29,9 +29,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function __construct($value, ScriptInterface $script)
     {
-        if (!is_numeric($value)) {
-            throw new \InvalidArgumentException('TransactionInput: vout must be numeric');
-        }
 
         $this->value = $value;
         $this->script = $script;

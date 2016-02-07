@@ -37,9 +37,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function __construct(OutPointInterface $outPoint, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
     {
-        if (!is_numeric($sequence)) {
-            throw new \InvalidArgumentException('TransactionInput: sequence must be numeric');
-        }
 
         $this->outPoint = $outPoint;
         $this->script = $script;

@@ -53,24 +53,12 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     public function __construct($version, BufferInterface $prevBlock, BufferInterface $merkleRoot, $timestamp, BufferInterface $bits, $nonce)
     {
-        if (!is_numeric($version)) {
-            throw new \InvalidArgumentException('Block header version must be numeric');
-        }
-
         if ($prevBlock->getSize() !== 32) {
             throw new \InvalidArgumentException('Block header prevBlock must be a 32-byte Buffer');
         }
 
         if ($merkleRoot->getSize() !== 32) {
             throw new \InvalidArgumentException('Block header prevBlock must be a 32-byte Buffer');
-        }
-
-        if (!is_numeric($timestamp)) {
-            throw new \InvalidArgumentException('Block header timestamp must be numeric');
-        }
-
-        if (!is_numeric($nonce)) {
-            throw new \InvalidArgumentException('Block header nonce must be numeric');
         }
 
         $this->version = $version;
