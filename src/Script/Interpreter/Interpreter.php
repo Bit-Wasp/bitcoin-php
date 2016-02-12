@@ -391,7 +391,7 @@ class Interpreter implements InterpreterInterface
         $this->opCount = 0;
         $altStack = new Stack();
         $vfStack = new Stack();
-        $minimal = (bool) ($flags & self::VERIFY_MINIMALDATA);
+        $minimal = ($flags & self::VERIFY_MINIMALDATA) != 0;
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
