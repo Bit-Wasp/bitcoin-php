@@ -132,6 +132,51 @@ class CheckerTest extends AbstractTestCase
 
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
+     * @expectedExceptionMessage Signature with incorrect encoding
+     */
+    public function testIsLowDERFailsWithIncorrectEncoding()
+    {
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $checker->isLowDerSignature(new Buffer('abcd'));
+    }
+
+    public function testReturnsFalseWithNoSig()
+    {
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $this->assertFalse($checker->isDefinedHashtypeSignature(new Buffer()));
+    }
+
+    public function testIsDefinedHashType()
+    {
+        $valid = [
+            1,
+            2,
+            3,
+            0x81,
+            0x82,
+            0x83
+        ];
+
+        $invalid = [
+            4,
+            50,
+            255
+        ];
+
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
+        foreach ($valid as $t) {
+            $t = new Buffer(chr($t));
+            $this->assertTrue($checker->isDefinedHashtypeSignature($t));
+        }
+
+        foreach ($invalid as $t) {
+            $t = new Buffer(chr($t));
+            $this->assertFalse($checker->isDefinedHashtypeSignature($t));
+        }
+    }
+
+    /**
+     * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      * @expectedExceptionMessage Public key with incorrect encoding
      */
     public function testCheckPublicKeyEncodingFail()
