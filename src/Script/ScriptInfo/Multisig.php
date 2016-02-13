@@ -57,7 +57,7 @@ class Multisig implements ScriptInfoInterface
             $publicKeys[] = PublicKeyFactory::fromHex($key->getData());
         }
 
-        $n = (int) $nCode - Opcodes::OP_1 + 1 ;
+        $n = \BitWasp\Bitcoin\Script\decodeOpN($nCode);
         $this->n = count($publicKeys);
         if ($this->n === 0 || $this->n !== $n) {
             throw new \LogicException('No public keys found in script');

@@ -194,7 +194,12 @@ class ScriptTest extends AbstractTestCase
     {
         return [
             [ScriptFactory::create()->push(new Buffer())->push(new Buffer())->op('OP_0')->getScript(), true],
-            [ScriptFactory::create()->op('OP_1')->getScript(), false]
+            [ScriptFactory::create()->op('OP_1')->getScript(), true],
+            [ScriptFactory::create()->op('OP_0')->getScript(), true],
+            [ScriptFactory::create()->op('OP_16')->op('OP_RESERVED')->getScript(), true],
+            [ScriptFactory::create()->op('OP_16')->op('OP_RESERVED')->getScript(), true],
+            [ScriptFactory::create()->op('OP_NOP')->getScript(), false],
+
         ];
     }
 

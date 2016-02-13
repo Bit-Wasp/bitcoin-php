@@ -52,7 +52,6 @@ class ScriptCountSigOpsTest extends AbstractTestCase
             ->push(new Buffer())
             ->op('OP_2')
             ->op('OP_CHECKMULTISIG')
-            ->op('OP_IF')->op('OP_CHECKSIG')->op('OP_ENDIF')
             ->getScript();
 
         $innerBuf = $innerScript->getBuffer();
@@ -61,7 +60,7 @@ class ScriptCountSigOpsTest extends AbstractTestCase
         $scriptSig = ScriptFactory::create()->op('OP_0')->push($innerBuf)->getScript();
         $count = $p2sh->countP2shSigOps($scriptSig);
 
-        $this->assertEquals(3, $count);
+        $this->assertEquals(2, $count);
 
     }
 
