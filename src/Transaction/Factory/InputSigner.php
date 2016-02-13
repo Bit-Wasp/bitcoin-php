@@ -135,7 +135,7 @@ class InputSigner
      * @param ScriptInterface $scriptCode
      * @param BufferInterface[] $stack
      * @param int $sigVersion
-     * @return mixed
+     * @return string
      */
     public function extractFromValues($type, ScriptInterface $scriptCode, array $stack, $sigVersion)
     {
@@ -280,7 +280,7 @@ class InputSigner
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function isFullySigned()
     {
@@ -292,7 +292,7 @@ class InputSigner
      *
      * @param PrivateKeyInterface $key
      * @param ScriptInterface $scriptPubKey
-     * @param int $outputType
+     * @param string $outputType
      * @param BufferInterface[] $results
      * @param int $sigVersion
      * @return bool
@@ -448,7 +448,7 @@ class InputSigner
     }
 
     /**
-     * @param $outputType
+     * @param string $outputType
      * @param $answer
      * @return bool
      */

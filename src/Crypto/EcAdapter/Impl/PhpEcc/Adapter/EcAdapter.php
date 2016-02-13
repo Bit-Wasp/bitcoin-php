@@ -14,7 +14,6 @@ use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Primitives\PointInterface;
@@ -254,8 +253,8 @@ class EcAdapter implements EcAdapterInterface
     /**
      * Attempt to calculate the public key recovery param by trial and error
      *
-     * @param int|string     $r
-     * @param int|string     $s
+     * @param integer|string $r
+     * @param integer|string $s
      * @param BufferInterface $messageHash
      * @param PublicKey $publicKey
      * @return int
