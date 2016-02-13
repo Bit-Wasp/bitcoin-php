@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
 
 class ScriptTest extends AbstractTestCase
 {
