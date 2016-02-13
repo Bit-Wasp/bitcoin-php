@@ -110,7 +110,7 @@ class TxBuilder
     }
 
     /**
-     * @param BufferInterface|string $hashPrevOut
+     * @param BufferInterface $hashPrevOut
      * @param int $nPrevOut
      * @param Script|null $script
      * @param int $nSequence
@@ -144,7 +144,7 @@ class TxBuilder
     }
 
     /**
-     * @param int|string $value
+     * @param integer $value
      * @param ScriptInterface $script
      * @return $this
      */

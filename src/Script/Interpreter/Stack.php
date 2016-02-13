@@ -17,7 +17,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
     }
 
     /**
-     * @param mixed $value
+     * @param BufferInterface $value
      * @throws \InvalidArgumentException
      */
     private function typeCheck($value)
