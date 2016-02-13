@@ -93,7 +93,11 @@ class ScriptFactory
      */
     public static function getNativeConsensus($flags = null, EcAdapterInterface $ecAdapter = null)
     {
-        return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter(), $flags ?: self::defaultFlags());
+        if ($flags === null) {
+            $flags = self::defaultFlags();
+        }
+
+        return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter(), $flags);
     }
 
     /**
@@ -102,7 +106,11 @@ class ScriptFactory
      */
     public static function getBitcoinConsensus($flags = null)
     {
-        return new BitcoinConsensus($flags ?: self::defaultFlags());
+        if ($flags === null) {
+            $flags = self::defaultFlags();
+        }
+
+        return new BitcoinConsensus($flags);
     }
 
     /**
@@ -110,7 +118,7 @@ class ScriptFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return \BitWasp\Bitcoin\Script\Consensus\ConsensusInterface
      */
-    public static function consensus($flags = null, EcAdapterInterface $ecAdapter = null)
+    public static function consensus($flags, EcAdapterInterface $ecAdapter = null)
     {
         if (extension_loaded('bitcoinconsensus')) {
             return self::getBitcoinConsensus($flags);
