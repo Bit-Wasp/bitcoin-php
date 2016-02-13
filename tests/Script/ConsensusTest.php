@@ -30,7 +30,7 @@ class ConsensusFactoryTest extends AbstractTestCase
 
     public function testDefaultAdapter()
     {
-        $this->assertInstanceOf($this->getExpectedAdapter(), ScriptFactory::consensus());
+        $this->assertInstanceOf($this->getExpectedAdapter(), ScriptFactory::consensus(ScriptFactory::defaultFlags()));
     }
 
     public function getVerifyVectors()
