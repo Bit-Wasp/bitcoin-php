@@ -4,24 +4,11 @@
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
-use BitWasp\Bitcoin\Script\Interpreter\Stack;
-use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
-use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
-use Mdanter\Ecc\EccFactory;
 
 class CheckerTest extends AbstractTestCase
 {
@@ -127,6 +114,51 @@ class CheckerTest extends AbstractTestCase
             $this->assertTrue(true);
         } catch (\Exception $e) {
             $this->fail();
+        }
+    }
+
+    /**
+     * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
+     * @expectedExceptionMessage Signature with incorrect encoding
+     */
+    public function testIsLowDERFailsWithIncorrectEncoding()
+    {
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $checker->isLowDerSignature(new Buffer('abcd'));
+    }
+
+    public function testReturnsFalseWithNoSig()
+    {
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction(), 0, 0);
+        $this->assertFalse($checker->isDefinedHashtypeSignature(new Buffer()));
+    }
+
+    public function testIsDefinedHashType()
+    {
+        $valid = [
+            1,
+            2,
+            3,
+            0x81,
+            0x82,
+            0x83
+        ];
+
+        $invalid = [
+            4,
+            50,
+            255
+        ];
+
+        $checker = new Checker(Bitcoin::getEcAdapter(), new Transaction, 0, 0);
+        foreach ($valid as $t) {
+            $t = new Buffer(chr($t));
+            $this->assertTrue($checker->isDefinedHashtypeSignature($t));
+        }
+
+        foreach ($invalid as $t) {
+            $t = new Buffer(chr($t));
+            $this->assertFalse($checker->isDefinedHashtypeSignature($t));
         }
     }
 

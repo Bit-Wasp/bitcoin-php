@@ -71,18 +71,48 @@
       "desc": "OP_IF"
     },
     {
-      "scriptSig": "0100",
-      "scriptPubKey": "635067010168",
-      "result": true,
+      "scriptSig": "51",
+      "scriptPubKey": "50",
+      "result": false,
       "flags": "VERIFY_STRICTENC",
-      "desc": "0 IF OP_RESERVED OP_ENDIF 1 OP_ENDIF"
+      "desc": "1 OP_RESERVED"
     },
     {
-      "scriptSig": "0101",
-      "scriptPubKey": "645067010168",
-      "result": true,
+      "scriptSig": "51",
+      "scriptPubKey": "89",
+      "result": false,
       "flags": "VERIFY_STRICTENC",
-      "desc": "1 OP_NOTIF 1 OP_ENDIF OP_RESERVED OP_ENDIF"
+      "desc": "1 OP_RESERVED1"
+    },
+    {
+      "scriptSig": "51",
+      "scriptPubKey": "8a",
+      "result": false,
+      "flags": "VERIFY_STRICTENC",
+      "desc": "1 OP_RESERVED2"
+    },
+    {
+      "scriptSig": "000150",
+      "scriptPubKey": "8aa914ece424a6bb6ddf4db592c0faed60685047a361b187",
+      "result": false,
+      "flags": "VERIFY_STRICTENC,VERIFY_P2SH",
+      "desc": "OP_RESERVED in p2sh"
+    },
+
+    {
+      "scriptSig": "000169",
+      "scriptPubKey": "8aa9140f4d7845db968f2a81b530b6f3c1d6246d4c7e0187",
+      "result": false,
+      "flags": "VERIFY_STRICTENC,VERIFY_P2SH",
+      "desc": "OP_VERIFY in p2sh"
+    },
+
+    {
+      "scriptSig": "",
+      "scriptPubKey": "74",
+      "result": false,
+      "flags": "VERIFY_P2SH,VERIFY_WITNESS,VERIFY_STRICTENC",
+      "desc": "OP_DEPTH"
     },
     {
       "scriptSig": "",

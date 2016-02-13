@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
 
 class ScriptTest extends AbstractTestCase
 {
@@ -194,7 +193,12 @@ class ScriptTest extends AbstractTestCase
     {
         return [
             [ScriptFactory::create()->push(new Buffer())->push(new Buffer())->op('OP_0')->getScript(), true],
-            [ScriptFactory::create()->op('OP_1')->getScript(), false]
+            [ScriptFactory::create()->op('OP_1')->getScript(), true],
+            [ScriptFactory::create()->op('OP_0')->getScript(), true],
+            [ScriptFactory::create()->op('OP_16')->op('OP_RESERVED')->getScript(), true],
+            [ScriptFactory::create()->op('OP_16')->op('OP_RESERVED')->getScript(), true],
+            [ScriptFactory::create()->op('OP_NOP')->getScript(), false],
+
         ];
     }
 

@@ -81,26 +81,20 @@ class Script extends Serializable implements ScriptInterface
 
         $lastOp = 0xff;
         foreach ($parser as $exec) {
-            if ($exec->isPush()) {
-                continue;
-            }
-
             $op = $exec->getOp();
-            if ($op > Opcodes::OP_PUSHDATA4) {
-                // None of these are pushdatas, so just an opcode
-                if ($op === Opcodes::OP_CHECKSIG || $op === Opcodes::OP_CHECKSIGVERIFY) {
-                    $count++;
-                } elseif ($op === Opcodes::OP_CHECKMULTISIG || $op === Opcodes::OP_CHECKMULTISIGVERIFY) {
-                    if ($accurate && ($lastOp >= Opcodes::OP_1 && $lastOp <= Opcodes::OP_16)) {
-                        $c = ($lastOp - (Opcodes::OP_1 - 1));
-                        $count += $c;
-                    } else {
-                        $count += 20;
-                    }
-                }
 
-                $lastOp = $op;
+            // None of these are pushdatas, so just an opcode
+            if ($op === Opcodes::OP_CHECKSIG || $op === Opcodes::OP_CHECKSIGVERIFY) {
+                $count++;
+            } elseif ($op === Opcodes::OP_CHECKMULTISIG || $op === Opcodes::OP_CHECKMULTISIGVERIFY) {
+                if ($accurate && ($lastOp >= Opcodes::OP_1 && $lastOp <= Opcodes::OP_16)) {
+                    $count += decodeOpN($lastOp);
+                } else {
+                    $count += 20;
+                }
             }
+
+            $lastOp = $op;
         }
 
         return $count;
@@ -108,6 +102,7 @@ class Script extends Serializable implements ScriptInterface
 
     /**
      * @param WitnessProgram $program
+     * @param ScriptWitnessInterface $scriptWitness
      * @return int
      */
     private function witnessSigOps(WitnessProgram $program, ScriptWitnessInterface $scriptWitness)
@@ -163,10 +158,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function countP2shSigOps(ScriptInterface $scriptSig)
     {
-        if (ScriptFactory::scriptPubKey()
-            ->classify($this)
-            ->isPayToScriptHash() === false
-        ) {
+        if (!ScriptFactory::scriptPubKey()->classify($this)->isPayToScriptHash()) {
             return $this->countSigOps(true);
         }
 
@@ -195,11 +187,13 @@ class Script extends Serializable implements ScriptInterface
      */
     public function isPushOnly()
     {
-        $pushOnly = true;
         foreach ($this->getScriptParser()->decode() as $entity) {
-            $pushOnly &= $entity->isPush();
+            if ($entity->getOp() > Opcodes::OP_16) {
+                return false;
+            }
         }
-        return $pushOnly;
+
+        return true;
     }
 
     /**

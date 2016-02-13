@@ -373,6 +373,7 @@ class Interpreter implements InterpreterInterface
                 $c++;
             }
         }
+
         return !(bool)$c;
     }
 
@@ -520,9 +521,10 @@ class Interpreter implements InterpreterInterface
                                 if ($mainStack->isEmpty()) {
                                     throw new \RuntimeException('Unbalanced conditional');
                                 }
-                                // todo
+
                                 $buffer = Number::buffer($mainStack->pop(), $minimal)->getBuffer();
                                 $value = $this->castToBool($buffer);
+
                                 if ($opCode === Opcodes::OP_NOTIF) {
                                     $value = !$value;
                                 }
@@ -534,7 +536,7 @@ class Interpreter implements InterpreterInterface
                             if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
-                            $vfStack[-1] = !$vfStack->end() ? $this->vchTrue : $this->vchFalse;
+                            $vfStack->push(!$vfStack->end() ? $this->vchTrue : $this->vchFalse);
                             break;
 
                         case Opcodes::OP_ENDIF:
@@ -552,10 +554,6 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Error: verify');
                             }
                             $mainStack->pop();
-                            break;
-
-                        case Opcodes::OP_RESERVED:
-                            // todo
                             break;
 
                         case Opcodes::OP_TOALTSTACK:
@@ -725,9 +723,8 @@ class Interpreter implements InterpreterInterface
                             if ($mainStack->isEmpty()) {
                                 throw new \RuntimeException('Invalid stack operation OP_SIZE');
                             }
-                            // todo: Int sizes?
-                            $vch = $mainStack[-1];
-                            $mainStack->push(Number::int($vch->getSize())->getBuffer());
+                            $size = Number::int($mainStack[-1]->getSize());
+                            $mainStack->push($size->getBuffer());
                             break;
 
                         case Opcodes::OP_EQUAL:
@@ -735,13 +732,11 @@ class Interpreter implements InterpreterInterface
                             if (count($mainStack) < 2) {
                                 throw new \RuntimeException('Invalid stack operation OP_EQUAL');
                             }
-                            $vch1 = $mainStack[-2];
-                            $vch2 = $mainStack[-1];
 
-                            $equal = ($vch1->getBinary() === $vch2->getBinary());
+                            $equal = $mainStack[-2]->equals($mainStack[-1]);
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push(($equal ? $this->vchTrue : $this->vchFalse));
+                            $mainStack->push($equal ? $this->vchTrue : $this->vchFalse);
                             if ($opCode === Opcodes::OP_EQUALVERIFY) {
                                 if ($equal) {
                                     $mainStack->pop();
