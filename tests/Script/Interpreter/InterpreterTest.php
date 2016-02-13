@@ -113,18 +113,6 @@ class InterpreterTest extends AbstractTestCase
 
     public function getScripts()
     {
-        $f = $this->dataFile('scriptinterpreter.simple.json');
-        $json = json_decode($f);
-
-        $vectors = [];
-        foreach ($json->test as $c => $test) {
-            $flags = $this->getInterpreterFlags($test->flags);
-            $scriptSig = ScriptFactory::fromHex($test->scriptSig);
-            $scriptPubKey = ScriptFactory::fromHex($test->scriptPubKey);
-            $vectors[] = [
-                $flags, $scriptSig, $scriptPubKey, $test->result, new Transaction
-            ];
-        }
 
         $flags = Interpreter::VERIFY_NONE;
         $vectors[] = [
