@@ -81,6 +81,25 @@ class AddressFactory
     }
 
     /**
+     * @param string $address
+     * @param NetworkInterface $network
+     * @return AddressInterface
+     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     */
+    public static function isValidAddress($address, NetworkInterface $network = null)
+    {
+        try {
+          self::fromString( $address , $network );
+          $is_valid = true;
+        }
+        catch (\Exception $e) {
+          $is_valid = false;
+        }
+
+        return $is_valid;
+    }
+
+    /**
      * @param ScriptInterface $script
      * @param NetworkInterface $network
      * @return String
