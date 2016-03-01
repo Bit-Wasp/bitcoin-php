@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
+use BitWasp\Bitcoin\Transaction\Bip69\Bip69;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -266,6 +267,21 @@ class TxBuilder
             $value,
             ScriptFactory::scriptPubKey()->payToAddress($address)
         );
+
+        return $this;
+    }
+
+    /**
+     * Sorts the transaction inputs and outputs lexicographically,
+     * according to BIP69
+     *
+     * @param Bip69 $bip69
+     * @return $this
+     */
+    public function bip69(Bip69 $bip69)
+    {
+        $this->inputs = $bip69->sortInputs($this->inputs);
+        $this->outputs = $bip69->sortOutputs($this->outputs);
 
         return $this;
     }
