@@ -89,11 +89,10 @@ class AddressFactory
     public static function isValidAddress($address, NetworkInterface $network = null)
     {
         try {
-          self::fromString( $address , $network );
-          $is_valid = true;
-        }
-        catch (\Exception $e) {
-          $is_valid = false;
+            self::fromString($address, $network);
+            $is_valid = true;
+        } catch (\Exception $e) {
+            $is_valid = false;
         }
 
         return $is_valid;
