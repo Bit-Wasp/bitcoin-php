@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction\Bip69;
 
-
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
