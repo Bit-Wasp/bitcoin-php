@@ -2,6 +2,10 @@
 
 namespace BitWasp\Bitcoin\Transaction\Bip69;
 
+use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
+use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
@@ -19,17 +23,18 @@ class Bip69
     }
 
     /**
-     * @param TransactionInputInterface $tx1
-     * @param TransactionInputInterface $tx2
+     * @param TransactionInputInterface $vin1
+     * @param TransactionInputInterface $vin2
      * @return bool
      */
-    public function compareInputs(TransactionInputInterface $tx1, TransactionInputInterface $tx2)
+    public function compareInputs(TransactionInputInterface $vin1, TransactionInputInterface $vin2)
     {
-        $outpoint1 = $tx1->getOutPoint();
-        $outpoint2 = $tx2->getOutPoint();
-        $txid1 = $outpoint1->getTxId();
-        $txid2 = $outpoint2->getTxId();
-        return strcmp($txid1->getBinary(), $txid2->getBinary()) || $outpoint1->getVout() - $outpoint2->getVout();
+        $outpoint1 = $vin1->getOutPoint();
+        $outpoint2 = $vin2->getOutPoint();
+
+        $cmpTxId = strcmp($outpoint1->getTxId()->getBinary(), $outpoint2->getTxId()->getBinary());
+
+        return ($cmpTxId !== 0) ? $cmpTxId : $outpoint1->getVout() - $outpoint2->getVout();
     }
 
     /**
@@ -43,13 +48,15 @@ class Bip69
     }
 
     /**
-     * @param TransactionOutputInterface $tx1
-     * @param TransactionOutputInterface $tx2
+     * @param TransactionOutputInterface $vout1
+     * @param TransactionOutputInterface $vout2
      * @return bool
      */
-    public function compareOutputs(TransactionOutputInterface $tx1, TransactionOutputInterface $tx2)
+    public function compareOutputs(TransactionOutputInterface $vout1, TransactionOutputInterface $vout2)
     {
-        return $tx1->getValue() - $tx2->getValue() || strcmp($tx1->getScript()->getBinary(), $tx2->getScript()->getBinary());
+        $value = $vout1->getValue() - $vout2->getValue();
+
+        return ($value !== 0) ? $value : strcmp($vout1->getScript()->getBinary(), $vout2->getScript()->getBinary());
     }
 
     /**
@@ -59,13 +66,51 @@ class Bip69
     public function check(TransactionInterface $tx)
     {
         $inputs = $tx->getInputs()->all();
-        $sortedInputs = $this->sortInputs($inputs);
-
         $outputs = $tx->getOutputs()->all();
-        $sortedOutputs = $this->sortOutputs($outputs);
 
-        $valid = $sortedInputs === $inputs && $sortedOutputs === $sortedOutputs;
+        return $this->sortInputs($inputs) === $inputs && $this->sortOutputs($outputs) === $outputs;
+    }
 
-        return $valid;
+    /**
+     * @param TransactionInputCollection $inputs
+     * @param TransactionWitnessCollection $witnesses
+     * @return array
+     * @throws \Exception
+     */
+    public function sortInputsAndWitness(TransactionInputCollection $inputs, TransactionWitnessCollection $witnesses)
+    {
+        if (count($inputs) !== count($witnesses)) {
+            throw new \Exception('Number of inputs must match witnesses');
+        }
+
+        $inputs = $inputs->all();
+        uasort($inputs, [$this, 'compareInputs']);
+
+        $vWitness = [];
+        foreach ($inputs as $key => $input) {
+            $vWitness[] = $witnesses[$key];
+        }
+
+        return [new TransactionInputCollection($inputs), new TransactionWitnessCollection($vWitness)];
+    }
+
+    /**
+     * @param TransactionInterface $tx
+     * @return TransactionInterface
+     */
+    public function mutate(TransactionInterface $tx)
+    {
+        if (count($tx->getWitnesses()) > 0) {
+            list ($vTxin, $vWit) = $this->sortInputsAndWitness($tx->getInputs(), $tx->getWitnesses());
+        } else {
+            $vTxin = new TransactionInputCollection($this->sortInputs($tx->getInputs()->all()));
+            $vWit = new TransactionWitnessCollection([]);
+        }
+
+        return (new TxMutator($tx))
+            ->inputs($vTxin)
+            ->outputs(new TransactionOutputCollection($this->sortOutputs($tx->getOutputs()->all())))
+            ->witness($vWit)
+            ->done();
     }
 }
