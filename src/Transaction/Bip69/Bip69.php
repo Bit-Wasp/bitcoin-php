@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Transaction\Bip69;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -72,18 +73,17 @@ class Bip69
     }
 
     /**
-     * @param TransactionInputCollection $inputs
-     * @param TransactionWitnessCollection $witnesses
+     * @param TransactionInputInterface[] $inputs
+     * @param ScriptWitnessInterface[] $witnesses
      * @return array
      * @throws \Exception
      */
-    public function sortInputsAndWitness(TransactionInputCollection $inputs, TransactionWitnessCollection $witnesses)
+    public function sortInputsAndWitness(array $inputs, array $witnesses)
     {
         if (count($inputs) !== count($witnesses)) {
             throw new \Exception('Number of inputs must match witnesses');
         }
 
-        $inputs = $inputs->all();
         uasort($inputs, [$this, 'compareInputs']);
 
         $vWitness = [];
@@ -91,7 +91,7 @@ class Bip69
             $vWitness[] = $witnesses[$key];
         }
 
-        return [new TransactionInputCollection($inputs), new TransactionWitnessCollection($vWitness)];
+        return [$inputs, $vWitness];
     }
 
     /**
@@ -101,16 +101,16 @@ class Bip69
     public function mutate(TransactionInterface $tx)
     {
         if (count($tx->getWitnesses()) > 0) {
-            list ($vTxin, $vWit) = $this->sortInputsAndWitness($tx->getInputs(), $tx->getWitnesses());
+            list ($vTxin, $vWit) = $this->sortInputsAndWitness($tx->getInputs()->all(), $tx->getWitnesses()->all());
         } else {
-            $vTxin = new TransactionInputCollection($this->sortInputs($tx->getInputs()->all()));
-            $vWit = new TransactionWitnessCollection([]);
+            $vTxin = $this->sortInputs($tx->getInputs()->all());
+            $vWit = [];
         }
 
         return (new TxMutator($tx))
-            ->inputs($vTxin)
+            ->inputs(new TransactionInputCollection($vTxin))
             ->outputs(new TransactionOutputCollection($this->sortOutputs($tx->getOutputs()->all())))
-            ->witness($vWit)
+            ->witness(new TransactionWitnessCollection($vWit))
             ->done();
     }
 }

@@ -280,8 +280,11 @@ class TxBuilder
      */
     public function bip69(Bip69 $bip69)
     {
-        $this->inputs = $bip69->sortInputs($this->inputs);
+        list ($inputs, $witness) = $bip69->sortInputsAndWitness($this->inputs, $this->witness);
+
+        $this->inputs = $inputs;
         $this->outputs = $bip69->sortOutputs($this->outputs);
+        $this->witness = $witness;
 
         return $this;
     }
