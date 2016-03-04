@@ -31,5 +31,4 @@ interface ScriptInfoInterface
      * @return string
      */
     public function classification();
-
 }

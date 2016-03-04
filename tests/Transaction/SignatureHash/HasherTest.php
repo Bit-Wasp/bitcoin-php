@@ -160,9 +160,9 @@ class HasherTest extends AbstractTestCase
         $sighashSingle = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::SINGLE;
         $singleSigning = new Signer($unsigned, $ecAdapter);
         $singleSigning
-            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null,null, $sighashSingle)
-            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null,null, $sighashSingle)
-            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null,null, $sighashSingle);
+            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $sighashSingle)
+            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null, null, $sighashSingle)
+            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null, null, $sighashSingle);
         $hex = $singleSigning->get()->getHex();
         if ($hex == $regressionSigSingle) {
             $this->fail('Regression in Sighash Single handling (clone, object references?)');
@@ -180,27 +180,27 @@ class HasherTest extends AbstractTestCase
 
         $singleSigningBug = new Signer($buggy, $ecAdapter);
         $singleSigningBug
-            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null,null, $sighashSingle)
-            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null,null, $sighashSingle)
-            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null,null, $sighashSingle);
+            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $sighashSingle)
+            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null, null, $sighashSingle)
+            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null, null, $sighashSingle);
         $this->assertEquals($expectedSingleBugTx, $singleSigningBug->get()->getHex());
 
         // Test handling of SIGHASH_SINGLE|SIGHASH_ANYONECANPAY
         $singleAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::ANYONECANPAY, $sighashSingle);
         $singleAnyone = new Signer($unsigned, $ecAdapter);
         $singleAnyone
-            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null,null, $singleAny)
-            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null,null, $singleAny)
-            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null,null, $singleAny);
+            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $singleAny)
+            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null, null, $singleAny)
+            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null, null, $singleAny);
         $this->assertEquals($expectedSigSingleAnyoneTx, $singleAnyone->get()->getHex());
 
         // Test signs SIGHASH_NONE transaction properly
         $sighashNone = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::NONE;
         $noneSigning = new Signer($unsigned, $ecAdapter);
         $noneSigning
-            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null,null, $sighashNone)
-            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null,null, $sighashNone)
-            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null,null, $sighashNone);
+            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $sighashNone)
+            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null, null, $sighashNone)
+            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null, null, $sighashNone);
         $this->assertEquals($expectedSigNoneTx, $noneSigning->get()->getHex());
 
 
@@ -208,9 +208,9 @@ class HasherTest extends AbstractTestCase
         $noneAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::ANYONECANPAY, $sighashNone);
         $noneAnyone = new Signer($unsigned, $ecAdapter);
         $noneAnyone
-            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null,null, $noneAny)
-            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null,null, $noneAny)
-            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null,null, $noneAny);
+            ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $noneAny)
+            ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null, null, $noneAny)
+            ->sign(2, $privateKey, $transaction3->getOutput($tx3NOut), null, null, $noneAny);
 
         $this->assertEquals($expectedSigNoneAnyTx, $noneAnyone->get()->getHex());
     }
