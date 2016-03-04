@@ -88,7 +88,7 @@ class PublicKey extends Key implements PublicKeyInterface
 
         /** @var resource $clone */
         $clone = '';
-        if (1 !== secp256k1_ec_pubkey_parse($context, $serialized, $clone)) {
+        if (1 !== secp256k1_ec_pubkey_parse($context, $clone, $serialized)) {
             throw new \Exception('Secp256k1 pubkey parse');
         }
 
