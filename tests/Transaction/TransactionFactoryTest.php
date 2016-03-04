@@ -14,12 +14,6 @@ class TransactionFactoryTest extends AbstractTestCase
         $this->assertInstanceOf($this->txBuilderType, $builder);
     }
 
-    public function testSigner()
-    {
-        $signer = TransactionFactory::sign(new Transaction());
-        $this->assertInstanceOf($this->txSignerType, $signer);
-    }
-
     public function testMutateSigner()
     {
         $signer = TransactionFactory::mutate(new Transaction());

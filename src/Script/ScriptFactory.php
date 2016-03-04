@@ -65,12 +65,11 @@ class ScriptFactory
 
     /**
      * @param ScriptInterface $script
-     * @param ScriptInterface|null $redeemScript
      * @return ScriptInfo\ScriptInfoInterface
      */
-    public static function info(ScriptInterface $script, ScriptInterface $redeemScript = null)
+    public static function info(ScriptInterface $script)
     {
-        return (new ScriptInfoFactory())->load($script, $redeemScript);
+        return (new ScriptInfoFactory())->load($script);
     }
 
     /**

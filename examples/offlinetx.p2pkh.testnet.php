@@ -28,8 +28,8 @@ $spendTx = TransactionFactory::build()
     ->get();
 
 echo "Sign transaction\n";
-$signer = TransactionFactory::sign($spendTx);
-$signer->sign(0, $privateKey, $myTx->getOutput($spendOutput)->getScript());
+$signer = new \BitWasp\Bitcoin\Transaction\Factory\Signer($spendTx, $ecAdapter);
+$signer->sign(0, $privateKey, $myTx->getOutput($spendOutput));
 
 echo "Generate transaction: \n";
 $new = $signer->get();

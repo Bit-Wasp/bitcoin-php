@@ -4,10 +4,7 @@ namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
 
 class PayToPubkeyHash implements ScriptInfoInterface
@@ -77,20 +74,5 @@ class PayToPubkeyHash implements ScriptInfoInterface
     public function getKeys()
     {
         return [];
-    }
-
-    /**
-     * @param TransactionSignatureInterface[] $signatures
-     * @param PublicKeyInterface[] $publicKeys
-     * @return Script|ScriptInterface
-     */
-    public function makeScriptSig(array $signatures = [], array $publicKeys = [])
-    {
-        $newScript = new Script();
-        if (count($publicKeys) > 0 && count($signatures) === $this->getRequiredSigCount()) {
-            $newScript = ScriptFactory::sequence([$signatures[0]->getBuffer(), $publicKeys[0]->getBuffer()]);
-        }
-
-        return $newScript;
     }
 }
