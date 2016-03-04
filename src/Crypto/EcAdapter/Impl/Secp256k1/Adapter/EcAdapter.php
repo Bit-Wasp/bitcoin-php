@@ -207,7 +207,7 @@ class EcAdapter implements EcAdapterInterface
     {
         $sig_t = '';
         /** @var resource $sig_t */
-        if (1 !== secp256k1_ecdsa_sign_recoverable($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
+        if (1 !== secp256k1_ecdsa_sign_recoverable($this->context, $sig_t, $msg32->getBinary(), $privateKey->getBinary())) {
             throw new \RuntimeException('Secp256k1: failed to sign');
         }
 
