@@ -16,7 +16,7 @@ install:
         sh -c 'if [ "$EXT_SECP256K1" != "" ]; then \
             git clone https://github.com/bitcoin/secp256k1.git \
             && cd secp256k1 \
-            && ./autogen.sh && ./configure --disable-jni --enable-module-recovery && make && sudo make install \
+            && ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-module-schnorr --enable-experimental && make && sudo make install \
             && cd ..; fi'
     - |
         sh -c 'if [ "$EXT_SECP256K1" != "" ]; then \
