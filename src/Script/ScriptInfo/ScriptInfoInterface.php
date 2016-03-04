@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Script\ScriptInterface;
 
 interface ScriptInfoInterface
 {
@@ -32,11 +31,4 @@ interface ScriptInfoInterface
      * @return string
      */
     public function classification();
-
-    /**
-     * @param array $signatures
-     * @param array $publicKeys
-     * @return ScriptInterface
-     */
-    public function makeScriptSig(array $signatures = [], array $publicKeys = []);
 }

@@ -16,8 +16,8 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\Factory\TxSigner;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\EccFactory;
@@ -99,8 +99,8 @@ class InterpreterTest extends AbstractTestCase
         // Here is where
         $spend = $builder->spendOutputFrom($fake, 0)->get();
 
-        $signer = new TxSigner($ec, $spend);
-        $signer->sign(0, $privateKey, $outputScript, $rs);
+        $signer = new Signer($spend, $ec);
+        $signer->sign(0, $privateKey, $fake->getOutput(0), $rs);
 
         $spendTx = $signer->get();
         $scriptSig = $spendTx->getInput(0)->getScript();

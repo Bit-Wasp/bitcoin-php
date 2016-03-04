@@ -18,13 +18,14 @@ $tx = TransactionFactory::build()
     ->payToAddress(50, $publicKey->getAddress())
     ->get();
 
-$signed = TransactionFactory::sign($tx)
-    ->sign(0, $priv, $outputScript)
+$signed = (new \BitWasp\Bitcoin\Transaction\Factory\Signer($tx, \BitWasp\Bitcoin\Bitcoin::getEcAdapter()))
+    ->sign(0, $priv, $tx->getOutput(0))
     ->get();
 
 echo $signed->getHex();
 
-$consensus = ScriptFactory::consensus();
+$flags = \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_NONE;
+$consensus = ScriptFactory::consensus($flags);
 $validator = $signed->validator();
 
 var_dump($validator->checkSignatures($consensus, [$outputScript]));

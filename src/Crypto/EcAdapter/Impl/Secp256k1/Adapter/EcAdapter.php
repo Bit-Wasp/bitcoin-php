@@ -117,12 +117,12 @@ class EcAdapter implements EcAdapterInterface
     {
         /** @var resource $sig_t */
         $sig_t = '';
-        if (1 !== secp256k1_ecdsa_sign($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
+        if (1 !== secp256k1_ecdsa_sign($this->context, $sig_t, $msg32->getBinary(), $privateKey->getBinary())) {
             throw new \RuntimeException('Secp256k1: failed to sign');
         }
 
         $derSig = '';
-        secp256k1_ecdsa_signature_serialize_der($this->context, $sig_t, $derSig);
+        secp256k1_ecdsa_signature_serialize_der($this->context, $derSig, $sig_t);
 
         $rL = ord($derSig[3]);
         $r = (new Buffer(substr($derSig, 4, $rL), $rL, $this->math))->getInt();
@@ -153,7 +153,7 @@ class EcAdapter implements EcAdapterInterface
      */
     private function doVerify(BufferInterface $msg32, PublicKey $publicKey, Signature $signature)
     {
-        return (bool) secp256k1_ecdsa_verify($this->context, $msg32->getBinary(), $signature->getResource(), $publicKey->getResource());
+        return (bool) secp256k1_ecdsa_verify($this->context, $signature->getResource(), $msg32->getBinary(), $publicKey->getResource());
     }
 
     /**
@@ -180,7 +180,7 @@ class EcAdapter implements EcAdapterInterface
         /** @var resource $publicKey */
         $context = $this->context;
         $sig = $compactSig->getResource();
-        if (1 !== secp256k1_ecdsa_recover($context, $msg32->getBinary(), $sig, $publicKey)) {
+        if (1 !== secp256k1_ecdsa_recover($context, $publicKey, $sig, $msg32->getBinary())) {
             throw new \RuntimeException('Unable to recover Public Key');
         }
 
@@ -207,7 +207,7 @@ class EcAdapter implements EcAdapterInterface
     {
         $sig_t = '';
         /** @var resource $sig_t */
-        if (1 !== secp256k1_ecdsa_sign_recoverable($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
+        if (1 !== secp256k1_ecdsa_sign_recoverable($this->context, $sig_t, $msg32->getBinary(), $privateKey->getBinary())) {
             throw new \RuntimeException('Secp256k1: failed to sign');
         }
 

@@ -111,7 +111,7 @@ class TxBuilder
     }
 
     /**
-     * @param BufferInterface $hashPrevOut
+     * @param BufferInterface|string $hashPrevOut - hex or BufferInterface
      * @param int $nPrevOut
      * @param Script|null $script
      * @param int $nSequence

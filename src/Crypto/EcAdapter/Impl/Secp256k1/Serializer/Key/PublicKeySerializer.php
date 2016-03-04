@@ -35,9 +35,9 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         $isCompressed = $publicKey->isCompressed();
         if (!secp256k1_ec_pubkey_serialize(
             $this->ecAdapter->getContext(),
+            $serialized,
             $publicKey->getResource(),
-            $isCompressed,
-            $serialized
+            $isCompressed
         )) {
             throw new \RuntimeException('Secp256k1: Failed to serialize public key');
         }
@@ -69,7 +69,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         $binary = $buffer->getBinary();
         $pubkey_t = '';
         /** @var resource $pubkey_t */
-        if (!secp256k1_ec_pubkey_parse($this->ecAdapter->getContext(), $binary, $pubkey_t)) {
+        if (!secp256k1_ec_pubkey_parse($this->ecAdapter->getContext(), $pubkey_t, $binary)) {
             throw new \RuntimeException('Secp256k1 failed to parse public key');
         }
 

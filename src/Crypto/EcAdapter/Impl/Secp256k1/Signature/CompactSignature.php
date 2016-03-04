@@ -99,7 +99,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     {
         $sig_t = '';
         /** @var resource $sig_t */
-        secp256k1_ecdsa_recoverable_signature_convert($this->ecAdapter->getContext(), $this->resource, $sig_t);
+        secp256k1_ecdsa_recoverable_signature_convert($this->ecAdapter->getContext(), $sig_t, $this->resource);
         return new Signature($this->ecAdapter, $this->r, $this->s, $sig_t);
     }
 

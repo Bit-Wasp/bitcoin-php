@@ -23,10 +23,8 @@ class ScriptFactoryTest extends AbstractTestCase
         $arbitrary = [$pk1->getPublicKey(), $pk2->getPublicKey()];
 
         $redeemScript = ScriptFactory::scriptPubKey()->multisig($m, $arbitrary, false);
-        $outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($redeemScript);
-        $info = ScriptFactory::info($outputScript, $redeemScript);
-        $keys = $info->getKeys();
-        foreach ($keys as $i => $key) {
+        $info = ScriptFactory::info($redeemScript);
+        foreach ($info->getKeys() as $i => $key) {
             $this->assertEquals($arbitrary[$i]->getBinary(), $key->getBinary(), 'verify false flag disables sorting');
         }
 

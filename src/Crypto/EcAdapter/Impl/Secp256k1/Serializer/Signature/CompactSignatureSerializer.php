@@ -76,7 +76,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 
         $sig_t = '';
         /** @var resource $sig_t */
-        if (!secp256k1_ecdsa_recoverable_signature_parse_compact($this->ecAdapter->getContext(), $sig->getBinary(), $recoveryId, $sig_t)) {
+        if (!secp256k1_ecdsa_recoverable_signature_parse_compact($this->ecAdapter->getContext(), $sig_t, $sig->getBinary(), $recoveryId)) {
             throw new \RuntimeException('Unable to parse compact signature');
         }
 

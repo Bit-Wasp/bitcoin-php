@@ -80,15 +80,14 @@ class PublicKey extends Key implements PublicKeyInterface
     private function clonePubkey()
     {
         $context = $this->ecAdapter->getContext();
-        /** @var resource $serialized */
         $serialized = '';
-        if (1 !== secp256k1_ec_pubkey_serialize($context, $this->pubkey_t, $this->compressed, $serialized)) {
+        if (1 !== secp256k1_ec_pubkey_serialize($context, $serialized, $this->pubkey_t, $this->compressed)) {
             throw new \Exception('Secp256k1: pubkey serialize');
         }
 
         /** @var resource $clone */
         $clone = '';
-        if (1 !== secp256k1_ec_pubkey_parse($context, $serialized, $clone)) {
+        if (1 !== secp256k1_ec_pubkey_parse($context, $clone, $serialized)) {
             throw new \Exception('Secp256k1 pubkey parse');
         }
 
