@@ -42,7 +42,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     private function doSerialize(Signature $signature)
     {
         $signatureOut = '';
-        if (!secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $signature->getResource(), $signatureOut)) {
+        if (!secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $signatureOut, $signature->getResource())) {
             throw new \RuntimeException('Secp256k1: serialize der failure');
         }
 

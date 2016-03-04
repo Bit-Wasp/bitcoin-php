@@ -117,12 +117,12 @@ class EcAdapter implements EcAdapterInterface
     {
         /** @var resource $sig_t */
         $sig_t = '';
-        if (1 !== secp256k1_ecdsa_sign($this->context, $msg32->getBinary(), $privateKey->getBinary(), $sig_t)) {
+        if (1 !== secp256k1_ecdsa_sign($this->context, $sig_t, $msg32->getBinary(), $privateKey->getBinary())) {
             throw new \RuntimeException('Secp256k1: failed to sign');
         }
 
         $derSig = '';
-        secp256k1_ecdsa_signature_serialize_der($this->context, $sig_t, $derSig);
+        secp256k1_ecdsa_signature_serialize_der($this->context, $derSig, $sig_t);
 
         $rL = ord($derSig[3]);
         $r = (new Buffer(substr($derSig, 4, $rL), $rL, $this->math))->getInt();
