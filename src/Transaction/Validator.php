@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
-use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class Validator implements ValidatorInterface
 {
