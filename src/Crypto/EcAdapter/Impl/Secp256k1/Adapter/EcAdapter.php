@@ -153,7 +153,7 @@ class EcAdapter implements EcAdapterInterface
      */
     private function doVerify(BufferInterface $msg32, PublicKey $publicKey, Signature $signature)
     {
-        return (bool) secp256k1_ecdsa_verify($this->context, $msg32->getBinary(), $signature->getResource(), $publicKey->getResource());
+        return (bool) secp256k1_ecdsa_verify($this->context, $signature->getResource(), $msg32->getBinary(), $publicKey->getResource());
     }
 
     /**
