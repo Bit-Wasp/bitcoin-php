@@ -180,7 +180,7 @@ class EcAdapter implements EcAdapterInterface
         /** @var resource $publicKey */
         $context = $this->context;
         $sig = $compactSig->getResource();
-        if (1 !== secp256k1_ecdsa_recover($context, $msg32->getBinary(), $sig, $publicKey)) {
+        if (1 !== secp256k1_ecdsa_recover($context, $publicKey, $sig, $msg32->getBinary())) {
             throw new \RuntimeException('Unable to recover Public Key');
         }
 
