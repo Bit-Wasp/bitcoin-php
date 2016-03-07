@@ -80,21 +80,25 @@ class Script extends Serializable implements ScriptInterface
         $parser = $this->getScriptParser();
 
         $lastOp = 0xff;
-        foreach ($parser as $exec) {
-            $op = $exec->getOp();
+        try {
+            foreach ($parser as $exec) {
+                $op = $exec->getOp();
 
-            // None of these are pushdatas, so just an opcode
-            if ($op === Opcodes::OP_CHECKSIG || $op === Opcodes::OP_CHECKSIGVERIFY) {
-                $count++;
-            } elseif ($op === Opcodes::OP_CHECKMULTISIG || $op === Opcodes::OP_CHECKMULTISIGVERIFY) {
-                if ($accurate && ($lastOp >= Opcodes::OP_1 && $lastOp <= Opcodes::OP_16)) {
-                    $count += decodeOpN($lastOp);
-                } else {
-                    $count += 20;
+                // None of these are pushdatas, so just an opcode
+                if ($op === Opcodes::OP_CHECKSIG || $op === Opcodes::OP_CHECKSIGVERIFY) {
+                    $count++;
+                } elseif ($op === Opcodes::OP_CHECKMULTISIG || $op === Opcodes::OP_CHECKMULTISIGVERIFY) {
+                    if ($accurate && ($lastOp >= Opcodes::OP_1 && $lastOp <= Opcodes::OP_16)) {
+                        $count += decodeOpN($lastOp);
+                    } else {
+                        $count += 20;
+                    }
                 }
-            }
 
-            $lastOp = $op;
+                $lastOp = $op;
+            }
+        } catch (\Exception $e) {
+            /* Script parsing failures don't count, and terminate the loop */
         }
 
         return $count;
@@ -162,24 +166,26 @@ class Script extends Serializable implements ScriptInterface
             return $this->countSigOps(true);
         }
 
-        $parser = $scriptSig->getScriptParser();
+        try {
+            $data = null;
+            foreach ($scriptSig->getScriptParser() as $exec) {
+                if ($exec->getOp() > Opcodes::OP_16) {
+                    return 0;
+                }
 
-        $data = null;
-        foreach ($parser as $exec) {
-            if ($exec->getOp() > Opcodes::OP_16) {
+                if ($exec->isPush()) {
+                    $data = $exec->getData();
+                }
+            }
+
+            if (!$data instanceof BufferInterface) {
                 return 0;
             }
 
-            if ($exec->isPush()) {
-                $data = $exec->getData();
-            }
-        }
-
-        if (!$data instanceof BufferInterface) {
+            return (new Script($data))->countSigOps(true);
+        } catch (\Exception $e) {
             return 0;
         }
-
-        return (new Script($data))->countSigOps(true);
     }
 
     /**
