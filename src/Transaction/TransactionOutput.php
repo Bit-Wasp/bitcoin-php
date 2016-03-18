@@ -62,6 +62,20 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
+     * @param TransactionOutputInterface $output
+     * @return bool
+     */
+    public function equals(TransactionOutputInterface $output)
+    {
+        $script = $this->script->equals($output->getScript());
+        if (!$script) {
+            return false;
+        }
+
+        return gmp_cmp($this->value, $output->getValue()) === 0;
+    }
+
+    /**
      * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
      */
     public function getBuffer()

@@ -16,4 +16,10 @@ interface OutPointInterface extends SerializableInterface
      * @return int
      */
     public function getVout();
+
+    /**
+     * @param OutPointInterface $outPoint
+     * @return bool
+     */
+    public function equals(OutPointInterface $outPoint);
 }

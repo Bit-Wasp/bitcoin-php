@@ -212,6 +212,16 @@ class ScriptTest extends AbstractTestCase
         $this->assertEquals($eResult, $script->isPushOnly());
     }
 
+    public function testEquals()
+    {
+        $script = new Script();
+        $scriptEq = new Script();
+        $scriptNotEq = new Script(new Buffer('AAAA'));
+
+        $this->assertTrue($script->equals($scriptEq));
+        $this->assertFalse($script->equals($scriptNotEq));
+    }
+
     public function getWitnessVectors()
     {
         $array = json_decode($this->dataFile('witness.json'), true);

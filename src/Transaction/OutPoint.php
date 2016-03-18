@@ -57,6 +57,20 @@ class OutPoint extends Serializable implements OutPointInterface
     }
 
     /**
+     * @param OutPointInterface $outPoint
+     * @return int
+     */
+    public function equals(OutPointInterface $outPoint)
+    {
+        $txid = strcmp($this->getTxId()->getBinary(), $outPoint->getTxId()->getBinary());
+        if ($txid !== 0) {
+            return false;
+        }
+
+        return gmp_cmp($this->getVout(), $outPoint->getVout()) === 0;
+    }
+
+    /**
      * @return BufferInterface
      */
     public function getBuffer()

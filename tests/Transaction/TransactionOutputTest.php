@@ -41,6 +41,19 @@ class TransactionOutputTest extends AbstractTestCase
         $this->assertInstanceOf($this->txOutType, $out);
     }
 
+    public function testEquals()
+    {
+        $o = new TransactionOutput(1, new Script());
+        $oEq = new TransactionOutput(1, new Script());
+        $oBadVal = new TransactionOutput(100, new Script());
+        $oBadScript = new TransactionOutput(1, new Script(new Buffer('a')));
+
+        $this->assertTrue($o->equals($oEq));
+        $this->assertFalse($o->equals($oBadVal));
+        $this->assertFalse($o->equals($oBadScript));
+
+    }
+
     public function testSerialize()
     {
         $buffer = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';

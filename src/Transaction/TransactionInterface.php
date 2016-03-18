@@ -124,6 +124,12 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     public function getSignatureHash();
 
     /**
+     * @param TransactionInterface $tx
+     * @return bool
+     */
+    public function equals(TransactionInterface $tx);
+
+    /**
      * @return Validator
      */
     public function validator();

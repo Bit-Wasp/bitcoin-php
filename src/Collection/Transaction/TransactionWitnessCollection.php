@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Collection\Transaction;
 
 use BitWasp\Bitcoin\Collection\StaticCollection;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 
 class TransactionWitnessCollection extends StaticCollection
@@ -33,6 +34,14 @@ class TransactionWitnessCollection extends StaticCollection
         foreach ($inputs as $idx => $input) {
             $this->set->offsetSet($idx, $input);
         }
+    }
+
+    /**
+     * @return ScriptWitnessInterface[]
+     */
+    public function all()
+    {
+        return $this->set->toArray();
     }
 
     /**

@@ -56,4 +56,10 @@ interface TransactionInputInterface extends SerializableInterface, \ArrayAccess
      * @return int
      */
     public function getSequence();
+
+    /**
+     * @param TransactionInputInterface $input
+     * @return bool
+     */
+    public function equals(TransactionInputInterface $input);
 }
