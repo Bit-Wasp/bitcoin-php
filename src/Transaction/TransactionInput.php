@@ -37,7 +37,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function __construct(OutPointInterface $outPoint, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
     {
-
         $this->outPoint = $outPoint;
         $this->script = $script;
         $this->sequence = $sequence;
@@ -79,6 +78,25 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function getSequence()
     {
         return $this->sequence;
+    }
+
+    /**
+     * @param TransactionInputInterface $input
+     * @return bool
+     */
+    public function equals(TransactionInputInterface $input)
+    {
+        $outPoint = $this->outPoint->equals($input->getOutPoint());
+        if (!$outPoint) {
+            return false;
+        }
+
+        $script = $this->script->equals($input->getScript());
+        if (!$script) {
+            return false;
+        }
+
+        return gmp_cmp($this->sequence, $input->getSequence()) === 0;
     }
 
     /**

@@ -33,6 +33,13 @@ class TransactionInputCollection extends StaticCollection
         }
     }
 
+    /**
+     * @return TransactionInputInterface[]
+     */
+    public function all()
+    {
+        return $this->set->toArray();
+    }
 
     /**
      * @return TransactionInputInterface

@@ -25,4 +25,25 @@ class OutPointTest extends AbstractTestCase
         $this->assertEquals($txid, $outpoint->getTxId());
         $this->assertEquals($vout, $outpoint->getVout());
     }
+
+    public function testCompare()
+    {
+        $txidA = Buffer::hex('41', 32);
+        $txidB = Buffer::hex('42', 32);
+
+        $outPoint1a = new OutPoint($txidA, 0);
+        $outPoint1b = new OutPoint($txidA, 1);
+
+        $this->assertFalse($outPoint1a->equals($outPoint1b));
+
+        $outPoint2a = new OutPoint($txidA, 0);
+        $outPoint2b = new OutPoint($txidB, 0);
+
+        $this->assertFalse($outPoint2a->equals($outPoint2b));
+
+        $outPoint3a = new OutPoint($txidA, 0);
+        $outPoint3b = new OutPoint($txidA, 0);
+
+        $this->assertTrue($outPoint3a->equals($outPoint3b));
+    }
 }

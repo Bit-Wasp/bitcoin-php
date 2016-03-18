@@ -35,6 +35,14 @@ class TransactionOutputCollection extends StaticCollection
     }
 
     /**
+     * @return TransactionOutputInterface[]
+     */
+    public function all()
+    {
+        return $this->set->toArray();
+    }
+
+    /**
      * @return TransactionOutputInterface
      */
     public function current()

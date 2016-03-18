@@ -3,11 +3,13 @@
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Buffertools\Buffer;
 
 class TransactionTest extends \PHPUnit_Framework_TestCase
 {
@@ -151,6 +153,49 @@ class TransactionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($raw, $tx->getHex());
         $this->assertEquals($txId, $tx->getTxId()->getHex());
         $this->assertTrue($tx->isCoinbase());
+    }
+
+    public function testEquals()
+    {
+        $builder = (new TxBuilder())
+            ->version(1)
+            ->input('abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 0)
+            ->output(1, new Script(new Buffer('a')));
+
+        $tx = $builder->get();
+        $txEq = $builder->get();
+        $txBadLock = clone $builder->locktime(123)->get();
+        $txBadVer = clone $builder->version(123)->get();
+
+        $this->assertTrue($tx->equals($txEq));
+        $this->assertFalse($tx->equals($txBadLock));
+        $this->assertFalse($tx->equals($txBadVer));
+
+        $this->assertFalse($tx->equals((new TxBuilder())
+            ->version(1)
+            ->input('abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 0)
+            ->input('123dabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 0)
+            ->output(1, new Script(new Buffer('a')))
+            ->get()));
+
+        $this->assertFalse($tx->equals((new TxBuilder())
+            ->version(1)
+            ->input('abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 0)
+            ->output(1, new Script(new Buffer('a')))
+            ->output(21, new Script(new Buffer('b')))
+            ->get()));
+
+        $this->assertFalse($tx->equals((new TxBuilder())
+            ->version(1)
+            ->input('abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 0)
+            ->output(1123, new Script(new Buffer('abdffd')))
+            ->get()));
+
+        $this->assertFalse($tx->equals((new TxBuilder())
+            ->version(1)
+            ->input('9999abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd', 0)
+            ->output(1, new Script(new Buffer('a')))
+            ->get()));
     }
 
     public function testOpReturnTx()

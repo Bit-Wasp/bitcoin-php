@@ -243,6 +243,45 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @param TransactionInterface $tx
+     * @return bool
+     */
+    public function equals(TransactionInterface $tx)
+    {
+        $version = gmp_cmp($this->version, $tx->getVersion());
+        if ($version !== 0) {
+            return false;
+        }
+
+        $nIn = count($this->inputs);
+        $nOut = count($this->outputs);
+        $nWit = count($this->witness);
+        if ($nIn !== count($tx->getInputs()) || $nOut !== count($tx->getOutputs()) || $nWit !== count($tx->getWitnesses())) {
+            return false;
+        }
+
+        for ($i = 0; $i < $nIn; $i++) {
+            if (false === $this->getInput($i)->equals($tx->getInput($i))) {
+                return false;
+            }
+        }
+
+        for ($i = 0; $i < $nOut; $i++) {
+            if (false === $this->getOutput($i)->equals($tx->getOutput($i))) {
+                return false;
+            }
+        }
+
+        for ($i = 0; $i < $nWit; $i++) {
+            if (false === $this->getWitness($i)->equals($tx->getWitness($i))) {
+                return false;
+            }
+        }
+
+        return gmp_cmp($this->lockTime, $tx->getLockTime()) === 0;
+    }
+
+    /**
      * @return Validator
      */
     public function validator()

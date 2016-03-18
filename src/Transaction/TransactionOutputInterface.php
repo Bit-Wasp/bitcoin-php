@@ -20,4 +20,10 @@ interface TransactionOutputInterface extends SerializableInterface, \ArrayAccess
      * @return ScriptInterface
      */
     public function getScript();
+
+    /**
+     * @param TransactionOutputInterface $output
+     * @return bool
+     */
+    public function equals(TransactionOutputInterface $output);
 }

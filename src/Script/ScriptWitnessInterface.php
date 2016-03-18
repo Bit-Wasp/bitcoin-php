@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tk
- * Date: 14/01/16
- * Time: 02:36
- */
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Collection\CollectionInterface;
-use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\SerializableInterface;
 
@@ -25,4 +19,10 @@ interface ScriptWitnessInterface extends CollectionInterface, SerializableInterf
      * @return ScriptWitness
      */
     public function slice($start, $length);
+
+    /**
+     * @param ScriptWitnessInterface $witness
+     * @return bool
+     */
+    public function equals(ScriptWitnessInterface $witness);
 }

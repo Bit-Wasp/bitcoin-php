@@ -232,4 +232,13 @@ class Script extends Serializable implements ScriptInterface
 
         return false;
     }
+
+    /**
+     * @param ScriptInterface $script
+     * @return bool
+     */
+    public function equals(ScriptInterface $script)
+    {
+        return strcmp($this->script, $script->getBinary()) === 0;
+    }
 }
