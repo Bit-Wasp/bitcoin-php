@@ -127,7 +127,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
     }
 
     /**
-     * @param $length
+     * @param int $length
      * @return $this
      */
     public function resize($length)
