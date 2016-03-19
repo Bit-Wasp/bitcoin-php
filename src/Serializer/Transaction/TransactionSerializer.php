@@ -19,7 +19,7 @@ use BitWasp\Buffertools\Types\Uint32;
 use BitWasp\Buffertools\Types\VarInt;
 use BitWasp\Buffertools\Types\Vector;
 
-class TransactionSerializer
+class TransactionSerializer implements TransactionSerializerInterface
 {
     /**
      * @var TransactionInputSerializer
@@ -45,7 +45,7 @@ class TransactionSerializer
 
     /**
      * @param Parser $parser
-     * @return Transaction
+     * @return TransactionInterface
      */
     public function fromParser(Parser $parser)
     {
@@ -111,7 +111,7 @@ class TransactionSerializer
 
     /**
      * @param string|BufferInterface $data
-     * @return Transaction
+     * @return TransactionInterface
      */
     public function parse($data)
     {
