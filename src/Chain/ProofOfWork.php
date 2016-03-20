@@ -10,6 +10,7 @@ use BitWasp\Buffertools\BufferInterface;
 class ProofOfWork
 {
     const DIFF_PRECISION = 12;
+    const POW_2_256 = '115792089237316195423570985008687907853269984665640564039457584007913129639936';
 
     /**
      * @var Math
@@ -118,6 +119,6 @@ class ProofOfWork
      */
     public function getWork(BufferInterface $bits)
     {
-        return bcdiv($this->math->pow(2, 256), $this->getTarget($bits));
+        return bcdiv(self::POW_2_256, $this->getTarget($bits));
     }
 }
