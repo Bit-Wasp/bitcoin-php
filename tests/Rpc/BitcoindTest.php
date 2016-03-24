@@ -25,7 +25,7 @@ class BitcoindTest extends AbstractTestCase
     /**
      * Test totally invalid details so the JsonRpcClient returns null.
      * @expectedException \Exception
-     * @expectedExceptionMessage Received no response from server
+     * @expectedExceptionMessage Unable to establish a connection
      */
     public function testBitcoind()
     {
