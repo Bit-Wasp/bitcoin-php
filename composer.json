@@ -37,7 +37,7 @@
     "rgooding/protobuf-php": "~0.0",
     "bitwasp/buffertools": "~0.1.16",
     "bitwasp/trait": "~0.0",
-    "bitwasp/stratum": "~0.1",
+    "bitwasp/stratum": "~0.2",
     "bitwasp/secp256k1-php": "~0.0.7"
   },
   "require-dev": {
