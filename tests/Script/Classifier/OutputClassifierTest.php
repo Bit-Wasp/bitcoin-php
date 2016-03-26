@@ -95,6 +95,7 @@ class OutputClassifierTest extends AbstractTestCase
         $pub = new Buffer("\x04", 33);
         $this->assertTrue($classifier->isPayToPublicKey(ScriptFactory::sequence([$pub, Opcodes::OP_CHECKSIG]), $solution));
         $this->assertInstanceOf($this->bufferType, $solution);
+        /** @var BufferInterface $solution */
         $this->assertTrue($pub->equals($solution));
     }
 
@@ -112,6 +113,7 @@ class OutputClassifierTest extends AbstractTestCase
         $hash = new Buffer("\x04", 20);
         $this->assertTrue($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]), $solution));
         $this->assertInstanceOf($this->bufferType, $solution);
+        /** @var BufferInterface $solution */
         $this->assertTrue($hash->equals($solution));
     }
 
@@ -154,6 +156,7 @@ class OutputClassifierTest extends AbstractTestCase
         $solution = '';
         $this->assertTrue($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, $hash]), $solution));
         $this->assertInstanceOf($this->bufferType, $solution);
+        /** @var BufferInterface $solution */
         $this->assertTrue($hash->equals($solution));
     }
 
@@ -172,6 +175,7 @@ class OutputClassifierTest extends AbstractTestCase
         $solution = '';
         $this->assertTrue($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUAL]), $solution));
         $this->assertInstanceOf($this->bufferType, $solution);
+        /** @var BufferInterface $solution */
         $this->assertTrue($hash->equals($solution));
     }
     
