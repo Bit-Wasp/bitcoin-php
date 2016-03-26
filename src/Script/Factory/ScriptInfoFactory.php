@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Factory;
 
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\ScriptHash;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
@@ -17,16 +18,15 @@ class ScriptInfoFactory
      */
     public function load(ScriptInterface $script)
     {
-        $classifier = ScriptFactory::scriptPubKey()->classify($script);
-
-        if ($classifier->isMultisig()) {
+        $classifier = new OutputClassifier();
+        if ($classifier->isMultisig($script)) {
             $handler = new Multisig($script);
-        } elseif ($classifier->isPayToPublicKey()) {
+        } elseif ($classifier->isPayToPublicKey($script)) {
             $handler = new PayToPubkey($script);
-        } elseif ($classifier->isPayToPublicKeyHash()) {
+        } elseif ($classifier->isPayToPublicKeyHash($script)) {
             $handler = new PayToPubkeyHash($script);
         } else {
-            throw new \InvalidArgumentException('Unparsable script type');
+            throw new \InvalidArgumentException('Script type is non-standard, no parser available');
         }
 
         return $handler;

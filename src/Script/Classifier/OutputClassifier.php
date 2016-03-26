@@ -20,39 +20,22 @@ class OutputClassifier
     const NONSTANDARD = 'nonstandard';
 
     /**
-     * @var \BitWasp\Bitcoin\Script\Parser\Operation[]
-     */
-    private $decoded;
-
-    /**
-     * @var ScriptInterface
-     */
-    private $script;
-
-    /**
      * @param ScriptInterface $script
-     */
-    public function __construct(ScriptInterface $script)
-    {
-        $this->script = $script;
-        $this->decoded = $script->getScriptParser()->decode();
-    }
-
-    /**
-     * @param BufferInterface|null $publicKey
+     * @param BufferInterface $publicKey
      * @return bool
      */
-    public function isPayToPublicKey(& $publicKey = null)
+    public function isPayToPublicKey(ScriptInterface $script, & $publicKey = null)
     {
-        if (count($this->decoded) < 1 || !$this->decoded[0]->isPush()) {
+        $decoded = $script->getScriptParser()->decode();
+        if (count($decoded) !== 2 || $decoded[0]->isPush() === false || $decoded[1]->isPush() === true) {
             return false;
         }
 
-        $size = $this->decoded[0]->getDataSize();
+        $size = $decoded[0]->getDataSize();
         if ($size === 33 || $size === 65) {
-            $op = $this->decoded[1];
-            if (!$op->isPush() && $op->getOp() === Opcodes::OP_CHECKSIG) {
-                $publicKey = $this->decoded[0]->getData();
+            $op = $decoded[1];
+            if ($op->getOp() === Opcodes::OP_CHECKSIG) {
+                $publicKey = $decoded[0]->getData();
                 return true;
             }
         }
@@ -61,20 +44,22 @@ class OutputClassifier
     }
 
     /**
-     * @param BufferInterface|null $pubKeyHash
+     * @param ScriptInterface $script
+     * @param null $pubKeyHash
      * @return bool
      */
-    public function isPayToPublicKeyHash(& $pubKeyHash = null)
+    public function isPayToPublicKeyHash(ScriptInterface $script, & $pubKeyHash = null)
     {
-        if (count($this->decoded) !== 5) {
+        $decoded = $script->getScriptParser()->decode();
+        if (count($decoded) !== 5) {
             return false;
         }
 
-        $dup = $this->decoded[0];
-        $hash = $this->decoded[1];
-        $buf = $this->decoded[2];
-        $eq = $this->decoded[3];
-        $checksig = $this->decoded[4];
+        $dup = $decoded[0];
+        $hash = $decoded[1];
+        $buf = $decoded[2];
+        $eq = $decoded[3];
+        $checksig = $decoded[4];
 
         foreach ([$dup, $hash, $eq, $checksig] as $op) {
             /** @var Operation $op */
@@ -88,7 +73,7 @@ class OutputClassifier
         && $buf->isPush() && $buf->getDataSize() === 20
         && $eq->getOp() === Opcodes::OP_EQUALVERIFY
         && $checksig->getOp() === Opcodes::OP_CHECKSIG) {
-            $pubKeyHash = $this->decoded[2]->getData();
+            $pubKeyHash = $decoded[2]->getData();
             return true;
         }
 
@@ -96,29 +81,30 @@ class OutputClassifier
     }
 
     /**
-     * @param BufferInterface|null $scriptHash
+     * @param ScriptInterface $script
+     * @param null $scriptHash
      * @return bool
      */
-    public function isPayToScriptHash(& $scriptHash = null)
+    public function isPayToScriptHash(ScriptInterface $script, & $scriptHash = null)
     {
-        if (count($this->decoded) !== 3) {
+        $decoded = $script->getScriptParser()->decode();
+        if (count($decoded) !== 3) {
             return false;
         }
 
-        $hash = $this->decoded[0];
+        $hash = $decoded[0];
         if ($hash->isPush() || !$hash->getOp() === Opcodes::OP_HASH160) {
             return false;
         }
 
-        $buffer = $this->decoded[1];
+        $buffer = $decoded[1];
         if (!$buffer->isPush() || $buffer->getDataSize() !== 20) {
             return false;
         }
 
-
-        $eq = $this->decoded[2];
+        $eq = $decoded[2];
         if (!$eq->isPush() && $eq->getOp() === Opcodes::OP_EQUAL) {
-            $scriptHash = $this->decoded[1]->getData();
+            $scriptHash = $decoded[1]->getData();
             return true;
         }
 
@@ -126,25 +112,27 @@ class OutputClassifier
     }
 
     /**
-     * @param BufferInterface[] $keys
+     * @param ScriptInterface $script
+     * @param array $keys
      * @return bool
      */
-    public function isMultisig(& $keys = [])
+    public function isMultisig(ScriptInterface $script, & $keys = [])
     {
-        $count = count($this->decoded);
+        $decoded = $script->getScriptParser()->decode();
+        $count = count($decoded);
         if ($count <= 3) {
             return false;
         }
 
-        $mOp = $this->decoded[0];
-        $nOp = $this->decoded[$count - 2];
-        $checksig = $this->decoded[$count - 1];
+        $mOp = $decoded[0];
+        $nOp = $decoded[$count - 2];
+        $checksig = $decoded[$count - 1];
         if ($mOp->isPush() || $nOp->isPush() || $checksig->isPush()) {
             return false;
         }
 
         /** @var Operation[] $vKeys */
-        $vKeys = array_slice($this->decoded, 1, -2);
+        $vKeys = array_slice($decoded, 1, -2);
         $solutions = [];
         foreach ($vKeys as $key) {
             if (!$key->isPush() || !PublicKey::isCompressedOrUncompressed($key->getData())) {
@@ -164,30 +152,28 @@ class OutputClassifier
     }
 
     /**
-     * @param BufferInterface $programHash
+     * @param ScriptInterface $script
+     * @param null $programHash
      * @return bool
      */
-    public function isWitness(& $programHash = null)
+    public function isWitness(ScriptInterface $script, & $programHash = null)
     {
-        $buffer = $this->script->getBuffer();
-        $size = $buffer->getSize();
-
+        $decoded = $script->getScriptParser()->decode();
+        $size = $script->getBuffer()->getSize();
         if ($size < 4 || $size > 34) {
             return false;
         }
 
-        $parser = $this->script->getScriptParser();
-        $script = $parser->decode();
-        if (count($script) !== 2 || !$script[1]->isPush()) {
+        if (count($decoded) !== 2 || !$decoded[1]->isPush()) {
             return false;
         }
 
-        $version = $script[0]->getOp();
+        $version = $decoded[0]->getOp();
         if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
             return false;
         }
 
-        $witness = $script[1];
+        $witness = $decoded[1];
         if ($size === $witness->getDataSize() + 2) {
             $programHash = $witness->getData();
             return true;
@@ -197,35 +183,34 @@ class OutputClassifier
     }
 
     /**
-     * @param BufferInterface|BufferInterface[] $solutions
+     * @param ScriptInterface $script
+     * @param null $solution
      * @return string
      */
-    public function classify(&$solutions = null)
+    public function classify(ScriptInterface $script, &$solution = null)
     {
         $type = self::UNKNOWN;
         $solution = null;
-        if ($this->isPayToScriptHash($solution)) {
+        if ($this->isPayToScriptHash($script, $solution)) {
             /** @var BufferInterface $solution */
             $type = self::PAYTOSCRIPTHASH;
-        } elseif ($this->isWitness($solution)) {
+        } elseif ($this->isWitness($script, $solution)) {
             /** @var BufferInterface $solution */
             if ($solution->getSize() == 20) {
                 $type = self::WITNESS_V0_KEYHASH;
             } else {
                 $type = self::WITNESS_V0_SCRIPTHASH;
             }
-        } elseif ($this->isPayToPublicKey($solution)) {
+        } elseif ($this->isPayToPublicKey($script, $solution)) {
             /** @var BufferInterface $solution */
             $type = self::PAYTOPUBKEY;
-        } elseif ($this->isPayToPublicKeyHash($solution)) {
+        } elseif ($this->isPayToPublicKeyHash($script, $solution)) {
             /** @var BufferInterface $solution */
             $type = self::PAYTOPUBKEYHASH;
-        } elseif ($this->isMultisig($solution)) {
+        } elseif ($this->isMultisig($script, $solution)) {
             /** @var BufferInterface[] $solution */
             $type = self::MULTISIG;
         }
-
-        $solutions = $solution;
 
         return $type;
     }

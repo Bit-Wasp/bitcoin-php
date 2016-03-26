@@ -92,6 +92,7 @@ class InputSigner
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
+        $this->classifier = new OutputClassifier();
         $this->sigHashType = $sigHashType;
         $this->publicKeys = [];
         $this->signatures = [];
@@ -182,9 +183,9 @@ class InputSigner
      */
     public function extractSignatures()
     {
-        $type = (new OutputClassifier($this->txOut->getScript()))->classify();
         $scriptPubKey = $this->txOut->getScript();
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
+        $type = $this->classifier->classify($scriptPubKey);
 
         if ($type === OutputClassifier::PAYTOPUBKEYHASH || $type === OutputClassifier::PAYTOPUBKEY || $type === OutputClassifier::MULTISIG) {
             $values = [];
@@ -199,7 +200,7 @@ class InputSigner
             $decodeSig = $scriptSig->getScriptParser()->decode();
             if (count($decodeSig) > 0) {
                 $redeemScript = new Script(end($decodeSig)->getData());
-                $p2shType = (new OutputClassifier($redeemScript))->classify();
+                $p2shType = $this->classifier->classify($redeemScript);
 
                 if (count($decodeSig) > 1) {
                     $decodeSig = array_slice($decodeSig, 0, -1);
@@ -237,7 +238,7 @@ class InputSigner
                         $vWitness = array_slice($witness->all(), 0, -1);
                     }
 
-                    $witnessType = (new OutputClassifier($witnessScript))->classify();
+                    $witnessType = $this->classifier->classify($witnessScript);
                     $this->extractFromValues($witnessType, $witnessScript, $vWitness, 1);
                     $this->witnessScript = $witnessScript;
                 }
@@ -300,7 +301,7 @@ class InputSigner
     private function doSignature(PrivateKeyInterface $key, ScriptInterface $scriptPubKey, &$outputType, array &$results, $sigVersion = 0)
     {
         $return = [];
-        $outputType = (new OutputClassifier($scriptPubKey))->classify($return);
+        $outputType = $this->classifier->classify($scriptPubKey, $return);
         if ($outputType === OutputClassifier::UNKNOWN) {
             throw new \RuntimeException('Cannot sign unknown script type');
         }
@@ -497,7 +498,7 @@ class InputSigner
         }
 
         /** @var BufferInterface[] $return */
-        $outputType = (new OutputClassifier($this->txOut->getScript()))->classify();
+        $outputType = $this->classifier->classify($this->txOut->getScript());
 
         /** @var SigValues $answer */
         $answer = new SigValues($emptyScript, $emptyWitness);
@@ -506,7 +507,7 @@ class InputSigner
         $p2sh = false;
         if (!$serialized && $outputType === OutputClassifier::PAYTOSCRIPTHASH) {
             $p2sh = true;
-            $outputType = (new OutputClassifier($this->redeemScript))->classify();
+            $outputType = $this->classifier->classify($this->redeemScript);
             $serialized = $this->serializeSimpleSig($outputType, $answer);
         }
 
@@ -514,7 +515,7 @@ class InputSigner
             $answer = new SigValues($emptyScript, new ScriptWitness([$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()]));
 
         } else if (!$serialized && $outputType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
-            $outputType = (new OutputClassifier($this->witnessScript))->classify();
+            $outputType = $this->classifier->classify($this->witnessScript);
             $serialized = $this->serializeSimpleSig($outputType, $answer);
 
             if ($serialized) {

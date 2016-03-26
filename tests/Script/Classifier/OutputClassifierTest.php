@@ -11,14 +11,14 @@ class OutputClassifierTest extends AbstractTestCase
     public function testIsMultisigFail()
     {
         $script = new Script();
-        $classifier = new OutputClassifier($script);
-        $this->assertFalse($classifier->isMultisig());
+        $classifier = new OutputClassifier();
+        $this->assertFalse($classifier->isMultisig($script));
     }
 
     public function testIsKnown()
     {
         $script = new Script();
-        $classifier = new OutputClassifier($script);
-        $this->assertEquals(OutputClassifier::UNKNOWN, $classifier->classify());
+        $classifier = new OutputClassifier();
+        $this->assertEquals(OutputClassifier::UNKNOWN, $classifier->classify($script));
     }
 }
