@@ -17,16 +17,6 @@ class V1Hasher
     private $transaction;
 
     /**
-     * @var int
-     */
-    private $nInputs;
-
-    /**
-     * @var int
-     */
-    private $nOutputs;
-
-    /**
      * @var int|string
      */
     private $amount;
@@ -39,8 +29,6 @@ class V1Hasher
     public function __construct(TransactionInterface $transaction, $amount)
     {
         $this->transaction = $transaction;
-        $this->nInputs = count($this->transaction->getInputs());
-        $this->nOutputs = count($this->transaction->getOutputs());
         $this->amount = $amount;
     }
 

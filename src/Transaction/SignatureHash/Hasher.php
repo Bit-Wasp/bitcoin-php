@@ -20,23 +20,11 @@ class Hasher implements SigHash
     private $transaction;
 
     /**
-     * @var int
-     */
-    private $nInputs;
-
-    /**
-     * @var int
-     */
-    private $nOutputs;
-
-    /**
      * @param TransactionInterface $transaction
      */
     public function __construct(TransactionInterface $transaction)
     {
         $this->transaction = $transaction;
-        $this->nInputs = count($this->transaction->getInputs());
-        $this->nOutputs = count($this->transaction->getOutputs());
     }
 
     /**
@@ -80,7 +68,7 @@ class Hasher implements SigHash
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
-            if ($nOutput >= $this->nOutputs) {
+            if ($nOutput >= count($this->transaction->getOutputs())) {
                 return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
             }
 
