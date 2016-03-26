@@ -26,18 +26,24 @@ class OutputClassifier
      */
     public function isPayToPublicKey(ScriptInterface $script, & $publicKey = null)
     {
-        $decoded = $script->getScriptParser()->decode();
-        if (count($decoded) !== 2 || $decoded[0]->isPush() === false || $decoded[1]->isPush() === true) {
-            return false;
-        }
+        try {
 
-        $size = $decoded[0]->getDataSize();
-        if ($size === 33 || $size === 65) {
-            $op = $decoded[1];
-            if ($op->getOp() === Opcodes::OP_CHECKSIG) {
-                $publicKey = $decoded[0]->getData();
-                return true;
+            $decoded = $script->getScriptParser()->decode();
+            if (count($decoded) !== 2 || $decoded[0]->isPush() === false || $decoded[1]->isPush() === true) {
+                return false;
             }
+
+            $size = $decoded[0]->getDataSize();
+            if ($size === 33 || $size === 65) {
+                $op = $decoded[1];
+                if ($op->getOp() === Opcodes::OP_CHECKSIG) {
+                    $publicKey = $decoded[0]->getData();
+                    return true;
+                }
+            }
+
+        } catch (\Exception $e) {
+
         }
 
         return false;
@@ -50,31 +56,37 @@ class OutputClassifier
      */
     public function isPayToPublicKeyHash(ScriptInterface $script, & $pubKeyHash = null)
     {
-        $decoded = $script->getScriptParser()->decode();
-        if (count($decoded) !== 5) {
-            return false;
-        }
+        try {
 
-        $dup = $decoded[0];
-        $hash = $decoded[1];
-        $buf = $decoded[2];
-        $eq = $decoded[3];
-        $checksig = $decoded[4];
-
-        foreach ([$dup, $hash, $eq, $checksig] as $op) {
-            /** @var Operation $op */
-            if ($op->isPush()) {
+            $decoded = $script->getScriptParser()->decode();
+            if (count($decoded) !== 5) {
                 return false;
             }
-        }
 
-        if ($dup->getOp() === Opcodes::OP_DUP
-        && $hash->getOp() === Opcodes::OP_HASH160
-        && $buf->isPush() && $buf->getDataSize() === 20
-        && $eq->getOp() === Opcodes::OP_EQUALVERIFY
-        && $checksig->getOp() === Opcodes::OP_CHECKSIG) {
-            $pubKeyHash = $decoded[2]->getData();
-            return true;
+            $dup = $decoded[0];
+            $hash = $decoded[1];
+            $buf = $decoded[2];
+            $eq = $decoded[3];
+            $checksig = $decoded[4];
+
+            foreach ([$dup, $hash, $eq, $checksig] as $op) {
+                /** @var Operation $op */
+                if ($op->isPush()) {
+                    return false;
+                }
+            }
+
+            if ($dup->getOp() === Opcodes::OP_DUP
+                && $hash->getOp() === Opcodes::OP_HASH160
+                && $buf->isPush() && $buf->getDataSize() === 20
+                && $eq->getOp() === Opcodes::OP_EQUALVERIFY
+                && $checksig->getOp() === Opcodes::OP_CHECKSIG) {
+                $pubKeyHash = $decoded[2]->getData();
+                return true;
+            }
+
+        } catch (\Exception $e) {
+
         }
 
         return false;
@@ -87,25 +99,31 @@ class OutputClassifier
      */
     public function isPayToScriptHash(ScriptInterface $script, & $scriptHash = null)
     {
-        $decoded = $script->getScriptParser()->decode();
-        if (count($decoded) !== 3) {
-            return false;
-        }
+        try {
 
-        $hash = $decoded[0];
-        if ($hash->isPush() || !$hash->getOp() === Opcodes::OP_HASH160) {
-            return false;
-        }
+            $decoded = $script->getScriptParser()->decode();
+            if (count($decoded) !== 3) {
+                return false;
+            }
 
-        $buffer = $decoded[1];
-        if (!$buffer->isPush() || $buffer->getDataSize() !== 20) {
-            return false;
-        }
+            $op_hash = $decoded[0];
+            if ($op_hash->isPush() || $op_hash->getOp() !== Opcodes::OP_HASH160) {
+                return false;
+            }
 
-        $eq = $decoded[2];
-        if (!$eq->isPush() && $eq->getOp() === Opcodes::OP_EQUAL) {
-            $scriptHash = $decoded[1]->getData();
-            return true;
+            $buffer = $decoded[1];
+            if (!$buffer->isPush() || $buffer->getDataSize() !== 20) {
+                return false;
+            }
+
+            $eq = $decoded[2];
+            if (!$eq->isPush() && $eq->getOp() === Opcodes::OP_EQUAL) {
+                $scriptHash = $decoded[1]->getData();
+                return true;
+            }
+
+        } catch (\Exception $e) {
+
         }
 
         return false;
@@ -118,34 +136,39 @@ class OutputClassifier
      */
     public function isMultisig(ScriptInterface $script, & $keys = [])
     {
-        $decoded = $script->getScriptParser()->decode();
-        $count = count($decoded);
-        if ($count <= 3) {
-            return false;
-        }
+        try {
 
-        $mOp = $decoded[0];
-        $nOp = $decoded[$count - 2];
-        $checksig = $decoded[$count - 1];
-        if ($mOp->isPush() || $nOp->isPush() || $checksig->isPush()) {
-            return false;
-        }
-
-        /** @var Operation[] $vKeys */
-        $vKeys = array_slice($decoded, 1, -2);
-        $solutions = [];
-        foreach ($vKeys as $key) {
-            if (!$key->isPush() || !PublicKey::isCompressedOrUncompressed($key->getData())) {
+            $decoded = $script->getScriptParser()->decode();
+            $count = count($decoded);
+            if ($count <= 3) {
                 return false;
             }
-            $solutions[] = $key->getData();
-        }
 
-        if ($mOp->getOp() >= Opcodes::OP_0
-            && $nOp->getOp() <= Opcodes::OP_16
-            && $checksig->getOp() === Opcodes::OP_CHECKMULTISIG) {
-            $keys = $solutions;
-            return true;
+            $mOp = $decoded[0];
+            $nOp = $decoded[$count - 2];
+            $checksig = $decoded[$count - 1];
+            if ($mOp->isPush() || $nOp->isPush() || $checksig->isPush()) {
+                return false;
+            }
+
+            /** @var Operation[] $vKeys */
+            $vKeys = array_slice($decoded, 1, -2);
+            $solutions = [];
+            foreach ($vKeys as $key) {
+                if (!$key->isPush() || !PublicKey::isCompressedOrUncompressed($key->getData())) {
+                    return false;
+                }
+                $solutions[] = $key->getData();
+            }
+
+            if ($mOp->getOp() >= Opcodes::OP_0
+                && $nOp->getOp() <= Opcodes::OP_16
+                && $checksig->getOp() === Opcodes::OP_CHECKMULTISIG) {
+                $keys = $solutions;
+                return true;
+            }
+        } catch (\Exception $e) {
+
         }
 
         return false;
@@ -158,25 +181,31 @@ class OutputClassifier
      */
     public function isWitness(ScriptInterface $script, & $programHash = null)
     {
-        $decoded = $script->getScriptParser()->decode();
-        $size = $script->getBuffer()->getSize();
-        if ($size < 4 || $size > 34) {
-            return false;
-        }
+        try {
 
-        if (count($decoded) !== 2 || !$decoded[1]->isPush()) {
-            return false;
-        }
+            $decoded = $script->getScriptParser()->decode();
+            $size = $script->getBuffer()->getSize();
+            if ($size < 4 || $size > 34) {
+                return false;
+            }
 
-        $version = $decoded[0]->getOp();
-        if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
-            return false;
-        }
+            if (count($decoded) !== 2 || !$decoded[1]->isPush()) {
+                return false;
+            }
 
-        $witness = $decoded[1];
-        if ($size === $witness->getDataSize() + 2) {
-            $programHash = $witness->getData();
-            return true;
+            $version = $decoded[0]->getOp();
+            if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
+                return false;
+            }
+
+            $witness = $decoded[1];
+            if ($size === $witness->getDataSize() + 2) {
+                $programHash = $witness->getData();
+                return true;
+            }
+
+        } catch (\Exception $e) {
+
         }
 
         return false;
@@ -190,15 +219,15 @@ class OutputClassifier
     public function classify(ScriptInterface $script, &$solution = null)
     {
         $type = self::UNKNOWN;
-        $solution = null;
         if ($this->isPayToScriptHash($script, $solution)) {
             /** @var BufferInterface $solution */
             $type = self::PAYTOSCRIPTHASH;
         } elseif ($this->isWitness($script, $solution)) {
             /** @var BufferInterface $solution */
-            if ($solution->getSize() == 20) {
+            $size = $solution->getSize();
+            if (20 === $size) {
                 $type = self::WITNESS_V0_KEYHASH;
-            } else {
+            } elseif (32 === $size) {
                 $type = self::WITNESS_V0_SCRIPTHASH;
             }
         } elseif ($this->isPayToPublicKey($script, $solution)) {
