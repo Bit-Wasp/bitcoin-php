@@ -123,16 +123,13 @@ class Number extends Serializable
         $abs = $negative ? $this->math->sub(0, $this->number) : $this->number;
 
         while ($this->math->cmp($abs, 0) > 0) {
-            //array_unshift($result, (int)$this->math->bitwiseAnd($abs, 0xff));
             $result[] = (int)$this->math->bitwiseAnd($abs, 0xff);
             $abs = $this->math->rightShift($abs, 8);
         }
 
         if ($result[count($result) - 1] & 0x80) {
-            //array_unshift($result, $negative ? 0x80 : 0);
             $result[] = $negative ? 0x80 : 0;
         } else if ($negative) {
-            //$result[0] |= 0x80;
             $result[count($result) - 1] |= 0x80;
         }
 
