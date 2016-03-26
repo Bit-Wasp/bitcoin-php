@@ -31,14 +31,6 @@ class PayToPubkeyHash implements ScriptInfoInterface
     }
 
     /**
-     * @return string
-     */
-    public function classification()
-    {
-        return OutputClassifier::PAYTOPUBKEYHASH;
-    }
-
-    /**
      * @return int
      */
     public function getRequiredSigCount()

@@ -27,14 +27,6 @@ class PayToPubkey implements ScriptInfoInterface
     }
 
     /**
-     * @return string
-     */
-    public function classification()
-    {
-        return OutputClassifier::PAYTOPUBKEY;
-    }
-
-    /**
      * @return int
      */
     public function getRequiredSigCount()

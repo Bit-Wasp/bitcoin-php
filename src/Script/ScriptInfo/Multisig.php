@@ -74,14 +74,6 @@ class Multisig implements ScriptInfoInterface
     }
 
     /**
-     * @return string
-     */
-    public function classification()
-    {
-        return OutputClassifier::MULTISIG;
-    }
-
-    /**
      * @param PublicKeyInterface $publicKey
      * @return bool
      */
