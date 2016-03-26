@@ -10,11 +10,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 class PayToPubkey implements ScriptInfoInterface
 {
     /**
-     * @var ScriptInterface
-     */
-    private $script;
-
-    /**
      * @var PublicKeyInterface
      */
     private $publicKey;
@@ -24,7 +19,6 @@ class PayToPubkey implements ScriptInfoInterface
      */
     public function __construct(ScriptInterface $script)
     {
-        $this->script = $script;
         $chunks = $script->getScriptParser()->decode();
         if (count($chunks) < 1 || !$chunks[0]->isPush()) {
             throw new \InvalidArgumentException('Malformed pay-to-pubkey script');

@@ -9,10 +9,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class PayToPubkeyHash implements ScriptInfoInterface
 {
-    /**
-     * @var ScriptInterface
-     */
-    private $script;
 
     /**
      * @var BufferInterface
@@ -24,8 +20,7 @@ class PayToPubkeyHash implements ScriptInfoInterface
      */
     public function __construct(ScriptInterface $script)
     {
-        $this->script = $script;
-        $chunks = $this->script->getScriptParser()->decode();
+        $chunks = $script->getScriptParser()->decode();
         if (count($chunks) < 5 || !$chunks[2]->isPush()) {
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
         }
