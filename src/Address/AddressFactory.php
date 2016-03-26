@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class AddressFactory
 {
@@ -110,9 +111,9 @@ class AddressFactory
         $network = $network ?: Bitcoin::getNetwork();
         
         try {
-            $publicKey = '';
+            $publicKey = null;
             if ($classifier->isPayToPublicKey($script, $publicKey)) {
-                /** @var PublicKeyInterface $publicKey */
+                /** @var BufferInterface $publicKey */
                 $address = PublicKeyFactory::fromHex($publicKey)->getAddress();
             } else {
                 $address = self::fromOutputScript($script);

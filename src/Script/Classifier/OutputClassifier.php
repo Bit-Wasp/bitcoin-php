@@ -17,7 +17,6 @@ class OutputClassifier
     const WITNESS_V0_SCRIPTHASH = 'witness_v0_scripthash';
     const MULTISIG = 'multisig';
     const UNKNOWN = 'unknown';
-    const NONSTANDARD = 'nonstandard';
 
     /**
      * @param ScriptInterface $script
@@ -43,7 +42,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -86,7 +85,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -123,7 +122,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -168,7 +167,7 @@ class OutputClassifier
                 return true;
             }
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -205,7 +204,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;

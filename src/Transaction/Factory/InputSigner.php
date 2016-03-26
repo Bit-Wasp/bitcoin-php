@@ -79,6 +79,11 @@ class InputSigner
     private $requiredSigs = 0;
 
     /**
+     * @var OutputClassifier
+     */
+    private $classifier;
+
+    /**
      * TxInputSigning constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
