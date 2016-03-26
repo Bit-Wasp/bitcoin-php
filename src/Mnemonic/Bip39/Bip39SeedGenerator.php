@@ -9,19 +9,6 @@ use BitWasp\Buffertools\BufferInterface;
 class Bip39SeedGenerator
 {
     /**
-     * @var Bip39Mnemonic
-     */
-    private $mnemonic;
-
-    /**
-     * @param Bip39Mnemonic $mnemonic
-     */
-    public function __construct(Bip39Mnemonic $mnemonic)
-    {
-        $this->mnemonic = $mnemonic;
-    }
-
-    /**
      * @param $string
      * @return BufferInterface
      * @throws \Exception
