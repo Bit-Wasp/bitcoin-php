@@ -20,11 +20,6 @@ class Multisig implements ScriptInfoInterface
     private $n;
 
     /**
-     * @var ScriptInterface
-     */
-    private $script;
-
-    /**
      * @var PublicKeyInterface[]
      */
     private $keys = [];
@@ -59,7 +54,6 @@ class Multisig implements ScriptInfoInterface
             throw new \LogicException('No public keys found in script');
         }
 
-        $this->script = $script;
         $this->keys = $publicKeys;
     }
 
