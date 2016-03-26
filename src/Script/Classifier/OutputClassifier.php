@@ -17,7 +17,6 @@ class OutputClassifier
     const WITNESS_V0_SCRIPTHASH = 'witness_v0_scripthash';
     const MULTISIG = 'multisig';
     const UNKNOWN = 'unknown';
-    const NONSTANDARD = 'nonstandard';
 
     /**
      * @param ScriptInterface $script
