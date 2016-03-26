@@ -81,7 +81,7 @@ class HasherTest extends AbstractTestCase
             ->get();
 
         $builder = new Signer($new, $ecAdapter);
-        $single = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::SINGLE;
+        $single = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface::SINGLE;
         $builder->sign(0, $priv, $tx->getOutput(1), null, null, $single);
 
         $expected = '01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a010000006b483045022100dad4bd28448e626ecb1ade42a09c43559d50b61b57a06fac992a5ecdd73deb740220524082f83560e2df9afaa283c699dec4c5b01687484d73e7b280e5a506caf1c4032102f1c7eac9200f8dee7e34e59318ff2076c8b3e3ac7f43121e57569a1aec1803d4ffffffff02c0e1e400000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac80969800000000001976a91454d0e925d5ee0ee26768a237067dee793d01a70688ac00000000';
@@ -139,7 +139,7 @@ class HasherTest extends AbstractTestCase
         $this->assertEquals($expectedUnsignedTx, $unsigned->getHex());
 
         // Test signs sighash_all transaction properly
-        $sighashAll = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::ALL;
+        $sighashAll = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface::ALL;
         $regularSigning = new Signer($unsigned, $ecAdapter);
         $regularSigning
             ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $sighashAll)
@@ -149,7 +149,7 @@ class HasherTest extends AbstractTestCase
 
         // Test signs SIGHASH_ALL|ANYONECANPAY
         $regularSigningAnyone = new Signer($unsigned, $ecAdapter);
-        $allAnyone = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::ANYONECANPAY, $sighashAll);
+        $allAnyone = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface::ANYONECANPAY, $sighashAll);
         $regularSigningAnyone
             ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $allAnyone)
             ->sign(1, $privateKey, $transaction2->getOutput($tx2NOut), null, null, $allAnyone)
@@ -157,7 +157,7 @@ class HasherTest extends AbstractTestCase
         $this->assertEquals($expectedSigAllAnyonecanpayTx, $regularSigningAnyone->get()->getHex());
 
         // Test signs SIGHASH_SINGLE transaction properly
-        $sighashSingle = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::SINGLE;
+        $sighashSingle = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface::SINGLE;
         $singleSigning = new Signer($unsigned, $ecAdapter);
         $singleSigning
             ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $sighashSingle)
@@ -186,7 +186,7 @@ class HasherTest extends AbstractTestCase
         $this->assertEquals($expectedSingleBugTx, $singleSigningBug->get()->getHex());
 
         // Test handling of SIGHASH_SINGLE|SIGHASH_ANYONECANPAY
-        $singleAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::ANYONECANPAY, $sighashSingle);
+        $singleAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface::ANYONECANPAY, $sighashSingle);
         $singleAnyone = new Signer($unsigned, $ecAdapter);
         $singleAnyone
             ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $singleAny)
@@ -195,7 +195,7 @@ class HasherTest extends AbstractTestCase
         $this->assertEquals($expectedSigSingleAnyoneTx, $singleAnyone->get()->getHex());
 
         // Test signs SIGHASH_NONE transaction properly
-        $sighashNone = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::NONE;
+        $sighashNone = \BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface::NONE;
         $noneSigning = new Signer($unsigned, $ecAdapter);
         $noneSigning
             ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $sighashNone)
@@ -205,7 +205,7 @@ class HasherTest extends AbstractTestCase
 
 
         // Test signs SIGHASH_NONE transaction properly
-        $noneAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHash::ANYONECANPAY, $sighashNone);
+        $noneAny = $ecAdapter->getMath()->bitwiseXor(\BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface::ANYONECANPAY, $sighashNone);
         $noneAnyone = new Signer($unsigned, $ecAdapter);
         $noneAnyone
             ->sign(0, $privateKey, $transaction1->getOutput($tx1NOut), null, null, $noneAny)

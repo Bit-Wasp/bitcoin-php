@@ -213,7 +213,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Transaction\SignatureHash\SigHash
+     * @return \BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface
      */
     public function getSignatureHash()
     {

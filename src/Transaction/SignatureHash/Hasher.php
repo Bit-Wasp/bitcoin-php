@@ -12,7 +12,7 @@ use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-class Hasher implements SigHash
+class Hasher implements SigHashInterface
 {
     /**
      * @var TransactionInterface
@@ -39,7 +39,7 @@ class Hasher implements SigHash
      * @return BufferInterface
      * @throws \Exception
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL)
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHashInterface::ALL)
     {
         $math = Bitcoin::getMath();
         $tx = new TxMutator($this->transaction);
@@ -53,7 +53,7 @@ class Hasher implements SigHash
 
         $inputs[$inputToSign]->script($txOutScript);
 
-        if ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHash::NONE) === 0) {
+        if ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHashInterface::NONE) === 0) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
             $outputs->null();
 
@@ -64,7 +64,7 @@ class Hasher implements SigHash
                 }
             }
 
-        } elseif ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHash::SINGLE) === 0) {
+        } elseif ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHashInterface::SINGLE) === 0) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
@@ -87,7 +87,7 @@ class Hasher implements SigHash
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
-        if ($math->cmp($math->bitwiseAnd($sighashType, SigHash::ANYONECANPAY), 0) > 0) {
+        if ($math->cmp($math->bitwiseAnd($sighashType, SigHashInterface::ANYONECANPAY), 0) > 0) {
             $input = $inputs[$inputToSign]->done();
             $inputs->null()->add($input);
         }
