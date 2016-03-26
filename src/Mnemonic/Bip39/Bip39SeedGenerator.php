@@ -9,7 +9,7 @@ use BitWasp\Buffertools\BufferInterface;
 class Bip39SeedGenerator
 {
     /**
-     * @param $string
+     * @param string $string
      * @return BufferInterface
      * @throws \Exception
      */
