@@ -9,7 +9,7 @@ function decodeOpN($op)
     }
 
     assert($op >= Opcodes::OP_1 && $op <= Opcodes::OP_16);
-    return $op - (Opcodes::OP_1 - 1);
+    return (int) $op - (Opcodes::OP_1 - 1);
 }
 
 function encodeOpN($op)
@@ -19,5 +19,5 @@ function encodeOpN($op)
     }
 
     assert($op >= 1 && $op <= 16);
-    return Opcodes::OP_1 + $op - 1;
+    return (int) Opcodes::OP_1 + $op - 1;
 }
