@@ -28,11 +28,6 @@ class Interpreter implements InterpreterInterface
     private $opCount;
 
     /**
-     * @var EcAdapterInterface
-     */
-    private $ecAdapter;
-
-    /**
      * @var \BitWasp\Bitcoin\Math\Math
      */
     private $math;
@@ -46,16 +41,6 @@ class Interpreter implements InterpreterInterface
      * @var BufferInterface
      */
     private $vchTrue;
-
-    /**
-     * @var BufferInterface
-     */
-    private $int0;
-
-    /**
-     * @var BufferInterface
-     */
-    private $int1;
 
     /**
      * @var array
@@ -72,12 +57,9 @@ class Interpreter implements InterpreterInterface
      */
     public function __construct(EcAdapterInterface $ecAdapter)
     {
-        $this->ecAdapter = $ecAdapter;
         $this->math = $ecAdapter->getMath();
         $this->vchFalse = new Buffer("", 0, $this->math);
         $this->vchTrue = new Buffer("\x01", 1, $this->math);
-        $this->int0 = Number::buffer($this->vchFalse, false, 4, $this->math)->getBuffer();
-        $this->int1 = Number::buffer($this->vchTrue, false, 1, $this->math)->getBuffer();
     }
 
     /**
@@ -910,7 +892,6 @@ class Interpreter implements InterpreterInterface
                             if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
-
 
                             $keyCount = Number::buffer($mainStack[-$i], $minimal)->getInt();
                             if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
