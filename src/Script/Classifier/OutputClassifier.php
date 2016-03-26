@@ -43,7 +43,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -86,7 +86,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -123,7 +123,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -168,7 +168,7 @@ class OutputClassifier
                 return true;
             }
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
@@ -205,7 +205,7 @@ class OutputClassifier
             }
 
         } catch (\Exception $e) {
-
+            /** Return false later */
         }
 
         return false;
