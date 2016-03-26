@@ -272,7 +272,7 @@ class Interpreter implements InterpreterInterface
             }
         }
 
-        if ($flags & self::VERIFY_P2SH && (new OutputClassifier($scriptPubKey))->isPayToScriptHash()) {
+        if ($flags & self::VERIFY_P2SH && (new OutputClassifier())->isPayToScriptHash($scriptPubKey)) {
             if (!$scriptSig->isPushOnly()) {
                 return false;
             }

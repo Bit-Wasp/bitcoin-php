@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Address;
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -42,8 +43,7 @@ class AddressFactory
      */
     public static function fromOutputScript(ScriptInterface $outputScript)
     {
-        $classifier = new OutputClassifier($outputScript);
-        $type = $classifier->classify();
+        $type = (new OutputClassifier())->classify($outputScript);
         $parsed = $outputScript->getScriptParser()->decode();
 
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
@@ -106,11 +106,14 @@ class AddressFactory
      */
     public static function getAssociatedAddress(ScriptInterface $script, NetworkInterface $network = null)
     {
-        $classifier = new OutputClassifier($script);
+        $classifier = new OutputClassifier();
         $network = $network ?: Bitcoin::getNetwork();
+        
         try {
-            if ($classifier->isPayToPublicKey()) {
-                $address = PublicKeyFactory::fromHex($script->getScriptParser()->decode()[0]->getData())->getAddress();
+            $publicKey = '';
+            if ($classifier->isPayToPublicKey($script, $publicKey)) {
+                /** @var PublicKeyInterface $publicKey */
+                $address = PublicKeyFactory::fromHex($publicKey)->getAddress();
             } else {
                 $address = self::fromOutputScript($script);
             }

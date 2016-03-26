@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Bloom;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializable;
@@ -344,6 +345,8 @@ class BloomFilter extends Serializable
             $found = true;
         }
 
+        $classifier = new OutputClassifier();
+        
         // Check for relevant output scripts. We add the outpoint to the filter if found.
         foreach ($tx->getOutputs() as $vout => $output) {
             $script = $output->getScript();
@@ -354,8 +357,7 @@ class BloomFilter extends Serializable
                     if ($this->isUpdateAll()) {
                         $this->insertOutPoint($tx->makeOutPoint($vout));
                     } else if ($this->isUpdatePubKeyOnly()) {
-                        $type = ScriptFactory::scriptPubKey()->classify($script);
-                        if ($type->isMultisig() || $type->isPayToPublicKey()) {
+                        if ($classifier->isMultisig($script) || $classifier->isPayToPublicKey($script)) {
                             $this->insertOutPoint($tx->makeOutPoint($vout));
                         }
                     }

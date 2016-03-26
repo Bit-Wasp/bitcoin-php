@@ -16,12 +16,11 @@ use BitWasp\Buffertools\Buffertools;
 class OutputScriptFactory
 {
     /**
-     * @param ScriptInterface $script
      * @return OutputClassifier
      */
-    public function classify(ScriptInterface $script)
+    public function classify()
     {
-        return new OutputClassifier($script);
+        return new OutputClassifier();
     }
 
     /**

@@ -144,7 +144,7 @@ class Script extends Serializable implements ScriptInterface
             return $this->witnessSigOps($program, $scriptWitness);
         }
 
-        if ((new OutputClassifier($this))->isPayToScriptHash()) {
+        if ((new OutputClassifier())->isPayToScriptHash($this)) {
             $parsed = $scriptSig->getScriptParser()->decode();
             $subscript = new Script(end($parsed)->getData());
             if ($subscript->isWitness($program)) {
@@ -162,7 +162,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function countP2shSigOps(ScriptInterface $scriptSig)
     {
-        if (!ScriptFactory::scriptPubKey()->classify($this)->isPayToScriptHash()) {
+        if (!(new OutputClassifier())->isPayToScriptHash($this)) {
             return $this->countSigOps(true);
         }
 
