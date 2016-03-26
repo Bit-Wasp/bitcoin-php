@@ -90,12 +90,8 @@ class ScriptFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return NativeConsensus
      */
-    public static function getNativeConsensus($flags = null, EcAdapterInterface $ecAdapter = null)
+    public static function getNativeConsensus($flags, EcAdapterInterface $ecAdapter = null)
     {
-        if ($flags === null) {
-            $flags = self::defaultFlags();
-        }
-
         return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter(), $flags);
     }
 
@@ -103,12 +99,8 @@ class ScriptFactory
      * @param int|null $flags
      * @return BitcoinConsensus
      */
-    public static function getBitcoinConsensus($flags = null)
+    public static function getBitcoinConsensus($flags)
     {
-        if ($flags === null) {
-            $flags = self::defaultFlags();
-        }
-
         return new BitcoinConsensus($flags);
     }
 

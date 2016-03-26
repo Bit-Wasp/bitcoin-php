@@ -26,9 +26,4 @@ interface ScriptInfoInterface
      * @return PublicKeyInterface[]
      */
     public function getKeys();
-
-    /**
-     * @return string
-     */
-    public function classification();
 }

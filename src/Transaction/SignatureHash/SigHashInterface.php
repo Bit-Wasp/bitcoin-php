@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-interface SigHash
+interface SigHashInterface
 {
     /**
      * Default procedure: Sign ALL of the outputs.
@@ -38,5 +38,5 @@ interface SigHash
      * @param int $sighashType
      * @return \BitWasp\Buffertools\BufferInterface
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL);
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHashInterface::ALL);
 }

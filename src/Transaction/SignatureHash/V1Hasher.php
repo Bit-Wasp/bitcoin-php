@@ -17,16 +17,6 @@ class V1Hasher
     private $transaction;
 
     /**
-     * @var int
-     */
-    private $nInputs;
-
-    /**
-     * @var int
-     */
-    private $nOutputs;
-
-    /**
      * @var int|string
      */
     private $amount;
@@ -39,8 +29,6 @@ class V1Hasher
     public function __construct(TransactionInterface $transaction, $amount)
     {
         $this->transaction = $transaction;
-        $this->nInputs = count($this->transaction->getInputs());
-        $this->nOutputs = count($this->transaction->getOutputs());
         $this->amount = $amount;
     }
 
@@ -50,7 +38,7 @@ class V1Hasher
      */
     public function hashPrevOuts($sighashType)
     {
-        if (!($sighashType & SigHash::ANYONECANPAY)) {
+        if (!($sighashType & SigHashInterface::ANYONECANPAY)) {
             $binary = '';
             foreach ($this->transaction->getInputs() as $input) {
                 $binary .= $input->getOutPoint()->getBinary();
@@ -67,7 +55,7 @@ class V1Hasher
      */
     public function hashSequences($sighashType)
     {
-        if (!($sighashType & SigHash::ANYONECANPAY) && ($sighashType & 0x1f) != SigHash::SINGLE && ($sighashType & 0x1f) != SigHash::NONE) {
+        if (!($sighashType & SigHashInterface::ANYONECANPAY) && ($sighashType & 0x1f) != SigHashInterface::SINGLE && ($sighashType & 0x1f) != SigHashInterface::NONE) {
             $binary = '';
             foreach ($this->transaction->getInputs() as $input) {
                 $binary .= Buffer::int($input->getSequence())->flip()->getBinary();
@@ -85,13 +73,13 @@ class V1Hasher
      */
     public function hashOutputs($sighashType, $inputToSign)
     {
-        if (($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) != SigHash::NONE) {
+        if (($sighashType & 0x1f) !== SigHashInterface::SINGLE && ($sighashType & 0x1f) != SigHashInterface::NONE) {
             $binary = '';
             foreach ($this->transaction->getOutputs() as $output) {
                 $binary .= $output->getBinary();
             }
             return Hash::sha256d(new Buffer($binary));
-        } elseif (($sighashType & 0x1f) == SigHash::SINGLE && $inputToSign < count($this->transaction->getOutputs())) {
+        } elseif (($sighashType & 0x1f) == SigHashInterface::SINGLE && $inputToSign < count($this->transaction->getOutputs())) {
             return Hash::sha256($this->transaction->getOutput($inputToSign)->getBuffer());
         }
 
@@ -110,7 +98,7 @@ class V1Hasher
      * @return BufferInterface
      * @throws \Exception
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL)
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHashInterface::ALL)
     {
         $sighashType = (int) $sighashType;
 
