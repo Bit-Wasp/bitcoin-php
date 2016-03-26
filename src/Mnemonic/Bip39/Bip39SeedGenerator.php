@@ -27,8 +27,8 @@ class Bip39SeedGenerator
     }
 
     /**
-     * @param $mnemonic
-     * @param $passphrase
+     * @param string $mnemonic
+     * @param string $passphrase
      * @return \BitWasp\Buffertools\BufferInterface
      * @throws \Exception
      */
