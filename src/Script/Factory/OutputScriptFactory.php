@@ -29,33 +29,20 @@ class OutputScriptFactory
      */
     public function payToAddress(AddressInterface $address)
     {
-        $script = ($address instanceof ScriptHashAddress
-            ? ScriptFactory::create()
-                ->op('OP_HASH160')
-                ->push(Buffer::hex($address->getHash(), 20))
-                ->op('OP_EQUAL')
-            : ScriptFactory::create()
-                ->op('OP_DUP')
-                ->op('OP_HASH160')
-                ->push(Buffer::hex($address->getHash(), 20))
-                ->op('OP_EQUALVERIFY')
-                ->op('OP_CHECKSIG'));
-
-        return $script->getScript();
+        return $address instanceof ScriptHashAddress
+            ? ScriptFactory::sequence([Opcodes::OP_HASH160, Buffer::hex($address->getHash(), 20), Opcodes::OP_EQUAL])
+            : ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, Buffer::hex($address->getHash(), 20), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
     }
 
     /**
      * Create a Pay to pubkey output
      *
-     * @param PublicKeyInterface  $public_key
+     * @param PublicKeyInterface  $publicKey
      * @return ScriptInterface
      */
-    public function payToPubKey(PublicKeyInterface $public_key)
+    public function payToPubKey(PublicKeyInterface $publicKey)
     {
-        return ScriptFactory::create()
-            ->push($public_key->getBuffer())
-            ->op('OP_CHECKSIG')
-            ->getScript();
+        return ScriptFactory::sequence([$publicKey->getBuffer(), Opcodes::OP_CHECKSIG]);
     }
 
     /**
@@ -66,13 +53,7 @@ class OutputScriptFactory
      */
     public function payToPubKeyHash(PublicKeyInterface $public_key)
     {
-        return ScriptFactory::create()
-            ->op('OP_DUP')
-            ->op('OP_HASH160')
-            ->push($public_key->getPubKeyHash())
-            ->op('OP_EQUALVERIFY')
-            ->op('OP_CHECKSIG')
-            ->getScript();
+        return ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $public_key->getPubKeyHash(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
     }
 
     /**
@@ -83,11 +64,7 @@ class OutputScriptFactory
      */
     public function payToScriptHash(ScriptInterface $p2shScript)
     {
-        return ScriptFactory::create()
-            ->op('OP_HASH160')
-            ->push($p2shScript->getScriptHash())
-            ->op('OP_EQUAL')
-            ->getScript();
+        return ScriptFactory::sequence([Opcodes::OP_HASH160, $p2shScript->getScriptHash(), Opcodes::OP_EQUAL]);
     }
 
     /**
@@ -111,20 +88,17 @@ class OutputScriptFactory
             $keys = Buffertools::sort($keys);
         }
 
-        $opM = \BitWasp\Bitcoin\Script\encodeOpN($m);
-        $opN = \BitWasp\Bitcoin\Script\encodeOpN($n);
-
-        $script = ScriptFactory::create();
+        $new = ScriptFactory::create()->int($m);
         foreach ($keys as $key) {
             if (!$key instanceof PublicKeyInterface) {
                 throw new \LogicException('Values in $keys[] must be a PublicKey');
             }
 
-            $script->push($key->getBuffer());
+            $new->push($key->getBuffer());
         }
-        $keyBuf = $script->getScript()->getBuffer();
 
-        $script = new Script(new Buffer(chr($opM) . $keyBuf->getBinary() . chr($opN) . chr(Opcodes::OP_CHECKMULTISIG)));
-        return $script;
+        $new->int($n)->op('OP_CHECKMULTISIG');
+
+        return $new->getScript();
     }
 }
