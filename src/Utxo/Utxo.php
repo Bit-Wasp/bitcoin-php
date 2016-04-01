@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
-class Utxo
+class Utxo implements UtxoInterface
 {
     /**
      * @var OutPointInterface
