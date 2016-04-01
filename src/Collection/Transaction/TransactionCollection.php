@@ -20,7 +20,7 @@ class TransactionCollection extends StaticCollection
             }
         }
 
-        $this->set = \SplFixedArray::fromArray($transactions);
+        $this->set = \SplFixedArray::fromArray($transactions, false);
     }
 
     public function __clone()

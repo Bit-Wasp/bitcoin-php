@@ -12,6 +12,6 @@ class Set extends StaticCollection
      */
     public function __construct(array $values)
     {
-        $this->set = \SplFixedArray::fromArray($values);
+        $this->set = \SplFixedArray::fromArray($values, false);
     }
 }
