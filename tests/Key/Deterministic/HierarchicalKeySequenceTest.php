@@ -78,8 +78,12 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
     public function getEncodePathVectors()
     {
         $array = ['2147483648','2147483649','444','2147526030'];
-        $stdClass = (object) $array;
-        $traversable = \SplFixedArray::fromArray($array);
+        $stdClass = new \stdClass();
+        $stdClass->a = '2147483648';
+        $stdClass->b = '2147483649';
+        $stdClass->c = '444';
+        $stdClass->d  = '2147526030';
+        $traversable = \SplFixedArray::fromArray($array, false);
 
         return [
             [$array],

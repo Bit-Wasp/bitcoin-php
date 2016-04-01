@@ -20,7 +20,7 @@ class InputCollectionMutator extends MutableCollection
             $set[$i] = new InputMutator($input);
         }
 
-        $this->set = \SplFixedArray::fromArray($set);
+        $this->set = \SplFixedArray::fromArray($set, false);
     }
 
     /**
@@ -69,7 +69,7 @@ class InputCollectionMutator extends MutableCollection
             throw new \RuntimeException('Invalid start or length');
         }
 
-        $this->set = \SplFixedArray::fromArray(array_slice($this->set->toArray(), $start, $length));
+        $this->set = \SplFixedArray::fromArray(array_slice($this->set->toArray(), $start, $length), false);
         return $this;
     }
 
