@@ -2,38 +2,39 @@
 
 require "../vendor/autoload.php";
 
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\WitnessProgram;
+use BitWasp\Bitcoin\Transaction\Factory\Signer;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Buffertools\Buffer;
 
-$wif = 'QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7';
+Bitcoin::setNetwork(NetworkFactory::bitcoinSegnet());
 
-$s = \BitWasp\Bitcoin\Network\NetworkFactory::bitcoinSegnet();
-Bitcoin::setNetwork($s);
-$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-$key = PrivateKeyFactory::fromWif($wif);
-
+$key = PrivateKeyFactory::fromWif('QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7');
+$scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
 echo $key->getPublicKey()->getAddress()->getAddress() . PHP_EOL;
 
-
+// Utxo
 $outpoint = new OutPoint(Buffer::hex('874381bb431eaaae16e94f8b88e4ea7baf2ebf541b2ae11ec10d54c8e03a237f', 32), 0);
-$scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
-$value = 100000000;
-$txOut = new \BitWasp\Bitcoin\Transaction\TransactionOutput($value, $scriptPubKey);
+$txOut = new TransactionOutput(100000000, $scriptPubKey);
 
-$destination = new WitnessProgram(0, $key->getPubKeyHash());
+// Destination is a pay-to-witness pubkey-hash
+$p2wpkh = new WitnessProgram(0, $key->getPubKeyHash());
 
-$tx = TransactionFactory::build()
+// Create unsigned transaction, spending UTXO, moving funds to P2WPKH
+$tx = (new TxBuilder())
     ->spendOutPoint($outpoint)
-    ->output(99900000, $destination->getScript())
+    ->output(99900000, $p2wpkh->getScript())
     ->get();
 
-$signed = new \BitWasp\Bitcoin\Transaction\Factory\Signer($tx, $ec);
-$signed->sign(0, $key, $txOut);
-$ss = $signed->get();
+// Sign transaction
+$signed = (new Signer($tx,  Bitcoin::getEcAdapter()))
+    ->sign(0, $key, $txOut)
+    ->get();
 
-echo $ss->getHex() . PHP_EOL;
+echo $signed->getHex() . PHP_EOL;
