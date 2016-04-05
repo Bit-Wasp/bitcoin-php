@@ -2,50 +2,45 @@
 
 require "../vendor/autoload.php";
 
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Script\WitnessProgram;
-use BitWasp\Bitcoin\Script\P2shScript;
-use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
+use BitWasp\Bitcoin\Script\P2shScript;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\WitnessProgram;
+use BitWasp\Bitcoin\Transaction\Factory\Signer;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Buffertools\Buffer;
 
-$wif = 'QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7';
+Bitcoin::setNetwork(NetworkFactory::bitcoinSegnet());
 
-$s = \BitWasp\Bitcoin\Network\NetworkFactory::bitcoinSegnet();
-Bitcoin::setNetwork($s);
-$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-$key = PrivateKeyFactory::fromWif($wif);
+$key = PrivateKeyFactory::fromWif('QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7');
 
-echo "Bitcoin address: " . $key->getPublicKey()->getAddress()->getAddress() . PHP_EOL;
-
-$outpoint = new OutPoint(Buffer::hex('23d6640c3f3383ffc8233fbd830ee49162c720389bbba1c313a43b06a235ae13', 32), 0);
-
+// scriptPubKey is P2SH | P2WPKH
 $destination = new WitnessProgram(0, $key->getPubKeyHash());
-$p2sh = new \BitWasp\Bitcoin\Script\P2shScript($destination->getScript());
+$p2sh = new P2shScript($destination->getScript());
 
-$value = 95590000;
-$txOut = new \BitWasp\Bitcoin\Transaction\TransactionOutput($value, $p2sh->getOutputScript());
+// UTXO
+$outpoint = new OutPoint(Buffer::hex('23d6640c3f3383ffc8233fbd830ee49162c720389bbba1c313a43b06a235ae13', 32), 0);
+$txOut = new TransactionOutput(95590000, $p2sh->getOutputScript());
 
-$tx = TransactionFactory::build()
+// Move UTXO to a pub-key-hash address
+$tx = (new TxBuilder())
     ->spendOutPoint($outpoint)
     ->payToAddress(94550000, $key->getPublicKey()->getAddress())
     ->get();
 
-$signed = new \BitWasp\Bitcoin\Transaction\Factory\Signer($tx, $ec);
-$signed->sign(0, $key, $txOut, $destination->getScript());
-$ss = $signed->get();
+// Sign transaction
+$signed = (new Signer($tx, Bitcoin::getEcAdapter()))
+    ->sign(0, $key, $txOut, $destination->getScript())
+    ->get();
 
-$consensus = ScriptFactory::consensus(
-    \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_P2SH |
-    \BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::VERIFY_WITNESS
-);
-echo "Script validation result: " . ($ss->validator()->checkSignature($consensus, 0, 95590000, $p2sh->getOutputScript()) ? "yay\n" : "nay\n");
+$consensus = ScriptFactory::consensus(I::VERIFY_P2SH | I::VERIFY_WITNESS);
+echo "Script validation result: " . ($signed->validator()->checkSignature($consensus, 0, $txOut) ? "yay\n" : "nay\n");
 
 echo PHP_EOL;
-echo $ss->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;
-echo $ss->getHex() . PHP_EOL;
+echo "Witness serialized transaction: " . $signed->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;
+echo "Base serialized transaction: " . $signed->getHex() . PHP_EOL;
