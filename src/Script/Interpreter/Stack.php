@@ -107,7 +107,6 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
                     $this->push($value);
                 }
             }
-
         } else {
             parent::add($index, $value);
         }

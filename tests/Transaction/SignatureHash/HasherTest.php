@@ -56,7 +56,6 @@ class HasherTest extends AbstractTestCase
             $h = $t->getSignatureHash()->calculate($script, 0);
 
             $this->assertEquals($h->getHex(), $test->sighash);
-
         }
     }
 

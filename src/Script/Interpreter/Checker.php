@@ -177,7 +177,6 @@ class Checker
 
             $hash = $hasher->calculate($script, $this->nInput, $txSignature->getHashType());
             return $this->adapter->verify($hash, $publicKey, $txSignature->getSignature());
-
         } catch (\Exception $e) {
             return false;
         }

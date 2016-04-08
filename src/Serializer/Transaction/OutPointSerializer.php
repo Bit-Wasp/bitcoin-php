@@ -7,7 +7,7 @@ use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\TemplateFactory;
 
-class OutPointSerializer
+class OutPointSerializer implements OutPointSerializerInterface
 {
     /**
      * @return \BitWasp\Buffertools\Template

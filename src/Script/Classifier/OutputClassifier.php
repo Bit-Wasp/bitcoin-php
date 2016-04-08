@@ -26,7 +26,6 @@ class OutputClassifier
     public function isPayToPublicKey(ScriptInterface $script, & $publicKey = null)
     {
         try {
-
             $decoded = $script->getScriptParser()->decode();
             if (count($decoded) !== 2 || $decoded[0]->isPush() === false || $decoded[1]->isPush() === true) {
                 return false;
@@ -40,7 +39,6 @@ class OutputClassifier
                     return true;
                 }
             }
-
         } catch (\Exception $e) {
             /** Return false later */
         }
@@ -56,7 +54,6 @@ class OutputClassifier
     public function isPayToPublicKeyHash(ScriptInterface $script, & $pubKeyHash = null)
     {
         try {
-
             $decoded = $script->getScriptParser()->decode();
             if (count($decoded) !== 5) {
                 return false;
@@ -83,7 +80,6 @@ class OutputClassifier
                 $pubKeyHash = $decoded[2]->getData();
                 return true;
             }
-
         } catch (\Exception $e) {
             /** Return false later */
         }
@@ -99,7 +95,6 @@ class OutputClassifier
     public function isPayToScriptHash(ScriptInterface $script, & $scriptHash = null)
     {
         try {
-
             $decoded = $script->getScriptParser()->decode();
             if (count($decoded) !== 3) {
                 return false;
@@ -120,7 +115,6 @@ class OutputClassifier
                 $scriptHash = $decoded[1]->getData();
                 return true;
             }
-
         } catch (\Exception $e) {
             /** Return false later */
         }
@@ -136,7 +130,6 @@ class OutputClassifier
     public function isMultisig(ScriptInterface $script, & $keys = [])
     {
         try {
-
             $decoded = $script->getScriptParser()->decode();
             $count = count($decoded);
             if ($count <= 3) {
@@ -181,7 +174,6 @@ class OutputClassifier
     public function isWitness(ScriptInterface $script, & $programHash = null)
     {
         try {
-
             $decoded = $script->getScriptParser()->decode();
             $size = $script->getBuffer()->getSize();
             if ($size < 4 || $size > 34) {
@@ -202,7 +194,6 @@ class OutputClassifier
                 $programHash = $witness->getData();
                 return true;
             }
-
         } catch (\Exception $e) {
             /** Return false later */
         }
