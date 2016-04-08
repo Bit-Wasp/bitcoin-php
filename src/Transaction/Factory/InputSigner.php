@@ -231,7 +231,6 @@ class InputSigner
                 $this->signatures = [TransactionSignatureFactory::fromHex($witness[0], $this->ecAdapter)];
                 $this->publicKeys = [PublicKeyFactory::fromHex($witness[1], $this->ecAdapter)];
             }
-
         } else if ($type === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             if (isset($witnesses[$this->nInput])) {
                 $witness = $witnesses[$this->nInput];
@@ -518,7 +517,6 @@ class InputSigner
 
         if (!$serialized && $outputType === OutputClassifier::WITNESS_V0_KEYHASH) {
             $answer = new SigValues($emptyScript, new ScriptWitness([$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()]));
-
         } else if (!$serialized && $outputType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $outputType = $this->classifier->classify($this->witnessScript);
             $serialized = $this->serializeSimpleSig($outputType, $answer);

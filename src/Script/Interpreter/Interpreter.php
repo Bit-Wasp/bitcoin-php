@@ -921,7 +921,6 @@ class Interpreter implements InterpreterInterface
 
                             $fSuccess = true;
                             while ($fSuccess && $sigCount > 0) {
-
                                 // Fetch the signature and public key
                                 $sig = $mainStack[-$isig];
                                 $pubkey = $mainStack[-$ikey];

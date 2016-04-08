@@ -63,7 +63,6 @@ class Hasher implements SigHashInterface
                     $input->sequence(0);
                 }
             }
-
         } elseif ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHashInterface::SINGLE) === 0) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
