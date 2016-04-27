@@ -109,7 +109,7 @@ class HierarchicalKeySequence
 
         $list = [];
         foreach (explode('/', $path) as $segment) {
-            if ($segment !== 'm' || $segment !== 'M') {
+            if ($segment !== 'm' && $segment !== 'M') {
                 $list[] = $this->fromNode($segment);
             }
         }
