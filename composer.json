@@ -34,7 +34,7 @@
     "rych/hash_pbkdf2-compat": "~1.0",
     "lastguest/murmurhash": "~1.1",
     "rgooding/protobuf-php": "~0.0",
-    "bitwasp/buffertools": "~0.1.16",
+    "bitwasp/buffertools": "~0.1",
     "bitwasp/trait": "~0.0",
     "bitwasp/secp256k1-php": "~0.0.7"
   },
