@@ -15,7 +15,7 @@ class BlockLocatorSerializer
     public function getTemplate()
     {
         return (new TemplateFactory())
-            ->vector(function (Parser & $parser) {
+            ->vector(function (Parser $parser) {
                 return $parser->readBytes(32, true);
             })
             ->bytestringle(32)

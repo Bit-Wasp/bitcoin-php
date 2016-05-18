@@ -18,7 +18,7 @@ class BloomFilterSerializer
     public function getTemplate()
     {
         return (new TemplateFactory())
-            ->vector(function (Parser & $parser) {
+            ->vector(function (Parser $parser) {
                 return $parser->readBytes(1)->getInt();
             })
             ->uint32le()
