@@ -18,10 +18,10 @@ class PartialMerkleTreeSerializer
     {
         return (new TemplateFactory())
             ->uint32le()
-            ->vector(function (Parser & $parser) {
+            ->vector(function (Parser $parser) {
                 return $parser->readBytes(32);
             })
-            ->vector(function (Parser & $parser) {
+            ->vector(function (Parser $parser) {
                 return $parser->readBytes(1);
             })
             ->getTemplate();

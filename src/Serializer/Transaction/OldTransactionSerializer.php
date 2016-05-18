@@ -36,10 +36,10 @@ class OldTransactionSerializer
     {
         return (new TemplateFactory())
             ->int32le()
-            ->vector(function (Parser & $parser) {
+            ->vector(function (Parser $parser) {
                 return $this->inputSerializer->fromParser($parser);
             })
-            ->vector(function (Parser &$parser) {
+            ->vector(function (Parser $parser) {
                 return $this->outputSerializer->fromParser($parser);
             })
             ->uint32le()

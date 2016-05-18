@@ -47,7 +47,7 @@ class BlockSerializer implements BlockSerializerInterface
     private function getTxsTemplate()
     {
         return (new TemplateFactory())
-            ->vector(function (Parser &$parser) {
+            ->vector(function (Parser $parser) {
                 return $this->txSerializer->fromParser($parser);
             })
             ->getTemplate();
