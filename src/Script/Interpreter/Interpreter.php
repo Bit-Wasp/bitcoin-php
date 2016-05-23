@@ -147,12 +147,12 @@ class Interpreter implements InterpreterInterface
 
     /**
      * @param WitnessProgram $witnessProgram
-     * @param ScriptWitness $scriptWitness
+     * @param ScriptWitnessInterface $scriptWitness
      * @param int $flags
      * @param Checker $checker
      * @return bool
      */
-    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitness $scriptWitness, $flags, Checker $checker)
+    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, $flags, Checker $checker)
     {
         $witnessCount = count($scriptWitness);
 
@@ -256,7 +256,6 @@ class Interpreter implements InterpreterInterface
         }
 
         $program = null;
-
         if ($flags & self::VERIFY_WITNESS) {
             if ($scriptPubKey->isWitness($program)) {
                 /** @var WitnessProgram $program */

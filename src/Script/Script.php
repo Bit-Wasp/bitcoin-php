@@ -206,7 +206,7 @@ class Script extends Serializable implements ScriptInterface
      * @param WitnessProgram|null $program
      * @return bool
      */
-    public function isWitness(WitnessProgram & $program = null)
+    public function isWitness(& $program = null)
     {
         $buffer = $this->getBuffer();
         $size = $buffer->getSize();
