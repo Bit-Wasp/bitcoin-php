@@ -225,7 +225,7 @@ class Interpreter implements InterpreterInterface
             $emptyWitness = new ScriptWitness([]);
         }
 
-        $witness = $witness ?: $emptyWitness;
+        $witness = is_null($witness) ? $emptyWitness : $witness;
 
         if (($flags & self::VERIFY_SIGPUSHONLY) != 0 && !$scriptSig->isPushOnly()) {
             return false;
