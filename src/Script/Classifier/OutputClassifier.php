@@ -20,7 +20,7 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param BufferInterface $publicKey
+     * @param mixed $publicKey
      * @return bool
      */
     public function isPayToPublicKey(ScriptInterface $script, & $publicKey = null)
@@ -48,7 +48,7 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param null $pubKeyHash
+     * @param mixed $pubKeyHash
      * @return bool
      */
     public function isPayToPublicKeyHash(ScriptInterface $script, & $pubKeyHash = null)
@@ -89,7 +89,7 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param null $scriptHash
+     * @param mixed $scriptHash
      * @return bool
      */
     public function isPayToScriptHash(ScriptInterface $script, & $scriptHash = null)
@@ -124,7 +124,7 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param array $keys
+     * @param mixed $keys
      * @return bool
      */
     public function isMultisig(ScriptInterface $script, & $keys = [])
@@ -168,7 +168,7 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param null $programHash
+     * @param mixed $programHash
      * @return bool
      */
     public function isWitness(ScriptInterface $script, & $programHash = null)
@@ -203,7 +203,7 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param null $solution
+     * @param mixed $solution
      * @return string
      */
     public function classify(ScriptInterface $script, &$solution = null)
