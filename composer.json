@@ -28,7 +28,7 @@
     "ext-json": "*",
     "ext-curl": "*",
     "ext-openssl": "*",
-    "ext-mcrypt": "*",
+    "paragonie/random_compat": "~2.0",
     "mdanter/ecc": "~0.3",
     "pleonasm/merkle-tree": "1.0.0",
     "rych/hash_pbkdf2-compat": "~1.0",
