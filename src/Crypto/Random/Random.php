@@ -15,12 +15,6 @@ class Random implements RbgInterface
      */
     public function bytes($length = 32)
     {
-        $random = mcrypt_create_iv($length, \MCRYPT_DEV_URANDOM);
-
-        if (!$random) {
-            throw new RandomBytesFailure('Failed to generate random bytes');
-        }
-
-        return new Buffer($random, $length);
+        return new Buffer(random_bytes($length), $length);
     }
 }
