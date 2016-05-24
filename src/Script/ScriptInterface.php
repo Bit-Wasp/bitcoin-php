@@ -28,10 +28,10 @@ interface ScriptInterface extends SerializableInterface
     public function isPushOnly();
 
     /**
-     * @param WitnessProgram $witness
+     * @param WitnessProgram|null $witness
      * @return bool
      */
-    public function isWitness(WitnessProgram & $witness);
+    public function isWitness(& $witness);
 
     /**
      * @param bool $accurate
