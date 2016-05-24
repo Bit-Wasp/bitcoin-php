@@ -5,8 +5,12 @@ namespace BitWasp\Bitcoin\PaymentProtocol;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\X509Certificates as X509CertificatesBuf;
 
-class PaymentRequestSigner
+class RequestSigner
 {
+    const SHA256 = 'x509+sha256';
+    const SHA1 = 'x509+sha1';
+    const NONE = 'none';
+    
     /**
      * @var string
      */
@@ -33,18 +37,50 @@ class PaymentRequestSigner
      * @param string $certFile
      * @throws \Exception
      */
-    public function __construct($type = 'none', $keyFile = '', $certFile = '')
+    public function __construct($type = null, $keyFile = '', $certFile = '')
     {
-        if (false === in_array($type, ['none','x509+sha1', 'x509+sha256'], true)) {
+        if ($type === null) {
+            $type = self::NONE;
+        }
+        
+        if (false === in_array($type, [self::NONE, self::SHA1, self::SHA256], true)) {
             throw new \InvalidArgumentException('Invalid BIP70 signature type');
         }
 
         $this->type = $type;
         $this->certificates = new X509CertificatesBuf();
 
-        if ($type !== 'none') {
+        if ($type !== self::NONE) {
             $this->initialize($keyFile, $certFile);
         }
+    }
+
+    /**
+     * @return RequestSigner
+     */
+    public static function none()
+    {
+        return new self(self::NONE);
+    }
+
+    /**
+     * @param string $keyFile
+     * @param string $certFile
+     * @return RequestSigner
+     */
+    public static function sha1($keyFile, $certFile)
+    {
+        return new self(self::SHA1, $keyFile, $certFile);
+    }
+
+    /**
+     * @param string $keyFile
+     * @param string $certFile
+     * @return RequestSigner
+     */
+    public static function sha256($keyFile, $certFile)
+    {
+        return new self(self::SHA256, $keyFile, $certFile);
     }
 
     /**
@@ -70,7 +106,7 @@ class PaymentRequestSigner
             throw new \InvalidArgumentException('Certificate file does not exist');
         }
 
-        if ('x509+sha256' === $this->type && !$this->supportsSha256()) {
+        if (self::SHA256 === $this->type && !$this->supportsSha256()) {
             throw new \Exception('Server does not support x.509+SHA256');
         }
 
@@ -89,7 +125,7 @@ class PaymentRequestSigner
         }
 
         $this->privateKey = $pkeyid;
-        $this->algoConst = $this->type === 'x509+sha256'
+        $this->algoConst = $this->type === self::SHA256
             ? OPENSSL_ALGO_SHA256
             : OPENSSL_ALGO_SHA1;
     }
@@ -99,15 +135,14 @@ class PaymentRequestSigner
      * @return string
      * @throws \Exception
      */
-    public function signData($data)
+    private function signData($data)
     {
-        if ($this->type === 'none') {
+        if ($this->type === self::NONE) {
             throw new \RuntimeException('signData called when Signer is not configured for signatures');
         }
 
         $signature = '';
-        $result = openssl_sign($data, $signature, $this->privateKey, $this->algoConst);
-        if (!$result) {
+        if (!openssl_sign($data, $signature, $this->privateKey, $this->algoConst)) {
             throw new \Exception('PaymentRequestSigner: Unable to create signature');
         }
 
@@ -122,12 +157,12 @@ class PaymentRequestSigner
      * @return PaymentRequestBuf
      * @throws \Exception
      */
-    public function apply(PaymentRequestBuf $request)
+    public function sign(PaymentRequestBuf $request)
     {
         $request->setPkiType($this->type);
         $request->setSignature('');
 
-        if ($this->type !== 'none') {
+        if ($this->type !== self::NONE) {
             // PkiData must be captured in signature, and signature must be empty!
             $request->setPkiData($this->certificates->serialize());
             $signature = $this->signData($request->serialize());
@@ -135,6 +170,38 @@ class PaymentRequestSigner
         }
 
         return $request;
+    }
+
+    /**
+     * @param PaymentRequestBuf $request
+     * @return bool
+     */
+    public function verify(PaymentRequestBuf $request)
+    {
+        $type = $request->getPkiType();
+        if ($type === RequestSigner::NONE) {
+            return true;
+        }
+
+        if ($type === RequestSigner::SHA256) {
+            $algorithm = OPENSSL_ALGO_SHA256;
+        } else if ($type === RequestSigner::SHA1) {
+            $algorithm = OPENSSL_ALGO_SHA1;
+        } else {
+            throw new \RuntimeException('Unsupported signature algorithm');
+        }
+
+        $clone = clone $request;
+        $clone->setSignature('');
+        $data = $clone->serialize();
+
+        // Parse the public key
+        $certificates = new X509CertificatesBuf();
+        $certificates->parse($clone->getPkiData());
+        $certificate = $this->der2pem($certificates->getCertificate(0));
+        $pubkeyid = openssl_pkey_get_public($certificate);
+
+        return 1 === openssl_verify($data, $request->getSignature(), $pubkeyid, $algorithm);
     }
 
     /**
@@ -189,6 +256,21 @@ class PaymentRequestSigner
         $d .= chunk_split(base64_encode($certData));
         $d .= $end . "\n";
         return openssl_x509_parse($d);
+    }
+
+    /**
+     * @param $certData
+     * @return array
+     */
+    private function der2pem($certData)
+    {
+        $begin = '-----BEGIN CERTIFICATE-----';
+        $end = '-----END CERTIFICATE-----';
+
+        $d = $begin . "\n";
+        $d .= chunk_split(base64_encode($certData));
+        $d .= $end . "\n";
+        return $d;
     }
 
     /**

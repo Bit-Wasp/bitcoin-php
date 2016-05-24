@@ -25,7 +25,7 @@ class PaymentACK extends \DrSlump\Protobuf\Message
         $f->name = 'payment';
         $f->type = \DrSlump\Protobuf::TYPE_MESSAGE;
         $f->rule = \DrSlump\Protobuf::RULE_REQUIRED;
-        $f->reference = '\BitWasp\Bitcoin\Payments\Protobufs\Payment';
+        $f->reference = '\BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment';
         $descriptor->addField($f);
 
         // OPTIONAL STRING memo = 2

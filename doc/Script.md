@@ -19,8 +19,11 @@ The `BitWasp\Bitcoin\Script\Parser\Parser` class is used to parse & decode scrip
 Calling `Parser::decode()` will return an array of Operations, containing data about effects the each operation in the script.
 
    `Operation::getOp()` - Returns the opcode 
+   
    `Operation::isPush()` - Returns a boolean indicating whether the operation pushed a value to the stack
+   
    `Operation::getData()` - Returns the push-data if there was any.
+   
    `Operation::getDataSize()` - If data was pushed, this function returns the length indicated by the pushdata opcode.
 
 Calling `ScriptParser::getHumanReadable()` will return a string of the operation names, and value pushes in the script. 
