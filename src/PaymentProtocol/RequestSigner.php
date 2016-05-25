@@ -179,13 +179,13 @@ class RequestSigner
     public function verify(PaymentRequestBuf $request)
     {
         $type = $request->getPkiType();
-        if ($type === RequestSigner::NONE) {
+        if ($type === self::NONE) {
             return true;
         }
 
-        if ($type === RequestSigner::SHA256) {
+        if ($type === self::SHA256) {
             $algorithm = OPENSSL_ALGO_SHA256;
-        } else if ($type === RequestSigner::SHA1) {
+        } else if ($type === self::SHA1) {
             $algorithm = OPENSSL_ALGO_SHA1;
         } else {
             throw new \RuntimeException('Unsupported signature algorithm');
