@@ -4,7 +4,7 @@ php:
   - 5.5
   - 5.6
   - hhvm
-  - nightly
+  - 7.0
 
 env:
   - EXT_SECP256K1="-dextension=secp256k1.so"
@@ -47,7 +47,7 @@ matrix:
         env: EXT_SECP256K1="-dextension=secp256k1.so"
 
       ## exclude nightly + extension until the extension itself actually passes tests
-      - php: nightly
+      - php: 7.0
         env: EXT_SECP256K1="-dextension=secp256k1.so"
 
 notifications:
