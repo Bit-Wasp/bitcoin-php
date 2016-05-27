@@ -87,18 +87,22 @@ $transaction = new Transaction(
  is used to create unsigned transactions, or simply to create a transaction from an API response. 
  
  An input can be added to the transaction using:
-  - TxBuilder::input(); providing the txid string, and vout index, along with a script (default is empty), and sequence (default is MAX)
-  - TxBuilder::inputs(); by providing an array of `TransactionInputInterface`
-  - TxBuilder::spendOutPoint(); which takes an OutPoint, and optionally a script and sequence.
-  - TxBuilder::spendOutPointFrom(); which takes a transaction, and a vout index, and optionally a script and sequence
+ 
+   `TxBuilder::input()` - providing the txid string, and vout index, along with a script (default is empty), and sequence (default is MAX)
+   
+   `TxBuilder::inputs()` - by providing an array of `TransactionInputInterface`
+   
+   `TxBuilder::spendOutPoint()` - which takes an OutPoint, and optionally a script and sequence.
+   
+   `TxBuilder::spendOutPointFrom()` - which takes a transaction, and a vout index, and optionally a script and sequence
   
  An output can be added using:
-  - TxBuilder::output(); providing a value, and a script.
-  - TxBuilder::payToAddress(); providing a value, and an AddressInterface
-  - TxBuilder::outputs(); providing an array of `TransactionOutputInterface`
+  `TxBuilder::output()` - providing a value, and a script.
+  `TxBuilder::payToAddress()` - providing a value, and an AddressInterface
+  `TxBuilder::outputs()` - providing an array of `TransactionOutputInterface`
   
  Witness data can be added using:
-  - TxBuilder::witnesses(); providing an array of `ScriptWitnessInterface` 
+  `TxBuilder::witnesses()` - providing an array of `ScriptWitnessInterface` 
   
 ```php
 use BitWasp\Bitcoin\Bitcoin;

@@ -2,15 +2,14 @@
 
 require "../vendor/autoload.php";
 
-use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestBuilder;
-use BitWasp\Bitcoin\PaymentProtocol\PaymentRequestSigner;
+use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest;
+use BitWasp\Bitcoin\PaymentProtocol\HttpResponse;
 
 $time = $_GET['time'];
 
-//$signer = new PaymentRequestSigner('x509+sha256', '/var/www/git/paymentrequestold/.keys/key.key', '/var/www/git/paymentrequestold/.keys/certificateChain.pem');
-// This can be the regular signer, since the signature has already been added.
-$signer = new PaymentRequestSigner('none');
-$request = new PaymentRequestBuilder($signer, 'main', $time);
-$request->parse(file_get_contents('/tmp/.abc'.$time));
-$request->send();
+$request = new PaymentRequest();
+$request->parse(file_get_contents('/tmp/pr.bitcoin.'.$time));
 
+$http = new HttpResponse();
+$response = $http->paymentRequest($request);
+$response->send();

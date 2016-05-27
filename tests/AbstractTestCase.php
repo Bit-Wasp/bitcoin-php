@@ -108,12 +108,21 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $filename
+     * @param string $file
+     * @return string
+     */
+    public function dataPath($file)
+    {
+        return __DIR__ . '/Data/' . $file;
+    }
+
+    /**
+     * @param string $filename
      * @return string
      */
     public function dataFile($filename)
     {
-        return file_get_contents(__DIR__ . '/Data/' . $filename);
+        return file_get_contents($this->dataPath($filename));
     }
 
     /**
