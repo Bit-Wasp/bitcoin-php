@@ -19,12 +19,12 @@ class ElectrumKey
     /**
      * @var null|PrivateKeyInterface
      */
-    private $masterKey;
+    private $masterPrivate;
 
     /**
      * @var PublicKeyInterface
      */
-    private $publicKey;
+    private $masterPublic;
 
     /**
      * @param EcAdapterInterface $ecAdapter
@@ -36,25 +36,26 @@ class ElectrumKey
             throw new \RuntimeException('Electrum keys are not compressed');
         }
 
-        $this->ecAdapter = $ecAdapter;
         if ($masterKey instanceof PrivateKeyInterface) {
-            $this->masterKey = $masterKey;
-            $masterKey = $this->masterKey->getPublicKey();
+            $this->masterPrivate = $masterKey;
+            $this->masterPublic = $masterKey->getPublicKey();
+        } elseif ($masterKey instanceof PublicKeyInterface) {
+            $this->masterPublic = $masterKey;
         }
 
-        $this->publicKey = $masterKey;
+        $this->ecAdapter = $ecAdapter;
     }
 
     /**
-     * @return KeyInterface|PrivateKeyInterface|PublicKeyInterface
+     * @return PrivateKeyInterface
      */
     public function getMasterPrivateKey()
     {
-        if (null === $this->masterKey) {
+        if (null === $this->masterPrivate) {
             throw new \RuntimeException("Cannot produce master private key from master public key");
         }
 
-        return $this->masterKey;
+        return $this->masterPrivate;
     }
 
     /**
@@ -62,7 +63,7 @@ class ElectrumKey
      */
     public function getMasterPublicKey()
     {
-        return $this->publicKey;
+        return $this->masterPublic;
     }
 
     /**
@@ -80,16 +81,8 @@ class ElectrumKey
      */
     public function getSequenceOffset($sequence, $change = false)
     {
-        return Hash::sha256d(new Buffer(
-            sprintf(
-                "%s:%s:%s",
-                $sequence,
-                $change ? '1' : '0',
-                $this->getMPK()->getBinary()
-            ),
-            null,
-            $this->ecAdapter->getMath()
-        ))->getInt();
+        $seed = new Buffer(sprintf("%s:%s:%s", $sequence, $change ? '1' : '0', $this->getMPK()->getBinary()), null, $this->ecAdapter->getMath());
+        return Hash::sha256d($seed)->getInt();
     }
 
     /**
@@ -99,6 +92,7 @@ class ElectrumKey
      */
     public function deriveChild($sequence, $change = false)
     {
-        return $this->publicKey->tweakAdd($this->getSequenceOffset($sequence, $change));
+        $key = is_null($this->masterPrivate) ? $this->masterPublic : $this->masterPrivate;
+        return $key->tweakAdd($this->getSequenceOffset($sequence, $change));
     }
 }
