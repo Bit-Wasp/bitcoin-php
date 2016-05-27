@@ -238,7 +238,7 @@ $signed = (new Signer($transaction, $ec))
 
 echo "Get non-witness transaction " . $signed->getBuffer()->getHex() . PHP_EOL . PHP_EOL;
 echo "Get witness bearing transaction: " . $signed->getWitnessBuffer()->getHex() . PHP_EOL;
-```php
+```
 
 
 ### P2SH | Witness V0 Script Hash: 1 of 2 multisig
