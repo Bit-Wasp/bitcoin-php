@@ -153,7 +153,7 @@ $transaction = TransactionFactory::build()
 ### Simple output script: pay to pubkey hash
 ```php
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
-use BitWasp\Bitcoin\Key\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 
 $privateKey = PrivateKeyFactory::fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
