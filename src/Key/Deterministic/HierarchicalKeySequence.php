@@ -41,7 +41,7 @@ class HierarchicalKeySequence
      */
     public function isHardened($sequence)
     {
-        return $this->binaryMath()->isNegative($sequence, 32);
+        return $this->binaryMath()->isNegative(gmp_init($sequence, 10), 32);
     }
 
     /**
@@ -54,8 +54,8 @@ class HierarchicalKeySequence
             throw new \LogicException('Sequence is already for a hardened key');
         }
 
-        $prime = $this->binaryMath()->makeNegative($sequence, 32);
-        return $prime;
+        $prime = $this->binaryMath()->makeNegative(gmp_init($sequence, 10), 32);
+        return gmp_strval($prime, 10);
     }
 
     /**
@@ -89,7 +89,8 @@ class HierarchicalKeySequence
     public function getNode($sequence)
     {
         if ($this->isHardened($sequence)) {
-            $sequence = $this->math->sub($sequence, self::START_HARDENED) . 'h';
+            $sequence = $this->math->sub(gmp_init($sequence), gmp_init(self::START_HARDENED));
+            $sequence = gmp_strval($sequence, 10) . 'h';
         }
 
         return $sequence;

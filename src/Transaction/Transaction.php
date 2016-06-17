@@ -62,11 +62,11 @@ class Transaction extends Serializable implements TransactionInterface
         $nLockTime = 0
     ) {
         $math = Bitcoin::getMath();
-        if ($math->cmp($nVersion, TransactionInterface::MAX_VERSION) > 0) {
+        if ($nVersion > TransactionInterface::MAX_VERSION) {
             throw new \InvalidArgumentException('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
 
-        if ($math->cmp($nLockTime, 0) < 0 || $math->cmp($nLockTime, TransactionInterface::MAX_LOCKTIME) > 0) {
+        if ($nLockTime < 0 || $nLockTime > TransactionInterface::MAX_LOCKTIME) {
             throw new \InvalidArgumentException('Locktime must be positive and less than ' . TransactionInterface::MAX_LOCKTIME);
         }
 
@@ -226,12 +226,12 @@ class Transaction extends Serializable implements TransactionInterface
     public function getValueOut()
     {
         $math = Bitcoin::getMath();
-        $value = 0;
+        $value = gmp_init(0);
         foreach ($this->outputs as $output) {
-            $value = $math->add($value, $output->getValue());
+            $value = $math->add($value, gmp_init($output->getValue()));
         }
 
-        return $value;
+        return gmp_strval($value, 10);
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Locktime;
 
 class LocktimeTest extends AbstractTestCase
@@ -93,10 +92,8 @@ class LocktimeTest extends AbstractTestCase
      */
     public function testFromBlockHeightTooHigh()
     {
-        $math = new Math();
-        $locktime = new Locktime($math);
-
-        $disallowed = $math->add(Locktime::BLOCK_MAX, 1);
+        $locktime = new Locktime();
+        $disallowed = Locktime::BLOCK_MAX + 1;
         $locktime->fromBlockHeight($disallowed);
     }
 

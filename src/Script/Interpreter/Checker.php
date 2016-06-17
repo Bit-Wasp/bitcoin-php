@@ -87,7 +87,7 @@ class Checker
         $binary = $signature->getBinary();
         $nLenR = ord($binary[3]);
         $nLenS = ord($binary[5 + $nLenR]);
-        $s = $signature->slice(6 + $nLenR, $nLenS)->getInt();
+        $s = gmp_init($signature->slice(6 + $nLenR, $nLenS)->getInt(), 10);
 
         return $this->adapter->validateSignatureElement($s, true);
     }
@@ -108,8 +108,7 @@ class Checker
         $binary = $signature->getBinary();
         $nHashType = ord(substr($binary, -1)) & (~(SigHashInterface::ANYONECANPAY));
 
-        $math = $this->adapter->getMath();
-        return ! ($math->cmp($nHashType, SigHashInterface::ALL) < 0 || $math->cmp($nHashType, SigHashInterface::SINGLE) > 0);
+        return !(($nHashType < SigHashInterface::ALL) || ($nHashType > SigHashInterface::SINGLE));
     }
 
     /**
@@ -190,15 +189,14 @@ class Checker
      */
     private function verifyLockTime($txLockTime, $nThreshold, \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime)
     {
-        $math = $this->adapter->getMath();
         $nTime = $lockTime->getInt();
-        if (($math->cmp($txLockTime, $nThreshold) < 0 && $math->cmp($nTime, $nThreshold) < 0) ||
-            ($math->cmp($txLockTime, $nThreshold) >= 0 && $math->cmp($nTime, $nThreshold) >= 0)
+        if (($txLockTime < $nThreshold && $nTime < $nThreshold) ||
+            ($txLockTime >= $nThreshold && $nTime >= $nThreshold)
         ) {
             return false;
         }
 
-        return $math->cmp($nTime, $txLockTime) >= 0;
+        return $nTime >= $txLockTime;
     }
 
     /**

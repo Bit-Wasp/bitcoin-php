@@ -119,11 +119,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param \GMP $tweak
      * @var string $tweak
      * @return PrivateKey
      */
-    public function tweakAdd($tweak)
+    public function tweakAdd(\GMP $tweak)
     {
         $adapter = $this->ecAdapter;
         $math = $adapter->getMath();
@@ -145,10 +145,10 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param \GMP $tweak
      * @return PrivateKey
      */
-    public function tweakMul($tweak)
+    public function tweakMul(\GMP $tweak)
     {
         $adapter = $this->ecAdapter;
         $math = $adapter->getMath();

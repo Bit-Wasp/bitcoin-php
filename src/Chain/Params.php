@@ -234,17 +234,17 @@ class Params implements ParamsInterface
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getMaxBlockSigOps()
     {
-        return $this->math->div($this->maxBlockSizeBytes(), 50);
+        return $this->maxBlockSizeBytes() / 50;
     }
     /**
-     * @return int|string
+     * @return int
      */
     public function getMaxTxSigOps()
     {
-        return $this->math->div($this->getMaxBlockSigOps(), 5);
+        return $this->getMaxBlockSigOps() / 5;
     }
 }

@@ -131,8 +131,8 @@ class EcAdapterTest extends AbstractTestCase
             $this->assertEquals(strtolower($test->expectedK), $k->bytes(32)->getHex());
 
             // R and S should be correct
-            $rHex = $math->dechex($sig->getR());
-            $sHex = $math->decHex($sig->getS());
+            $rHex = $math->dechex(gmp_strval($sig->getR(), 10));
+            $sHex = $math->decHex(gmp_strval($sig->getS(),10));
             $this->assertSame($test->expectedRSLow, $rHex . $sHex);
 
             $this->assertTrue($ecAdapter->verify($messageHash, $privateKey->getPublicKey(), $sig));

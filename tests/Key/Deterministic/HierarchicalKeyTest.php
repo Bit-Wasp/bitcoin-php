@@ -376,7 +376,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $math = new Math();
         $generator = EccFactory::getSecgCurves($math)->generator256k1();
 
-        $k = $math->sub($generator->getOrder(), 1);
+        $k = gmp_strval($math->sub($generator->getOrder(), gmp_init(1)), 10);
         $startPub = PrivateKeyFactory::fromInt($k, true)->getPublicKey();
 
         $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface')
@@ -481,6 +481,6 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertNotEquals($expected, $child->getSequence());
         $this->assertEquals(2, $child->getSequence());
         $this->assertEquals(2, $this->HK_run_count);
-        $this->assertEquals($math->add($k, 1), $child->getPrivateKey()->getSecretMultiplier());
+        $this->assertEquals(gmp_strval($math->add(gmp_init($k), gmp_init(1)), 10), gmp_strval($child->getPrivateKey()->getSecretMultiplier(), 10));
     }
 }

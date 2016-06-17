@@ -138,7 +138,7 @@ class Interpreter implements InterpreterInterface
      */
     private function checkOpcodeCount()
     {
-        if ($this->math->cmp($this->opCount, 201) > 0) {
+        if ($this->opCount > 201) {
             throw new \RuntimeException('Error: Script op code count');
         }
 
@@ -464,12 +464,12 @@ class Interpreter implements InterpreterInterface
                             }
 
                             $sequence = Number::buffer($mainStack[-1], $minimal, 5, $math);
-                            $nSequence = $sequence->getInt();
-                            if ($math->cmp($nSequence, 0) < 0) {
+                            $nSequence = gmp_init($sequence->getInt(), 10);
+                            if ($math->cmp($nSequence, gmp_init(0)) < 0) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
                             }
 
-                            if ($math->cmp($math->bitwiseAnd($nSequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), '0') !== 0) {
+                            if ($math->cmp($math->bitwiseAnd($nSequence, gmp_init(TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG, 10)), gmp_init(0)) !== 0) {
                                 break;
                             }
 
@@ -627,13 +627,13 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $n = Number::buffer($mainStack[-1], $minimal, 4)->getInt();
+                            $n = gmp_init(Number::buffer($mainStack[-1], $minimal, 4)->getInt(), 10);
                             $mainStack->pop();
-                            if ($math->cmp($n, 0) < 0 || $math->cmp($n, count($mainStack)) >= 0) {
+                            if ($math->cmp($n, gmp_init(0)) < 0 || $math->cmp($n, gmp_init(count($mainStack))) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $pos = (int) $math->sub($math->sub(0, $n), 1);
+                            $pos = (int) gmp_strval($math->sub($math->sub(gmp_init(0), $n), gmp_init(1)), 10);
                             $vch = $mainStack[$pos];
                             if ($opCode === Opcodes::OP_ROLL) {
                                 unset($mainStack[$pos]);
@@ -734,30 +734,30 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
                             }
 
-                            $num = Number::buffer($mainStack[-1], $minimal)->getInt();
+                            $num = gmp_init(Number::buffer($mainStack[-1], $minimal)->getInt(), 10);
 
                             if ($opCode === Opcodes::OP_1ADD) {
-                                $num = $math->add($num, '1');
+                                $num = $math->add($num, gmp_init(1));
                             } elseif ($opCode === Opcodes::OP_1SUB) {
-                                $num = $math->sub($num, '1');
+                                $num = $math->sub($num, gmp_init(1));
                             } elseif ($opCode === Opcodes::OP_2MUL) {
-                                $num = $math->mul(2, $num);
+                                $num = $math->mul(gmp_init(2), $num);
                             } elseif ($opCode === Opcodes::OP_NEGATE) {
-                                $num = $math->sub(0, $num);
+                                $num = $math->sub(gmp_init(0), $num);
                             } elseif ($opCode === Opcodes::OP_ABS) {
-                                if ($math->cmp($num, '0') < 0) {
-                                    $num = $math->sub(0, $num);
+                                if ($math->cmp($num, gmp_init(0)) < 0) {
+                                    $num = $math->sub(gmp_init(0), $num);
                                 }
                             } elseif ($opCode === Opcodes::OP_NOT) {
-                                $num = (int) $math->cmp($num, '0') === 0;
+                                $num = (int) $math->cmp($num, gmp_init(0)) === 0;
                             } else {
                                 // is OP_0NOTEQUAL
-                                $num = (int) ($math->cmp($num, '0') !== 0);
+                                $num = (int) ($math->cmp($num, gmp_init(0)) !== 0);
                             }
 
                             $mainStack->pop();
 
-                            $buffer = Number::int($num)->getBuffer();
+                            $buffer = Number::int(gmp_strval($num, 10))->getBuffer();
 
                             $mainStack->push($buffer);
                             break;
@@ -767,17 +767,17 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation (OP_ADD - OP_MAX)');
                             }
 
-                            $num1 = Number::buffer($mainStack[-2], $minimal)->getInt();
-                            $num2 = Number::buffer($mainStack[-1], $minimal)->getInt();
+                            $num1 = gmp_init(Number::buffer($mainStack[-2], $minimal)->getInt(), 10);
+                            $num2 = gmp_init(Number::buffer($mainStack[-1], $minimal)->getInt(), 10);
 
                             if ($opCode === Opcodes::OP_ADD) {
                                 $num = $math->add($num1, $num2);
                             } else if ($opCode === Opcodes::OP_SUB) {
                                 $num = $math->sub($num1, $num2);
                             } else if ($opCode === Opcodes::OP_BOOLAND) {
-                                $num = $math->cmp($num1, '0') !== 0 && $math->cmp($num2, '0') !== 0;
+                                $num = $math->cmp($num1, gmp_init(0)) !== 0 && $math->cmp($num2, gmp_init(0)) !== 0;
                             } else if ($opCode === Opcodes::OP_BOOLOR) {
-                                $num = $math->cmp($num1, '0') !== 0 || $math->cmp($num2, '0') !== 0;
+                                $num = $math->cmp($num1, gmp_init(0)) !== 0 || $math->cmp($num2, gmp_init(0)) !== 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUAL) {
                                 $num = $math->cmp($num1, $num2) === 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -800,7 +800,7 @@ class Interpreter implements InterpreterInterface
 
                             $mainStack->pop();
                             $mainStack->pop();
-                            $buffer = Number::int($num)->getBuffer();
+                            $buffer = Number::int(gmp_strval($num, 10))->getBuffer();
                             $mainStack->push($buffer);
 
                             if ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -817,9 +817,9 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $num1 = Number::buffer($mainStack[-3], $minimal)->getInt();
-                            $num2 = Number::buffer($mainStack[-2], $minimal)->getInt();
-                            $num3 = Number::buffer($mainStack[-1], $minimal)->getInt();
+                            $num1 = gmp_init(Number::buffer($mainStack[-3], $minimal)->getInt(), 10);
+                            $num2 = gmp_init(Number::buffer($mainStack[-2], $minimal)->getInt(), 10);
+                            $num3 = gmp_init(Number::buffer($mainStack[-1], $minimal)->getInt(), 10);
 
                             $value = $math->cmp($num2, $num1) <= 0 && $math->cmp($num1, $num3) < 0;
                             $mainStack->pop();
@@ -893,7 +893,7 @@ class Interpreter implements InterpreterInterface
                             }
 
                             $keyCount = Number::buffer($mainStack[-$i], $minimal)->getInt();
-                            if ($math->cmp($keyCount, 0) < 0 || $math->cmp($keyCount, 20) > 0) {
+                            if ($keyCount < 0 || $keyCount > 20) {
                                 throw new \RuntimeException('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
 
@@ -908,7 +908,7 @@ class Interpreter implements InterpreterInterface
                             }
 
                             $sigCount = Number::buffer($mainStack[-$i], $minimal)->getInt();
-                            if ($math->cmp($sigCount, 0) < 0 || $math->cmp($sigCount, $keyCount) > 0) {
+                            if ($sigCount < 0 || $sigCount > $keyCount) {
                                 throw new \RuntimeException('Invalid Signature count');
                             }
 

@@ -53,7 +53,7 @@ class Hasher implements SigHashInterface
 
         $inputs[$inputToSign]->script($txOutScript);
 
-        if ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHashInterface::NONE) === 0) {
+        if (($sighashType & 31) === SigHashInterface::NONE) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
             $outputs->null();
 
@@ -63,7 +63,7 @@ class Hasher implements SigHashInterface
                     $input->sequence(0);
                 }
             }
-        } elseif ($math->cmp($math->bitwiseAnd($sighashType, 31), SigHashInterface::SINGLE) === 0) {
+        } elseif (($sighashType & 31) === SigHashInterface::SINGLE) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
@@ -86,7 +86,7 @@ class Hasher implements SigHashInterface
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
-        if ($math->cmp($math->bitwiseAnd($sighashType, SigHashInterface::ANYONECANPAY), 0) > 0) {
+        if (($sighashType & SigHashInterface::ANYONECANPAY) > 0) {
             $input = $inputs[$inputToSign]->done();
             $inputs->null()->add($input);
         }

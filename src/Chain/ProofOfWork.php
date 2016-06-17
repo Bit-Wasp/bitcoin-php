@@ -34,7 +34,7 @@ class ProofOfWork
 
     /**
      * @param BufferInterface $bits
-     * @return int|string
+     * @return \GMP
      */
     public function getTarget(BufferInterface $bits)
     {
@@ -44,7 +44,7 @@ class ProofOfWork
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
     public function getMaxTarget()
     {
@@ -58,7 +58,7 @@ class ProofOfWork
     public function getTargetHash(BufferInterface $bits)
     {
         return Buffer::int(
-            $this->getTarget($bits),
+            gmp_strval($this->getTarget($bits), 10),
             32,
             $this->math
         );
@@ -72,9 +72,9 @@ class ProofOfWork
     {
         $target = $this->getTarget($bits);
         $lowest = $this->getMaxTarget();
-        $lowest = $this->math->mul($lowest, $this->math->pow(10, self::DIFF_PRECISION));
+        $lowest = $this->math->mul($lowest, $this->math->pow(gmp_init(10, 10), self::DIFF_PRECISION));
         
-        $difficulty = str_pad($this->math->div($lowest, $target), self::DIFF_PRECISION + 1, '0', STR_PAD_LEFT);
+        $difficulty = str_pad($this->math->toString($this->math->div($lowest, $target)), self::DIFF_PRECISION + 1, '0', STR_PAD_LEFT);
         
         $intPart = substr($difficulty, 0, 0 - self::DIFF_PRECISION);
         $decPart = substr($difficulty, 0 - self::DIFF_PRECISION, self::DIFF_PRECISION);
@@ -90,13 +90,14 @@ class ProofOfWork
     public function check(BufferInterface $hash, $nBits)
     {
         $negative = false;
-        $overflow = false;
+        $overflow = false
+        ;
         $target = $this->math->writeCompact($nBits, $negative, $overflow);
-        if ($negative || $overflow || $this->math->cmp($target, 0) === 0 ||  $this->math->cmp($target, $this->getMaxTarget()) > 0) {
+        if ($negative || $overflow || $this->math->cmp($target, gmp_init(0)) === 0 ||  $this->math->cmp($target, $this->getMaxTarget()) > 0) {
             throw new \RuntimeException('nBits below minimum work');
         }
 
-        if ($this->math->cmp($hash->getInt(), $target) > 0) {
+        if ($this->math->cmp(gmp_init($hash->getInt(), 10), $target) > 0) {
             throw new \RuntimeException("Hash doesn't match nBits");
         }
 

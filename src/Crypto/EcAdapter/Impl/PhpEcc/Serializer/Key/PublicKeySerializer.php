@@ -55,10 +55,10 @@ class PublicKeySerializer implements PublicKeySerializerInterface
 
         $compressed
             ? $parser
-            ->writeBytes(32, Buffer::int($point->getX(), null, $math))
+            ->writeBytes(32, Buffer::int(gmp_strval($point->getX(), 10), null, $math))
             : $parser
-            ->writeBytes(32, Buffer::int($point->getX(), null, $math))
-            ->writeBytes(32, Buffer::int($point->getY(), null, $math));
+            ->writeBytes(32, Buffer::int(gmp_strval($point->getX(), 10), null, $math))
+            ->writeBytes(32, Buffer::int(gmp_strval($point->getY(), 10), null, $math));
 
         return $parser->getBuffer();
     }

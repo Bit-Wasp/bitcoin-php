@@ -98,21 +98,24 @@ class EcAdapter implements EcAdapterInterface
         $math = $this->getMath();
         $generator = $this->getGenerator();
 
-        if ($math->cmp($signature->getR(), 1) < 1 || $math->cmp($signature->getR(), $math->sub($n, 1)) > 0) {
+        $one = gmp_init(1);
+        $r = gmp_init($signature->getR());
+        $s = gmp_init($signature->getS());
+        if ($math->cmp($r, $one) < 1 || $math->cmp($r, $math->sub($n, $one)) > 0) {
             return false;
         }
 
-        if ($math->cmp($signature->getS(), 1) < 1 || $math->cmp($signature->getS(), $math->sub($n, 1)) > 0) {
+        if ($math->cmp($s, $one) < 1 || $math->cmp($s, $math->sub($n, $one)) > 0) {
             return false;
         }
 
-        $c = $math->inverseMod($signature->getS(), $n);
-        $u1 = $math->mod($math->mul($messageHash->getInt(), $c), $n);
-        $u2 = $math->mod($math->mul($signature->getR(), $c), $n);
+        $c = $math->inverseMod($s, $n);
+        $u1 = $math->mod($math->mul(gmp_init($messageHash->getInt(), 10), $c), $n);
+        $u2 = $math->mod($math->mul($r, $c), $n);
         $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
         $v = $math->mod($xy->getX(), $n);
 
-        return $math->cmp($v, $signature->getR()) === 0;
+        return $math->cmp($v, $r) === 0;
     }
 
     /**
@@ -143,10 +146,10 @@ class EcAdapter implements EcAdapterInterface
         $generator = $this->getGenerator();
         $n = $generator->getOrder();
 
-        $k = $math->mod($randomK->getInt(), $n);
+        $k = $math->mod(gmp_init($randomK->getInt(), 10), $n);
         $r = $generator->mul($k)->getX();
 
-        if ($math->cmp($r, 0) === 0) {
+        if ($math->cmp($r, gmp_init(0)) === 0) {
             throw new \RuntimeException('Random number r = 0');
         }
 
@@ -155,9 +158,9 @@ class EcAdapter implements EcAdapterInterface
                 $math->inverseMod($k, $n),
                 $math->mod(
                     $math->add(
-                        $messageHash->getInt(),
+                        gmp_init($messageHash->getInt(), 10),
                         $math->mul(
-                            $privateKey->getSecretMultiplier(),
+                            gmp_init($privateKey->getSecretMultiplier(), 10),
                             $r
                         )
                     ),
@@ -167,7 +170,7 @@ class EcAdapter implements EcAdapterInterface
             $n
         );
 
-        if ($math->cmp($s, 0) === 0) {
+        if ($math->cmp($s, gmp_init(0)) === 0) {
             throw new \RuntimeException('Signature s = 0');
         }
 
@@ -176,7 +179,7 @@ class EcAdapter implements EcAdapterInterface
             $s = $math->sub($n, $s);
         }
 
-        return new Signature($this, $r, $s);
+        return new Signature($this, gmp_strval($r, 10), gmp_strval($s, 10));
     }
 
     /**
@@ -203,18 +206,24 @@ class EcAdapter implements EcAdapterInterface
         $math = $this->getMath();
         $G = $this->getGenerator();
 
-        $isYEven = $math->cmp($math->bitwiseAnd($signature->getRecoveryId(), 1), 0) !== 0;
-        $isSecondKey = $math->cmp($math->bitwiseAnd($signature->getRecoveryId(), 2), 0) !== 0;
+        $zero = gmp_init(0);
+        $one = gmp_init(1);
+
+        $r = gmp_init($signature->getR());
+        $s = gmp_init($signature->getS());
+        $recGMP = gmp_init($signature->getRecoveryId(), 10);
+        $isYEven = $math->cmp($math->bitwiseAnd($recGMP, $one), $zero) !== 0;
+        $isSecondKey = $math->cmp($math->bitwiseAnd($recGMP, gmp_init(2)), $zero) !== 0;
         $curve = $G->getCurve();
 
         // Precalculate (p + 1) / 4 where p is the field order
-        $p_over_four = $math->div($math->add($curve->getPrime(), 1), 4);
+        $p_over_four = $math->div($math->add($curve->getPrime(), $one), gmp_init(4));
 
         // 1.1 Compute x
         if (!$isSecondKey) {
-            $x = $signature->getR();
+            $x = $r;
         } else {
-            $x = $math->add($signature->getR(), $G->getOrder());
+            $x = $math->add($r, $G->getOrder());
         }
 
         // 1.3 Convert x to point
@@ -233,13 +242,13 @@ class EcAdapter implements EcAdapterInterface
         $R = $G->getCurve()->getPoint($x, $y);
 
         $point_negate = function (PointInterface $p) use ($math, $G) {
-            return $G->getCurve()->getPoint($p->getX(), $math->mul($p->getY(), -1));
+            return $G->getCurve()->getPoint($p->getX(), $math->mul($p->getY(), gmp_init('-1', 10)));
         };
 
         // 1.6.1 Compute a candidate public key Q = r^-1 (sR - eG)
-        $rInv = $math->inverseMod($signature->getR(), $G->getOrder());
-        $eGNeg = $point_negate($G->mul($messageHash->getInt()));
-        $Q = $R->mul($signature->getS())->add($eGNeg)->mul($rInv);
+        $rInv = $math->inverseMod($r, $G->getOrder());
+        $eGNeg = $point_negate($G->mul(gmp_init($messageHash->getInt())));
+        $Q = $R->mul($s)->add($eGNeg)->mul($rInv);
 
         // 1.6.2 Test Q as a public key
         $Qk = new PublicKey($this, $Q, $signature->isCompressed());
@@ -253,8 +262,8 @@ class EcAdapter implements EcAdapterInterface
     /**
      * Attempt to calculate the public key recovery param by trial and error
      *
-     * @param integer|string $r
-     * @param integer|string $s
+     * @param int $r
+     * @param int $s
      * @param BufferInterface $messageHash
      * @param PublicKey $publicKey
      * @return int
@@ -318,16 +327,16 @@ class EcAdapter implements EcAdapterInterface
     public function validatePrivateKey(BufferInterface $privateKey)
     {
         $math = $this->math;
-        $scalar = $privateKey->getInt();
-        return $math->cmp($scalar, 0) > 0 && $math->cmp($scalar, $this->getGenerator()->getOrder()) < 0;
+        $scalar = gmp_init($privateKey->getInt(), 10);
+        return $math->cmp($scalar, gmp_init(0)) > 0 && $math->cmp($scalar, $this->getGenerator()->getOrder()) < 0;
     }
 
     /**
-     * @param int|string $element
+     * @param \GMP $element
      * @param bool $half
      * @return bool
      */
-    public function validateSignatureElement($element, $half = false)
+    public function validateSignatureElement(\GMP $element, $half = false)
     {
         $math = $this->getMath();
         $against = $this->getGenerator()->getOrder();
@@ -335,7 +344,7 @@ class EcAdapter implements EcAdapterInterface
             $against = $math->rightShift($against, 1);
         }
 
-        return $math->cmp($element, $against) < 0 && $math->cmp($element, 0) !== 0;
+        return $math->cmp($element, $against) < 0 && $math->cmp($element, gmp_init(0)) !== 0;
     }
 
     /**
@@ -346,7 +355,7 @@ class EcAdapter implements EcAdapterInterface
     public function publicKeyFromBuffer(BufferInterface $publicKey)
     {
         $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
-        $xCoord = $publicKey->slice(1, 32)->getInt();
+        $xCoord = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
 
         return new PublicKey(
             $this,
@@ -356,19 +365,19 @@ class EcAdapter implements EcAdapterInterface
                     $xCoord,
                     $compressed
                     ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
-                    : $publicKey->slice(33, 32)->getInt()
+                    : gmp_init($publicKey->slice(33, 32)->getInt(), 10)
                 ),
             $compressed
         );
     }
 
     /**
-     * @param int|string $xCoord
+     * @param \GMP $xCoord
      * @param string $prefix
      * @return int|string
      * @throws \Exception
      */
-    public function recoverYfromX($xCoord, $prefix)
+    public function recoverYfromX(\GMP $xCoord, $prefix)
     {
         if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
             throw new \RuntimeException('Incorrect byte for a public key');
@@ -381,9 +390,9 @@ class EcAdapter implements EcAdapterInterface
         // Calculate first root
         $root0 = $math->getNumberTheory()->squareRootModP(
             $math->add(
-                $math->powMod(
+                $math->powmod(
                     $xCoord,
-                    3,
+                    gmp_init(3, 10),
                     $prime
                 ),
                 $curve->getB()

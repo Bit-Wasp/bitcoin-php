@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -17,7 +18,7 @@ class CompactSignatureTest extends AbstractTestCase
      */
     public function testFromParserFailure(EcAdapterInterface $ecAdapter)
     {
-        $serializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface');
+        $serializer = EcSerializer::getSerializer($ecAdapter, CompactSignatureSerializerInterface::class);
         /** @var CompactSignatureSerializerInterface $serializer */
         $serializer->parse('');
     }
@@ -30,15 +31,15 @@ class CompactSignatureTest extends AbstractTestCase
     {
         $r = str_pad('', 64, '4');
         $s = str_pad('', 64, '5');
-        $serializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface');
+        $serializer = EcSerializer::getSerializer($ecAdapter, CompactSignatureSerializerInterface::class);
         /** @var CompactSignatureSerializerInterface $serializer */
 
         $math = $ecAdapter->getMath();
         for ($c = 1; $c < 5; $c++) {
-            $t = $math->add($c, 27);
+            $t = $c + 27;
             $test = Buffer::hex($math->decHex($t) . $r . $s);
             $parsed = $serializer->parse($test);
-            $this->assertInstanceOf('BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface', $parsed);
+            $this->assertInstanceOf(CompactSignatureInterface::class, $parsed);
         }
     }
 

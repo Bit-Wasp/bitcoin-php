@@ -14,127 +14,127 @@ class CompactIntegerTest extends AbstractTestCase
         return [
             [
                 $math,
-                '0',
-                '0',
+                gmp_init('0'),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x00123456,
-                '0',
+                gmp_init(0x00123456),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x01003456,
-                '0',
+                gmp_init(0x01003456),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x03000000,
-                '0',
+                gmp_init(0x03000000),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x04000000,
-                '0',
+                gmp_init(0x04000000),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x0923456,
-                '0',
+                gmp_init(0x0923456),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x01803456,
-                '0',
+                gmp_init(0x01803456),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x02800056,
-                '0',
+                gmp_init(0x02800056),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                0x03800000,
-                '0',
+                gmp_init(0x03800000),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x04800000'),
-                '0',
+                gmp_init(0x04800000),
+                gmp_init(0),
                 false,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x01123456'),
-                $math->hexDec('0x01120000'),
+                gmp_init(0x01123456),
+                gmp_init(0x01120000),
                 false,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x01fedcba'),
-                $math->hexDec('01fe0000'),
+                gmp_init(0x01fedcba),
+                gmp_init(0x01fe0000),
                 true,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x02123456'),
-                $math->hexDec('0x02123400'),
+                gmp_init(0x02123456),
+                gmp_init(0x02123400),
                 false,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x03123456'),
-                $math->hexDec('0x03123456'),
+                gmp_init(0x03123456),
+                gmp_init(0x03123456),
                 false,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x04123456'),
-                $math->hexDec('0x04123456'),
+                gmp_init(0x04123456),
+                gmp_init(0x04123456),
                 false,
                 false
             ],
             [
                 $math,
-                $math->hexDec('04923456'),
-                $math->hexDec('04923456'),
+                gmp_init(0x04923456),
+                gmp_init(0x04923456),
                 true,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x05009234'),
-                $math->hexDec('0x05009234'),
+                gmp_init(0x05009234),
+                gmp_init(0x05009234),
                 false,
                 false
             ],
             [
                 $math,
-                $math->hexDec('0x20123456'),
-                $math->hexDec('0x20123456'),
+                gmp_init(0x20123456),
+                gmp_init(0x20123456),
                 false,
                 false
             ]
@@ -143,19 +143,19 @@ class CompactIntegerTest extends AbstractTestCase
 
     /**
      * @param Math $math
-     * @param int|string $int
-     * @param int|string $eInt
+     * @param \GMP $int
+     * @param \GMP $eInt
      * @param bool $eNegative
      * @param bool $eOverflow
      * @dataProvider getTestVectors
      */
-    public function testCases(Math $math, $int, $eInt, $eNegative, $eOverflow)
+    public function testCases(Math $math, \GMP $int, \GMP $eInt, $eNegative, $eOverflow)
     {
         $negative = false;
         $overflow = false;
-        $integer = $math->writeCompact($int, $negative, $overflow);
+        $integer = $math->writeCompact(gmp_strval($int, 10), $negative, $overflow);
         $compact = $math->parseCompact($integer, $eNegative);
-        $this->assertEquals($eInt, $compact);
+        $this->assertTrue(gmp_cmp($eInt, $compact) === 0);
         $this->assertEquals($eNegative, $negative);
         $this->assertEquals($eOverflow, $overflow);
     }
@@ -166,7 +166,7 @@ class CompactIntegerTest extends AbstractTestCase
     public function testFNegative()
     {
         $math = new Math();
-        $math->parseCompact(1, 1);
+        $math->parseCompact(gmp_init(1), 'wrong type');
     }
 
     public function testOverflow()

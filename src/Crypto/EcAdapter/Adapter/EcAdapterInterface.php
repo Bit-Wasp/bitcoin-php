@@ -29,11 +29,11 @@ interface EcAdapterInterface
     public function validatePrivateKey(BufferInterface $buffer);
 
     /**
-     * @param int|string $element
+     * @param \GMP $element
      * @param bool|false $halfOrder
      * @return bool
      */
-    public function validateSignatureElement($element, $halfOrder = false);
+    public function validateSignatureElement(\GMP $element, $halfOrder = false);
 
     /**
      * @param int $scalar

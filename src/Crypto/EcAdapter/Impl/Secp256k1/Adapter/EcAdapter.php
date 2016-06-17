@@ -75,11 +75,11 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param int|string $element
+     * @param \GMP $element
      * @param bool $half
      * @return bool
      */
-    public function validateSignatureElement($element, $half = false)
+    public function validateSignatureElement(\GMP $element, $half = false)
     {
         $math = $this->getMath();
         $against = $this->getGenerator()->getOrder();
@@ -87,7 +87,7 @@ class EcAdapter implements EcAdapterInterface
             $against = $math->rightShift($against, 1);
         }
 
-        return $math->cmp($element, $against) < 0 && $math->cmp($element, 0) !== 0;
+        return $math->cmp($element, $against) < 0 && $math->cmp($element, gmp_init(0)) !== 0;
     }
 
     /**

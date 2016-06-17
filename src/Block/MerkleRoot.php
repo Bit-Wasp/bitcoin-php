@@ -54,7 +54,6 @@ class MerkleRoot
         };
 
         $txCount = count($this->transactions);
-
         if ($txCount === 0) {
             // TODO: Probably necessary. Should always have a coinbase at least.
             throw new MerkleTreeEmpty('Cannot compute Merkle root of an empty tree');
@@ -74,7 +73,7 @@ class MerkleRoot
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)
-            if (!$this->math->isEven($txCount)) {
+            if (!($txCount % 2 === 0)) {
                 $tree->set($txCount, $last);
             }
 

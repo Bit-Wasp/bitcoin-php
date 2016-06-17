@@ -97,7 +97,7 @@ class Parser implements \Iterator
      */
     private function doNext($ptr)
     {
-        if ($this->math->cmp($this->position, $this->end) >= 0) {
+        if ($this->position >= $this->end) {
             throw new \RuntimeException('Position exceeds end of script!');
         }
 

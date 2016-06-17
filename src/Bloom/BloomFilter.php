@@ -6,11 +6,9 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class BloomFilter extends Serializable
@@ -247,10 +245,10 @@ class BloomFilter extends Serializable
      */
     public function hash($nHashNum, BufferInterface $data)
     {
-        return $this->math->mod(
-            Hash::murmur3($data, ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff)->getInt(),
-            count($this->vFilter) * 8
-        );
+        $hash = Hash::murmur3($data, ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff)->getInt();
+        $hash = gmp_init($hash, 10);
+        $hash = $this->math->mod($hash, gmp_init(count($this->vFilter) * 8));
+        return gmp_strval($hash, 10);
     }
 
     /**

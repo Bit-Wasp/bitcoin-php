@@ -15,12 +15,12 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     private $ecAdapter;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $r;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $s;
 
@@ -36,9 +36,9 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
 
     /**
      * @param EcAdapter $adapter
-     * @param int|string $r
-     * @param int|string $s
-     * @param int|string $recid
+     * @param int $r
+     * @param int $s
+     * @param int $recid
      * @param bool $compressed
      */
     public function __construct(EcAdapter $adapter, $r, $s, $recid, $compressed)
@@ -55,7 +55,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getR()
     {
@@ -63,7 +63,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getS()
     {
