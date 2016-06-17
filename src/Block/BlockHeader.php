@@ -33,7 +33,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $timestamp;
 
     /**
-     * @var BufferInterface
+     * @var int
      */
     private $bits;
 
@@ -47,10 +47,10 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      * @param BufferInterface $prevBlock
      * @param BufferInterface $merkleRoot
      * @param int $timestamp
-     * @param BufferInterface $bits
+     * @param int $bits
      * @param int $nonce
      */
-    public function __construct($version, BufferInterface $prevBlock, BufferInterface $merkleRoot, $timestamp, BufferInterface $bits, $nonce)
+    public function __construct($version, BufferInterface $prevBlock, BufferInterface $merkleRoot, $timestamp, $bits, $nonce)
     {
         if ($prevBlock->getSize() !== 32) {
             throw new \InvalidArgumentException('BlockHeader prevBlock must be a 32-byte Buffer');

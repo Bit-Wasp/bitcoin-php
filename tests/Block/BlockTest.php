@@ -21,7 +21,7 @@ class BlockTest extends AbstractTestCase
             Buffer::hex('00000000000000000de6926c80141b69e9a42025ac64b1513e138b8c69ca8df5', 32),
             Buffer::hex('5058c1ce878af3efe8cc78493e7362d11d7fd4e4414f70669a86287556c3cbcd', 32),
             1431097669,
-            Buffer::hex('181713dd'),
+            0x181713dd,
             1582016577
         );
     }
@@ -56,7 +56,7 @@ class BlockTest extends AbstractTestCase
             Buffer::hex('00000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 32),
             Buffer::hex('12345678aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 32),
             1,
-            new Buffer(),
+            0,
             1
         ), $txCollection);
         $this->assertSame($txCollection, $block->getTransactions());
@@ -68,7 +68,7 @@ class BlockTest extends AbstractTestCase
         $tx = TransactionFactory::fromHex($hex);
 
         $txCollection = new TransactionCollection(array($tx));
-        $block = new Block(new Math(), new BlockHeader(1, Buffer::hex('00000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), Buffer::hex('12345678aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1, new Buffer(), 1), $txCollection);
+        $block = new Block(new Math(), new BlockHeader(1, Buffer::hex('00000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), Buffer::hex('12345678aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1, 1, 1), $txCollection);
 
         $this->assertEquals($tx->getTxId(), $block->getMerkleRoot());
         $this->assertEquals($tx->getTxId(), $block['merkleRoot']);

@@ -111,7 +111,7 @@ class ProofOfWork
      */
     public function checkHeader(BlockHeaderInterface $header)
     {
-        return $this->check($header->getHash(), $header->getBits()->getInt());
+        return $this->check($header->getHash(), $header->getBits());
     }
 
     /**

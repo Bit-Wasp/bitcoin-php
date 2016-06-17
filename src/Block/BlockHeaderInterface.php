@@ -7,8 +7,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
 {
-    const CURRENT_VERSION = 2;
-
     /**
      * Return the version of this block.
      *
@@ -40,7 +38,7 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     /**
      * Return the buffer containing the short representation of the difficulty
      *
-     * @return BufferInterface
+     * @return int
      */
     public function getBits();
 

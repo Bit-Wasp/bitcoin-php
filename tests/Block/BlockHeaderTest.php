@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Block\BlockHeaderFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Block\BlockHeader;
-use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 
 class BlockHeaderTest extends AbstractTestCase
 {
@@ -23,7 +22,7 @@ class BlockHeaderTest extends AbstractTestCase
         $prevBlock = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141', 32);
         $merkleRoot = Buffer::hex('4242424241414141414141414141414141414141414141414141414141414141', 32);
         $time ='191230123';
-        $bits = Buffer::hex('1d00ffff');
+        $bits = 0x1d00ffff;
         $nonce = '666';
 
         $header = new BlockHeader(
@@ -48,20 +47,6 @@ class BlockHeaderTest extends AbstractTestCase
 
     }
 
-    public function testGetVersionDefault()
-    {
-        $header = new BlockHeader(
-            BlockHeaderInterface::CURRENT_VERSION,
-            Buffer::hex('00000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 32),
-            Buffer::hex('12340000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 32),
-            1,
-            new Buffer(),
-            1
-        );
-
-        $this->assertEquals(BlockHeaderInterface::CURRENT_VERSION, $header->getVersion());
-    }
-
     public function testFromParser()
     {
         $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
@@ -75,10 +60,10 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertInstanceOf($this->bufferType, $result->getMerkleRoot());
         $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->getHex());
 
-        $this->assertInstanceOf($this->bufferType, $result->getBits());
-        $this->assertSame('1d00ffff', $result->getBits()->getHex());
+        $this->assertInternalType('int', $result->getBits());
+        $this->assertEquals(0x1d00ffff, $result->getBits());
 
-        $this->assertSame('1231006505', $result->getTimestamp());
+        $this->assertEquals('1231006505', $result->getTimestamp());
 
         $this->assertSame('2083236893', $result->getNonce());
     }
