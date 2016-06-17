@@ -311,13 +311,13 @@ class EcAdapter implements EcAdapterInterface
     {
         $prefix = $publicKey->slice(0, 1)->getBinary();
         $size = $publicKey->getSize();
-        if ($prefix == PublicKeyInterface::KEY_UNCOMPRESSED) {
-            if ($size !== PublicKeyInterface::LENGTH_UNCOMPRESSED) {
+        if ($prefix == PublicKey::KEY_UNCOMPRESSED) {
+            if ($size !== PublicKey::LENGTH_UNCOMPRESSED) {
                 throw new \Exception('Invalid length for uncompressed key');
             }
             $compressed = false;
-        } else if ($prefix === PublicKeyInterface::KEY_COMPRESSED_EVEN || $prefix === PublicKeyInterface::KEY_COMPRESSED_ODD) {
-            if ($size !== PublicKeyInterface::LENGTH_COMPRESSED) {
+        } else if ($prefix === PublicKey::KEY_COMPRESSED_EVEN || $prefix === PublicKey::KEY_COMPRESSED_ODD) {
+            if ($size !== PublicKey::LENGTH_COMPRESSED) {
                 throw new \Exception('Invalid length for compressed key');
             }
             $compressed = true;
@@ -328,7 +328,7 @@ class EcAdapter implements EcAdapterInterface
         $x = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
         $curve = $this->generator->getCurve();
         $y = $compressed
-            ? $curve->recoverYfromX($prefix === "\x03", $x)
+            ? $curve->recoverYfromX($prefix === PublicKey::KEY_COMPRESSED_ODD, $x)
             : gmp_init($publicKey->slice(33, 32)->getInt(), 10);
 
         return new PublicKey(

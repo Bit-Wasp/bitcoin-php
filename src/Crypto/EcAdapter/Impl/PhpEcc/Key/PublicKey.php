@@ -107,12 +107,12 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     public static function isCompressedOrUncompressed(BufferInterface $publicKey)
     {
         $vchPubKey = $publicKey->getBinary();
-        if ($publicKey->getSize() < 33) {
+        if ($publicKey->getSize() < self::LENGTH_COMPRESSED) {
             return false;
         }
 
         if ($vchPubKey[0] === self::KEY_UNCOMPRESSED) {
-            if ($publicKey->getSize() !== 65) {
+            if ($publicKey->getSize() !== self::LENGTH_UNCOMPRESSED) {
                 // Invalid length for uncompressed key
                 return false;
             }
@@ -120,7 +120,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
             self::KEY_COMPRESSED_EVEN,
             self::KEY_COMPRESSED_ODD
         ])) {
-            if ($publicKey->getSize() !== 33) {
+            if ($publicKey->getSize() !== self::LENGTH_COMPRESSED) {
                 return false;
             }
         } else {
