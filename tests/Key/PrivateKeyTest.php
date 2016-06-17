@@ -168,7 +168,7 @@ class PrivateKeyTest extends AbstractTestCase
 
         foreach ($regular as $wif => $hex) {
             $private = PrivateKeyFactory::fromWif($wif, $ecAdapter);
-            $this->assertTrue($math->cmp(gmp_init($hex, 16), gmp_init($private->getSecretMultiplier(), 10)) == 0);
+            $this->assertTrue($math->cmp(gmp_init($hex, 16), $private->getSecretMultiplier()) == 0);
             $this->assertFalse($private->isCompressed());
         }
 
@@ -180,7 +180,7 @@ class PrivateKeyTest extends AbstractTestCase
 
         foreach ($compressed as $wif => $hex) {
             $private = PrivateKeyFactory::fromWif($wif, $ecAdapter);
-            $this->assertTrue($math->cmp(gmp_init($hex, 16), gmp_init($private->getSecretMultiplier(), 10)) == 0);
+            $this->assertTrue($math->cmp(gmp_init($hex, 16), $private->getSecretMultiplier()) == 0);
             $this->assertTrue($private->isCompressed());
         }
     }

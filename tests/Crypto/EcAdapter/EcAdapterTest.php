@@ -142,12 +142,11 @@ class EcAdapterTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
-     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
     public function testPrivateKeySign(EcAdapterInterface $ecAdapter)
     {
         $random = new Random();
-        $pk = $ecAdapter->getPrivateKey('4141414141414141414141414141414141414141414141414141414141414141', false);
+        $pk = $ecAdapter->getPrivateKey(gmp_init('4141414141414141414141414141414141414141414141414141414141414141'), false);
 
         $hash = $random->bytes(32);
         $sig = $ecAdapter->sign($hash, $pk, new Random());

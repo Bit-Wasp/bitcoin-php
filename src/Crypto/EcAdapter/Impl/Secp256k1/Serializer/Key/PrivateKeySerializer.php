@@ -74,7 +74,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
         $this->haveNextCompressed = false;
 
         return $this->ecAdapter->getPrivateKey(
-            $parser->readBytes(32)->getInt(),
+            gmp_init($parser->readBytes(32)->getHex(), 16),
             $compressed
         );
     }

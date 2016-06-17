@@ -17,8 +17,7 @@ class MultisigHDTest extends AbstractTestCase
      */
     public function testAlwaysProvidesKeys()
     {
-        $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-        $sequences = new HierarchicalKeySequence($ec->getMath());
+        $sequences = new HierarchicalKeySequence();
         new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', [], $sequences, true);
     }
 
@@ -27,9 +26,8 @@ class MultisigHDTest extends AbstractTestCase
         $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
         $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
 
-        $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
+        $sequences = new HierarchicalKeySequence();
 
-        $sequences = new HierarchicalKeySequence($ec->getMath());
         $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
 
         $this->assertEquals('m', $hd->getPath(), 'confirm path set via constructor');
@@ -41,8 +39,7 @@ class MultisigHDTest extends AbstractTestCase
         $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
         $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
 
-        $ec = $this->safeEcAdapter();
-        $sequences = new HierarchicalKeySequence($ec->getMath());
+        $sequences = new HierarchicalKeySequence();
         $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
         
         $this->assertNotEquals($keys, $hd->getKeys(), 'these cases should not match input since they will be sorted');
@@ -53,8 +50,8 @@ class MultisigHDTest extends AbstractTestCase
         $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
         $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
 
-        $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-        $sequences = new HierarchicalKeySequence($ec->getMath());
+        $sequences = new HierarchicalKeySequence();
+
         $hd = new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', $keys, $sequences, false);
 
         $this->assertEquals($keys, $hd->getKeys(), 'keys should match input when not sorting');
@@ -64,8 +61,7 @@ class MultisigHDTest extends AbstractTestCase
     {
         $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
         $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
-        $ec = $this->safeEcAdapter();
-        $sequences = new HierarchicalKeySequence($ec->getMath());
+        $sequences = new HierarchicalKeySequence();
         $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
         $script = $hd->getRedeemScript();
 
@@ -77,8 +73,6 @@ class MultisigHDTest extends AbstractTestCase
 
     public function testDeriveChild()
     {
-        $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-
         $hd = new MultisigHD(
             2,
             'm',
@@ -86,7 +80,7 @@ class MultisigHDTest extends AbstractTestCase
                 HierarchicalKeyFactory::fromEntropy(Buffer::hex('01')),
                 HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'))
             ],
-            new HierarchicalKeySequence($ec->getMath()),
+            new HierarchicalKeySequence(),
             true
         );
 
@@ -104,7 +98,6 @@ class MultisigHDTest extends AbstractTestCase
 
     public function testDerivePath()
     {
-        $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
         $hd = new MultisigHD(
             2,
             'm',
@@ -112,7 +105,7 @@ class MultisigHDTest extends AbstractTestCase
                 HierarchicalKeyFactory::fromEntropy(Buffer::hex('01')),
                 HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'))
             ],
-            new HierarchicalKeySequence($ec->getMath()),
+            new HierarchicalKeySequence(),
             true
         );
 

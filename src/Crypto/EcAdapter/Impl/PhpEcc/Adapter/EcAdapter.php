@@ -57,11 +57,11 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param int|string $scalar
+     * @param \GMP $scalar
      * @param bool|false $compressed
      * @return PrivateKey
      */
-    public function getPrivateKey($scalar, $compressed = false)
+    public function getPrivateKey(\GMP $scalar, $compressed = false)
     {
         return new PrivateKey($this, $scalar, $compressed);
     }
@@ -160,7 +160,7 @@ class EcAdapter implements EcAdapterInterface
                     $math->add(
                         gmp_init($messageHash->getInt(), 10),
                         $math->mul(
-                            gmp_init($privateKey->getSecretMultiplier(), 10),
+                            $privateKey->getSecretMultiplier(),
                             $r
                         )
                     ),

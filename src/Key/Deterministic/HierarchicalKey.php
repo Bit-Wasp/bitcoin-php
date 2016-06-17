@@ -8,8 +8,8 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
-use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
@@ -50,9 +50,9 @@ class HierarchicalKey
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param integer|string $depth
-     * @param integer|string $parentFingerprint
-     * @param integer|string $sequence
+     * @param int $depth
+     * @param int $parentFingerprint
+     * @param int $sequence
      * @param integer|string $chainCode
      * @param KeyInterface $key
      * @throws \Exception
@@ -110,7 +110,7 @@ class HierarchicalKey
 
     /**
      * Return the fingerprint to be used for child keys.
-     * @return string
+     * @return int
      */
     public function getChildFingerprint()
     {
@@ -184,7 +184,7 @@ class HierarchicalKey
     public function isHardened()
     {
         // (sequence >> 31) == 1 ?
-        return $this->ecAdapter->getMath()->getBinaryMath()->isNegative(gmp_init($this->sequence, 10), 32);
+        return ($this->sequence >> 31) === 1;
     }
 
     /**
@@ -216,7 +216,7 @@ class HierarchicalKey
     /**
      * Derive a child key
      *
-     * @param $sequence
+     * @param int $sequence
      * @return HierarchicalKey
      * @throws \Exception
      */
@@ -239,7 +239,7 @@ class HierarchicalKey
             $this->getChildFingerprint(),
             $sequence,
             $chain->getInt(),
-            $key->tweakAdd($offset->getInt())
+            $key->tweakAdd(gmp_init($offset->getInt(), 10))
         );
     }
 
@@ -270,7 +270,7 @@ class HierarchicalKey
      */
     public function derivePath($path)
     {
-        $sequences = new HierarchicalKeySequence($this->ecAdapter->getMath());
+        $sequences = new HierarchicalKeySequence();
         return $this->deriveFromList($sequences->decodePath($path));
     }
 
@@ -283,7 +283,7 @@ class HierarchicalKey
     {
         $network = $network ?: Bitcoin::getNetwork();
 
-        $extendedSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($this->ecAdapter, $network));
+        $extendedSerializer = new Base58ExtendedKeySerializer(new ExtendedKeySerializer($this->ecAdapter, $network));
         $extended = $extendedSerializer->serialize($this);
         return $extended;
     }

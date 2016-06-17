@@ -65,24 +65,23 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @param int|string $tweak
+     * @param \GMP $tweak
      * @return PublicKeyInterface
      */
-    public function tweakAdd($tweak)
+    public function tweakAdd(\GMP $tweak)
     {
-        $adapter = $this->ecAdapter;
-        $offset = $adapter->getGenerator()->mul(gmp_init($tweak, 10));
+        $offset = $this->ecAdapter->getGenerator()->mul($tweak);
         $newPoint = $this->point->add($offset);
-        return $adapter->getPublicKey($newPoint, $this->compressed);
+        return $this->ecAdapter->getPublicKey($newPoint, $this->compressed);
     }
 
     /**
-     * @param int|string $tweak
+     * @param \GMP $tweak
      * @return PublicKeyInterface
      */
-    public function tweakMul($tweak)
+    public function tweakMul(\GMP $tweak)
     {
-        $point = $this->point->mul(gmp_init($tweak, 10));
+        $point = $this->point->mul($tweak);
         return $this->ecAdapter->getPublicKey($point, $this->compressed);
     }
 

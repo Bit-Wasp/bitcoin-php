@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -35,16 +34,16 @@ interface KeyInterface extends SerializableInterface
     public function getAddress();
 
     /**
-     * @param integer $offset
+     * @param \GMP $offset
      * @return KeyInterface
      */
-    public function tweakAdd($offset);
+    public function tweakAdd(\GMP $offset);
 
     /**
-     * @param integer $offset
+     * @param \GMP $offset
      * @return KeyInterface
      */
-    public function tweakMul($offset);
+    public function tweakMul(\GMP $offset);
 
     /**
      * @return \BitWasp\Buffertools\BufferInterface
