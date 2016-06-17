@@ -30,7 +30,7 @@ class BlockHeaderSerializer
             ->bytestringle(32)
             ->bytestringle(32)
             ->uint32le()
-            ->bytestringle(4)
+            ->uint32le()
             ->uint32le()
             ->getTemplate();
     }
@@ -51,7 +51,7 @@ class BlockHeaderSerializer
                 $prevHash,
                 $merkleHash,
                 $time,
-                $nBits,
+                (int) $nBits,
                 $nonce
             );
         } catch (ParserOutOfRange $e) {
