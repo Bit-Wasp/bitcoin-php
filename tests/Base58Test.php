@@ -7,36 +7,34 @@ use BitWasp\Buffertools\Buffer;
 
 class Base58Test extends \PHPUnit_Framework_TestCase
 {
- 
-    /**
-     * Test results of encoding a hex string against test vectors
-     */
-    public function testEncode()
+
+    public function getVectors()
     {
-        $f = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
+        $f = file_get_contents(__DIR__ . '/Data/base58.encodedecode.json');
         $json = json_decode($f);
 
+        $results = [];
         foreach ($json->test as $test) {
-            $hash = Base58::encode(Buffer::hex($test[0]));
-            $this->assertSame($test[1], $hash);
+            $buffer = Buffer::hex($test[0]);
+            $base58 = $test[1];
+            $results[] = [$buffer, $base58];
         }
-    }
 
+        return $results;
+    }
+    
     /**
      * Test that encoding and decoding a string results in the original data
+     * @dataProvider getVectors
      */
-    public function testEncodeDecode()
+    public function testEncodeDecode(Buffer $bs, $base58)
     {
-        $f = file_get_contents(__DIR__.'/Data/base58.encodedecode.json');
-        $json = json_decode($f);
+        $encoded = Base58::encode($bs);
+        $this->assertEquals($base58, $encoded);
 
-        foreach ($json->test as $test) {
-            $bs = Buffer::hex($test[0]);
-            $encoded = Base58::encode($bs);
-            $this->assertSame($test[1], $encoded);
-            $decoded = Base58::decode($encoded)->getHex();
-            $this->assertSame($test[0], $decoded);
-        }
+        $decoded = Base58::decode($encoded)->getHex();
+        $this->assertEquals($bs->getHex(), $decoded);
+
     }
 
     /**
@@ -53,18 +51,13 @@ class Base58Test extends \PHPUnit_Framework_TestCase
 
     /**
      * Check that when data is encoded with a checksum, that we can decode
-     * correctly and
+     * correctly
+     * @dataProvider getVectors
      */
-    public function testEncodeDecodeCheck()
+    public function testEncodeDecodeCheck(Buffer $bs, $base58)
     {
-        $f = file_get_contents(__DIR__ . '/Data/base58.encodedecode.json');
-        $json = json_decode($f);
-
-        foreach ($json->test as $test) {
-            $bs = Buffer::hex($test[0]);
-            $encoded = Base58::encodeCheck($bs);
-            $this->assertEquals($bs, Base58::decodeCheck($encoded));
-        }
+        $encoded = Base58::encodeCheck($bs);
+        $this->assertTrue($bs->equals(Base58::decodeCheck($encoded)));
     }
 
     /**
@@ -73,7 +66,6 @@ class Base58Test extends \PHPUnit_Framework_TestCase
     public function testDecodeCheckChecksumFailure()
     {
         // Base58Check encoded data has a checksum at the end.
-
         // 12D2adLM3UKy4bH891ZFDkWmXmotrMoF <-- valid
         // 12D2adLM3UKy4cH891ZFDkWmXmotrMoF <-- has typo, b replaced with c.
         //              ^
