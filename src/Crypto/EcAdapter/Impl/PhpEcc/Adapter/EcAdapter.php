@@ -230,7 +230,7 @@ class EcAdapter implements EcAdapterInterface
         for ($i = 0; $i < 4; $i++) {
             try {
                 $recover = $this->recover($messageHash, new CompactSignature($this, $r, $s, $i, $publicKey->isCompressed()));
-                if ($recover->getPoint()->equals($Q)) {
+                if ($Q->equals($recover->getPoint())) {
                     return $i;
                 }
             } catch (\Exception $e) {
