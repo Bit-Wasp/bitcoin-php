@@ -122,46 +122,19 @@ class EcAdapter implements EcAdapterInterface
     private function doSign(BufferInterface $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null)
     {
         $rbg = $rbg ?: new Rfc6979($this, $privateKey, $messageHash);
-        $randomK = $rbg->bytes(32);
+        $randomK = gmp_init($rbg->bytes(32)->getHex(), 16);
+        $hash = gmp_init($messageHash->getHex(), 16);
 
-        $math = $this->getMath();
-        $generator = $this->getGenerator();
-        $n = $generator->getOrder();
-
-        $k = $math->mod(gmp_init($randomK->getInt(), 10), $n);
-        $r = $generator->mul($k)->getX();
-
-        if ($math->cmp($r, gmp_init(0)) === 0) {
-            throw new \RuntimeException('Random number r = 0');
-        }
-
-        $s = $math->mod(
-            $math->mul(
-                $math->inverseMod($k, $n),
-                $math->mod(
-                    $math->add(
-                        gmp_init($messageHash->getInt(), 10),
-                        $math->mul(
-                            $privateKey->getSecret(),
-                            $r
-                        )
-                    ),
-                    $n
-                )
-            ),
-            $n
-        );
-
-        if ($math->cmp($s, gmp_init(0)) === 0) {
-            throw new \RuntimeException('Signature s = 0');
-        }
+        $signer = new Signer($this->math);
+        $signature = $signer->sign($privateKey, $hash, $randomK);
+        $s = $signature->getS();
 
         // if s is less than half the curve order, invert s
         if (!$this->validateSignatureElement($s, true)) {
-            $s = $math->sub($n, $s);
+            $s = $this->math->sub($this->generator->getOrder(), $s);
         }
 
-        return new Signature($this, $r, $s);
+        return new Signature($this, $signature->getR(), $s);
     }
 
     /**
