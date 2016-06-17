@@ -40,7 +40,7 @@ class ProofOfWork
     {
         $negative = false;
         $overflow = false;
-        return $this->math->writeCompact($bits->getInt(), $negative, $overflow);
+        return $this->math->decodeCompact($bits->getInt(), $negative, $overflow);
     }
 
     /**
@@ -84,15 +84,15 @@ class ProofOfWork
 
     /**
      * @param BufferInterface $hash
-     * @param int|string $nBits
+     * @param int $nBits
      * @return bool
      */
     public function check(BufferInterface $hash, $nBits)
     {
         $negative = false;
-        $overflow = false
-        ;
-        $target = $this->math->writeCompact($nBits, $negative, $overflow);
+        $overflow = false;
+        
+        $target = $this->math->decodeCompact($nBits, $negative, $overflow);
         if ($negative || $overflow || $this->math->cmp($target, gmp_init(0)) === 0 ||  $this->math->cmp($target, $this->getMaxTarget()) > 0) {
             throw new \RuntimeException('nBits below minimum work');
         }

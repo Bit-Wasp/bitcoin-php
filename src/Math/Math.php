@@ -50,7 +50,7 @@ class Math extends GmpMath
      * @param bool|false $isOverflow
      * @return \GMP
      */
-    public function writeCompact($compact, &$isNegative, &$isOverflow)
+    public function decodeCompact($compact, &$isNegative, &$isOverflow)
     {
         $compact = gmp_init($compact, 10);
         $size = $this->rightShift($compact, 24);
@@ -93,7 +93,7 @@ class Math extends GmpMath
      * @param bool $fNegative
      * @return \GMP
      */
-    public function parseCompact(\GMP $integer, $fNegative)
+    public function encodeCompact(\GMP $integer, $fNegative)
     {
         if (!is_bool($fNegative)) {
             throw new \InvalidArgumentException('CompactInteger::read() - flag must be boolean!');
