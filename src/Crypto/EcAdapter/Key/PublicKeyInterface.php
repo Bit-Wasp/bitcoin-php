@@ -20,17 +20,17 @@ interface PublicKeyInterface extends KeyInterface
     /**
      * When key is uncompressed, this is the prefix.
      */
-    const KEY_UNCOMPRESSED = '04';
+    const KEY_UNCOMPRESSED = "\x04";
 
     /**
      * When y coordinate is even, prepend x coordinate with this hex byte
      */
-    const KEY_COMPRESSED_EVEN = '02';
+    const KEY_COMPRESSED_EVEN = "\x02";
 
     /**
      * When y coordinate is odd, prepend x coordinate this this hex byte
      */
-    const KEY_COMPRESSED_ODD = '03';
+    const KEY_COMPRESSED_ODD = "\x03";
 
     /**
      * @param BufferInterface $msg32

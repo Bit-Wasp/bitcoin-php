@@ -309,58 +309,32 @@ class EcAdapter implements EcAdapterInterface
      */
     public function publicKeyFromBuffer(BufferInterface $publicKey)
     {
-        $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
-        
+        $prefix = $publicKey->slice(0, 1)->getBinary();
+        $size = $publicKey->getSize();
+        if ($prefix == PublicKeyInterface::KEY_UNCOMPRESSED) {
+            if ($size !== PublicKeyInterface::LENGTH_UNCOMPRESSED) {
+                throw new \Exception('Invalid length for uncompressed key');
+            }
+            $compressed = false;
+        } else if ($prefix === PublicKeyInterface::KEY_COMPRESSED_EVEN || $prefix === PublicKeyInterface::KEY_COMPRESSED_ODD) {
+            if ($size !== PublicKeyInterface::LENGTH_COMPRESSED) {
+                throw new \Exception('Invalid length for compressed key');
+            }
+            $compressed = true;
+        } else {
+            throw new \Exception('Unknown public key prefix');
+        }
+
         $x = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
+        $curve = $this->generator->getCurve();
         $y = $compressed
-            ? $this->generator->getCurve()->recoverYfromX($publicKey->slice(0, 1)->getHex() === '03', $x)
+            ? $curve->recoverYfromX($prefix === "\x03", $x)
             : gmp_init($publicKey->slice(33, 32)->getInt(), 10);
 
         return new PublicKey(
             $this,
-            $this->getGenerator()
-                ->getCurve()
-                ->getPoint(
-                    $x,
-                    $y
-                ),
+            $curve->getPoint($x, $y),
             $compressed
         );
-    }
-
-    /**
-     * @param \GMP $xCoord
-     * @param string $prefix
-     * @return int|string
-     * @throws \Exception
-     */
-    public function recoverYfromX(\GMP $xCoord, $prefix)
-    {
-        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
-            throw new \RuntimeException('Incorrect byte for a public key');
-        }
-
-        $math = $this->getMath();
-        $curve = $this->getGenerator()->getCurve();
-        $prime = $curve->getPrime();
-
-        // Calculate first root
-        $root0 = $math->getNumberTheory()->squareRootModP(
-            $math->add(
-                $math->powmod(
-                    $xCoord,
-                    gmp_init(3, 10),
-                    $prime
-                ),
-                $curve->getB()
-            ),
-            $prime
-        );
-
-        // Depending on the byte, we expect the Y value to be even or odd.
-        // We only calculate the second y root if it's needed.
-        return (($prefix == PublicKey::KEY_COMPRESSED_EVEN) == $math->isEven($root0))
-            ? $root0
-            : $math->sub($prime, $root0);
     }
 }

@@ -111,14 +111,15 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
             return false;
         }
 
-        if (ord($vchPubKey[0]) === 0x04) {
+        if ($vchPubKey[0] === self::KEY_UNCOMPRESSED) {
             if ($publicKey->getSize() !== 65) {
                 // Invalid length for uncompressed key
                 return false;
             }
-        } elseif (in_array($vchPubKey[0], array(
-            hex2bin(self::KEY_COMPRESSED_EVEN),
-            hex2bin(self::KEY_COMPRESSED_ODD)))) {
+        } elseif (in_array($vchPubKey[0], [
+            self::KEY_COMPRESSED_EVEN,
+            self::KEY_COMPRESSED_ODD
+        ])) {
             if ($publicKey->getSize() !== 33) {
                 return false;
             }
