@@ -18,21 +18,21 @@ class Base58
     /**
      * Encode a given hex string in base58
      *
-     * @param BufferInterface $binary
+     * @param BufferInterface $buffer
      * @return string
      * @throws \Exception
      */
-    public static function encode(BufferInterface $binary)
+    public static function encode(BufferInterface $buffer)
     {
-        $size = $binary->getSize();
-        if ($binary->getBinary() === '') {
+        $size = $buffer->getSize();
+        if ($buffer->getBinary() === '') {
             return '';
         }
 
         $math = Bitcoin::getMath();
 
-        $orig = $binary->getBinary();
-        $decimal = gmp_init($binary->getInt(), 10);
+        $orig = $buffer->getBinary();
+        $decimal = gmp_init($buffer->getInt(), 10);
 
         $return = '';
         $zero = gmp_init(0);
