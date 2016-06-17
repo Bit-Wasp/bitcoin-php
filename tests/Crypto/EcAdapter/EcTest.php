@@ -33,7 +33,7 @@ class EcTest extends AbstractTestCase
     public function addModN(PrivateKeyInterface $private, \GMP $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
-        $key = $private->getSecretMultiplier();
+        $key = $private->getSecret();
         return $math->mod($math->add($key, $add), $ec->getGenerator()->getOrder());
     }
 
@@ -46,7 +46,7 @@ class EcTest extends AbstractTestCase
     public function mulModN(PrivateKeyInterface $private, \GMP $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
-        $key = $private->getSecretMultiplier();
+        $key = $private->getSecret();
         return $math->mod($math->mul($key, $add), $ec->getGenerator()->getOrder());
     }
 
@@ -78,11 +78,11 @@ class EcTest extends AbstractTestCase
         $expected = $ec->getPrivateKey($k);
         $expectedPub = $expected->getPublicKey();
         // Check addModN works just the same
-        $this->assertEquals('2', gmp_strval($expected->getSecretMultiplier(), 10));
+        $this->assertEquals('2', gmp_strval($expected->getSecret(), 10));
 
         // k + k % n
         $new = $private->tweakAdd($tweak);
-        $this->assertEquals('2', gmp_strval($new->getSecretMultiplier(), 10));
+        $this->assertEquals('2', gmp_strval($new->getSecret(), 10));
 
         // (k + k % n) * G
         // Check our publickey matches that of expectedPub
@@ -107,10 +107,10 @@ class EcTest extends AbstractTestCase
         $expected = $ec->getPrivateKey($this->mulModN($private, $tweak, $ec));
         $expectedPub = $expected->getPublicKey();
         // Check addModN works just the same
-        $this->assertEquals('4', gmp_strval($expected->getSecretMultiplier(), 10));
+        $this->assertEquals('4', gmp_strval($expected->getSecret(), 10));
 
         $new = $private->tweakMul($tweak);
-        $this->assertEquals('4', gmp_strval($new->getSecretMultiplier(), 10));
+        $this->assertEquals('4', gmp_strval($new->getSecret(), 10));
 
         $tweaked = $new->getPublicKey();
         $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());

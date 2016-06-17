@@ -15,7 +15,7 @@ interface PrivateKeyInterface extends KeyInterface
      *
      * @return \GMP
      */
-    public function getSecretMultiplier();
+    public function getSecret();
 
     /**
      * @param BufferInterface $msg32

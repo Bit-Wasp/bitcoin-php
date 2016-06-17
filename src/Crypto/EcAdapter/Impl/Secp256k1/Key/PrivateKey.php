@@ -86,7 +86,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * @return int|string
      */
-    public function getSecretMultiplier()
+    public function getSecret()
     {
         return $this->secret;
     }

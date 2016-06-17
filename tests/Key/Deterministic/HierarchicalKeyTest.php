@@ -18,10 +18,6 @@ use Mdanter\Ecc\EccFactory;
 
 class HierarchicalKeyTest extends AbstractTestCase
 {
-    /**
-     * @var Math
-     */
-    protected $math;
 
     /**
      * @var Network
@@ -44,7 +40,6 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function setUp()
     {
-        $this->math = $this->safeMath();
         $this->network = NetworkFactory::bitcoin();
     }
 
@@ -419,7 +414,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 
         $privMockBuilder = $this->getMockBuilder('BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface')
             ->setMethods([
-                'getSecretMultiplier',
+                'getSecret',
                 'getPublicKey',
                 'sign',
                 'toWif',
@@ -447,12 +442,12 @@ class HierarchicalKeyTest extends AbstractTestCase
             ->method('isPrivate')
             ->willReturn(true);
         $invalidPriv->expects($this->any())
-            ->method('getSecretMultiplier')
+            ->method('getSecret')
             ->willReturn($generator->getOrder());
 
         $mockPriv = $privMockBuilder->getMock();
         $mockPriv->expects($this->any())
-            ->method('getSecretMultiplier')
+            ->method('getSecret')
             ->willReturn($k);
 
         $mockPriv->expects($this->any())
@@ -481,6 +476,6 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertNotEquals($expected, $child->getSequence());
         $this->assertEquals(2, $child->getSequence());
         $this->assertEquals(2, $this->HK_run_count);
-        $this->assertEquals(gmp_strval($math->add(gmp_init($k), gmp_init(1)), 10), gmp_strval($child->getPrivateKey()->getSecretMultiplier(), 10));
+        $this->assertEquals(gmp_strval($math->add(gmp_init($k), gmp_init(1)), 10), gmp_strval($child->getPrivateKey()->getSecret(), 10));
     }
 }

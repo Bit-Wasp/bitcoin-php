@@ -92,7 +92,7 @@ class PrivateKeyFactory
 
         $parsed = $serializer->parse($hex);
         if ($compressed) {
-            $parsed = $ecAdapter->getPrivateKey($parsed->getSecretMultiplier(), $compressed);
+            $parsed = $ecAdapter->getPrivateKey($parsed->getSecret(), $compressed);
         }
 
         return $parsed;

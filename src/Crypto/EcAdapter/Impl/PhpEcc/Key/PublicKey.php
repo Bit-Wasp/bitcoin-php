@@ -7,11 +7,10 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PublicKeySeriali
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Primitives\PointInterface;
 
-class PublicKey extends Key implements PublicKeyInterface
+class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\Key\PublicKeyInterface
 {
     /**
      * @var EcAdapter
@@ -44,6 +43,22 @@ class PublicKey extends Key implements PublicKeyInterface
         $this->ecAdapter = $ecAdapter;
         $this->point = $point;
         $this->compressed = $compressed;
+    }
+
+    /**
+     * @return \Mdanter\Ecc\Primitives\GeneratorPoint
+     */
+    public function getGenerator()
+    {
+        return $this->ecAdapter->getGenerator();
+    }
+
+    /**
+     * @return \Mdanter\Ecc\Primitives\CurveFpInterface
+     */
+    public function getCurve()
+    {
+        return $this->ecAdapter->getGenerator()->getCurve();
     }
 
     /**

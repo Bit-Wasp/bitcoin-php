@@ -15,6 +15,7 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 use BitWasp\Buffertools\BufferInterface;
+use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Primitives\PointInterface;
 
@@ -94,28 +95,9 @@ class EcAdapter implements EcAdapterInterface
      */
     private function doVerify(BufferInterface $messageHash, PublicKey $publicKey, Signature $signature)
     {
-        $n = $this->getGenerator()->getOrder();
-        $math = $this->getMath();
-        $generator = $this->getGenerator();
-
-        $one = gmp_init(1);
-        $r = $signature->getR();
-        $s = $signature->getS();
-        if ($math->cmp($r, $one) < 1 || $math->cmp($r, $math->sub($n, $one)) > 0) {
-            return false;
-        }
-
-        if ($math->cmp($s, $one) < 1 || $math->cmp($s, $math->sub($n, $one)) > 0) {
-            return false;
-        }
-
-        $c = $math->inverseMod($s, $n);
-        $u1 = $math->mod($math->mul(gmp_init($messageHash->getInt(), 10), $c), $n);
-        $u2 = $math->mod($math->mul($r, $c), $n);
-        $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
-        $v = $math->mod($xy->getX(), $n);
-
-        return $math->cmp($v, $r) === 0;
+        $hash = gmp_init($messageHash->getHex(), 16);
+        $signer = new Signer($this->math);
+        return $signer->verify($publicKey, $signature, $hash);
     }
 
     /**
@@ -160,7 +142,7 @@ class EcAdapter implements EcAdapterInterface
                     $math->add(
                         gmp_init($messageHash->getInt(), 10),
                         $math->mul(
-                            $privateKey->getSecretMultiplier(),
+                            $privateKey->getSecret(),
                             $r
                         )
                     ),

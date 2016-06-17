@@ -13,8 +13,9 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use Mdanter\Ecc\Crypto\EcDH\EcDH;
 
-class PrivateKey extends Key implements PrivateKeyInterface
+class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto\Key\PrivateKeyInterface
 {
     /**
      * @var \GMP
@@ -58,11 +59,31 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
+     * @return \Mdanter\Ecc\Primitives\GeneratorPoint
+     */
+    public function getPoint()
+    {
+        return $this->ecAdapter->getGenerator();
+    }
+
+    /**
      * @return \GMP
      */
-    public function getSecretMultiplier()
+    public function getSecret()
     {
         return $this->secretMultiplier;
+    }
+
+    /**
+     * @param \Mdanter\Ecc\Crypto\Key\PublicKeyInterface $recipient
+     * @return EcDH
+     */
+    public function createExchange(\Mdanter\Ecc\Crypto\Key\PublicKeyInterface $recipient)
+    {
+        $ecdh = new EcDH($this->ecAdapter->getMath());
+        $ecdh->setSenderKey($this);
+        $ecdh->setRecipientKey($recipient);
+        return $ecdh;
     }
 
     /**
@@ -92,7 +113,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
                 )
                 ->add(
                     $tweak,
-                    $this->getSecretMultiplier()
+                    $this->getSecret()
                 ),
             $this->compressed
         );
@@ -115,7 +136,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
             )
             ->mul(
                 $tweak,
-                $this->getSecretMultiplier()
+                $this->getSecret()
             ),
             $this->compressed
         );

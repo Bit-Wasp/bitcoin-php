@@ -47,7 +47,7 @@ class PublicKey extends Key implements PublicKeyInterface
         $this->pubkey_t = $secp256k1_pubkey_t;
         $this->compressed = $compressed;
     }
-
+    
     /**
      * @param BufferInterface $msg32
      * @param SignatureInterface $signature

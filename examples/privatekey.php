@@ -18,7 +18,7 @@ echo " - Compressed? " . (($privateKey->isCompressed() ? 'yes' : 'no')) . "\n";
 echo "Private key\n";
 echo " - WIF: " . $privateKey->toWif($network) . "\n";
 echo " - Hex: " . $privateKey->getBuffer() . "\n";
-echo " - Dec: " . $privateKey->getSecretMultiplier() . "\n";
+echo " - Dec: " . $privateKey->getSecret() . "\n";
 
 echo "Public Key\n";
 echo " - Hex: " . $publicKey->getBuffer() . "\n";
