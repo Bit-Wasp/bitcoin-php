@@ -120,6 +120,7 @@ class ProofOfWork
      */
     public function getWork(BufferInterface $bits)
     {
-        return bcdiv(self::POW_2_256, $this->getTarget($bits));
+        $target = gmp_strval($this->getTarget($bits), 10);
+        return bcdiv(self::POW_2_256, $target);
     }
 }

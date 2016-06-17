@@ -91,13 +91,13 @@ class ElectrumMnemonic implements MnemonicInterface
                 $math->add(
                     $math->mul(
                         $n,
-                        $math->mod($index2 - $index1, $n)
+                        $math->mod($math->sub($index2, $index1), $n)
                     ),
                     $math->mul(
                         $n,
                         $math->mul(
                             $n,
-                            $math->mod($index3 - $index2, $n)
+                            $math->mod($math->sub($index3, $index2), $n)
                         )
                     )
                 )

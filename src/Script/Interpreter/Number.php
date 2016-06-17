@@ -124,7 +124,7 @@ class Number extends Serializable
         $abs = $negative ? $this->math->sub($zero, gmp_init($this->number, 10)) : gmp_init($this->number, 10);
 
         while ($this->math->cmp($abs, $zero) > 0) {
-            $result[] = (int)$this->math->bitwiseAnd($abs, gmp_init(0xff));
+            $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, gmp_init(0xff)), 10);
             $abs = $this->math->rightShift($abs, 8);
         }
 
