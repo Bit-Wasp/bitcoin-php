@@ -72,21 +72,18 @@ class ElectrumMnemonic implements MnemonicInterface
     {
         $math = $this->ecAdapter->getMath();
         $wordList = $this->wordList;
-
         $words = explode(' ', $mnemonic);
         $n = gmp_init(count($wordList), 10);
+        $thirdWordCount = count($words) / 3;
         $out = '';
 
-        $thirdWordCount = count($words) / 3;
-
         for ($i = 0; $i < $thirdWordCount; $i++) {
-            list ($word1, $word2, $word3) = array_slice($words, 3 * $i, 3);
+            list ($index1, $index2, $index3) = array_map(function ($v) use ($wordList) {
+                return gmp_init($wordList->getIndex($v), 10);
 
-            $index1 = gmp_init($wordList->getIndex($word1), 10);
-            $index2 = gmp_init($wordList->getIndex($word2), 10);
-            $index3 = gmp_init($wordList->getIndex($word3), 10);
+            }, array_slice($words, 3 * $i, 3));
 
-            $x = $math->add(
+            $xxx = $math->add(
                 $index1,
                 $math->add(
                     $math->mul(
@@ -103,7 +100,8 @@ class ElectrumMnemonic implements MnemonicInterface
                 )
             );
 
-            $out .= str_pad($math->decHex(gmp_strval($x, 10)), 8, '0', STR_PAD_LEFT);
+            $hex = gmp_strval($xxx, 16);
+            $out .= str_pad($hex, 8, '0', STR_PAD_LEFT);
         }
 
         return Buffer::hex($out);
