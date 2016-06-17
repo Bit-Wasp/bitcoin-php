@@ -169,7 +169,8 @@ $transaction = TransactionFactory::build()
    ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
    ->get();
 
-$signed = (new Signer($transaction))
+$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
+$signed = (new Signer($transaction, $ec))
    ->sign(0, $privateKey, $txOut)
    ->get();
 
