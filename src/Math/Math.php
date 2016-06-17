@@ -7,13 +7,6 @@ use Mdanter\Ecc\Util\NumberSize;
 
 class Math extends GmpMath
 {
-    /**
-     * @return BinaryMath
-     */
-    public function getBinaryMath()
-    {
-        return new BinaryMath($this);
-    }
 
     /**
      * @param $integer

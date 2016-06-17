@@ -53,15 +53,14 @@ interface ParamsInterface
     public function powRetargetInterval();
 
     /**
-     * @return string
+     * @return int|string
      */
     public function powTargetLimit();
 
     /**
-     * @return string
+     * @return int
      */
     public function powBitsLimit();
-
 
     /**
      * @return int

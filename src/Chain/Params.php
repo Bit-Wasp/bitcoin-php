@@ -194,7 +194,7 @@ class Params implements ParamsInterface
     }
 
     /**
-     * @return string
+     * @return int|string
      */
     public function powTargetLimit()
     {
@@ -202,7 +202,7 @@ class Params implements ParamsInterface
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function powBitsLimit()
     {
@@ -240,6 +240,7 @@ class Params implements ParamsInterface
     {
         return $this->maxBlockSizeBytes() / 50;
     }
+    
     /**
      * @return int
      */

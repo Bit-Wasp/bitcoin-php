@@ -23,12 +23,12 @@ interface PublicKeyInterface extends KeyInterface
     const KEY_UNCOMPRESSED = "\x04";
 
     /**
-     * When y coordinate is even, prepend x coordinate with this hex byte
+     * When y coordinate is even, prepend x coordinate with this byte
      */
     const KEY_COMPRESSED_EVEN = "\x02";
 
     /**
-     * When y coordinate is odd, prepend x coordinate this this hex byte
+     * When y coordinate is odd, prepend x coordinate with this byte
      */
     const KEY_COMPRESSED_ODD = "\x03";
 

@@ -42,7 +42,7 @@ class TransactionOutputSerializer
     public function fromParser(Parser $parser)
     {
         $parse = $this->getTemplate()->parse($parser);
-        /** @var int|string $value */
+        /** @var int $value */
         $value = $parse[0];
         /** @var BufferInterface $scriptBuf */
         $scriptBuf = $parse[1];
@@ -54,7 +54,7 @@ class TransactionOutputSerializer
     }
 
     /**
-     * @param $string
+     * @param string $string
      * @return TransactionOutput
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
