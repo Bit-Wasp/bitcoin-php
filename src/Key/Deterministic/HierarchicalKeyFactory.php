@@ -8,8 +8,8 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
-use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
 use BitWasp\Buffertools\BufferInterface;
 
 class HierarchicalKeyFactory
@@ -17,11 +17,11 @@ class HierarchicalKeyFactory
     /**
      * @param EcAdapterInterface|null $ecAdapter
      * @param NetworkInterface $network
-     * @return ExtendedKeySerializer
+     * @return Base58ExtendedKeySerializer
      */
     public static function getSerializer(EcAdapterInterface $ecAdapter, $network)
     {
-        $extSerializer = new ExtendedKeySerializer(new HexExtendedKeySerializer($ecAdapter, $network));
+        $extSerializer = new Base58ExtendedKeySerializer(new ExtendedKeySerializer($ecAdapter, $network));
         return $extSerializer;
     }
 

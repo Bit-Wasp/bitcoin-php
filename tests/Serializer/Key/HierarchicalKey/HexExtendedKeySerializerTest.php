@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\HexExtendedKeySerializer;
+use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 
@@ -18,7 +18,7 @@ class HexExtendedKeySerializerTest extends AbstractTestCase
     public function testInvalidKey(EcAdapterInterface $adapter)
     {
         $network = NetworkFactory::bitcoinTestnet();
-        $serializer = new HexExtendedKeySerializer($adapter, $network);
+        $serializer = new ExtendedKeySerializer($adapter, $network);
         $serializer->parse(new Buffer());
     }
 }

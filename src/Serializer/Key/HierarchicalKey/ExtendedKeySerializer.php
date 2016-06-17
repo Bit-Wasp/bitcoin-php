@@ -1,45 +1,120 @@
 <?php
 
+
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
-use BitWasp\Bitcoin\Base58;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Buffertools\TemplateFactory;
 
 class ExtendedKeySerializer
 {
     /**
-     * @var HexExtendedKeySerializer
+     * @var NetworkInterface
      */
-    public $hexSerializer;
+    private $network;
 
     /**
-     * @param HexExtendedKeySerializer $hexSerializer
+     * @var EcAdapterInterface
      */
-    public function __construct(HexExtendedKeySerializer $hexSerializer)
+    private $ecAdapter;
+
+    /**
+     * @param EcAdapterInterface $ecAdapter
+     * @param NetworkInterface $network
+     * @throws \Exception
+     */
+    public function __construct(EcAdapterInterface $ecAdapter, NetworkInterface $network)
     {
-        $this->hexSerializer = $hexSerializer;
+        try {
+            $network->getHDPrivByte();
+            $network->getHDPubByte();
+        } catch (\Exception $e) {
+            throw new \Exception('Network not configured for HD wallets');
+        }
+
+        $this->network = $network;
+        $this->ecAdapter = $ecAdapter;
+    }
+
+    /**
+     * @return \BitWasp\Buffertools\Template
+     */
+    public function getTemplate()
+    {
+        return (new TemplateFactory())
+            ->bytestring(4)
+            ->uint8()
+            ->uint32()
+            ->uint32()
+            ->uint256()
+            ->bytestring(33)
+            ->getTemplate();
     }
 
     /**
      * @param HierarchicalKey $key
-     * @return string
+     * @return BufferInterface
      */
     public function serialize(HierarchicalKey $key)
     {
-        $bytes = $this->hexSerializer->serialize($key);
-        return Base58::encodeCheck($bytes);
+        list ($prefix, $data) = ($key->isPrivate())
+            ? [$this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->getHex()]
+            : [$this->network->getHDPubByte(), $key->getPublicKey()->getHex()];
+
+        return $this->getTemplate()->write([
+            Buffer::hex($prefix, 4),
+            $key->getDepth(),
+            $key->getFingerprint(),
+            $key->getSequence(),
+            $key->getChainCode(),
+            Buffer::hex($data, 33)
+        ]);
     }
 
     /**
-     * @param string $base58
+     * @param Parser $parser
      * @return HierarchicalKey
-     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
-     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws ParserOutOfRange
+     */
+    public function fromParser(Parser $parser)
+    {
+        try {
+            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->getTemplate()->parse($parser);
+            /** @var BufferInterface $keyData */
+            /** @var BufferInterface $bytes */
+            $bytes = $bytes->getHex();
+        } catch (ParserOutOfRange $e) {
+            throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
+        }
+
+        if ($bytes !== $this->network->getHDPubByte() && $bytes !== $this->network->getHDPrivByte()) {
+            throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
+        }
+
+        $key = ($this->network->getHDPrivByte() === $bytes)
+            ? PrivateKeyFactory::fromHex($keyData->slice(1)->getHex(), true, $this->ecAdapter)
+            : PublicKeyFactory::fromHex($keyData->getHex(), $this->ecAdapter);
+
+        return new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
+    }
+
+    /**
+     * @param BufferInterface $buffer
+     * @return \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey
+     * @throws ParserOutOfRange
      * @throws \Exception
      */
-    public function parse($base58)
+    public function parse(BufferInterface $buffer)
     {
-        $payload = Base58::decodeCheck($base58);
-        return $this->hexSerializer->parse($payload);
+        $parser = new Parser($buffer);
+        return $this->fromParser($parser);
     }
 }
