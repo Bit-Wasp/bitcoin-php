@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
@@ -38,15 +39,15 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         /** @var PayToPubKeyHashAddress $address */
         $address = AddressFactory::fromString($address, $network);
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+            EcSerializer::getSerializer($ecAdapter, CompactSignatureSerializerInterface::class)
         );
 
         $signed = $serializer->parse($content);
         $signer = new MessageSigner($ecAdapter);
 
         $this->assertSame($message, $signed->getMessage());
-        $this->assertSame('11884306385941066859834558634967777927278716082145975036347303871472774300855', $signed->getCompactSignature()->getR());
-        $this->assertSame('38787429741286654786942380905403782954160859974631158035207591010286944440307', $signed->getCompactSignature()->getS());
+        $this->assertSame('11884306385941066859834558634967777927278716082145975036347303871472774300855', gmp_strval($signed->getCompactSignature()->getR(), 10));
+        $this->assertSame('38787429741286654786942380905403782954160859974631158035207591010286944440307', gmp_strval($signed->getCompactSignature()->getS(), 10));
         $this->assertEquals(1, $signed->getCompactSignature()->getRecoveryId());
         $this->assertSame(true, $signed->getCompactSignature()->isCompressed());
         $this->assertTrue($signer->verify($signed, $address));

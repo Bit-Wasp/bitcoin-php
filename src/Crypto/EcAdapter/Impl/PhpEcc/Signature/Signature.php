@@ -9,26 +9,26 @@ use BitWasp\Bitcoin\Serializable;
 class Signature extends Serializable implements SignatureInterface
 {
     /**
-     * @var int
+     * @var \GMP
      */
     private $r;
 
     /**
-     * @var int
+     * @var \GMP
      */
     private $s;
 
     /**
      * @var EcAdapter
      */
-    protected $ecAdapter;
+    private $ecAdapter;
 
     /**
      * @param EcAdapter $ecAdapter
-     * @param $r
-     * @param $s
+     * @param \GMP $r
+     * @param \GMP $s
      */
-    public function __construct(EcAdapter $ecAdapter, $r, $s)
+    public function __construct(EcAdapter $ecAdapter, \GMP $r, \GMP $s)
     {
         $this->ecAdapter = $ecAdapter;
         $this->r = $r;

@@ -77,11 +77,11 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param int|string $r
-     * @param int|string $s
+     * @param \GMP $r
+     * @param \GMP $s
      * @return Signature
      */
-    public function getSignature($r, $s)
+    public function getSignature(\GMP $r, \GMP $s)
     {
         return new Signature($this, $r, $s);
     }
@@ -99,8 +99,8 @@ class EcAdapter implements EcAdapterInterface
         $generator = $this->getGenerator();
 
         $one = gmp_init(1);
-        $r = gmp_init($signature->getR());
-        $s = gmp_init($signature->getS());
+        $r = $signature->getR();
+        $s = $signature->getS();
         if ($math->cmp($r, $one) < 1 || $math->cmp($r, $math->sub($n, $one)) > 0) {
             return false;
         }
@@ -179,7 +179,7 @@ class EcAdapter implements EcAdapterInterface
             $s = $math->sub($n, $s);
         }
 
-        return new Signature($this, gmp_strval($r, 10), gmp_strval($s, 10));
+        return new Signature($this, $r, $s);
     }
 
     /**
@@ -209,8 +209,8 @@ class EcAdapter implements EcAdapterInterface
         $zero = gmp_init(0);
         $one = gmp_init(1);
 
-        $r = gmp_init($signature->getR());
-        $s = gmp_init($signature->getS());
+        $r = $signature->getR();
+        $s = $signature->getS();
         $recGMP = gmp_init($signature->getRecoveryId(), 10);
         $isYEven = $math->cmp($math->bitwiseAnd($recGMP, $one), $zero) !== 0;
         $isSecondKey = $math->cmp($math->bitwiseAnd($recGMP, gmp_init(2)), $zero) !== 0;
@@ -262,14 +262,14 @@ class EcAdapter implements EcAdapterInterface
     /**
      * Attempt to calculate the public key recovery param by trial and error
      *
-     * @param int $r
-     * @param int $s
+     * @param \GMP $r
+     * @param \GMP $s
      * @param BufferInterface $messageHash
      * @param PublicKey $publicKey
      * @return int
      * @throws \Exception
      */
-    public function calcPubKeyRecoveryParam($r, $s, BufferInterface $messageHash, PublicKey $publicKey)
+    public function calcPubKeyRecoveryParam(\GMP $r, \GMP $s, BufferInterface $messageHash, PublicKey $publicKey)
     {
         $Q = $publicKey->getPoint();
         for ($i = 0; $i < 4; $i++) {

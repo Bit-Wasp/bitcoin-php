@@ -104,6 +104,6 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         /** @var Buffer $r */
         /** @var Buffer $s */
 
-        return new Signature($this->ecAdapter, $r->getInt(), $s->getInt(), $sig_t);
+        return new Signature($this->ecAdapter, gmp_init($r->getInt(), 10), gmp_init($s->getInt(), 10), $sig_t);
     }
 }

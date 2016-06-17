@@ -61,7 +61,7 @@ class EcTest extends AbstractTestCase
 
         $phpecc = new PhpEcc($math, $g);
         $private = $phpecc->getPrivateKey(1, false);
-        $phpecc->calcPubKeyRecoveryParam(1, 1, Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'), $private->getPublicKey());
+        $phpecc->calcPubKeyRecoveryParam(gmp_init(1), gmp_init(1), Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'), $private->getPublicKey());
     }
 
     /**
