@@ -83,7 +83,7 @@ class ElectrumMnemonic implements MnemonicInterface
 
             }, array_slice($words, 3 * $i, 3));
 
-            $xxx = $math->add(
+            $x = $math->add(
                 $index1,
                 $math->add(
                     $math->mul(
@@ -100,8 +100,7 @@ class ElectrumMnemonic implements MnemonicInterface
                 )
             );
 
-            $hex = gmp_strval($xxx, 16);
-            $out .= str_pad($hex, 8, '0', STR_PAD_LEFT);
+            $out .= str_pad(gmp_strval($x, 16), 8, '0', STR_PAD_LEFT);
         }
 
         return Buffer::hex($out);
