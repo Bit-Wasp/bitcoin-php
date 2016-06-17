@@ -310,17 +310,19 @@ class EcAdapter implements EcAdapterInterface
     public function publicKeyFromBuffer(BufferInterface $publicKey)
     {
         $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
-        $xCoord = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
+        
+        $x = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
+        $y = $compressed
+            ? $this->generator->getCurve()->recoverYfromX($publicKey->slice(0, 1)->getHex() === '03', $x)
+            : gmp_init($publicKey->slice(33, 32)->getInt(), 10);
 
         return new PublicKey(
             $this,
             $this->getGenerator()
                 ->getCurve()
                 ->getPoint(
-                    $xCoord,
-                    $compressed
-                    ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
-                    : gmp_init($publicKey->slice(33, 32)->getInt(), 10)
+                    $x,
+                    $y
                 ),
             $compressed
         );
