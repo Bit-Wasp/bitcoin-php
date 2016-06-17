@@ -132,7 +132,7 @@ class EcAdapterTest extends AbstractTestCase
 
             // R and S should be correct
             $rHex = $math->dechex(gmp_strval($sig->getR(), 10));
-            $sHex = $math->decHex(gmp_strval($sig->getS(),10));
+            $sHex = $math->decHex(gmp_strval($sig->getS(), 10));
             $this->assertSame($test->expectedRSLow, $rHex . $sHex);
 
             $this->assertTrue($ecAdapter->verify($messageHash, $privateKey->getPublicKey(), $sig));

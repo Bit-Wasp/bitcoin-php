@@ -74,7 +74,7 @@ class Math extends GmpMath
         // isOverflow: $word != 0 && (($size > 34) || ($word > 0xff && $size > 33) || ($word > 0xffff && $size  >32))
         $zero = gmp_init(0);
         $isNegative = ($this->cmp($word, $zero) !== 0) && ($this->cmp($this->bitwiseAnd($compact, gmp_init(0x00800000)), $zero) === 1);
-        $isOverflow = $this->cmp($word, $zero ) !== 0 && (
+        $isOverflow = $this->cmp($word, $zero) !== 0 && (
                 ($this->cmp($size, gmp_init(34)) > 0)
                 || ($this->cmp($word, gmp_init(0xff)) > 0 && $this->cmp($size, gmp_init(33)) > 0)
                 || ($this->cmp($word, gmp_init(0xffff)) > 0 && $this->cmp($size, gmp_init(32)) > 0)
