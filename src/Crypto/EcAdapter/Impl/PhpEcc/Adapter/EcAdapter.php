@@ -15,6 +15,7 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 use BitWasp\Buffertools\BufferInterface;
+use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Primitives\PointInterface;
 
@@ -94,28 +95,9 @@ class EcAdapter implements EcAdapterInterface
      */
     private function doVerify(BufferInterface $messageHash, PublicKey $publicKey, Signature $signature)
     {
-        $n = $this->getGenerator()->getOrder();
-        $math = $this->getMath();
-        $generator = $this->getGenerator();
-
-        $one = gmp_init(1);
-        $r = $signature->getR();
-        $s = $signature->getS();
-        if ($math->cmp($r, $one) < 1 || $math->cmp($r, $math->sub($n, $one)) > 0) {
-            return false;
-        }
-
-        if ($math->cmp($s, $one) < 1 || $math->cmp($s, $math->sub($n, $one)) > 0) {
-            return false;
-        }
-
-        $c = $math->inverseMod($s, $n);
-        $u1 = $math->mod($math->mul(gmp_init($messageHash->getInt(), 10), $c), $n);
-        $u2 = $math->mod($math->mul($r, $c), $n);
-        $xy = $generator->mul($u1)->add($publicKey->getPoint()->mul($u2));
-        $v = $math->mod($xy->getX(), $n);
-
-        return $math->cmp($v, $r) === 0;
+        $hash = gmp_init($messageHash->getHex(), 16);
+        $signer = new Signer($this->math);
+        return $signer->verify($publicKey, $signature, $hash);
     }
 
     /**
@@ -140,46 +122,19 @@ class EcAdapter implements EcAdapterInterface
     private function doSign(BufferInterface $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null)
     {
         $rbg = $rbg ?: new Rfc6979($this, $privateKey, $messageHash);
-        $randomK = $rbg->bytes(32);
+        $randomK = gmp_init($rbg->bytes(32)->getHex(), 16);
+        $hash = gmp_init($messageHash->getHex(), 16);
 
-        $math = $this->getMath();
-        $generator = $this->getGenerator();
-        $n = $generator->getOrder();
-
-        $k = $math->mod(gmp_init($randomK->getInt(), 10), $n);
-        $r = $generator->mul($k)->getX();
-
-        if ($math->cmp($r, gmp_init(0)) === 0) {
-            throw new \RuntimeException('Random number r = 0');
-        }
-
-        $s = $math->mod(
-            $math->mul(
-                $math->inverseMod($k, $n),
-                $math->mod(
-                    $math->add(
-                        gmp_init($messageHash->getInt(), 10),
-                        $math->mul(
-                            $privateKey->getSecretMultiplier(),
-                            $r
-                        )
-                    ),
-                    $n
-                )
-            ),
-            $n
-        );
-
-        if ($math->cmp($s, gmp_init(0)) === 0) {
-            throw new \RuntimeException('Signature s = 0');
-        }
+        $signer = new Signer($this->math);
+        $signature = $signer->sign($privateKey, $hash, $randomK);
+        $s = $signature->getS();
 
         // if s is less than half the curve order, invert s
         if (!$this->validateSignatureElement($s, true)) {
-            $s = $math->sub($n, $s);
+            $s = $this->math->sub($this->generator->getOrder(), $s);
         }
 
-        return new Signature($this, $r, $s);
+        return new Signature($this, $signature->getR(), $s);
     }
 
     /**
@@ -275,7 +230,7 @@ class EcAdapter implements EcAdapterInterface
         for ($i = 0; $i < 4; $i++) {
             try {
                 $recover = $this->recover($messageHash, new CompactSignature($this, $r, $s, $i, $publicKey->isCompressed()));
-                if ($recover->getPoint()->equals($Q)) {
+                if ($Q->equals($recover->getPoint())) {
                     return $i;
                 }
             } catch (\Exception $e) {
@@ -354,56 +309,32 @@ class EcAdapter implements EcAdapterInterface
      */
     public function publicKeyFromBuffer(BufferInterface $publicKey)
     {
-        $compressed = $publicKey->getSize() == PublicKey::LENGTH_COMPRESSED;
-        $xCoord = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
+        $prefix = $publicKey->slice(0, 1)->getBinary();
+        $size = $publicKey->getSize();
+        if ($prefix == PublicKey::KEY_UNCOMPRESSED) {
+            if ($size !== PublicKey::LENGTH_UNCOMPRESSED) {
+                throw new \Exception('Invalid length for uncompressed key');
+            }
+            $compressed = false;
+        } else if ($prefix === PublicKey::KEY_COMPRESSED_EVEN || $prefix === PublicKey::KEY_COMPRESSED_ODD) {
+            if ($size !== PublicKey::LENGTH_COMPRESSED) {
+                throw new \Exception('Invalid length for compressed key');
+            }
+            $compressed = true;
+        } else {
+            throw new \Exception('Unknown public key prefix');
+        }
+
+        $x = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
+        $curve = $this->generator->getCurve();
+        $y = $compressed
+            ? $curve->recoverYfromX($prefix === PublicKey::KEY_COMPRESSED_ODD, $x)
+            : gmp_init($publicKey->slice(33, 32)->getInt(), 10);
 
         return new PublicKey(
             $this,
-            $this->getGenerator()
-                ->getCurve()
-                ->getPoint(
-                    $xCoord,
-                    $compressed
-                    ? $this->recoverYfromX($xCoord, $publicKey->slice(0, 1)->getHex())
-                    : gmp_init($publicKey->slice(33, 32)->getInt(), 10)
-                ),
+            $curve->getPoint($x, $y),
             $compressed
         );
-    }
-
-    /**
-     * @param \GMP $xCoord
-     * @param string $prefix
-     * @return int|string
-     * @throws \Exception
-     */
-    public function recoverYfromX(\GMP $xCoord, $prefix)
-    {
-        if (!in_array($prefix, array(PublicKey::KEY_COMPRESSED_ODD, PublicKey::KEY_COMPRESSED_EVEN))) {
-            throw new \RuntimeException('Incorrect byte for a public key');
-        }
-
-        $math = $this->getMath();
-        $curve = $this->getGenerator()->getCurve();
-        $prime = $curve->getPrime();
-
-        // Calculate first root
-        $root0 = $math->getNumberTheory()->squareRootModP(
-            $math->add(
-                $math->powmod(
-                    $xCoord,
-                    gmp_init(3, 10),
-                    $prime
-                ),
-                $curve->getB()
-            ),
-            $prime
-        );
-
-        // Depending on the byte, we expect the Y value to be even or odd.
-        // We only calculate the second y root if it's needed.
-        return (($prefix == PublicKey::KEY_COMPRESSED_EVEN) == $math->isEven($root0))
-            ? $root0
-            : $math->sub($prime, $root0);
     }
 }

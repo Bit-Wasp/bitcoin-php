@@ -12,7 +12,7 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     /**
      * Return the version of this block.
      *
-     * @return int|string
+     * @return int
      */
     public function getVersion();
 
@@ -33,7 +33,7 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     /**
      * Get the timestamp of the block.
      *
-     * @return string
+     * @return int
      */
     public function getTimestamp();
 
@@ -47,7 +47,7 @@ interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
     /**
      * Return the nonce of the block header.
      *
-     * @return int|string
+     * @return int
      */
     public function getNonce();
 

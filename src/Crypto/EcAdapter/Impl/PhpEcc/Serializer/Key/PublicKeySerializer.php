@@ -51,7 +51,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         $compressed = $publicKey->isCompressed();
 
         $parser = new Parser('', $math);
-        $parser->writeBytes(1, $this->getPrefix($compressed, $point));
+        $parser->writeBytes(1, new Buffer($this->getPrefix($compressed, $point)));
 
         $compressed
             ? $parser

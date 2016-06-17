@@ -63,7 +63,7 @@ class TransactionInputSerializer
 
         /**
          * @var BufferInterface $scriptBuf
-         * @var int|string $sequence
+         * @var int $sequence
          */
         list ($scriptBuf, $sequence) = $this->getInputTemplate()->parse($parser);
 

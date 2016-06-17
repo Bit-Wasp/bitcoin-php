@@ -13,7 +13,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     use FunctionAliasArrayAccess;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $version;
 
@@ -28,7 +28,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $merkleRoot;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $timestamp;
 
@@ -38,17 +38,17 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     private $bits;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $nonce;
 
     /**
-     * @param int|string $version
+     * @param int $version
      * @param BufferInterface $prevBlock
      * @param BufferInterface $merkleRoot
-     * @param int|string $timestamp
+     * @param int $timestamp
      * @param BufferInterface $bits
-     * @param int|string $nonce
+     * @param int $nonce
      */
     public function __construct($version, BufferInterface $prevBlock, BufferInterface $merkleRoot, $timestamp, BufferInterface $bits, $nonce)
     {

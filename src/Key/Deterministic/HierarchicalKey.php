@@ -24,22 +24,22 @@ class HierarchicalKey
     private $ecAdapter;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $depth;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $parentFingerprint;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $sequence;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $chainCode;
 
@@ -53,7 +53,7 @@ class HierarchicalKey
      * @param int $depth
      * @param int $parentFingerprint
      * @param int $sequence
-     * @param integer|string $chainCode
+     * @param int|string $chainCode
      * @param KeyInterface $key
      * @throws \Exception
      */
@@ -183,21 +183,19 @@ class HierarchicalKey
      */
     public function isHardened()
     {
-        // (sequence >> 31) == 1 ?
         return ($this->sequence >> 31) === 1;
     }
 
     /**
      * Create a buffer containing data to be hashed hashed to yield the child offset
      *
-     * @param integer|string $sequence
+     * @param int $sequence
      * @return BufferInterface
      * @throws \Exception
      */
     public function getHmacSeed($sequence)
     {
-        $hardened = $this->ecAdapter->getMath()->getBinaryMath()->isNegative(gmp_init($sequence, 10), 32);
-
+        $hardened = ($sequence >> 31) === 1;
         if ($hardened) {
             if ($this->isPrivate() === false) {
                 throw new \Exception("Can't derive a hardened key without the private key");

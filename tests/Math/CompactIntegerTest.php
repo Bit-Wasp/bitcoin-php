@@ -153,8 +153,8 @@ class CompactIntegerTest extends AbstractTestCase
     {
         $negative = false;
         $overflow = false;
-        $integer = $math->writeCompact(gmp_strval($int, 10), $negative, $overflow);
-        $compact = $math->parseCompact($integer, $eNegative);
+        $integer = $math->decodeCompact(gmp_strval($int, 10), $negative, $overflow);
+        $compact = $math->encodeCompact($integer, $eNegative);
         $this->assertTrue(gmp_cmp($eInt, $compact) === 0);
         $this->assertEquals($eNegative, $negative);
         $this->assertEquals($eOverflow, $overflow);
@@ -166,7 +166,7 @@ class CompactIntegerTest extends AbstractTestCase
     public function testFNegative()
     {
         $math = new Math();
-        $math->parseCompact(gmp_init(1), 'wrong type');
+        $math->encodeCompact(gmp_init(1), 'wrong type');
     }
 
     public function testOverflow()
@@ -174,7 +174,7 @@ class CompactIntegerTest extends AbstractTestCase
         $math = new Math();
         $negative = false;
         $overflow = false;
-        $math->writeCompact($math->hexDec('0xff123456'), $negative, $overflow);
+        $math->decodeCompact($math->hexDec('0xff123456'), $negative, $overflow);
         $this->assertEquals(false, $negative);
         $this->assertEquals(true, $overflow);
     }

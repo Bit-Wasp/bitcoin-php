@@ -7,11 +7,10 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PublicKeySeriali
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Primitives\PointInterface;
 
-class PublicKey extends Key implements PublicKeyInterface
+class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\Key\PublicKeyInterface
 {
     /**
      * @var EcAdapter
@@ -44,6 +43,22 @@ class PublicKey extends Key implements PublicKeyInterface
         $this->ecAdapter = $ecAdapter;
         $this->point = $point;
         $this->compressed = $compressed;
+    }
+
+    /**
+     * @return \Mdanter\Ecc\Primitives\GeneratorPoint
+     */
+    public function getGenerator()
+    {
+        return $this->ecAdapter->getGenerator();
+    }
+
+    /**
+     * @return \Mdanter\Ecc\Primitives\CurveFpInterface
+     */
+    public function getCurve()
+    {
+        return $this->ecAdapter->getGenerator()->getCurve();
     }
 
     /**
@@ -92,19 +107,20 @@ class PublicKey extends Key implements PublicKeyInterface
     public static function isCompressedOrUncompressed(BufferInterface $publicKey)
     {
         $vchPubKey = $publicKey->getBinary();
-        if ($publicKey->getSize() < 33) {
+        if ($publicKey->getSize() < self::LENGTH_COMPRESSED) {
             return false;
         }
 
-        if (ord($vchPubKey[0]) === 0x04) {
-            if ($publicKey->getSize() !== 65) {
+        if ($vchPubKey[0] === self::KEY_UNCOMPRESSED) {
+            if ($publicKey->getSize() !== self::LENGTH_UNCOMPRESSED) {
                 // Invalid length for uncompressed key
                 return false;
             }
-        } elseif (in_array($vchPubKey[0], array(
-            hex2bin(self::KEY_COMPRESSED_EVEN),
-            hex2bin(self::KEY_COMPRESSED_ODD)))) {
-            if ($publicKey->getSize() !== 33) {
+        } elseif (in_array($vchPubKey[0], [
+            self::KEY_COMPRESSED_EVEN,
+            self::KEY_COMPRESSED_ODD
+        ])) {
+            if ($publicKey->getSize() !== self::LENGTH_COMPRESSED) {
                 return false;
             }
         } else {
