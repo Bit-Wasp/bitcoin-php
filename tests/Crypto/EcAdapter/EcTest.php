@@ -26,26 +26,28 @@ class EcTest extends AbstractTestCase
 
     /**
      * @param PrivateKeyInterface $private
-     * @param $add
+     * @param \GMP $add
      * @param EcAdapterInterface $ec
      * @return int|string
      */
-    public function addModN(PrivateKeyInterface $private, $add, EcAdapterInterface $ec)
+    public function addModN(PrivateKeyInterface $private, \GMP $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
-        return $math->mod($math->add($private->getSecretMultiplier(), $add), $ec->getGenerator()->getOrder());
+        $key = gmp_init($private->getSecretMultiplier(), 10);
+        return $math->mod($math->add($key, $add), $ec->getGenerator()->getOrder());
     }
 
     /**
      * @param PrivateKeyInterface $private
-     * @param $add
+     * @param \GMP $add
      * @param EcAdapterInterface $ec
      * @return string
      */
-    public function mulModN(PrivateKeyInterface $private, $add, EcAdapterInterface $ec)
+    public function mulModN(PrivateKeyInterface $private, \GMP $add, EcAdapterInterface $ec)
     {
         $math = $ec->getMath();
-        return $math->mod($math->mul($private->getSecretMultiplier(), $add), $ec->getGenerator()->getOrder());
+        $key = gmp_init($private->getSecretMultiplier(), 10);
+        return $math->mod($math->mul($key, $add), $ec->getGenerator()->getOrder());
     }
 
     /**
@@ -70,15 +72,16 @@ class EcTest extends AbstractTestCase
     {
         $private = $this->getFirstPrivateKey($ec);
         $public = $private->getPublicKey();
-        $tweak = 1;
+        $tweak = gmp_init(1);
 
-        $expected = $ec->getPrivateKey($this->addModN($private, $tweak, $ec));
+        $k = gmp_strval($this->addModN($private, $tweak, $ec), 10);
+        $expected = $ec->getPrivateKey($k);
         $expectedPub = $expected->getPublicKey();
         // Check addModN works just the same
         $this->assertEquals('2', $expected->getSecretMultiplier());
 
         // k + k % n
-        $new = $private->tweakAdd($tweak);
+        $new = $private->tweakAdd(gmp_strval($tweak, 10));
         $this->assertEquals('2', $new->getSecretMultiplier());
 
         // (k + k % n) * G
@@ -87,7 +90,7 @@ class EcTest extends AbstractTestCase
         $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
 
         // (k+k%n)*G  === k*G +(tweak*G) (since tweak == k)
-        $tweaked = $public->tweakAdd($tweak);
+        $tweaked = $public->tweakAdd(gmp_strval($tweak, 10));
         $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
     }
 
@@ -99,20 +102,20 @@ class EcTest extends AbstractTestCase
     {
         $private = $this->getFirstPrivateKey($ec);
         $public = $private->getPublicKey();
-        $tweak = 4;
+        $tweak = gmp_init(4);
 
-        $expected = $ec->getPrivateKey($this->mulModN($private, $tweak, $ec));
+        $expected = $ec->getPrivateKey(gmp_strval($this->mulModN($private, $tweak, $ec), 10));
         $expectedPub = $expected->getPublicKey();
         // Check addModN works just the same
         $this->assertEquals('4', $expected->getSecretMultiplier());
 
-        $new = $private->tweakMul($tweak);
+        $new = $private->tweakMul(gmp_strval($tweak, 10));
         $this->assertEquals('4', $new->getSecretMultiplier());
 
         $tweaked = $new->getPublicKey();
         $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
 
-        $tweaked = $public->tweakMul($tweak);
+        $tweaked = $public->tweakMul(gmp_strval($tweak, 10));
         $this->assertEquals($expectedPub->getBinary(), $tweaked->getBinary());
 
     }

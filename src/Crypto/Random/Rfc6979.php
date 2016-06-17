@@ -35,9 +35,9 @@ class Rfc6979 implements RbgInterface
         BufferInterface $messageHash,
         $algo = 'sha256'
     ) {
-        $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey->getInt());
+        $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), gmp_init($privateKey->getInt(), 10));
         $this->ecAdapter = $ecAdapter;
-        $this->hmac = RandomGeneratorFactory::getHmacRandomGenerator($mdPk, $messageHash->getInt(), $algo);
+        $this->hmac = RandomGeneratorFactory::getHmacRandomGenerator($mdPk, gmp_init($messageHash->getInt(), 10), $algo);
     }
 
     /**
@@ -47,6 +47,6 @@ class Rfc6979 implements RbgInterface
     public function bytes($bytes)
     {
         $integer = $this->hmac->generate($this->ecAdapter->getGenerator()->getOrder());
-        return Buffer::int($integer, $bytes, $this->ecAdapter->getMath());
+        return Buffer::int(gmp_strval($integer, 10), $bytes, $this->ecAdapter->getMath());
     }
 }

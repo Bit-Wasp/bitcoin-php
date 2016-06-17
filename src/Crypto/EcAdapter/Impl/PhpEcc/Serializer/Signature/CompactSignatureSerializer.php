@@ -74,12 +74,12 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
         try {
             list ($byte, $r, $s) = $this->getTemplate()->parse($parser);
 
-            $recoveryFlags = $math->sub($byte, 27);
+            $recoveryFlags = $byte - 27;
             if ($recoveryFlags < 0 || $recoveryFlags > 7) {
                 throw new \InvalidArgumentException('invalid signature type');
             }
 
-            $isCompressed = $math->cmp($math->bitwiseAnd($recoveryFlags, 4), 0) !== 0;
+            $isCompressed = $math->cmp($math->bitwiseAnd(gmp_init($recoveryFlags), gmp_init(4)), gmp_init(0)) !== 0;
             $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');

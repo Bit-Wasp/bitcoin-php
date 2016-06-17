@@ -119,7 +119,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @var string $tweak
      * @return PrivateKey
      */
@@ -145,7 +145,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param int|string $tweak
      * @return PrivateKey
      */
     public function tweakMul($tweak)

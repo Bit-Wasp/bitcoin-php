@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Locktime;
 
 class LocktimeTest extends AbstractTestCase
@@ -10,31 +9,31 @@ class LocktimeTest extends AbstractTestCase
 
     public function testToTimestamp()
     {
-        $nTime = '1951606400';
-        $locktime = new Locktime(new Math());
+        $nTime = 1951606400;
+        $locktime = new Locktime();
         $timestamp = $locktime->toTimestamp($nTime);
         $this->assertEquals($nTime - Locktime::BLOCK_MAX, $timestamp);
     }
 
     public function testFromTimestamp()
     {
-        $timestamp = '1451606400';
-        $locktime = new Locktime(new Math());
+        $timestamp = 1451606400;
+        $locktime = new Locktime();
         $nTime = $locktime->fromTimestamp($timestamp);
         $this->assertEquals($timestamp, ($nTime - Locktime::BLOCK_MAX));
     }
 
     public function testFromBlockHeight()
     {
-        $height = '101011';
-        $locktime = new Locktime(new Math());
+        $height = 101011;
+        $locktime = new Locktime();
         $this->assertEquals($height, $locktime->fromBlockHeight($height));
     }
 
     public function testToBlockHeight()
     {
-        $height = $nTime = '999999';
-        $locktime = new Locktime(new Math());
+        $height = $nTime = 999999;
+        $locktime = new Locktime();
         $this->assertEquals($height, $locktime->toBlockHeight($nTime));
     }
 
@@ -46,8 +45,7 @@ class LocktimeTest extends AbstractTestCase
      */
     public function testMaxFromTimestamp()
     {
-        $math= new Math();
-        $locktime = new Locktime($math);
+        $locktime = new Locktime();
 
         // One under the maximum
         $allowed = Locktime::TIME_MAX;
@@ -55,9 +53,8 @@ class LocktimeTest extends AbstractTestCase
         $nTime = $locktime->fromTimestamp($allowed);
         $this->assertEquals(Locktime::INT_MAX, $nTime);
 
-        $disallowed = $math->add($allowed, 1);
+        $disallowed = $allowed + 1;
         $locktime->fromTimestamp($disallowed);
-
     }
 
     /**
@@ -69,14 +66,13 @@ class LocktimeTest extends AbstractTestCase
      */
     public function testMaxToTimestamp()
     {
-        $math = new Math();
-        $locktime = new Locktime($math);
+        $locktime = new Locktime();
 
         $allowed = Locktime::INT_MAX;
         $timestamp = $locktime->toTimestamp($allowed);
         $this->assertEquals(Locktime::TIME_MAX, $timestamp);
 
-        $disallowed = $math->add($allowed, 1);
+        $disallowed = $allowed + 1;
         $locktime->toTimestamp($disallowed);
     }
 
@@ -86,9 +82,7 @@ class LocktimeTest extends AbstractTestCase
      */
     public function testToTimeStampButTooLow()
     {
-        $math = new Math();
-        $locktime = new Locktime($math);
-
+        $locktime = new Locktime();
         $locktime->toTimestamp(1);
     }
 
@@ -98,10 +92,8 @@ class LocktimeTest extends AbstractTestCase
      */
     public function testFromBlockHeightTooHigh()
     {
-        $math = new Math();
-        $locktime = new Locktime($math);
-
-        $disallowed = $math->add(Locktime::BLOCK_MAX, 1);
+        $locktime = new Locktime();
+        $disallowed = Locktime::BLOCK_MAX + 1;
         $locktime->fromBlockHeight($disallowed);
     }
 
@@ -111,13 +103,12 @@ class LocktimeTest extends AbstractTestCase
      */
     public function testToBlockHeightF()
     {
-        $math = new Math();
-        $locktime = new Locktime($math);
+        $locktime = new Locktime();
 
         $allowed = Locktime::BLOCK_MAX;
         $this->assertEquals($allowed, $locktime->toBlockHeight($allowed));
 
-        $disallowed = $math->add($allowed, 1);
+        $disallowed = $allowed + 1;
         $locktime->toBlockHeight($disallowed);
     }
 }

@@ -32,12 +32,15 @@ class Base58
         $math = Bitcoin::getMath();
 
         $orig = $binary->getBinary();
-        $decimal = $binary->getInt();
+        $decimal = gmp_init($binary->getInt(), 10);
 
         $return = '';
-        while ($math->cmp($decimal, 0) > 0) {
-            list($decimal, $rem) = $math->divQr($decimal, 58);
-            $return .= self::$base58chars[$rem];
+        $zero = gmp_init(0);
+        $_58 = gmp_init(58);
+        while ($math->cmp($decimal, $zero) > 0) {
+            list($decimal, $rem) = $math->divQr($decimal, $_58);
+            $index = (int) gmp_strval($rem, 10);
+            $return .= self::$base58chars[$index];
         }
         $return = strrev($return);
 
@@ -64,12 +67,13 @@ class Base58
 
         $original = $base58;
         $length = strlen($base58);
-        $return = '0';
+        $return = gmp_init(0);
+        $_58 = gmp_init(58);
         for ($i = 0; $i < $length; $i++) {
-            $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
+            $return = $math->add($math->mul($return, $_58), gmp_init(strpos(self::$base58chars, $base58[$i]), 10));
         }
 
-        $binary = $math->cmp($return, '0') === 0 ? '' : hex2bin($math->decHex($return));
+        $binary = $math->cmp($return, gmp_init(0)) === 0 ? '' : hex2bin($math->decHex(gmp_strval($return, 10)));
         for ($i = 0; $i < $length && $original[$i] === '1'; $i++) {
             $binary = "\x00" . $binary;
         }

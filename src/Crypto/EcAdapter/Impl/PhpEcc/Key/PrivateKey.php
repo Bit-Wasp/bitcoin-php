@@ -51,6 +51,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
         if (false === is_bool($compressed)) {
             throw new \InvalidArgumentException('PrivateKey: Compressed argument must be a boolean');
         }
+        
         $this->ecAdapter = $ecAdapter;
         $this->secretMultiplier = $int;
         $this->compressed = $compressed;
@@ -82,7 +83,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         $adapter = $this->ecAdapter;
         return $adapter->getPrivateKey(
-            $adapter
+            gmp_strval($adapter
                 ->getMath()
                 ->getModularArithmetic(
                     $adapter
@@ -90,9 +91,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
                         ->getOrder()
                 )
                 ->add(
-                    $tweak,
-                    $this->getSecretMultiplier()
-                ),
+                    gmp_init($tweak, 10),
+                    gmp_init($this->getSecretMultiplier(), 10)
+                ), 10),
             $this->compressed
         );
     }
@@ -105,7 +106,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         $adapter = $this->ecAdapter;
         return $adapter->getPrivateKey(
-            $adapter
+            gmp_strval($adapter
             ->getMath()
             ->getModularArithmetic(
                 $adapter
@@ -113,9 +114,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
                     ->getOrder()
             )
             ->mul(
-                $tweak,
-                $this->getSecretMultiplier()
-            ),
+                gmp_init($tweak, 10),
+                gmp_init($this->getSecretMultiplier(), 10)
+            ), 10),
             $this->compressed
         );
     }
@@ -140,7 +141,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
             $this->publicKey = $adapter->getPublicKey(
                 $adapter
                     ->getGenerator()
-                    ->mul($this->secretMultiplier),
+                    ->mul(gmp_init($this->secretMultiplier, 10)),
                 $this->compressed
             );
         }

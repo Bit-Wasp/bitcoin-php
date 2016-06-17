@@ -96,7 +96,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
             return false;
         }
 
-        return gmp_cmp($this->sequence, $input->getSequence()) === 0;
+        return gmp_cmp(gmp_init($this->sequence), gmp_init($input->getSequence())) === 0;
     }
 
     /**
@@ -109,7 +109,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
         $math = Bitcoin::getMath();
         $outpoint = $this->outPoint;
         return $outpoint->getTxId()->getBinary() === str_pad('', 32, "\x00")
-            && $math->cmp($outpoint->getVout(), $math->hexDec('ffffffff')) === 0;
+            && $math->cmp(gmp_init($outpoint->getVout()), gmp_init(0xffffffff)) === 0;
     }
 
     /**
@@ -118,7 +118,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     public function isFinal()
     {
         $math = Bitcoin::getMath();
-        return $math->cmp($this->getSequence(), self::SEQUENCE_FINAL) === 0;
+        return $math->cmp(gmp_init($this->getSequence()), gmp_init(self::SEQUENCE_FINAL)) === 0;
     }
 
     /**

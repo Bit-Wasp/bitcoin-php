@@ -93,19 +93,19 @@ class Number extends Serializable
 
         }, str_split($buffer->getBinary(), 1));
 
-        $result = 0;
+        $result = gmp_init(0);
         for ($i = 0; $i < $size; $i++) {
-            $mul = $this->math->mul($i, 8);
-            $byte = $this->math->leftShift($chars[$i], $mul);
+            $mul = $i * 8;
+            $byte = $this->math->leftShift(gmp_init($chars[$i], 10), $mul);
             $result = $this->math->bitwiseOr($result, $byte);
         }
 
         if ($chars[count($chars)-1] & 0x80) {
-            $mask = gmp_strval(gmp_com($this->math->leftShift(0x80, (8 * ($size - 1)))), 10);
-            return $this->math->sub(0, $this->math->bitwiseAnd($result, $mask));
+            $mask = gmp_com($this->math->leftShift(gmp_init(0x80), (8 * ($size - 1))));
+            $result = $this->math->sub(gmp_init(0), $this->math->bitwiseAnd($result, $mask));
         }
 
-        return $result;
+        return gmp_strval($result, 10);
     }
 
     /**
@@ -113,17 +113,18 @@ class Number extends Serializable
      */
     private function serialize()
     {
-        if ($this->math->cmp($this->number, '0') === 0) {
+        if ($this->number == 0) {
             return new Buffer('', 0);
         }
 
+        $zero = gmp_init(0);
         // Using array of integers instead of bytes
         $result = [];
-        $negative = $this->math->cmp($this->number, 0) < 0;
-        $abs = $negative ? $this->math->sub(0, $this->number) : $this->number;
+        $negative = $this->math->cmp(gmp_init($this->number), $zero) < 0;
+        $abs = $negative ? $this->math->sub($zero, gmp_init($this->number, 10)) : gmp_init($this->number, 10);
 
-        while ($this->math->cmp($abs, 0) > 0) {
-            $result[] = (int)$this->math->bitwiseAnd($abs, 0xff);
+        while ($this->math->cmp($abs, $zero) > 0) {
+            $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, gmp_init(0xff)), 10);
             $abs = $this->math->rightShift($abs, 8);
         }
 
@@ -155,9 +156,9 @@ class Number extends Serializable
      */
     public function getInt()
     {
-        if ($this->math->cmp($this->number, self::MAX) > 0) {
+        if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MAX)) > 0) {
             return self::MAX;
-        } else if ($this->math->cmp($this->number, self::MIN) < 0) {
+        } else if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MIN)) < 0) {
             return self::MIN;
         }
 

@@ -2,59 +2,59 @@
 
 namespace BitWasp\Bitcoin\Math;
 
-use Mdanter\Ecc\Math\MathAdapterInterface;
+use Mdanter\Ecc\Math\GmpMathInterface;
 
 class BinaryMath
 {
     /**
-     * @var MathAdapterInterface
+     * @var GmpMathInterface
      */
     private $math;
 
     /**
-     * @param MathAdapterInterface $math
+     * @param GmpMathInterface $math
      */
-    public function __construct(MathAdapterInterface $math)
+    public function __construct(GmpMathInterface $math)
     {
         $this->math = $math;
     }
 
     /**
-     * @param $bitSize
-     * @return int|string
+     * @param int $bitSize
+     * @return int
      */
     private function fixSize($bitSize)
     {
-        return $this->math->sub($bitSize, 1);
+        return $bitSize - 1;
     }
 
     /**
-     * @param $integer
-     * @param $bitSize
+     * @param \GMP $integer
+     * @param int $bitSize
      * @return bool
      */
-    public function isNegative($integer, $bitSize)
+    public function isNegative(\GMP $integer, $bitSize)
     {
-        return $this->math->cmp($this->math->rightShift($integer, $this->fixSize($bitSize)), '1') === 0;
+        return $this->math->cmp($this->math->rightShift($integer, $this->fixSize($bitSize)), gmp_init(1)) === 0;
     }
 
     /**
-     * @param $integer
-     * @param $bitSize
-     * @return int|string
+     * @param \GMP $integer
+     * @param int $bitSize
+     * @return \GMP
      */
-    public function makeNegative($integer, $bitSize)
+    public function makeNegative(\GMP $integer, $bitSize)
     {
-        return $this->math->bitwiseXor($this->math->leftShift(1, $this->fixSize($bitSize)), $integer);
+        return $this->math->bitwiseXor($this->math->leftShift(gmp_init(1), $this->fixSize($bitSize)), $integer);
     }
 
     /**
-     * @param $integer
-     * @param $bitSize
-     * @return int|string
+     * @param \GMP $integer
+     * @param int $bitSize
+     * @return \GMP
      */
-    public function getTwosComplement($integer, $bitSize)
+    public function getTwosComplement(\GMP $integer, $bitSize)
     {
-        return $this->math->add($this->math->pow(2, $bitSize), $integer);
+        return $this->math->add($this->math->pow(gmp_init(2), $bitSize), $integer);
     }
 }

@@ -184,7 +184,7 @@ class HierarchicalKey
     public function isHardened()
     {
         // (sequence >> 31) == 1 ?
-        return $this->ecAdapter->getMath()->getBinaryMath()->isNegative($this->sequence, 32);
+        return $this->ecAdapter->getMath()->getBinaryMath()->isNegative(gmp_init($this->sequence, 10), 32);
     }
 
     /**
@@ -196,7 +196,7 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
-        $hardened = $this->ecAdapter->getMath()->getBinaryMath()->isNegative($sequence, 32);
+        $hardened = $this->ecAdapter->getMath()->getBinaryMath()->isNegative(gmp_init($sequence, 10), 32);
 
         if ($hardened) {
             if ($this->isPrivate() === false) {

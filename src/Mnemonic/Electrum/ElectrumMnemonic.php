@@ -37,19 +37,19 @@ class ElectrumMnemonic implements MnemonicInterface
     public function entropyToWords(BufferInterface $entropy)
     {
         $math = $this->ecAdapter->getMath();
-        $n = count($this->wordList);
+        $n = gmp_init(count($this->wordList), 10);
         $wordArray = [];
 
         $chunks = $entropy->getSize() / 4;
         for ($i = 0; $i < $chunks; $i++) {
-            $x = $entropy->slice(4*$i, 4)->getInt();
+            $x = gmp_init($entropy->slice(4*$i, 4)->getInt(), 10);
             $index1 = $math->mod($x, $n);
             $index2 = $math->mod($math->add($math->div($x, $n), $index1), $n);
             $index3 = $math->mod($math->add($math->div($math->div($x, $n), $n), $index2), $n);
 
-            $wordArray[] = $this->wordList->getWord($index1);
-            $wordArray[] = $this->wordList->getWord($index2);
-            $wordArray[] = $this->wordList->getWord($index3);
+            $wordArray[] = $this->wordList->getWord(gmp_strval($index1, 10));
+            $wordArray[] = $this->wordList->getWord(gmp_strval($index2, 10));
+            $wordArray[] = $this->wordList->getWord(gmp_strval($index3, 10));
         }
 
         return $wordArray;
@@ -74,36 +74,36 @@ class ElectrumMnemonic implements MnemonicInterface
         $wordList = $this->wordList;
 
         $words = explode(' ', $mnemonic);
-        $n = count($wordList);
+        $n = gmp_init(count($wordList), 10);
         $out = '';
 
         $thirdWordCount = count($words) / 3;
 
         for ($i = 0; $i < $thirdWordCount; $i++) {
-            list ($word1, $word2, $word3) = array_slice($words, $math->mul(3, $i), 3);
+            list ($word1, $word2, $word3) = array_slice($words, 3 * $i, 3);
 
-            $index1 = $wordList->getIndex($word1);
-            $index2 = $wordList->getIndex($word2);
-            $index3 = $wordList->getIndex($word3);
+            $index1 = gmp_init($wordList->getIndex($word1), 10);
+            $index2 = gmp_init($wordList->getIndex($word2), 10);
+            $index3 = gmp_init($wordList->getIndex($word3), 10);
 
             $x = $math->add(
                 $index1,
                 $math->add(
                     $math->mul(
                         $n,
-                        $math->mod($index2 - $index1, $n)
+                        $math->mod($math->sub($index2, $index1), $n)
                     ),
                     $math->mul(
                         $n,
                         $math->mul(
                             $n,
-                            $math->mod($index3 - $index2, $n)
+                            $math->mod($math->sub($index3, $index2), $n)
                         )
                     )
                 )
             );
 
-            $out .= str_pad($math->decHex($x), 8, '0', STR_PAD_LEFT);
+            $out .= str_pad($math->decHex(gmp_strval($x, 10)), 8, '0', STR_PAD_LEFT);
         }
 
         return Buffer::hex($out);

@@ -63,16 +63,16 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new \RuntimeException('Compact Sig must be 65 bytes');
         }
 
-        $byte = $buffer->slice(0, 1)->getInt();
+        $byte = (int) $buffer->slice(0, 1)->getInt();
         $sig = $buffer->slice(1, 64);
 
-        $recoveryFlags = $math->sub($byte, 27);
-        if ($math->cmp($recoveryFlags, 7) > 0) {
+        $recoveryFlags = $byte - 27;
+        if ($recoveryFlags > 7) {
             throw new \RuntimeException('Invalid signature type');
         }
 
-        $isCompressed = $math->cmp($math->bitwiseAnd($recoveryFlags, 4), 0) !== 0;
-        $recoveryId = $math->sub($recoveryFlags, $isCompressed ? 4 : 0);
+        $isCompressed = $math->cmp($math->bitwiseAnd(gmp_init($recoveryFlags), gmp_init(4)), gmp_init(0)) !== 0;
+        $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
 
         $sig_t = '';
         /** @var resource $sig_t */

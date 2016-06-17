@@ -54,9 +54,9 @@ class PaymentVerifier
             foreach ($tx->getOutputs() as $output) {
                 $scriptBin = $output->getScript()->getBinary();
                 if (array_key_exists($scriptBin, $scriptAmount)) {
-                    $scriptAmount[$scriptBin] = $this->math->add($output->getValue(), $scriptAmount[$scriptBin]);
+                    $scriptAmount[$scriptBin] = $this->math->add(gmp_init($output->getValue(), 10), $scriptAmount[$scriptBin]);
                 } else {
-                    $scriptAmount[$scriptBin] = $output->getValue();
+                    $scriptAmount[$scriptBin] = gmp_init($output->getValue(), 10);
                 }
             }
         }
@@ -69,11 +69,12 @@ class PaymentVerifier
         foreach ($details->getOutputsList() as $out) {
             $scriptBin = $out->getScript();
             if (array_key_exists($scriptBin, $requiredAmounts)) {
-                $requiredAmounts[$scriptBin] = $this->math->add($out->getAmount(), $requiredAmounts[$scriptBin]);
+                $requiredAmounts[$scriptBin] = $this->math->add(gmp_init($out->getAmount(), 10), $requiredAmounts[$scriptBin]);
             } else {
-                $requiredAmounts[$scriptBin] = $out->getAmount();
+                $requiredAmounts[$scriptBin] = gmp_init($out->getAmount(), 10);
             }
         }
+
 
         // Check required amounts against user transaction
         foreach ($requiredAmounts as $script => $value) {

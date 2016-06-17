@@ -121,7 +121,7 @@ class TxBuilderTest extends AbstractTestCase
 
     public function testLocktime()
     {
-        $locktime = new Locktime($this->safeMath());
+        $locktime = new Locktime();
         $blockHeight = 389356;
         $blockHeightLocktime = $locktime->fromBlockHeight($blockHeight);
 
