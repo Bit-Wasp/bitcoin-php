@@ -36,11 +36,11 @@ interface EcAdapterInterface
     public function validateSignatureElement(\GMP $element, $halfOrder = false);
 
     /**
-     * @param int $scalar
+     * @param \GMP $scalar
      * @param bool|false $compressed
      * @return PrivateKeyInterface
      */
-    public function getPrivateKey($scalar, $compressed = false);
+    public function getPrivateKey(\GMP $scalar, $compressed = false);
 
     /**
      * @param BufferInterface $messageHash

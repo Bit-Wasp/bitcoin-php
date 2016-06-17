@@ -91,11 +91,11 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
-     * @param int|string $int
+     * @param \GMP $int
      * @param bool|false $compressed
      * @return PrivateKey
      */
-    public function getPrivateKey($int, $compressed = false)
+    public function getPrivateKey(\GMP $int, $compressed = false)
     {
         return new PrivateKey($this, $int, $compressed);
     }

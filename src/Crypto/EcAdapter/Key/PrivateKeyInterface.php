@@ -13,7 +13,7 @@ interface PrivateKeyInterface extends KeyInterface
     /**
      * Return the decimal secret multiplier
      *
-     * @return int|string
+     * @return \GMP
      */
     public function getSecretMultiplier();
 

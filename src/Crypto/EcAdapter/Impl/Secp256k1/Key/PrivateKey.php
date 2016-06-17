@@ -18,7 +18,7 @@ use BitWasp\Buffertools\BufferInterface;
 class PrivateKey extends Key implements PrivateKeyInterface
 {
     /**
-     * @var int|string
+     * @var \GMP
      */
     private $secret;
 
@@ -44,13 +44,13 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     /**
      * @param EcAdapter $adapter
-     * @param $secret
+     * @param \GMP $secret
      * @param bool|false $compressed
      * @throws \Exception
      */
-    public function __construct(EcAdapter $adapter, $secret, $compressed = false)
+    public function __construct(EcAdapter $adapter, \GMP $secret, $compressed = false)
     {
-        $buffer = Buffer::int($secret, 32, $adapter->getMath());
+        $buffer = Buffer::int(gmp_strval($secret, 10), 32, $adapter->getMath());
         if (!$adapter->validatePrivateKey($buffer)) {
             throw new InvalidPrivateKey('Invalid private key');
         }
@@ -119,17 +119,16 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int|string $tweak
-     * @var string $tweak
+     * @param \GMP $tweak
      * @return PrivateKey
      */
-    public function tweakAdd($tweak)
+    public function tweakAdd(\GMP $tweak)
     {
         $adapter = $this->ecAdapter;
         $math = $adapter->getMath();
         $context = $adapter->getContext();
         $privKey = $this->getBinary(); // mod by reference
-        $tweak = Buffer::int($tweak, 32, $math)->getBinary();
+        $tweak = Buffer::int($math->toString($tweak), 32, $math)->getBinary();
         $ret = \secp256k1_ec_privkey_tweak_add(
             $context,
             $privKey,
@@ -140,23 +139,21 @@ class PrivateKey extends Key implements PrivateKeyInterface
             throw new \RuntimeException('Secp256k1 privkey tweak add: failed');
         }
 
-        $secret = $math->hexDec(bin2hex($privKey));
+        $secret = gmp_init(bin2hex($privKey), 16);
         return $adapter->getPrivateKey($secret, $this->compressed);
     }
 
     /**
-     * @param int|string $tweak
+     * @param \GMP $tweak
      * @return PrivateKey
      */
-    public function tweakMul($tweak)
+    public function tweakMul(\GMP $tweak)
     {
-        $adapter = $this->ecAdapter;
-        $math = $adapter->getMath();
-        $context = $adapter->getContext();
-        $privateKey = $this->getBinary(); // mod by reference
-        $tweak = Buffer::int($tweak, 32, $math)->getBinary();
+        $privateKey = $this->getBinary();
+        $math = $this->ecAdapter->getMath();
+        $tweak = Buffer::int($math->toString($tweak), 32, $math)->getBinary();
         $ret = \secp256k1_ec_privkey_tweak_mul(
-            $context,
+            $this->ecAdapter->getContext(),
             $privateKey,
             $tweak
         );
@@ -165,8 +162,8 @@ class PrivateKey extends Key implements PrivateKeyInterface
             throw new \RuntimeException('Secp256k1 privkey tweak mul: failed');
         }
 
-        $secret = $math->hexDec(bin2hex($privateKey));
-        return $adapter->getPrivateKey($secret, $this->compressed);
+        $secret = gmp_init(bin2hex($privateKey), 16);
+        return $this->ecAdapter->getPrivateKey($secret, $this->compressed);
     }
 
     /**

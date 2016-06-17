@@ -75,18 +75,18 @@ class ElectrumKey
     }
 
     /**
-     * @param int|string $sequence
+     * @param int $sequence
      * @param bool $change
-     * @return int|string
+     * @return \GMP
      */
     public function getSequenceOffset($sequence, $change = false)
     {
         $seed = new Buffer(sprintf("%s:%s:%s", $sequence, $change ? '1' : '0', $this->getMPK()->getBinary()), null, $this->ecAdapter->getMath());
-        return Hash::sha256d($seed)->getInt();
+        return gmp_init(Hash::sha256d($seed)->getInt(), 10);
     }
 
     /**
-     * @param int|string $sequence
+     * @param int $sequence
      * @param bool $change
      * @return PrivateKeyInterface|PublicKeyInterface
      */

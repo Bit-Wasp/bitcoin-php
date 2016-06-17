@@ -17,7 +17,7 @@ use BitWasp\Buffertools\BufferInterface;
 class PrivateKey extends Key implements PrivateKeyInterface
 {
     /**
-     * @var int|string
+     * @var \GMP
      */
     private $secretMultiplier;
 
@@ -38,13 +38,13 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     /**
      * @param EcAdapter $ecAdapter
-     * @param $int
+     * @param \GMP $int
      * @param bool $compressed
      * @throws InvalidPrivateKey
      */
-    public function __construct(EcAdapter $ecAdapter, $int, $compressed = false)
+    public function __construct(EcAdapter $ecAdapter, \GMP $int, $compressed = false)
     {
-        if (false === $ecAdapter->validatePrivateKey(Buffer::int($int, 32, $ecAdapter->getMath()))) {
+        if (false === $ecAdapter->validatePrivateKey(Buffer::int(gmp_strval($int, 10), 32, $ecAdapter->getMath()))) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
         }
 
@@ -58,7 +58,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
     public function getSecretMultiplier()
     {
@@ -76,14 +76,14 @@ class PrivateKey extends Key implements PrivateKeyInterface
     }
 
     /**
-     * @param int|string $tweak
+     * @param \GMP $tweak
      * @return PrivateKeyInterface
      */
-    public function tweakAdd($tweak)
+    public function tweakAdd(\GMP $tweak)
     {
         $adapter = $this->ecAdapter;
         return $adapter->getPrivateKey(
-            gmp_strval($adapter
+            $adapter
                 ->getMath()
                 ->getModularArithmetic(
                     $adapter
@@ -91,22 +91,22 @@ class PrivateKey extends Key implements PrivateKeyInterface
                         ->getOrder()
                 )
                 ->add(
-                    gmp_init($tweak, 10),
-                    gmp_init($this->getSecretMultiplier(), 10)
-                ), 10),
+                    $tweak,
+                    $this->getSecretMultiplier()
+                ),
             $this->compressed
         );
     }
 
     /**
-     * @param int|string $tweak
+     * @param \GMP $tweak
      * @return PrivateKeyInterface
      */
-    public function tweakMul($tweak)
+    public function tweakMul(\GMP $tweak)
     {
         $adapter = $this->ecAdapter;
         return $adapter->getPrivateKey(
-            gmp_strval($adapter
+            $adapter
             ->getMath()
             ->getModularArithmetic(
                 $adapter
@@ -114,9 +114,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
                     ->getOrder()
             )
             ->mul(
-                gmp_init($tweak, 10),
-                gmp_init($this->getSecretMultiplier(), 10)
-            ), 10),
+                $tweak,
+                $this->getSecretMultiplier()
+            ),
             $this->compressed
         );
     }
@@ -141,7 +141,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
             $this->publicKey = $adapter->getPublicKey(
                 $adapter
                     ->getGenerator()
-                    ->mul(gmp_init($this->secretMultiplier, 10)),
+                    ->mul($this->secretMultiplier),
                 $this->compressed
             );
         }

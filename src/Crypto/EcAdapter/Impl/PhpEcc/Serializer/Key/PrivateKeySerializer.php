@@ -37,7 +37,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     public function serialize(PrivateKeyInterface $privateKey)
     {
         return Buffer::int(
-            $privateKey->getSecretMultiplier(),
+            gmp_strval($privateKey->getSecretMultiplier(), 10),
             32,
             $this->ecAdapter->getMath()
         );
@@ -60,7 +60,8 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     {
         $compressed = $this->haveNextCompressed;
         $this->haveNextCompressed = false;
-        return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getInt(), $compressed);
+        $int = gmp_init($parser->readBytes(32)->getHex(), 16);
+        return $this->ecAdapter->getPrivateKey($int, $compressed);
     }
 
     /**

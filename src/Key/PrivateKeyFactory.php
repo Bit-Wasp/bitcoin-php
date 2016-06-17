@@ -41,7 +41,7 @@ class PrivateKeyFactory
     public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        return $ecAdapter->getPrivateKey($int, $compressed);
+        return $ecAdapter->getPrivateKey(gmp_init($int, 10), $compressed);
     }
 
     /**
@@ -88,10 +88,7 @@ class PrivateKeyFactory
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
 
         /** @var PrivateKeySerializerInterface $serializer */
-        $serializer = EcSerializer::getSerializer(
-            $ecAdapter,
-            'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface'
-        );
+        $serializer = EcSerializer::getSerializer($ecAdapter, PrivateKeySerializerInterface::class);
 
         $parsed = $serializer->parse($hex);
         if ($compressed) {

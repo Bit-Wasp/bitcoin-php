@@ -239,7 +239,7 @@ class HierarchicalKey
             $this->getChildFingerprint(),
             $sequence,
             $chain->getInt(),
-            $key->tweakAdd($offset->getInt())
+            $key->tweakAdd(gmp_init($offset->getInt(), 10))
         );
     }
 
