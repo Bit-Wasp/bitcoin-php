@@ -71,7 +71,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new \RuntimeException('Invalid signature type');
         }
 
-        $isCompressed = $math->cmp($math->bitwiseAnd(gmp_init($recoveryFlags), gmp_init(4)), 0) !== 0;
+        $isCompressed = $math->cmp($math->bitwiseAnd(gmp_init($recoveryFlags), gmp_init(4)), gmp_init(0)) !== 0;
         $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
 
         $sig_t = '';
