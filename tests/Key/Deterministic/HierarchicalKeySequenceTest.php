@@ -26,7 +26,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
      */
     public function testGetSequence($node, $eSeq)
     {
-        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence = new HierarchicalKeySequence();
         $this->assertEquals($eSeq, $sequence->fromNode($node));
 
         // canonicalize the sequence - library returns h.
@@ -39,7 +39,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
      */
     public function testHardenedSequenceFailure()
     {
-        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence = new HierarchicalKeySequence();
 
         // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
         $sequence->getHardened(HierarchicalKeySequence::START_HARDENED);
@@ -50,13 +50,13 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
      */
     public function testDecodePathFailure()
     {
-        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence = new HierarchicalKeySequence();
         $sequence->decodePath('');
     }
 
     public function testDecodePath()
     {
-        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence = new HierarchicalKeySequence();
 
         $expected = ['2147483648','2147483649','444','2147526030'];
         $this->assertEquals($expected, $sequence->decodePath("0'/1'/444/42382'"));
@@ -69,7 +69,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
      */
     public function testDecodePathVectors($node, $integer)
     {
-        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence = new HierarchicalKeySequence();
 
         // There should only be one, just implode to get the value
         $this->assertEquals($integer, implode("", $sequence->decodePath($node)));
@@ -97,7 +97,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
      */
     public function testEncodePathVectors($list)
     {
-        $sequence = new HierarchicalKeySequence(new Math());
+        $sequence = new HierarchicalKeySequence();
 
         $this->assertEquals("0h/1h/444/42382h", $sequence->encodePath($list));
     }

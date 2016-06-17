@@ -29,7 +29,7 @@ for ($i = 0; $i < 3; $i++) {
     $k[$i] = \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory::fromEntropy($s[$i]);
 }
 
-$sequences = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence($ec->getMath());
+$sequences = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence();
 $hd = new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', $k, $sequences, true);
 
 status($hd);

@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
-use BitWasp\Bitcoin\Math\Math;
-
 /**
  * NB: Paths returned by this library omit m/M. This is because
  * some knowledge is lost during derivations, so the full path
@@ -12,41 +10,21 @@ use BitWasp\Bitcoin\Math\Math;
  */
 class HierarchicalKeySequence
 {
-    /**
-     * @var Math
-     */
-    private $math;
 
-    const START_HARDENED = 2147483648; // 2^31
+    const START_HARDENED = 2147483648;
 
     /**
-     * @param Math $math
-     */
-    public function __construct(Math $math)
-    {
-        $this->math = $math;
-    }
-
-    /**
-     * @return \BitWasp\Bitcoin\Math\BinaryMath
-     */
-    private function binaryMath()
-    {
-        return $this->math->getBinaryMath();
-    }
-
-    /**
-     * @param $sequence
+     * @param int $sequence
      * @return bool
      */
     public function isHardened($sequence)
     {
-        return $this->binaryMath()->isNegative(gmp_init($sequence, 10), 32);
+        return ($sequence >> 31) === 1;
     }
 
     /**
-     * @param $sequence
-     * @return int|string
+     * @param int $sequence
+     * @return int
      */
     public function getHardened($sequence)
     {
@@ -54,8 +32,10 @@ class HierarchicalKeySequence
             throw new \LogicException('Sequence is already for a hardened key');
         }
 
-        $prime = $this->binaryMath()->makeNegative(gmp_init($sequence, 10), 32);
-        return gmp_strval($prime, 10);
+        $flag = 1 << 31;
+        $hardened = $sequence | $flag;
+
+        return $hardened;
     }
 
     /**
@@ -83,14 +63,14 @@ class HierarchicalKeySequence
     /**
      * Given a sequence, get the human readable node. Ie, 0 -> 0, 0x80000000 -> 0h
      *
-     * @param $sequence
+     * @param int $sequence
      * @return string
      */
     public function getNode($sequence)
     {
         if ($this->isHardened($sequence)) {
-            $sequence = $this->math->sub(gmp_init($sequence), gmp_init(self::START_HARDENED));
-            $sequence = gmp_strval($sequence, 10) . 'h';
+            $sequence = $sequence - self::START_HARDENED;
+            $sequence = (string) $sequence . 'h';
         }
 
         return $sequence;
