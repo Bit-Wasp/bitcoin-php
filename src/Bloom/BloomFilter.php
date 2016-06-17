@@ -17,7 +17,7 @@ class BloomFilter extends Serializable
     const LN2 = '0.6931471805599453094172321214581765680755001343602552';
     const MAX_HASH_FUNCS = '50';
     const MAX_FILTER_SIZE = 36000; // bytes
-    const TWEAK_START = '4221880213'; // 0xFBA4C795
+    const TWEAK_START = 0xFBA4C795;
 
     const UPDATE_NONE = 0;
     const UPDATE_ALL = 1;
@@ -50,7 +50,7 @@ class BloomFilter extends Serializable
     private $vFilter = [];
 
     /**
-     * @var int|string
+     * @var int
      */
     private $nTweak;
 
@@ -63,7 +63,7 @@ class BloomFilter extends Serializable
      * @param Math $math
      * @param array $vFilter
      * @param int $numHashFuncs
-     * @param int|string $nTweak
+     * @param int $nTweak
      * @param int $flags
      */
     public function __construct(Math $math, array $vFilter, $numHashFuncs, $nTweak, $flags)
@@ -166,7 +166,7 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getTweak()
     {

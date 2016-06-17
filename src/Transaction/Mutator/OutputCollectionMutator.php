@@ -56,8 +56,8 @@ class OutputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @param int|string $start
-     * @param int|string $length
+     * @param int $start
+     * @param int $length
      * @return $this
      */
     public function slice($start, $length)
