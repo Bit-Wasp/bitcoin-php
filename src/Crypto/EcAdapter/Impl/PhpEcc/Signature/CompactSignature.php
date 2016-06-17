@@ -4,25 +4,14 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
-use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
 
-class CompactSignature extends Serializable implements CompactSignatureInterface
+class CompactSignature extends Signature implements CompactSignatureInterface
 {
     /**
-     * @var
+     * @var EcAdapter
      */
     private $ecAdapter;
-
-    /**
-     * @var int
-     */
-    private $r;
-
-    /**
-     * @var int
-     */
-    private $s;
 
     /**
      * @var int|string
@@ -36,12 +25,12 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
 
     /**
      * @param EcAdapter $adapter
-     * @param int $r
-     * @param int $s
+     * @param \GMP $r
+     * @param \GMP $s
      * @param int $recid
      * @param bool $compressed
      */
-    public function __construct(EcAdapter $adapter, $r, $s, $recid, $compressed)
+    public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, $recid, $compressed)
     {
         if (!is_bool($compressed)) {
             throw new \InvalidArgumentException('CompactSignature: $compressed must be a boolean');
@@ -50,24 +39,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
         $this->ecAdapter = $adapter;
         $this->recid = $recid;
         $this->compressed = $compressed;
-        $this->r = $r;
-        $this->s = $s;
-    }
-
-    /**
-     * @return int
-     */
-    public function getR()
-    {
-        return $this->r;
-    }
-
-    /**
-     * @return int
-     */
-    public function getS()
-    {
-        return $this->s;
+        parent::__construct($adapter, $r, $s);
     }
 
     /**
@@ -75,11 +47,11 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
      */
     public function convert()
     {
-        return new Signature($this->ecAdapter, $this->r, $this->s);
+        return new Signature($this->ecAdapter, $this->getR(), $this->getS());
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getRecoveryId()
     {
@@ -95,7 +67,7 @@ class CompactSignature extends Serializable implements CompactSignatureInterface
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getFlags()
     {

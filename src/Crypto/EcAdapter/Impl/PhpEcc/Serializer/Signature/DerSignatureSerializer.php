@@ -70,8 +70,8 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         $math = $this->ecAdapter->getMath();
 
         // Ensure that the R and S hex's are of even length
-        $rBin = pack('H*', $math->decHex($signature->getR()));
-        $sBin = pack('H*', $math->decHex($signature->getS()));
+        $rBin = pack('H*', $math->decHex($math->toString($signature->getR())));
+        $sBin = pack('H*', $math->decHex($math->toString($signature->getS())));
 
         // Pad R and S if their highest bit is flipped, ie,
         // they are negative.
@@ -111,8 +111,8 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
 
             return new Signature(
                 $this->ecAdapter,
-                $r->getInt(),
-                $s->getInt()
+                gmp_init($r->getInt(), 10),
+                gmp_init($s->getInt(), 10)
             );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');

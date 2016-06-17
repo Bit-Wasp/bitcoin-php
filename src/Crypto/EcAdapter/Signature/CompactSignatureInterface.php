@@ -2,20 +2,8 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Signature;
 
-use BitWasp\Bitcoin\SerializableInterface;
-
-interface CompactSignatureInterface extends SerializableInterface
+interface CompactSignatureInterface extends SignatureInterface
 {
-    /**
-     * @return int|string
-     */
-    public function getR();
-
-    /**
-     * @return int|string
-     */
-    public function getS();
-
     /**
      * @return SignatureInterface
      */

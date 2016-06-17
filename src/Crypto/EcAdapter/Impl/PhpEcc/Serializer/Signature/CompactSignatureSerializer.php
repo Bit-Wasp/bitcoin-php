@@ -47,8 +47,8 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     {
         return $this->getTemplate()->write([
             $signature->getFlags(),
-            $signature->getR(),
-            $signature->getS()
+            gmp_strval($signature->getR(), 10),
+            gmp_strval($signature->getS(), 10)
         ]);
     }
 
@@ -85,7 +85,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
 
-        return new CompactSignature($this->ecAdapter, $r, $s, $recoveryId, $isCompressed);
+        return new CompactSignature($this->ecAdapter, gmp_init($r, 10), gmp_init($s, 10), $recoveryId, $isCompressed);
     }
 
     /**

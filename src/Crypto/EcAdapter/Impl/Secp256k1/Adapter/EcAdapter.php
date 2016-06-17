@@ -125,10 +125,10 @@ class EcAdapter implements EcAdapterInterface
         secp256k1_ecdsa_signature_serialize_der($this->context, $derSig, $sig_t);
 
         $rL = ord($derSig[3]);
-        $r = (new Buffer(substr($derSig, 4, $rL), $rL, $this->math))->getInt();
+        $r = gmp_init((new Buffer(substr($derSig, 4, $rL), $rL, $this->math))->getInt(), 10);
 
         $sL = ord($derSig[4+$rL + 1]);
-        $s = (new Buffer(substr($derSig, 4 + $rL + 2, $sL), $rL, $this->math))->getInt();
+        $s = gmp_init((new Buffer(substr($derSig, 4 + $rL + 2, $sL), $rL, $this->math))->getInt(), 10);
 
         return new Signature($this, $r, $s, $sig_t);
     }

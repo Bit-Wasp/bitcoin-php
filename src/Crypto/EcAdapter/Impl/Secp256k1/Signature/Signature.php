@@ -9,12 +9,12 @@ use BitWasp\Bitcoin\Serializable;
 class Signature extends Serializable implements SignatureInterface
 {
     /**
-     * @var int|string
+     * @var \GMP
      */
     private $r;
 
     /**
-     * @var  int|string
+     * @var  \GMP
      */
     private $s;
 
@@ -30,11 +30,11 @@ class Signature extends Serializable implements SignatureInterface
 
     /**
      * @param EcAdapter $adapter
-     * @param int|string $r
-     * @param int|string $s
+     * @param \GMP $r
+     * @param \GMP $s
      * @param resource $secp256k1_ecdsa_signature_t
      */
-    public function __construct(EcAdapter $adapter, $r, $s, $secp256k1_ecdsa_signature_t)
+    public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, $secp256k1_ecdsa_signature_t)
     {
         if (!is_resource($secp256k1_ecdsa_signature_t) ||
             !get_resource_type($secp256k1_ecdsa_signature_t) === SECP256K1_TYPE_SIG
@@ -49,7 +49,7 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
     public function getR()
     {
@@ -57,7 +57,7 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
     public function getS()
     {
