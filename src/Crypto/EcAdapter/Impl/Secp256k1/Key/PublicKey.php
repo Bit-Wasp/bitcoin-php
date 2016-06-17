@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key\PublicKeySeri
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class PublicKey extends Key implements PublicKeyInterface
@@ -95,15 +96,14 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param \GMP $tweak
      * @return PublicKey
      * @throws \Exception
      */
-    public function tweakAdd($tweak)
+    public function tweakAdd(\GMP $tweak)
     {
         $context = $this->ecAdapter->getContext();
-        $math = $this->ecAdapter->getMath();
-        $bin = pack('H*', str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
+        $bin = Buffer::int(gmp_strval($tweak, 10), 32)->getBinary();
 
         $clone = $this->clonePubkey();
         if (1 !== secp256k1_ec_pubkey_tweak_add($context, $clone, $bin)) {
@@ -114,15 +114,14 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
-     * @param int $tweak
+     * @param \GMP $tweak
      * @return PublicKey
      * @throws \Exception
      */
-    public function tweakMul($tweak)
+    public function tweakMul(\GMP $tweak)
     {
         $context = $this->ecAdapter->getContext();
-        $math = $this->ecAdapter->getMath();
-        $bin = pack('H*', str_pad($math->decHex($tweak), 64, '0', STR_PAD_LEFT));
+        $bin = Buffer::int(gmp_strval($tweak, 10), 32)->getBinary();
 
         $clone = $this->clonePubkey();
         if (1 !== secp256k1_ec_pubkey_tweak_mul($context, $clone, $bin)) {
