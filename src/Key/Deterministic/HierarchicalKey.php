@@ -39,7 +39,7 @@ class HierarchicalKey
     private $sequence;
 
     /**
-     * @var int
+     * @var BufferInterface
      */
     private $chainCode;
 
@@ -53,12 +53,16 @@ class HierarchicalKey
      * @param int $depth
      * @param int $parentFingerprint
      * @param int $sequence
-     * @param int|string $chainCode
+     * @param BufferInterface $chainCode
      * @param KeyInterface $key
      * @throws \Exception
      */
-    public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
+    public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, BufferInterface $chainCode, KeyInterface $key)
     {
+        if ($chainCode->getSize() !== 32) {
+            throw new \RuntimeException('Chaincode should be 32 bytes');
+        }
+
         if (!$key->isCompressed()) {
             throw new \InvalidArgumentException('A HierarchicalKey must always be compressed');
         }
@@ -121,7 +125,7 @@ class HierarchicalKey
      * Return the chain code - a deterministic 'salt' for HMAC-SHA512
      * in child derivations
      *
-     * @return integer
+     * @return BufferInterface
      */
     public function getChainCode()
     {
@@ -195,8 +199,7 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
-        $hardened = ($sequence >> 31) === 1;
-        if ($hardened) {
+        if (($sequence >> 31) === 1) {
             if ($this->isPrivate() === false) {
                 throw new \Exception("Can't derive a hardened key without the private key");
             }
@@ -220,24 +223,24 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $chain = Buffer::int($this->getChainCode(), 32, $this->ecAdapter->getMath());
-
-        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain);
+        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $this->getChainCode());
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
-        $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
 
         if (false === $this->ecAdapter->validatePrivateKey($offset)) {
             return $this->deriveChild($sequence + 1);
         }
+
+        $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
+        $key = $key->tweakAdd(gmp_init($offset->getInt(), 10));
 
         return new HierarchicalKey(
             $this->ecAdapter,
             $this->getDepth() + 1,
             $this->getChildFingerprint(),
             $sequence,
-            $chain->getInt(),
-            $key->tweakAdd(gmp_init($offset->getInt(), 10))
+            $chain,
+            $key
         );
     }
 

@@ -54,7 +54,7 @@ class ExtendedKeySerializer
             ->uint8()
             ->uint32()
             ->uint32()
-            ->uint256()
+            ->bytestring(32)
             ->bytestring(33)
             ->getTemplate();
     }
@@ -108,7 +108,7 @@ class ExtendedKeySerializer
 
     /**
      * @param BufferInterface $buffer
-     * @return \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey
+     * @return HierarchicalKey
      * @throws ParserOutOfRange
      * @throws \Exception
      */

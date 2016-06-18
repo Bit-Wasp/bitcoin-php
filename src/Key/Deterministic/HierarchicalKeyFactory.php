@@ -51,7 +51,7 @@ class HierarchicalKeyFactory
             0,
             0,
             0,
-            $hash->slice(32, 32)->getInt(),
+            $hash->slice(32, 32),
             PrivateKeyFactory::fromHex($hash->slice(0, 32)->getHex(), true, $ecAdapter)
         );
     }
