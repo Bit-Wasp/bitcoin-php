@@ -53,7 +53,7 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     /**
      * Get the version of this transaction
      *
-     * @return int|string
+     * @return int
      */
     public function getVersion();
 
@@ -109,7 +109,7 @@ interface TransactionInterface extends SerializableInterface, \ArrayAccess
     /**
      * Return the locktime for this transaction
      *
-     * @return int|string
+     * @return int
      */
     public function getLockTime();
 

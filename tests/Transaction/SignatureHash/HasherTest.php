@@ -53,7 +53,8 @@ class HasherTest extends AbstractTestCase
             $script = new Script(Buffer::hex($test->outScript));
 
             $t = TransactionFactory::fromHex($test->tx);
-            $h = $t->getSignatureHash()->calculate($script, 0);
+            $hasher = new Hasher($t);
+            $h = $hasher->calculate($script, 0);
 
             $this->assertEquals($h->getHex(), $test->sighash);
         }

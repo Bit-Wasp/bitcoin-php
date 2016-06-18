@@ -21,7 +21,7 @@ class Transaction extends Serializable implements TransactionInterface
     use FunctionAliasArrayAccess;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $version;
 
@@ -41,7 +41,7 @@ class Transaction extends Serializable implements TransactionInterface
     private $witness;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $lockTime;
 
@@ -61,7 +61,6 @@ class Transaction extends Serializable implements TransactionInterface
         TransactionWitnessCollection $witness = null,
         $nLockTime = 0
     ) {
-        $math = Bitcoin::getMath();
         if ($nVersion > TransactionInterface::MAX_VERSION) {
             throw new \InvalidArgumentException('Version must be less than ' . TransactionInterface::MAX_VERSION);
         }
@@ -109,7 +108,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
     public function getWitnessTxId()
     {
@@ -117,7 +116,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getVersion()
     {
@@ -194,18 +193,13 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function makeUtxo($vout)
     {
-        $output = $this->getOutput($vout);
-
-        return new Utxo(
-            new OutPoint($this->getTxId(), $vout),
-            $output
-        );
+        return new Utxo(new OutPoint($this->getTxId(), $vout), $this->getOutput($vout));
     }
 
     /**
      * Get Lock Time
      *
-     * @return int|string
+     * @return int
      */
     public function getLockTime()
     {
@@ -213,7 +207,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface
+     * @return Hasher
      */
     public function getSignatureHash()
     {
