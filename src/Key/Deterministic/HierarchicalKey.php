@@ -39,7 +39,7 @@ class HierarchicalKey
     private $sequence;
 
     /**
-     * @var int
+     * @var BufferInterface
      */
     private $chainCode;
 
@@ -53,12 +53,16 @@ class HierarchicalKey
      * @param int $depth
      * @param int $parentFingerprint
      * @param int $sequence
-     * @param int|string $chainCode
+     * @param BufferInterface $chainCode
      * @param KeyInterface $key
      * @throws \Exception
      */
-    public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, KeyInterface $key)
+    public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, BufferInterface $chainCode, KeyInterface $key)
     {
+        if ($chainCode->getSize() !== 32) {
+            throw new \RuntimeException('Chaincode should be 32 bytes');
+        }
+
         if (!$key->isCompressed()) {
             throw new \InvalidArgumentException('A HierarchicalKey must always be compressed');
         }
@@ -121,7 +125,7 @@ class HierarchicalKey
      * Return the chain code - a deterministic 'salt' for HMAC-SHA512
      * in child derivations
      *
-     * @return integer
+     * @return BufferInterface
      */
     public function getChainCode()
     {
@@ -220,7 +224,7 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $chain = Buffer::int($this->getChainCode(), 32, $this->ecAdapter->getMath());
+        $chain = $this->getChainCode();
 
         $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain);
         $offset = $hash->slice(0, 32);
@@ -236,7 +240,7 @@ class HierarchicalKey
             $this->getDepth() + 1,
             $this->getChildFingerprint(),
             $sequence,
-            $chain->getInt(),
+            $chain,
             $key->tweakAdd(gmp_init($offset->getInt(), 10))
         );
     }

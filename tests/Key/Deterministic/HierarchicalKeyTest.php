@@ -81,7 +81,7 @@ class HierarchicalKeyTest extends AbstractTestCase
             1,
             1,
             1,
-            1,
+            new Buffer('', 32),
             PrivateKeyFactory::create(false)
         );
     }
@@ -468,7 +468,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 
         /** @var EcAdapterInterface $mock */
         /** @var PrivateKeyInterface $mockPriv */
-        $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($mock, 0, 0, 0, 0, $mockPriv);
+        $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($mock, 0, 0, 0, new Buffer('00', 32), $mockPriv);
 
         $this->assertEquals(0, $this->HK_run_count);
         $expected = 1;
