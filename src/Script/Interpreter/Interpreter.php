@@ -23,11 +23,6 @@ class Interpreter implements InterpreterInterface
 {
 
     /**
-     * @var int
-     */
-    private $opCount;
-
-    /**
      * @var \BitWasp\Bitcoin\Math\Math
      */
     private $math;
@@ -133,12 +128,12 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
+     * @param int $count
      * @return $this
-     * @throws \Exception
      */
-    private function checkOpcodeCount()
+    private function checkOpcodeCount($count)
     {
-        if ($this->opCount > 201) {
+        if ($count > 201) {
             throw new \RuntimeException('Error: Script op code count');
         }
 
@@ -370,7 +365,7 @@ class Interpreter implements InterpreterInterface
     {
         $math = $this->math;
         $hashStartPos = 0;
-        $this->opCount = 0;
+        $opCount = 0;
         $altStack = new Stack();
         $vfStack = new Stack();
         $minimal = ($flags & self::VERIFY_MINIMALDATA) != 0;
@@ -392,8 +387,8 @@ class Interpreter implements InterpreterInterface
                 }
 
                 // OP_RESERVED should not count towards opCount
-                if ($opCode > Opcodes::OP_16 && ++$this->opCount) {
-                    $this->checkOpcodeCount();
+                if ($opCode > Opcodes::OP_16 && ++$opCount) {
+                    $this->checkOpcodeCount($opCount);
                 }
 
                 if (in_array($opCode, $this->disabledOps, true)) {
@@ -897,8 +892,8 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('OP_CHECKMULTISIG: Public key count exceeds 20');
                             }
 
-                            $this->opCount += $keyCount;
-                            $this->checkOpcodeCount();
+                            $opCount += $keyCount;
+                            $this->checkOpcodeCount($opCount);
 
                             // Extract positions of the keys, and signatures, from the stack.
                             $ikey = ++$i;
