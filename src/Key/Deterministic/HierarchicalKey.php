@@ -199,8 +199,7 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
-        $hardened = ($sequence >> 31) === 1;
-        if ($hardened) {
+        if (($sequence >> 31) === 1) {
             if ($this->isPrivate() === false) {
                 throw new \Exception("Can't derive a hardened key without the private key");
             }
