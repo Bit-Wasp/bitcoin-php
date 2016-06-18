@@ -223,16 +223,16 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $chain = $this->getChainCode();
-
-        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $chain);
+        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $this->getChainCode());
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
-        $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
 
         if (false === $this->ecAdapter->validatePrivateKey($offset)) {
             return $this->deriveChild($sequence + 1);
         }
+
+        $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
+        $key = $key->tweakAdd(gmp_init($offset->getInt(), 10));
 
         return new HierarchicalKey(
             $this->ecAdapter,
@@ -240,7 +240,7 @@ class HierarchicalKey
             $this->getChildFingerprint(),
             $sequence,
             $chain,
-            $key->tweakAdd(gmp_init($offset->getInt(), 10))
+            $key
         );
     }
 
