@@ -4,23 +4,21 @@ namespace BitWasp\Bitcoin\Tests\Chain;
 
 use BitWasp\Bitcoin\Chain\Params;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Chain\ProofOfWork;
-use Mdanter\Ecc\Math\MathAdapterInterface;
 
 class DifficultyTest extends AbstractTestCase
 {
 
-    public function getLowestBits(MathAdapterInterface $math)
+    public function getLowestBits()
     {
-        return Buffer::hex('1d00ffff', 4, $math);
+        return 0x1d00ffff;
     }
 
     public function testGetWork()
     {
         $vectors = [
             [
-                Buffer::hex('1d00ffff'),
+                0x1d00ffff,
                 '4295032833'
             ]
         ];
@@ -30,7 +28,7 @@ class DifficultyTest extends AbstractTestCase
         $difficulty = new ProofOfWork($math, $params);
 
         foreach ($vectors as $v) {
-            $this->assertEquals($v[1], $difficulty->getWork($v[0]));
+            $this->assertEquals($v[1], $math->toString($difficulty->getWork($v[0])));
         }
 
     }
@@ -45,7 +43,7 @@ class DifficultyTest extends AbstractTestCase
         $params = new Params($math);
         $difficulty = new ProofOfWork($math, $params);
         foreach ($json->test as $test) {
-            $bits = Buffer::hex($test->bits);
+            $bits = hexdec($test->bits);
 
             $this->assertEquals($test->targetHash, $difficulty->getTargetHash($bits)->getHex());
             $this->assertEquals($test->difficulty, $difficulty->getDifficulty($bits));
