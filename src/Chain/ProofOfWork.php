@@ -33,14 +33,14 @@ class ProofOfWork
     }
 
     /**
-     * @param BufferInterface $bits
+     * @param int $bits
      * @return \GMP
      */
-    public function getTarget(BufferInterface $bits)
+    public function getTarget($bits)
     {
         $negative = false;
         $overflow = false;
-        return $this->math->decodeCompact($bits->getInt(), $negative, $overflow);
+        return $this->math->decodeCompact($bits, $negative, $overflow);
     }
 
     /**
@@ -48,14 +48,14 @@ class ProofOfWork
      */
     public function getMaxTarget()
     {
-        return $this->getTarget(Buffer::int($this->params->powBitsLimit(), 4, $this->math));
+        return $this->getTarget($this->params->powBitsLimit());
     }
 
     /**
-     * @param BufferInterface $bits
+     * @param int $bits
      * @return BufferInterface
      */
-    public function getTargetHash(BufferInterface $bits)
+    public function getTargetHash($bits)
     {
         return Buffer::int(
             gmp_strval($this->getTarget($bits), 10),
@@ -65,10 +65,10 @@ class ProofOfWork
     }
 
     /**
-     * @param BufferInterface $bits
+     * @param int $bits
      * @return string
      */
-    public function getDifficulty(BufferInterface $bits)
+    public function getDifficulty($bits)
     {
         $target = $this->getTarget($bits);
         $lowest = $this->getMaxTarget();
@@ -115,12 +115,12 @@ class ProofOfWork
     }
 
     /**
-     * @param BufferInterface $bits
-     * @return int|string
+     * @param int $bits
+     * @return \GMP
      */
-    public function getWork(BufferInterface $bits)
+    public function getWork($bits)
     {
         $target = gmp_strval($this->getTarget($bits), 10);
-        return bcdiv(self::POW_2_256, $target);
+        return gmp_init(bcdiv(self::POW_2_256, $target), 10);
     }
 }
