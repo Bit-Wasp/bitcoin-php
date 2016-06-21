@@ -11,6 +11,16 @@ use BitWasp\Buffertools\TemplateFactory;
 class BlockHeaderSerializer
 {
     /**
+     * @var \BitWasp\Buffertools\Template
+     */
+    private $template;
+
+    public function __construct()
+    {
+        $this->template = $this->getTemplate();
+    }
+
+    /**
      * @param \BitWasp\Buffertools\BufferInterface|string $string
      * @return BlockHeader
      * @throws ParserOutOfRange
@@ -44,7 +54,7 @@ class BlockHeaderSerializer
     {
 
         try {
-            list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->getTemplate()->parse($parser);
+            list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->template->parse($parser);
 
             return new BlockHeader(
                 $version,
@@ -65,7 +75,7 @@ class BlockHeaderSerializer
      */
     public function serialize(BlockHeaderInterface $header)
     {
-        return $this->getTemplate()->write([
+        return $this->template->write([
             $header->getVersion(),
             $header->getPrevBlock(),
             $header->getMerkleRoot(),

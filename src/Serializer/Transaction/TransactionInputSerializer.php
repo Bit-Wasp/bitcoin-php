@@ -18,12 +18,18 @@ class TransactionInputSerializer
     private $outpointSerializer;
 
     /**
-     * TransactionInputSerializer constructor.
-     * @param OutPointSerializer $outPointSerializer
+     * @var \BitWasp\Buffertools\Template
      */
-    public function __construct(OutPointSerializer $outPointSerializer)
+    private $template;
+
+    /**
+     * TransactionInputSerializer constructor.
+     * @param OutPointSerializerInterface $outPointSerializer
+     */
+    public function __construct(OutPointSerializerInterface $outPointSerializer)
     {
         $this->outpointSerializer = $outPointSerializer;
+        $this->template = $this->getInputTemplate();
     }
 
     /**
@@ -45,7 +51,7 @@ class TransactionInputSerializer
     {
         return Buffertools::concat(
             $this->outpointSerializer->serialize($input->getOutPoint()),
-            $this->getInputTemplate()->write([
+            $this->template->write([
                 $input->getScript()->getBuffer(),
                 $input->getSequence()
             ])

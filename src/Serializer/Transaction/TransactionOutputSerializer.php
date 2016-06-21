@@ -12,6 +12,16 @@ use BitWasp\Buffertools\TemplateFactory;
 class TransactionOutputSerializer
 {
     /**
+     * @var \BitWasp\Buffertools\Template
+     */
+    private $template;
+
+    public function __construct()
+    {
+        $this->template = $this->getTemplate();
+    }
+
+    /**
      * @return \BitWasp\Buffertools\Template
      */
     private function getTemplate()
@@ -28,7 +38,7 @@ class TransactionOutputSerializer
      */
     public function serialize(TransactionOutputInterface $output)
     {
-        return $this->getTemplate()->write([
+        return $this->template->write([
             $output->getValue(),
             $output->getScript()->getBuffer()
         ]);
@@ -41,7 +51,7 @@ class TransactionOutputSerializer
      */
     public function fromParser(Parser $parser)
     {
-        $parse = $this->getTemplate()->parse($parser);
+        $parse = $this->template->parse($parser);
         /** @var int $value */
         $value = $parse[0];
         /** @var BufferInterface $scriptBuf */
