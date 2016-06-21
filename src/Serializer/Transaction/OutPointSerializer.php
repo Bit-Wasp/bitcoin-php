@@ -10,6 +10,16 @@ use BitWasp\Buffertools\TemplateFactory;
 class OutPointSerializer implements OutPointSerializerInterface
 {
     /**
+     * @var \BitWasp\Buffertools\Template
+     */
+    private $template;
+
+    public function __construct()
+    {
+        $this->template = $this->getTemplate();
+    }
+
+    /**
      * @return \BitWasp\Buffertools\Template
      */
     public function getTemplate()
@@ -26,7 +36,7 @@ class OutPointSerializer implements OutPointSerializerInterface
      */
     public function serialize(OutPointInterface $outpoint)
     {
-        return $this->getTemplate()->write([
+        return $this->template->write([
             $outpoint->getTxId(),
             $outpoint->getVout()
         ]);
@@ -38,7 +48,7 @@ class OutPointSerializer implements OutPointSerializerInterface
      */
     public function fromParser(Parser $parser)
     {
-        list ($txid, $vout) = $this->getTemplate()->parse($parser);
+        list ($txid, $vout) = $this->template->parse($parser);
 
         return new OutPoint($txid, $vout);
     }

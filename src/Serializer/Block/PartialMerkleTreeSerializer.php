@@ -12,6 +12,19 @@ use BitWasp\Buffertools\TemplateFactory;
 class PartialMerkleTreeSerializer
 {
     /**
+     * @var \BitWasp\Buffertools\Template
+     */
+    private $template;
+
+    /**
+     * PartialMerkleTreeSerializer constructor.
+     */
+    public function __construct()
+    {
+        $this->template = $this->getTemplate();
+    }
+
+    /**
      * @return \BitWasp\Buffertools\Template
      */
     public function getTemplate()
@@ -52,7 +65,7 @@ class PartialMerkleTreeSerializer
      */
     public function fromParser(Parser $parser)
     {
-        list ($txCount, $vHash, $vBits) = $this->getTemplate()->parse($parser);
+        list ($txCount, $vHash, $vBits) = $this->template->parse($parser);
 
         return new PartialMerkleTree(
             (int)$txCount,
@@ -99,7 +112,7 @@ class PartialMerkleTreeSerializer
      */
     public function serialize(PartialMerkleTree $tree)
     {
-        return $this->getTemplate()->write([
+        return $this->template->write([
             $tree->getTxCount(),
             $tree->getHashes(),
             $this->bitsToBuffers($tree->getFlagBits())

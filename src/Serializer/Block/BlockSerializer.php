@@ -30,6 +30,11 @@ class BlockSerializer implements BlockSerializerInterface
     private $txSerializer;
 
     /**
+     * @var \BitWasp\Buffertools\Template
+     */
+    private $txsTemplate;
+
+    /**
      * @param Math $math
      * @param BlockHeaderSerializer $headerSerializer
      * @param TransactionSerializerInterface $txSerializer
@@ -39,6 +44,7 @@ class BlockSerializer implements BlockSerializerInterface
         $this->math = $math;
         $this->headerSerializer = $headerSerializer;
         $this->txSerializer = $txSerializer;
+        $this->txsTemplate = $this->getTxsTemplate();
     }
 
     /**
@@ -64,7 +70,7 @@ class BlockSerializer implements BlockSerializerInterface
             return new Block(
                 $this->math,
                 $this->headerSerializer->fromParser($parser),
-                new TransactionCollection($this->getTxsTemplate()->parse($parser)[0])
+                new TransactionCollection($this->txsTemplate->parse($parser)[0])
             );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
@@ -89,7 +95,7 @@ class BlockSerializer implements BlockSerializerInterface
     {
         return Buffertools::concat(
             $this->headerSerializer->serialize($block->getHeader()),
-            $this->getTxsTemplate()->write([$block->getTransactions()->all()])
+            $this->txsTemplate->write([$block->getTransactions()->all()])
         );
     }
 }
