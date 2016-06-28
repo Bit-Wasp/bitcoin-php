@@ -54,10 +54,9 @@ class Bip39Mnemonic implements MnemonicInterface
     private function calculateChecksum(BufferInterface $entropy, $CSlen)
     {
         $entHash = Hash::sha256($entropy);
-        $math = $this->ecAdapter->getMath();
 
         // Convert byte string to padded binary string of 0/1's.
-        $hashBits = str_pad($math->baseConvert($entHash->getHex(), 16, 2), 256, '0', STR_PAD_LEFT);
+        $hashBits = str_pad(gmp_strval($entHash->getGmp(), 2), 256, '0', STR_PAD_LEFT);
 
         // Take $CSlen bits for the checksum
         $checksumBits = substr($hashBits, 0, $CSlen);
@@ -76,9 +75,8 @@ class Bip39Mnemonic implements MnemonicInterface
         $ENT = $entropy->getSize() * 8;
         $CS = $ENT / 32;
 
-        $entBits = $math->baseConvert($entropy->getHex(), 16, 2);
-        $csBits = $this->calculateChecksum($entropy, $CS);
-        $bits = str_pad($entBits . $csBits, ($ENT + $CS), '0', STR_PAD_LEFT);
+        $bits = gmp_strval($entropy->getGmp(), 2) . $this->calculateChecksum($entropy, $CS);
+        $bits = str_pad($bits, ($ENT + $CS), '0', STR_PAD_LEFT);
 
         $result = [];
         foreach (str_split($bits, 11) as $bit) {
@@ -130,7 +128,7 @@ class Bip39Mnemonic implements MnemonicInterface
         for ($i = 0; $i < $ENT; $i += $bitsInChar) {
             // Extract 8 bits at a time, convert to hex, pad, and convert to binary.
             $eBits = substr($entBits, $i, $bitsInChar);
-            $binary .= hex2bin(str_pad($math->baseConvert($eBits, 2, 16), 2, '0', STR_PAD_LEFT));
+            $binary .= pack("H*", (str_pad($math->baseConvert($eBits, 2, 16), 2, '0', STR_PAD_LEFT)));
         }
 
         $entropy = new Buffer($binary, null, $math);

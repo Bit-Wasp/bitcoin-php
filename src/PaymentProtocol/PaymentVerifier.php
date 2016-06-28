@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Buffertools\Buffer;
 
 class PaymentVerifier
 {
@@ -34,7 +35,7 @@ class PaymentVerifier
         return new TransactionCollection(
             array_map(
                 function ($binTx) {
-                    return TransactionFactory::fromHex(bin2hex($binTx));
+                    return TransactionFactory::fromHex(new Buffer($binTx));
                 },
                 $payment->getTransactionsList()
             )
