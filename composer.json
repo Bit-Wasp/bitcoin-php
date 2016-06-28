@@ -23,10 +23,8 @@
     }
   },
   "require": {
-    "php": ">=5.5",
+    "php": ">=5.6",
     "ext-gmp": "*",
-    "ext-json": "*",
-    "ext-curl": "*",
     "ext-openssl": "*",
     "paragonie/random_compat": "~1.4|~2.0",
     "pleonasm/merkle-tree": "1.0.0",
@@ -34,12 +32,13 @@
     "lastguest/murmurhash": "~1.1",
     "rgooding/protobuf-php": "~0.0",
     "symfony/http-foundation": "~3.0",
-    "bitwasp/buffertools": "~0.2",
-    "afk11/ecc": "~0.0.2",
+    "mdanter/ecc": "~0.4",
+    "bitwasp/buffertools": "~0.3",
     "bitwasp/trait": "~0.0",
     "bitwasp/secp256k1-php": "~0.0.7"
   },
   "require-dev": {
+    "ext-json": "*",
     "bitwasp/testing-php": "~0.1",
     "symfony/yaml": "~2.6"
   }
