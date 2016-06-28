@@ -133,9 +133,9 @@ class Number extends Serializable
         $result = [];
         $negative = $this->math->cmp(gmp_init($this->number), $zero) < 0;
         $abs = $negative ? $this->math->sub($zero, gmp_init($this->number, 10)) : gmp_init($this->number, 10);
-
+        $mask = gmp_init(0xff);
         while ($this->math->cmp($abs, $zero) > 0) {
-            $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, gmp_init(0xff)), 10);
+            $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, $mask), 10);
             $abs = $this->math->rightShift($abs, 8);
         }
 
@@ -176,6 +176,9 @@ class Number extends Serializable
         return $this->number;
     }
 
+    /**
+     * @return \GMP
+     */
     public function getGmp()
     {
         return gmp_init($this->number, 10);
