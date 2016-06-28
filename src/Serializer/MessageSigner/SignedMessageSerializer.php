@@ -69,8 +69,8 @@ class SignedMessageSerializer
         $sigStart = $sigHeaderPos + strlen(self::SIG_START);
 
         $sig = trim(substr($content, $sigStart, $sigEnd - $sigStart));
-        $sigHex = bin2hex(base64_decode($sig));
-        $compactSig = $this->csSerializer->parse($sigHex);
+        $sig = new Buffer(base64_decode($sig));
+        $compactSig = $this->csSerializer->parse($sig);
 
         return new SignedMessage($message, $compactSig);
     }

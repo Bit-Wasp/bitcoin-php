@@ -127,11 +127,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $adapter = $this->ecAdapter;
         $math = $adapter->getMath();
         $context = $adapter->getContext();
-        $privKey = $this->getBinary(); // mod by reference
+        $privateKey = $this->getBinary(); // mod by reference
         $tweak = Buffer::int($math->toString($tweak), 32, $math)->getBinary();
         $ret = \secp256k1_ec_privkey_tweak_add(
             $context,
-            $privKey,
+            $privateKey,
             $tweak
         );
 
@@ -139,8 +139,8 @@ class PrivateKey extends Key implements PrivateKeyInterface
             throw new \RuntimeException('Secp256k1 privkey tweak add: failed');
         }
 
-        $secret = gmp_init(bin2hex($privKey), 16);
-        return $adapter->getPrivateKey($secret, $this->compressed);
+        $secret = new Buffer($privateKey);
+        return $adapter->getPrivateKey($secret->getGmp(), $this->compressed);
     }
 
     /**
@@ -162,8 +162,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
             throw new \RuntimeException('Secp256k1 privkey tweak mul: failed');
         }
 
-        $secret = gmp_init(bin2hex($privateKey), 16);
-        return $this->ecAdapter->getPrivateKey($secret, $this->compressed);
+        $secret = new Buffer($privateKey);
+
+        return $this->ecAdapter->getPrivateKey($secret->getGmp(), $this->compressed);
     }
 
     /**

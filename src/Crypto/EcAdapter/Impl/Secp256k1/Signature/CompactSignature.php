@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class CompactSignature extends Signature implements CompactSignatureInterface
@@ -52,7 +53,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
         secp256k1_ecdsa_recoverable_signature_serialize_compact($ecAdapter->getContext(), $secp256k1_ecdsa_signature_t, $ser, $recidout);
         list ($r, $s) = array_map(
             function ($val) use ($math) {
-                return gmp_init($math->hexDec(bin2hex($val)), 10);
+                return (new Buffer($val))->getGmp();
             },
             str_split($ser, 32)
         );
