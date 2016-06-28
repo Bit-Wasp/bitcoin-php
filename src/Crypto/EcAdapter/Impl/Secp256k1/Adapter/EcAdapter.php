@@ -128,7 +128,7 @@ class EcAdapter implements EcAdapterInterface
         $r = (new Buffer(substr($derSig, 4, $rL), $rL, $this->math))->getGmp();
 
         $sL = ord($derSig[4+$rL + 1]);
-        $s = (new Buffer(substr($derSig, 4 + $rL + 2, $sL), $rL, $this->math))->getGmp();
+        $s = (new Buffer(substr($derSig, 4 + $rL + 2, $sL), $sL, $this->math))->getGmp();
 
         return new Signature($this, $r, $s, $sig_t);
     }
