@@ -23,7 +23,7 @@ class WifPrivateKeySerializer
     /**
      * @var PrivateKeySerializerInterface
      */
-    private $hexSerializer;
+    private $keySerializer;
 
     /**
      * @param Math $math
@@ -32,7 +32,7 @@ class WifPrivateKeySerializer
     public function __construct(Math $math, PrivateKeySerializerInterface $hexSerializer)
     {
         $this->math = $math;
-        $this->hexSerializer = $hexSerializer;
+        $this->keySerializer = $hexSerializer;
     }
 
     /**
@@ -44,7 +44,7 @@ class WifPrivateKeySerializer
     {
         $serialized = Buffertools::concat(
             Buffer::hex($network->getPrivByte()),
-            $this->hexSerializer->serialize($privateKey)
+            $this->keySerializer->serialize($privateKey)
         );
 
         if ($privateKey->isCompressed()) {

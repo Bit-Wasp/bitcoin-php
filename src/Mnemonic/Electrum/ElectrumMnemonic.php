@@ -42,7 +42,7 @@ class ElectrumMnemonic implements MnemonicInterface
 
         $chunks = $entropy->getSize() / 4;
         for ($i = 0; $i < $chunks; $i++) {
-            $x = gmp_init($entropy->slice(4*$i, 4)->getInt(), 10);
+            $x = $entropy->slice(4*$i, 4)->getGmp();
             $index1 = $math->mod($x, $n);
             $index2 = $math->mod($math->add($math->div($x, $n), $index1), $n);
             $index3 = $math->mod($math->add($math->div($math->div($x, $n), $n), $index2), $n);
@@ -99,7 +99,7 @@ class ElectrumMnemonic implements MnemonicInterface
                     )
                 )
             );
-
+            
             $out .= str_pad(gmp_strval($x, 16), 8, '0', STR_PAD_LEFT);
         }
 

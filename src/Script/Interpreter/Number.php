@@ -11,8 +11,8 @@ use BitWasp\Buffertools\BufferInterface;
 class Number extends Serializable
 {
     const MAX_NUM_SIZE = 4;
-    const MAX = 2147483647; // 2^31-1
-    const MIN = -2147483647; // -2^31+1
+    const MAX = 2**31-1;
+    const MIN = -2**31+1;
 
     /**
      * @var Math
@@ -49,6 +49,19 @@ class Number extends Serializable
     }
 
     /**
+     * @param \GMP $number
+     * @param Math|null $math
+     * @return self
+     */
+    public static function gmp(\GMP $number, Math $math = null)
+    {
+        return new self(
+            gmp_strval($number, 10),
+            $math ?: Bitcoin::getMath()
+        );
+    }
+
+    /**
      * @param BufferInterface $vch
      * @param bool $fRequireMinimal
      * @param int $maxNumSize
@@ -64,8 +77,9 @@ class Number extends Serializable
 
         if ($fRequireMinimal && $size > 0) {
             $binary = $vch->getBinary();
-            if (ord($binary[$size - 1]) & 0x7f === 0) {
-                if ($size <= 1 || ord($binary[$size - 2]) & 0x80 === 0) {
+            $chars = array_values(unpack("C*", $binary));
+            if ($chars[$size - 1] & 0x7f === 0) {
+                if ($size <= 1 || $chars[$size - 2] & 0x80 === 0) {
                     throw new \RuntimeException('Non-minimally encoded script number');
                 }
             }
@@ -88,10 +102,7 @@ class Number extends Serializable
             return '0';
         }
 
-        $chars = array_map(function ($binary) {
-            return ord($binary);
-
-        }, str_split($buffer->getBinary(), 1));
+        $chars = array_values(unpack("C*", $buffer->getBinary()));
 
         $result = gmp_init(0);
         for ($i = 0; $i < $size; $i++) {
@@ -122,9 +133,9 @@ class Number extends Serializable
         $result = [];
         $negative = $this->math->cmp(gmp_init($this->number), $zero) < 0;
         $abs = $negative ? $this->math->sub($zero, gmp_init($this->number, 10)) : gmp_init($this->number, 10);
-
+        $mask = gmp_init(0xff);
         while ($this->math->cmp($abs, $zero) > 0) {
-            $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, gmp_init(0xff)), 10);
+            $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, $mask), 10);
             $abs = $this->math->rightShift($abs, 8);
         }
 
@@ -163,5 +174,13 @@ class Number extends Serializable
         }
 
         return $this->number;
+    }
+
+    /**
+     * @return \GMP
+     */
+    public function getGmp()
+    {
+        return gmp_init($this->number, 10);
     }
 }

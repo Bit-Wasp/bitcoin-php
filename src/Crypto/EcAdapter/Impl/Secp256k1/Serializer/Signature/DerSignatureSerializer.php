@@ -84,7 +84,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param $data
+     * @param string $data
      * @return SignatureInterface
      */
     public function parse($data)
@@ -104,6 +104,6 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         /** @var Buffer $r */
         /** @var Buffer $s */
 
-        return new Signature($this->ecAdapter, gmp_init($r->getInt(), 10), gmp_init($s->getInt(), 10), $sig_t);
+        return new Signature($this->ecAdapter, $r->getGmp(), $s->getGmp(), $sig_t);
     }
 }

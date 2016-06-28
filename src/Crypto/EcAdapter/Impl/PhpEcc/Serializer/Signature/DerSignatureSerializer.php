@@ -111,8 +111,8 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
 
             return new Signature(
                 $this->ecAdapter,
-                gmp_init($r->getInt(), 10),
-                gmp_init($s->getInt(), 10)
+                $r->getGmp(),
+                $s->getGmp()
             );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');

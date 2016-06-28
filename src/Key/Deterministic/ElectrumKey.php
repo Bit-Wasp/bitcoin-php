@@ -82,7 +82,7 @@ class ElectrumKey
     public function getSequenceOffset($sequence, $change = false)
     {
         $seed = new Buffer(sprintf("%s:%s:%s", $sequence, $change ? '1' : '0', $this->getMPK()->getBinary()), null, $this->ecAdapter->getMath());
-        return gmp_init(Hash::sha256d($seed)->getInt(), 10);
+        return Hash::sha256d($seed)->getGmp();
     }
 
     /**

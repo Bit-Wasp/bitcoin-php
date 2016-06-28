@@ -87,7 +87,7 @@ class Checker
         $binary = $signature->getBinary();
         $nLenR = ord($binary[3]);
         $nLenS = ord($binary[5 + $nLenR]);
-        $s = gmp_init($signature->slice(6 + $nLenR, $nLenS)->getInt(), 10);
+        $s = $signature->slice(6 + $nLenR, $nLenS)->getGmp();
 
         return $this->adapter->validateSignatureElement($s, true);
     }
@@ -219,21 +219,20 @@ class Checker
      */
     public function checkSequence(\BitWasp\Bitcoin\Script\Interpreter\Number $sequence)
     {
-        $math = $this->adapter->getMath();
         $txSequence = $this->transaction->getInput($this->nInput)->getSequence();
         if ($this->transaction->getVersion() < 2) {
             return false;
         }
 
-        if ($math->cmp($math->bitwiseAnd($txSequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), 0) !== 0) {
-            return 0;
+        if (($txSequence & TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG) !== 0) {
+            return true;
         }
 
-        $mask = $math->bitwiseOr(TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG, TransactionInputInterface::SEQUENCE_LOCKTIME_MASK);
+        $mask = TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG | TransactionInputInterface::SEQUENCE_LOCKTIME_MASK;
         return $this->verifyLockTime(
-            $math->bitwiseAnd($txSequence, $mask),
+            $txSequence & $mask,
             TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG,
-            Number::int($math->bitwiseAnd($sequence->getInt(), $mask))
+            Number::int($sequence->getInt() & $mask)
         );
     }
 }
