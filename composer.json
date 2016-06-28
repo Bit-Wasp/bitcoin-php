@@ -28,7 +28,6 @@
     "ext-openssl": "*",
     "paragonie/random_compat": "~1.4|~2.0",
     "pleonasm/merkle-tree": "1.0.0",
-    "rych/hash_pbkdf2-compat": "~1.0",
     "lastguest/murmurhash": "~1.1",
     "rgooding/protobuf-php": "~0.0",
     "symfony/http-foundation": "~3.0",
