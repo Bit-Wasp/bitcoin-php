@@ -202,7 +202,7 @@ class EcAdapter implements EcAdapterInterface
 
         // 1.6.1 Compute a candidate public key Q = r^-1 (sR - eG)
         $rInv = $math->inverseMod($r, $G->getOrder());
-        $eGNeg = $point_negate($G->mul(gmp_init($messageHash->getInt())));
+        $eGNeg = $point_negate($G->mul($messageHash->getGmp()));
         $Q = $R->mul($s)->add($eGNeg)->mul($rInv);
 
         // 1.6.2 Test Q as a public key
@@ -282,7 +282,7 @@ class EcAdapter implements EcAdapterInterface
     public function validatePrivateKey(BufferInterface $privateKey)
     {
         $math = $this->math;
-        $scalar = gmp_init($privateKey->getInt(), 10);
+        $scalar = $privateKey->getGmp();
         return $math->cmp($scalar, gmp_init(0)) > 0 && $math->cmp($scalar, $this->getGenerator()->getOrder()) < 0;
     }
 
@@ -325,11 +325,11 @@ class EcAdapter implements EcAdapterInterface
             throw new \Exception('Unknown public key prefix');
         }
 
-        $x = gmp_init($publicKey->slice(1, 32)->getInt(), 10);
+        $x = $publicKey->slice(1, 32)->getGmp();
         $curve = $this->generator->getCurve();
         $y = $compressed
             ? $curve->recoverYfromX($prefix === PublicKey::KEY_COMPRESSED_ODD, $x)
-            : gmp_init($publicKey->slice(33, 32)->getInt(), 10);
+            : $publicKey->slice(33, 32)->getGmp();
 
         return new PublicKey(
             $this,

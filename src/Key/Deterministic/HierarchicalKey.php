@@ -232,7 +232,7 @@ class HierarchicalKey
         }
 
         $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
-        $key = $key->tweakAdd(gmp_init($offset->getInt(), 10));
+        $key = $key->tweakAdd($offset->getGmp());
 
         return new HierarchicalKey(
             $this->ecAdapter,

@@ -32,15 +32,14 @@ class Base58
         $math = Bitcoin::getMath();
 
         $orig = $buffer->getBinary();
-        $decimal = gmp_init($buffer->getInt(), 10);
+        $decimal = $buffer->getGmp();
 
         $return = '';
         $zero = gmp_init(0);
         $_58 = gmp_init(58);
         while ($math->cmp($decimal, $zero) > 0) {
             list($decimal, $rem) = $math->divQr($decimal, $_58);
-            $index = (int) gmp_strval($rem, 10);
-            $return .= self::$base58chars[$index];
+            $return .= self::$base58chars[(int) gmp_strval($rem, 10)];
         }
         $return = strrev($return);
 

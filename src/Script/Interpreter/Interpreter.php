@@ -458,7 +458,7 @@ class Interpreter implements InterpreterInterface
                             }
 
                             $sequence = Number::buffer($mainStack[-1], $minimal, 5, $this->math);
-                            $nSequence = gmp_init($sequence->getInt(), 10);
+                            $nSequence = $sequence->getGmp();
                             if ($this->math->cmp($nSequence, gmp_init(0)) < 0) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
                             }
@@ -621,7 +621,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $n = gmp_init(Number::buffer($mainStack[-1], $minimal, 4)->getInt(), 10);
+                            $n = Number::buffer($mainStack[-1], $minimal, 4)->getGmp();
                             $mainStack->pop();
                             if ($this->math->cmp($n, gmp_init(0)) < 0 || $this->math->cmp($n, gmp_init(count($mainStack))) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
@@ -728,7 +728,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation 1ADD-OP_0NOTEQUAL');
                             }
 
-                            $num = gmp_init(Number::buffer($mainStack[-1], $minimal)->getInt(), 10);
+                            $num = Number::buffer($mainStack[-1], $minimal)->getGmp();
 
                             if ($opCode === Opcodes::OP_1ADD) {
                                 $num = $this->math->add($num, gmp_init(1));
@@ -761,8 +761,8 @@ class Interpreter implements InterpreterInterface
                                 throw new \Exception('Invalid stack operation (OP_ADD - OP_MAX)');
                             }
 
-                            $num1 = gmp_init(Number::buffer($mainStack[-2], $minimal)->getInt(), 10);
-                            $num2 = gmp_init(Number::buffer($mainStack[-1], $minimal)->getInt(), 10);
+                            $num1 = Number::buffer($mainStack[-2], $minimal)->getGmp();
+                            $num2 = Number::buffer($mainStack[-1], $minimal)->getGmp();
 
                             if ($opCode === Opcodes::OP_ADD) {
                                 $num = $this->math->add($num1, $num2);
@@ -811,9 +811,9 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation');
                             }
 
-                            $num1 = gmp_init(Number::buffer($mainStack[-3], $minimal)->getInt(), 10);
-                            $num2 = gmp_init(Number::buffer($mainStack[-2], $minimal)->getInt(), 10);
-                            $num3 = gmp_init(Number::buffer($mainStack[-1], $minimal)->getInt(), 10);
+                            $num1 = Number::buffer($mainStack[-3], $minimal)->getGmp();
+                            $num2 = Number::buffer($mainStack[-2], $minimal)->getGmp();
+                            $num3 = Number::buffer($mainStack[-1], $minimal)->getGmp();
 
                             $value = $this->math->cmp($num2, $num1) <= 0 && $this->math->cmp($num1, $num3) < 0;
                             $mainStack->pop();

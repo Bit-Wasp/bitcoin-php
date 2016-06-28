@@ -97,7 +97,7 @@ class ProofOfWork
             throw new \RuntimeException('nBits below minimum work');
         }
 
-        if ($this->math->cmp(gmp_init($hash->getInt(), 10), $target) > 0) {
+        if ($this->math->cmp($hash->getGmp(), $target) > 0) {
             throw new \RuntimeException("Hash doesn't match nBits");
         }
 
