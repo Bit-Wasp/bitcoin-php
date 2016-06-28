@@ -72,7 +72,7 @@ class Base58
             $return = $math->add($math->mul($return, $_58), gmp_init(strpos(self::$base58chars, $base58[$i]), 10));
         }
 
-        $binary = $math->cmp($return, gmp_init(0)) === 0 ? '' : hex2bin($math->decHex(gmp_strval($return, 10)));
+        $binary = $math->cmp($return, gmp_init(0)) === 0 ? '' : Buffer::int(gmp_strval($return, 10))->getBinary();
         for ($i = 0; $i < $length && $original[$i] === '1'; $i++) {
             $binary = "\x00" . $binary;
         }
