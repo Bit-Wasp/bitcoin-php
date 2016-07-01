@@ -76,8 +76,17 @@ interface InterpreterInterface
 
     // Verify CHECKSEQUENCEVERIFY
     //
-    // See BIP112 for details.
+    // See BIP112 esetfor details.
     const VERIFY_CHECKSEQUENCEVERIFY = 1 << 10;
+
+    /**
+     * Verify Witness Programs
+     *
+     * See BIP 141
+     */
+    const VERIFY_WITNESS = 1 << 11;
+
+    const VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM = 1 << 12;
 
 
     const SIGHASH_ALL          = 0x1;
