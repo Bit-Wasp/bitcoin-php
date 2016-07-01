@@ -70,7 +70,6 @@ class Number extends Serializable
      */
     public static function buffer(BufferInterface $vch, $fRequireMinimal, $maxNumSize = self::MAX_NUM_SIZE, Math $math = null)
     {
-        echo "Create Number from buffer, ";
         $size = $vch->getSize();
         if ($size > $maxNumSize) {
             throw new \RuntimeException('Script number overflow');

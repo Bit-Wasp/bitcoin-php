@@ -108,7 +108,6 @@ class Interpreter implements InterpreterInterface
         if ($pushSize === 0) {
             return $opCode === Opcodes::OP_0;
         } elseif ($pushSize === 1) {
-            echo "check code: ".bin2hex($binary[0]).PHP_EOL;
             $first = ord($binary[0]);
 
             if ($first >= 1 && $first <= 16) {
@@ -367,7 +366,6 @@ class Interpreter implements InterpreterInterface
         $altStack = new Stack();
         $vfStack = new Stack();
         $minimal = ($flags & self::VERIFY_MINIMALDATA) != 0;
-        var_dump($minimal);
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {

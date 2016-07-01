@@ -223,8 +223,6 @@ class ScriptTest extends AbstractTestCase
      */
     public function testScript(EcAdapterInterface $ecAdapter, Interpreter $interpreter, $flags, $expectedResult, ScriptWitnessInterface $scriptWitness, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $amount, $strTest)
     {
-        echo "Sig: " . $scriptSig->getHex().PHP_EOL;
-        echo "Pub: " . $scriptPubKey->getHex().PHP_EOL;
         $create = $this->buildCreditingTransaction($scriptPubKey, $amount);
         $tx = $this->buildSpendTransaction($create, $scriptSig, $scriptWitness);
         $check = $interpreter->verify($scriptSig, $scriptPubKey, $flags, new Checker($ecAdapter, $tx, 0, $amount), $scriptWitness);
