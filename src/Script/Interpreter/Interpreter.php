@@ -65,11 +65,14 @@ class Interpreter implements InterpreterInterface
      */
     public function castToBool(BufferInterface $value)
     {
-        $val = $value->getBinary();
-        for ($i = 0, $size = strlen($val); $i < $size; $i++) {
-            $chr = ord($val[$i]);
-            if ($chr != 0) {
-                if ($i == ($size - 1) && $chr == 0x80) {
+        $character = $value->getBinary();
+        $characters = array_values(unpack("C*", $value->getBinary()));
+        $size = count($characters);
+
+        for ($i = 0; $i < $size; $i++) {
+            $chr = ord($characters[$i]);
+            if ($chr !== 0) {
+                if ($i === ($size - 1) && $chr === 0x80) {
                     return false;
                 }
 
@@ -163,8 +166,7 @@ class Interpreter implements InterpreterInterface
                 $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
                 $stackValues = $scriptWitness->slice(0, -1);
                 $hashScriptPubKey = Hash::sha256($scriptPubKey->getBuffer());
-
-                if ($hashScriptPubKey == $buffer) {
+                if (!$hashScriptPubKey->equals($buffer)) {
                     return false;
                 }
             } elseif ($buffer->getSize() === 20) {
@@ -313,7 +315,7 @@ class Interpreter implements InterpreterInterface
             }
         }
 
-        if ($flags & self::VERIFY_CLEAN_STACK != 0) {
+        if ($flags & self::VERIFY_CLEAN_STACK) {
             if (!($flags & self::VERIFY_P2SH != 0 && $flags & self::VERIFY_WITNESS != 0)) {
                 return false; // implied flags required
             }
@@ -342,15 +344,14 @@ class Interpreter implements InterpreterInterface
      */
     private function checkExec(Stack $vfStack)
     {
-        $c = 0;
-        $len = $vfStack->end();
-        for ($i = 0; $i < $len; $i++) {
-            if ($vfStack[0 - $len - $i] === true) {
-                $c++;
+        $ret = 0;
+        foreach ($vfStack as $item) {
+            if ($item === false) {
+                $ret++;
             }
         }
 
-        return !(bool)$c;
+        return $ret;
     }
 
     /**
@@ -367,7 +368,7 @@ class Interpreter implements InterpreterInterface
         $opCount = 0;
         $altStack = new Stack();
         $vfStack = new Stack();
-        $minimal = ($flags & self::VERIFY_MINIMALDATA) != 0;
+        $minimal = ($flags & self::VERIFY_MINIMALDATA) > 0;
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
@@ -378,7 +379,7 @@ class Interpreter implements InterpreterInterface
             foreach ($parser as $operation) {
                 $opCode = $operation->getOp();
                 $pushData = $operation->getData();
-                $fExec = $this->checkExec($vfStack);
+                $fExec = !$this->checkExec($vfStack);
 
                 // If pushdata was written to
                 if ($operation->isPush() && $operation->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
@@ -395,15 +396,16 @@ class Interpreter implements InterpreterInterface
                 }
 
                 if ($fExec && $operation->isPush()) {
+                    var_dump($minimal);
                     // In range of a pushdata opcode
                     if ($minimal && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(self::VERIFY_MINIMALDATA, 'Minimal pushdata required');
                     }
 
                     $mainStack->push($pushData);
-                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
-                } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
-                    // echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
+                     echo " - [pushed '" . $pushData->getHex() . "']\n";
+                } elseif ($fExec || (Opcodes::OP_IF <= $opCode && $opCode <= Opcodes::OP_ENDIF)) {
+                     echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1NEGATE:
                         case Opcodes::OP_1:
@@ -422,12 +424,12 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_14:
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
-                            $num = \BitWasp\Bitcoin\Script\decodeOpN($opCode);
-                            $mainStack->push(Number::int($num)->getBuffer());
+                            $num = Number::int((int) $opCode - (Opcodes::OP_1 - 1))->getBuffer();
+                            $mainStack->push($num);
                             break;
 
                         case Opcodes::OP_CHECKLOCKTIMEVERIFY:
-                            if (!$flags & self::VERIFY_CHECKLOCKTIMEVERIFY) {
+                            if (!($flags & self::VERIFY_CHECKLOCKTIMEVERIFY)) {
                                 if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS) {
                                     throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                                 }
@@ -446,7 +448,7 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_CHECKSEQUENCEVERIFY:
-                            if (!$flags & self::VERIFY_CHECKSEQUENCEVERIFY) {
+                            if (!($flags & self::VERIFY_CHECKSEQUENCEVERIFY)) {
                                 if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS) {
                                     throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                                 }
@@ -463,12 +465,12 @@ class Interpreter implements InterpreterInterface
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
                             }
 
-                            if ($this->math->cmp($this->math->bitwiseAnd($nSequence, gmp_init(TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG, 10)), gmp_init(0)) !== 0) {
+                            if (($nSequence & TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG) != 0) {
                                 break;
                             }
 
                             if (!$checker->checkSequence($sequence)) {
-                                throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Unsatisfied locktime');
+                                throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Unsatisfied sequence locks');
                             }
                             break;
 
@@ -491,33 +493,36 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_IF:
                         case Opcodes::OP_NOTIF:
                             // <expression> if [statements] [else [statements]] endif
+
                             $value = false;
                             if ($fExec) {
                                 if ($mainStack->isEmpty()) {
-                                    throw new \RuntimeException('Unbalanced conditional');
+                                    throw new \RuntimeException('Unbalanced conditional: IF/NOTIF');
                                 }
 
-                                $buffer = Number::buffer($mainStack->pop(), $minimal)->getBuffer();
-                                $value = $this->castToBool($buffer);
-
+                                $value = $this->castToBool($mainStack->pop());
                                 if ($opCode === Opcodes::OP_NOTIF) {
                                     $value = !$value;
                                 }
                             }
-                            $vfStack->push($value ? $this->vchTrue : $this->vchFalse);
+
+                            $vfStack->push($value);
                             break;
+
 
                         case Opcodes::OP_ELSE:
                             if ($vfStack->isEmpty()) {
-                                throw new \RuntimeException('Unbalanced conditional');
+                                throw new \RuntimeException('Unbalanced conditional: ELSE');
                             }
-                            $vfStack->push(!$vfStack->end() ? $this->vchTrue : $this->vchFalse);
+
+                            $vfStack->push(!$vfStack->pop());
                             break;
 
                         case Opcodes::OP_ENDIF:
                             if ($vfStack->isEmpty()) {
-                                throw new \RuntimeException('Unbalanced conditional');
+                                throw new \RuntimeException('Unbalanced conditional: ENDIF');
                             }
+                            $vfStack->pop();
                             break;
 
                         case Opcodes::OP_VERIFY:
@@ -612,7 +617,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation OP_TUCK');
                             }
                             $vch = $mainStack[-1];
-                            $mainStack->add(count($mainStack) - 1 - 2, $vch);
+                            $mainStack->add(count($mainStack) - 2, $vch);
                             break;
 
                         case Opcodes::OP_PICK:
@@ -743,10 +748,10 @@ class Interpreter implements InterpreterInterface
                                     $num = $this->math->sub(gmp_init(0), $num);
                                 }
                             } elseif ($opCode === Opcodes::OP_NOT) {
-                                $num = (int) $this->math->cmp($num, gmp_init(0)) === 0;
+                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) == 0 ? 1 : 0);
                             } else {
                                 // is OP_0NOTEQUAL
-                                $num = (int) ($this->math->cmp($num, gmp_init(0)) !== 0);
+                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) !== 0 ? 1 : 0);
                             }
 
                             $mainStack->pop();
@@ -974,17 +979,17 @@ class Interpreter implements InterpreterInterface
                 }
             }
 
-            if (!$vfStack->end() === 0) {
+            if (count($vfStack) !== 0) {
                 throw new \RuntimeException('Unbalanced conditional at script end');
             }
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            // echo "\n Runtime: " . $e->getMessage() . "\n";
+             echo "\n Runtime: " . $e->getMessage() . "\n";
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            // echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString();
+             echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString();
             return false;
         }
     }

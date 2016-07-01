@@ -21,7 +21,10 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
      * @var PointInterface
      */
     private $point;
-
+    /**
+     * @var string
+     */
+    private $prefix;
     /**
      * @var bool
      */
@@ -31,15 +34,18 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
      * @param EcAdapter $ecAdapter
      * @param PointInterface $point
      * @param bool $compressed
+     * @param string $prefix
      */
     public function __construct(
         EcAdapter $ecAdapter,
         PointInterface $point,
-        $compressed = false
+        $compressed = false,
+        $prefix = null
     ) {
         if (false === is_bool($compressed)) {
             throw new \InvalidArgumentException('PublicKey: Compressed must be a boolean');
         }
+        $this->prefix = $prefix;
         $this->ecAdapter = $ecAdapter;
         $this->point = $point;
         $this->compressed = $compressed;
@@ -67,6 +73,14 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     public function getPoint()
     {
         return $this->point;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 
     /**
