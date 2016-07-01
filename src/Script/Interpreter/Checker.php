@@ -224,15 +224,24 @@ class Checker
             return false;
         }
 
-        if (($txSequence & TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG) !== 0) {
-            return true;
+        if ($txSequence & TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG) {
+            return false;
         }
 
         $mask = TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG | TransactionInputInterface::SEQUENCE_LOCKTIME_MASK;
-        return $this->verifyLockTime(
-            $txSequence & $mask,
-            TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG,
-            Number::int($sequence->getInt() & $mask)
-        );
+        $txSequenceMasked = $txSequence & $mask;
+        $nSequenceMasked = Number::int(gmp_strval(gmp_and($sequence->getGmp(), gmp_init($mask)), 10))->getInt();
+        if (!(
+            ($txSequenceMasked <  TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked <  TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG) ||
+            ($txSequenceMasked >= TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked >= TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG)
+        )) {
+            return false;
+        }
+
+        if ($nSequenceMasked > $txSequenceMasked) {
+            return false;
+        }
+
+        return true;
     }
 }

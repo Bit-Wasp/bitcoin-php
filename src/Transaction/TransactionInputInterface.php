@@ -14,7 +14,7 @@ interface TransactionInputInterface extends SerializableInterface, \ArrayAccess
 
     /* If this flag set, CTxIn::nSequence is NOT interpreted as a
      * relative lock-time. */
-    const SEQUENCE_LOCKTIME_DISABLE_FLAG = 2147483648; // 1 << 31
+    const SEQUENCE_LOCKTIME_DISABLE_FLAG = 1 << 31; // 1 << 31
 
     /* If CTxIn::nSequence encodes a relative lock-time and this flag
      * is set, the relative lock-time has units of 512 seconds,

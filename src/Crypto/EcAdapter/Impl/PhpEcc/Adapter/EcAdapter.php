@@ -311,7 +311,7 @@ class EcAdapter implements EcAdapterInterface
     {
         $prefix = $publicKey->slice(0, 1)->getBinary();
         $size = $publicKey->getSize();
-        if ($prefix == PublicKey::KEY_UNCOMPRESSED) {
+        if ($prefix == PublicKey::KEY_UNCOMPRESSED || $prefix == "\x06" || $prefix == "\x07") {
             if ($size !== PublicKey::LENGTH_UNCOMPRESSED) {
                 throw new \Exception('Invalid length for uncompressed key');
             }

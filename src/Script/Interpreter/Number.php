@@ -77,9 +77,8 @@ class Number extends Serializable
 
         if ($fRequireMinimal && $size > 0) {
             $binary = $vch->getBinary();
-            $chars = array_values(unpack("C*", $binary));
-            if ($chars[$size - 1] & 0x7f === 0) {
-                if ($size <= 1 || $chars[$size - 2] & 0x80 === 0) {
+            if ((ord($binary[$size - 1]) & 0x7f) == 0) {
+                if ($size <= 1 || (ord($binary[$size - 2]) & 0x80) == 0) {
                     throw new \RuntimeException('Non-minimally encoded script number');
                 }
             }
@@ -102,12 +101,12 @@ class Number extends Serializable
             return '0';
         }
 
-        $chars = array_values(unpack("C*", $buffer->getBinary()));
+        $chars = $buffer->getBinary();
 
         $result = gmp_init(0);
         for ($i = 0; $i < $size; $i++) {
             $mul = $i * 8;
-            $byte = $this->math->leftShift(gmp_init($chars[$i], 10), $mul);
+            $byte = $this->math->leftShift(gmp_init(ord($chars[$i]), 10), $mul);
             $result = $this->math->bitwiseOr($result, $byte);
         }
 

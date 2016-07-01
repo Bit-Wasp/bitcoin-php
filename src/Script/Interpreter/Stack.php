@@ -92,23 +92,19 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
     {
         $this->typeCheck($value);
 
-        if (getenv('HHVM_VERSION') || version_compare(phpversion(), '5.5.0', 'lt')) {
-            if ($index == $this->count()) {
-                $this->push($value);
-            } else {
-                $size = count($this);
-                $temp = [];
-                for ($i = $size; $i > $index; $i--) {
-                    array_unshift($temp, $this->pop());
-                }
+        if ($this->count() === 0 || $index === $this->count()) {
+            $this->push($value);
+        }
 
-                $this->push($value);
-                foreach ($temp as $value) {
-                    $this->push($value);
-                }
-            }
-        } else {
-            parent::add($index, $value);
+        $temp = [];
+        for ($i = count($this); $i > $index; $i--) {
+            echo $i.PHP_EOL;
+            array_unshift($temp, $this->pop());
+        }
+
+        $this->push($value);
+        foreach ($temp as $value) {
+            $this->push($value);
         }
     }
 
