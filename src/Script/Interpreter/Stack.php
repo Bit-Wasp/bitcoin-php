@@ -88,7 +88,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      * @param int $index
      * @param BufferInterface $value
      */
-    public function add($index, $value)
+    public function add2($index, $value)
     {
         $this->typeCheck($value);
 
@@ -99,6 +99,34 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
                 $size = count($this);
                 $temp = [];
                 for ($i = $size; $i > $index; $i--) {
+                    array_unshift($temp, $this->pop());
+                }
+
+                $this->push($value);
+                foreach ($temp as $value) {
+                    $this->push($value);
+                }
+            }
+        } else {
+            parent::add($index, $value);
+        }
+    }
+
+
+    /**
+     * @param int $index
+     * @param BufferInterface $value
+     */
+    public function add($index, $value)
+    {
+        $this->typeCheck($value);
+
+        if (getenv('HHVM_VERSION') || version_compare(phpversion(), '5.5.0', 'lt')) {
+            if ($index == $this->count()) {
+                $this->push($value);
+            } else {
+                $temp = [];
+                for ($i = count($this); $i >= $index; $i--) {
                     array_unshift($temp, $this->pop());
                 }
 
