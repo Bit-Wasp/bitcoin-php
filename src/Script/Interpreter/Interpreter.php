@@ -496,7 +496,6 @@ class Interpreter implements InterpreterInterface
 
                                 $buffer = Number::buffer($mainStack->pop(), $minimal)->getBuffer();
                                 $value = $this->castToBool($buffer);
-
                                 if ($opCode === Opcodes::OP_NOTIF) {
                                     $value = !$value;
                                 }
@@ -515,7 +514,10 @@ class Interpreter implements InterpreterInterface
                             if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
+                            var_dump($vfStack);
+                            echo "OP_ENDIF\n";
                             $vfStack->pop();
+                            var_dump($vfStack);
                             break;
 
                         case Opcodes::OP_VERIFY:
