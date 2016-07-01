@@ -311,11 +311,12 @@ class EcAdapter implements EcAdapterInterface
     {
         $prefix = $publicKey->slice(0, 1)->getBinary();
         $size = $publicKey->getSize();
-        if ($prefix == PublicKey::KEY_UNCOMPRESSED) {
+
+        $compressed = false;
+        if ($prefix == PublicKey::KEY_UNCOMPRESSED || $prefix === "\x06" || $prefix === "\x07") {
             if ($size !== PublicKey::LENGTH_UNCOMPRESSED) {
                 throw new \Exception('Invalid length for uncompressed key');
             }
-            $compressed = false;
         } else if ($prefix === PublicKey::KEY_COMPRESSED_EVEN || $prefix === PublicKey::KEY_COMPRESSED_ODD) {
             if ($size !== PublicKey::LENGTH_COMPRESSED) {
                 throw new \Exception('Invalid length for compressed key');
@@ -334,7 +335,8 @@ class EcAdapter implements EcAdapterInterface
         return new PublicKey(
             $this,
             $curve->getPoint($x, $y),
-            $compressed
+            $compressed,
+            $prefix
         );
     }
 }

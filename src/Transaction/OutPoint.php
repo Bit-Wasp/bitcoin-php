@@ -41,6 +41,17 @@ class OutPoint extends Serializable implements OutPointInterface
     }
 
     /**
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return [
+            'txid' => $this->hashPrevOutput,
+            'vout' => $this->nPrevOutput,
+        ];
+    }
+
+    /**
      * @return BufferInterface
      */
     public function getTxId()
