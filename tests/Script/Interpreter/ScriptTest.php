@@ -169,7 +169,7 @@ class ScriptTest extends AbstractTestCase
         $testCount = count($object);
         $vectors = [];
         $calcAm = new Amount();
-        $testCount = 500;
+        $testCount = 50;
         for ($idx = 0; $idx < $testCount; $idx++) {
             $test = $object[$idx];
             $strTest = end($test);
