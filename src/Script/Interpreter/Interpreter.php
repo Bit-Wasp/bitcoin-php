@@ -243,7 +243,7 @@ class Interpreter implements InterpreterInterface
         if ($stack->isEmpty()) {
             return false;
         }
-        
+
         if (false === $this->castToBool($stack[-1])) {
             return false;
         }
@@ -971,7 +971,7 @@ class Interpreter implements InterpreterInterface
                 }
             }
 
-            if (!count($vfStack) === 0) {
+            if (count($vfStack) !== 0) {
                 throw new \RuntimeException('Unbalanced conditional at script end');
             }
 
