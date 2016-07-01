@@ -65,11 +65,13 @@ class Interpreter implements InterpreterInterface
      */
     public function castToBool(BufferInterface $value)
     {
-        $val = $value->getBinary();
-        for ($i = 0, $size = strlen($val); $i < $size; $i++) {
-            $chr = ord($val[$i]);
-            if ($chr != 0) {
-                if ($i == ($size - 1) && $chr == 0x80) {
+        $characters = array_values(unpack("C*", $value->getBinary()));
+        $size = count($characters);
+
+        for ($i = 0; $i < $size; $i++) {
+            $chr = $characters[$i];
+            if ($chr !== 0) {
+                if ($i === ($size - 1) && $chr === 0x80) {
                     return false;
                 }
 
@@ -365,7 +367,7 @@ class Interpreter implements InterpreterInterface
         $opCount = 0;
         $altStack = new Stack();
         $vfStack = new Stack();
-        $minimal = ($flags & self::VERIFY_MINIMALDATA) != 0;
+        $minimal = ($flags & self::VERIFY_MINIMALDATA) > 0;
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
@@ -393,6 +395,7 @@ class Interpreter implements InterpreterInterface
                 }
 
                 if ($fExec && $operation->isPush()) {
+                    var_dump($minimal);
                     // In range of a pushdata opcode
                     if ($minimal && !$this->checkMinimalPush($opCode, $pushData)) {
                         throw new ScriptRuntimeException(self::VERIFY_MINIMALDATA, 'Minimal pushdata required');
@@ -747,7 +750,7 @@ class Interpreter implements InterpreterInterface
                                 $num = gmp_init($this->math->cmp($num, gmp_init(0)) == 0 ? 1 : 0);
                             } else {
                                 // is OP_0NOTEQUAL
-                                $num = (int) ($this->math->cmp($num, gmp_init(0)) !== 0);
+                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) !== 0 ? 1 : 0);
                             }
 
                             $mainStack->pop();
