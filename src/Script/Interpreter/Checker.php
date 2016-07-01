@@ -230,8 +230,7 @@ class Checker
 
         $mask = TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG | TransactionInputInterface::SEQUENCE_LOCKTIME_MASK;
         $txSequenceMasked = $txSequence & $mask;
-        $nSequenceMasked = Number::int(gmp_strval(gmp_and($sequence->getInt(), gmp_init($mask)), 10))->getInt();
-
+        $nSequenceMasked = Number::int(gmp_strval(gmp_and($sequence->getGmp(), gmp_init($mask)), 10))->getInt();
         if (!(
             ($txSequenceMasked <  TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked <  TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG) ||
             ($txSequenceMasked >= TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked >= TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG)
