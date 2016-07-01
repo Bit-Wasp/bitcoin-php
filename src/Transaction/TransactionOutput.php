@@ -29,7 +29,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function __construct($value, ScriptInterface $script)
     {
-
         $this->value = $value;
         $this->script = $script;
         $this
@@ -43,6 +42,17 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     public function __clone()
     {
         $this->script = clone $this->script;
+    }
+
+    /**
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return [
+            'value' => $this->value,
+            'script' => $this->script
+        ];
     }
 
     /**

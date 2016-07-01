@@ -128,4 +128,16 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     {
         return (new TransactionInputSerializer(new OutPointSerializer()))->serialize($this);
     }
+
+    /**
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return [
+            'outPoint' => $this->outPoint,
+            'script' => $this->script,
+            'sequence' => $this->sequence
+        ];
+    }
 }
