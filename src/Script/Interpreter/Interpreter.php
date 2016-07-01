@@ -376,6 +376,7 @@ class Interpreter implements InterpreterInterface
                 $opCode = $operation->getOp();
                 $pushData = $operation->getData();
                 $fExec = !$this->checkExec($vfStack, false);
+                echo "Fexec: " . ($fExec ? 'yes' : 'no') . PHP_EOL;
                 // If pushdata was written to
                 if ($operation->isPush() && $operation->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
                     throw new \RuntimeException('Error - push size');
@@ -609,7 +610,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation OP_TUCK');
                             }
                             $vch = $mainStack[-1];
-                            $mainStack->add( - 2, $vch);
+                            $mainStack->add(- 2, $vch);
                             break;
 
                         case Opcodes::OP_PICK:

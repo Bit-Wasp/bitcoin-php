@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
-
 use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
@@ -206,7 +205,6 @@ class ScriptTest extends AbstractTestCase
             $returns = ($test[$pos++]) === 'OK' ? true : false;
             $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
             $vectors[] = $case;
-
         }
 
         return $vectors;
