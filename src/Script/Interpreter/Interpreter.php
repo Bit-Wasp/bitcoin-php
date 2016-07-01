@@ -461,12 +461,12 @@ class Interpreter implements InterpreterInterface
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
                             }
 
-                            if ($this->math->cmp($this->math->bitwiseAnd($nSequence, gmp_init(TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG, 10)), gmp_init(0)) !== 0) {
+                            if (($nSequence & TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG) != 0) {
                                 break;
                             }
 
                             if (!$checker->checkSequence($sequence)) {
-                                throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Unsatisfied locktime');
+                                throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Unsatisfied sequence locks');
                             }
                             break;
 
@@ -489,33 +489,36 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_IF:
                         case Opcodes::OP_NOTIF:
                             // <expression> if [statements] [else [statements]] endif
+
                             $value = false;
                             if ($fExec) {
                                 if ($mainStack->isEmpty()) {
-                                    throw new \RuntimeException('Unbalanced conditional');
+                                    throw new \RuntimeException('Unbalanced conditional: IF/NOTIF');
                                 }
 
-                                $buffer = Number::buffer($mainStack->pop(), $minimal)->getBuffer();
-                                $value = $this->castToBool($buffer);
-
+                                $value = $this->castToBool($mainStack->pop());
                                 if ($opCode === Opcodes::OP_NOTIF) {
                                     $value = !$value;
                                 }
                             }
-                            $vfStack->push($value ? $this->vchTrue : $this->vchFalse);
+
+                            $vfStack->push($value);
                             break;
+
 
                         case Opcodes::OP_ELSE:
                             if ($vfStack->isEmpty()) {
-                                throw new \RuntimeException('Unbalanced conditional');
+                                throw new \RuntimeException('Unbalanced conditional: ELSE');
                             }
-                            $vfStack->push(!$vfStack->end() ? $this->vchTrue : $this->vchFalse);
-                            break;
 
+                            $vfStack->push(!$vfStack->pop());
+                            break;
+                        
                         case Opcodes::OP_ENDIF:
                             if ($vfStack->isEmpty()) {
-                                throw new \RuntimeException('Unbalanced conditional');
+                                throw new \RuntimeException('Unbalanced conditional: ENDIF');
                             }
+                            $vfStack->pop();
                             break;
 
                         case Opcodes::OP_VERIFY:
