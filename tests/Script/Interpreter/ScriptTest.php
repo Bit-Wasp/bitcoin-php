@@ -169,7 +169,7 @@ class ScriptTest extends AbstractTestCase
         $testCount = count($object);
         $vectors = [];
         $calcAm = new Amount();
-        $testCount = 50;
+        $testCount = 50 ;
         for ($idx = 0; $idx < $testCount; $idx++) {
             $test = $object[$idx];
             $strTest = end($test);
@@ -229,6 +229,10 @@ class ScriptTest extends AbstractTestCase
         $create = $this->buildCreditingTransaction($scriptPubKey, $amount);
         $tx = $this->buildSpendTransaction($create, $scriptSig, $scriptWitness);
         $check = $interpreter->verify($scriptSig, $scriptPubKey, $flags, new Checker($ecAdapter, $tx, 0, $amount), $scriptWitness);
+        if ($check == $expectedResult) {
+            ob_clean();
+        }
+        
         $this->assertEquals($expectedResult, $check, $strTest);
     }
 }
