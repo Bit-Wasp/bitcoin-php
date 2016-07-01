@@ -85,30 +85,27 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
     }
 
     /**
-     * @param int $index
+     * @param int $offset
      * @param BufferInterface $value
      */
-    public function add($index, $value)
+    public function add($offset, $value)
     {
         $this->typeCheck($value);
+        $size = count($this);
+        $index = $size + $offset;
+        if ($index > $size) {
+            throw new \RuntimeException('Invalid add position');
+        }
+        
+        // Unwind current values, push provided value, reapply popped values
+        $values = [];
+        for ($i = $size; $i > $index; $i--) {
+            $values[] = $this->pop();
+        }
 
-        if (getenv('HHVM_VERSION') || version_compare(phpversion(), '5.5.0', 'lt')) {
-            if ($index == $this->count()) {
-                $this->push($value);
-            } else {
-                $size = count($this);
-                $temp = [];
-                for ($i = $size; $i > $index; $i--) {
-                    array_unshift($temp, $this->pop());
-                }
-
-                $this->push($value);
-                foreach ($temp as $value) {
-                    $this->push($value);
-                }
-            }
-        } else {
-            parent::add($index, $value);
+        $this->push($value);
+        for ($i = count($values); $i > 0; $i--) {
+            $this->push(array_pop($values));
         }
     }
 

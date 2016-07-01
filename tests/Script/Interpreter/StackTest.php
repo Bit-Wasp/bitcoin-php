@@ -31,13 +31,12 @@ class StackTest extends AbstractTestCase
         $this->assertTrue(isset($stack[-1]));
         $this->assertSame($stack[-1], $value2);
 
-        $stack->add(1, $value1);
+        $stack->add(-1, $value1);
         $this->assertTrue(count($stack) == 2);
 
-        // Check a different value2, ie, that the chosen index works
         $this->assertTrue(isset($stack[-2]));
-        $this->assertSame($stack[-1], $value1);
-        $this->assertSame($stack[-2], $value2);
+        $this->assertSame($stack[-2], $value1);
+        $this->assertSame($stack[-1], $value2);
     }
 
     /**
@@ -110,16 +109,15 @@ class StackTest extends AbstractTestCase
         });
 
         $stack->add(0, Buffer::hex('de'));
-
         $this->assertEquals(4, count($stack));
-        $this->assertSame('99', $stack[-1]->getHex());
-        $this->assertSame('44', $stack[-2]->getHex());
-        $this->assertSame('41', $stack[-3]->getHex());
-        $this->assertSame('de', $stack[-4]->getHex());
+        $stack->add(-4, Buffer::hex('df'));
+        $this->assertEquals(5, count($stack));
 
-        $stack->add(2, Buffer::hex('df'));
-        $this->assertEquals('df', $stack[-3]->getHex());
-
+        $this->assertSame('de', $stack[-1]->getHex());
+        $this->assertSame('99', $stack[-2]->getHex());
+        $this->assertSame('44', $stack[-3]->getHex());
+        $this->assertSame('41', $stack[-4]->getHex());
+        $this->assertSame('df', $stack[-5]->getHex());
     }
 
     public function testCount()
