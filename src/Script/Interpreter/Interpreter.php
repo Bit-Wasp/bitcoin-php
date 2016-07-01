@@ -163,8 +163,7 @@ class Interpreter implements InterpreterInterface
                 $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
                 $stackValues = $scriptWitness->slice(0, -1);
                 $hashScriptPubKey = Hash::sha256($scriptPubKey->getBuffer());
-
-                if ($hashScriptPubKey == $buffer) {
+                if (!$hashScriptPubKey->equals($buffer)) {
                     return false;
                 }
             } elseif ($buffer->getSize() === 20) {
@@ -313,7 +312,7 @@ class Interpreter implements InterpreterInterface
             }
         }
 
-        if ($flags & self::VERIFY_CLEAN_STACK != 0) {
+        if ($flags & self::VERIFY_CLEAN_STACK) {
             if (!($flags & self::VERIFY_P2SH != 0 && $flags & self::VERIFY_WITNESS != 0)) {
                 return false; // implied flags required
             }
@@ -342,15 +341,14 @@ class Interpreter implements InterpreterInterface
      */
     private function checkExec(Stack $vfStack)
     {
-        $c = 0;
-        $len = $vfStack->end();
-        for ($i = 0; $i < $len; $i++) {
-            if ($vfStack[0 - $len - $i] === true) {
-                $c++;
+        $ret = 0;
+        foreach ($vfStack as $item) {
+            if ($item === false) {
+                $ret++;
             }
         }
 
-        return !(bool)$c;
+        return $ret;
     }
 
     /**
@@ -378,7 +376,7 @@ class Interpreter implements InterpreterInterface
             foreach ($parser as $operation) {
                 $opCode = $operation->getOp();
                 $pushData = $operation->getData();
-                $fExec = $this->checkExec($vfStack);
+                $fExec = !$this->checkExec($vfStack);
 
                 // If pushdata was written to
                 if ($operation->isPush() && $operation->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
