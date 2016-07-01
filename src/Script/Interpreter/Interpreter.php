@@ -399,9 +399,9 @@ class Interpreter implements InterpreterInterface
                     }
 
                     $mainStack->push($pushData);
-                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
+                     echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || (Opcodes::OP_IF <= $opCode && $opCode <= Opcodes::OP_ENDIF)) {
-                    // echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
+                     echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1NEGATE:
                         case Opcodes::OP_1:
@@ -613,7 +613,7 @@ class Interpreter implements InterpreterInterface
                                 throw new \RuntimeException('Invalid stack operation OP_TUCK');
                             }
                             $vch = $mainStack[-1];
-                            $mainStack->add(count($mainStack) - 1 - 2, $vch);
+                            $mainStack->add(count($mainStack) - 2, $vch);
                             break;
 
                         case Opcodes::OP_PICK:
@@ -981,11 +981,11 @@ class Interpreter implements InterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            // echo "\n Runtime: " . $e->getMessage() . "\n";
+             echo "\n Runtime: " . $e->getMessage() . "\n";
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            // echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString();
+             echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString();
             return false;
         }
     }
