@@ -12,7 +12,6 @@ use BitWasp\Buffertools\Buffer;
 
 class CheckerTest extends AbstractTestCase
 {
-
     /**
      * @expectedException \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      * @expectedExceptionMessage Signature with invalid hashtype

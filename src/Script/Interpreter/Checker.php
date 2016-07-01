@@ -219,21 +219,30 @@ class Checker
      */
     public function checkSequence(\BitWasp\Bitcoin\Script\Interpreter\Number $sequence)
     {
-        $math = $this->adapter->getMath();
         $txSequence = $this->transaction->getInput($this->nInput)->getSequence();
         if ($this->transaction->getVersion() < 2) {
             return false;
         }
 
-        if ($math->cmp($math->bitwiseAnd($txSequence, TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG), 0) !== 0) {
-            return 0;
+        if ($txSequence & TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG) {
+            return false;
         }
 
-        $mask = $math->bitwiseOr(TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG, TransactionInputInterface::SEQUENCE_LOCKTIME_MASK);
-        return $this->verifyLockTime(
-            $math->bitwiseAnd($txSequence, $mask),
-            TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG,
-            Number::int($math->bitwiseAnd($sequence->getInt(), $mask))
-        );
+        $mask = TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG | TransactionInputInterface::SEQUENCE_LOCKTIME_MASK;
+        $txSequenceMasked = $txSequence & $mask;
+        $nSequenceMasked = Number::int(gmp_strval(gmp_and($sequence->getInt(), gmp_init($mask)), 10))->getInt();
+
+        if (!(
+            ($txSequenceMasked <  TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked <  TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG) ||
+            ($txSequenceMasked >= TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked >= TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG)
+        )) {
+            return false;
+        }
+
+        if ($nSequenceMasked > $txSequenceMasked) {
+            return false;
+        }
+
+        return true;
     }
 }

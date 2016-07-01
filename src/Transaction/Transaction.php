@@ -298,4 +298,18 @@ class Transaction extends Serializable implements TransactionInterface
     {
         return (new TransactionSerializer())->serialize($this);
     }
+    
+    /**
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return [
+            'version' => $this->version,
+            'vin' => $this->inputs,
+            'vout' => $this->outputs,
+            'vwit' => $this->witness,
+            'locktime' => $this->lockTime
+        ];
+    }
 }

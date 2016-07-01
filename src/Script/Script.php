@@ -241,4 +241,14 @@ class Script extends Serializable implements ScriptInterface
     {
         return strcmp($this->script, $script->getBinary()) === 0;
     }
+
+    /**
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return [
+            'script' => $this->script
+        ];
+    }
 }

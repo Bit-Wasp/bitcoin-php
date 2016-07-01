@@ -11,8 +11,8 @@ use BitWasp\Buffertools\BufferInterface;
 class Number extends Serializable
 {
     const MAX_NUM_SIZE = 4;
-    const MAX = 2147483647; // 2^31-1
-    const MIN = -2147483647; // -2^31+1
+    const MAX = 2**31-1;
+    const MIN = -2**31+1;
 
     /**
      * @var Math
@@ -64,8 +64,8 @@ class Number extends Serializable
 
         if ($fRequireMinimal && $size > 0) {
             $binary = $vch->getBinary();
-            if (ord($binary[$size - 1]) & 0x7f === 0) {
-                if ($size <= 1 || ord($binary[$size - 2]) & 0x80 === 0) {
+            if ((ord($binary[$size - 1]) & 0x7f) === 0) {
+                if ($size <= 1 || (ord($binary[$size - 2]) & 0x80) === 0) {
                     throw new \RuntimeException('Non-minimally encoded script number');
                 }
             }
@@ -88,15 +88,11 @@ class Number extends Serializable
             return '0';
         }
 
-        $chars = array_map(function ($binary) {
-            return ord($binary);
-
-        }, str_split($buffer->getBinary(), 1));
+        $chars = array_values(unpack("C*", $buffer->getBinary()));
 
         $result = gmp_init(0);
         for ($i = 0; $i < $size; $i++) {
-            $mul = $i * 8;
-            $byte = $this->math->leftShift(gmp_init($chars[$i], 10), $mul);
+            $byte = $this->math->leftShift(gmp_init($chars[$i], 10), $i * 8);
             $result = $this->math->bitwiseOr($result, $byte);
         }
 
@@ -104,7 +100,6 @@ class Number extends Serializable
             $mask = gmp_com($this->math->leftShift(gmp_init(0x80), (8 * ($size - 1))));
             $result = $this->math->sub(gmp_init(0), $this->math->bitwiseAnd($result, $mask));
         }
-
         return gmp_strval($result, 10);
     }
 
@@ -156,12 +151,20 @@ class Number extends Serializable
      */
     public function getInt()
     {
-        if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MAX)) > 0) {
+        /*if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MAX)) > 0) {
             return self::MAX;
         } else if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MIN)) < 0) {
             return self::MIN;
-        }
+        }*/
 
         return $this->number;
+    }
+
+    /**
+     * @return resource
+     */
+    public function getGmp()
+    {
+        return gmp_init($this->number, 10);
     }
 }
