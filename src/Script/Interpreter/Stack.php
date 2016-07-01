@@ -8,7 +8,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
 {
     public function __construct()
     {
-        $this->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
+        
     }
 
     public function bottom()
@@ -96,7 +96,7 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
         if ($index > $size) {
             throw new \RuntimeException('Invalid add position');
         }
-        
+
         // Unwind current values, push provided value, reapply popped values
         $values = [];
         for ($i = $size; $i > $index; $i--) {
