@@ -65,16 +65,19 @@ class Interpreter implements InterpreterInterface
      */
     public function castToBool(BufferInterface $value)
     {
-        $val = $value->getBinary();
-        for ($i = 0, $size = strlen($val); $i < $size; $i++) {
-            $chr = ord($val[$i]);
-            if ($chr != 0) {
-                if ($i == ($size - 1) && $chr == 0x80) {
+        $binary = $value->getBinary();
+        $size = strlen($binary);
+
+        for ($i = 0; $i < $size; $i++) {
+            $chr = ord($binary[$i]);
+            if ($chr !== 0) {
+                if ($i === ($size - 1) && $chr === 0x80) {
                     return false;
                 }
 
                 return true;
             }
+            
         }
 
         return false;
