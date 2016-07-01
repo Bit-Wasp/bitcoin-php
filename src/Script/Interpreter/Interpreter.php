@@ -108,7 +108,9 @@ class Interpreter implements InterpreterInterface
         if ($pushSize === 0) {
             return $opCode === Opcodes::OP_0;
         } elseif ($pushSize === 1) {
+            echo "check code: ".bin2hex($binary[0]).PHP_EOL;
             $first = ord($binary[0]);
+
             if ($first >= 1 && $first <= 16) {
                 return $opCode === (Opcodes::OP_1 + ($first - 1));
             } elseif ($first === 0x81) {
@@ -162,7 +164,7 @@ class Interpreter implements InterpreterInterface
                 $stackValues = $scriptWitness->slice(0, -1);
                 $hashScriptPubKey = Hash::sha256($scriptPubKey->getBuffer());
 
-                if ($hashScriptPubKey == $buffer) {
+                if (!$hashScriptPubKey->equals($buffer)) {
                     return false;
                 }
             } elseif ($buffer->getSize() === 20) {
@@ -365,6 +367,7 @@ class Interpreter implements InterpreterInterface
         $altStack = new Stack();
         $vfStack = new Stack();
         $minimal = ($flags & self::VERIFY_MINIMALDATA) != 0;
+        var_dump($minimal);
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
@@ -740,10 +743,10 @@ class Interpreter implements InterpreterInterface
                                     $num = $this->math->sub(gmp_init(0), $num);
                                 }
                             } elseif ($opCode === Opcodes::OP_NOT) {
-                                $num = (int) $this->math->cmp($num, gmp_init(0)) === 0;
+                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) == 0 ? 1 : 0);
                             } else {
                                 // is OP_0NOTEQUAL
-                                $num = (int) ($this->math->cmp($num, gmp_init(0)) !== 0);
+                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) != 0 ? 1 : 0);
                             }
 
                             $mainStack->pop();
