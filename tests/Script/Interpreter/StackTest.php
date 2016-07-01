@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class StackTest extends AbstractTestCase
 {
@@ -19,24 +20,24 @@ class StackTest extends AbstractTestCase
 
     public function testAdd()
     {
-        $value1 = Buffer::hex('65');
-        $value2 = Buffer::hex('41');
+        $alpha = Buffer::hex('65');
+        $beta = Buffer::hex('41');
 
         $stack = new Stack;
-        $stack->add(0, $value2);
+        $stack->add(0, $beta);
 
         $this->assertTrue(count($stack) == 1);
 
         // Check specifics of what was set
         $this->assertTrue(isset($stack[-1]));
-        $this->assertSame($stack[-1], $value2);
+        $this->assertSame($stack[-1], $beta);
 
-        $stack->add(-1, $value1);
+        $stack->add(-1, $alpha);
         $this->assertTrue(count($stack) == 2);
 
         $this->assertTrue(isset($stack[-2]));
-        $this->assertSame($stack[-2], $value1);
-        $this->assertSame($stack[-1], $value2);
+        $this->assertSame($stack[-2], $alpha);
+        $this->assertSame($stack[-1], $beta);
     }
 
     /**
@@ -71,7 +72,7 @@ class StackTest extends AbstractTestCase
 
     public function testPop()
     {
-        $list =  ['41', '44', '99'];
+        $list =  ['41', '44', '4e'];
         $arr = array_map(function ($v) {
             return Buffer::hex($v);
         }, $list);
@@ -83,7 +84,9 @@ class StackTest extends AbstractTestCase
 
         $ePop = array_reverse($list);
         foreach ($arr as $c => $p) {
-            $this->assertSame($stack->pop()->getHex(), $ePop[$c]);
+            $popped = $stack->pop();
+            $this->assertInstanceOf(BufferInterface::class, $popped);
+            $this->assertSame($popped->getHex(), $ePop[$c]);
         }
     }
 

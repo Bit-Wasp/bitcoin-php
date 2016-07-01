@@ -4,27 +4,66 @@ namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Buffertools\BufferInterface;
 
-class Stack extends \SplDoublyLinkedList implements StackInterface
+class Stack implements \Countable, \ArrayAccess, \Iterator
 {
+    /**
+     * @var int
+     */
+    private $position = 0;
+
+    /**
+     * @var array
+     */
+    private $values = [];
+
     public function __construct()
     {
-        
+
+    }
+
+    public function current()
+    {
+        return $this->values[$this->position];
+    }
+
+    public function next()
+    {
+        ++$this->position;
+    }
+
+    public function key()
+    {
+        return $this->position;
+    }
+
+    public function valid()
+    {
+        return isset($this->values[$this->position]);
+    }
+
+    public function rewind()
+    {
+        $this->position = 0;
+    }
+
+    public function count()
+    {
+        return count($this->values);
+    }
+
+    public function isEmpty()
+    {
+        return count($this->values) === 0;
     }
 
     public function bottom()
     {
-        return parent::offsetGet(count($this) - 1);
-    }
-
-    /**
-     * @param BufferInterface $value
-     * @throws \InvalidArgumentException
-     */
-    private function typeCheck($value)
-    {
-        if (!$value instanceof BufferInterface) {
-            throw new \InvalidArgumentException('Value was not of type Buffer');
+        $count = count($this);
+        if ($count < 1) {
+            throw new \RuntimeException('No values in stack');
         }
+
+        return $this->values[$count - 1];
     }
 
     /**
@@ -34,8 +73,12 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      */
     public function offsetGet($offset)
     {
-        $offset = count($this) + $offset;
-        return parent::offsetGet($offset);
+        $index = count($this) + $offset;
+        if (!isset($this->values[$index])) {
+            throw new \RuntimeException('No value at this position');
+        }
+
+        return $this->values[$index];
     }
 
     /**
@@ -46,9 +89,20 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      */
     public function offsetSet($offset, $value)
     {
-        $this->typeCheck($value);
-        $offset = count($this) + $offset;
-        parent::offsetSet($offset, $value);
+        if (!$value instanceof BufferInterface) {
+            throw new \InvalidArgumentException;
+        }
+
+        $count = count($this);
+        $index = $count + $offset;
+        if (isset($this->values[$index])) {
+            $this->values[$index] = $value;
+            return;
+        }
+
+        if ($index !== $count) {
+            throw new \RuntimeException('Index must be end position');
+        }
     }
 
     /**
@@ -58,8 +112,8 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      */
     public function offsetExists($offset)
     {
-        $offset = count($this) + $offset;
-        return parent::offsetExists($offset);
+        $index = count($this) + $offset;
+        return isset($this->values[$index]);
     }
 
     /**
@@ -68,8 +122,13 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      */
     public function offsetUnset($offset)
     {
-        $offset = count($this) + $offset;
-        parent::offsetUnset($offset);
+        $count = count($this);
+        $index = $count + $offset;
+        if (!isset($this->values[$index])) {
+            throw new \RuntimeException('Nothing at this position');
+        }
+
+        array_splice($this->values, $index, 1);
     }
 
     /**
@@ -90,7 +149,6 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
      */
     public function add($offset, $value)
     {
-        $this->typeCheck($value);
         $size = count($this);
         $index = $size + $offset;
         if ($index > $size) {
@@ -107,6 +165,22 @@ class Stack extends \SplDoublyLinkedList implements StackInterface
         for ($i = count($values); $i > 0; $i--) {
             $this->push(array_pop($values));
         }
+    }
+
+    public function pop()
+    {
+        $count = count($this);
+        if ($count === 0) {
+            throw new \RuntimeException('Cannot pop from empty stack');
+        }
+
+        $value = array_pop($this->values);
+        return $value;
+    }
+
+    public function push($buffer)
+    {
+        $this->values[] = $buffer;
     }
 
     /**

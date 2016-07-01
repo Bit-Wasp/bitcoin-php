@@ -243,7 +243,7 @@ class Interpreter implements InterpreterInterface
         if ($stack->isEmpty()) {
             return false;
         }
-
+        
         if (false === $this->castToBool($stack[-1])) {
             return false;
         }
@@ -376,7 +376,7 @@ class Interpreter implements InterpreterInterface
                 $opCode = $operation->getOp();
                 $pushData = $operation->getData();
                 $fExec = !$this->checkExec($vfStack, false);
-                echo "Fexec: " . ($fExec ? 'yes' : 'no') . PHP_EOL;
+
                 // If pushdata was written to
                 if ($operation->isPush() && $operation->getDataSize() > InterpreterInterface::MAX_SCRIPT_ELEMENT_SIZE) {
                     throw new \RuntimeException('Error - push size');
@@ -398,9 +398,9 @@ class Interpreter implements InterpreterInterface
                     }
 
                     $mainStack->push($pushData);
-                     echo " - [pushed '" . $pushData->getHex() . "']\n";
+                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || (Opcodes::OP_IF <= $opCode && $opCode <= Opcodes::OP_ENDIF)) {
-                     echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
+                    // echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1NEGATE:
                         case Opcodes::OP_1:
@@ -514,10 +514,7 @@ class Interpreter implements InterpreterInterface
                             if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional');
                             }
-                            var_dump($vfStack);
-                            echo "OP_ENDIF\n";
                             $vfStack->pop();
-                            var_dump($vfStack);
                             break;
 
                         case Opcodes::OP_VERIFY:
@@ -980,11 +977,11 @@ class Interpreter implements InterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-             echo "\n Runtime: " . $e->getMessage() . "\n" . $e->getTraceAsString() . PHP_EOL;
+            // echo "\n Runtime: " . $e->getMessage() . "\n" . $e->getTraceAsString() . PHP_EOL;
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-             echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
+            // echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
             return false;
         }
     }
