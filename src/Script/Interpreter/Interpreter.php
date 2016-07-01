@@ -513,7 +513,7 @@ class Interpreter implements InterpreterInterface
 
                             $vfStack->push(!$vfStack->pop());
                             break;
-                        
+
                         case Opcodes::OP_ENDIF:
                             if ($vfStack->isEmpty()) {
                                 throw new \RuntimeException('Unbalanced conditional: ENDIF');
@@ -744,7 +744,7 @@ class Interpreter implements InterpreterInterface
                                     $num = $this->math->sub(gmp_init(0), $num);
                                 }
                             } elseif ($opCode === Opcodes::OP_NOT) {
-                                $num = (int) $this->math->cmp($num, gmp_init(0)) === 0;
+                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) == 0 ? 1 : 0);
                             } else {
                                 // is OP_0NOTEQUAL
                                 $num = (int) ($this->math->cmp($num, gmp_init(0)) !== 0);
@@ -975,7 +975,7 @@ class Interpreter implements InterpreterInterface
                 }
             }
 
-            if (!$vfStack->end() === 0) {
+            if (count($vfStack) !== 0) {
                 throw new \RuntimeException('Unbalanced conditional at script end');
             }
 
