@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class StackTest extends AbstractTestCase
 {
@@ -19,25 +20,24 @@ class StackTest extends AbstractTestCase
 
     public function testAdd()
     {
-        $value1 = Buffer::hex('65');
-        $value2 = Buffer::hex('41');
+        $alpha = Buffer::hex('65');
+        $beta = Buffer::hex('41');
 
         $stack = new Stack;
-        $stack->add(0, $value2);
+        $stack->add(0, $beta);
 
         $this->assertTrue(count($stack) == 1);
 
         // Check specifics of what was set
         $this->assertTrue(isset($stack[-1]));
-        $this->assertSame($stack[-1], $value2);
+        $this->assertSame($stack[-1], $beta);
 
-        $stack->add(1, $value1);
+        $stack->add(-1, $alpha);
         $this->assertTrue(count($stack) == 2);
 
-        // Check a different value2, ie, that the chosen index works
         $this->assertTrue(isset($stack[-2]));
-        $this->assertSame($stack[-1], $value1);
-        $this->assertSame($stack[-2], $value2);
+        $this->assertSame($stack[-2], $alpha);
+        $this->assertSame($stack[-1], $beta);
     }
 
     /**
@@ -72,7 +72,7 @@ class StackTest extends AbstractTestCase
 
     public function testPop()
     {
-        $list =  ['41', '44', '99'];
+        $list =  ['41', '44', '4e'];
         $arr = array_map(function ($v) {
             return Buffer::hex($v);
         }, $list);
@@ -84,7 +84,9 @@ class StackTest extends AbstractTestCase
 
         $ePop = array_reverse($list);
         foreach ($arr as $c => $p) {
-            $this->assertSame($stack->pop()->getHex(), $ePop[$c]);
+            $popped = $stack->pop();
+            $this->assertInstanceOf(BufferInterface::class, $popped);
+            $this->assertSame($popped->getHex(), $ePop[$c]);
         }
     }
 
@@ -110,16 +112,15 @@ class StackTest extends AbstractTestCase
         });
 
         $stack->add(0, Buffer::hex('de'));
-
         $this->assertEquals(4, count($stack));
-        $this->assertSame('99', $stack[-1]->getHex());
-        $this->assertSame('44', $stack[-2]->getHex());
-        $this->assertSame('41', $stack[-3]->getHex());
-        $this->assertSame('de', $stack[-4]->getHex());
+        $stack->add(-4, Buffer::hex('df'));
+        $this->assertEquals(5, count($stack));
 
-        $stack->add(2, Buffer::hex('df'));
-        $this->assertEquals('df', $stack[-3]->getHex());
-
+        $this->assertSame('de', $stack[-1]->getHex());
+        $this->assertSame('99', $stack[-2]->getHex());
+        $this->assertSame('44', $stack[-3]->getHex());
+        $this->assertSame('41', $stack[-4]->getHex());
+        $this->assertSame('df', $stack[-5]->getHex());
     }
 
     public function testCount()
