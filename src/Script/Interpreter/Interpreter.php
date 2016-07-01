@@ -400,7 +400,7 @@ class Interpreter implements InterpreterInterface
 
                     $mainStack->push($pushData);
                     // echo " - [pushed '" . $pushData->getHex() . "']\n";
-                } elseif ($fExec || ($opCode !== Opcodes::OP_IF && $opCode !== Opcodes::OP_ENDIF)) {
+                } elseif ($fExec || (Opcodes::OP_IF <= $opCode && $opCode <= Opcodes::OP_ENDIF)) {
                     // echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1NEGATE:
@@ -420,12 +420,12 @@ class Interpreter implements InterpreterInterface
                         case Opcodes::OP_14:
                         case Opcodes::OP_15:
                         case Opcodes::OP_16:
-                            $num = \BitWasp\Bitcoin\Script\decodeOpN($opCode);
-                            $mainStack->push(Number::int($num)->getBuffer());
+                            $num = Number::int((int) $opCode - (Opcodes::OP_1 - 1))->getBuffer();
+                            $mainStack->push($num);
                             break;
 
                         case Opcodes::OP_CHECKLOCKTIMEVERIFY:
-                            if (!$flags & self::VERIFY_CHECKLOCKTIMEVERIFY) {
+                            if (!($flags & self::VERIFY_CHECKLOCKTIMEVERIFY)) {
                                 if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS) {
                                     throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                                 }
@@ -444,7 +444,7 @@ class Interpreter implements InterpreterInterface
                             break;
 
                         case Opcodes::OP_CHECKSEQUENCEVERIFY:
-                            if (!$flags & self::VERIFY_CHECKSEQUENCEVERIFY) {
+                            if (!($flags & self::VERIFY_CHECKSEQUENCEVERIFY)) {
                                 if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS) {
                                     throw new ScriptRuntimeException(self::VERIFY_DISCOURAGE_UPGRADABLE_NOPS, 'Upgradable NOP found - this is discouraged');
                                 }
