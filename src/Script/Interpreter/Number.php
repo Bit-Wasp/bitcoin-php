@@ -101,12 +101,12 @@ class Number extends Serializable
             return '0';
         }
 
-        $chars = array_values(unpack("C*", $buffer->getBinary()));
+        $chars = $buffer->getBinary();
 
         $result = gmp_init(0);
         for ($i = 0; $i < $size; $i++) {
             $mul = $i * 8;
-            $byte = $this->math->leftShift(gmp_init($chars[$i], 10), $mul);
+            $byte = $this->math->leftShift(gmp_init(ord($chars[$i]), 10), $mul);
             $result = $this->math->bitwiseOr($result, $byte);
         }
 
