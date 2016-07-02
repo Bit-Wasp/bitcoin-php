@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -167,6 +168,7 @@ class ScriptTest extends AbstractTestCase
         $object = json_decode(file_get_contents(__DIR__."/../../Data/script_tests.json"), true);
         $testCount = count($object);
         $vectors = [];
+        $phpecc = new EcAdapter(Bitcoin::getMath(), Bitcoin::getGenerator());
         $calcAm = new Amount();
         //$testCount = 1100 ;
         for ($idx = 0; $idx < $testCount; $idx++) {
@@ -203,7 +205,17 @@ class ScriptTest extends AbstractTestCase
 
             $flags = $this->calcScriptFlags($mapFlagNames, $test[$pos++]);
             $returns = ($test[$pos++]) === 'OK' ? true : false;
-            $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+
+            if ($ecAdapter instanceof \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter) {
+                if ($flags & Interpreter::VERIFY_DERSIG) {
+                    $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+                } else {
+                    $case = [$phpecc, new Interpreter($phpecc), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+                }
+            } else {
+                $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+            }
+
             $vectors[] = $case;
         }
 
