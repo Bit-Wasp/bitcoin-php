@@ -2,13 +2,11 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
-use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -25,8 +23,18 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
+/**
+ * This is essentially a port of Bitcoin Core's test suite.
+ * When updating:
+ *   cp bitcoin/src/test/data/script_tests.json bitcoin-php/tests/Data/script_tests.json
+ */
 class ScriptTest extends AbstractTestCase
 {
+    /**
+     * @param ScriptInterface $scriptPubKey
+     * @param int $amount
+     * @return Transaction
+     */
     public function buildCreditingTransaction(ScriptInterface $scriptPubKey, $amount = 0)
     {
         return new Transaction(
@@ -46,6 +54,12 @@ class ScriptTest extends AbstractTestCase
         );
     }
 
+    /**
+     * @param TransactionInterface $tx
+     * @param ScriptInterface $scriptSig
+     * @param ScriptWitnessInterface|null $scriptWitness
+     * @return Transaction
+     */
     public function buildSpendTransaction(TransactionInterface $tx, ScriptInterface $scriptSig, ScriptWitnessInterface $scriptWitness = null)
     {
         return new Transaction(
@@ -65,6 +79,10 @@ class ScriptTest extends AbstractTestCase
         );
     }
 
+    /**
+     * @param string $data
+     * @return Script|ScriptInterface
+     */
     public function parseTestScript($data)
     {
         if (is_array($data)) {
@@ -76,6 +94,33 @@ class ScriptTest extends AbstractTestCase
         throw new \RuntimeException('Invalid data for test case: supports array (interpreted as sequence), or string (interpreted as hex)');
     }
 
+    /**
+     * @return array
+     */
+    public function calcMapFlagNames()
+    {
+        return [
+            "NONE" => Interpreter::VERIFY_NONE,
+            "P2SH" => Interpreter::VERIFY_P2SH,
+            "STRICTENC" => Interpreter::VERIFY_STRICTENC,
+            "DERSIG" => Interpreter::VERIFY_DERSIG,
+            "LOW_S" => Interpreter::VERIFY_LOW_S,
+            "SIGPUSHONLY" => Interpreter::VERIFY_SIGPUSHONLY,
+            "MINIMALDATA" => Interpreter::VERIFY_MINIMALDATA,
+            "NULLDUMMY" => Interpreter::VERIFY_NULL_DUMMY,
+            "DISCOURAGE_UPGRADABLE_NOPS" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_NOPS,
+            "CLEANSTACK" => Interpreter::VERIFY_CLEAN_STACK,
+            "CHECKLOCKTIMEVERIFY" => Interpreter::VERIFY_CHECKLOCKTIMEVERIFY,
+            "CHECKSEQUENCEVERIFY" => Interpreter::VERIFY_CHECKSEQUENCEVERIFY,
+            "WITNESS" => Interpreter::VERIFY_WITNESS,
+            "DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
+        ];
+    }
+
+    /**
+     * @param Opcodes $opcodes
+     * @return array
+     */
     public function calcMapOpNames(Opcodes $opcodes)
     {
         $mapOpNames = [];
@@ -96,6 +141,11 @@ class ScriptTest extends AbstractTestCase
         return $mapOpNames;
     }
 
+    /**
+     * @param array $mapOpNames
+     * @param string $string
+     * @return ScriptInterface
+     */
     public function calcScriptFromString($mapOpNames, $string)
     {
         $builder = ScriptFactory::create();
@@ -120,26 +170,11 @@ class ScriptTest extends AbstractTestCase
         return $builder->getScript();
     }
 
-    public function calcMapFlagNames()
-    {
-        return [
-            "NONE" => Interpreter::VERIFY_NONE,
-            "P2SH" => Interpreter::VERIFY_P2SH,
-            "STRICTENC" => Interpreter::VERIFY_STRICTENC,
-            "DERSIG" => Interpreter::VERIFY_DERSIG,
-            "LOW_S" => Interpreter::VERIFY_LOW_S,
-            "SIGPUSHONLY" => Interpreter::VERIFY_SIGPUSHONLY,
-            "MINIMALDATA" => Interpreter::VERIFY_MINIMALDATA,
-            "NULLDUMMY" => Interpreter::VERIFY_NULL_DUMMY,
-            "DISCOURAGE_UPGRADABLE_NOPS" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_NOPS,
-            "CLEANSTACK" => Interpreter::VERIFY_CLEAN_STACK,
-            "CHECKLOCKTIMEVERIFY" => Interpreter::VERIFY_CHECKLOCKTIMEVERIFY,
-            "CHECKSEQUENCEVERIFY" => Interpreter::VERIFY_CHECKSEQUENCEVERIFY,
-            "WITNESS" => Interpreter::VERIFY_WITNESS,
-            "DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
-        ];
-    }
-
+    /**
+     * @param array $mapFlagNames
+     * @param string $string
+     * @return int
+     */
     public function calcScriptFlags(array $mapFlagNames, $string)
     {
         if (strlen($string) === 0) {
@@ -159,6 +194,9 @@ class ScriptTest extends AbstractTestCase
         return $flags;
     }
 
+    /**
+     * @return array
+     */
     public function prepareTests()
     {
         $ecAdapter = Bitcoin::getEcAdapter();
@@ -168,9 +206,6 @@ class ScriptTest extends AbstractTestCase
         $object = json_decode(file_get_contents(__DIR__."/../../Data/script_tests.json"), true);
         $testCount = count($object);
         $vectors = [];
-        $phpecc = new EcAdapter(Bitcoin::getMath(), Bitcoin::getGenerator());
-        $calcAm = new Amount();
-        //$testCount = 1100 ;
         for ($idx = 0; $idx < $testCount; $idx++) {
             $test = $object[$idx];
             $strTest = end($test);
@@ -206,16 +241,7 @@ class ScriptTest extends AbstractTestCase
             $flags = $this->calcScriptFlags($mapFlagNames, $test[$pos++]);
             $returns = ($test[$pos++]) === 'OK' ? true : false;
 
-            if ($ecAdapter instanceof \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter) {
-                //if ($flags & Interpreter::VERIFY_DERSIG) {
-                 //   $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-               // } else {
-                    $case = [$phpecc, new Interpreter($phpecc), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-                //}
-            } else {
-                $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-            }
-
+            $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
             $vectors[] = $case;
         }
 

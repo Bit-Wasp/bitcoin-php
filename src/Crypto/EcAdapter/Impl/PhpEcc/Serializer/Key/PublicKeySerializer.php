@@ -27,17 +27,21 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param bool $compressed
-     * @param PointInterface $point
+     * @param PublicKey $publicKey
      * @return string
      */
-    public function getPrefix($compressed, PointInterface $point)
+    public function getPrefix(PublicKey $publicKey)
     {
-        return $compressed
-            ? $this->ecAdapter->getMath()->isEven($point->getY())
-                ? PublicKey::KEY_COMPRESSED_EVEN
-                : PublicKey::KEY_COMPRESSED_ODD
-            : PublicKey::KEY_UNCOMPRESSED;
+        if (null === $publicKey->getPrefix()) {
+            return $publicKey->isCompressed()
+                ? $this->ecAdapter->getMath()->isEven($publicKey->getPoint()->getY())
+                    ? PublicKey::KEY_COMPRESSED_EVEN
+                    : PublicKey::KEY_COMPRESSED_ODD
+                : PublicKey::KEY_UNCOMPRESSED;
+        } else {
+            return $publicKey->getPrefix();
+        }
+
     }
 
     /**
@@ -51,7 +55,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         $compressed = $publicKey->isCompressed();
 
         $parser = new Parser('', $math);
-        $parser->writeBytes(1, new Buffer($this->getPrefix($compressed, $point)));
+        $parser->writeBytes(1, new Buffer($this->getPrefix($publicKey)));
 
         $compressed
             ? $parser
