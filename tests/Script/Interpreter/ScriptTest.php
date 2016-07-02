@@ -207,11 +207,11 @@ class ScriptTest extends AbstractTestCase
             $returns = ($test[$pos++]) === 'OK' ? true : false;
 
             if ($ecAdapter instanceof \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter) {
-                if ($flags & Interpreter::VERIFY_DERSIG) {
-                    $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-                } else {
+                //if ($flags & Interpreter::VERIFY_DERSIG) {
+                 //   $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+               // } else {
                     $case = [$phpecc, new Interpreter($phpecc), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-                }
+                //}
             } else {
                 $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
             }
