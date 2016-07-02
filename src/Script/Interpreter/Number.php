@@ -76,7 +76,6 @@ class Number extends Serializable
         }
 
         if ($fRequireMinimal && $size > 0) {
-
             $binary = $vch->getBinary();
             //$chars = array_values(unpack("C*", $binary));
             if ((ord($binary[$size - 1]) & 0x7f) == 0) {
