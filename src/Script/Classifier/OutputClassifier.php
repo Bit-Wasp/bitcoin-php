@@ -106,7 +106,7 @@ class OutputClassifier
             }
 
             $buffer = $decoded[1];
-            if (!$buffer->isPush() || $buffer->getDataSize() !== 20) {
+            if (!$buffer->isPush() || $buffer->getOp() !== 20) {
                 return false;
             }
 
