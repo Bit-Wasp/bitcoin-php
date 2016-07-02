@@ -313,7 +313,8 @@ class Interpreter implements InterpreterInterface
         }
 
         if ($flags & self::VERIFY_CLEAN_STACK) {
-            if (!($flags & self::VERIFY_P2SH && $flags & self::VERIFY_WITNESS)) {
+            if (!($flags & self::VERIFY_P2SH != 0) && ($flags & self::VERIFY_WITNESS != 0)) {
+                echo 'cleanstack flags';
                 return false; // implied flags required
             }
 
