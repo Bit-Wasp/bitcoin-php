@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -241,8 +242,13 @@ class ScriptTest extends AbstractTestCase
             $flags = $this->calcScriptFlags($mapFlagNames, $test[$pos++]);
             $returns = ($test[$pos++]) === 'OK' ? true : false;
 
-            $case = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-            $vectors[] = $case;
+            if ($ecAdapter instanceof EcAdapter) {
+                if ($flags & Interpreter::VERIFY_DERSIG) {
+                    $vectors[] = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+                }
+            } else {
+                $vectors[] = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+            }
         }
 
         return $vectors;
