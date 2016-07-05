@@ -15,8 +15,8 @@ use BitWasp\Buffertools\BufferInterface;
 class HierarchicalKeyFactory
 {
     /**
-     * @param EcAdapterInterface|null $ecAdapter
-     * @param NetworkInterface $network|null
+     * @param EcAdapterInterface $ecAdapter
+     * @param NetworkInterface $network
      * @return Base58ExtendedKeySerializer
      */
     public static function getSerializer(EcAdapterInterface $ecAdapter, $network = null)
@@ -59,7 +59,7 @@ class HierarchicalKeyFactory
 
     /**
      * @param string $extendedKey
-     * @param NetworkInterface|null $network
+     * @param NetworkInterface $network
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey
      */
