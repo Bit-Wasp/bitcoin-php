@@ -2,34 +2,34 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
+use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
+use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class ConsensusFactoryTest extends AbstractTestCase
 {
     public function testGetNativeConsensus()
     {
-        $this->assertInstanceOf($this->nativeConsensusInstance, ScriptFactory::getNativeConsensus(ScriptFactory::defaultFlags()));
+        $this->assertInstanceOf(NativeConsensus::class, ScriptFactory::getNativeConsensus());
     }
 
     public function getExpectedAdapter()
     {
         return extension_loaded('bitcoinconsensus')
-            ? $this->libBitcoinConsensusInstance
-            : $this->nativeConsensusInstance;
+            ? BitcoinConsensus::class
+            : NativeConsensus::class;
     }
 
     public function testGetBitcoinConsensus()
     {
-        if ($this->getExpectedAdapter() == $this->libBitcoinConsensusInstance) {
-            $this->assertInstanceOf($this->libBitcoinConsensusInstance, ScriptFactory::getBitcoinConsensus(0));
+        if ($this->getExpectedAdapter() === BitcoinConsensus::class) {
+            $this->assertInstanceOf(BitcoinConsensus::class, ScriptFactory::getBitcoinConsensus());
         }
     }
 
     public function testDefaultAdapter()
     {
-        $this->assertInstanceOf($this->getExpectedAdapter(), ScriptFactory::consensus(ScriptFactory::defaultFlags()));
+        $this->assertInstanceOf($this->getExpectedAdapter(), ScriptFactory::consensus());
     }
 }

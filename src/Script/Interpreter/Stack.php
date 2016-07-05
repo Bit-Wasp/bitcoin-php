@@ -16,11 +16,6 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
      */
     private $values = [];
 
-    public function __construct()
-    {
-
-    }
-
     public function current()
     {
         return $this->values[$this->position];

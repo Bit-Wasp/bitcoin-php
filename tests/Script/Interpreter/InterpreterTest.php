@@ -39,7 +39,10 @@ class InterpreterTest extends AbstractTestCase
         $ec = EcAdapterFactory::getAdapter(new Math(), EccFactory::getSecgCurves()->generator256k1());
         $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ec);
 
-        $standard = ScriptFactory::defaultFlags();
+        $standard = InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_STRICTENC | InterpreterInterface::VERIFY_DERSIG |
+            InterpreterInterface::VERIFY_LOW_S | InterpreterInterface::VERIFY_NULL_DUMMY | InterpreterInterface::VERIFY_SIGPUSHONLY |
+            InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS | InterpreterInterface::VERIFY_CLEAN_STACK |
+            InterpreterInterface::VERIFY_CHECKLOCKTIMEVERIFY | InterpreterInterface::VERIFY_WITNESS;
 
         $vectors = [];
 

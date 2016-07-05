@@ -10,15 +10,17 @@ interface ValidatorInterface
     /**
      * @param ConsensusInterface $consensus
      * @param int $nInput
+     * @param int $flags
      * @param TransactionOutputInterface $txOut
      * @return bool
      */
-    public function checkSignature(ConsensusInterface $consensus, $nInput, TransactionOutputInterface $txOut);
+    public function checkSignature(ConsensusInterface $consensus, $flags, $nInput, TransactionOutputInterface $txOut);
 
     /**
      * @param ConsensusInterface $consensus
+     * @param int $flags
      * @param TransactionOutputInterface[] $outputs
      * @return bool
      */
-    public function checkSignatures(ConsensusInterface $consensus, array $outputs);
+    public function checkSignatures(ConsensusInterface $consensus, $flags, array $outputs);
 }

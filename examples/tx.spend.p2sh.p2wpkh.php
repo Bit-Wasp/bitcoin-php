@@ -38,8 +38,9 @@ $signed = (new Signer($tx, Bitcoin::getEcAdapter()))
     ->sign(0, $key, $txOut, $destination->getScript())
     ->get();
 
-$consensus = ScriptFactory::consensus(I::VERIFY_P2SH | I::VERIFY_WITNESS);
-echo "Script validation result: " . ($signed->validator()->checkSignature($consensus, 0, $txOut) ? "yay\n" : "nay\n");
+$consensus = ScriptFactory::consensus();
+$flags = I::VERIFY_P2SH | I::VERIFY_WITNESS;
+echo "Script validation result: " . ($signed->validator()->checkSignature($consensus, $flags, 0, $txOut) ? "yay\n" : "nay\n");
 
 echo PHP_EOL;
 echo "Witness serialized transaction: " . $signed->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;
