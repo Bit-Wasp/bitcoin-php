@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
+use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
@@ -26,17 +27,19 @@ class WitnessTxFullTest extends AbstractTestCase
     {
         $wif = 'QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7';
         $key = PrivateKeyFactory::fromWif($wif);
-        $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
+        
+        $factory = ScriptFactory::scriptPubKey();
+        $scriptPubKey = $factory->payToPubKeyHash($key->getPublicKey());
         $v0destkey = new WitnessProgram(0, $key->getPubKeyHash());
         $v0destscript = new WitnessProgram(0, Hash::sha256($scriptPubKey->getBuffer()));
-        $payToPubkeyScript = ScriptFactory::scriptPubKey()->payToPubKey($key->getPublicKey());
-        $multisig = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
-        $p2shmultisig = ScriptFactory::scriptPubKey()->payToScriptHash($multisig);
-        $p2shv0keyhash = new \BitWasp\Bitcoin\Script\P2shScript($v0destkey->getScript());
+        $payToPubkeyScript = $factory->payToPubKey($key->getPublicKey());
+        $multisig = $factory->multisig(1, [$key->getPublicKey()]);
+        $p2shmultisig = $factory->payToScriptHash($multisig);
+        $p2shv0keyhash = new P2shScript($v0destkey->getScript());
 
-        $multisig = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
-        $wp = new \BitWasp\Bitcoin\Script\WitnessProgram(0, \BitWasp\Bitcoin\Crypto\Hash::sha256($multisig->getBuffer()));
-        $p2shWitMultisig = ScriptFactory::scriptPubKey()->payToScriptHash($wp->getScript());
+        $multisig = $factory->multisig(1, [$key->getPublicKey()]);
+        $wp = new WitnessProgram(0, Hash::sha256($multisig->getBuffer()));
+        $p2shWitMultisig = $factory->payToScriptHash($wp->getScript());
 
         $multisigWpOut = $wp->getScript();
 
