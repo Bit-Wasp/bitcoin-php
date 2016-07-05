@@ -5,13 +5,10 @@ namespace BitWasp\Bitcoin\Address;
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class AddressFactory
@@ -48,11 +45,11 @@ class AddressFactory
         $parsed = $outputScript->getScriptParser()->decode();
 
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
-            /** @var \BitWasp\Buffertools\BufferInterface $hash */
+            /** @var BufferInterface $hash */
             $hash = $parsed[2]->getData();
             return new PayToPubKeyHashAddress($hash);
         } else if ($type === OutputClassifier::PAYTOSCRIPTHASH) {
-            /** @var \BitWasp\Buffertools\BufferInterface $hash */
+            /** @var BufferInterface $hash */
             $hash = $parsed[1]->getData();
             return new ScriptHashAddress($hash);
         }
@@ -101,14 +98,12 @@ class AddressFactory
 
     /**
      * @param ScriptInterface $script
-     * @param NetworkInterface $network
-     * @return String
+     * @return AddressInterface
      * @throws \RuntimeException
      */
-    public static function getAssociatedAddress(ScriptInterface $script, NetworkInterface $network = null)
+    public static function getAssociatedAddress(ScriptInterface $script)
     {
         $classifier = new OutputClassifier();
-        $network = $network ?: Bitcoin::getNetwork();
         
         try {
             $publicKey = null;
@@ -119,7 +114,7 @@ class AddressFactory
                 $address = self::fromOutputScript($script);
             }
 
-            return Base58::encodeCheck(Buffer::hex($network->getAddressByte() . $address->getHash(), 21));
+            return $address;
         } catch (\Exception $e) {
             throw new \RuntimeException('No address associated with this script type');
         }

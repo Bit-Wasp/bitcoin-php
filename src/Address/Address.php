@@ -15,7 +15,7 @@ use BitWasp\Buffertools\BufferInterface;
 abstract class Address implements AddressInterface
 {
     /**
-     * @var string
+     * @var BufferInterface
      */
     private $hash;
 
@@ -24,12 +24,11 @@ abstract class Address implements AddressInterface
      */
     public function __construct(BufferInterface $hash)
     {
-        $this->hash = $hash->getHex();
+        $this->hash = $hash;
     }
 
     /**
-     * TODO: Check why this is a string
-     * @return string
+     * @return BufferInterface
      */
     public function getHash()
     {
@@ -43,7 +42,7 @@ abstract class Address implements AddressInterface
     public function getAddress(NetworkInterface $network = null)
     {
         $network = $network ?: Bitcoin::getNetwork();
-        $payload = Buffer::hex($this->getPrefixByte($network) . $this->getHash());
+        $payload = new Buffer($this->getPrefixByte($network) . $this->getHash()->getBinary());
         return Base58::encodeCheck($payload);
     }
 }

@@ -112,16 +112,16 @@ class AddressTest extends AbstractTestCase
 
         $network = NetworkFactory::bitcoinTestnet();
 
-        $p2pkResult = AddressFactory::getAssociatedAddress(ScriptFactory::fromHex($p2pkHex), $network);
+        $p2pkResult = AddressFactory::getAssociatedAddress(ScriptFactory::fromHex($p2pkHex))->getAddress($network);
         $this->assertEquals($p2pkAddress, $p2pkResult);
 
-        $p2pkhResult = AddressFactory::getAssociatedAddress(ScriptFactory::fromHex($p2pkhHex), $network);
+        $p2pkhResult = AddressFactory::getAssociatedAddress(ScriptFactory::fromHex($p2pkhHex))->getAddress($network);
         $this->assertEquals($p2pkhAddress, $p2pkhResult);
 
         $publicKey = PublicKeyFactory::fromHex('03a3f20be479bce0b17589cc526983f544dce3f80ff8b7ec46d2ee3362c3c6e775');
         $p2pubkey = ScriptFactory::scriptPubKey()->payToPubKey($publicKey);
         $address = AddressFactory::getAssociatedAddress($p2pubkey);
-        $this->assertEquals($publicKey->getAddress()->getAddress(), $address);
+        $this->assertEquals($publicKey->getAddress()->getAddress($network), $address->getAddress($network));
     }
 
     /**

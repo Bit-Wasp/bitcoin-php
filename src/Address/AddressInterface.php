@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 interface AddressInterface
 {
@@ -19,7 +20,7 @@ interface AddressInterface
     public function getAddress(NetworkInterface $network = null);
 
     /**
-     * @return string
+     * @return BufferInterface
      */
     public function getHash();
 }

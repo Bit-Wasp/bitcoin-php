@@ -26,7 +26,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $classifier = new OutputClassifier();
         $this->assertEquals(Opcodes::OP_DUP, $parsedScript[0]->getOp());
         $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[1]->getOp());
-        $this->assertEquals($pk1->getAddress()->getHash(), $parsedScript[2]->getData()->getHex());
+        $this->assertTrue($pk1->getAddress()->getHash()->equals($parsedScript[2]->getData()));
         $this->assertEquals(Opcodes::OP_EQUALVERIFY, $parsedScript[3]->getOp());
         $this->assertEquals(Opcodes::OP_CHECKSIG, $parsedScript[4]->getOp());
         $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, $classifier->classify($p2pkhScript));
@@ -35,7 +35,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $p2shScript = ScriptFactory::scriptPubKey()->payToAddress($p2sh);
         $parsedScript = $p2shScript->getScriptParser()->decode();
         $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[0]->getOp());
-        $this->assertEquals($p2sh->getHash(), $parsedScript[1]->getData()->getHex());
+        $this->assertTrue($p2sh->getHash()->equals($parsedScript[1]->getData()));
         $this->assertEquals(Opcodes::OP_EQUAL, $parsedScript[2]->getOp());
         $this->assertEquals(OutputClassifier::PAYTOSCRIPTHASH, $classifier->classify($p2shScript));
     }

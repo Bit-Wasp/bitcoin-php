@@ -21,6 +21,6 @@ class P2shScriptTest extends AbstractTestCase
 
         $address = $script->getAddress();
         $this->assertEquals($hash->getBinary(), $slice->getBinary());
-        $this->assertEquals($hash->getHex(), $address->getHash());
+        $this->assertTrue($hash->equals($address->getHash()));
     }
 }

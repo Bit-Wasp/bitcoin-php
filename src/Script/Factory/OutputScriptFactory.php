@@ -30,8 +30,8 @@ class OutputScriptFactory
     public function payToAddress(AddressInterface $address)
     {
         return $address instanceof ScriptHashAddress
-            ? ScriptFactory::sequence([Opcodes::OP_HASH160, Buffer::hex($address->getHash(), 20), Opcodes::OP_EQUAL])
-            : ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, Buffer::hex($address->getHash(), 20), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
+            ? ScriptFactory::sequence([Opcodes::OP_HASH160, $address->getHash(), Opcodes::OP_EQUAL])
+            : ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $address->getHash(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
     }
 
     /**
