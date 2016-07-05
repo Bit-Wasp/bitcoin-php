@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -117,11 +116,6 @@ interface TransactionInterface extends SerializableInterface
      * @return int|string
      */
     public function getValueOut();
-
-    /**
-     * @return SigHashInterface
-     */
-    public function getSignatureHash();
 
     /**
      * @param TransactionInterface $tx
