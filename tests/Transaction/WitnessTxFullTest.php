@@ -133,9 +133,10 @@ class WitnessTxFullTest extends AbstractTestCase
             ->sign(0, $key, $utxo->getOutput(), $redeemScript, $witnessScript)
             ->get();
 
-        $consensus = ScriptFactory::consensus(InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_WITNESS);
+        $flags = InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_WITNESS;
+        $consensus = ScriptFactory::consensus();
 
-        $check = $signed->validator()->checkSignature($consensus, 0, $utxo->getOutput());
+        $check = $signed->validator()->checkSignature($consensus, $flags, 0, $utxo->getOutput());
         $this->assertTrue($check);
         $this->assertEquals($expectedTx, $signed->getWitnessBuffer()->getHex());
 

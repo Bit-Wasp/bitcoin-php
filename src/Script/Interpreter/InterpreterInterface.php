@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 
 interface InterpreterInterface

@@ -17,37 +17,31 @@ class NativeConsensus implements ConsensusInterface
     private $adapter;
 
     /**
-     * @var int
-     */
-    private $flags;
-
-    /**
      * NativeConsensus constructor.
      * @param EcAdapterInterface $ecAdapter
-     * @param int $flags
      */
-    public function __construct(EcAdapterInterface $ecAdapter, $flags)
+    public function __construct(EcAdapterInterface $ecAdapter)
     {
         $this->adapter = $ecAdapter;
-        $this->flags = $flags;
     }
 
     /**
      * @param TransactionInterface $tx
      * @param ScriptInterface $scriptPubKey
      * @param int $nInputToSign
+     * @param int $flags
      * @param int $amount
      * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $nInputToSign, $amount, ScriptWitnessInterface $witness = null)
+    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $flags, $nInputToSign, $amount, ScriptWitnessInterface $witness = null)
     {
         $inputs = $tx->getInputs();
         $interpreter = new Interpreter($this->adapter);
         return $interpreter->verify(
             $inputs[$nInputToSign]->getScript(),
             $scriptPubKey,
-            $this->flags,
+            $flags,
             new Checker($this->adapter, $tx, $nInputToSign, $amount),
             $witness
         );

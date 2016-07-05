@@ -61,7 +61,7 @@ class ConsensusTest
         }
 
         $consensus = ScriptFactory::getNativeConsensus();
-        $r = $consensus->verify($tx, $scriptPubKey, $nInput, $flags);
+        $r = $consensus->verify($tx, $scriptPubKey, $flags, $nInput, 0);
 
         $this->assertEquals($result, $r);
 

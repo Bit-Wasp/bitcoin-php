@@ -337,6 +337,7 @@ class Interpreter implements InterpreterInterface
 
     /**
      * @param Stack $vfStack
+     * @param bool $value
      * @return bool
      */
     private function checkExec(Stack $vfStack, $value)
