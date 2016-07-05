@@ -10,7 +10,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 interface BlockInterface extends SerializableInterface
 {
-    const CURRENT_VERSION = 2;
     const MAX_BLOCK_SIZE = 1000000;
 
     /**

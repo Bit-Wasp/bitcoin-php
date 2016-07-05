@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin;
 
+use BitWasp\Bitcoin\Chain\Params;
+use BitWasp\Bitcoin\Chain\ParamsInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
@@ -18,7 +20,15 @@ class Bitcoin
      */
     private static $network;
 
+    /**
+     * @var EcAdapterInterface
+     */
     private static $adapter;
+
+    /**
+     * @var ParamsInterface
+     */
+    private static $params;
 
     /**
      * @return Math
@@ -53,6 +63,38 @@ class Bitcoin
         return self::$adapter;
     }
 
+    /**
+     * @param ParamsInterface $params
+     */
+    public static function setParams(ParamsInterface $params)
+    {
+        self::$params = $params;
+    }
+
+    /**
+     * @return ParamsInterface
+     */
+    public function getParams()
+    {
+        if (null === self::$params) {
+            self::$params = self::getDefaultParams();
+        }
+
+        return self::$params;
+    }
+
+    /**
+     * @param Math|null $math
+     * @return ParamsInterface
+     */
+    public static function getDefaultParams(Math $math = null)
+    {
+        return new Params($math ?: Bitcoin::getMath());
+    }
+
+    /**
+     * @param EcAdapterInterface $adapter
+     */
     public static function setAdapter(EcAdapterInterface $adapter)
     {
         self::$adapter = $adapter;
@@ -78,6 +120,9 @@ class Bitcoin
         return self::$network;
     }
 
+    /**
+     * @return NetworkInterface
+     */
     public static function getDefaultNetwork()
     {
         return NetworkFactory::bitcoin();
