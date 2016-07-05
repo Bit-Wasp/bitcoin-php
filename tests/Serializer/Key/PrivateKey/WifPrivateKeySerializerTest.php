@@ -27,9 +27,9 @@ class WifPrivateKeySerializerTest extends AbstractBip39Case
         $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $hexSerializer);
 
         $valid = PrivateKeyFactory::create();
-        $this->assertEquals($valid, $wifSerializer->parse($wifSerializer->serialize($network, $valid)));
+        $this->assertEquals($valid, $wifSerializer->parse($wifSerializer->serialize($network, $valid), $network));
 
-        $invalid = Buffer::hex('0041414141414141414141414141414141');
+        $invalid = Buffer::hex('8041414141414141414141414141414141');
         $b58 = Base58::encodeCheck($invalid);
         $wifSerializer->parse($b58);
     }

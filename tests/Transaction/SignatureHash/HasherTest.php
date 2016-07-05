@@ -69,7 +69,7 @@ class HasherTest extends AbstractTestCase
         //  bitcoin-cli -testnet=1 signrawtransaction "01000000012ffb29d53528ad30c37c267fbbeda3c6fce08f5f6f5d3b1eab22193599a3612a0100000000ffffffff02c0e1e400000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac809698000000000019
 
         $spend = '0100000001e2deba2aaf49ccbca9bafabc9049917db0d219cd9a44cfc751369d0a1c538b4e010000006a47304402205f73e04abdc4687e12ded30916f747cee200e113158c85fda953344bdc02d43b02207b86e6b2862aca49b727afee0a6ff7d52795d19cae4d357419f31fd987ec7b220121034087874436d20c49f5afdf14f7cbf6b8c03f28629ef299e4cb454070d563e6e9feffffff028cb7d31b000000001976a9144df845f26149b78004fa15bd9afbe6a70895a1a488ac80c3c901000000001976a9140de1f9b92d2ab6d8ead83f9a0ff5cf518dcb03b888ac28fb0500';
-        $priv = PrivateKeyFactory::fromWif('cQnFidqYxEoi8xZz1hDtFRcEkzpXF5tbofpWbgWdEk9KHhAo7RxD', $ecAdapter);
+        $priv = PrivateKeyFactory::fromWif('cQnFidqYxEoi8xZz1hDtFRcEkzpXF5tbofpWbgWdEk9KHhAo7RxD', $ecAdapter, $network);
 
         $tx = TransactionFactory::fromHex($spend);
 
