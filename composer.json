@@ -33,7 +33,6 @@
     "symfony/http-foundation": "~3.0",
     "mdanter/ecc": "~0.4",
     "bitwasp/buffertools": "~0.3",
-    "bitwasp/trait": "~0.0",
     "bitwasp/secp256k1-php": "~0.0.7"
   },
   "require-dev": {

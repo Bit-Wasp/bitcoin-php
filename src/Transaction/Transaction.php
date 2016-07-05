@@ -14,12 +14,9 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class Transaction extends Serializable implements TransactionInterface
 {
-    use FunctionAliasArrayAccess;
-
     /**
      * @var int
      */
@@ -75,11 +72,6 @@ class Transaction extends Serializable implements TransactionInterface
         $this->witness = $witness ?: new TransactionWitnessCollection();
         $this->lockTime = $nLockTime;
 
-        $this
-            ->initFunctionAlias('version', 'getVersion')
-            ->initFunctionAlias('inputs', 'getInputs')
-            ->initFunctionAlias('outputs', 'getOutputs')
-            ->initFunctionAlias('locktime', 'getLockTime');
     }
 
     /**

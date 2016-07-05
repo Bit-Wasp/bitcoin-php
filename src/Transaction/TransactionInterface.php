@@ -11,7 +11,7 @@ use BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
 
-interface TransactionInterface extends SerializableInterface, \ArrayAccess
+interface TransactionInterface extends SerializableInterface
 {
     const DEFAULT_VERSION = 1;
 

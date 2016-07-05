@@ -101,10 +101,6 @@ class TransactionTest extends AbstractTestCase
         $this->assertEquals(0, $tx->getLockTime());
         $this->assertEquals(20, count($tx->getInputs()));
         $this->assertEquals(19, count($tx->getOutputs()));
-        $this->assertEquals(1, $tx['version']);
-        $this->assertEquals(0, $tx['locktime']);
-        $this->assertEquals($tx->getInputs(), $tx['inputs']);
-        $this->assertEquals($tx->getOutputs(), $tx['outputs']);
 
         $serialized = $tx->getBuffer()->getHex();
         $this->assertSame($hex, $serialized);

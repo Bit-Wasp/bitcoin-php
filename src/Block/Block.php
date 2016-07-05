@@ -9,12 +9,9 @@ use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class Block extends Serializable implements BlockInterface
 {
-    use FunctionAliasArrayAccess;
-
     /**
      * @var Math
      */
@@ -45,10 +42,6 @@ class Block extends Serializable implements BlockInterface
         $this->math = $math;
         $this->header = $header;
         $this->transactions = $transactions;
-        $this
-            ->initFunctionAlias('header', 'getHeader')
-            ->initFunctionAlias('merkleRoot', 'getMerkleRoot')
-            ->initFunctionAlias('tx', 'getTransactions');
     }
 
     /**
