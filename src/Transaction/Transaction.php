@@ -11,7 +11,6 @@ use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\OldTransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -196,14 +195,6 @@ class Transaction extends Serializable implements TransactionInterface
     public function getLockTime()
     {
         return $this->lockTime;
-    }
-
-    /**
-     * @return Hasher
-     */
-    public function getSignatureHash()
-    {
-        return new Hasher($this);
     }
 
     /**
