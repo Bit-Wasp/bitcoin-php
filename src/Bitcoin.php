@@ -89,7 +89,7 @@ class Bitcoin
      */
     public static function getDefaultParams(Math $math = null)
     {
-        return new Params($math ?: Bitcoin::getMath());
+        return new Params($math ?: self::getMath());
     }
 
     /**
