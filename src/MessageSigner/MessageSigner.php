@@ -59,7 +59,7 @@ class MessageSigner
             $signedMessage->getCompactSignature()
         );
 
-        return ($publicKey->getAddress()->getHash() === $address->getHash());
+        return $publicKey->getAddress()->getHash()->equals($address->getHash());
     }
 
     /**
