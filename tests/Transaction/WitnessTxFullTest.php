@@ -25,11 +25,12 @@ class WitnessTxFullTest extends AbstractTestCase
 {
     public function getVectors()
     {
-        $wif = 'QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7';
-        $key = PrivateKeyFactory::fromWif($wif);
+
+        $key = PrivateKeyFactory::fromHex('0cf4f6ba10a7ef675517a2c558c2fe273923aad3231388ad2d44c57ebe48eae4', true);
         
         $factory = ScriptFactory::scriptPubKey();
         $scriptPubKey = $factory->payToPubKeyHash($key->getPublicKey());
+
         $v0destkey = new WitnessProgram(0, $key->getPubKeyHash());
         $v0destscript = new WitnessProgram(0, Hash::sha256($scriptPubKey->getBuffer()));
         $payToPubkeyScript = $factory->payToPubKey($key->getPublicKey());

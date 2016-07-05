@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterfac
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 
 class PrivateKeyFactory
@@ -59,16 +60,18 @@ class PrivateKeyFactory
     /**
      * @param string $wif
      * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKey
+     * @param NetworkInterface $network
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface
      * @throws InvalidPrivateKey
      */
-    public static function fromWif($wif, EcAdapterInterface $ecAdapter = null)
+    public static function fromWif($wif, EcAdapterInterface $ecAdapter = null, NetworkInterface $network = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $network = $network ?: Bitcoin::getNetwork();
         $serializer = EcSerializer::getSerializer($ecAdapter, PrivateKeySerializerInterface::class);
         $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $serializer);
 
-        return $wifSerializer->parse($wif);
+        return $wifSerializer->parse($wif, $network);
     }
 
     /**

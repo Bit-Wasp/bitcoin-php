@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Buffertools\Buffer;
@@ -59,13 +60,20 @@ class WifPrivateKeySerializer
 
     /**
      * @param string $wif
-     * @return PrivateKeyInterface
-     * @throws InvalidPrivateKey
+     * @param NetworkInterface|null $network
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
      * @throws Base58ChecksumFailure
+     * @throws InvalidPrivateKey
      */
-    public function parse($wif)
+    public function parse($wif, NetworkInterface $network = null)
     {
-        $payload = Base58::decodeCheck($wif)->slice(1);
+        $network = $network ?: Bitcoin::getNetwork();
+        $data = Base58::decodeCheck($wif);
+        if ($data->slice(0, 1)->getHex() !== $network->getPrivByte()) {
+            throw new \RuntimeException('WIF prefix does not match networks');
+        }
+
+        $payload = $data->slice(1);
         $size = $payload->getSize();
 
         if (33 === $size) {
