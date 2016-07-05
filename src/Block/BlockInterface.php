@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\BufferInterface;
 
-interface BlockInterface extends SerializableInterface, \ArrayAccess
+interface BlockInterface extends SerializableInterface
 {
     const CURRENT_VERSION = 2;
     const MAX_BLOCK_SIZE = 1000000;

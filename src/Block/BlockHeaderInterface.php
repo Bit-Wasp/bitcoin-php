@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Block;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Buffertools\BufferInterface;
 
-interface BlockHeaderInterface extends SerializableInterface, \ArrayAccess
+interface BlockHeaderInterface extends SerializableInterface
 {
     /**
      * Return the version of this block.

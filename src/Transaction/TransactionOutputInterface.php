@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\SerializableInterface;
 
-interface TransactionOutputInterface extends SerializableInterface, \ArrayAccess
+interface TransactionOutputInterface extends SerializableInterface
 {
     /**
      * Get the value of this output

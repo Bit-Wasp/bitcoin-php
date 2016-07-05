@@ -19,7 +19,6 @@ class TransactionOutputTest extends AbstractTestCase
 
         $out = new TransactionOutput(10901, new Script());
         $this->assertSame(10901, $out->getValue());
-        $this->assertSame(10901, $out['value']);
 
     }
 
@@ -29,7 +28,6 @@ class TransactionOutputTest extends AbstractTestCase
         $out = new TransactionOutput(1, $testScript);
         $script = $out->getScript();
         $this->assertInstanceOf($this->scriptType, $script);
-        $this->assertSame($testScript, $out['script']);
     }
 
     public function testFromParser()

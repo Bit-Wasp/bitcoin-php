@@ -5,11 +5,9 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
-    use FunctionAliasArrayAccess;
 
     /**
      * @var string|int
@@ -29,12 +27,8 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function __construct($value, ScriptInterface $script)
     {
-
         $this->value = $value;
         $this->script = $script;
-        $this
-            ->initFunctionAlias('value', 'getValue')
-            ->initFunctionAlias('script', 'getScript');
     }
 
     /**

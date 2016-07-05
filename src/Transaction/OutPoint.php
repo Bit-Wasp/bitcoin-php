@@ -9,8 +9,6 @@ use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class OutPoint extends Serializable implements OutPointInterface
 {
-    use FunctionAliasArrayAccess;
-
     /**
      * @var BufferInterface
      */
@@ -34,10 +32,6 @@ class OutPoint extends Serializable implements OutPointInterface
         
         $this->hashPrevOutput = $hashPrevOutput;
         $this->nPrevOutput = $nPrevOutput;
-
-        $this
-            ->initFunctionAlias('txid', 'getTxId')
-            ->initFunctionAlias('vout', 'getVout');
     }
 
     /**
