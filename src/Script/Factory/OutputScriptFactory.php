@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class OutputScriptFactory
@@ -57,6 +58,21 @@ class OutputScriptFactory
     }
 
     /**
+     * Create a P2PKH output script from a hash.
+     *
+     * @param BufferInterface $hash
+     * @return ScriptInterface
+     */
+    public function payToPubKeyHashFromHash(BufferInterface $hash)
+    {
+        if ($hash->getSize() !== 20) {
+            throw new \RuntimeException('pub-key-hash should be 20 bytes');
+        }
+
+        return ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
+    }
+
+    /**
      * Create a P2SH output script
      *
      * @param ScriptInterface $p2shScript
@@ -65,6 +81,21 @@ class OutputScriptFactory
     public function payToScriptHash(ScriptInterface $p2shScript)
     {
         return ScriptFactory::sequence([Opcodes::OP_HASH160, $p2shScript->getScriptHash(), Opcodes::OP_EQUAL]);
+    }
+
+    /**
+     * Create a P2SH script from a provided hash.
+     *
+     * @param BufferInterface $hash
+     * @return ScriptInterface
+     */
+    public function payToScriptHashFromHash(BufferInterface $hash)
+    {
+        if ($hash->getSize() !== 20) {
+            throw new \RuntimeException('pub-key-hash should be 20 bytes');
+        }
+
+        return ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUAL]);
     }
 
     /**
@@ -88,7 +119,8 @@ class OutputScriptFactory
             $keys = Buffertools::sort($keys);
         }
 
-        $new = ScriptFactory::create()->int($m);
+        $new = ScriptFactory::create();
+        $new->int($m);
         foreach ($keys as $key) {
             if (!$key instanceof PublicKeyInterface) {
                 throw new \LogicException('Values in $keys[] must be a PublicKey');
@@ -97,8 +129,6 @@ class OutputScriptFactory
             $new->push($key->getBuffer());
         }
 
-        $new->int($n)->op('OP_CHECKMULTISIG');
-
-        return $new->getScript();
+        return $new->int($n)->op('OP_CHECKMULTISIG')->getScript();
     }
 }
