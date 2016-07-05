@@ -63,8 +63,10 @@ class ScriptCreator
                 $new->push($operation->getBuffer());
             } elseif ($operation instanceof BufferInterface) {
                 $new->push($operation);
+            } elseif ($operation instanceof ScriptInterface) {
+                $new->concat($operation);
             } else {
-                throw new \RuntimeException('Input was neither an opcode or BufferInterfacecc');
+                throw new \RuntimeException('Value must be an opcode/BufferInterface/Number');
             }
         }
 
@@ -147,19 +149,6 @@ class ScriptCreator
     public function pushSerializable(Serializable $object)
     {
         $this->push($object->getBuffer());
-        return $this;
-    }
-
-    /**
-     * @param Serializable[] $serializable
-     * @return $this
-     */
-    public function pushSerializableArray(array $serializable)
-    {
-        foreach ($serializable as $object) {
-            $this->pushSerializable($object);
-        }
-
         return $this;
     }
 
