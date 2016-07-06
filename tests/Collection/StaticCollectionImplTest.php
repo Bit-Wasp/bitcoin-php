@@ -2,51 +2,52 @@
 
 namespace BitWasp\Bitcoin\Tests\Collection;
 
-use BitWasp\Bitcoin\Collection\Generic\Set;
+use BitWasp\Bitcoin\Collection\StaticBufferCollection;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Buffertools\Buffer;
 
 class StaticCollectionImplTest extends AbstractTestCase
 {
-    public function testArrayAccessOffsetGet()
+    public function testArrayAccessOffStaticBufferCollectionGet()
     {
-        $collection = new Set(['1']);
-        $this->assertEquals('1', $collection[0]);
-        $this->assertEquals('1', $collection->offsetGet(0));
+        $collection = new StaticBufferCollection([new Buffer("\x01")]);
+        $this->assertEquals(new Buffer("\x01"), $collection[0]);
+        $this->assertEquals(new Buffer("\x01"), $collection->offsetGet(0));
     }
 
     /**
      * @expectedException \OutOfRangeException
      */
-    public function testArrayAccessOffsetGetFailure()
+    public function testArrayAccessOffStaticBufferCollectionGetFailure()
     {
-        $collection = new Set(['1']);
+        $collection = new StaticBufferCollection([new Buffer("\x01")]);
         $collection[20];
     }
-
-    public function testIteratorSetCurrent()
+    
+    public function testIteratorStaticBufferCollectionCurrent()
     {
-        $set = new Set(['1','2']);
-        $this->assertEquals('1', $set->current());
+        $StaticBufferCollection = new StaticBufferCollection([new Buffer("\x01"),new Buffer("\x02")]);
+        $this->assertEquals(new Buffer("\x01"), $StaticBufferCollection->current());
     }
 
     public function testCountable()
     {
-        $set = new Set(['1','2']);
-        $this->assertEquals(2, count($set));
+        $StaticBufferCollection = new StaticBufferCollection([new Buffer("\x01"),new Buffer("\x02")]);
+        $this->assertEquals(2, count($StaticBufferCollection));
     }
 
     public function testAll()
     {
-        $all = ['1','2'];
-        $set = new Set($all);
-        $this->assertEquals($all, $set->all());
+        $all = [new Buffer("\x01"),new Buffer("\x02")];
+        $StaticBufferCollection = new StaticBufferCollection($all);
+        $this->assertEquals($all, $StaticBufferCollection->all());
     }
 
     public function testGet()
     {
-        $all = ['1','2'];
-        $set = new Set($all);
-        $this->assertEquals('1', $set[0]);
+        $all = [new Buffer("\x01"),new Buffer("\x02")];
+        $StaticBufferCollection = new StaticBufferCollection($all);
+        $this->assertEquals(new Buffer("\x01"), $StaticBufferCollection[0]);
     }
 
     /**
@@ -54,7 +55,7 @@ class StaticCollectionImplTest extends AbstractTestCase
      */
     public function testGetInvalid()
     {
-        $set = new Set([]);
-        $set[0];
+        $StaticBufferCollection = new StaticBufferCollection([]);
+        $StaticBufferCollection[0];
     }
 }

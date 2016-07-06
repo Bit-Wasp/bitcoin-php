@@ -408,7 +408,7 @@ class InputSigner
                 throw new \InvalidArgumentException('Must provide redeem script for P2SH');
             }
 
-            if (!$redeemScript->getScriptHash()->getBinary() === $redeemScriptBuffer->getBinary()) {
+            if (!$redeemScript->getScriptHash()->equals($redeemScriptBuffer)) {
                 throw new \InvalidArgumentException("Incorrect redeem script - hash doesn't match");
             }
 
