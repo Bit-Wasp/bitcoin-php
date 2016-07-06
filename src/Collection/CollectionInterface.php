@@ -13,6 +13,11 @@ interface CollectionInterface extends \Iterator, \ArrayAccess, \Countable
      * @return mixed
      */
     public function bottom();
+
+    /**
+     * @return mixed
+     */
+    public function top();
     
     /**
      * @param int $start

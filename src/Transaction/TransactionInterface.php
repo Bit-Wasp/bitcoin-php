@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;

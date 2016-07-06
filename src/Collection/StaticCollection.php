@@ -51,7 +51,23 @@ abstract class StaticCollection implements CollectionInterface
      */
     public function bottom()
     {
+        if (count($this->set) === 0) {
+            throw new \RuntimeException('No bottom for empty collection');
+        }
+        
         return $this->offsetGet(count($this) - 1);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function top()
+    {
+        if (count($this->set) === 0) {
+            throw new \RuntimeException('No top for empty collection');
+        }
+
+        return $this->offsetGet(0);
     }
 
     /**

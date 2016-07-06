@@ -38,6 +38,14 @@ class StaticBufferCollection extends StaticCollection
     /**
      * @return BufferInterface
      */
+    public function top()
+    {
+        return parent::top();
+    }
+
+    /**
+     * @return BufferInterface
+     */
     public function current()
     {
         return $this->set[$this->position];

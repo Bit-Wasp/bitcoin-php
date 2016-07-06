@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Mutator;
 
-
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
