@@ -74,7 +74,7 @@ class Bitcoin
     /**
      * @return ParamsInterface
      */
-    public function getParams()
+    public static function getParams()
     {
         if (null === self::$params) {
             self::$params = self::getDefaultParams();
