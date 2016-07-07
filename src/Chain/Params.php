@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
@@ -126,14 +125,14 @@ class Params implements ParamsInterface
         return new Block(
             $this->math,
             $this->getGenesisBlockHeader(),
-            new TransactionCollection([
+            [
                 (new TxBuilder)
                     ->version('1')
                     ->input(new Buffer('', 32), 0xffffffff, $inputScript)
                     ->output(5000000000, $outputScript)
                     ->locktime(0)
                     ->get()
-            ])
+            ]
         );
     }
 

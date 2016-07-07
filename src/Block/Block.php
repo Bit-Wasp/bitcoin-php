@@ -6,9 +6,9 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 class Block extends Serializable implements BlockInterface
 {
@@ -23,7 +23,7 @@ class Block extends Serializable implements BlockInterface
     private $header;
 
     /**
-     * @var TransactionCollection
+     * @var TransactionInterface[]
      */
     private $transactions;
 
@@ -35,13 +35,15 @@ class Block extends Serializable implements BlockInterface
     /**
      * @param Math $math
      * @param BlockHeaderInterface $header
-     * @param TransactionCollection $transactions
+     * @param TransactionInterface[] $transactions
      */
-    public function __construct(Math $math, BlockHeaderInterface $header, TransactionCollection $transactions)
+    public function __construct(Math $math, BlockHeaderInterface $header, array $transactions)
     {
         $this->math = $math;
         $this->header = $header;
-        $this->transactions = $transactions;
+        $this->transactions = array_map(function (TransactionInterface $tx) {
+            return $tx;
+        }, $transactions);
     }
 
     /**
@@ -69,7 +71,7 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransactions()
-     * @return TransactionCollection
+     * @return TransactionInterface[]
      */
     public function getTransactions()
     {

@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
+use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
+use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
 class TxMutator
 {
@@ -39,7 +39,7 @@ class TxMutator
     public function inputsMutator()
     {
         if (null === $this->inputsMutator) {
-            $this->inputsMutator = new InputCollectionMutator($this->transaction->getInputs()->all());
+            $this->inputsMutator = new InputCollectionMutator($this->transaction->getInputs());
         }
 
         return $this->inputsMutator;
@@ -51,7 +51,7 @@ class TxMutator
     public function outputsMutator()
     {
         if (null === $this->outputsMutator) {
-            $this->outputsMutator = new OutputCollectionMutator($this->transaction->getOutputs()->all());
+            $this->outputsMutator = new OutputCollectionMutator($this->transaction->getOutputs());
         }
 
         return $this->outputsMutator;
@@ -100,28 +100,28 @@ class TxMutator
     }
 
     /**
-     * @param TransactionInputCollection $inputCollection
+     * @param TransactionInputInterface[] $inputCollection
      * @return $this
      */
-    public function inputs(TransactionInputCollection $inputCollection)
+    public function inputs(array $inputCollection)
     {
         return $this->replace(array('inputs' => $inputCollection));
     }
 
     /**
-     * @param TransactionOutputCollection $outputCollection
+     * @param TransactionOutputInterface[] $outputCollection
      * @return $this
      */
-    public function outputs(TransactionOutputCollection $outputCollection)
+    public function outputs(array $outputCollection)
     {
         return $this->replace(array('outputs' => $outputCollection));
     }
 
     /**
-     * @param TransactionWitnessCollection $witnessCollection
+     * @param ScriptWitnessInterface[] $witnessCollection
      * @return $this
      */
-    public function witness(TransactionWitnessCollection $witnessCollection)
+    public function witness(array $witnessCollection)
     {
         return $this->replace(array('witness' => $witnessCollection));
     }

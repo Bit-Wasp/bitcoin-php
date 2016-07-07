@@ -2,11 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Collection\MutableCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
-class OutputCollectionMutator extends MutableCollection
+class OutputCollectionMutator extends AbstractCollectionMutator
 {
     /**
      * @param TransactionOutputInterface[] $outputs
@@ -43,7 +41,7 @@ class OutputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @return TransactionOutputCollection
+     * @return TransactionOutputInterface[]
      */
     public function done()
     {
@@ -52,7 +50,7 @@ class OutputCollectionMutator extends MutableCollection
             $set[] = $mutator->done();
         }
 
-        return new TransactionOutputCollection($set);
+        return $set;
     }
 
     /**

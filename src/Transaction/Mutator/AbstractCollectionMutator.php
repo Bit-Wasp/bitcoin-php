@@ -1,8 +1,8 @@
 <?php
 
-namespace BitWasp\Bitcoin\Collection;
+namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-abstract class MutableCollection implements CollectionInterface
+abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Countable
 {
     /**
      * @var \SplFixedArray

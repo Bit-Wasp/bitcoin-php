@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
@@ -19,9 +17,9 @@ class TxMutatorTest extends AbstractTestCase
     {
         $tx = new Transaction(
             1,
-            new TransactionInputCollection(),
-            new TransactionOutputCollection(),
-            null,
+            [],
+            [],
+            [],
             20
         );
 
@@ -34,13 +32,13 @@ class TxMutatorTest extends AbstractTestCase
             ->locktime($newLockTime)
         ;
 
-        $mutator->inputs(new TransactionInputCollection([
+        $mutator->inputs([
             new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1), new Script())
-        ]));
+        ]);
 
-        $mutator->outputs(new TransactionOutputCollection([
+        $mutator->outputs([
             new TransactionOutput(50, new Script())
-        ]));
+        ]);
 
         $newTx = $mutator->done();
         $this->assertEquals($newVersion, $newTx->getVersion());

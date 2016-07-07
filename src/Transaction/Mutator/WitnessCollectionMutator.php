@@ -2,11 +2,9 @@
 
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Collection\MutableCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 
-class WitnessCollectionMutator extends MutableCollection
+class WitnessCollectionMutator extends AbstractCollectionMutator
 {
 
     /**
@@ -45,7 +43,7 @@ class WitnessCollectionMutator extends MutableCollection
     }
 
     /**
-     * @return TransactionWitnessCollection
+     * @return ScriptWitnessInterface[]
      */
     public function done()
     {
@@ -54,7 +52,7 @@ class WitnessCollectionMutator extends MutableCollection
             $set[] = $mutator->done();
         }
 
-        return new TransactionWitnessCollection($set);
+        return $set;
     }
 
     /**

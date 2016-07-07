@@ -5,16 +5,69 @@ namespace BitWasp\Bitcoin\Collection;
 abstract class StaticCollection implements CollectionInterface
 {
     /**
-     * @var \SplFixedArray
+     * @var array
      */
     protected $set;
+
+    /**
+     * @var int
+     */
+    protected $position = 0;
 
     /**
      * @return array
      */
     public function all()
     {
-        return $this->set->toArray();
+        return $this->set;
+    }
+
+    /**
+     * @param int $start
+     * @param int $length
+     * @return self
+     */
+    public function slice($start, $length)
+    {
+        $end = count($this->set);
+        if ($start > $end || $length > $end) {
+            throw new \RuntimeException('Invalid start or length');
+        }
+
+        $sliced = array_slice($this->set, $start, $length);
+        return new static($sliced);
+    }
+
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->set);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function bottom()
+    {
+        if (count($this->set) === 0) {
+            throw new \RuntimeException('No bottom for empty collection');
+        }
+        
+        return $this->offsetGet(count($this) - 1);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function top()
+    {
+        if (count($this->set) === 0) {
+            throw new \RuntimeException('No top for empty collection');
+        }
+
+        return $this->offsetGet(0);
     }
 
     /**
@@ -26,19 +79,11 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @return int
-     */
-    public function count()
-    {
-        return $this->set->count();
-    }
-
-    /**
-     *
+     * @return void
      */
     public function rewind()
     {
-        $this->set->rewind();
+        $this->position = 0;
     }
 
     /**
@@ -46,7 +91,7 @@ abstract class StaticCollection implements CollectionInterface
      */
     public function current()
     {
-        return $this->set->current();
+        return $this->set[$this->position];
     }
 
     /**
@@ -54,15 +99,15 @@ abstract class StaticCollection implements CollectionInterface
      */
     public function key()
     {
-        return $this->set->key();
+        return $this->position;
     }
 
     /**
-     *
+     * @return void
      */
     public function next()
     {
-        $this->set->next();
+        ++$this->position;
     }
 
     /**
@@ -70,7 +115,7 @@ abstract class StaticCollection implements CollectionInterface
      */
     public function valid()
     {
-        return $this->set->valid();
+        return isset($this->set[$this->position]);
     }
 
     /**
@@ -79,7 +124,7 @@ abstract class StaticCollection implements CollectionInterface
      */
     public function offsetExists($offset)
     {
-        return $this->set->offsetExists($offset);
+        return array_key_exists($offset, $this->set);
     }
 
     /**
@@ -96,10 +141,11 @@ abstract class StaticCollection implements CollectionInterface
      */
     public function offsetGet($offset)
     {
-        if (!$this->set->offsetExists($offset)) {
+        if (!array_key_exists($offset, $this->set)) {
             throw new \OutOfRangeException('Nothing found at this offset');
         }
-        return $this->set->offsetGet($offset);
+
+        return $this->set[$offset];
     }
 
     /**

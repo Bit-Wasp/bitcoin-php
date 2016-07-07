@@ -2,12 +2,12 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 
 class PaymentVerifier
@@ -28,30 +28,28 @@ class PaymentVerifier
 
     /**
      * @param Payment $payment
-     * @return TransactionCollection
+     * @return TransactionInterface[]
      */
     public function getTransactions(Payment $payment)
     {
-        return new TransactionCollection(
-            array_map(
-                function ($binTx) {
-                    return TransactionFactory::fromHex(new Buffer($binTx));
-                },
-                $payment->getTransactionsList()
-            )
+        return array_map(
+            function ($binTx) {
+                return TransactionFactory::fromHex(new Buffer($binTx));
+            },
+            $payment->getTransactionsList()
         );
     }
 
     /**
      * @param PaymentRequest $request
-     * @param TransactionCollection $collection
+     * @param TransactionInterface[] $collection
      * @return bool
      */
-    public function checkTransactions(PaymentRequest $request, TransactionCollection $collection)
+    public function checkTransactions(PaymentRequest $request, array $collection)
     {
         // Add up cumulative amounts for each destination
         $scriptAmount = [];
-        foreach ($collection as $tx) {
+        array_map(function (TransactionInterface $tx) use (&$scriptAmount) {
             foreach ($tx->getOutputs() as $output) {
                 $scriptBin = $output->getScript()->getBinary();
                 if (array_key_exists($scriptBin, $scriptAmount)) {
@@ -60,7 +58,7 @@ class PaymentVerifier
                     $scriptAmount[$scriptBin] = gmp_init($output->getValue(), 10);
                 }
             }
-        }
+        }, $collection);
 
         // Do the same for our PaymentDetails
         $details = new PaymentDetails();
@@ -75,7 +73,6 @@ class PaymentVerifier
                 $requiredAmounts[$scriptBin] = gmp_init($out->getAmount(), 10);
             }
         }
-
 
         // Check required amounts against user transaction
         foreach ($requiredAmounts as $script => $value) {

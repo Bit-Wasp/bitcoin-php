@@ -2,9 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction\Bip69;
 
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
@@ -14,7 +11,7 @@ use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 class Bip69
 {
     /**
-     * @param array $vTxin
+     * @param TransactionInputInterface[] $vTxin
      * @return array
      */
     public function sortInputs(array $vTxin)
@@ -66,8 +63,8 @@ class Bip69
      */
     public function check(TransactionInterface $tx)
     {
-        $inputs = $tx->getInputs()->all();
-        $outputs = $tx->getOutputs()->all();
+        $inputs = $tx->getInputs();
+        $outputs = $tx->getOutputs();
 
         return $this->sortInputs($inputs) === $inputs && $this->sortOutputs($outputs) === $outputs;
     }
@@ -101,16 +98,16 @@ class Bip69
     public function mutate(TransactionInterface $tx)
     {
         if (count($tx->getWitnesses()) > 0) {
-            list ($vTxin, $vWit) = $this->sortInputsAndWitness($tx->getInputs()->all(), $tx->getWitnesses()->all());
+            list ($vTxin, $vWit) = $this->sortInputsAndWitness($tx->getInputs(), $tx->getWitnesses());
         } else {
-            $vTxin = $this->sortInputs($tx->getInputs()->all());
+            $vTxin = $this->sortInputs($tx->getInputs());
             $vWit = [];
         }
 
         return (new TxMutator($tx))
-            ->inputs(new TransactionInputCollection($vTxin))
-            ->outputs(new TransactionOutputCollection($this->sortOutputs($tx->getOutputs()->all())))
-            ->witness(new TransactionWitnessCollection($vWit))
+            ->inputs($vTxin)
+            ->outputs($this->sortOutputs($tx->getOutputs()))
+            ->witness($vWit)
             ->done();
     }
 }

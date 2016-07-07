@@ -2,9 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction;
 
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
@@ -59,7 +56,7 @@ interface TransactionInterface extends SerializableInterface
     /**
      * Return an array of all inputs
      *
-     * @return TransactionInputCollection
+     * @return TransactionInputInterface[]
      */
     public function getInputs();
 
@@ -72,7 +69,7 @@ interface TransactionInterface extends SerializableInterface
     /**
      * Return an array of all outputs
      *
-     * @return TransactionOutputCollection
+     * @return TransactionOutputInterface[]
      */
     public function getOutputs();
 
@@ -89,7 +86,7 @@ interface TransactionInterface extends SerializableInterface
     public function getWitness($index);
 
     /**
-     * @return TransactionWitnessCollection
+     * @return ScriptWitnessInterface[]
      */
     public function getWitnesses();
 

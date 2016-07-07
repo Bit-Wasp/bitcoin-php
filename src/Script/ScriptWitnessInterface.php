@@ -9,18 +9,6 @@ use BitWasp\Buffertools\SerializableInterface;
 interface ScriptWitnessInterface extends CollectionInterface, SerializableInterface
 {
     /**
-     * @return BufferInterface
-     */
-    public function bottom();
-
-    /**
-     * @param int $start
-     * @param int $length
-     * @return ScriptWitness
-     */
-    public function slice($start, $length);
-
-    /**
      * @param ScriptWitnessInterface $witness
      * @return bool
      */

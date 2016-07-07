@@ -3,9 +3,6 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializable;
@@ -22,17 +19,17 @@ class Transaction extends Serializable implements TransactionInterface
     private $version;
 
     /**
-     * @var TransactionInputCollection
+     * @var TransactionInputInterface[]
      */
     private $inputs;
 
     /**
-     * @var TransactionOutputCollection
+     * @var TransactionOutputInterface[]
      */
     private $outputs;
 
     /**
-     * @var TransactionWitnessCollection
+     * @var ScriptWitnessInterface[]
      */
     private $witness;
 
@@ -45,16 +42,16 @@ class Transaction extends Serializable implements TransactionInterface
      * Transaction constructor.
      *
      * @param int $nVersion
-     * @param TransactionInputCollection|null $inputs
-     * @param TransactionOutputCollection|null $outputs
-     * @param TransactionWitnessCollection|null $witness
+     * @param TransactionInputInterface[] $vin
+     * @param TransactionOutputInterface[] $vout
+     * @param ScriptWitnessInterface[] $vwit
      * @param int $nLockTime
      */
     public function __construct(
         $nVersion = TransactionInterface::DEFAULT_VERSION,
-        TransactionInputCollection $inputs = null,
-        TransactionOutputCollection $outputs = null,
-        TransactionWitnessCollection $witness = null,
+        array $vin = [],
+        array $vout = [],
+        array $vwit = [],
         $nLockTime = 0
     ) {
         if ($nVersion > TransactionInterface::MAX_VERSION) {
@@ -66,10 +63,17 @@ class Transaction extends Serializable implements TransactionInterface
         }
 
         $this->version = $nVersion;
-        $this->inputs = $inputs ?: new TransactionInputCollection();
-        $this->outputs = $outputs ?: new TransactionOutputCollection();
-        $this->witness = $witness ?: new TransactionWitnessCollection();
         $this->lockTime = $nLockTime;
+
+        $this->inputs = array_map(function (TransactionInputInterface $input) {
+            return $input;
+        }, $vin);
+        $this->outputs = array_map(function (TransactionOutputInterface $output) {
+            return $output;
+        }, $vout);
+        $this->witness = array_map(function (ScriptWitnessInterface $scriptWitness) {
+            return $scriptWitness;
+        }, $vwit);
 
     }
 
@@ -78,8 +82,8 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function __clone()
     {
-        $this->inputs = clone $this->inputs;
-        $this->outputs = clone $this->outputs;
+        //$this->inputs = clone $this->inputs;
+        //$this->outputs = clone $this->outputs;
     }
 
     /**
@@ -117,7 +121,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * Get the array of inputs in the transaction
      *
-     * @return TransactionInputCollection
+     * @return TransactionInputInterface[]
      */
     public function getInputs()
     {
@@ -130,13 +134,16 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getInput($index)
     {
+        if (!isset($this->inputs[$index])) {
+            throw new \RuntimeException('No input at this index');
+        }
         return $this->inputs[$index];
     }
 
     /**
      * Get Outputs
      *
-     * @return TransactionOutputCollection
+     * @return TransactionOutputInterface[]
      */
     public function getOutputs()
     {
@@ -149,11 +156,14 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getOutput($vout)
     {
+        if (!isset($this->outputs[$vout])) {
+            throw new \RuntimeException('No output at this index');
+        }
         return $this->outputs[$vout];
     }
 
     /**
-     * @return TransactionWitnessCollection
+     * @return ScriptWitnessInterface[]
      */
     public function getWitnesses()
     {
@@ -165,6 +175,9 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getWitness($index)
     {
+        if (!isset($this->witness[$index])) {
+            throw new \RuntimeException('No witness at this index');
+        }
         return $this->witness[$index];
     }
 

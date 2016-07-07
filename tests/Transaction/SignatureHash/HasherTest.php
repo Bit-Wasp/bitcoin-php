@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
@@ -174,8 +173,8 @@ class HasherTest extends AbstractTestCase
         $buggy = new Transaction(
             $unsigned->getVersion(),
             $unsigned->getInputs(),
-            new TransactionOutputCollection(array_slice($unsigned->getOutputs()->all(), 0, 2)),
-            null,
+            array_slice($unsigned->getOutputs(), 0, 2),
+            [],
             $unsigned->getLockTime()
         );
 

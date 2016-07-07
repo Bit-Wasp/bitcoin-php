@@ -2,11 +2,9 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Mutator\OutputCollectionMutator;
-use BitWasp\Bitcoin\Transaction\Mutator\OutputMutator;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
@@ -18,12 +16,12 @@ class OutputCollectionMutatorTest extends AbstractTestCase
         $script1 = new Script(new Buffer('0'));
         $value2 = -2;
         $script2 = new Script(new Buffer('1'));
-        $collection = new TransactionOutputCollection([
+        $collection = [
             new TransactionOutput(5, new Script()),
             new TransactionOutput(10, new Script()),
-        ]);
+        ];
 
-        $mutator = new OutputCollectionMutator($collection->all());
+        $mutator = new OutputCollectionMutator($collection);
         $mutator[0]->script($script1)
                 ->value($value1);
 
@@ -38,12 +36,12 @@ class OutputCollectionMutatorTest extends AbstractTestCase
 
     public function testAdds()
     {
-        $collection = new TransactionOutputCollection([
+        $collection = [
             new TransactionOutput(5, new Script()),
             new TransactionOutput(10, new Script()),
-        ]);
+        ];
 
-        $mutator = new OutputCollectionMutator($collection->all());
+        $mutator = new OutputCollectionMutator($collection);
         $mutator->add(new TransactionOutput(15, new Script()));
         $outputs = $mutator->done();
 
@@ -52,12 +50,12 @@ class OutputCollectionMutatorTest extends AbstractTestCase
 
     public function testSlice()
     {
-        $collection = new TransactionOutputCollection([
+        $collection = [
             new TransactionOutput(5, new Script()),
             new TransactionOutput(10, new Script()),
-        ]);
+        ];
 
-        $mutator = new OutputCollectionMutator($collection->all());
+        $mutator = new OutputCollectionMutator($collection);
         $mutator->slice(0, 1);
         $outputs = $mutator->done();
 
@@ -69,21 +67,21 @@ class OutputCollectionMutatorTest extends AbstractTestCase
      */
     public function testInvalidSlice()
     {
-        $collection = new TransactionOutputCollection([
-        ]);
+        $collection = [
+        ];
 
-        $mutator = new OutputCollectionMutator($collection->all());
+        $mutator = new OutputCollectionMutator($collection);
         $mutator->slice(0, 1);
     }
 
     public function testNull()
     {
-        $collection = new TransactionOutputCollection([
+        $collection = [
             new TransactionOutput(5, new Script()),
             new TransactionOutput(10, new Script()),
-        ]);
+        ];
 
-        $mutator = new OutputCollectionMutator($collection->all());
+        $mutator = new OutputCollectionMutator($collection);
         $mutator->null();
         $outputs = $mutator->done();
 
@@ -92,12 +90,12 @@ class OutputCollectionMutatorTest extends AbstractTestCase
 
     public function testSet()
     {
-        $collection = new TransactionOutputCollection([
+        $collection = [
             new TransactionOutput(5, new Script()),
             new TransactionOutput(10, new Script()),
-        ]);
+        ];
 
-        $mutator = new OutputCollectionMutator($collection->all());
+        $mutator = new OutputCollectionMutator($collection);
         $mutator->set(0, new TransactionOutput(1, new Script()));
         $newCollection = $mutator->done();
         $this->assertEquals(1, $newCollection[0]->getValue());

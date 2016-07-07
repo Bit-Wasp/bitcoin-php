@@ -3,9 +3,6 @@
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
@@ -40,17 +37,17 @@ class ScriptTest extends AbstractTestCase
     {
         return new Transaction(
             1,
-            new TransactionInputCollection([
+            [
                 new TransactionInput(
                     new OutPoint(new Buffer("\x00", 32), 0xffffffff),
                     ScriptFactory::sequence([Opcodes::OP_0, Opcodes::OP_0]),
                     TransactionInput::SEQUENCE_FINAL
                 )
-            ]),
-            new TransactionOutputCollection([
+            ],
+            [
                 new TransactionOutput($amount, $scriptPubKey)
-            ]),
-            null,
+            ],
+            [],
             0
         );
     }
@@ -65,17 +62,17 @@ class ScriptTest extends AbstractTestCase
     {
         return new Transaction(
             1,
-            new TransactionInputCollection([
+            [
                 new TransactionInput(
                     $tx->makeOutPoint(0),
                     $scriptSig,
                     TransactionInput::SEQUENCE_FINAL
                 )
-            ]),
-            new TransactionOutputCollection([
+            ],
+            [
                 new TransactionOutput($tx->getOutput(0)->getValue(), new Script())
-            ]),
-            new TransactionWitnessCollection($scriptWitness == null ? [] : [$scriptWitness]),
+            ],
+            $scriptWitness == null ? [] : [$scriptWitness],
             0
         );
     }

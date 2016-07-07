@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -27,9 +26,9 @@ interface BlockInterface extends SerializableInterface
     public function getMerkleRoot();
 
     /**
-     * Return the TransactionCollection from the block.
+     * Return the block's transactions.
      *
-     * @return TransactionCollection
+     * @return TransactionInterface[]
      */
     public function getTransactions();
 

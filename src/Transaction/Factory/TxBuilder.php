@@ -3,9 +3,6 @@
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -73,13 +70,7 @@ class TxBuilder
      */
     private function makeTransaction()
     {
-        return new Transaction(
-            $this->nVersion,
-            new TransactionInputCollection($this->inputs),
-            new TransactionOutputCollection($this->outputs),
-            new TransactionWitnessCollection($this->witness),
-            $this->nLockTime
-        );
+        return new Transaction($this->nVersion, $this->inputs, $this->outputs, $this->witness, $this->nLockTime);
     }
 
     /**
