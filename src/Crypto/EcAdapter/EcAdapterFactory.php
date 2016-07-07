@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
+use Composer\Semver\Semver;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1;
@@ -48,7 +49,7 @@ class EcAdapterFactory
             return self::$adapter;
         }
 
-        if (extension_loaded('secp256k1')) {
+        if (extension_loaded('secp256k1') && Semver::satisfies(phpversion('secp256k1'), "~0.1.0")) {
             self::$adapter = self::getSecp256k1($math, $generator);
         } else {
             self::$adapter = self::getPhpEcc($math, $generator);
