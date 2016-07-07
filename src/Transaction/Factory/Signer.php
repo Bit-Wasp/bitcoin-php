@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -33,10 +34,10 @@ class Signer
      * @param TransactionInterface $tx
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(TransactionInterface $tx, EcAdapterInterface $ecAdapter)
+    public function __construct(TransactionInterface $tx, EcAdapterInterface $ecAdapter = null)
     {
         $this->tx = $tx;
-        $this->ecAdapter = $ecAdapter;
+        $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
     }
 
     /**
