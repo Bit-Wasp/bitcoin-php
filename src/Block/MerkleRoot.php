@@ -3,7 +3,7 @@
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
@@ -12,7 +12,7 @@ use Pleo\Merkle\FixedSizeTree;
 class MerkleRoot
 {
     /**
-     * @var TransactionCollection
+     * @var TransactionInterface[]
      */
     private $transactions;
 
@@ -30,9 +30,9 @@ class MerkleRoot
      * Instantiate the class when given a block
      *
      * @param Math $math
-     * @param TransactionCollection $txCollection
+     * @param TransactionInterface[] $txCollection
      */
-    public function __construct(Math $math, TransactionCollection $txCollection)
+    public function __construct(Math $math, array $txCollection)
     {
         $this->math = $math;
         $this->transactions = $txCollection;

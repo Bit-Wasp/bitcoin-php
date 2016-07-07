@@ -54,8 +54,8 @@ class OldTransactionSerializer
     {
         return $this->getTemplate()->write([
             $transaction->getVersion(),
-            $transaction->getInputs()->all(),
-            $transaction->getOutputs()->all(),
+            $transaction->getInputs(),
+            $transaction->getOutputs(),
             $transaction->getLockTime()
         ]);
     }

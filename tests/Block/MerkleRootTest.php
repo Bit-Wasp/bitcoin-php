@@ -19,23 +19,22 @@ class MerkleRootTest extends AbstractTestCase
     public function testCannotUseEmptyCollection()
     {
         $math = $this->safeMath();
-        $root = new MerkleRoot($math, new TransactionCollection());
+        $root = new MerkleRoot($math, []);
         $root->calculateHash();
     }
 
     /**
-     * @param array $hexes - a list of transaction hex strings
-     * @return TransactionCollection
+     * @param array $hexes
+     * @return array
      */
     private function getTransactionCollection(array $hexes)
     {
-        $transactions = new TransactionCollection(array_map(
+        return array_map(
             function ($value) {
                 return TransactionFactory::fromHex($value);
             },
             $hexes
-        ));
-        return $transactions;
+        );
     }
 
     /**

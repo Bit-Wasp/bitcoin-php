@@ -65,13 +65,9 @@ class TxBuilderTest extends AbstractTestCase
 
     public function testSpendsOutputFrom()
     {
-        $parent = new Transaction(
-            1,
-            new TransactionInputCollection([]),
-            new TransactionOutputCollection([
-                new TransactionOutput(50, new Script())
-            ])
-        );
+        $parent = new Transaction(1, [], [
+            new TransactionOutput(50, new Script())
+        ]);
 
         $parentHash = $parent->getTxId();
 

@@ -3,9 +3,6 @@
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -102,9 +99,9 @@ class TransactionSerializer implements TransactionSerializerInterface
 
         return new Transaction(
             $version,
-            new TransactionInputCollection($vin),
-            new TransactionOutputCollection($vout),
-            new TransactionWitnessCollection($vwit),
+            $vin,
+            $vout,
+            $vwit,
             $lockTime
         );
     }
@@ -135,7 +132,7 @@ class TransactionSerializer implements TransactionSerializerInterface
         $binary = $int32le->write($transaction->getVersion());
         $flags = 0;
 
-        if (!$transaction->getWitnesses()->isNull()) {
+        if (!empty($transaction->getWitnesses())) {
             $flags |= 1;
         }
 
@@ -144,8 +141,8 @@ class TransactionSerializer implements TransactionSerializerInterface
             $binary .= $int8le->write($flags);
         }
 
-        $binary .= $vector->write($transaction->getInputs()->all());
-        $binary .= $vector->write($transaction->getOutputs()->all());
+        $binary .= $vector->write($transaction->getInputs());
+        $binary .= $vector->write($transaction->getOutputs());
 
         if ($flags & 1) {
             foreach ($transaction->getWitnesses() as $witness) {

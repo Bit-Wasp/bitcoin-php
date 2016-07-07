@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Buffertools\Buffer;
 
 class TransactionTest extends AbstractTestCase
@@ -25,7 +24,7 @@ class TransactionTest extends AbstractTestCase
             $outputs[] = new TransactionOutput($value, new Script());
         }
 
-        $tx = new Transaction(1, null, new TransactionOutputCollection($outputs));
+        $tx = new Transaction(1, [], $outputs);
         $this->assertEquals($count * $value, $tx->getValueOut());
     }
 
@@ -61,7 +60,7 @@ class TransactionTest extends AbstractTestCase
 
     public function testSetLockTime()
     {
-        $tx = new Transaction(1, null, null, null, '1093');
+        $tx = new Transaction(1, [], [], [], '1093');
 
         $this->assertSame('1093', $tx->getLockTime());
     }
@@ -71,7 +70,7 @@ class TransactionTest extends AbstractTestCase
      */
     public function testSetLockTimeException()
     {
-        new Transaction(1, null, null, null, '4294967297');
+        new Transaction(1, [], [], [], '4294967297');
     }
 
     /**
@@ -198,7 +197,7 @@ class TransactionTest extends AbstractTestCase
 
         $tx = TransactionFactory::fromHex($raw);
 
-        $this->assertEquals(3, $tx->getOutputs()->count());
+        $this->assertEquals(3, count($tx->getOutputs()));
         $this->assertEquals('6a0a6f6d000000468000002a', $tx->getOutput(1)->getScript()->getHex());
 
         $this->assertEquals($raw, $tx->getHex());

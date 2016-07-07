@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -76,7 +75,7 @@ class Signer
         }
 
         if (count($witnesses) > 0) {
-            $mutable->witness(new TransactionWitnessCollection($witnesses));
+            $mutable->witness($witnesses);
         }
 
         $new = $mutable->done();
