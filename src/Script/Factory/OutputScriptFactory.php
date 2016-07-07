@@ -102,7 +102,7 @@ class OutputScriptFactory
      * @param int $m
      * @param PublicKeyInterface[] $keys
      * @param bool|true $sort
-     * @return ScriptCreator|Script
+     * @return ScriptInterface
      */
     public function multisig($m, array $keys = [], $sort = true)
     {
