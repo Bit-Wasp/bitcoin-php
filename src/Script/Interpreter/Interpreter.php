@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
@@ -50,9 +51,9 @@ class Interpreter implements InterpreterInterface
     /**
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter)
+    public function __construct(EcAdapterInterface $ecAdapter = null)
     {
-        $this->math = $ecAdapter->getMath();
+        $this->math = ($ecAdapter ?: Bitcoin::getEcAdapter())->getMath();
         $this->vchFalse = new Buffer("", 0, $this->math);
         $this->vchTrue = new Buffer("\x01", 1, $this->math);
     }

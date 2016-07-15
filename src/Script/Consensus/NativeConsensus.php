@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Consensus;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
@@ -20,9 +21,9 @@ class NativeConsensus implements ConsensusInterface
      * NativeConsensus constructor.
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter)
+    public function __construct(EcAdapterInterface $ecAdapter = null)
     {
-        $this->adapter = $ecAdapter;
+        $this->adapter = $ecAdapter ?: Bitcoin::getEcAdapter();
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\MessageSigner;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
@@ -21,9 +22,9 @@ class MessageSigner
     /**
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter)
+    public function __construct(EcAdapterInterface $ecAdapter = null)
     {
-        $this->ecAdapter = $ecAdapter;
+        $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
     }
 
     /**
