@@ -17,18 +17,16 @@ hi
 IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+FogOoz/M=
 -----END BITCOIN SIGNED MESSAGE-----';
 
-$ec = Bitcoin::getEcAdapter();
-
 /** @var PayToPubKeyHashAddress $addr */
 $addr = \BitWasp\Bitcoin\Address\AddressFactory::fromString($address);
 
 /** @var CompactSignatureSerializerInterface $cs */
-$cs = \BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer::getSerializer($ec, CompactSignatureSerializerInterface::class);
+$cs = \BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer::getSerializer(CompactSignatureSerializerInterface::class);
 $serializer = new \BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer($cs);
 
 $signedMessage = $serializer->parse($sig);
 
-$signer = new MessageSigner($ec);
+$signer = new MessageSigner();
 if ($signer->verify($signedMessage, $addr)) {
     echo "Signature verified!\n";
 } else {

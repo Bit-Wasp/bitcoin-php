@@ -60,8 +60,8 @@ class CompactSignatureTest extends AbstractTestCase
         $this->assertEquals(65, $compact->getBuffer()->getSize());
         $this->assertTrue($msgSigner->verify($signed, $pubKey->getAddress()));
 
-        $serializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface');
         /** @var CompactSignatureSerializerInterface $serializer */
+        $serializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter);
 
         $parsed = $serializer->parse($compact->getBuffer());
         $this->assertEquals($compact->getBinary(), $parsed->getBinary());

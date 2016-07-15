@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
@@ -102,13 +103,15 @@ class EcSerializer
     }
 
     /**
-     * @param EcAdapterInterface $adapter
      * @param $interface
      * @param bool|true $useCache
+     * @param EcAdapterInterface $adapter
      * @return mixed
      */
-    public static function getSerializer(EcAdapterInterface $adapter, $interface, $useCache = true)
+    public static function getSerializer($interface, $useCache = true, EcAdapterInterface $adapter = null)
     {
+        $adapter = $adapter ?: Bitcoin::getEcAdapter();
+
         if (isset(self::$cache[$interface])) {
             return self::$cache[$interface];
         }

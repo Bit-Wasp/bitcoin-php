@@ -16,8 +16,8 @@ class DerSignatureSerializerTest extends AbstractTestCase
      */
     public function testFromParserFailure(EcAdapterInterface $adapter)
     {
-        $serializer = EcSerializer::getSerializer($adapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface');
         /** @var DerSignatureSerializerInterface $serializer */
+        $serializer = EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $adapter);
         $serializer->parse('');
     }
 }
