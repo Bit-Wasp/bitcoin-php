@@ -151,7 +151,6 @@ class Number extends Serializable
         }
 
         return new Buffer($s, null, $this->math);
-
     }
 
     /**

@@ -74,7 +74,6 @@ class Transaction extends Serializable implements TransactionInterface
         $this->witness = array_map(function (ScriptWitnessInterface $scriptWitness) {
             return $scriptWitness;
         }, $vwit);
-
     }
 
     /**

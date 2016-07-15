@@ -115,7 +115,6 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
         $checkVal('S', $startS, $lenS, $bin);
 
         return true;
-
     }
 
     /**

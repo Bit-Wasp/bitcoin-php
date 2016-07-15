@@ -41,7 +41,6 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         } else {
             return $publicKey->getPrefix();
         }
-
     }
 
     /**

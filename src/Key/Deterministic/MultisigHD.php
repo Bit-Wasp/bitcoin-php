@@ -70,7 +70,6 @@ class MultisigHD
             },
             $this->keys
         ));
-
     }
 
     /**
