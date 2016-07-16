@@ -17,11 +17,17 @@ install:
             && ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-module-schnorr --enable-experimental && make && sudo make install \
             && cd ..; fi'
     - |
-        sh -c 'if [ "$EXT_SECP256K1" != "" ]; then \
-          git clone git://github.com/Bit-Wasp/secp256k1-php \
-          && cd secp256k1-php/secp256k1 \
-          && phpize && ./configure && make && sudo make install \
-          && cd ../..; fi'
+        sh -c 'if [ "$EXT_SECP256K1" != "" ] && [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then \
+              git clone -b v0.0 https://github.com/Bit-Wasp/secp256k1-php \
+                       && cd secp256k1-php/secp256k1 \
+                       && phpize && ./configure && make && sudo make install \
+                       && cd ../..; fi';
+    - |
+        sh -c 'if [ "$EXT_SECP256K1" != "" ] && [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then \
+             git clone -b v0.1 https://github.com/Bit-Wasp/secp256k1-php \
+                      && cd secp256k1-php/secp256k1 \
+                      && phpize && ./configure && make && sudo make install \
+                      && cd ../..; fi';
     - | 
       sh -c 'if [ "" == ""]; then \
           cd tests/Data \
@@ -46,7 +52,7 @@ matrix:
         env: EXT_SECP256K1="-dextension=secp256k1.so"
 
       ## exclude nightly + extension until the extension itself actually passes tests
-      - php: 7.0
+      - php: nightly
         env: EXT_SECP256K1="-dextension=secp256k1.so"
 
 notifications:
