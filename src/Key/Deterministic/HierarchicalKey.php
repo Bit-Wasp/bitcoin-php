@@ -73,7 +73,6 @@ class HierarchicalKey
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
         $this->key = $key;
-
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin\MessageSigner;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 
@@ -52,10 +52,7 @@ class SignedMessage
     public function getBuffer()
     {
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer(
-                Bitcoin::getEcAdapter(),
-                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface'
-            )
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class)
         );
         return $serializer->serialize($this);
     }

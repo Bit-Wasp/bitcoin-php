@@ -39,7 +39,7 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         /** @var PayToPubKeyHashAddress $address */
         $address = AddressFactory::fromString($address, $network);
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer($ecAdapter, CompactSignatureSerializerInterface::class)
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
         );
 
         $signed = $serializer->parse($content);
@@ -68,7 +68,7 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         -----END BITCOIN SIGNED MESSAGE-----';
 
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer($this->safeEcAdapter(), 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $this->safeEcAdapter())
         );
         $serializer->parse($invalid);
     }
@@ -86,7 +86,7 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         ';
 
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer($this->safeEcAdapter(), 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $this->safeEcAdapter())
         );
         $serializer->parse($invalid);
     }
@@ -104,7 +104,7 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         -----END BITCOIN SIGNED MESSAGE-----';
 
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer($this->safeEcAdapter(), 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface')
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $this->safeEcAdapter())
         );
         $serializer->parse($invalid);
     }

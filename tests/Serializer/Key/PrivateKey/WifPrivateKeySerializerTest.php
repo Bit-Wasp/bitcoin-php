@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Key\PrivateKey;
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
@@ -23,7 +24,7 @@ class WifPrivateKeySerializerTest extends AbstractBip39Case
     {
         $network = NetworkFactory::bitcoin();
 
-        $hexSerializer = EcSerializer::getSerializer($ecAdapter, 'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface');
+        $hexSerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
         $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $hexSerializer);
 
         $valid = PrivateKeyFactory::create();

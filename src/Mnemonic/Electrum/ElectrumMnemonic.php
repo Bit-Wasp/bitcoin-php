@@ -80,7 +80,6 @@ class ElectrumMnemonic implements MnemonicInterface
         for ($i = 0; $i < $thirdWordCount; $i++) {
             list ($index1, $index2, $index3) = array_map(function ($v) use ($wordList) {
                 return gmp_init($wordList->getIndex($v), 10);
-
             }, array_slice($words, 3 * $i, 3));
 
             $x = $math->add(

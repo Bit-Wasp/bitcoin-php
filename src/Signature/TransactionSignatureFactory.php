@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Signature;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 
 class TransactionSignatureFactory
@@ -16,13 +17,8 @@ class TransactionSignatureFactory
      */
     public static function fromHex($string, EcAdapterInterface $ecAdapter = null)
     {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-
         $serializer = new TransactionSignatureSerializer(
-            EcSerializer::getSerializer(
-                $ecAdapter,
-                'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface'
-            )
+            EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter)
         );
 
         return $serializer->parse($string);

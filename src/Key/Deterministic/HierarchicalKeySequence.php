@@ -126,6 +126,5 @@ class HierarchicalKeySequence
         if (!is_array($list) && !$list instanceof \Traversable && !$list instanceof \stdClass) {
             throw new \InvalidArgumentException('Sequence list must be an array or \Traversable');
         }
-
     }
 }
