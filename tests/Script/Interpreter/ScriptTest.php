@@ -201,7 +201,7 @@ class ScriptTest extends AbstractTestCase
         $opcodes = new Opcodes();
         $mapOpNames = $this->calcMapOpNames($opcodes);
         $mapFlagNames = $this->calcMapFlagNames();
-        $object = json_decode(file_get_contents(__DIR__."/../../Data/script_tests.json"), true);
+        $object = json_decode($this->dataFile("script_tests.json"), true);
         $testCount = count($object);
         $vectors = [];
         for ($idx = 0; $idx < $testCount; $idx++) {

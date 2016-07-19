@@ -27,7 +27,7 @@ class EcAdapterTest extends AbstractTestCase
         $datasets = [];
         $yaml = new Yaml();
 
-        $data = $yaml->parse(file_get_contents(__DIR__ . '/../../Data/privateKeys.yml'));
+        $data = $yaml->parse($this->dataFile('privateKeys.yml'));
         foreach ($data['vectors'] as $vector) {
             foreach ($this->getEcAdapters() as $adapter) {
                 $datasets[] = [
@@ -97,8 +97,7 @@ class EcAdapterTest extends AbstractTestCase
      */
     public function testIsValidPublicKey(EcAdapterInterface $ecAdapter)
     {
-        $f    = file_get_contents(__DIR__.'/../../Data/publickey.compressed.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('publickey.compressed.json'));
         foreach ($json->test as $test) {
             try {
                 PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
@@ -116,8 +115,7 @@ class EcAdapterTest extends AbstractTestCase
      */
     public function testDeterministicSign(EcAdapterInterface $ecAdapter)
     {
-        $f = file_get_contents(__DIR__.'/../../Data/hmacdrbg.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hmacdrbg.json'));
         $math = $ecAdapter->getMath();
         foreach ($json->test as $c => $test) {
             $privateKey = PrivateKeyFactory ::fromHex($test->privKey, false, $ecAdapter);

@@ -25,7 +25,7 @@ class AddressTest extends AbstractTestCase
         $datasets = [];
         $yaml = new Yaml();
 
-        $data = $yaml->parse(file_get_contents(__DIR__ . '/../Data/addresstests.yml'));
+        $data = $yaml->parse($this->dataFile('addresstests.yml'));
         foreach ($data['scriptHash'] as $vector) {
             $datasets[] = [
                 'script',

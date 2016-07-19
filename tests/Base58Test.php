@@ -5,13 +5,12 @@ namespace BitWasp\Bitcoin\Tests;
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Buffertools\Buffer;
 
-class Base58Test extends \PHPUnit_Framework_TestCase
+class Base58Test extends AbstractTestCase
 {
 
     public function getVectors()
     {
-        $f = file_get_contents(__DIR__ . '/Data/base58.encodedecode.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('base58.encodedecode.json'));
 
         $results = [];
         foreach ($json->test as $test) {
