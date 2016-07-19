@@ -12,94 +12,20 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var string
-     */
-    protected $blockType = 'BitWasp\Bitcoin\Block\Block';
-
-    /**
-     * @var string
-     */
-    protected $headerType = 'BitWasp\Bitcoin\Block\BlockHeader';
-
-    /**
-     * @var string
-     */
-    protected $netInterfaceType = 'BitWasp\Bitcoin\Network\NetworkInterface';
-
-    /**
-     * @var string
-     */
-    protected $scriptType = 'BitWasp\Bitcoin\Script\Script';
-
-    /**
-     * @var string
-     */
-    protected $scriptInterfaceType = 'BitWasp\Bitcoin\Script\ScriptInterface';
-
-    /**
-     * @var string
-     */
-    protected $outScriptFactoryType = 'BitWasp\Bitcoin\Script\Factory\OutputScriptFactory';
-
-    /**
-     * @var string
-     */
-    protected $scriptCreatorType = 'BitWasp\Bitcoin\Script\Factory\ScriptCreator';
-
-    /**
-     * @var string
-     */
-    protected $txType = 'BitWasp\Bitcoin\Transaction\Transaction';
-
-    /**
-     * @var string
-     */
-    protected $txInterfaceType = 'BitWasp\Bitcoin\Transaction\TransactionInterface';
-
-    /**
-     * @var string
-     */
-    protected $txOutType = 'BitWasp\Bitcoin\Transaction\TransactionOutput';
-
-    /**
-     * @var string
-     */
-    protected $txColType = 'BitWasp\Bitcoin\Collection\Transaction\TransactionCollection';
-
-    /**
-     * @var string
-     */
-    protected $txSignerType = 'BitWasp\Bitcoin\Transaction\Factory\TxSigner';
-
-    /**
-     * @var string
-     */
-    protected $txSignerStateType = 'BitWasp\Bitcoin\Transaction\Factory\TxSignerState';
-
-    /**
-     * @var string
-     */
-    protected $txBuilderType = 'BitWasp\Bitcoin\Transaction\Factory\TxBuilder';
-
-    /**
-     * @var string
-     */
-    protected $txMutatorType = 'BitWasp\Bitcoin\Transaction\Mutator\TxMutator';
-
-    protected $nativeConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\NativeConsensus';
-    protected $libBitcoinConsensusInstance = 'BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus';
-    /**
      * @var resource
      */
-    private static $context;
+    private static $secp256k1Context;
 
-    public static function getContext()
+    /**
+     * @return resource
+     */
+    public static function getSecp256k1Context()
     {
-        if (null === self::$context) {
-            self::$context = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
+        if (null === self::$secp256k1Context) {
+            self::$secp256k1Context = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY | SECP256K1_CONTEXT_SIGN);
         }
 
-        return self::$context;
+        return self::$secp256k1Context;
     }
 
     /**
@@ -132,7 +58,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $i
-     * @return \BitWasp\Bitcoin\Block\Block
+     * @return \BitWasp\Bitcoin\Block\BlockInterface
      */
     public function getBlock($i)
     {
@@ -184,7 +110,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     {
         $array = explode(",", $flagStr);
         $int = 0;
-        $checkdisabled = false;
         foreach ($array as $activeFlag) {
             $f = constant('\BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::'.$activeFlag);
             $int |= $f;
@@ -193,17 +118,25 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         return $int;
     }
 
-
+    /**
+     * @return Math
+     */
     public function safeMath()
     {
         return new Math();
     }
 
+    /**
+     * @return \Mdanter\Ecc\Primitives\GeneratorPoint
+     */
     public function safeGenerator()
     {
         return EccFactory::getSecgCurves($this->safeMath())->generator256k1();
     }
 
+    /**
+     * @return PhpEccAdapter|\BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter
+     */
     public function safeEcAdapter()
     {
         $math = $this->safeMath();

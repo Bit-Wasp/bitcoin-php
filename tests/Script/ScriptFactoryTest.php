@@ -3,15 +3,19 @@
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
+use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Tests\Script\Factory\OutputScriptFactoryTest;
 
 class ScriptFactoryTest extends AbstractTestCase
 {
     public function testScriptPubKey()
     {
         $outputScripts = ScriptFactory::scriptPubKey();
-        $this->assertInstanceOf($this->outScriptFactoryType, $outputScripts);
+        $this->assertInstanceOf(OutputScriptFactory::class, $outputScripts);
     }
 
     public function testMultisig()
@@ -29,14 +33,14 @@ class ScriptFactoryTest extends AbstractTestCase
         }
 
         $sorted = ScriptFactory::scriptPubKey()->multisig($m, $arbitrary, true);
-        $this->assertInstanceOf($this->scriptInterfaceType, $sorted);
+        $this->assertInstanceOf(ScriptInterface::class, $sorted);
         $this->assertNotEquals($sorted->getBinary(), $redeemScript->getBinary());
     }
 
     public function testCreate()
     {
         $script = ScriptFactory::create(null);
-        $this->assertInstanceOf($this->scriptCreatorType, $script);
+        $this->assertInstanceOf(ScriptCreator::class, $script);
         $this->assertEmpty($script->getScript()->getBinary());
     }
 }

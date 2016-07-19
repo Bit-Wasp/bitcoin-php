@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Network;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -16,7 +17,7 @@ class NetworkTest extends AbstractTestCase
     public function testCreatesInstance()
     {
         $network = NetworkFactory::create('00', '05', '80', true);
-        $this->assertInstanceOf($this->netInterfaceType, $network);
+        $this->assertInstanceOf(NetworkInterface::class, $network);
     }
 
     /**
@@ -91,7 +92,7 @@ class NetworkTest extends AbstractTestCase
     public function testCreateTestnet()
     {
         $network = $this->getTestNetwork();
-        $this->assertInstanceOf($this->netInterfaceType, $network);
+        $this->assertInstanceOf(NetworkInterface::class, $network);
         $this->assertInternalType('bool', $network->isTestnet());
         $this->assertTrue($network->isTestnet());
     }
@@ -99,7 +100,7 @@ class NetworkTest extends AbstractTestCase
     public function testCreateLivenet()
     {
         $network = $this->getLiveNetwork();
-        $this->assertInstanceOf($this->netInterfaceType, $network);
+        $this->assertInstanceOf(NetworkInterface::class, $network);
         $this->assertInternalType('bool', $network->isTestnet());
         $this->assertFalse($network->isTestnet());
     }
@@ -178,7 +179,7 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals('2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV', $p2sh->getAddress(NetworkFactory::viacoinTestnet()));
         $this->assertEquals('t7ZKfRypXUd7ByZGLLi5jX3AbD7KQvDj4a', $p2pk->getAddress(NetworkFactory::viacoinTestnet()));
 
-        $this->assertInstanceOf($this->netInterfaceType, NetworkFactory::litecoinTestnet());
+        $this->assertInstanceOf(NetworkInterface::class, NetworkFactory::litecoinTestnet());
 
         $this->assertEquals(NetworkFactory::dogecoin()->getAddressByte(), '1e');
         $this->assertEquals(NetworkFactory::dogecoin()->getP2shByte(), '16');

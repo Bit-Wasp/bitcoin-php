@@ -46,7 +46,7 @@ class BlockHeaderTest extends AbstractTestCase
     {
         $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
 
-        $this->assertInstanceOf($this->headerType, $result);
+        $this->assertInstanceOf(BlockHeader::class, $result);
         $this->assertSame('1', $result->getVersion());
 
         $this->assertInstanceOf(Buffer::class, $result->getPrevBlock());

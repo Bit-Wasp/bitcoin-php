@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Tests\Block;
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockHeader;
@@ -95,11 +96,11 @@ class BlockTest extends AbstractTestCase
 
         $newBlock = BlockFactory::fromHex($blockHex);
 
-        $this->assertInstanceOf($this->blockType, $newBlock);
+        $this->assertInstanceOf(Block::class, $newBlock);
 
         $this->assertInternalType('array', $newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
-        $this->assertInstanceOf($this->txInterfaceType, $newBlock->getTransaction(0));
+        $this->assertInstanceOf(TransactionInterface::class, $newBlock->getTransaction(0));
         $this->assertEquals($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
     }
 
@@ -128,7 +129,7 @@ class BlockTest extends AbstractTestCase
 
         $newBlock = BlockFactory::fromHex($blockHex);
 
-        $this->assertInstanceOf($this->blockType, $newBlock);
+        $this->assertInstanceOf(Block::class, $newBlock);
         $this->assertEquals($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
         $this->assertEquals($blockHex, $newBlock->getHex());
     }
