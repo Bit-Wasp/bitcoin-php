@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
 
@@ -27,7 +28,7 @@ class TransactionOutputTest extends AbstractTestCase
         $testScript = new Script(Buffer::hex('414141'));
         $out = new TransactionOutput(1, $testScript);
         $script = $out->getScript();
-        $this->assertInstanceOf($this->scriptType, $script);
+        $this->assertInstanceOf(Script::class, $script);
     }
 
     public function testFromParser()
@@ -36,7 +37,7 @@ class TransactionOutputTest extends AbstractTestCase
         $parser = new Parser($buffer);
         $s = new TransactionOutputSerializer();
         $out = $s->fromParser($parser);
-        $this->assertInstanceOf($this->txOutType, $out);
+        $this->assertInstanceOf(TransactionOutputInterface::class, $out);
     }
 
     public function testEquals()

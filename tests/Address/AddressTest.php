@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Tests\Address;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -93,10 +95,10 @@ class AddressTest extends AbstractTestCase
         $scriptHash = $outputScriptFactory->payToScriptHash($outputScriptFactory->multisig(1, [$publicKey]));
 
         $p2pkhAddress = AddressFactory::fromOutputScript($pubkeyHash);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Address\PayToPubKeyHashAddress', $p2pkhAddress);
+        $this->assertInstanceOf(PayToPubKeyHashAddress::class, $p2pkhAddress);
 
         $scriptAddress = AddressFactory::fromOutputScript($scriptHash);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Address\ScriptHashAddress', $scriptAddress);
+        $this->assertInstanceOf(ScriptHashAddress::class, $scriptAddress);
 
         $unknownScript = ScriptFactory::create()->op('OP_0')->op('OP_1')->getScript();
         AddressFactory::fromOutputScript($unknownScript);

@@ -27,9 +27,9 @@ class RequestSignerTest extends Bip70Test
         $sha1 = RequestSigner::sha1($this->getKey(), $this->getCert());
         $sha256 = RequestSigner::sha256($this->getKey(), $this->getCert());
 
-        $this->assertInstanceOf('\BitWasp\Bitcoin\PaymentProtocol\RequestSigner', $none);
-        $this->assertInstanceOf('\BitWasp\Bitcoin\PaymentProtocol\RequestSigner', $sha1);
-        $this->assertInstanceOf('\BitWasp\Bitcoin\PaymentProtocol\RequestSigner', $sha256);
+        $this->assertInstanceOf(RequestSigner::class, $none);
+        $this->assertInstanceOf(RequestSigner::class, $sha1);
+        $this->assertInstanceOf(RequestSigner::class, $sha256);
     }
 
     public function getSignerVectors()

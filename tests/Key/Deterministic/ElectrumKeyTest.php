@@ -81,7 +81,7 @@ class ElectrumKeyTest extends AbstractTestCase
     {
         $key = PrivateKeyFactory::create(false);
         $e = ElectrumKeyFactory::fromKey($key);
-        $this->assertInstanceOf('BitWasp\Bitcoin\Key\Deterministic\ElectrumKey', $e);
+        $this->assertInstanceOf(ElectrumKey::class, $e);
 
         $key = PrivateKeyFactory::create(true);
         ElectrumKeyFactory::fromKey($key);
@@ -91,7 +91,7 @@ class ElectrumKeyTest extends AbstractTestCase
     {
         $random = new Random();
         $key = ElectrumKeyFactory::generateMasterKey($random->bytes(32));
-        $this->assertInstanceOf('BitWasp\Bitcoin\Key\Deterministic\ElectrumKey', $key);
+        $this->assertInstanceOf(ElectrumKey::class, $key);
     }
 
     /**

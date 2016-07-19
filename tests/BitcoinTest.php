@@ -7,13 +7,8 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use Mdanter\Ecc\EccFactory;
 
-class BitcoinTest extends \PHPUnit_Framework_TestCase
+class BitcoinTest extends AbstractTestCase
 {
-    public function tearDown()
-    {
-
-    }
-
     public function testGetMath()
     {
         $this->assertEquals(new Math(), Bitcoin::getMath());

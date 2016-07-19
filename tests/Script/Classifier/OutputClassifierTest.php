@@ -40,7 +40,7 @@ class OutputClassifierTest extends AbstractTestCase
         $hash160 = $publicKey1->getPubKeyHash();
         $p2pkh = ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash160, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
 
-        $publicKey2 = $publicKey1->tweakAdd(1);
+        $publicKey2 = $publicKey1->tweakAdd(gmp_init(1));
         $multisig = ScriptFactory::scriptPubKey()->multisig(1, [$publicKey1, $publicKey2], false);
 
         $p2wpkh = (new WitnessProgram(0, $hash160))->getScript();
@@ -62,7 +62,6 @@ class OutputClassifierTest extends AbstractTestCase
     public function getVectors()
     {
         $classifier = new OutputClassifier();
-        //echo json_encode($this->generateVectors(), \JSON_PRETTY_PRINT).PHP_EOL;
         $data = json_decode($this->dataFile('outputclassifier.json'), true);
 
         $vectors = [];
@@ -94,7 +93,7 @@ class OutputClassifierTest extends AbstractTestCase
         $solution = '';
         $pub = new Buffer("\x04", 33);
         $this->assertTrue($classifier->isPayToPublicKey(ScriptFactory::sequence([$pub, Opcodes::OP_CHECKSIG]), $solution));
-        $this->assertInstanceOf($this->bufferType, $solution);
+        $this->assertInstanceOf(Buffer::class, $solution);
         /** @var BufferInterface $solution */
         $this->assertTrue($pub->equals($solution));
     }
@@ -112,7 +111,7 @@ class OutputClassifierTest extends AbstractTestCase
         $solution = '';
         $hash = new Buffer("\x04", 20);
         $this->assertTrue($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]), $solution));
-        $this->assertInstanceOf($this->bufferType, $solution);
+        $this->assertInstanceOf(Buffer::class, $solution);
         /** @var BufferInterface $solution */
         $this->assertTrue($hash->equals($solution));
     }
@@ -134,7 +133,7 @@ class OutputClassifierTest extends AbstractTestCase
         $count = count($solution);
         $this->assertEquals(1, $count);
         for ($i = 0; $i < $count; $i++) {
-            $this->assertInstanceOf($this->bufferType, $solution[$i]);
+            $this->assertInstanceOf(Buffer::class, $solution[$i]);
         }
 
         $this->assertTrue($pub->equals($solution[0]));
@@ -155,7 +154,7 @@ class OutputClassifierTest extends AbstractTestCase
         $hash = Hash::sha256(new Buffer('string'));
         $solution = '';
         $this->assertTrue($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, $hash]), $solution));
-        $this->assertInstanceOf($this->bufferType, $solution);
+        $this->assertInstanceOf(Buffer::class, $solution);
         /** @var BufferInterface $solution */
         $this->assertTrue($hash->equals($solution));
     }
@@ -174,7 +173,7 @@ class OutputClassifierTest extends AbstractTestCase
 
         $solution = '';
         $this->assertTrue($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUAL]), $solution));
-        $this->assertInstanceOf($this->bufferType, $solution);
+        $this->assertInstanceOf(Buffer::class, $solution);
         /** @var BufferInterface $solution */
         $this->assertTrue($hash->equals($solution));
     }

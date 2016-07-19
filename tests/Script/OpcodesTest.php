@@ -3,8 +3,9 @@
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class OpcodesTest extends \PHPUnit_Framework_TestCase
+class OpcodesTest extends AbstractTestCase
 {
     public function testGetOpByName()
     {
