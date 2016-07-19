@@ -14,11 +14,6 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $bufferType = 'BitWasp\Buffertools\Buffer';
-
-    /**
-     * @var string
-     */
     protected $blockType = 'BitWasp\Bitcoin\Block\Block';
 
     /**

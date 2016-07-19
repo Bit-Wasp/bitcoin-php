@@ -49,10 +49,10 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertInstanceOf($this->headerType, $result);
         $this->assertSame('1', $result->getVersion());
 
-        $this->assertInstanceOf($this->bufferType, $result->getPrevBlock());
+        $this->assertInstanceOf(Buffer::class, $result->getPrevBlock());
         $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock()->getHex());
 
-        $this->assertInstanceOf($this->bufferType, $result->getMerkleRoot());
+        $this->assertInstanceOf(Buffer::class, $result->getMerkleRoot());
         $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->getHex());
 
         $this->assertInternalType('int', $result->getBits());
