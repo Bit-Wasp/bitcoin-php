@@ -175,7 +175,7 @@ class Interpreter implements InterpreterInterface
                     return false;
                 }
 
-                $scriptPubKey = ScriptFactory::create()->sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $buffer, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG])->getScript();
+                $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHashFromHash($buffer);
                 $stackValues = $scriptWitness;
             } else {
                 return false;
