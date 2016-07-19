@@ -6,24 +6,19 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 
 class ScriptTest extends AbstractTestCase
 {
-    /**
-     * @var string
-     */
-    protected $bufferType = 'BitWasp\Buffertools\Buffer';
-
     public function testGetOpCodes()
     {
         $script = new Script();
         $opCodes = $script->getOpCodes();
-        $this->assertInstanceOf('BitWasp\Bitcoin\Script\Opcodes', $opCodes);
+        $this->assertInstanceOf(Opcodes::class, $opCodes);
     }
-
 
     public function testPushdata4()
     {
@@ -106,7 +101,7 @@ class ScriptTest extends AbstractTestCase
         $op = 'OP_HASH160';
         $script = ScriptFactory::create()->op($op)->getScript();
 
-        $rOp = $script->getOpCodes()->getOpByName($op);
+        $rOp = $script->getOpcodes()->getOpByName($op);
         $expected = chr($rOp);
         $this->assertSame($script->getBuffer()->getBinary(), $expected);
     }
@@ -244,7 +239,7 @@ class ScriptTest extends AbstractTestCase
         $witness = null;
         $isWitness = $script->isWitness($witness);
         if ($isWitness) {
-            $this->assertInstanceOf('BitWasp\Bitcoin\Script\WitnessProgram', $witness);
+            $this->assertInstanceOf(WitnessProgram::class, $witness);
         }
 
         $this->assertEquals($valid, $isWitness);
