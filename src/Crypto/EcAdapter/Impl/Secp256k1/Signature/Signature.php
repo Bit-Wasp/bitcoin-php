@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Signature\DerSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Serializable;
 
 class Signature extends Serializable implements SignatureInterface
@@ -70,6 +71,30 @@ class Signature extends Serializable implements SignatureInterface
     public function getResource()
     {
         return $this->secp256k1_sig;
+    }
+
+    /**
+     * @param Signature $other
+     * @return bool
+     */
+    private function doEquals(Signature $other)
+    {
+        $a = '';
+        $b = '';
+        secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $a, $this->getResource());
+        secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $b, $other->getResource());
+
+        return $a === $b;
+    }
+
+    /**
+     * @param SignatureInterface $signature
+     * @return bool
+     */
+    public function equals(SignatureInterface $signature)
+    {
+        /** @var Signature $signature */
+        return $this->doEquals($signature);
     }
 
     /**

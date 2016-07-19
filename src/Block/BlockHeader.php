@@ -133,6 +133,20 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     }
 
     /**
+     * @param BlockHeaderInterface $other
+     * @return bool
+     */
+    public function equals(BlockHeaderInterface $other)
+    {
+        return $this->version === $other->getVersion()
+            && $this->prevBlock->equals($other->getPrevBlock())
+            && $this->merkleRoot->equals($other->getMerkleRoot())
+            && $this->timestamp === $other->getTimestamp()
+            && $this->bits === $other->getBits()
+            && $this->nonce === $other->getNonce();
+    }
+
+    /**
      * {@inheritdoc}
      * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
