@@ -57,7 +57,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @return Script
+     * @return ScriptInterface
      */
     public function getScript()
     {
@@ -78,13 +78,11 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function equals(TransactionInputInterface $input)
     {
-        $outPoint = $this->outPoint->equals($input->getOutPoint());
-        if (!$outPoint) {
+        if (!$this->outPoint->equals($input->getOutPoint())) {
             return false;
         }
 
-        $script = $this->script->equals($input->getScript());
-        if (!$script) {
+        if (!$this->script->equals($input->getScript())) {
             return false;
         }
 
