@@ -12,7 +12,7 @@ class Bip69
 {
     /**
      * @param TransactionInputInterface[] $vTxin
-     * @return array
+     * @return TransactionInputInterface[]
      */
     public function sortInputs(array $vTxin)
     {
