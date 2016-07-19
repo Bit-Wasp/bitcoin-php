@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Tests\Script\Factory\OutputScriptFactoryTest;
 
 class ScriptFactoryTest extends AbstractTestCase
 {
