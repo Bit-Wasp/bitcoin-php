@@ -2,9 +2,16 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Bip69;
 
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Bip69\Bip69;
+use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
+use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
+use BitWasp\Buffertools\Buffer;
 
 class Bip69Test extends AbstractTestCase
 {
@@ -31,6 +38,91 @@ class Bip69Test extends AbstractTestCase
         if ($expectedCheck === false) {
             $fixed = $bip69->mutate($tx);
             $this->assertEquals(true, $bip69->check($fixed));
+        }
+    }
+
+    /**
+     * @return \stdClass
+     */
+    private function getBitcoinJsVectors()
+    {
+        $file = $this->dataFile('bip69.bitcoinjs.json');
+        return json_decode($file);
+    }
+
+    /**
+     * @return array
+     */
+    public function getOutputVectors()
+    {
+        $bitcoinjs = $this->getBitcoinJsVectors();
+        $outputFixtures = $bitcoinjs->outputs;
+        $outputVectors = [];
+
+        foreach ($outputFixtures as $fixture) {
+            $outputs = $fixture->outputs;
+            $expected = $fixture->expected;
+            $array = [];
+            foreach ($outputs as $i) {
+                $array[] = new TransactionOutput($i->value, new Script(Buffer::hex($i->script)));
+            }
+
+            $outputVectors[] = [$array, $expected];
+        }
+
+        return $outputVectors;
+    }
+
+    /**
+     * @return array
+     */
+    public function getInputVectors()
+    {
+        $bitcoinjs = $this->getBitcoinJsVectors();
+        $inputFixtures = $bitcoinjs->inputs;
+        $inputVectors = [];
+
+        foreach ($inputFixtures as $fixture) {
+            $inputs = $fixture->inputs;
+            $expected = $fixture->expected;
+            $array = [];
+            foreach ($inputs as $i) {
+                $array[] = new TransactionInput(new OutPoint(Buffer::hex($i->txId, 32), $i->vout), new Script());
+            }
+
+            $inputVectors[] = [$array, $expected];
+        }
+
+        return $inputVectors;
+    }
+
+    /**
+     * @param TransactionInputInterface[] $vin
+     * @param array $vexpected
+     * @dataProvider getInputVectors
+     */
+    public function testInputsSort(array $vin, array $vexpected)
+    {
+        $bip69 = new Bip69();
+        $result = $bip69->sortInputs($vin);
+
+        foreach ($vexpected as $i => $k) {
+            $this->assertTrue($result[$i]->equals($vin[$k]));
+        }
+    }
+
+    /**
+     * @param TransactionOutputInterface[] $vout
+     * @param array $vexpected
+     * @dataProvider getOutputVectors
+     */
+    public function testOutputsSort(array $vout, array $vexpected)
+    {
+        $bip69 = new Bip69();
+        $result = $bip69->sortOutputs($vout);
+
+        foreach ($vexpected as $i => $k) {
+            $this->assertTrue($result[$i]->equals($vout[$k]));
         }
     }
 }
