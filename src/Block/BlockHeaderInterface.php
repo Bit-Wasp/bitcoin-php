@@ -50,6 +50,14 @@ interface BlockHeaderInterface extends SerializableInterface
     public function getNonce();
 
     /**
+     * Return whether this header is equal to the other.
+     *
+     * @param BlockHeaderInterface $header
+     * @return bool
+     */
+    public function equals(self $header);
+
+    /**
      * @return BufferInterface
      */
     public function getHash();

@@ -57,6 +57,16 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     }
 
     /**
+     * @param TransactionSignatureInterface $other
+     * @return bool
+     */
+    public function equals(TransactionSignatureInterface $other)
+    {
+        return $this->signature->equals($other->getSignature())
+            && $this->hashType === $other->getHashType();
+    }
+
+    /**
      * @param BufferInterface $sig
      * @return bool
      * @throws SignatureNotCanonical
