@@ -179,8 +179,7 @@ class ScriptTest extends AbstractTestCase
 
     public function testGetVarInt()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/script.varint.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('script.varint.json'));
         foreach ($json->test as $test) {
             $script = new Script(Buffer::hex($test->script));
 

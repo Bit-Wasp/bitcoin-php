@@ -121,7 +121,7 @@ class InterpreterTest extends AbstractTestCase
         $vectors[] = [
             $flags,
             new Script(new Buffer()),
-            ScriptFactory::create()->push(Buffer::hex(file_get_contents(__DIR__ . "/../../Data/10010bytes.hex")))->getScript(),
+            ScriptFactory::create()->push(Buffer::hex($this->dataFile("10010bytes.hex")))->getScript(),
             false,
             new Transaction
         ];

@@ -17,8 +17,7 @@ class PublicKeyTest extends AbstractTestCase
 
     public function getPublicVectors()
     {
-        $f = file_get_contents(__DIR__.'/../Data/publickey.compressed.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('publickey.compressed.json'));
         $results = [];
         foreach ($json->test as $test) {
             foreach ($this->getEcAdapters() as $adapter) {
@@ -72,9 +71,7 @@ class PublicKeyTest extends AbstractTestCase
     public function testFromHexInvalidLength(EcAdapterInterface $ecAdapter)
     {
         $hex = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44febaa';
-        $publicKey = PublicKeyFactory::fromHex($hex, $ecAdapter);
-        $this->assertInstanceOf($this->publicType, $publicKey);
-        $this->assertSame($hex, $publicKey->getBuffer()->getHex());
+        PublicKeyFactory::fromHex($hex, $ecAdapter);
     }
 
     /**
@@ -113,8 +110,7 @@ class PublicKeyTest extends AbstractTestCase
 
     public function getPkHashVectors()
     {
-        $f = file_get_contents(__DIR__.'/../Data/publickey.pubkeyhash.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('publickey.pubkeyhash.json'));
         $results = [];
 
         foreach ($json->test as $test) {

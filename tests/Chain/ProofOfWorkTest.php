@@ -18,7 +18,7 @@ class ProofOfWorkTest extends AbstractTestCase
         $math = $this->safeMath();
         $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
-        $data = json_decode(file_get_contents(__DIR__ . '/../Data/pow'), true);
+        $data = json_decode($this->dataFile('pow'), true);
 
         $results = [];
         foreach ($data as $c => $record) {

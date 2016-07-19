@@ -25,11 +25,6 @@ class HierarchicalKeyTest extends AbstractTestCase
     protected $network;
 
     /**
-     * @var string
-     */
-    protected $baseType = 'BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey';
-
-    /**
      * Used for testing skipped keys
      * @var int
      */
@@ -67,7 +62,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGenerateNew(EcAdapterInterface $ecAdapter)
     {
         $key = HierarchicalKeyFactory::generateMasterKey($ecAdapter);
-        $this->assertInstanceOf($this->baseType, $key);
+        $this->assertInstanceOf(HierarchicalKey::class, $key);
     }
 
     /**
@@ -94,7 +89,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $entropy = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
         $key = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
-        $this->assertInstanceOf($this->baseType, $key);
+        $this->assertInstanceOf(HierarchicalKey::class, $key);
     }
 
     /**
@@ -102,8 +97,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function getBip32Vectors()
     {
-        $f = file_get_contents(__DIR__ . '/../../Data/bip32testvectors.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('bip32testvectors.json'));
 
         $results = [];
         foreach ($json->test as $testC => $test) {
@@ -180,7 +174,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
         $key = HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
 
-        $this->assertInstanceOf($this->baseType, $key);
+        $this->assertInstanceOf(HierarchicalKey::class, $key);
         $this->assertSame($key->toExtendedPrivateKey($this->network), $xPrv);
         $this->assertSame($key->toExtendedKey($this->network), $xPrv);
         $this->assertTrue($key->isPrivate());
@@ -188,7 +182,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xPub = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
 
-        $this->assertInstanceOf($this->baseType, $key);
+        $this->assertInstanceOf(HierarchicalKey::class, $key);
         $this->assertSame($key->toExtendedPublicKey($this->network), $xPub);
         $this->assertSame($key->toExtendedKey($this->network), $xPub);
         $this->assertFalse($key->isPrivate());
@@ -243,7 +237,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertSame($xprv, $key->toExtendedKey($this->network));
         $this->assertSame($xprv, $key->toExtendedPrivateKey($this->network));
         $this->assertSame($xpub, $key->toExtendedPublicKey($this->network));
-        $this->assertInstanceOf($this->baseType, $key);
+        $this->assertInstanceOf(HierarchicalKey::class, $key);
     }
 
     /**

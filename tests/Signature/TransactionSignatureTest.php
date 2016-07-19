@@ -24,7 +24,7 @@ class TransactionSignatureTest extends AbstractTestCase
 
     public function testSigCanonical()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/sig_canonical.json');
+        $f = $this->dataFile('sig_canonical.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $sigBuf = Buffer::hex($test);
@@ -34,7 +34,7 @@ class TransactionSignatureTest extends AbstractTestCase
 
     public function testSigNonCanonical()
     {
-        $f = file_get_contents(__DIR__ . '/../Data/sig_noncanonical.json');
+        $f = $this->dataFile('sig_noncanonical.json');
         $json = json_decode($f);
         foreach ($json->test as $c => $test) {
             try {
@@ -49,7 +49,7 @@ class TransactionSignatureTest extends AbstractTestCase
 
     public function testSignaturesConsistent()
     {
-        $f    = file_get_contents(__DIR__ . '/../Data/signatures_blockchain.json');
+        $f    = $this->dataFile('signatures_blockchain.json');
         $json = json_decode($f);
         foreach ($json->test as $c => $test) {
             $sig  = TransactionSignatureFactory::fromHex($test);

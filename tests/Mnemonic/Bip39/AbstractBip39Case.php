@@ -29,7 +29,7 @@ abstract class AbstractBip39Case extends AbstractTestCase
      */
     public function getBip39Vectors()
     {
-        $file = json_decode(file_get_contents(__DIR__ . '/../../Data/bip39.json'), true);
+        $file = json_decode($this->dataFile('bip39.json'), true);
         $vectors = [];
 
         $ec = $this->safeEcAdapter();

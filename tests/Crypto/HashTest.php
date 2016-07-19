@@ -3,13 +3,14 @@
 namespace BitWasp\Bitcoin\Tests\Crypto;
 
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 
-class HashTest extends \PHPUnit_Framework_TestCase
+class HashTest extends AbstractTestCase
 {
     public function testSha256()
     {
-        $f = file_get_contents(__DIR__.'/../Data/hash.sha256.json');
+        $f = $this->dataFile('hash.sha256.json');
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
@@ -19,7 +20,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
 
     public function testSha256d()
     {
-        $f = file_get_contents(__DIR__.'/../Data/hash.sha256d.json');
+        $f = $this->dataFile('hash.sha256d.json');
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
@@ -29,7 +30,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
 
     public function testRipemd160()
     {
-        $f = file_get_contents(__DIR__.'/../Data/hash.ripemd160.json');
+        $f = $this->dataFile('hash.ripemd160.json');
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
@@ -39,7 +40,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
 
     public function testRipemd160d()
     {
-        $f = file_get_contents(__DIR__.'/../Data/hash.ripemd160d.json');
+        $f = $this->dataFile('hash.ripemd160d.json');
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
@@ -49,7 +50,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
 
     public function testPBKDF2()
     {
-        $f = file_get_contents(__DIR__.'/../Data/hash.pbkdf2.json');
+        $f = $this->dataFile('hash.pbkdf2.json');
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
@@ -78,7 +79,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
 
     public function testSha256Ripe160()
     {
-        $f = file_get_contents(__DIR__.'/../Data/hash.sha256ripe160.json');
+        $f = $this->dataFile('hash.sha256ripe160.json');
 
         $json = json_decode($f);
         foreach ($json->test as $test) {
@@ -88,7 +89,7 @@ class HashTest extends \PHPUnit_Framework_TestCase
     }
     public function testSha1()
     {
-        $f = file_get_contents(__DIR__.'/../Data/hash.sha1.json');
+        $f = $this->dataFile('hash.sha1.json');
         $json = json_decode($f);
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::sha1(new Buffer($test->data))->getHex());

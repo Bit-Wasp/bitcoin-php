@@ -35,9 +35,7 @@ class DifficultyTest extends AbstractTestCase
 
     public function testGetTarget()
     {
-        $f = file_get_contents(__DIR__.'/../Data/difficulty.json');
-
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('difficulty.json'));
 
         $math = $this->safeMath();
         $params = new Params($math);
