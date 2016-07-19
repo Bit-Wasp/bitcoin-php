@@ -25,6 +25,8 @@ class Base58Test extends AbstractTestCase
     /**
      * Test that encoding and decoding a string results in the original data
      * @dataProvider getVectors
+     * @param Buffer $bs
+     * @param string $base58
      */
     public function testEncodeDecode(Buffer $bs, $base58)
     {
@@ -52,6 +54,8 @@ class Base58Test extends AbstractTestCase
      * Check that when data is encoded with a checksum, that we can decode
      * correctly
      * @dataProvider getVectors
+     * @param Buffer $bs
+     * @param string $base58
      */
     public function testEncodeDecodeCheck(Buffer $bs, $base58)
     {
