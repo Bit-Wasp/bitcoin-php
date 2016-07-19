@@ -10,9 +10,7 @@ class HashTest extends AbstractTestCase
 {
     public function testSha256()
     {
-        $f = $this->dataFile('hash.sha256.json');
-
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hash.sha256.json'));
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::sha256(new Buffer($test->data))->getHex());
         }
@@ -20,9 +18,7 @@ class HashTest extends AbstractTestCase
 
     public function testSha256d()
     {
-        $f = $this->dataFile('hash.sha256d.json');
-
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hash.sha256d.json'));
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::sha256d(new Buffer($test->data))->getHex());
         }
@@ -30,9 +26,7 @@ class HashTest extends AbstractTestCase
 
     public function testRipemd160()
     {
-        $f = $this->dataFile('hash.ripemd160.json');
-
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hash.ripemd160.json'));
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::ripemd160(new Buffer($test->data))->getHex());
         }
@@ -40,9 +34,7 @@ class HashTest extends AbstractTestCase
 
     public function testRipemd160d()
     {
-        $f = $this->dataFile('hash.ripemd160d.json');
-
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hash.ripemd160d.json'));
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::ripemd160d(new Buffer($test->data))->getHex());
         }
@@ -50,9 +42,7 @@ class HashTest extends AbstractTestCase
 
     public function testPBKDF2()
     {
-        $f = $this->dataFile('hash.pbkdf2.json');
-
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hash.pbkdf2.json'));
         foreach ($json->test as $test) {
             $hash = Hash::pbkdf2($test->algo, new Buffer($test->data), new Buffer($test->salt), $test->iterations, $test->length);
             $this->assertSame($test->result, $hash->getHex());
@@ -79,18 +69,15 @@ class HashTest extends AbstractTestCase
 
     public function testSha256Ripe160()
     {
-        $f = $this->dataFile('hash.sha256ripe160.json');
-
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hash.sha256ripe160.json'));
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::sha256ripe160(Buffer::hex($test->data))->getHex());
         }
-
     }
+
     public function testSha1()
     {
-        $f = $this->dataFile('hash.sha1.json');
-        $json = json_decode($f);
+        $json = json_decode($this->dataFile('hash.sha1.json'));
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::sha1(new Buffer($test->data))->getHex());
         }
