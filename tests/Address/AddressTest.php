@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -14,7 +13,6 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
-use Symfony\Component\Yaml\Yaml;
 
 class AddressTest extends AbstractTestCase
 {
@@ -25,9 +23,8 @@ class AddressTest extends AbstractTestCase
     public function getVectors()
     {
         $datasets = [];
-        $yaml = new Yaml();
 
-        $data = $yaml->parse($this->dataFile('addresstests.yml'));
+        $data = json_decode($this->dataFile('addresstests.json'), true);
         foreach ($data['scriptHash'] as $vector) {
             $datasets[] = [
                 'script',
