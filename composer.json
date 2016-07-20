@@ -38,7 +38,6 @@
   },
   "require-dev": {
     "ext-json": "*",
-    "bitwasp/testing-php": "~0.1.0",
-    "symfony/yaml": "~2.6.0"
+    "bitwasp/testing-php": "~0.1.0"
   }
 }
