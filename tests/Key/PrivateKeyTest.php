@@ -3,49 +3,12 @@
 namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class PrivateKeyTest extends AbstractTestCase
 {
-    /**
-     * @var PrivateKey
-     */
-    protected $privateKey;
-
-    /**
-     * @var Math
-     */
-    protected $math;
-
-    /**
-     * @var GeneratorPoint
-     */
-    protected $generator;
-
-    /**
-     * @var string
-     */
-    protected $baseType = 'BitWasp\Bitcoin\Key\PrivateKey';
-
-    /**
-     * @var string
-     */
-    protected $publicType = 'BitWasp\Bitcoin\Key\PublicKey';
-
-    /**
-     *
-     */
-    public function setUp()
-    {
-        $this->math = $this->safeMath();
-        $this->generator = $this->safeGenerator();
-    }
-
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter

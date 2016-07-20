@@ -10,11 +10,6 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class PublicKeyTest extends AbstractTestCase
 {
-    /**
-     * @var
-     */
-    protected $publicType = 'BitWasp\Bitcoin\Key\PublicKey';
-
     public function getPublicVectors()
     {
         $json = json_decode($this->dataFile('publickey.compressed.json'));
@@ -146,40 +141,10 @@ class PublicKeyTest extends AbstractTestCase
      */
     public function testIsNotCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
     {
-        $pub = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
-        $this->assertFalse($pub->isCompressed());
-    }
-
-    /**
-     * @param EcAdapterInterface $ecAdapter
-     * @param $eCompressed
-     * @param $eUncompressed
-     * @dataProvider getPublicVectors
-     */
-    public function testIsCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
-    {
         $pub = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
         $this->assertTrue($pub->isCompressed());
 
-    }
-
-    /**
-     * @dataProvider getPublicVectors
-     * @param EcAdapterInterface $ecAdapter
-     * @param string $eCompressed
-     * @param string $eUncompressed
-     */
-    public function testSerializeHex(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
-    {
-
-        $pubkey = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
-        $hex = $pubkey->getBuffer()->getHex();
-        $bin = $pubkey->getBuffer()->getBinary();
-
-        for ($i = 0; $i < count($bin); $i++) {
-            $nHex = bin2hex(substr($bin, $i, 1));
-            $hHex = substr($hex, $i*2, 2);
-            $this->assertSame($nHex, $hHex);
-        }
+        $pub = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
+        $this->assertFalse($pub->isCompressed());
     }
 }

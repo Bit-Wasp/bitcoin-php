@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -14,11 +15,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class EcAdapterTest extends AbstractTestCase
 {
-    /**
-     * @var string
-     */
-    public $sigType = 'BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface';
-
     /**
      * @return array
      */
@@ -149,7 +145,7 @@ class EcAdapterTest extends AbstractTestCase
         $hash = $random->bytes(32);
         $sig = $ecAdapter->sign($hash, $pk, new Random());
 
-        $this->assertInstanceOf($this->sigType, $sig);
+        $this->assertInstanceOf(SignatureInterface::class, $sig);
         $this->assertTrue($ecAdapter->verify($hash, $pk->getPublicKey(), $sig));
     }
 }

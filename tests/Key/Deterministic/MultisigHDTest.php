@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\Deterministic\MultisigHD;
@@ -18,7 +19,7 @@ class MultisigHDTest extends AbstractTestCase
     public function testAlwaysProvidesKeys()
     {
         $sequences = new HierarchicalKeySequence();
-        new \BitWasp\Bitcoin\Key\Deterministic\MultisigHD(2, 'm', [], $sequences, true);
+        new MultisigHD(2, 'm', [], $sequences, true);
     }
 
     public function testCreateRootWhenAlreadySorted()
@@ -59,8 +60,8 @@ class MultisigHDTest extends AbstractTestCase
 
     public function testGetRedeemScript()
     {
-        $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
-        $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
+        $keys[0] = HierarchicalKeyFactory::fromExtended('xpub661MyMwAqRbcGG5afwSiBJ37bLbnzj9VuCdKzcQgihyuRYbiA1PnhuzWzMg2H9xT7JMHWGowEfx93cxzL7KUsX9Q2hrG2ayhKf93x1uXUsV');
+        $keys[1] = HierarchicalKeyFactory::fromExtended('xpub661MyMwAqRbcG2X4GYsMkLw3Rputa3aG865sQUG1mK6B4UGCyGLePHejDxiSYqWGBDUzUagLqzHq8cemTYYjHop8DRtkfqt6TAxMEznufcz');
         $sequences = new HierarchicalKeySequence();
         $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
         $script = $hd->getRedeemScript();
