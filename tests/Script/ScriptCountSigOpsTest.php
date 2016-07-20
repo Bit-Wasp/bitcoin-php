@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -67,9 +67,9 @@ class ScriptCountSigOpsTest extends AbstractTestCase
     public function testMultisig()
     {
         $pk = [];
-        for ($i = 0; $i < 3; $i++) {
-            $pk[] = PrivateKeyFactory::create()->getPublicKey();
-        }
+        $pk[] = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $pk[] = $pk[0]->tweakAdd(gmp_init(1));
+        $pk[] = $pk[0]->tweakAdd(gmp_init(2));
 
         $p2shScript = ScriptFactory::scriptPubKey()->multisig(1, $pk);
         $this->assertEquals(3, $p2shScript->countSigOps(true));

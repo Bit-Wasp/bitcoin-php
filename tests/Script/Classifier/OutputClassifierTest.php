@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Script\Classifier;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -33,7 +34,7 @@ class OutputClassifierTest extends AbstractTestCase
 
     public function generateVectors()
     {
-        $publicKey1 = PrivateKeyFactory::create()->getPublicKey();
+        $publicKey1 = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $buffer1 = $publicKey1->getBuffer();
         $p2pk = ScriptFactory::sequence([$buffer1, Opcodes::OP_CHECKSIG]);
 
