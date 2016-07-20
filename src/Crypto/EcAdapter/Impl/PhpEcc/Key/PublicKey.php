@@ -33,9 +33,11 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     private $compressed;
 
     /**
+     * PublicKey constructor.
      * @param EcAdapter $ecAdapter
      * @param PointInterface $point
      * @param bool $compressed
+     * @param string $prefix
      */
     public function __construct(
         EcAdapter $ecAdapter,
