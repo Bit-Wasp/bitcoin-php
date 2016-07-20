@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Key;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
@@ -37,7 +38,7 @@ class PrivateKeyFactory
      * @param int|string $int
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKey
+     * @return PrivateKeyInterface
      */
     public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
@@ -48,7 +49,7 @@ class PrivateKeyFactory
     /**
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKey
+     * @return PrivateKeyInterface
      */
     public static function create($compressed = false, EcAdapterInterface $ecAdapter = null)
     {
@@ -78,7 +79,7 @@ class PrivateKeyFactory
      * @param \BitWasp\Buffertools\BufferInterface|string $hex
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKey
+     * @return PrivateKeyInterface
      */
     public static function fromHex($hex, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {

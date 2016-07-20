@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
@@ -365,8 +366,9 @@ class HierarchicalKeyTest extends AbstractTestCase
         $math = new Math();
         $generator = EccFactory::getSecgCurves($math)->generator256k1();
 
-        $k = gmp_strval($math->sub($generator->getOrder(), gmp_init(1)), 10);
-        $startPub = PrivateKeyFactory::fromInt($k, true)->getPublicKey();
+
+        $k = $math->sub($generator->getOrder(), gmp_init(1));
+        $startPub = PublicKeyFactory::fromHex('0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798');
 
         $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface')
             ->setMethods([
@@ -470,6 +472,6 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertNotEquals($expected, $child->getSequence());
         $this->assertEquals(2, $child->getSequence());
         $this->assertEquals(2, $this->HK_run_count);
-        $this->assertEquals(gmp_strval($math->add(gmp_init($k), gmp_init(1)), 10), gmp_strval($child->getPrivateKey()->getSecret(), 10));
+        $this->assertEquals(gmp_strval($math->add($k, gmp_init(1)), 10), gmp_strval($child->getPrivateKey()->getSecret(), 10));
     }
 }
