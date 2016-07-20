@@ -11,7 +11,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use Symfony\Component\Yaml\Yaml;
 
 class EcAdapterTest extends AbstractTestCase
 {
@@ -21,9 +20,8 @@ class EcAdapterTest extends AbstractTestCase
     public function getPrivVectors()
     {
         $datasets = [];
-        $yaml = new Yaml();
+        $data = json_decode($this->dataFile('privateKeys.json'), true);
 
-        $data = $yaml->parse($this->dataFile('privateKeys.yml'));
         foreach ($data['vectors'] as $vector) {
             foreach ($this->getEcAdapters() as $adapter) {
                 $datasets[] = [
@@ -125,7 +123,7 @@ class EcAdapterTest extends AbstractTestCase
             $this->assertEquals(strtolower($test->expectedK), $k->bytes(32)->getHex());
 
             // R and S should be correct
-            $rHex = $math->dechex(gmp_strval($sig->getR(), 10));
+            $rHex = $math->decHex(gmp_strval($sig->getR(), 10));
             $sHex = $math->decHex(gmp_strval($sig->getS(), 10));
             $this->assertSame($test->expectedRSLow, $rHex . $sHex);
 

@@ -1,0 +1,39 @@
+{
+    "vectors": [
+        {
+            "priv": "dbe9609e2842db0c2b867f100fcf1118c7ee9e5ef602916605d4558156f8c085",
+            "public": "043b81e6fd2d4f7d4bb9d2d8a8435fe32f29411600eaeb31c9bed771c6b9e2ce1dc4167689a7b5736e5c12cf34f0d83048e6a6f223d886ed6dbb4000926ba7eeff",
+            "compressed": "033b81e6fd2d4f7d4bb9d2d8a8435fe32f29411600eaeb31c9bed771c6b9e2ce1d"
+        },
+        {
+            "priv": "98f46eed2af75bb4bea81ef1a5c65be2a990e93bb84b708f80f7823eb04eaa93",
+            "public": "042b8ef851b8067e5a2ee3d156e7d57ba3f760e5cfeb8cee9e15d2e5fd1313695767664183ee6de871f2757fd3cc2232f685785c3375baefc5b46fa8c3924d9251",
+            "compressed": "032b8ef851b8067e5a2ee3d156e7d57ba3f760e5cfeb8cee9e15d2e5fd13136957"
+        },
+        {
+            "priv": "02ec5d19d204d4d71d07fb57c97bf1a58317e4b5f89ed1a63048397bb089ba4b",
+            "public": "04dcd6e7e7f5ac26ec466d731d8caefd2e6c958179643aaaf77d06078660e550bf510f2d0ec4411f49dae54f2016993546f37177f9ef3d9b410d12d72e26bc3556",
+            "compressed": "02dcd6e7e7f5ac26ec466d731d8caefd2e6c958179643aaaf77d06078660e550bf"
+        },
+        {
+            "priv": "3d1f3bd7834986fb96d0c8a972b1bdd79f622b854efb53d1faab753431bf99c7",
+            "public": "04e7c72f442efdc796a9084dc6bb4cf279ea42b7f3074a63c12ef336b6369a7493e0a4a562ac7891c0db7a9d21efcd565eba203f710c7a38eb3ac2eb30f6e7562a",
+            "compressed": "02e7c72f442efdc796a9084dc6bb4cf279ea42b7f3074a63c12ef336b6369a7493"
+        },
+        {
+            "priv": "dbf8be6160cc50e8032a67fd47295a2f9fd9b0ae8050e8e19832a7f9ac4566ad",
+            "public": "04a5a0e1e6941fc2c54097f6c0833c79b6abb3fd0d04cb16a46ad1dad4f9c0ab7e0212572f5e574de76816a2f6c964d743bba2ce00d951607efaa14f7b772b7d8e",
+            "compressed": "02a5a0e1e6941fc2c54097f6c0833c79b6abb3fd0d04cb16a46ad1dad4f9c0ab7e"
+        },
+        {
+            "priv": "4f5c420ca3746f37e3086e5b9e6e584cb1c3a8782d0d810645c07e3e762bbb97",
+            "public": "04dedd4197e1d6015b8d641d0557abbd475cca3a65e3dec0c06438bedbe6d894c424add5885b32bbd09fccc0b02460a9ca90cd267e6a49f5e5d89f20269cc9b4a9",
+            "compressed": "03dedd4197e1d6015b8d641d0557abbd475cca3a65e3dec0c06438bedbe6d894c4"
+        },
+        {
+            "priv": "bf41b5b645171397713f315f5aaa1e5073bc3756c30fedb2b557961339084638",
+            "public": "04a4133ad343b5c730305b1f34f6f3dd1a5b985e099e4ed1885a1a968befb56278c259f63d050e14786b89c6fe0a69317d4313bcce1355ec1eb3758e3d24513f2b",
+            "compressed": "03a4133ad343b5c730305b1f34f6f3dd1a5b985e099e4ed1885a1a968befb56278"
+        }
+    ]
+}
