@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
@@ -17,7 +16,7 @@ class EcTest extends AbstractTestCase
 
     /**
      * @param EcAdapterInterface $ecAdapterInterface
-     * @return PrivateKey
+     * @return PrivateKeyInterface
      */
     public function getFirstPrivateKey(EcAdapterInterface $ecAdapterInterface)
     {
