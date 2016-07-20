@@ -132,5 +132,6 @@ class EcSerializer
     public static function disableCache()
     {
         self::$useCache = false;
+        self::$cache = [];
     }
 }
