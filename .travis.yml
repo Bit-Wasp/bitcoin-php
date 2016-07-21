@@ -1,12 +1,14 @@
 language: php
 
 php:
-  - 5.6
   - hhvm
+  - 5.6
   - 7.0
 
 env:
+  - EXT_SECP256K1="-dextension=secp256k1.so" EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
   - EXT_SECP256K1="-dextension=secp256k1.so"
+  - EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
   - EXT_SECP256K1=""
 
 install:
@@ -29,14 +31,23 @@ install:
                       && phpize && ./configure && make && sudo make install \
                       && cd ../..; fi';
     - | 
-      sh -c 'if [ "" == ""]; then \
-          cd tests/Data \
-          && git clone https://github.com/jonasnick/bitcoinconsensus_testcases.git  \
-          && cd ../..; fi'
+        sh -c 'if [ "$EXT_BITCOINCONSENSUS" != "" ]; then \
+         wget https://bitcoin.org/bin/bitcoin-core-0.13.0/test.rc1/bitcoin-0.13.0rc1-x86_64-linux-gnu.tar.gz && \
+         tar xvf bitcoin-0.13.0rc1-x86_64-linux-gnu.tar.gz && \
+         cd bitcoin-0.13.0 && \
+         sudo cp include/bitcoinconsensus.h /usr/include && \
+         sudo cp lib/libbitcoinconsensus.so.0.0.0 /usr/lib && \
+         sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so && \
+         sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so.0 && \
+         cd .. && \
+          git clone https://github.com/Bit-Wasp/bitcoinconsensus-php && \
+                cd bitcoinconsensus-php/bitcoinconsensus && \
+                phpize && ./configure --with-bitcoinconsensus && make && sudo make install && \
+                cd ../..; fi';
     - composer update
 
 script:
-  - php $EXT_SECP256K1 vendor/bin/phpunit --coverage-clover build/logs/clover.xml
+  - php $EXT_SECP256K1 $EXT_BITCOINCONSENSUS vendor/bin/phpunit --coverage-clover build/logs/clover.xml
   - php vendor/bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
@@ -47,13 +58,14 @@ after_script:
 matrix:
     fast_finish: true
     exclude:
-      ## exclude hhvm + extension because it's a zend extension
       - php: hhvm
         env: EXT_SECP256K1="-dextension=secp256k1.so"
 
-      ## exclude nightly + extension until the extension itself actually passes tests
-      - php: nightly
-        env: EXT_SECP256K1="-dextension=secp256k1.so"
+      - php: hhvm
+        env: EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
+
+      - php: hhvm
+        env: EXT_SECP256K1="-dextension=secp256k1.so" EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
 
 notifications:
   webhooks:
