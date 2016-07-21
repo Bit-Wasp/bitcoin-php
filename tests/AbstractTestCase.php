@@ -84,10 +84,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $adapters = [];
 
         if (getenv('TRAVIS_PHP_VERSION')) {
-            // If travis
-            // If EXT_SECP256K1 env var is set, only return secp256k1.
-            // Otherwise return phpecc
-            if (getenv('EXT_SECP256K1') === '') {
+            if (getenv('EXT_SECP256K1') == false || getenv('EXT_SECP256K1') == '') {
                 $adapters[] = [EcAdapterFactory::getPhpEcc($math, $generator)];
             } else {
                 $adapters[] = [EcAdapterFactory::getSecp256k1($math, $generator)];
