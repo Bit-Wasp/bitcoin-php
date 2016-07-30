@@ -59,9 +59,6 @@ use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 
 $txid = Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1');
 $vout = 0;
@@ -70,14 +67,14 @@ $input = new TransactionInput($outpoint, new Script());
 
 $value = 100000000; /* amounts are satoshis */
 $scriptPubKey = new Script();
-$output = new TransactionOutput($value, $script);
+$output = new TransactionOutput($value, $scriptPubKey);
 
 $transaction = new Transaction(
-    1,
-    new TransactionInputCollection([$input]),
-    new TransactionOutputCollection([$output]),
-    new TransactionWitnessCollection([]),
-    0
+    1, /* version */
+    [$input], /* vTxIn */
+    [$output], /* vTxOut */
+    [], /* vWit */
+    0 /* locktime */
 );
 ```
 
@@ -121,7 +118,6 @@ $transaction = TransactionFactory::build()
     ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
     ->lockToBlockHeight($lockTime, 400000)
     ->get();
- 
 ```
  
 ## Transaction Signer
@@ -152,6 +148,10 @@ $transaction = TransactionFactory::build()
  
 ### Simple output script: pay to pubkey hash
 ```php
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -165,15 +165,14 @@ $amount = 1501000;
 $txOut = new TransactionOutput($amount, $outputScript);
 
 $transaction = TransactionFactory::build()
-   ->spendOutPoint($outpoint)
-   ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
-   ->get();
+    ->spendOutPoint($outpoint)
+    ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
+    ->get();
 
 $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
 $signed = (new Signer($transaction, $ec))
-   ->sign(0, $privateKey, $txOut)
-   ->get();
-
+    ->sign(0, $privateKey, $txOut)
+    ->get();
 ```
 
 ### P2SH: 1 of 2 multisig
@@ -199,7 +198,6 @@ $ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
 $signed = (new Signer($transaction, $ec))
     ->sign(0, $privateKey, $txOut, $redeemScript)
     ->get();
-
 ```
 
 ### Witness V0 ScriptHash: 1 of 2 multisig
