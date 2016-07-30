@@ -87,13 +87,13 @@ The `PaymentVerifier` is a simple checker which determines if every output and a
 
 If you require stricter checking of `Protobufs\Payment` messages, you should avoid using this class.
 
-It exposes methods for checking a `TransactionCollection`, or a `Protobufs\Payment` against a `Protobufs\PaymentRequest`  
+It exposes methods for checking a set of `TransactionInterface`, or a `Protobufs\Payment` against a `Protobufs\PaymentRequest`  
 
- `PaymentVerifier::checkTransactions($request, $txCollection)` - Check a TransactionCollection against the request
+ `PaymentVerifier::getTransactions($payment)` - Parse the transactions from the payment
+
+ `PaymentVerifier::checkTransactions($request, $txArray)` - Check a set of transactions against the request
  
- `PaymentVerifier::getTransactions($payment)` - Create a TransactionCollection from the payment
- 
- `PaymentVerifier::checkPayment($request, $payment)` - Check a TransactionCollection against the request
+ `PaymentVerifier::checkPayment($request, $payment)` - Check a `Payment` message against the request
 
 
 ### \BitWasp\Bitcoin\PaymentProtocol\PaymentHandler
@@ -108,7 +108,9 @@ This class is a factory for a `PaymentACK` message.
 The methods in this class accept a message, and produce a HTTP response: 
 
  `HttpResponse::paymentRequest($request)` - Create a response for the payment request
+ 
  `HttpResponse::payment($payment)` - Create a response for the payment
+ 
  `HttpResponse::paymentAck($paymentAck)` - Create a response for the paymentACK
   
 Sending a PaymentRequest:
