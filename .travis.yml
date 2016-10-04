@@ -49,6 +49,8 @@ install:
 script:
   - php $EXT_SECP256K1 $EXT_BITCOINCONSENSUS vendor/bin/phpunit --coverage-clover build/logs/clover.xml
   - php vendor/bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
+  - for f in ./examples/*.php; do echo $f; php $f; if [ $? -ne  0 ]; then exit 1; fi; done
+
 ##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
 
 after_script:
