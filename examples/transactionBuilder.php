@@ -1,7 +1,6 @@
 <?php
 
-require "../vendor/autoload.php";
-
+require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;

@@ -1,6 +1,6 @@
 <?php
 
-require "../vendor/autoload.php";
+require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
@@ -15,7 +15,7 @@ $txid = '4141414141414141414141414141414141414141414141414141414141414141';
 $vout = 0;
 $amount = '161662670';
 $fee = '12345';
-$amountAfterFee = $math->sub($amount, $fee);
+$amountAfterFee = $amount - $fee;
 
 // Two users independently create private keys.
 $pk1 = \BitWasp\Bitcoin\Key\PrivateKeyFactory::fromHex($privHex1);

@@ -1,5 +1,5 @@
 <?php
-require "../vendor/autoload.php";
+require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
