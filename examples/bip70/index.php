@@ -1,6 +1,6 @@
 <?php
 
-require "../vendor/autoload.php";
+require __DIR__ . "/../../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\PaymentProtocol\RequestBuilder;
@@ -9,7 +9,8 @@ use BitWasp\Bitcoin\PaymentProtocol\RequestSigner;
 $time = time();
 $amount = 10000;
 $destination = '18Ffckz8jsjU7YbhP9P44JMd33Hdkkojtc';
-$paymentUrl = 'http://192.168.0.223:81/bitcoin-php/examples/bip70.fetch.php?time=' . $time;
+$fetchUrl = 'http://192.168.0.223:81/bitcoin-php/examples/bip70/fetch.php?time=' . $time;
+$paymentUrl = 'http://192.168.0.223:81/bitcoin-php/examples/bip70/payment.php?time=' . $time;
 
 // Create a signer for x509+sha256 - this requires a readable private key and certificate chain.
 // $signer = new PaymentRequestSigner('none');
@@ -19,6 +20,7 @@ $builder = new RequestBuilder($signer, 'main', time());
 // PaymentRequests contain outputs that the wallet will fulfill
 $address = AddressFactory::fromString($destination);
 $builder->addAddressPayment($address, $amount);
+$builder->setPaymentUrl($paymentUrl);
 
 // Create the request, write it to a temporary file
 $request = $builder->getPaymentRequest();
@@ -29,7 +31,7 @@ fwrite($fd, $request->serialize());
 fclose($fd);
 
 // Create a url + display a QR
-$encodedUrl = urlencode($paymentUrl);
+$encodedUrl = urlencode($fetchUrl);
 $uri = "bitcoin:$address?r=$encodedUrl&amount=0.00010000";
 $qr = urlencode($uri);
 
