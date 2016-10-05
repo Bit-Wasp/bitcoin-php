@@ -70,6 +70,16 @@ class Bip39Mnemonic implements MnemonicInterface
      */
     public function entropyToWords(BufferInterface $entropy)
     {
+        if ($entropy->getSize() === 0) {
+            throw new \InvalidArgumentException('Invalid entropy, empty');
+        }
+        if ($entropy->getSize() > 1024) {
+            throw new \InvalidArgumentException('Invalid entropy, max 1024 bytes');
+        }
+        if ($entropy->getSize() % 4 !== 0) {
+            throw new \InvalidArgumentException('Invalid entropy, must be multitude of 4 bytes');
+        }
+
         $math = $this->ecAdapter->getMath();
 
         $ENT = $entropy->getSize() * 8;
@@ -116,6 +126,11 @@ class Bip39Mnemonic implements MnemonicInterface
         }
 
         $bits = implode('', $bits);
+
+        // max entropy is 1024; (1024×8)+((1024×8)÷32) = 8448
+        if (strlen($bits) > 8448) {
+            throw new \InvalidArgumentException('Invalid mnemonic, too long');
+        }
 
         $CS = strlen($bits) / 33;
         $ENT = strlen($bits) - $CS;
