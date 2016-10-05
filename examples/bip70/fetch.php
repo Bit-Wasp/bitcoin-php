@@ -1,6 +1,6 @@
 <?php
 
-require "../vendor/autoload.php";
+require __DIR__ . "/../../vendor/autoload.php";
 
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest;
 use BitWasp\Bitcoin\PaymentProtocol\HttpResponse;

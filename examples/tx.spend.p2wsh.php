@@ -1,6 +1,6 @@
 <?php
 
-require "../vendor/autoload.php";
+require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -33,14 +33,14 @@ $tx = (new TxBuilder())
     ->payToAddress(97900000, $key->getPublicKey()->getAddress())
     ->get();
 
-// Sign
+// Sign4
 $signed = (new Signer($tx, Bitcoin::getEcAdapter()))
     ->sign(0, $key, $txOut, null, $destScript)
     ->get();
 
 // Check signatures
-$consensus = ScriptFactory::consensus(I::VERIFY_P2SH | I::VERIFY_WITNESS);
-echo "Script validation result: " . ($signed->validator()->checkSignature($consensus, 0, $txOut) ? "yay\n" : "nay\n");
+$consensus = ScriptFactory::consensus();
+echo "Script validation result: " . ($signed->validator()->checkSignature($consensus, I::VERIFY_P2SH | I::VERIFY_WITNESS, 0, $txOut) ? "yay\n" : "nay\n");
 
 echo PHP_EOL;
 echo "Witness serialized transaction: " . $signed->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;

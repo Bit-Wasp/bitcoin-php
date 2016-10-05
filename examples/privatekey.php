@@ -17,12 +17,12 @@ echo " - Compressed? " . (($privateKey->isCompressed() ? 'yes' : 'no')) . "\n";
 
 echo "Private key\n";
 echo " - WIF: " . $privateKey->toWif($network) . "\n";
-echo " - Hex: " . $privateKey->getBuffer() . "\n";
-echo " - Dec: " . $privateKey->getSecret() . "\n";
+echo " - Hex: " . $privateKey->getHex() . "\n";
+echo " - Dec: " . gmp_strval($privateKey->getSecret(), 10) . "\n";
 
 echo "Public Key\n";
-echo " - Hex: " . $publicKey->getBuffer() . "\n";
-echo " - Hash: " . $publicKey->getPubKeyHash() . "\n";
-echo " - Address: " . $publicKey->getAddress() . "\n";
+echo " - Hex: " . $publicKey->getHex() . "\n";
+echo " - Hash: " . $publicKey->getPubKeyHash()->getHex() . "\n";
+echo " - Address: " . $publicKey->getAddress()->getAddress() . "\n";
 
 
