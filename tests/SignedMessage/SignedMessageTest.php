@@ -52,7 +52,6 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $this->assertSame(true, $signed->getCompactSignature()->isCompressed());
         $this->assertTrue($signer->verify($signed, $address));
         $this->assertSame($content, $signed->getBuffer()->getBinary());
-
     }
 
     /**

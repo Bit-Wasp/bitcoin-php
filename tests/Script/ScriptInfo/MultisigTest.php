@@ -28,6 +28,5 @@ class MultisigTest extends AbstractTestCase
 
         $unrelatedPub = $otherpub->tweakAdd(gmp_init(1));
         $this->assertFalse($info->checkInvolvesKey($unrelatedPub));
-
     }
 }

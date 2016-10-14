@@ -94,7 +94,6 @@ class MultisigHDTest extends AbstractTestCase
         $this->assertEquals('522102d5514b338973151bdedf58a08cb0c912807ac9c7e026e6dc0f11abf8073be99e210318c49f3d850f37d93314cb9b08ed3e864af991dc109da5b3e23a0ef4c518e5d252ae', $child->getRedeemScript()->getHex());
         $address = $child->getAddress();
         $this->assertEquals('3GX7j2puUbkyMiWu3YYYEczJQ1ZPS9vdam', $address->getAddress());
-
     }
 
     public function testDerivePath()

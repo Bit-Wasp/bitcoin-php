@@ -49,7 +49,6 @@ class TransactionInputTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($outpoint, $t->getOutPoint());
         $this->assertSame($script, $t->getScript());
         $this->assertSame($sequence, $t->getSequence());
-
     }
 
     public function testGetScript()

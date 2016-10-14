@@ -20,7 +20,6 @@ class TransactionOutputTest extends AbstractTestCase
 
         $out = new TransactionOutput(10901, new Script());
         $this->assertSame(10901, $out->getValue());
-
     }
 
     public function testGetScript()
@@ -50,7 +49,6 @@ class TransactionOutputTest extends AbstractTestCase
         $this->assertTrue($o->equals($oEq));
         $this->assertFalse($o->equals($oBadVal));
         $this->assertFalse($o->equals($oBadScript));
-
     }
 
     public function testSerialize()

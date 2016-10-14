@@ -337,6 +337,5 @@ class BloomFilterTest extends AbstractTestCase
         $fullFilter = $this->getFullFilterVector();
         $this->assertTrue($fullFilter->isFull());
         $this->assertFalse($fullFilter->isEmpty());
-
     }
 }

@@ -30,7 +30,6 @@ class DifficultyTest extends AbstractTestCase
         foreach ($vectors as $v) {
             $this->assertEquals($v[1], $math->toString($difficulty->getWork($v[0])));
         }
-
     }
 
     public function testGetTarget()
