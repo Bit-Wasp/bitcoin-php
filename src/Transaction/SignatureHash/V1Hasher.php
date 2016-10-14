@@ -105,10 +105,9 @@ class V1Hasher
         $hashPrevOuts = $this->hashPrevOuts($sighashType);
         $hashSequence = $this->hashSequences($sighashType);
         $hashOutputs = $this->hashOutputs($sighashType, $inputToSign);
-
         $input = $this->transaction->getInput($inputToSign);
 
-        return Hash::sha256d(new Buffer(
+        $preimage = new Buffer(
             pack("V", $this->transaction->getVersion()) .
             $hashPrevOuts->getBinary() .
             $hashSequence->getBinary() .
@@ -119,6 +118,8 @@ class V1Hasher
             $hashOutputs->getBinary() .
             pack("V", $this->transaction->getLockTime()) .
             pack("V", $sighashType)
-        ));
+        );
+
+        return Hash::sha256d($preimage);
     }
 }
