@@ -9,11 +9,13 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
@@ -337,5 +339,35 @@ class EcAdapter implements EcAdapterInterface
             $compressed,
             $prefix
         );
+    }
+
+    /**
+     * @param PrivateKey $privateKey
+     * @param PublicKey $publicKey
+     * @return BufferInterface
+     */
+    private function doEcdh(PrivateKey $privateKey, PublicKey $publicKey)
+    {
+        $point = $publicKey->getPoint()->mul($privateKey->getSecret());
+
+        $serialized =
+            pack("C", 0x02 | (intval(gmp_cmp(gmp_mod($point->getY(), gmp_init(2)), 0) === 0))) .
+            $this->math->intToStringPadded($point->getX(), 32);
+
+        return Hash::sha256(new Buffer($serialized));
+    }
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param PublicKeyInterface $publicKey
+     * @return BufferInterface
+     */
+    public function ecdh(PrivateKeyInterface $privateKey, PublicKeyInterface $publicKey)
+    {
+        /**
+         * @var PrivateKey $privateKey
+         * @var PublicKey $publicKey
+         */
+        return $this->doEcdh($privateKey, $publicKey);
     }
 }
