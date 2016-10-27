@@ -35,7 +35,6 @@ class Base58Test extends AbstractTestCase
 
         $decoded = Base58::decode($encoded)->getHex();
         $this->assertEquals($bs->getHex(), $decoded);
-
     }
 
     /**
@@ -74,6 +73,5 @@ class Base58Test extends AbstractTestCase
         //              ^
 
         Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
-
     }
 }

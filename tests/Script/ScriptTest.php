@@ -128,7 +128,6 @@ class ScriptTest extends AbstractTestCase
         $result = $script->getScriptParser()->decode();
         $this->assertEquals(Opcodes::OP_PUSHDATA1, $result[0]->getOp());
         $this->assertEquals($data->getBinary(), $result[0]->getData()->getBinary());
-
     }
 
     public function testPushdata2()
@@ -169,7 +168,6 @@ class ScriptTest extends AbstractTestCase
 
         // Validate it's correct
         $this->assertSame($script->getScriptHash()->getHex(), 'f7c29c0c6d319e33c9250fca0cb61a500621d93e');
-
     }
 
     public function testGetVarInt()

@@ -61,7 +61,6 @@ class ScriptCountSigOpsTest extends AbstractTestCase
         $count = $p2sh->countP2shSigOps($scriptSig);
 
         $this->assertEquals(2, $count);
-
     }
 
     public function testMultisig()

@@ -138,7 +138,6 @@ class OutputClassifierTest extends AbstractTestCase
         }
 
         $this->assertTrue($pub->equals($solution[0]));
-
     }
 
     public function testIsWitness()

@@ -55,7 +55,6 @@ class PublicKeyTest extends AbstractTestCase
         $this->assertSame($publicKey->getBuffer()->getHex(), $eUncompressed);
         $this->assertFalse($publicKey->isCompressed());
         $this->assertFalse($publicKey->isPrivate());
-        
     }
 
     /**
@@ -91,7 +90,6 @@ class PublicKeyTest extends AbstractTestCase
         $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('0300010203040506070809000102030405060708090001020304050607080900')));
 
         $this->assertFalse(PublicKey::isCompressedOrUncompressed(Buffer::hex('050001020304050607080900010203040506070809000102030405060708090001')));
-
     }
 
     /**

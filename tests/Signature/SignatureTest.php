@@ -57,6 +57,5 @@ class SignatureTest extends AbstractTestCase
         $this->assertInstanceOf($this->sigType, $sig);
         $this->assertEquals('56860522993476239843569407076292679822350064328987049204205911586688428093823', gmp_strval($sig->getR(), 10));
         $this->assertEquals('75328468267675219166053001951181042681597800329127462438170420074748074627387', gmp_strval($sig->getS(), 10));
-
     }
 }

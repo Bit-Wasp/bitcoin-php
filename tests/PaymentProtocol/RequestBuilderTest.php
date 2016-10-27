@@ -88,6 +88,5 @@ class RequestBuilderTest extends Bip70Test
 
         $this->assertEquals(RequestSigner::SHA1, $requestSha1->getPkiType());
         $this->assertNotEquals('', $requestSha1->getSignature());
-
     }
 }

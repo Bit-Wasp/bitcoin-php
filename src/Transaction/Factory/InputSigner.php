@@ -311,12 +311,10 @@ class InputSigner
         }
 
         if ($outputType === OutputClassifier::PAYTOPUBKEY) {
-            $publicKeyBuffer = $return;
-            $results[] = $publicKeyBuffer;
+            /** @var BufferInterface $return */
+            $results[] = $return;
             $this->requiredSigs = 1;
-            $publicKey = PublicKeyFactory::fromHex($publicKeyBuffer);
-
-            if ($publicKey->getBinary() === $key->getPublicKey()->getBinary()) {
+            if ($key->getPublicKey()->getBuffer()->equals($return)) {
                 $this->signatures[0] = $this->calculateSignature($key, $scriptPubKey, $sigVersion);
             }
 
@@ -324,11 +322,10 @@ class InputSigner
         }
 
         if ($outputType === OutputClassifier::PAYTOPUBKEYHASH) {
-            /** @var BufferInterface $pubKeyHash */
-            $pubKeyHash = $return;
-            $results[] = $pubKeyHash;
+            /** @var BufferInterface $return */
+            $results[] = $return;
             $this->requiredSigs = 1;
-            if ($pubKeyHash->getBinary() === $key->getPublicKey()->getPubKeyHash()->getBinary()) {
+            if ($key->getPublicKey()->getPubKeyHash()->equals($return)) {
                 $this->signatures[0] = $this->calculateSignature($key, $scriptPubKey, $sigVersion);
                 $this->publicKeys[0] = $key->getPublicKey();
             }
@@ -338,16 +335,13 @@ class InputSigner
 
         if ($outputType === OutputClassifier::MULTISIG) {
             $info = new Multisig($scriptPubKey);
-
-            foreach ($info->getKeys() as $publicKey) {
-                $results[] = $publicKey->getBuffer();
-            }
-
             $this->publicKeys = $info->getKeys();
             $this->requiredSigs = $info->getKeyCount();
 
-            foreach ($this->publicKeys as $keyIdx => $publicKey) {
-                if ($publicKey->getBinary() == $key->getPublicKey()->getBinary()) {
+            $myKey = $key->getPublicKey()->getBuffer();
+            foreach ($info->getKeys() as $keyIdx => $publicKey) {
+                $results[] = $publicKey->getBuffer();
+                if ($publicKey->getBuffer()->equals($myKey)) {
                     $this->signatures[$keyIdx] = $this->calculateSignature($key, $scriptPubKey, $sigVersion);
                 }
             }

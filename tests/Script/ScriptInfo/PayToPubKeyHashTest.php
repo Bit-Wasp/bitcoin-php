@@ -28,6 +28,5 @@ class PayToPubkeyHashTest extends AbstractTestCase
         $otherpriv = PrivateKeyFactory::create();
         $otherpub = $otherpriv->getPublicKey();
         $this->assertFalse($info->checkInvolvesKey($otherpub));
-
     }
 }

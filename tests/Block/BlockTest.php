@@ -162,6 +162,5 @@ class BlockTest extends AbstractTestCase
 
         $newBlock = BlockFactory::fromHex($blockHex);
         $this->assertSame($blockHex, $newBlock->getBuffer()->getHex());
-
     }
 }

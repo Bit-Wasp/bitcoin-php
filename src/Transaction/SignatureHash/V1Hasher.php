@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Buffertools\Buffertools;
 
 class V1Hasher
 {
@@ -80,7 +81,7 @@ class V1Hasher
             }
             return Hash::sha256d(new Buffer($binary));
         } elseif (($sighashType & 0x1f) == SigHashInterface::SINGLE && $inputToSign < count($this->transaction->getOutputs())) {
-            return Hash::sha256($this->transaction->getOutput($inputToSign)->getBuffer());
+            return Hash::sha256d($this->transaction->getOutput($inputToSign)->getBuffer());
         }
 
         return new Buffer('', 32);
@@ -89,8 +90,7 @@ class V1Hasher
     /**
      * Calculate the hash of the current transaction, when you are looking to
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
-     * SIGHASH_ALL, though SIGHASH_SINGLE, SIGHASH_NONE, SIGHASH_ANYONECANPAY
-     * can be used.
+     * SIGHASH_ALL
      *
      * @param ScriptInterface $txOutScript
      * @param int $inputToSign
@@ -105,20 +105,22 @@ class V1Hasher
         $hashPrevOuts = $this->hashPrevOuts($sighashType);
         $hashSequence = $this->hashSequences($sighashType);
         $hashOutputs = $this->hashOutputs($sighashType, $inputToSign);
-
         $input = $this->transaction->getInput($inputToSign);
 
-        return Hash::sha256d(new Buffer(
+        $scriptBuf = $txOutScript->getBuffer();
+        $preimage = new Buffer(
             pack("V", $this->transaction->getVersion()) .
             $hashPrevOuts->getBinary() .
             $hashSequence->getBinary() .
             $input->getOutPoint()->getBinary() .
-            ScriptFactory::create()->push($txOutScript->getBuffer())->getScript()->getBinary() .
+            Buffertools::numToVarInt($scriptBuf->getSize())->getBinary() . $scriptBuf->getBinary() .
             Buffer::int($this->amount, 8)->flip()->getBinary() .
             pack("V", $input->getSequence()) .
             $hashOutputs->getBinary() .
             pack("V", $this->transaction->getLockTime()) .
             pack("V", $sighashType)
-        ));
+        );
+
+        return Hash::sha256d($preimage);
     }
 }

@@ -159,6 +159,5 @@ class StackTest extends AbstractTestCase
         $this->assertEquals('00', $stack[-1]->getHex());
         $this->assertEquals('22', $stack[-2]->getHex());
         $this->assertEquals('11', $stack[-3]->getHex());
-
     }
 }
