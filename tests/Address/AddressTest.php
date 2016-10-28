@@ -63,9 +63,12 @@ class AddressTest extends AbstractTestCase
             throw new \Exception('Unknown address type');
         }
 
-        $fromString = AddressFactory::fromString($address);
         $this->assertEquals($address, $obj->getAddress($network));
-        $this->assertEquals($obj, $fromString);
+
+        $fromString = AddressFactory::fromString($address);
+        $this->assertTrue($obj->getHash()->equals($fromString->getHash()));
+        $this->assertEquals($obj->getPrefixByte($network), $fromString->getPrefixByte($network));
+        $this->assertEquals($obj->getAddress($network), $fromString->getAddress($network));
     }
 
     /**
