@@ -361,4 +361,12 @@ class Opcodes implements \ArrayAccess
     {
         $this->errorNoWrite();
     }
+
+    /**
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return [];
+    }
 }
