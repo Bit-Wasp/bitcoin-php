@@ -65,4 +65,10 @@ class OpcodesTest extends AbstractTestCase
         $op = new Opcodes();
         unset($op[Opcodes::OP_1]);
     }
+
+    public function testDebugInfo()
+    {
+        $op = new Opcodes();
+        $this->assertEquals([], $op->__debugInfo());
+    }
 }
