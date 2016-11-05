@@ -129,4 +129,30 @@ class OutputScriptFactory
 
         return $new->int($n)->op('OP_CHECKMULTISIG')->getScript();
     }
+
+    /**
+     * @param BufferInterface $keyHash
+     * @return ScriptInterface
+     */
+    public function witnessKeyHash(BufferInterface $keyHash)
+    {
+        if ($keyHash->getSize() !== 20) {
+            throw new \RuntimeException('witness key-hash should be 20 bytes');
+        }
+
+        return ScriptFactory::sequence([Opcodes::OP_0, $keyHash]);
+    }
+
+    /**
+     * @param BufferInterface $scriptHash
+     * @return ScriptInterface
+     */
+    public function witnessScriptHash(BufferInterface $scriptHash)
+    {
+        if ($scriptHash->getSize() !== 32) {
+            throw new \RuntimeException('witness script-hash should be 32 bytes');
+        }
+
+        return ScriptFactory::sequence([Opcodes::OP_0, $scriptHash]);
+    }
 }
