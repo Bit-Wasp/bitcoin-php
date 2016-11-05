@@ -115,6 +115,11 @@ interface TransactionInterface extends SerializableInterface
     public function getValueOut();
 
     /**
+     * @return bool
+     */
+    public function hasWitness();
+
+    /**
      * @param TransactionInterface $tx
      * @return bool
      */
