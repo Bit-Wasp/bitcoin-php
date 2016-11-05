@@ -162,6 +162,20 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @return bool
+     */
+    public function hasWitness()
+    {
+        for ($l = count($this->inputs), $i = 0; $i < $l; $i++) {
+            if (isset($this->witness[$i]) && count($this->witness[$i]) > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return ScriptWitnessInterface[]
      */
     public function getWitnesses()
