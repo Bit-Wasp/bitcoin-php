@@ -342,6 +342,26 @@ class EcAdapter implements EcAdapterInterface
     }
 
     /**
+     * @param \GMP $int
+     * @param int $byteSize
+     * @return string
+     */
+    private function fixedSizeInt(\GMP $int, $byteSize)
+    {
+        $two = gmp_init(2);
+        $maskShift = gmp_pow($two, 8);
+        $mask = gmp_mul(gmp_init(255), gmp_pow($two, 256));
+
+        $x = '';
+        for ($i = $byteSize - 1; $i >= 0; $i--) {
+            $mask = gmp_div($mask, $maskShift);
+            $x .= pack('C', gmp_strval(gmp_div(gmp_and($int, $mask), gmp_pow($two, $i * 8)), 10));
+        }
+
+        return $x;
+    }
+
+    /**
      * @param PrivateKey $privateKey
      * @param PublicKey $publicKey
      * @return BufferInterface
@@ -349,12 +369,9 @@ class EcAdapter implements EcAdapterInterface
     private function doEcdh(PrivateKey $privateKey, PublicKey $publicKey)
     {
         $point = $publicKey->getPoint()->mul($privateKey->getSecret());
+        $prefix = pack("C", 0x02 | gmp_cmp(gmp_mod($point->getY(), gmp_init(2)), 0));
 
-        $serialized =
-            pack("C", 0x02 | (intval(gmp_cmp(gmp_mod($point->getY(), gmp_init(2)), 0) === 0))) .
-            $this->math->intToStringPadded($point->getX(), 32);
-
-        return Hash::sha256(new Buffer($serialized));
+        return Hash::sha256(new Buffer($prefix . $this->fixedSizeInt($point->getX(), 32)));
     }
 
     /**

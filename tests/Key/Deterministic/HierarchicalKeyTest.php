@@ -43,7 +43,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @param HierarchicalKey $key
      * @param $vectors
      */
-    private function compareToPrivVectors(\BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey $key, $vectors)
+    private function compareToPrivVectors(HierarchicalKey $key, $vectors)
     {
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif($this->network));
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif());
@@ -375,6 +375,7 @@ class HierarchicalKeyTest extends AbstractTestCase
                 'getMath',
                 'getAdapterName',
                 'getGenerator',
+                'ecdh',
                 'publicKeyFromBuffer',
                 'recoverYfromX',
                 'validateSignatureElement',
