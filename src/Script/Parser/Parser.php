@@ -205,9 +205,14 @@ class Parser implements \Iterator
     {
         return implode(' ', array_map(
             function (Operation $operation) {
-                return $operation->isPush()
-                    ? $operation->getData()->getHex()
-                    : $this->script->getOpcodes()->getOp($operation->getOp());
+                $op = $operation->getOp();
+                if ($op === Opcodes::OP_0 || $op === Opcodes::OP_1NEGATE || $op >= Opcodes::OP_1 && $op <= Opcodes::OP_16) {
+                    return $this->script->getOpcodes()->getOp($op);
+                } else if ($operation->isPush()) {
+                    return $operation->getData()->getHex();
+                } else {
+                    return $this->script->getOpcodes()->getOp($operation->getOp());
+                }
             },
             $this->decode()
         ));
