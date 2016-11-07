@@ -89,6 +89,26 @@ class Math extends GmpMath
     }
 
     /**
+     * @param \GMP $int
+     * @param int $byteSize
+     * @return string
+     */
+    public function fixedSizeInt(\GMP $int, $byteSize)
+    {
+        $two = gmp_init(2);
+        $maskShift = gmp_pow($two, 8);
+        $mask = gmp_mul(gmp_init(255), gmp_pow($two, 256));
+
+        $x = '';
+        for ($i = $byteSize - 1; $i >= 0; $i--) {
+            $mask = gmp_div($mask, $maskShift);
+            $x .= pack('C', gmp_strval(gmp_div(gmp_and($int, $mask), gmp_pow($two, $i * 8)), 10));
+        }
+
+        return $x;
+    }
+
+    /**
      * @param \GMP $integer
      * @param bool $fNegative
      * @return \GMP
