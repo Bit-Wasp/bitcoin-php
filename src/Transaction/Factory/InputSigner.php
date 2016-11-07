@@ -253,6 +253,22 @@ class InputSigner
     }
 
     /**
+     * @param ScriptInterface $scriptCode
+     * @param int $sigVersion
+     * @return BufferInterface
+     */
+    public function calculateSigHash(ScriptInterface $scriptCode, $sigVersion)
+    {
+        if ($sigVersion === 1) {
+            $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
+        } else {
+            $hasher = new Hasher($this->tx);
+        }
+
+        return $hasher->calculate($scriptCode, $this->nInput, $this->sigHashType);
+    }
+
+    /**
      * @param PrivateKeyInterface $key
      * @param ScriptInterface $scriptCode
      * @param int $sigVersion
@@ -260,14 +276,7 @@ class InputSigner
      */
     public function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, $sigVersion)
     {
-        if ($sigVersion == 1) {
-            $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
-        } else {
-            $hasher = new Hasher($this->tx);
-        }
-
-        $hash = $hasher->calculate($scriptCode, $this->nInput, $this->sigHashType);
-
+        $hash = $this->calculateSigHash($scriptCode, $sigVersion);
         return new TransactionSignature(
             $this->ecAdapter,
             $this->ecAdapter->sign(
