@@ -184,6 +184,7 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
+     * @param int $index
      * @return ScriptWitnessInterface
      */
     public function getWitness($index)
