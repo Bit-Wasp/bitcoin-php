@@ -184,7 +184,6 @@ class ScriptTest extends \PHPUnit_Framework_TestCase
 
         // Validate it's correct
         $this->assertSame($script->getScriptHash()->getHex(), 'f7c29c0c6d319e33c9250fca0cb61a500621d93e');
-
     }
 
     public function testGetVarInt()

@@ -6,7 +6,6 @@ class GenesisMiningBlockHeader extends BlockHeader
 {
     public function __construct()
     {
-        
     }
 
     /**

@@ -53,7 +53,6 @@ class InterpreterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $i->getStackState()->getAltStack()->size());
         $i->getStackState()->restoreMainStack($testStack);
         $this->assertEquals($testStack, $i->getStackState()->getMainStack());
-
     }
 
     /**

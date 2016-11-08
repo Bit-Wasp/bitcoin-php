@@ -79,6 +79,5 @@ class Base58Test extends \PHPUnit_Framework_TestCase
         //              ^
 
         Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
-
     }
 }

@@ -56,7 +56,6 @@ class HexBlockHeaderSerializer
                 $nBits,
                 $nonce
             );
-
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }

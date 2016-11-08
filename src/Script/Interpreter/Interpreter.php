@@ -666,7 +666,6 @@ class Interpreter implements InterpreterInterface
                     if ($mainStack->size() + $altStack->size() > 1000) {
                         throw new \Exception('Invalid stack size, exceeds 1000');
                     }
-
                 }
             }
 

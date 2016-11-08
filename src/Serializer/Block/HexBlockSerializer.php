@@ -66,7 +66,6 @@ class HexBlockSerializer
             );
 
             $block->getTransactions()->addTransactions($this->getTxsTemplate()->parse($parser)[0]);
-
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }

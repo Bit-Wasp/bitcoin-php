@@ -59,21 +59,18 @@ class FlowControlOperation
             }
             $vfStack->push($value);
             return;
-
         } else if ($opName == 'OP_ELSE') {
             if ($vfStack->size() == 0) {
                 throw new \Exception('Unbalanced conditional');
             }
             $vfStack->set($vfStack->end() - 1, !$vfStack->end());
             return;
-
         } else if ($opName == 'OP_ENDIF') {
             if ($vfStack->size() == 0) {
                 throw new \Exception('Unbalanced conditional');
             }
             // todo
             return;
-
         } else if ($opName == 'OP_VERIFY') {
             if ($mainStack->size() < 1) {
                 throw new \Exception('Invalid stack operation');
@@ -84,7 +81,6 @@ class FlowControlOperation
             }
             $mainStack->pop();
             return;
-
         } else if ($opName == 'OP_RETURN') {
             throw new \Exception('Error: OP_RETURN');
         }

@@ -358,6 +358,5 @@ class BitcoindTest extends AbstractTestCase
         $bitcoind = new Bitcoind($json);
         $tx = $bitcoind->signrawtransaction($t, $inputs, [$priv]);
         $this->assertEquals(TransactionFactory::fromHex('01000000017dfd7f9356ff570cab318383a30c52f77f31d923f2c17da876ecc3a117a3004f010000006a473044022067fae0180dc75d4e4713502d80d915e912f73f84d41a7e56c0cedc0ef6b12bd7022048fab8f21508e6e7a4221047cf2afa5e63abfc96a1e8a028c37b9734b38140970121027431c86d5f701959a92c5c47bce58e2db85b377a263ede522cd7aaa77f1384a4ffffffff0182de0e00000000001976a91477c42a179e7f74bc5851ea7b0e326f430418625b88ac00000000'), $tx);
-
     }
 }

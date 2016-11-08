@@ -75,7 +75,6 @@ class PaymentRequestSigner
                 ? OPENSSL_ALGO_SHA256
                 : OPENSSL_ALGO_SHA1;
         }
-
     }
 
     /**

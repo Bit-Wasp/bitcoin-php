@@ -116,17 +116,14 @@ class Script extends Serializable implements ScriptInterface
 
         if ($length < $this->opcodes->getOpByName('OP_PUSHDATA1')) {
             $parsed = $parsed->writeWithLength($data);
-
         } elseif ($length <= 0xff) {
             $parsed->writeInt(1, $this->opcodes->getOpByName('OP_PUSHDATA1'))
                 ->writeInt(1, $length, false)
                 ->writeBytes($length, $data);
-
         } elseif ($length <= 0xffff) {
             $parsed->writeInt(1, $this->opcodes->getOpByName('OP_PUSHDATA2'))
                 ->writeInt(2, $length, true)
                 ->writeBytes($length, $data);
-
         } else {
             $parsed->writeInt(1, $this->opcodes->getOpByName('OP_PUSHDATA4'))
                 ->writeInt(4, $length, true)

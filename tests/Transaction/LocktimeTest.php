@@ -15,12 +15,10 @@ class LocktimeTest extends AbstractTestCase
 
     public function __construct()
     {
-
     }
 
     public function fromTimestampVectors()
     {
-
     }
 
     public function testToTimestamp()
@@ -72,7 +70,6 @@ class LocktimeTest extends AbstractTestCase
 
         $disallowed = $math->add($allowed, 1);
         $locktime->fromTimestamp($disallowed);
-
     }
 
     /**
