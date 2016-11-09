@@ -44,7 +44,7 @@ class AddressFactory
         $solution = null;
         $data = (new OutputClassifier())->classify($outputScript, $solution);
         switch ($data) {
-            case OutputClassifier::PAYTOPUBKEYHASH;
+            case OutputClassifier::PAYTOPUBKEYHASH:
                 /** @var BufferInterface $solution */
                 return new PayToPubKeyHashAddress($solution);
             case OutputClassifier::PAYTOSCRIPTHASH:
