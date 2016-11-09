@@ -107,7 +107,7 @@ class InputSigner
 
     /**
      * @param int $sigVersion
-     * @param $stack
+     * @param TransactionSignatureInterface[] $stack
      * @param ScriptInterface $scriptCode
      * @return \SplObjectStorage
      */
@@ -191,7 +191,6 @@ class InputSigner
         $scriptPubKey = $this->txOut->getScript();
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
         $type = $this->classifier->classify($scriptPubKey);
-
         if ($type === OutputClassifier::PAYTOPUBKEYHASH || $type === OutputClassifier::PAYTOPUBKEY || $type === OutputClassifier::MULTISIG) {
             $values = [];
             foreach ($scriptSig->getScriptParser()->decode() as $o) {
@@ -205,8 +204,7 @@ class InputSigner
             $decodeSig = $scriptSig->getScriptParser()->decode();
             if (count($decodeSig) > 0) {
                 $redeemScript = new Script(end($decodeSig)->getData());
-                $p2shType = $this->classifier->classify($redeemScript);
-
+                $type = $this->classifier->classify($redeemScript);
                 if (count($decodeSig) > 1) {
                     $decodeSig = array_slice($decodeSig, 0, -1);
                 }
@@ -217,9 +215,7 @@ class InputSigner
                 }
 
                 $this->redeemScript = $redeemScript;
-                $this->extractFromValues($p2shType, $redeemScript, $internalSig, 0);
-
-                $type = $p2shType;
+                $this->extractFromValues($type, $redeemScript, $internalSig, 0);
             }
         }
 
@@ -242,8 +238,8 @@ class InputSigner
                         $vWitness = array_slice($witness->all(), 0, -1);
                     }
 
-                    $witnessType = $this->classifier->classify($witnessScript);
-                    $this->extractFromValues($witnessType, $witnessScript, $vWitness, 1);
+                    $type = $this->classifier->classify($witnessScript);
+                    $this->extractFromValues($type, $witnessScript, $vWitness, 1);
                     $this->witnessScript = $witnessScript;
                 }
             }
@@ -397,7 +393,6 @@ class InputSigner
 
         if ($solved && $type === OutputClassifier::PAYTOSCRIPTHASH) {
             $redeemScriptBuffer = $return[0];
-
             if (!$redeemScript instanceof ScriptInterface) {
                 throw new \InvalidArgumentException('Must provide redeem script for P2SH');
             }
@@ -514,7 +509,6 @@ class InputSigner
         } else if (!$serialized && $outputType === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $outputType = $this->classifier->classify($this->witnessScript);
             $serialized = $this->serializeSimpleSig($outputType, $answer);
-
             if ($serialized) {
                 $data = [];
                 foreach ($answer->getScriptSig()->getScriptParser()->decode() as $o) {

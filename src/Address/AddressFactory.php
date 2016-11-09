@@ -41,20 +41,18 @@ class AddressFactory
      */
     public static function fromOutputScript(ScriptInterface $outputScript)
     {
-        $type = (new OutputClassifier())->classify($outputScript);
-        $parsed = $outputScript->getScriptParser()->decode();
-
-        if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
-            /** @var BufferInterface $hash */
-            $hash = $parsed[2]->getData();
-            return new PayToPubKeyHashAddress($hash);
-        } else if ($type === OutputClassifier::PAYTOSCRIPTHASH) {
-            /** @var BufferInterface $hash */
-            $hash = $parsed[1]->getData();
-            return new ScriptHashAddress($hash);
+        $solution = null;
+        $data = (new OutputClassifier())->classify($outputScript, $solution);
+        switch ($data) {
+            case OutputClassifier::PAYTOPUBKEYHASH;
+                /** @var BufferInterface $solution */
+                return new PayToPubKeyHashAddress($solution);
+            case OutputClassifier::PAYTOSCRIPTHASH:
+                /** @var BufferInterface $solution */
+                return new ScriptHashAddress($solution);
+            default:
+                throw new \RuntimeException('Script type is not associated with an address');
         }
-
-        throw new \RuntimeException('Script type is not associated with an address');
     }
 
     /**

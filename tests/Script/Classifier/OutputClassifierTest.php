@@ -106,6 +106,7 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([new Buffer(), Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP])));
 
         $hash = new Buffer("\x04", 20);
+        $solution = null;
         $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_DUP, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]), $solution));
 
 
