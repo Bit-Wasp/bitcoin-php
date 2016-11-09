@@ -24,7 +24,7 @@ class Signer
     private $tx;
 
     /**
-     * @var InputSigner
+     * @var InputSigner[]
      */
     private $signatureCreator = [];
 
@@ -51,10 +51,10 @@ class Signer
     public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null, $sigHashType = SigHashInterface::ALL)
     {
         if (!isset($this->signatureCreator[$nIn])) {
-            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $sigHashType);
+            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut);
         }
 
-        if (!$this->signatureCreator[$nIn]->sign($key, $redeemScript, $witnessScript)) {
+        if (!$this->signatureCreator[$nIn]->sign($key, $redeemScript, $witnessScript, $sigHashType)) {
             throw new \RuntimeException('Unsignable script');
         }
 

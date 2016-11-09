@@ -64,11 +64,6 @@ class InputSigner
     private $publicKeys = [];
 
     /**
-     * @var int
-     */
-    private $sigHashType;
-
-    /**
      * @var TransactionSignatureInterface[]
      */
     private $signatures = [];
@@ -89,16 +84,14 @@ class InputSigner
      * @param TransactionInterface $tx
      * @param int $nInput
      * @param TransactionOutputInterface $txOut
-     * @param int $sigHashType
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, $sigHashType = SigHashInterface::ALL)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut)
     {
         $this->ecAdapter = $ecAdapter;
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
         $this->classifier = new OutputClassifier();
-        $this->sigHashType = $sigHashType;
         $this->publicKeys = [];
         $this->signatures = [];
 
@@ -107,7 +100,7 @@ class InputSigner
 
     /**
      * @param int $sigVersion
-     * @param $stack
+     * @param TransactionSignatureInterface[] $stack
      * @param ScriptInterface $scriptCode
      * @return \SplObjectStorage
      */
@@ -254,10 +247,11 @@ class InputSigner
 
     /**
      * @param ScriptInterface $scriptCode
+     * @param int $sigHashType
      * @param int $sigVersion
      * @return BufferInterface
      */
-    public function calculateSigHash(ScriptInterface $scriptCode, $sigVersion)
+    public function calculateSigHash(ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
         if ($sigVersion === 1) {
             $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
@@ -265,18 +259,19 @@ class InputSigner
             $hasher = new Hasher($this->tx);
         }
 
-        return $hasher->calculate($scriptCode, $this->nInput, $this->sigHashType);
+        return $hasher->calculate($scriptCode, $this->nInput, $sigHashType);
     }
 
     /**
      * @param PrivateKeyInterface $key
      * @param ScriptInterface $scriptCode
+     * @param int $sigHashType
      * @param int $sigVersion
      * @return TransactionSignature
      */
-    public function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, $sigVersion)
+    public function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
-        $hash = $this->calculateSigHash($scriptCode, $sigVersion);
+        $hash = $this->calculateSigHash($scriptCode, $sigHashType, $sigVersion);
         return new TransactionSignature(
             $this->ecAdapter,
             $this->ecAdapter->sign(
@@ -289,7 +284,7 @@ class InputSigner
                     'sha256'
                 )
             ),
-            $this->sigHashType
+            $sigHashType
         );
     }
 
@@ -308,10 +303,11 @@ class InputSigner
      * @param ScriptInterface $scriptPubKey
      * @param string $outputType
      * @param BufferInterface[] $results
+     * @param int $sigHashType
      * @param int $sigVersion
      * @return bool
      */
-    private function doSignature(PrivateKeyInterface $key, ScriptInterface $scriptPubKey, &$outputType, array &$results, $sigVersion = 0)
+    private function doSignature(PrivateKeyInterface $key, ScriptInterface $scriptPubKey, &$outputType, array &$results, $sigHashType, $sigVersion = 0)
     {
         $return = [];
         $outputType = $this->classifier->classify($scriptPubKey, $return);
@@ -324,7 +320,7 @@ class InputSigner
             $results[] = $return;
             $this->requiredSigs = 1;
             if ($key->getPublicKey()->getBuffer()->equals($return)) {
-                $this->signatures[0] = $this->calculateSignature($key, $scriptPubKey, $sigVersion);
+                $this->signatures[0] = $this->calculateSignature($key, $scriptPubKey, $sigHashType, $sigVersion);
             }
 
             return true;
@@ -335,7 +331,7 @@ class InputSigner
             $results[] = $return;
             $this->requiredSigs = 1;
             if ($key->getPublicKey()->getPubKeyHash()->equals($return)) {
-                $this->signatures[0] = $this->calculateSignature($key, $scriptPubKey, $sigVersion);
+                $this->signatures[0] = $this->calculateSignature($key, $scriptPubKey, $sigHashType, $sigVersion);
                 $this->publicKeys[0] = $key->getPublicKey();
             }
 
@@ -351,7 +347,7 @@ class InputSigner
             foreach ($info->getKeys() as $keyIdx => $publicKey) {
                 $results[] = $publicKey->getBuffer();
                 if ($publicKey->getBuffer()->equals($myKey)) {
-                    $this->signatures[$keyIdx] = $this->calculateSignature($key, $scriptPubKey, $sigVersion);
+                    $this->signatures[$keyIdx] = $this->calculateSignature($key, $scriptPubKey, $sigHashType, $sigVersion);
                 }
             }
 
@@ -373,7 +369,7 @@ class InputSigner
 
             if ($pubKeyHash->getBinary() === $key->getPublicKey()->getPubKeyHash()->getBinary()) {
                 $script = ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $pubKeyHash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
-                $this->signatures[0] = $this->calculateSignature($key, $script, 1);
+                $this->signatures[0] = $this->calculateSignature($key, $script, $sigHashType, 1);
                 $this->publicKeys[0] = $key->getPublicKey();
             }
 
@@ -395,14 +391,15 @@ class InputSigner
      * @param PrivateKeyInterface $key
      * @param ScriptInterface|null $redeemScript
      * @param ScriptInterface|null $witnessScript
+     * @param int $sigHashType
      * @return bool
      */
-    public function sign(PrivateKeyInterface $key, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null)
+    public function sign(PrivateKeyInterface $key, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null, $sigHashType = SigHashInterface::ALL)
     {
         /** @var BufferInterface[] $return */
         $type = null;
         $return = [];
-        $solved = $this->doSignature($key, $this->txOut->getScript(), $type, $return, 0);
+        $solved = $this->doSignature($key, $this->txOut->getScript(), $type, $return, $sigHashType, 0);
 
         if ($solved && $type === OutputClassifier::PAYTOSCRIPTHASH) {
             $redeemScriptBuffer = $return[0];
@@ -416,7 +413,7 @@ class InputSigner
             }
 
             $results = []; // ???
-            $solved = $solved && $this->doSignature($key, $redeemScript, $type, $results, 0) && $type !== OutputClassifier::PAYTOSCRIPTHASH;
+            $solved = $solved && $this->doSignature($key, $redeemScript, $type, $results, $sigHashType, 0) && $type !== OutputClassifier::PAYTOSCRIPTHASH;
             if ($solved) {
                 $this->redeemScript = $redeemScript;
             }
@@ -427,7 +424,7 @@ class InputSigner
             $witnessScript = ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $pubKeyHash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
             $subType = null;
             $subResults = [];
-            $solved = $solved && $this->doSignature($key, $witnessScript, $subType, $subResults, 1);
+            $solved = $solved && $this->doSignature($key, $witnessScript, $subType, $subResults, $sigHashType, 1);
         } else if ($solved && $type === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $scriptHash = $return[0];
 
@@ -442,7 +439,7 @@ class InputSigner
             $subType = null;
             $subResults = [];
 
-            $solved = $solved && $this->doSignature($key, $witnessScript, $subType, $subResults, 1)
+            $solved = $solved && $this->doSignature($key, $witnessScript, $subType, $subResults, $sigHashType, 1)
                 && $subType !== OutputClassifier::PAYTOSCRIPTHASH
                 && $subType !== OutputClassifier::WITNESS_V0_SCRIPTHASH
                 && $subType !== OutputClassifier::WITNESS_V0_KEYHASH;
