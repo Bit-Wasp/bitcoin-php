@@ -105,11 +105,15 @@ class OutputScriptFactory
     public function multisig($m, array $keys = [], $sort = true)
     {
         $n = count($keys);
+        if ($m < 0) {
+            throw new \LogicException('Number of signatures cannot be less than zero');
+        }
+
         if ($m > $n) {
             throw new \LogicException('Required number of sigs exceeds number of public keys');
         }
 
-        if ($n > 16) {
+        if ($n > 20) {
             throw new \LogicException('Number of public keys is greater than 16');
         }
 
