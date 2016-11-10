@@ -17,6 +17,11 @@ class SignData
     protected $witnessScript = null;
 
     /**
+     * @var int
+     */
+    protected $signaturePolicy = null;
+
+    /**
      * @param ScriptInterface $redeemScript
      * @return $this
      */
@@ -27,13 +32,11 @@ class SignData
     }
 
     /**
-     * @param ScriptInterface $witnessScript
-     * @return $this
+     * @return bool
      */
-    public function p2wsh(ScriptInterface $witnessScript)
+    public function hasRedeemScript()
     {
-        $this->witnessScript = $witnessScript;
-        return $this;
+        return $this->redeemScript instanceof ScriptInterface;
     }
 
     /**
@@ -47,6 +50,22 @@ class SignData
 
         return $this->redeemScript;
     }
+    /**
+     * @param ScriptInterface $witnessScript
+     * @return $this
+     */
+    public function p2wsh(ScriptInterface $witnessScript)
+    {
+        $this->witnessScript = $witnessScript;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasWitnessScript() {
+        return $this->witnessScript instanceof ScriptInterface;
+    }
 
     /**
      * @return ScriptInterface
@@ -59,4 +78,34 @@ class SignData
 
         return $this->witnessScript;
     }
+    
+    /**
+     * @param int $flags
+     * @return $this
+     */
+    public function signaturePolicy($flags)
+    {
+        $this->signaturePolicy = $flags;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSignaturePolicy()
+    {
+        return $this->signaturePolicy !== null;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSignaturePolicy()
+    {
+        if (null === $this->signaturePolicy) {
+            throw new \RuntimeException('Requested signature policy but not set');
+        }
+        return $this->signaturePolicy;
+    }
+
 }
