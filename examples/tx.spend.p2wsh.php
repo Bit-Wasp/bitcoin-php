@@ -20,7 +20,7 @@ Bitcoin::setNetwork(NetworkFactory::bitcoinSegnet());
 $key = PrivateKeyFactory::fromWif('QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7');
 
 // scriptPubKey is P2WSH | P2PKH
-$destScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
+$destScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash());
 $program = new WitnessProgram(0, Hash::sha256($destScript->getBuffer()));
 
 // UTXO

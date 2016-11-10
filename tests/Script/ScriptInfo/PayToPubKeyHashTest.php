@@ -16,7 +16,7 @@ class PayToPubkeyHashTest extends AbstractTestCase
         $priv = PrivateKeyFactory::create();
         $pub = $priv->getPublicKey();
 
-        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pub);
+        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pub->getPubKeyHash());
         $classifier = new OutputClassifier();
         $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, $classifier->classify($script));
 

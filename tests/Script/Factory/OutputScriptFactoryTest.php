@@ -81,7 +81,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
     public function testPayToPubKeyHash()
     {
         $pubkey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pubkey);
+        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pubkey->getPubKeyHash());
         $parsed = $script->getScriptParser()->decode()  ;
         $this->assertSame(Opcodes::OP_DUP, $parsed[0]->getOp());
         $this->assertSame(Opcodes::OP_HASH160, $parsed[1]->getOp());

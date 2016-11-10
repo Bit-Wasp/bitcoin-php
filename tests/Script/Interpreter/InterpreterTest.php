@@ -48,7 +48,7 @@ class InterpreterTest extends AbstractTestCase
         $vectors = [];
 
         // Pay to pubkey hash that succeeds
-        $s0 = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
+        $s0 = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPubKeyHash());
         $vectors[] = [
             true,
             $ec,

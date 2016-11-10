@@ -15,14 +15,6 @@ use BitWasp\Buffertools\Buffertools;
 class OutputScriptFactory
 {
     /**
-     * @return OutputClassifier
-     */
-    public function classify()
-    {
-        return new OutputClassifier();
-    }
-
-    /**
      * @param AddressInterface $address
      * @return ScriptInterface
      */
@@ -47,12 +39,16 @@ class OutputScriptFactory
     /**
      * Create a P2PKH output script
      *
-     * @param PublicKeyInterface $public_key
+     * @param BufferInterface $pubKeyHash
      * @return ScriptInterface
      */
-    public function payToPubKeyHash(PublicKeyInterface $public_key)
+    public function payToPubKeyHash(BufferInterface $pubKeyHash)
     {
-        return ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $public_key->getPubKeyHash(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
+        if ($pubKeyHash->getSize() !== 20) {
+            throw new \RuntimeException('Public key hash must be exactly 20 bytes');
+        }
+
+        return ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $pubKeyHash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
     }
 
     /**
@@ -83,21 +79,6 @@ class OutputScriptFactory
         }
 
         return ScriptFactory::sequence([Opcodes::OP_HASH160, $scriptHash, Opcodes::OP_EQUAL]);
-    }
-
-    /**
-     * Create a P2SH script from a provided hash.
-     *
-     * @param BufferInterface $hash
-     * @return ScriptInterface
-     */
-    public function payToScriptHashFromHash(BufferInterface $hash)
-    {
-        if ($hash->getSize() !== 20) {
-            throw new \RuntimeException('pub-key-hash should be 20 bytes');
-        }
-
-        return ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUAL]);
     }
 
     /**

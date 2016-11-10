@@ -30,7 +30,7 @@ class WitnessTxFullTest extends AbstractTestCase
         $key = PrivateKeyFactory::fromHex('0cf4f6ba10a7ef675517a2c558c2fe273923aad3231388ad2d44c57ebe48eae4', true);
         
         $factory = ScriptFactory::scriptPubKey();
-        $scriptPubKey = $factory->payToPubKeyHash($key->getPublicKey());
+        $scriptPubKey = $factory->payToPubKeyHash($key->getPubKeyHash());
 
         $v0destkey = new WitnessProgram(0, $key->getPubKeyHash());
         $v0destscript = new WitnessProgram(0, Hash::sha256($scriptPubKey->getBuffer()));
