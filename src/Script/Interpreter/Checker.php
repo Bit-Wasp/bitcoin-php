@@ -94,6 +94,17 @@ class Checker
     }
 
     /**
+     * @param int $hashType
+     * @return bool
+     */
+    public function isDefinedHashtype($hashType)
+    {
+        $nHashType = $hashType & (~(SigHash::ANYONECANPAY));
+
+        return !(($nHashType < SigHash::ALL) || ($nHashType > SigHash::SINGLE));
+    }
+
+    /**
      * Determine whether the sighash byte appended to the signature encodes
      * a valid sighash type.
      *
@@ -107,9 +118,7 @@ class Checker
         }
 
         $binary = $signature->getBinary();
-        $nHashType = ord(substr($binary, -1)) & (~(SigHash::ANYONECANPAY));
-
-        return !(($nHashType < SigHash::ALL) || ($nHashType > SigHash::SINGLE));
+        return $this->isDefinedHashtype(ord(substr($binary, -1)));
     }
 
     /**
