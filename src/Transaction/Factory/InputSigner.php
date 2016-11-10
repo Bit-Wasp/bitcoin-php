@@ -144,6 +144,7 @@ class InputSigner
         $this->classifier = new OutputClassifier();
         $this->interpreter = new Interpreter();
         $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue());
+        $this->flags = $signData->hasSignaturePolicy() ? $signData->getSignaturePolicy() : Interpreter::VERIFY_NONE;
         $this->publicKeys = [];
         $this->signatures = [];
 
@@ -188,7 +189,7 @@ class InputSigner
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
             $this->requiredSigs = 1;
             if ($size === 2) {
-                if (!$this->evaluateSolution(0, $scriptCode, $stack, $sigVersion)) {
+                if (!$this->evaluateSolution($scriptCode, $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
                 $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
@@ -199,7 +200,7 @@ class InputSigner
         if ($type === OutputClassifier::PAYTOPUBKEY && count($stack) === 1) {
             $this->requiredSigs = 1;
             if ($size === 1) {
-                if (!$this->evaluateSolution(0, $scriptCode, $stack, $sigVersion)) {
+                if (!$this->evaluateSolution($scriptCode, $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
                 $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
@@ -223,7 +224,7 @@ class InputSigner
                 }
 
                 if (count(array_filter($this->signatures, 'is_null')) === count($this->publicKeys)) {
-                    if (!$this->evaluateSolution(0, $scriptCode, $stack, $sigVersion)) {
+                    if (!$this->evaluateSolution($scriptCode, $stack, $sigVersion)) {
                         throw new \RuntimeException('Existing signatures are invalid!');
                     }
                 }
@@ -243,7 +244,6 @@ class InputSigner
      */
     private function solve(SignData $signData)
     {
-        $flags = Interpreter::VERIFY_NONE;
         $scriptPubKey = $this->txOut->getScript();
         $solution = $this->scriptPubKey = $this->classifier->decode($scriptPubKey);
         if ($solution->getType() === OutputClassifier::UNKNOWN) {
@@ -252,7 +252,7 @@ class InputSigner
 
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $redeemScript = $signData->getRedeemScript();
-            if (!$this->verifySolution($flags, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
+            if (!$this->verifySolution(ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
                 throw new \Exception('Redeem script fails to solve pay-to-script-hash');
             }
             $solution = $this->redeemScript = $this->classifier->decode($redeemScript);
@@ -265,8 +265,8 @@ class InputSigner
             $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHashFromHash($solution->getSolution()));
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $witnessScript = $signData->getWitnessScript();
-            if (!$this->verifySolution($flags, ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript())) {
-                throw new \Exception('Redeem script fails to solve pay-to-script-hash');
+            if (!$this->verifySolution(ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript())) {
+                throw new \Exception('Witness script fails to solve witness-script-hash');
             }
             $this->witnessScript = $this->classifier->decode($witnessScript);
             if (!in_array($this->witnessScript->getType(), self::$canSign)) {
@@ -278,27 +278,25 @@ class InputSigner
     }
 
     /**
-     * @param int $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param ScriptWitnessInterface|null $scriptWitness
      * @return bool
      */
-    private function verifySolution($flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, ScriptWitnessInterface $scriptWitness = null)
+    private function verifySolution(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, ScriptWitnessInterface $scriptWitness = null)
     {
-        return $this->interpreter->verify($scriptSig, $scriptPubKey, $flags, $this->signatureChecker, $scriptWitness);
+        return $this->interpreter->verify($scriptSig, $scriptPubKey, $this->flags, $this->signatureChecker, $scriptWitness);
     }
 
     /**
-     * @param int $flags
      * @param ScriptInterface $scriptPubKey
      * @param array $chunks
      * @param int $sigVersion
      * @return bool
      */
-    private function evaluateSolution($flags, ScriptInterface $scriptPubKey, array $chunks, $sigVersion)
+    private function evaluateSolution(ScriptInterface $scriptPubKey, array $chunks, $sigVersion)
     {
-        return $this->interpreter->evaluate($scriptPubKey, new Stack($chunks), $sigVersion, $flags, $this->signatureChecker);
+        return $this->interpreter->evaluate($scriptPubKey, new Stack($chunks), $sigVersion, $this->flags, $this->signatureChecker);
     }
 
     /**
@@ -311,32 +309,33 @@ class InputSigner
         $witness = isset($witnesses[$this->nInput]) ? $witnesses[$this->nInput]->all() : [];
 
         $solution = $this->scriptPubKey;
-        $chunks = [];
         $sigVersion = SigHash::V0;
+        $chunks = [];
+
         if ($solution->canSign()) {
             $chunks = $this->evalPushOnly($scriptSig);
         }
 
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
-            $sigChunks = $this->evalPushOnly($scriptSig);
-            if (count($sigChunks) > 0) {
-                if (!end($sigChunks)->equals($this->redeemScript->getScript()->getBuffer())) {
+            $chunks = $this->evalPushOnly($scriptSig);
+            if (count($chunks) > 0) {
+                if (!end($chunks)->equals($this->redeemScript->getScript()->getBuffer())) {
                     throw new \RuntimeException('Extracted redeemScript did not match script-hash');
                 }
 
                 $solution = $this->redeemScript;
-                $chunks = array_slice($sigChunks, 0, -1);
+                $chunks = array_slice($chunks, 0, -1);
             }
         }
 
         if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $chunks = $witness;
             $solution = $this->witnessKeyHash;
             $sigVersion = SigHash::V1;
+            $chunks = $witness;
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
-            if (is_array($witness) && count($witness) > 0) {
+            if (count($witness) > 0) {
                 if (!end($witness)->equals($this->witnessScript->getScript()->getBuffer())) {
-                    throw new \RuntimeException('Extracted redeemScript did not match script-hash');
+                    throw new \RuntimeException('Extracted witnessScript did not match witness-script-hash');
                 }
 
                 $solution = $this->witnessScript;
@@ -421,7 +420,7 @@ class InputSigner
             $myKey = $key->getPublicKey()->getBuffer();
             $signed = false;
             foreach ($info->getKeys() as $keyIdx => $publicKey) {
-                if ($publicKey->getBuffer()->equals($myKey)) {
+                if ($myKey->equals($publicKey->getBuffer())) {
                     $this->signatures[$keyIdx] = $this->calculateSignature($key, $solution->getScript(), $sigHashType, $sigVersion);
                     $signed = true;
                 }
@@ -490,14 +489,13 @@ class InputSigner
 
     /**
      * @param ScriptInterface $script
-     * @param int $flags
      * @return \BitWasp\Buffertools\BufferInterface[]
      */
-    private function evalPushOnly(ScriptInterface $script, $flags = Interpreter::VERIFY_NONE)
+    private function evalPushOnly(ScriptInterface $script)
     {
         $stack = new Stack();
         $interpreter = new Interpreter();
-        $interpreter->evaluate($script, $stack, SigHash::V0, $flags | Interpreter::VERIFY_SIGPUSHONLY, new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue()));
+        $interpreter->evaluate($script, $stack, SigHash::V0, $this->flags | Interpreter::VERIFY_SIGPUSHONLY, new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue()));
         return $stack->all();
     }
 

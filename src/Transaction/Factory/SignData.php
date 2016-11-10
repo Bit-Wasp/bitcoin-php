@@ -63,7 +63,8 @@ class SignData
     /**
      * @return bool
      */
-    public function hasWitnessScript() {
+    public function hasWitnessScript()
+    {
         return $this->witnessScript instanceof ScriptInterface;
     }
 
@@ -107,5 +108,4 @@ class SignData
         }
         return $this->signaturePolicy;
     }
-
 }
