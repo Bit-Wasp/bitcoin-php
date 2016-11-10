@@ -22,7 +22,7 @@ use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
