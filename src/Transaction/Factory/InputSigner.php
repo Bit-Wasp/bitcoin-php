@@ -371,14 +371,11 @@ class InputSigner
      */
     public function sign(PrivateKeyInterface $key, $sigHashType = SigHashInterface::ALL)
     {
-        /** @var BufferInterface[] $return */
-        $type = null;
-        $solution = $this->scriptPubKey;
-        if ($solution->canSign()) {
+        if ($this->scriptPubKey->canSign()) {
             $this->doSignature($key, $this->scriptPubKey, $sigHashType, 0);
             return true;
         }
-
+        $solution = $this->scriptPubKey;
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             if ($this->redeemScript->canSign()) {
                 $this->doSignature($key, $this->redeemScript, $sigHashType, 0);
