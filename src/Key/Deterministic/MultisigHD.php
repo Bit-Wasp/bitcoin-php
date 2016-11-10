@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 
@@ -64,12 +65,13 @@ class MultisigHD
         $this->path = $path;
         $this->sort = $sort;
         $this->sequences = $sequences;
-        $this->redeemScript = ScriptFactory::p2sh()->multisig($m, array_map(
+        $this->redeemScript = ScriptFactory::scriptPubKey()->multisig($m, array_map(
             function (HierarchicalKey $key) {
                 return $key->getPublicKey();
             },
             $this->keys
-        ));
+        ), false);
+        $this->outputScript = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($this->redeemScript->getBuffer()));
     }
 
     /**

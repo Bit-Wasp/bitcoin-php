@@ -69,7 +69,8 @@ class InterpreterTest extends AbstractTestCase
             null,               // redeemscript
         ];
 
-        $rs = ScriptFactory::p2sh()->multisig(1, [$privateKey->getPublicKey()]);
+        $rs = ScriptFactory::scriptPubKey()->multisig(1, [$privateKey->getPublicKey()]);
+        $os = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($rs->getBuffer()));
         $vectors[] = [
             true,
             $ec,
@@ -78,7 +79,7 @@ class InterpreterTest extends AbstractTestCase
                 InterpreterInterface::VERIFY_CLEAN_STACK
             ,
             $privateKey,
-            $rs->getOutputScript(),
+            $os,
             $rs
         ];
 

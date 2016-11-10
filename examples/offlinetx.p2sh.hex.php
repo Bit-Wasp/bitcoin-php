@@ -4,6 +4,12 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 $ecAdapter = Bitcoin::getEcAdapter();
 $math = $ecAdapter->getMath();
@@ -18,13 +24,13 @@ $fee = '12345';
 $amountAfterFee = $amount - $fee;
 
 // Two users independently create private keys.
-$pk1 = \BitWasp\Bitcoin\Key\PrivateKeyFactory::fromHex($privHex1);
-$pk2 = \BitWasp\Bitcoin\Key\PrivateKeyFactory::fromHex($privHex2);
+$pk1 = PrivateKeyFactory::fromHex($privHex1);
+$pk2 = PrivateKeyFactory::fromHex($privHex2);
 
-$outpoint = new \BitWasp\Bitcoin\Transaction\OutPoint(\BitWasp\Buffertools\Buffer::hex($txid), $vout);
-$redeemScript = new \BitWasp\Bitcoin\Script\P2shScript(\BitWasp\Bitcoin\Script\ScriptFactory::fromHex($redeemScriptHex));
-$os = $redeemScript->getOutputScript();
-$txOut = new \BitWasp\Bitcoin\Transaction\TransactionOutput(
+$outpoint = new OutPoint(Buffer::hex($txid), $vout);
+$redeemScript = ScriptFactory::fromHex($redeemScriptHex);
+$os = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($redeemScript->getBuffer()));
+$txOut = new TransactionOutput(
     $amount,
     $os
 );
