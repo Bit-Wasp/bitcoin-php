@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Transaction\Factory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
@@ -19,6 +18,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitness;
+use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Signature\SignatureSort;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
@@ -34,6 +34,26 @@ use BitWasp\Buffertools\BufferInterface;
 
 class InputSigner
 {
+    /**
+     * @var array
+     */
+    protected static $canSign = [
+        OutputClassifier::PAYTOPUBKEYHASH,
+        OutputClassifier::PAYTOPUBKEY,
+        OutputClassifier::MULTISIG
+    ];
+
+    /**
+     * @var array
+     */
+    protected static $validP2sh = [
+        OutputClassifier::WITNESS_V0_KEYHASH,
+        OutputClassifier::WITNESS_V0_SCRIPTHASH,
+        OutputClassifier::PAYTOPUBKEYHASH,
+        OutputClassifier::PAYTOPUBKEY,
+        OutputClassifier::MULTISIG
+    ];
+
     /**
      * @var EcAdapterInterface
      */
@@ -53,6 +73,11 @@ class InputSigner
      * @var OutputData $witnessScript
      */
     private $witnessScript;
+
+    /**
+     * @var OutputData $witnessKeyHash
+     */
+    private $witnessKeyHash;
 
     /**
      * @var TransactionInterface
@@ -90,6 +115,16 @@ class InputSigner
     private $classifier;
 
     /**
+     * @var Interpreter
+     */
+    private $interpreter;
+
+    /**
+     * @var Checker
+     */
+    private $signatureChecker;
+
+    /**
      * TxInputSigning constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
@@ -99,11 +134,17 @@ class InputSigner
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData)
     {
+        if (!isset($tx->getInputs()[$nInput])) {
+            throw new \RuntimeException('No input at this index');
+        }
+
         $this->ecAdapter = $ecAdapter;
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
         $this->classifier = new OutputClassifier();
+        $this->interpreter = new Interpreter();
+        $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue());
         $this->publicKeys = [];
         $this->signatures = [];
 
@@ -182,6 +223,9 @@ class InputSigner
     }
 
     /**
+     * This function must throw an exception whenever execution
+     * has not yielded a signable script.
+     *
      * @param SignData $signData
      * @return $this
      * @throws \Exception
@@ -189,7 +233,6 @@ class InputSigner
     private function solve(SignData $signData)
     {
         $flags = Interpreter::VERIFY_NONE;
-        $interpreter = new Interpreter();
         $scriptPubKey = $this->txOut->getScript();
         $solution = $this->scriptPubKey = $this->classifier->decode($scriptPubKey);
         if ($solution->getType() === OutputClassifier::UNKNOWN) {
@@ -198,22 +241,24 @@ class InputSigner
 
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $redeemScript = $signData->getRedeemScript();
-            if (!$interpreter->verify(ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript(), $flags, new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue()))) {
+            if (!$this->verifySolution($flags, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
                 throw new \Exception('Redeem script fails to solve pay-to-script-hash');
             }
             $solution = $this->redeemScript = $this->classifier->decode($redeemScript);
-            if (!in_array($solution->getType(), [OutputClassifier::WITNESS_V0_SCRIPTHASH, OutputClassifier::WITNESS_V0_KEYHASH, OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
+            if (!in_array($solution->getType(), self::$validP2sh)) {
                 throw new \Exception('Unsupported pay-to-script-hash script');
             }
         }
-        // WitnessKeyHash doesn't require further solving until signing
-        if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+
+        if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
+            $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHashFromHash($solution->getSolution()));
+        } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $witnessScript = $signData->getWitnessScript();
-            if (!$interpreter->verify(ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript(), $flags, new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue()))) {
-                throw new \Exception('Witness script fails to solve pay-to-script-hash');
+            if (!$this->verifySolution($flags, ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript())) {
+                throw new \Exception('Redeem script fails to solve pay-to-script-hash');
             }
-            $solution = $this->witnessScript = $this->classifier->decode($witnessScript);
-            if (!in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
+            $this->witnessScript = $this->classifier->decode($witnessScript);
+            if (!in_array($this->witnessScript->getType(), self::$canSign)) {
                 throw new \Exception('Unsupported witness-script-hash script');
             }
         }
@@ -222,47 +267,53 @@ class InputSigner
     }
 
     /**
+     * @param int $flags
+     * @param ScriptInterface $scriptSig
+     * @param ScriptInterface $scriptPubKey
+     * @param ScriptWitnessInterface|null $scriptWitness
+     * @return bool
+     */
+    private function verifySolution($flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, ScriptWitnessInterface $scriptWitness = null)
+    {
+        return $this->interpreter->verify($scriptSig, $scriptPubKey, $flags, $this->signatureChecker, $scriptWitness);
+    }
+
+    /**
      * @return $this
      */
     public function extractSignatures()
     {
-        $solution = $this->scriptPubKey;
+        $flags = Interpreter::VERIFY_NONE;
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
-        if (in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
-            $this->extractFromValues($solution->getType(), $solution->getScript(), $this->evalPushOnly($scriptSig), 0);
-        }
-
-        if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
-            $stack = $this->evalPushOnly($scriptSig);
-            if (count($stack) > 0) {
-                $redeemScript = new Script(end($stack));
-                if (!$redeemScript->getBuffer()->equals($this->redeemScript->getScript()->getBuffer())) {
-                    throw new \RuntimeException('Redeem script from scriptSig doesn\'t match script-hash');
-                }
-
-                $solution = $this->redeemScript;
-                $this->extractFromValues($solution->getType(), $solution->getScript(), array_slice($stack, 0, -1), 0);
-            }
-        }
-
         $witnesses = $this->tx->getWitnesses();
-        if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $wit = isset($witnesses[$this->nInput]) ? $witnesses[$this->nInput]->all() : [];
-            $keyHashCode = ScriptFactory::scriptPubKey()->payToPubKeyHashFromHash($solution->getSolution());
-            $this->extractFromValues(OutputClassifier::PAYTOPUBKEYHASH, $keyHashCode, $wit, 1);
-        } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
-            if (isset($witnesses[$this->nInput])) {
-                $witness = $witnesses[$this->nInput];
-                $witCount = count($witnesses[$this->nInput]);
-                if ($witCount > 0) {
-                    if (!$witness[$witCount - 1]->equals($this->witnessScript->getScript()->getBuffer())) {
-                        throw new \RuntimeException('Redeem script from scriptSig doesn\'t match script-hash');
-                    }
+        $witness = isset($witnesses[$this->nInput]) ? $witnesses[$this->nInput] : null;
 
-                    $solution = $this->witnessScript;
-                    $this->extractFromValues($solution->getType(), $solution->getScript(), array_slice($witness->all(), 0, -1), 1);
+        if ($this->verifySolution($flags | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS, $scriptSig, $this->scriptPubKey->getScript(), $witness)) {
+            $solution = $this->scriptPubKey;
+            $chunks = [];
+            $sigVersion = 0;
+            if (in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
+                $chunks = $this->evalPushOnly($scriptSig);
+            }
+
+            if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
+                $solution = $this->redeemScript;
+                if (in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
+                    $chunks = array_slice($this->evalPushOnly($scriptSig), 0, -1);
                 }
             }
+
+            if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
+                $chunks = $witness->all();
+                $solution = $this->witnessKeyHash;
+                $sigVersion = 1;
+            } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+                $chunks = array_slice($witness->all(), 0, -1);
+                $solution = $this->witnessScript;
+                $sigVersion = 1;
+            }
+
+            $this->extractFromValues($solution->getType(), $solution->getScript(), $chunks, $sigVersion);
         }
 
         return $this;
@@ -358,30 +409,25 @@ class InputSigner
      * @param int $sigHashType
      * @return bool
      */
-    public function sign(PrivateKeyInterface $key, $sigHashType = SigHashInterface::ALL)
+    public function sign(PrivateKeyInterface $key, $sigHashType = SigHash::ALL)
     {
-        if ($this->scriptPubKey->canSign()) {
-            $this->doSignature($key, $this->scriptPubKey, $sigHashType, 0);
-            return true;
-        }
         $solution = $this->scriptPubKey;
+        $sigVersion = 0;
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
-            if ($this->redeemScript->canSign()) {
-                $this->doSignature($key, $this->redeemScript, $sigHashType, 0);
-                return true;
-            }
             $solution = $this->redeemScript;
         }
 
         if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $keyHashScript = ScriptFactory::scriptPubKey()->payToPubKeyHashFromHash($solution->getSolution());
-            $this->doSignature($key, $this->classifier->decode($keyHashScript), $sigHashType, 1);
-            return true;
+            $solution = $this->witnessKeyHash;
+            $sigVersion = 1;
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
-            if ($this->witnessScript->canSign()) {
-                $this->doSignature($key, $this->witnessScript, $sigHashType, 1);
-                return true;
-            }
+            $solution = $this->witnessScript;
+            $sigVersion = 1;
+        }
+
+        if ($solution->canSign()) {
+            $this->doSignature($key, $solution, $sigHashType, $sigVersion);
+            return true;
         }
 
         return false;
