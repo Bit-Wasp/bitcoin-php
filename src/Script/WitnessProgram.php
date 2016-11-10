@@ -6,6 +6,8 @@ use BitWasp\Buffertools\BufferInterface;
 
 class WitnessProgram
 {
+    const V0 = 0;
+
     /**
      * @var int
      */
@@ -25,6 +27,21 @@ class WitnessProgram
     {
         $this->version = $version;
         $this->program = $program;
+    }
+
+    /**
+     * @param BufferInterface $program
+     * @return WitnessProgram
+     */
+    public static function V0(BufferInterface $program)
+    {
+        if ($program->getSize() === 20) {
+            return new self(self::V0, $program);
+        } else if ($program->getSize() === 20) {
+            return new self(self::V0, $program);
+        } else {
+            throw new \RuntimeException('Invalid size for V0 witness program - must be 20 or 32 bytes');
+        }
     }
 
     /**
