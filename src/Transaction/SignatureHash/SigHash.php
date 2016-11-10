@@ -10,7 +10,7 @@ abstract class SigHash implements SigHashInterface
 {
     const V0 = 0;
     const V1 = 1;
-
+    
     /**
      * @var TransactionInterface
      */
@@ -25,5 +25,5 @@ abstract class SigHash implements SigHashInterface
         $this->tx = $transaction;
     }
 
-    abstract public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHashInterface::ALL);
+    abstract public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL);
 }

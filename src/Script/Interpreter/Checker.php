@@ -13,6 +13,7 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
@@ -106,9 +107,9 @@ class Checker
         }
 
         $binary = $signature->getBinary();
-        $nHashType = ord(substr($binary, -1)) & (~(SigHashInterface::ANYONECANPAY));
+        $nHashType = ord(substr($binary, -1)) & (~(SigHash::ANYONECANPAY));
 
-        return !(($nHashType < SigHashInterface::ALL) || ($nHashType > SigHashInterface::SINGLE));
+        return !(($nHashType < SigHash::ALL) || ($nHashType > SigHash::SINGLE));
     }
 
     /**
