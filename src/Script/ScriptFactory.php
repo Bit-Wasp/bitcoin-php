@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\P2shScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
-use BitWasp\Bitcoin\Script\Factory\ScriptInfoFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -18,7 +17,7 @@ class ScriptFactory
 {
     /**
      * @param BufferInterface|string $string
-     * @return Script
+     * @return ScriptInterface
      */
     public static function fromHex($string)
     {
@@ -60,15 +59,6 @@ class ScriptFactory
     public static function p2sh(Opcodes $opcodes = null)
     {
         return new P2shScriptFactory(self::scriptPubKey(), $opcodes ?: new Opcodes());
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @return ScriptInfo\ScriptInfoInterface
-     */
-    public static function info(ScriptInterface $script)
-    {
-        return (new ScriptInfoFactory())->load($script);
     }
 
     /**
