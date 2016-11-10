@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
-
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
