@@ -10,8 +10,10 @@ use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
+use BitWasp\Bitcoin\Script\Interpreter\Checker;
+use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
+use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
@@ -24,6 +26,7 @@ use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
+use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\Buffer;
@@ -224,29 +227,19 @@ class InputSigner
         $solution = $this->scriptPubKey;
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
         if (in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
-            $stack = [];
-            foreach ($scriptSig->getScriptParser()->decode() as $op) {
-                $stack[] = $op->getData();
-            }
-            $this->extractFromValues($solution->getType(), $solution->getScript(), $stack, 0);
+            $this->extractFromValues($solution->getType(), $solution->getScript(), $this->evalPushOnly($scriptSig), 0);
         }
 
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
-            $decodeSig = $scriptSig->getScriptParser()->decode();
-            if (count($decodeSig) > 0) {
-                $redeemScript = new Script(end($decodeSig)->getData());
+            $stack = $this->evalPushOnly($scriptSig);
+            if (count($stack) > 0) {
+                $redeemScript = new Script(end($stack));
                 if (!$redeemScript->getBuffer()->equals($this->redeemScript->getScript()->getBuffer())) {
                     throw new \RuntimeException('Redeem script from scriptSig doesn\'t match script-hash');
                 }
 
-                $internalSig = [];
-                foreach (array_slice($decodeSig, 0, -1) as $operation) {
-                    /** @var Operation $operation */
-                    $internalSig[] = $operation->getData();
-                }
-
                 $solution = $this->redeemScript;
-                $this->extractFromValues($solution->getType(), $solution->getScript(), $internalSig, 0);
+                $this->extractFromValues($solution->getType(), $solution->getScript(), array_slice($stack, 0, -1), 0);
             }
         }
 
@@ -320,7 +313,7 @@ class InputSigner
      * @param int $sigHashType
      * @param int $sigVersion
      */
-    private function doSignature(PrivateKeyInterface $key, OutputData $solution, $sigHashType, $sigVersion = 0)
+    private function doSignature(PrivateKeyInterface $key, OutputData $solution, $sigHashType, $sigVersion)
     {
         if ($solution->getType() === OutputClassifier::PAYTOPUBKEY) {
             if (!$key->getPublicKey()->getBuffer()->equals($solution->getSolution())) {
@@ -340,7 +333,6 @@ class InputSigner
             $info = new Multisig($solution->getScript());
             $this->publicKeys = $info->getKeys();
             $this->requiredSigs = $info->getRequiredSigCount();
-
             $myKey = $key->getPublicKey()->getBuffer();
             $signed = false;
             foreach ($info->getKeys() as $keyIdx => $publicKey) {
@@ -351,6 +343,11 @@ class InputSigner
             }
 
             if (!$signed) {
+                print_r($myKey->getHex());
+                echo '--'.PHP_EOl;
+                foreach ($info->getKeys() as $key) {
+                    echo $key->getHex().PHP_EOL;
+                }
                 throw new \RuntimeException('Signing with the wrong private key');
             }
         } else {
@@ -414,6 +411,19 @@ class InputSigner
         } else {
             throw new \RuntimeException('Cannot serialize this script sig');
         }
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @param int $flags
+     * @return \BitWasp\Buffertools\BufferInterface[]
+     */
+    private function evalPushOnly(ScriptInterface $script, $flags = Interpreter::VERIFY_NONE)
+    {
+        $stack = new Stack();
+        $interpreter = new Interpreter();
+        $interpreter->evaluate($script, $stack, 0, $flags | Interpreter::VERIFY_SIGPUSHONLY, new Checker($this->ecAdapter, new Transaction(), 0, 0));
+        return $stack->all();
     }
 
     /**
