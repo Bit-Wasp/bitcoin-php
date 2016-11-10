@@ -10,14 +10,17 @@ class OutputData
      * @var string
      */
     private $type;
+
     /**
      * @var ScriptInterface
      */
     private $script;
+
     /**
      * @var mixed
      */
     private $solution;
+
     /**
      * OutputData constructor.
      * @param string $type
@@ -53,5 +56,13 @@ class OutputData
     public function getSolution()
     {
         return $this->solution;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canSign()
+    {
+        return in_array($this->type, [OutputClassifier::MULTISIG, OutputClassifier::PAYTOPUBKEY, OutputClassifier::PAYTOPUBKEYHASH]);
     }
 }
