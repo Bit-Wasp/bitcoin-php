@@ -33,7 +33,7 @@ class WitnessProgram
      * @param BufferInterface $program
      * @return WitnessProgram
      */
-    public static function V0(BufferInterface $program)
+    public static function v0(BufferInterface $program)
     {
         if ($program->getSize() === 20) {
             return new self(self::V0, $program);
