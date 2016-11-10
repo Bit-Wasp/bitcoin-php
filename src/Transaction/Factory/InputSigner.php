@@ -451,6 +451,22 @@ class InputSigner
     }
 
     /**
+     * @return TransactionSignatureInterface[]
+     */
+    public function getSignatures()
+    {
+        return $this->signatures;
+    }
+
+    /**
+     * @return PublicKeyInterface[]
+     */
+    public function getPublicKeys()
+    {
+        return $this->publicKeys;
+    }
+
+    /**
      * The function only returns true when $scriptPubKey could be classified
      *
      * @param PrivateKeyInterface $key
