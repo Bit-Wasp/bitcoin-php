@@ -50,11 +50,19 @@ class Signer
      */
     public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null, $sigHashType = SigHashInterface::ALL)
     {
-        if (!isset($this->signatureCreator[$nIn])) {
-            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut);
+        $signData = new SignData();
+        if ($redeemScript) {
+            $signData->p2sh($redeemScript);
+        }
+        if ($witnessScript) {
+            $signData->p2wsh($witnessScript);
         }
 
-        if (!$this->signatureCreator[$nIn]->sign($key, $redeemScript, $witnessScript, $sigHashType)) {
+        if (!isset($this->signatureCreator[$nIn])) {
+            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData);
+        }
+
+        if (!$this->signatureCreator[$nIn]->sign($key, $sigHashType)) {
             throw new \RuntimeException('Unsignable script');
         }
 

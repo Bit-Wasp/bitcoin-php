@@ -14,6 +14,7 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Factory\InputSigner;
+use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
@@ -144,7 +145,14 @@ class WitnessTxFullTest extends AbstractTestCase
         $this->assertTrue($check);
         $this->assertEquals($expectedTx, $signed->getWitnessBuffer()->getHex());
 
-        $signer = new InputSigner($ec, $signed, 0, $utxo->getOutput());
+        $signData = new SignData();
+        if ($redeemScript instanceof ScriptInterface) {
+            $signData->p2sh($redeemScript);
+        }
+        if ($witnessScript instanceof ScriptInterface) {
+            $signData->p2wsh($witnessScript);
+        }
+        $signer = new InputSigner($ec, $signed, 0, $utxo->getOutput(), $signData);
         $this->assertTrue($signer->isFullySigned());
     }
 }
