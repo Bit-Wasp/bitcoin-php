@@ -26,6 +26,7 @@ use BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class InputSigner
@@ -400,32 +401,51 @@ class InputSigner
 
     /**
      * @param string $outputType
-     * @return SigValues
+     * @return BufferInterface[]
      */
-    private function serializeSimpleSig($outputType)
+    private function serializeSolution($outputType)
     {
-        if (!in_array($outputType, [OutputClassifier::PAYTOPUBKEY, OutputClassifier::PAYTOPUBKEYHASH, OutputClassifier::MULTISIG])) {
-            throw new \RuntimeException('Cannot serialize this script sig');
-        }
-
-        if ($outputType === OutputClassifier::PAYTOPUBKEY && $this->isFullySigned()) {
-            return new SigValues(ScriptFactory::sequence([$this->signatures[0]->getBuffer()]), new ScriptWitness([]));
-        }
-
-        if ($outputType === OutputClassifier::PAYTOPUBKEYHASH && $this->isFullySigned()) {
-            return new SigValues(ScriptFactory::sequence([$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()]), new ScriptWitness([]));
-        }
-
-        if ($outputType === OutputClassifier::MULTISIG) {
-            $sequence = [Opcodes::OP_0];
+        if ($outputType === OutputClassifier::PAYTOPUBKEY ) {
+            return [$this->signatures[0]->getBuffer()];
+        } else if ($outputType === OutputClassifier::PAYTOPUBKEYHASH ) {
+            return [$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()];
+        } else if ($outputType === OutputClassifier::MULTISIG) {
+            $sequence = [new Buffer()];
             for ($i = 0, $nPubKeys = count($this->publicKeys); $i < $nPubKeys; $i++) {
                 if (isset($this->signatures[$i])) {
                     $sequence[] = $this->signatures[$i]->getBuffer();
                 }
             }
 
-            return new SigValues(ScriptFactory::sequence($sequence), new ScriptWitness([]));
+            return $sequence;
+        } else {
+            throw new \RuntimeException('Cannot serialize this script sig');
         }
+    }
+
+    /**
+     * @param BufferInterface[] $buffers
+     * @return ScriptInterface
+     */
+    public function pushAll(array $buffers)
+    {
+        return ScriptFactory::sequence(array_map(function ($buffer) {
+            if (!($buffer instanceof BufferInterface)) {
+                throw new \RuntimeException('Script contained a non-push opcode');
+            }
+
+            $size = $buffer->getSize();
+            if ($size === 0) {
+                return Opcodes::OP_0;
+            }
+
+            $first = ord($buffer->getBinary());
+            if ($size === 1 && $first >= 1 && $first <= 16) {
+                return \BitWasp\Bitcoin\Script\encodeOpN($first);
+            } else {
+                return $buffer;
+            }
+        }, $buffers));
     }
 
     /**
@@ -440,44 +460,37 @@ class InputSigner
             $emptyWitness = new ScriptWitness([]);
         }
 
-        /** @var SigValues $answer */
-        $answer = new SigValues($emptyScript, $emptyWitness);
+        $scriptSig = $emptyScript;
+        $witness = [];
         $solution = $this->scriptPubKey;
         if ($solution->canSign()) {
-            $answer = $this->serializeSimpleSig($this->scriptPubKey->getType());
+            $scriptSig = $this->pushAll($this->serializeSolution($this->scriptPubKey->getType()));
         }
 
         $p2sh = false;
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $p2sh = true;
             if ($this->redeemScript->canSign()) {
-                $answer = $this->serializeSimpleSig($this->redeemScript->getType());
+                $scriptSig = $this->pushAll($this->serializeSolution($this->redeemScript->getType()));
             }
             $solution = $this->redeemScript;
         }
 
         if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $answer = new SigValues($emptyScript, new ScriptWitness([$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()]));
+            $scriptSig = $emptyScript;
+            $witness = $this->serializeSolution(OutputClassifier::PAYTOPUBKEYHASH);
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             if ($this->witnessScript->canSign()) {
-                $answer = $this->serializeSimpleSig($this->witnessScript->getType());
-                $data = [];
-                foreach ($answer->getScriptSig()->getScriptParser()->decode() as $o) {
-                    $data[] = $o->getData();
-                }
-
-                $data[] = $this->witnessScript->getScript()->getBuffer();
-                $answer = new SigValues($emptyScript, new ScriptWitness($data));
+                $scriptSig = $emptyScript;
+                $witness = $this->serializeSolution($this->witnessScript->getType());
+                $witness[] = $this->witnessScript->getScript()->getBuffer();
             }
         }
 
         if ($p2sh) {
-            $answer = new SigValues(
-                ScriptFactory::create($answer->getScriptSig()->getBuffer())->push($this->redeemScript->getScript()->getBuffer())->getScript(),
-                $answer->getScriptWitness()
-            );
+            $scriptSig = ScriptFactory::create($scriptSig->getBuffer())->push($this->redeemScript->getScript()->getBuffer())->getScript();
         }
 
-        return $answer;
+        return new SigValues($scriptSig, new ScriptWitness($witness));
     }
 }
