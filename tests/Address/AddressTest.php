@@ -131,7 +131,7 @@ class AddressTest extends AbstractTestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage No address associated with this script type
+     * @expectedExceptionMessage Script type is not associated with an address
      */
     public function testAssociatedAddressFailure()
     {

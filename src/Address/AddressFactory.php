@@ -41,15 +41,14 @@ class AddressFactory
      */
     public static function fromOutputScript(ScriptInterface $outputScript)
     {
-        $solution = null;
-        $data = (new OutputClassifier())->classify($outputScript, $solution);
-        switch ($data) {
+        $decode = (new OutputClassifier())->decode($outputScript);
+        switch ($decode->getType()) {
             case OutputClassifier::PAYTOPUBKEYHASH:
                 /** @var BufferInterface $solution */
-                return new PayToPubKeyHashAddress($solution);
+                return new PayToPubKeyHashAddress($decode->getSolution());
             case OutputClassifier::PAYTOSCRIPTHASH:
                 /** @var BufferInterface $solution */
-                return new ScriptHashAddress($solution);
+                return new ScriptHashAddress($decode->getSolution());
             default:
                 throw new \RuntimeException('Script type is not associated with an address');
         }

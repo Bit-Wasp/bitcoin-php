@@ -43,16 +43,10 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isPayToPublicKey(ScriptInterface $script, &$solution = null)
+    public function isPayToPublicKey(ScriptInterface $script)
     {
         try {
-            $decoded = $script->getScriptParser()->decode();
-            $info = $this->decodeP2PK($decoded);
-            if ($info === false) {
-                return false;
-            }
-            $solution = $info;
-            return true;
+            return $this->decodeP2PK($script->getScriptParser()->decode()) !== false;
         } catch (\Exception $e) {
             /** Return false later */
         }
@@ -98,16 +92,10 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isPayToPublicKeyHash(ScriptInterface $script, &$solution = null)
+    public function isPayToPublicKeyHash(ScriptInterface $script)
     {
         try {
-            $decoded = $script->getScriptParser()->decode();
-            $info = $this->decodeP2PKH($decoded);
-            if ($info === false) {
-                return false;
-            }
-            $solution = $info;
-            return true;
+            return $this->decodeP2PKH($script->getScriptParser()->decode()) !== false;
         } catch (\Exception $e) {
             /** Return false later */
         }
@@ -147,16 +135,10 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isPayToScriptHash(ScriptInterface $script, &$solution = null)
+    public function isPayToScriptHash(ScriptInterface $script)
     {
         try {
-            $decoded = $script->getScriptParser()->decode();
-            $info = $this->decodeP2SH($decoded);
-            if ($info === false) {
-                return false;
-            }
-            $solution = $info;
-            return true;
+            return $this->decodeP2SH($script->getScriptParser()->decode()) !== false;
         } catch (\Exception $e) {
             /** Return false later */
         }
@@ -203,19 +185,12 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param mixed $keys
      * @return bool
      */
-    public function isMultisig(ScriptInterface $script, & $keys = [])
+    public function isMultisig(ScriptInterface $script)
     {
         try {
-            $decoded = $script->getScriptParser()->decode();
-            $info = $this->decodeMultisig($decoded);
-            if ($info === false) {
-                return false;
-            }
-            $keys = $info;
-            return true;
+            return $this->decodeMultisig($script->getScriptParser()->decode()) !== false;
         } catch (\Exception $e) {
             /** Return false later */
         }
@@ -292,19 +267,12 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
-     * @param null $solution
      * @return bool
      */
-    public function isWitness(ScriptInterface $script, &$solution = null)
+    public function isWitness(ScriptInterface $script)
     {
         try {
-            $decoded = $script->getScriptParser()->decode();
-            $info = $this->decodeWitnessNoLimit($script, $decoded);
-            if ($info === false) {
-                return false;
-            }
-            $solution = $info;
-            return true;
+            return $this->decodeWitnessNoLimit($script, $script->getScriptParser()->decode())!== false;
         } catch (\Exception $e) {
             /** Return false later */
         }
