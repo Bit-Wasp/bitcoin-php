@@ -16,6 +16,7 @@ use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -191,7 +192,7 @@ class Interpreter implements InterpreterInterface
             $mainStack->push($value);
         }
 
-        if (!$this->evaluate($scriptPubKey, $mainStack, 1, $flags, $checker)) {
+        if (!$this->evaluate($scriptPubKey, $mainStack, SigHash::V1, $flags, $checker)) {
             return false;
         }
 
@@ -228,7 +229,7 @@ class Interpreter implements InterpreterInterface
         }
 
         $stack = new Stack();
-        if (!$this->evaluate($scriptSig, $stack, 0, $flags, $checker)) {
+        if (!$this->evaluate($scriptSig, $stack, SigHash::V0, $flags, $checker)) {
             return false;
         }
 
@@ -239,7 +240,7 @@ class Interpreter implements InterpreterInterface
             }
         }
 
-        if (!$this->evaluate($scriptPubKey, $stack, 0, $flags, $checker)) {
+        if (!$this->evaluate($scriptPubKey, $stack, SigHash::V0, $flags, $checker)) {
             return false;
         }
 

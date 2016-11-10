@@ -188,14 +188,20 @@ class InputSigner
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
             $this->requiredSigs = 1;
             if ($size === 2) {
+                if (!$this->evaluateSolution(0, $scriptCode, $stack, $sigVersion)) {
+                    throw new \RuntimeException('Existing signatures are invalid!');
+                }
                 $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
                 $this->publicKeys = [PublicKeyFactory::fromHex($stack[1], $this->ecAdapter)];
             }
         }
 
-        if ($type === OutputClassifier::PAYTOPUBKEY) {
+        if ($type === OutputClassifier::PAYTOPUBKEY && count($stack) === 1) {
             $this->requiredSigs = 1;
             if ($size === 1) {
+                if (!$this->evaluateSolution(0, $scriptCode, $stack, $sigVersion)) {
+                    throw new \RuntimeException('Existing signatures are invalid!');
+                }
                 $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
             }
         }
@@ -214,6 +220,12 @@ class InputSigner
                 $sigs = $this->sortMultiSigs($sigVersion, $vars, $scriptCode);
                 foreach ($this->publicKeys as $idx => $key) {
                     $this->signatures[$idx] = isset($sigs[$key]) ? $sigs[$key]->getBuffer() : null;
+                }
+
+                if (count(array_filter($this->signatures, 'is_null')) === count($this->publicKeys)) {
+                    if (!$this->evaluateSolution(0, $scriptCode, $stack, $sigVersion)) {
+                        throw new \RuntimeException('Existing signatures are invalid!');
+                    }
                 }
             }
         }
@@ -278,42 +290,62 @@ class InputSigner
     }
 
     /**
+     * @param int $flags
+     * @param ScriptInterface $scriptPubKey
+     * @param array $chunks
+     * @param int $sigVersion
+     * @return bool
+     */
+    private function evaluateSolution($flags, ScriptInterface $scriptPubKey, array $chunks, $sigVersion)
+    {
+        return $this->interpreter->evaluate($scriptPubKey, new Stack($chunks), $sigVersion, $flags, $this->signatureChecker);
+    }
+
+    /**
      * @return $this
      */
     public function extractSignatures()
     {
-        $flags = Interpreter::VERIFY_NONE;
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
         $witnesses = $this->tx->getWitnesses();
-        $witness = isset($witnesses[$this->nInput]) ? $witnesses[$this->nInput] : null;
+        $witness = isset($witnesses[$this->nInput]) ? $witnesses[$this->nInput]->all() : [];
 
-        if ($this->verifySolution($flags | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS, $scriptSig, $this->scriptPubKey->getScript(), $witness)) {
-            $solution = $this->scriptPubKey;
-            $chunks = [];
-            $sigVersion = SigHash::V0;
-            if (in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
-                $chunks = $this->evalPushOnly($scriptSig);
-            }
+        $solution = $this->scriptPubKey;
+        $chunks = [];
+        $sigVersion = SigHash::V0;
+        if ($solution->canSign()) {
+            $chunks = $this->evalPushOnly($scriptSig);
+        }
 
-            if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
-                $solution = $this->redeemScript;
-                if (in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
-                    $chunks = array_slice($this->evalPushOnly($scriptSig), 0, -1);
+        if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
+            $sigChunks = $this->evalPushOnly($scriptSig);
+            if (count($sigChunks) > 0) {
+                if (!end($sigChunks)->equals($this->redeemScript->getScript()->getBuffer())) {
+                    throw new \RuntimeException('Extracted redeemScript did not match script-hash');
                 }
-            }
 
-            if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-                $chunks = $witness->all();
-                $solution = $this->witnessKeyHash;
-                $sigVersion = SigHash::V1;
-            } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
-                $chunks = array_slice($witness->all(), 0, -1);
+                $solution = $this->redeemScript;
+                $chunks = array_slice($sigChunks, 0, -1);
+            }
+        }
+
+        if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
+            $chunks = $witness;
+            $solution = $this->witnessKeyHash;
+            $sigVersion = SigHash::V1;
+        } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+            if (is_array($witness) && count($witness) > 0) {
+                if (!end($witness)->equals($this->witnessScript->getScript()->getBuffer())) {
+                    throw new \RuntimeException('Extracted redeemScript did not match script-hash');
+                }
+
                 $solution = $this->witnessScript;
                 $sigVersion = SigHash::V1;
+                $chunks = array_slice($witness, 0, -1);
             }
-
-            $this->extractFromValues($solution->getType(), $solution->getScript(), $chunks, $sigVersion);
         }
+
+        $this->extractFromValues($solution->getType(), $solution->getScript(), $chunks, $sigVersion);
 
         return $this;
     }
