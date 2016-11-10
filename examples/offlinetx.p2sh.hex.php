@@ -24,19 +24,21 @@ $pk2 = \BitWasp\Bitcoin\Key\PrivateKeyFactory::fromHex($privHex2);
 $outpoint = new \BitWasp\Bitcoin\Transaction\OutPoint(\BitWasp\Buffertools\Buffer::hex($txid), $vout);
 $redeemScript = new \BitWasp\Bitcoin\Script\P2shScript(\BitWasp\Bitcoin\Script\ScriptFactory::fromHex($redeemScriptHex));
 $os = $redeemScript->getOutputScript();
-
+$txOut = new \BitWasp\Bitcoin\Transaction\TransactionOutput(
+    $amount,
+    $os
+);
 // One party (pk1) wants to spend funds. He creates a transaction spending the funding tx to his address.
 $spendTx = TransactionFactory::build()
     ->spendOutPoint($outpoint)
     ->payToAddress($amountAfterFee, $pk1->getAddress())
     ->get();
 
-$output = $spendTx->getOutput(0);
 // Two parties sign the transaction (can be done in steps)
 $signer = new \BitWasp\Bitcoin\Transaction\Factory\Signer($spendTx, $ecAdapter);
 $signer
-    ->sign(0, $pk1, $output, $redeemScript)
-    ->sign(0, $pk2, $output, $redeemScript);
+    ->sign(0, $pk1, $txOut, $redeemScript)
+    ->sign(0, $pk2, $txOut, $redeemScript);
 
 $signed = $signer->get();
 
