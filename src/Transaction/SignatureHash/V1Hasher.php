@@ -3,24 +3,23 @@
 namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffertools;
 
-class V1Hasher
+class V1Hasher extends SigHash
 {
     /**
      * @var TransactionInterface
      */
-    private $transaction;
+    protected $transaction;
 
     /**
      * @var int|string
      */
-    private $amount;
+    protected $amount;
 
     /**
      * V1Hasher constructor.
@@ -29,8 +28,8 @@ class V1Hasher
      */
     public function __construct(TransactionInterface $transaction, $amount)
     {
-        $this->transaction = $transaction;
         $this->amount = $amount;
+        parent::__construct($transaction);
     }
 
     /**

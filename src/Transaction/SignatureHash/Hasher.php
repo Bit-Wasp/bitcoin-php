@@ -5,28 +5,14 @@ namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
-class Hasher implements SigHashInterface
+class Hasher extends SigHash
 {
-    /**
-     * @var TransactionInterface
-     */
-    private $transaction;
-
-    /**
-     * @param TransactionInterface $transaction
-     */
-    public function __construct(TransactionInterface $transaction)
-    {
-        $this->transaction = $transaction;
-    }
-
     /**
      * Calculate the hash of the current transaction, when you are looking to
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
@@ -42,7 +28,7 @@ class Hasher implements SigHashInterface
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHashInterface::ALL)
     {
         $math = Bitcoin::getMath();
-        $tx = new TxMutator($this->transaction);
+        $tx = new TxMutator($this->tx);
         $inputs = $tx->inputsMutator();
         $outputs = $tx->outputsMutator();
 
@@ -67,7 +53,7 @@ class Hasher implements SigHashInterface
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
-            if ($nOutput >= count($this->transaction->getOutputs())) {
+            if ($nOutput >= count($this->tx->getOutputs())) {
                 return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
             }
 
