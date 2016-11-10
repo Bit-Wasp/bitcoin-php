@@ -507,37 +507,35 @@ class InputSigner
             $emptyWitness = new ScriptWitness([]);
         }
 
-        $scriptSig = $emptyScript;
+        $scriptSigChunks = [];
         $witness = [];
-        $solution = $this->scriptPubKey;
-        if ($solution->canSign()) {
-            $scriptSig = $this->pushAll($this->serializeSolution($this->scriptPubKey->getType()));
+        if ($this->scriptPubKey->canSign()) {
+            $scriptSigChunks = $this->serializeSolution($this->scriptPubKey->getType());
         }
 
+        $solution = $this->scriptPubKey;
         $p2sh = false;
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $p2sh = true;
             if ($this->redeemScript->canSign()) {
-                $scriptSig = $this->pushAll($this->serializeSolution($this->redeemScript->getType()));
+                $scriptSigChunks = $this->serializeSolution($this->redeemScript->getType());
             }
             $solution = $this->redeemScript;
         }
 
         if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $scriptSig = $emptyScript;
             $witness = $this->serializeSolution(OutputClassifier::PAYTOPUBKEYHASH);
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             if ($this->witnessScript->canSign()) {
-                $scriptSig = $emptyScript;
                 $witness = $this->serializeSolution($this->witnessScript->getType());
                 $witness[] = $this->witnessScript->getScript()->getBuffer();
             }
         }
 
         if ($p2sh) {
-            $scriptSig = ScriptFactory::create($scriptSig->getBuffer())->push($this->redeemScript->getScript()->getBuffer())->getScript();
+            $scriptSigChunks[] = $this->redeemScript->getScript()->getBuffer();
         }
 
-        return new SigValues($scriptSig, new ScriptWitness($witness));
+        return new SigValues($this->pushAll($scriptSigChunks), new ScriptWitness($witness));
     }
 }
