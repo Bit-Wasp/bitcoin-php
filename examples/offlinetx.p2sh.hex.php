@@ -22,8 +22,9 @@ $pk1 = \BitWasp\Bitcoin\Key\PrivateKeyFactory::fromHex($privHex1);
 $pk2 = \BitWasp\Bitcoin\Key\PrivateKeyFactory::fromHex($privHex2);
 
 $outpoint = new \BitWasp\Bitcoin\Transaction\OutPoint(\BitWasp\Buffertools\Buffer::hex($txid), $vout);
-$redeemScript = new \BitWasp\Bitcoin\Script\P2shScript(\BitWasp\Bitcoin\Script\ScriptFactory::fromHex($redeemScriptHex));
-$os = $redeemScript->getOutputScript();
+$rs = \BitWasp\Bitcoin\Script\ScriptFactory::fromHex($redeemScriptHex);
+$p2h = new \BitWasp\Bitcoin\Script\P2shScript($rs);
+$os = $p2h->getOutputScript();
 $txOut = new \BitWasp\Bitcoin\Transaction\TransactionOutput(
     $amount,
     $os
@@ -37,8 +38,8 @@ $spendTx = TransactionFactory::build()
 // Two parties sign the transaction (can be done in steps)
 $signer = new \BitWasp\Bitcoin\Transaction\Factory\Signer($spendTx, $ecAdapter);
 $signer
-    ->sign(0, $pk1, $txOut, $redeemScript)
-    ->sign(0, $pk2, $txOut, $redeemScript);
+    ->sign(0, $pk1, $txOut, $rs)
+    ->sign(0, $pk2, $txOut, $rs);
 
 $signed = $signer->get();
 

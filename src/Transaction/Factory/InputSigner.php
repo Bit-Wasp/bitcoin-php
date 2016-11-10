@@ -313,7 +313,7 @@ class InputSigner
      * @param int $sigHashType
      * @param int $sigVersion
      */
-    private function doSignature(PrivateKeyInterface $key, OutputData $solution, $sigHashType, $sigVersion = 0)
+    private function doSignature(PrivateKeyInterface $key, OutputData $solution, $sigHashType, $sigVersion)
     {
         if ($solution->getType() === OutputClassifier::PAYTOPUBKEY) {
             if (!$key->getPublicKey()->getBuffer()->equals($solution->getSolution())) {
@@ -333,7 +333,6 @@ class InputSigner
             $info = new Multisig($solution->getScript());
             $this->publicKeys = $info->getKeys();
             $this->requiredSigs = $info->getRequiredSigCount();
-
             $myKey = $key->getPublicKey()->getBuffer();
             $signed = false;
             foreach ($info->getKeys() as $keyIdx => $publicKey) {
@@ -344,6 +343,11 @@ class InputSigner
             }
 
             if (!$signed) {
+                print_r($myKey->getHex());
+                echo '--'.PHP_EOl;
+                foreach ($info->getKeys() as $key) {
+                    echo $key->getHex().PHP_EOL;
+                }
                 throw new \RuntimeException('Signing with the wrong private key');
             }
         } else {
