@@ -357,6 +357,10 @@ class InputSigner
      */
     public function calculateSigHash(ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
+        if (!$this->signatureChecker->isDefinedHashtype($sigHashType)) {
+            throw new \RuntimeException('Invalid sigHashType requested');
+        }
+
         if ($sigVersion === SigHash::V1) {
             $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
         } else {
