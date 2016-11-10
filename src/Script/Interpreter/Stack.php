@@ -16,6 +16,25 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
      */
     private $values = [];
 
+    /**
+     * Stack constructor.
+     * @param BufferInterface[] $values
+     */
+    public function __construct(array $values = [])
+    {
+        $this->values = array_map(function (BufferInterface $value) {
+            return $value;
+        }, $values);
+    }
+
+    /**
+     * @return BufferInterface[]
+     */
+    public function all()
+    {
+        return $this->values;
+    }
+
     public function current()
     {
         return $this->values[$this->position];
