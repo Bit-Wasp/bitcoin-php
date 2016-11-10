@@ -116,19 +116,12 @@ class InputSigner
      */
     private function sortMultiSigs($sigVersion, $stack, ScriptInterface $scriptCode)
     {
-        if ($sigVersion === 1) {
-            $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
-        } else {
-            $hasher = new Hasher($this->tx);
-        }
-
         $sigSort = new SignatureSort($this->ecAdapter);
         $sigs = new \SplObjectStorage;
 
         foreach ($stack as $txSig) {
-            $hash = $hasher->calculate($scriptCode, $this->nInput, $txSig->getHashType());
+            $hash = $this->calculateSigHash($scriptCode, $txSig->getHashType(), $sigVersion);
             $linked = $sigSort->link([$txSig->getSignature()], $this->publicKeys, $hash);
-
             foreach ($this->publicKeys as $key) {
                 if ($linked->contains($key)) {
                     $sigs[$key] = $txSig;
