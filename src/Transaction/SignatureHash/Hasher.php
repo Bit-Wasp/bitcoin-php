@@ -25,7 +25,7 @@ class Hasher extends SigHash
      * @return BufferInterface
      * @throws \Exception
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHashInterface::ALL)
+    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL)
     {
         $math = Bitcoin::getMath();
         $tx = new TxMutator($this->tx);
@@ -39,7 +39,7 @@ class Hasher extends SigHash
 
         $inputs[$inputToSign]->script($txOutScript);
 
-        if (($sighashType & 31) === SigHashInterface::NONE) {
+        if (($sighashType & 31) === SigHash::NONE) {
             // Set outputs to empty vector, and set sequence number of inputs to 0.
             $outputs->null();
 
@@ -49,7 +49,7 @@ class Hasher extends SigHash
                     $input->sequence(0);
                 }
             }
-        } elseif (($sighashType & 31) === SigHashInterface::SINGLE) {
+        } elseif (($sighashType & 31) === SigHash::SINGLE) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.
             $nOutput = $inputToSign;
@@ -72,7 +72,7 @@ class Hasher extends SigHash
         }
 
         // This can happen regardless of whether it's ALL, NONE, or SINGLE
-        if (($sighashType & SigHashInterface::ANYONECANPAY) > 0) {
+        if (($sighashType & SigHash::ANYONECANPAY) > 0) {
             $input = $inputs[$inputToSign]->done();
             $inputs->null()->add($input);
         }
