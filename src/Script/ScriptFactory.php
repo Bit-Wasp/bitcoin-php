@@ -63,15 +63,6 @@ class ScriptFactory
     }
 
     /**
-     * @param ScriptInterface $script
-     * @return ScriptInfo\ScriptInfoInterface
-     */
-    public static function info(ScriptInterface $script)
-    {
-        return (new ScriptInfoFactory())->load($script);
-    }
-
-    /**
      * @param EcAdapterInterface|null $ecAdapter
      * @return NativeConsensus
      */

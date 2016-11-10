@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -26,7 +27,7 @@ class ScriptFactoryTest extends AbstractTestCase
         $arbitrary = [$pk1->getPublicKey(), $pk2->getPublicKey()];
 
         $redeemScript = ScriptFactory::scriptPubKey()->multisig($m, $arbitrary, false);
-        $info = ScriptFactory::info($redeemScript);
+        $info = new Multisig($redeemScript);
         foreach ($info->getKeys() as $i => $key) {
             $this->assertEquals($arbitrary[$i]->getBinary(), $key->getBinary(), 'verify false flag disables sorting');
         }
