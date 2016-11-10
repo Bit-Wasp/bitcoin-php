@@ -339,7 +339,7 @@ class InputSigner
         } else if ($solution->getType() === OutputClassifier::MULTISIG) {
             $info = new Multisig($solution->getScript());
             $this->publicKeys = $info->getKeys();
-            $this->requiredSigs = $info->getKeyCount();
+            $this->requiredSigs = $info->getRequiredSigCount();
 
             $myKey = $key->getPublicKey()->getBuffer();
             $signed = false;
