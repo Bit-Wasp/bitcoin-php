@@ -79,7 +79,7 @@ class AddressFactory
     /**
      * @param string $address
      * @param NetworkInterface $network
-     * @return AddressInterface
+     * @return bool
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public static function isValidAddress($address, NetworkInterface $network = null)
@@ -102,19 +102,11 @@ class AddressFactory
     public static function getAssociatedAddress(ScriptInterface $script)
     {
         $classifier = new OutputClassifier();
-        
-        try {
-            $publicKey = null;
-            if ($classifier->isPayToPublicKey($script, $publicKey)) {
-                /** @var BufferInterface $publicKey */
-                $address = PublicKeyFactory::fromHex($publicKey)->getAddress();
-            } else {
-                $address = self::fromOutputScript($script);
-            }
-
-            return $address;
-        } catch (\Exception $e) {
-            throw new \RuntimeException('No address associated with this script type');
+        $decode = $classifier->decode($script);
+        if ($decode->getType() === OutputClassifier::PAYTOPUBKEY) {
+            return PublicKeyFactory::fromHex($decode->getSolution())->getAddress();
+        } else {
+            return self::fromOutputScript($script);
         }
     }
 }
