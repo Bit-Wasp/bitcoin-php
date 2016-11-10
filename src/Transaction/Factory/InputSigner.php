@@ -26,7 +26,6 @@ use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
-use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\Buffer;
@@ -291,7 +290,7 @@ class InputSigner
         if ($this->verifySolution($flags | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS, $scriptSig, $this->scriptPubKey->getScript(), $witness)) {
             $solution = $this->scriptPubKey;
             $chunks = [];
-            $sigVersion = 0;
+            $sigVersion = SigHash::V0;
             if (in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
                 $chunks = $this->evalPushOnly($scriptSig);
             }
@@ -306,11 +305,11 @@ class InputSigner
             if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
                 $chunks = $witness->all();
                 $solution = $this->witnessKeyHash;
-                $sigVersion = 1;
+                $sigVersion = SigHash::V1;
             } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
                 $chunks = array_slice($witness->all(), 0, -1);
                 $solution = $this->witnessScript;
-                $sigVersion = 1;
+                $sigVersion = SigHash::V1;
             }
 
             $this->extractFromValues($solution->getType(), $solution->getScript(), $chunks, $sigVersion);
@@ -327,7 +326,7 @@ class InputSigner
      */
     public function calculateSigHash(ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
-        if ($sigVersion === 1) {
+        if ($sigVersion === SigHash::V1) {
             $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
         } else {
             $hasher = new Hasher($this->tx);
@@ -366,7 +365,7 @@ class InputSigner
      * @param int $sigHashType
      * @param int $sigVersion
      */
-    private function doSignature(PrivateKeyInterface $key, OutputData $solution, $sigHashType, $sigVersion = 0)
+    private function doSignature(PrivateKeyInterface $key, OutputData $solution, $sigHashType, $sigVersion = SigHash::V0)
     {
         if ($solution->getType() === OutputClassifier::PAYTOPUBKEY) {
             if (!$key->getPublicKey()->getBuffer()->equals($solution->getSolution())) {
@@ -412,17 +411,17 @@ class InputSigner
     public function sign(PrivateKeyInterface $key, $sigHashType = SigHash::ALL)
     {
         $solution = $this->scriptPubKey;
-        $sigVersion = 0;
+        $sigVersion = SigHash::V0;
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $solution = $this->redeemScript;
         }
 
         if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
             $solution = $this->witnessKeyHash;
-            $sigVersion = 1;
+            $sigVersion = SigHash::V1;
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $solution = $this->witnessScript;
-            $sigVersion = 1;
+            $sigVersion = SigHash::V1;
         }
 
         if ($solution->canSign()) {
@@ -466,7 +465,7 @@ class InputSigner
     {
         $stack = new Stack();
         $interpreter = new Interpreter();
-        $interpreter->evaluate($script, $stack, 0, $flags | Interpreter::VERIFY_SIGPUSHONLY, new Checker($this->ecAdapter, new Transaction(), 0, 0));
+        $interpreter->evaluate($script, $stack, SigHash::V0, $flags | Interpreter::VERIFY_SIGPUSHONLY, new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue()));
         return $stack->all();
     }
 
