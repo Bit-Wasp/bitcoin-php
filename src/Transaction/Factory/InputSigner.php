@@ -188,6 +188,8 @@ class InputSigner
      */
     private function solve(SignData $signData)
     {
+        $flags = Interpreter::VERIFY_NONE;
+        $interpreter = new Interpreter();
         $scriptPubKey = $this->txOut->getScript();
         $solution = $this->scriptPubKey = $this->classifier->decode($scriptPubKey);
         if ($solution->getType() === OutputClassifier::UNKNOWN) {
@@ -196,8 +198,8 @@ class InputSigner
 
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $redeemScript = $signData->getRedeemScript();
-            if (!$solution->getSolution()->equals(Hash::sha256ripe160($redeemScript->getBuffer()))) {
-                throw new \Exception('Redeem script doesn\'t match script-hash');
+            if (!$interpreter->verify(ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript(), $flags, new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue()))) {
+                throw new \Exception('Redeem script fails to solve pay-to-script-hash');
             }
             $solution = $this->redeemScript = $this->classifier->decode($redeemScript);
             if (!in_array($solution->getType(), [OutputClassifier::WITNESS_V0_SCRIPTHASH, OutputClassifier::WITNESS_V0_KEYHASH, OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
@@ -207,8 +209,8 @@ class InputSigner
         // WitnessKeyHash doesn't require further solving until signing
         if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $witnessScript = $signData->getWitnessScript();
-            if (!$solution->getSolution()->equals(Hash::sha256($witnessScript->getBuffer()))) {
-                throw new \Exception('Witness script doesn\'t match witness-script-hash');
+            if (!$interpreter->verify(ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript(), $flags, new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue()))) {
+                throw new \Exception('Witness script fails to solve pay-to-script-hash');
             }
             $solution = $this->witnessScript = $this->classifier->decode($witnessScript);
             if (!in_array($solution->getType(), [OutputClassifier::PAYTOPUBKEYHASH , OutputClassifier::PAYTOPUBKEY, OutputClassifier::MULTISIG])) {
