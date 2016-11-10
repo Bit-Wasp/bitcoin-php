@@ -36,12 +36,12 @@ class WitnessTxFullTest extends AbstractTestCase
         $v0destscript = new WitnessProgram(0, Hash::sha256($scriptPubKey->getBuffer()));
         $payToPubkeyScript = $factory->payToPubKey($key->getPublicKey());
         $multisig = $factory->multisig(1, [$key->getPublicKey()]);
-        $p2shmultisig = $factory->payToScriptHash($multisig);
+        $p2shmultisig = $factory->payToScriptHash(Hash::sha256ripe160($multisig->getBuffer()));
         $p2shv0keyhash = new P2shScript($v0destkey->getScript());
 
         $multisig = $factory->multisig(1, [$key->getPublicKey()]);
         $wp = new WitnessProgram(0, Hash::sha256($multisig->getBuffer()));
-        $p2shWitMultisig = $factory->payToScriptHash($wp->getScript());
+        $p2shWitMultisig = $factory->payToScriptHash(Hash::sha256ripe160($wp->getScript()->getBuffer()));
 
         $multisigWpOut = $wp->getScript();
 

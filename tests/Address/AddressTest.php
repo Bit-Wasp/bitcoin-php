@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -87,7 +88,7 @@ class AddressTest extends AbstractTestCase
         $publicKey = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
 
         $pubkeyHash = $outputScriptFactory->payToPubKeyHash($publicKey);
-        $scriptHash = $outputScriptFactory->payToScriptHash($outputScriptFactory->multisig(1, [$publicKey]));
+        $scriptHash = $outputScriptFactory->payToScriptHash(Hash::sha256ripe160($outputScriptFactory->multisig(1, [$publicKey])->getBuffer()));
 
         $p2pkhAddress = AddressFactory::fromOutputScript($pubkeyHash);
         $this->assertInstanceOf(PayToPubKeyHashAddress::class, $p2pkhAddress);

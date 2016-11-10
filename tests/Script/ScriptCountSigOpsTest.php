@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -56,7 +57,7 @@ class ScriptCountSigOpsTest extends AbstractTestCase
 
         $innerBuf = $innerScript->getBuffer();
 
-        $p2sh = ScriptFactory::scriptPubKey()->payToScriptHash($innerScript);
+        $p2sh = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($innerScript->getBuffer()));
         $scriptSig = ScriptFactory::create()->op('OP_0')->push($innerBuf)->getScript();
         $count = $p2sh->countP2shSigOps($scriptSig);
 
@@ -74,7 +75,7 @@ class ScriptCountSigOpsTest extends AbstractTestCase
         $this->assertEquals(3, $p2shScript->countSigOps(true));
         $this->assertEquals(20, $p2shScript->countSigOps(false));
 
-        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($p2shScript);
+        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2shScript->getBuffer()));
         $this->assertEquals(0, $scriptPubKey->countSigOps(true));
         $this->assertEquals(0, $scriptPubKey->countSigOps(false));
 
@@ -105,11 +106,11 @@ class ScriptCountSigOpsTest extends AbstractTestCase
         $empty = new Script();
         $this->assertEquals(1, $p2pkh->countP2shSigOps($empty));
 
-        $p2shPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($empty);
+        $p2shPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($empty->getBuffer()));
         $this->assertEquals(0, $p2shPubKey->countP2shSigOps($empty));
 
         $p2shScript = ScriptFactory::create()->op('OP_HASH160')->getScript();
-        $p2shPubKey1 = ScriptFactory::scriptPubKey()->payToScriptHash($p2shScript);
+        $p2shPubKey1 = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2shScript->getBuffer()));
         $this->assertEquals(0, $p2shPubKey1->countP2shSigOps($p2shScript));
     }
 }

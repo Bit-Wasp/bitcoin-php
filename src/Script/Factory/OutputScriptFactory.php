@@ -73,12 +73,16 @@ class OutputScriptFactory
     /**
      * Create a P2SH output script
      *
-     * @param ScriptInterface $p2shScript
+     * @param BufferInterface $scriptHash
      * @return ScriptInterface
      */
-    public function payToScriptHash(ScriptInterface $p2shScript)
+    public function payToScriptHash(BufferInterface $scriptHash)
     {
-        return ScriptFactory::sequence([Opcodes::OP_HASH160, $p2shScript->getScriptHash(), Opcodes::OP_EQUAL]);
+        if ($scriptHash->getSize() !== 20) {
+            throw new \RuntimeException('P2SH scriptHash must be exactly 20 bytes');
+        }
+
+        return ScriptFactory::sequence([Opcodes::OP_HASH160, $scriptHash, Opcodes::OP_EQUAL]);
     }
 
     /**

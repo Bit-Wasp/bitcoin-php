@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Script\Factory;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -118,7 +119,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
             ->op('OP_CHECKMULTISIG')
             ->getScript();
 
-        $scriptHash = ScriptFactory::scriptPubKey()->payToScriptHash($script);
+        $scriptHash = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($script->getBuffer()));
         $parsed = $scriptHash->getScriptParser()->decode();
 
         $this->assertSame(Opcodes::OP_HASH160, $parsed[0]->getOp());
