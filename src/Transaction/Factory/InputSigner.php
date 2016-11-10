@@ -398,9 +398,9 @@ class InputSigner
      */
     private function serializeSolution($outputType)
     {
-        if ($outputType === OutputClassifier::PAYTOPUBKEY ) {
+        if ($outputType === OutputClassifier::PAYTOPUBKEY) {
             return [$this->signatures[0]->getBuffer()];
-        } else if ($outputType === OutputClassifier::PAYTOPUBKEYHASH ) {
+        } else if ($outputType === OutputClassifier::PAYTOPUBKEYHASH) {
             return [$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()];
         } else if ($outputType === OutputClassifier::MULTISIG) {
             $sequence = [new Buffer()];
