@@ -356,37 +356,4 @@ class OutputClassifier
         $type = $this->classify($script, $solution);
         return new OutputData($type, $script, $solution);
     }
-
-    /**
-     * @param ScriptInterface $script
-     * @param mixed $solution
-     * @return string
-     */
-    public function classifyold(ScriptInterface $script, &$solution = null)
-    {
-        $type = self::UNKNOWN;
-        if ($this->isPayToScriptHash($script, $solution)) {
-            /** @var BufferInterface $solution */
-            $type = self::PAYTOSCRIPTHASH;
-        } elseif ($this->isWitness($script, $solution)) {
-            /** @var BufferInterface $solution */
-            $size = $solution->getSize();
-            if (20 === $size) {
-                $type = self::WITNESS_V0_KEYHASH;
-            } elseif (32 === $size) {
-                $type = self::WITNESS_V0_SCRIPTHASH;
-            }
-        } elseif ($this->isPayToPublicKey($script, $solution)) {
-            /** @var BufferInterface $solution */
-            $type = self::PAYTOPUBKEY;
-        } elseif ($this->isPayToPublicKeyHash($script, $solution)) {
-            /** @var BufferInterface $solution */
-            $type = self::PAYTOPUBKEYHASH;
-        } elseif ($this->isMultisig($script, $solution)) {
-            /** @var BufferInterface[] $solution */
-            $type = self::MULTISIG;
-        }
-
-        return $type;
-    }
 }
