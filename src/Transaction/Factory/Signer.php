@@ -58,15 +58,26 @@ class Signer
             $signData->p2wsh($witnessScript);
         }
 
-        if (!isset($this->signatureCreator[$nIn])) {
-            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData);
-        }
-
-        if (!$this->signatureCreator[$nIn]->sign($key, $sigHashType)) {
+        if (!$this->signer($nIn, $txOut, $signData)->sign($key, $sigHashType)) {
             throw new \RuntimeException('Unsignable script');
         }
 
         return $this;
+    }
+
+    /**
+     * @param int $nIn
+     * @param TransactionOutputInterface $txOut
+     * @param SignData $signData
+     * @return InputSigner
+     */
+    public function signer($nIn, TransactionOutputInterface $txOut, SignData $signData)
+    {
+        if (!isset($this->signatureCreator[$nIn])) {
+            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData);
+        }
+
+        return $this->signatureCreator[$nIn];
     }
 
     /**
