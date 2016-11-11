@@ -20,7 +20,7 @@ class P2shScript extends Script
     public function __construct(ScriptInterface $script, Opcodes $opcodes = null)
     {
         parent::__construct($script->getBuffer(), $opcodes);
-        $this->outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($script);
+        $this->outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($script->getScriptHash());
     }
 
     /**

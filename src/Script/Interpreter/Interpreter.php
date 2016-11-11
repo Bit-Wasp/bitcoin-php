@@ -176,7 +176,7 @@ class Interpreter implements InterpreterInterface
                     return false;
                 }
 
-                $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHashFromHash($buffer);
+                $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($buffer);
                 $stackValues = $scriptWitness;
             } else {
                 return false;

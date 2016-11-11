@@ -18,7 +18,7 @@ use BitWasp\Buffertools\Buffer;
 Bitcoin::setNetwork(NetworkFactory::bitcoinSegnet());
 
 $key = PrivateKeyFactory::fromWif('QUgHwHaG1wDweqo8nYKBhGrCZVvgm6yRDh9egxn7qZbEzwzeRiUk');
-$scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
+$scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash());
 echo $key->getPublicKey()->getAddress()->getAddress() . PHP_EOL;
 
 // Utxo

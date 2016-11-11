@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Tests\Script\Classifier;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -91,12 +90,8 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([new Buffer('', 20), Opcodes::OP_CHECKSIG])));
         $this->assertFalse($classifier->isPayToPublicKey(ScriptFactory::sequence([new Buffer('', 33), Opcodes::OP_CHECKMULTISIG])));
 
-        $solution = '';
         $pub = new Buffer("\x04", 33);
-        $this->assertTrue($classifier->isPayToPublicKey(ScriptFactory::sequence([$pub, Opcodes::OP_CHECKSIG]), $solution));
-        $this->assertInstanceOf(Buffer::class, $solution);
-        /** @var BufferInterface $solution */
-        $this->assertTrue($pub->equals($solution));
+        $this->assertTrue($classifier->isPayToPublicKey(ScriptFactory::sequence([$pub, Opcodes::OP_CHECKSIG])));
     }
 
     public function testIsPayToPublicKeyHash()
@@ -106,16 +101,11 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([new Buffer(), Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP, Opcodes::OP_DUP])));
 
         $hash = new Buffer("\x04", 20);
-        $solution = null;
-        $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_DUP, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]), $solution));
+        $this->assertFalse($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_DUP, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG])));
 
 
-        $solution = '';
         $hash = new Buffer("\x04", 20);
-        $this->assertTrue($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]), $solution));
-        $this->assertInstanceOf(Buffer::class, $solution);
-        /** @var BufferInterface $solution */
-        $this->assertTrue($hash->equals($solution));
+        $this->assertTrue($classifier->isPayToPublicKeyHash(ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG])));
     }
 
     public function testIsMultisig()
@@ -128,17 +118,7 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertFalse($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_1, Opcodes::OP_DUP, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIG])));
         $this->assertFalse($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_1, $pub, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIGVERIFY])));
 
-        $solution = '';
-        $this->assertTrue($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_1, $pub, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIG]), $solution));
-        $this->assertInternalType('array', $solution);
-
-        $count = count($solution);
-        $this->assertEquals(1, $count);
-        for ($i = 0; $i < $count; $i++) {
-            $this->assertInstanceOf(Buffer::class, $solution[$i]);
-        }
-
-        $this->assertTrue($pub->equals($solution[0]));
+        $this->assertTrue($classifier->isMultisig(ScriptFactory::sequence([Opcodes::OP_1, $pub, Opcodes::OP_1, Opcodes::OP_CHECKMULTISIG])));
     }
 
     public function testIsWitness()
@@ -153,11 +133,8 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertFalse($classifier->isWitness(new Script(new Buffer("\x00\x0d\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01"))));
 
         $hash = Hash::sha256(new Buffer('string'));
-        $solution = '';
-        $this->assertTrue($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, $hash]), $solution));
-        $this->assertInstanceOf(Buffer::class, $solution);
-        /** @var BufferInterface $solution */
-        $this->assertTrue($hash->equals($solution));
+        $this->assertTrue($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, $hash])));
+        ;
     }
 
     public function testIsPayToScriptHash()
@@ -172,11 +149,7 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, new Buffer('', 16), Opcodes::OP_EQUAL])));
         $this->assertFalse($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY])));
 
-        $solution = '';
-        $this->assertTrue($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUAL]), $solution));
-        $this->assertInstanceOf(Buffer::class, $solution);
-        /** @var BufferInterface $solution */
-        $this->assertTrue($hash->equals($solution));
+        $this->assertTrue($classifier->isPayToScriptHash(ScriptFactory::sequence([Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUAL])));
     }
     
     /**

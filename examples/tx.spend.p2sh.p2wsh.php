@@ -21,7 +21,7 @@ Bitcoin::setNetwork(NetworkFactory::bitcoinSegnet());
 $key = PrivateKeyFactory::fromWif('QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7');
 
 // Script is P2SH | P2WSH | P2PKH
-$scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPublicKey());
+$scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash());
 $program = new WitnessProgram(0, Hash::sha256($scriptPubKey->getBuffer()));
 $p2sh = new P2shScript($program->getScript());
 

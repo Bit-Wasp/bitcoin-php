@@ -41,15 +41,14 @@ class AddressFactory
      */
     public static function fromOutputScript(ScriptInterface $outputScript)
     {
-        $solution = null;
-        $data = (new OutputClassifier())->classify($outputScript, $solution);
-        switch ($data) {
+        $decode = (new OutputClassifier())->decode($outputScript);
+        switch ($decode->getType()) {
             case OutputClassifier::PAYTOPUBKEYHASH:
                 /** @var BufferInterface $solution */
-                return new PayToPubKeyHashAddress($solution);
+                return new PayToPubKeyHashAddress($decode->getSolution());
             case OutputClassifier::PAYTOSCRIPTHASH:
                 /** @var BufferInterface $solution */
-                return new ScriptHashAddress($solution);
+                return new ScriptHashAddress($decode->getSolution());
             default:
                 throw new \RuntimeException('Script type is not associated with an address');
         }
@@ -79,7 +78,7 @@ class AddressFactory
     /**
      * @param string $address
      * @param NetworkInterface $network
-     * @return AddressInterface
+     * @return bool
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public static function isValidAddress($address, NetworkInterface $network = null)
@@ -102,19 +101,11 @@ class AddressFactory
     public static function getAssociatedAddress(ScriptInterface $script)
     {
         $classifier = new OutputClassifier();
-        
-        try {
-            $publicKey = null;
-            if ($classifier->isPayToPublicKey($script, $publicKey)) {
-                /** @var BufferInterface $publicKey */
-                $address = PublicKeyFactory::fromHex($publicKey)->getAddress();
-            } else {
-                $address = self::fromOutputScript($script);
-            }
-
-            return $address;
-        } catch (\Exception $e) {
-            throw new \RuntimeException('No address associated with this script type');
+        $decode = $classifier->decode($script);
+        if ($decode->getType() === OutputClassifier::PAYTOPUBKEY) {
+            return PublicKeyFactory::fromHex($decode->getSolution())->getAddress();
+        } else {
+            return self::fromOutputScript($script);
         }
     }
 }

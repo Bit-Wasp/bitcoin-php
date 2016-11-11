@@ -53,15 +53,6 @@ class ScriptFactory
     }
 
     /**
-     * @param Opcodes|null $opcodes
-     * @return P2shScriptFactory
-     */
-    public static function p2sh(Opcodes $opcodes = null)
-    {
-        return new P2shScriptFactory(self::scriptPubKey(), $opcodes ?: new Opcodes());
-    }
-
-    /**
      * @param EcAdapterInterface|null $ecAdapter
      * @return NativeConsensus
      */

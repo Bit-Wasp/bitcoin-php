@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Math\Math;
@@ -47,7 +48,7 @@ class InterpreterTest extends AbstractTestCase
         $vectors = [];
 
         // Pay to pubkey hash that succeeds
-        $s0 = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
+        $s0 = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPubKeyHash());
         $vectors[] = [
             true,
             $ec,
@@ -68,7 +69,8 @@ class InterpreterTest extends AbstractTestCase
             null,               // redeemscript
         ];
 
-        $rs = ScriptFactory::p2sh()->multisig(1, [$privateKey->getPublicKey()]);
+        $rs = ScriptFactory::scriptPubKey()->multisig(1, [$privateKey->getPublicKey()]);
+        $os = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($rs->getBuffer()));
         $vectors[] = [
             true,
             $ec,
@@ -77,7 +79,7 @@ class InterpreterTest extends AbstractTestCase
                 InterpreterInterface::VERIFY_CLEAN_STACK
             ,
             $privateKey,
-            $rs->getOutputScript(),
+            $os,
             $rs
         ];
 
@@ -199,7 +201,7 @@ class InterpreterTest extends AbstractTestCase
         $ec = Bitcoin::getEcAdapter();
 
         $p2sh = new Script();
-        $output = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
+        $output = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2sh->getBuffer()));
         $scriptSig = new Script();
 
         $f = InterpreterInterface::VERIFY_P2SH;
@@ -211,7 +213,7 @@ class InterpreterTest extends AbstractTestCase
     {
         $ec = Bitcoin::getEcAdapter();
         $p2sh = ScriptFactory::create()->op('OP_RETURN')->getScript();
-        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
+        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2sh->getBuffer()));
         $scriptSig = ScriptFactory::create()->op('OP_0')->push($p2sh->getBuffer())->getScript();
 
         $f = InterpreterInterface::VERIFY_P2SH;
@@ -224,7 +226,7 @@ class InterpreterTest extends AbstractTestCase
         $ec = Bitcoin::getEcAdapter();
         $p2sh = ScriptFactory::create()->op('OP_1')->push(Buffer::hex('41414141'))->op('OP_DEPTH')->getScript();
         $scriptSig = ScriptFactory::create()->op('OP_DEPTH')->push($p2sh->getBuffer())->getScript();
-        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($p2sh);
+        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2sh->getBuffer()));
 
         $f = InterpreterInterface::VERIFY_P2SH;
         $i = new Interpreter($ec, new Transaction);

@@ -270,7 +270,7 @@ class InputSigner
         }
 
         if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHashFromHash($solution->getSolution()));
+            $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $witnessScript = $signData->getWitnessScript();
             if (!$this->verifySolution(ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript())) {

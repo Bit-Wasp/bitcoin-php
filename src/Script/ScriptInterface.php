@@ -4,11 +4,12 @@ namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Script\Parser\Parser;
 use BitWasp\Bitcoin\SerializableInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 interface ScriptInterface extends SerializableInterface
 {
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
     public function getScriptHash();
 

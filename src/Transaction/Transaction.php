@@ -260,10 +260,13 @@ class Transaction extends Serializable implements TransactionInterface
         $nIn = count($this->inputs);
         $nOut = count($this->outputs);
         $nWit = count($this->witness);
+
+        // Check the length of each field is equal
         if ($nIn !== count($tx->getInputs()) || $nOut !== count($tx->getOutputs()) || $nWit !== count($tx->getWitnesses())) {
             return false;
         }
 
+        // Check each field
         for ($i = 0; $i < $nIn; $i++) {
             if (false === $this->getInput($i)->equals($tx->getInput($i))) {
                 return false;
