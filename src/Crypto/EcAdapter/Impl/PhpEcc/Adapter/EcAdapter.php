@@ -186,7 +186,7 @@ class EcAdapter implements EcAdapterInterface
         $beta = $math->powmod($alpha, $p_over_four, $curve->getPrime());
 
         // If beta is even, but y isn't or vice versa, then convert it,
-        // otherwise we're done and y == beta.
+        // otherwise we're done and y=beta.
         if ($math->isEven($beta) === $isYEven) {
             $y = $math->sub($curve->getPrime(), $beta);
         } else {
@@ -312,7 +312,7 @@ class EcAdapter implements EcAdapterInterface
         $prefix = $publicKey->slice(0, 1)->getBinary();
         $size = $publicKey->getSize();
         $compressed = false;
-        if ($prefix == PublicKey::KEY_UNCOMPRESSED || $prefix === "\x06" || $prefix === "\x07") {
+        if ($prefix === PublicKey::KEY_UNCOMPRESSED || $prefix === "\x06" || $prefix === "\x07") {
             if ($size !== PublicKey::LENGTH_UNCOMPRESSED) {
                 throw new \Exception('Invalid length for uncompressed key');
             }

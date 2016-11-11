@@ -114,7 +114,7 @@ class BloomFilter extends Serializable
      */
     public function isUpdateNone()
     {
-        return (($this->flags & self::UPDATE_MASK) == self::UPDATE_NONE);
+        return (($this->flags & self::UPDATE_MASK) === self::UPDATE_NONE);
     }
 
     /**
@@ -122,7 +122,7 @@ class BloomFilter extends Serializable
      */
     public function isUpdateAll()
     {
-        return (($this->flags & self::UPDATE_MASK) == self::UPDATE_ALL);
+        return (($this->flags & self::UPDATE_MASK) === self::UPDATE_ALL);
     }
 
     /**
@@ -130,7 +130,7 @@ class BloomFilter extends Serializable
      */
     public function isUpdatePubKeyOnly()
     {
-        return (($this->flags & self::UPDATE_MASK) == self::UPDATE_P2PUBKEY_ONLY);
+        return (($this->flags & self::UPDATE_MASK) === self::UPDATE_P2PUBKEY_ONLY);
     }
 
     /**

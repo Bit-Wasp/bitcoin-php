@@ -78,8 +78,8 @@ class Number extends Serializable
         if ($fRequireMinimal && $size > 0) {
             $binary = $vch->getBinary();
             //$chars = array_values(unpack("C*", $binary));
-            if ((ord($binary[$size - 1]) & 0x7f) == 0) {
-                if ($size <= 1 || (ord($binary[$size - 2]) & 0x80) == 0) {
+            if ((ord($binary[$size - 1]) & 0x7f) === 0) {
+                if ($size <= 1 || (ord($binary[$size - 2]) & 0x80) === 0) {
                     throw new \RuntimeException('Non-minimally encoded script number');
                 }
             }
@@ -124,7 +124,7 @@ class Number extends Serializable
      */
     private function serialize()
     {
-        if ($this->number == 0) {
+        if ((int) $this->number === 0) {
             return new Buffer('', 0);
         }
 
