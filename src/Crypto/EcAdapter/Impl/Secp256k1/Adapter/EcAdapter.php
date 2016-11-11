@@ -237,4 +237,33 @@ class EcAdapter implements EcAdapterInterface
         /** @var PrivateKey $privateKey */
         return $this->doSignCompact($msg32, $privateKey);
     }
+
+    /**
+     * @param PrivateKey $privateKey
+     * @param PublicKey $publicKey
+     * @return Buffer
+     */
+    private function doEcdh(PrivateKey $privateKey, PublicKey $publicKey)
+    {
+        $result = '';
+        if (!secp256k1_ecdh($this->context, $result, $publicKey->getResource(), $privateKey->getSecretBinary())) {
+            throw new \RuntimeException('Failed to perform ECDH');
+        }
+
+        return new Buffer($result);
+    }
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param PublicKeyInterface $publicKey
+     * @return Buffer
+     */
+    public function ecdh(PrivateKeyInterface $privateKey, PublicKeyInterface $publicKey)
+    {
+        /**
+         * @var PrivateKey $privateKey
+         * @var PublicKey $publicKey
+         */
+        return $this->doEcdh($privateKey, $publicKey);
+    }
 }

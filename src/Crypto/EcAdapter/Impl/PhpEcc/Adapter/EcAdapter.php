@@ -9,11 +9,13 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
@@ -337,5 +339,52 @@ class EcAdapter implements EcAdapterInterface
             $compressed,
             $prefix
         );
+    }
+
+    /**
+     * @param \GMP $int
+     * @param int $byteSize
+     * @return string
+     */
+    private function fixedSizeInt(\GMP $int, $byteSize)
+    {
+        $two = gmp_init(2);
+        $maskShift = gmp_pow($two, 8);
+        $mask = gmp_mul(gmp_init(255), gmp_pow($two, 256));
+
+        $x = '';
+        for ($i = $byteSize - 1; $i >= 0; $i--) {
+            $mask = gmp_div($mask, $maskShift);
+            $x .= pack('C', gmp_strval(gmp_div(gmp_and($int, $mask), gmp_pow($two, $i * 8)), 10));
+        }
+
+        return $x;
+    }
+
+    /**
+     * @param PrivateKey $privateKey
+     * @param PublicKey $publicKey
+     * @return BufferInterface
+     */
+    private function doEcdh(PrivateKey $privateKey, PublicKey $publicKey)
+    {
+        $point = $publicKey->getPoint()->mul($privateKey->getSecret());
+        $prefix = pack("C", 0x02 | gmp_cmp(gmp_mod($point->getY(), gmp_init(2)), 0));
+
+        return Hash::sha256(new Buffer($prefix . $this->fixedSizeInt($point->getX(), 32)));
+    }
+
+    /**
+     * @param PrivateKeyInterface $privateKey
+     * @param PublicKeyInterface $publicKey
+     * @return BufferInterface
+     */
+    public function ecdh(PrivateKeyInterface $privateKey, PublicKeyInterface $publicKey)
+    {
+        /**
+         * @var PrivateKey $privateKey
+         * @var PublicKey $publicKey
+         */
+        return $this->doEcdh($privateKey, $publicKey);
     }
 }
