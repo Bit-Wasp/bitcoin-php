@@ -71,8 +71,8 @@ class Interpreter implements InterpreterInterface
         $val = $value->getBinary();
         for ($i = 0, $size = strlen($val); $i < $size; $i++) {
             $chr = ord($val[$i]);
-            if ($chr != 0) {
-                if (($i == ($size - 1)) && $chr == 0x80) {
+            if ($chr !== 0) {
+                if (($i === ($size - 1)) && $chr === 0x80) {
                     return false;
                 }
                 return true;
@@ -153,7 +153,7 @@ class Interpreter implements InterpreterInterface
     {
         $witnessCount = count($scriptWitness);
 
-        if ($witnessProgram->getVersion() == 0) {
+        if ($witnessProgram->getVersion() === 0) {
             $buffer = $witnessProgram->getProgram();
             if ($buffer->getSize() === 32) {
                 // Version 0 segregated witness program: SHA256(Script) in program, Script + inputs in witness
@@ -224,7 +224,7 @@ class Interpreter implements InterpreterInterface
 
         $witness = is_null($witness) ? $emptyWitness : $witness;
 
-        if (($flags & self::VERIFY_SIGPUSHONLY) != 0 && !$scriptSig->isPushOnly()) {
+        if (($flags & self::VERIFY_SIGPUSHONLY) !== 0 && !$scriptSig->isPushOnly()) {
             return false;
         }
 
@@ -316,11 +316,11 @@ class Interpreter implements InterpreterInterface
         }
 
         if ($flags & self::VERIFY_CLEAN_STACK) {
-            if (!($flags & self::VERIFY_P2SH != 0) && ($flags & self::VERIFY_WITNESS != 0)) {
+            if (!($flags & self::VERIFY_P2SH !== 0) && ($flags & self::VERIFY_WITNESS !== 0)) {
                 return false; // implied flags required
             }
 
-            if (count($stack) != 1) {
+            if (count($stack) !== 1) {
                 return false; // Cleanstack
             }
         }
@@ -347,7 +347,7 @@ class Interpreter implements InterpreterInterface
     {
         $ret = 0;
         foreach ($vfStack as $item) {
-            if ($item == $value) {
+            if ($item === $value) {
                 $ret++;
             }
         }
@@ -367,9 +367,10 @@ class Interpreter implements InterpreterInterface
     {
         $hashStartPos = 0;
         $opCount = 0;
+        $zero = gmp_init(0, 10);
         $altStack = new Stack();
         $vfStack = new Stack();
-        $minimal = ($flags & self::VERIFY_MINIMALDATA) != 0;
+        $minimal = ($flags & self::VERIFY_MINIMALDATA) !== 0;
         $parser = $script->getScriptParser();
 
         if ($script->getBuffer()->getSize() > 10000) {
@@ -461,11 +462,11 @@ class Interpreter implements InterpreterInterface
 
                             $sequence = Number::buffer($mainStack[-1], $minimal, 5, $this->math);
                             $nSequence = $sequence->getGmp();
-                            if ($this->math->cmp($nSequence, gmp_init(0)) < 0) {
+                            if ($this->math->cmp($nSequence, $zero) < 0) {
                                 throw new ScriptRuntimeException(self::VERIFY_CHECKSEQUENCEVERIFY, 'Negative locktime');
                             }
 
-                            if ($this->math->cmp($this->math->bitwiseAnd($nSequence, gmp_init(TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG, 10)), gmp_init(0)) !== 0) {
+                            if ($this->math->cmp($this->math->bitwiseAnd($nSequence, gmp_init(TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG, 10)), $zero) !== 0) {
                                 break;
                             }
 
@@ -625,11 +626,11 @@ class Interpreter implements InterpreterInterface
 
                             $n = Number::buffer($mainStack[-1], $minimal, 4)->getGmp();
                             $mainStack->pop();
-                            if ($this->math->cmp($n, gmp_init(0)) < 0 || $this->math->cmp($n, gmp_init(count($mainStack))) >= 0) {
+                            if ($this->math->cmp($n, $zero) < 0 || $this->math->cmp($n, gmp_init(count($mainStack))) >= 0) {
                                 throw new \RuntimeException('Invalid stack operation OP_PICK');
                             }
 
-                            $pos = (int) gmp_strval($this->math->sub($this->math->sub(gmp_init(0), $n), gmp_init(1)), 10);
+                            $pos = (int) gmp_strval($this->math->sub($this->math->sub($zero, $n), gmp_init(1)), 10);
                             $vch = $mainStack[$pos];
                             if ($opCode === Opcodes::OP_ROLL) {
                                 unset($mainStack[$pos]);
@@ -739,16 +740,16 @@ class Interpreter implements InterpreterInterface
                             } elseif ($opCode === Opcodes::OP_2MUL) {
                                 $num = $this->math->mul(gmp_init(2), $num);
                             } elseif ($opCode === Opcodes::OP_NEGATE) {
-                                $num = $this->math->sub(gmp_init(0), $num);
+                                $num = $this->math->sub($zero, $num);
                             } elseif ($opCode === Opcodes::OP_ABS) {
-                                if ($this->math->cmp($num, gmp_init(0)) < 0) {
-                                    $num = $this->math->sub(gmp_init(0), $num);
+                                if ($this->math->cmp($num, $zero) < 0) {
+                                    $num = $this->math->sub($zero, $num);
                                 }
                             } elseif ($opCode === Opcodes::OP_NOT) {
-                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) == 0 ? 1 : 0);
+                                $num = gmp_init($this->math->cmp($num, $zero) === 0 ? 1 : 0);
                             } else {
                                 // is OP_0NOTEQUAL
-                                $num = gmp_init($this->math->cmp($num, gmp_init(0)) != 0 ? 1 : 0);
+                                $num = gmp_init($this->math->cmp($num, $zero) !== 0 ? 1 : 0);
                             }
 
                             $mainStack->pop();
@@ -771,9 +772,9 @@ class Interpreter implements InterpreterInterface
                             } else if ($opCode === Opcodes::OP_SUB) {
                                 $num = $this->math->sub($num1, $num2);
                             } else if ($opCode === Opcodes::OP_BOOLAND) {
-                                $num = $this->math->cmp($num1, gmp_init(0)) !== 0 && $this->math->cmp($num2, gmp_init(0)) !== 0;
+                                $num = $this->math->cmp($num1, $zero) !== 0 && $this->math->cmp($num2, $zero) !== 0;
                             } else if ($opCode === Opcodes::OP_BOOLOR) {
-                                $num = $this->math->cmp($num1, gmp_init(0)) !== 0 || $this->math->cmp($num2, gmp_init(0)) !== 0;
+                                $num = $this->math->cmp($num1, $zero) !== 0 || $this->math->cmp($num2, $zero) !== 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUAL) {
                                 $num = $this->math->cmp($num1, $num2) === 0;
                             } elseif ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
@@ -898,7 +899,7 @@ class Interpreter implements InterpreterInterface
 
                             // Extract positions of the keys, and signatures, from the stack.
                             $ikey = ++$i;
-                            $i += $keyCount; /** @var int $i */
+                            $i += $keyCount;
                             if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
                             }
