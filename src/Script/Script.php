@@ -111,7 +111,7 @@ class Script extends Serializable implements ScriptInterface
      */
     private function witnessSigOps(WitnessProgram $program, ScriptWitnessInterface $scriptWitness)
     {
-        if ($program->getVersion() == 0) {
+        if ($program->getVersion() === 0) {
             $size = $program->getProgram()->getSize();
             if ($size === 32 && count($scriptWitness) > 0) {
                 $script = new Script($scriptWitness->bottom());
@@ -220,7 +220,7 @@ class Script extends Serializable implements ScriptInterface
         }
 
         $version = $script[0]->getOp();
-        if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
+        if ($version !== Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
             return false;
         }
 

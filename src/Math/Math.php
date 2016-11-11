@@ -63,8 +63,8 @@ class Math extends GmpMath
             $word = $this->leftShift($word, $positions);
         }
 
-        // isNegative: $word != 0 && $uint32 & 0x00800000 != 0
-        // isOverflow: $word != 0 && (($size > 34) || ($word > 0xff && $size > 33) || ($word > 0xffff && $size  >32))
+        // isNegative: $word !== 0 && $uint32 & 0x00800000 !== 0
+        // isOverflow: $word !== 0 && (($size > 34) || ($word > 0xff && $size > 33) || ($word > 0xffff && $size > 32))
         $zero = gmp_init(0);
         $isNegative = ($this->cmp($word, $zero) !== 0) && ($this->cmp($this->bitwiseAnd($compact, gmp_init(0x00800000)), $zero) === 1);
         $isOverflow = $this->cmp($word, $zero) !== 0 && (

@@ -131,11 +131,11 @@ class Checker
             return $this;
         }
 
-        if (($flags & (Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_LOW_S | Interpreter::VERIFY_STRICTENC)) != 0 && !$this->isValidSignatureEncoding($signature)) {
+        if (($flags & (Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_LOW_S | Interpreter::VERIFY_STRICTENC)) !== 0 && !$this->isValidSignatureEncoding($signature)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_DERSIG, 'Signature with incorrect encoding');
-        } else if (($flags & Interpreter::VERIFY_LOW_S) != 0 && !$this->isLowDerSignature($signature)) {
+        } else if (($flags & Interpreter::VERIFY_LOW_S) !== 0 && !$this->isLowDerSignature($signature)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_LOW_S, 'Signature s element was not low');
-        } else if (($flags & Interpreter::VERIFY_STRICTENC) != 0 && !$this->isDefinedHashtypeSignature($signature)) {
+        } else if (($flags & Interpreter::VERIFY_STRICTENC) !== 0 && !$this->isDefinedHashtypeSignature($signature)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_STRICTENC, 'Signature with invalid hashtype');
         }
 
@@ -150,7 +150,7 @@ class Checker
      */
     public function checkPublicKeyEncoding(BufferInterface $publicKey, $flags)
     {
-        if (($flags & Interpreter::VERIFY_STRICTENC) != 0 && !PublicKey::isCompressedOrUncompressed($publicKey)) {
+        if (($flags & Interpreter::VERIFY_STRICTENC) !== 0 && !PublicKey::isCompressedOrUncompressed($publicKey)) {
             throw new ScriptRuntimeException(Interpreter::VERIFY_STRICTENC, 'Public key with incorrect encoding');
         }
 

@@ -214,7 +214,7 @@ class OutputClassifier
         }
 
         $version = $decoded[0]->getOp();
-        if ($version != Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
+        if ($version !== Opcodes::OP_0 && ($version < Opcodes::OP_1 || $version > Opcodes::OP_16)) {
             return false;
         }
 

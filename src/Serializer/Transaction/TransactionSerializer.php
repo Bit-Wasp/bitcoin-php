@@ -61,9 +61,9 @@ class TransactionSerializer implements TransactionSerializerInterface
 
         $vout = [];
         $flags = 0;
-        if (count($vin) == 0) {
+        if (count($vin) === 0) {
             $flags = (int) $varint->read($parser);
-            if ($flags != 0) {
+            if ($flags !== 0) {
                 $vinCount = $varint->read($parser);
                 for ($i = 0; $i < $vinCount; $i++) {
                     $vin[] = $this->inputSerializer->fromParser($parser);
