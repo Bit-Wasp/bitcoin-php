@@ -44,7 +44,6 @@ class ElectrumKey
         }
 
         $this->publicKey = $masterKey;
-
     }
 
     /**

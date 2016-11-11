@@ -354,6 +354,5 @@ class TransactionBuilderInputState
                     return true;
             }
         ) && (count($this->signatures) == $this->getRequiredSigCount());
-
     }
 }

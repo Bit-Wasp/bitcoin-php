@@ -124,7 +124,6 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
 
         $stack->insert(2, 'do');
         $this->assertEquals('do', $stack->top(-3));
-
     }
 
     public function testEnd()
@@ -163,6 +162,5 @@ class ScriptStackTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('00', $stack->top(-1));
         $this->assertEquals('22', $stack->top(-2));
         $this->assertEquals('11', $stack->top(-3));
-
     }
 }

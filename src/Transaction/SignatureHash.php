@@ -67,7 +67,6 @@ class SignatureHash implements SignatureHashInterface
                     $inputs->getInput($i)->setSequence(0);
                 }
             }
-
         } elseif ($math->bitwiseAnd($sighashType, 31) == SignatureHashInterface::SIGHASH_SINGLE) {
             // Resize output array to $inputToSign + 1, set remaining scripts to null,
             // and set sequence's to zero.

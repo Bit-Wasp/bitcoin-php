@@ -189,7 +189,6 @@ class TransactionBuilderTest extends AbstractTestCase
 
             // Verify that repeatedly doing a deterministic signature yields the same result
             $this->compareTwoSignRuns($builder, $outputScript, $privateKey, true);
-
         }
     }
 
@@ -217,7 +216,6 @@ class TransactionBuilderTest extends AbstractTestCase
         // Switch to random signatures now.
         // They should not yield the same script each time. Assuming the only thing that can change is the signature..
         $this->compareTwoSignRuns($builder->useRandomSignatures(), $outputScript, $privateKey, false);
-
     }
 
     /**

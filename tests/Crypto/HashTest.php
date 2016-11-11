@@ -84,7 +84,6 @@ class HashTest extends \PHPUnit_Framework_TestCase
         foreach ($json->test as $test) {
             $this->assertSame($test->result, Hash::sha256ripe160(Buffer::hex($test->data))->getHex());
         }
-
     }
     public function testSha1()
     {

@@ -27,6 +27,5 @@ class TransactionInputCollectionTest extends AbstractTestCase
         $this->assertEquals(1, count($collection->slice(0, 1)));
         $this->assertSame($in0, $collection->getInput(0));
         $this->assertEquals($arr, $collection->getInputs());
-
     }
 }

@@ -55,7 +55,6 @@ class BlockchainTest extends AbstractTestCase
         $this->assertEquals($utxos, $blockchain->utxos());
         $this->assertEquals(0, $blockchain->currentHeight());
         $this->assertEquals("1.000000000000", $blockchain->difficulty());
-
     }
 
     public function testFirstBlocks()

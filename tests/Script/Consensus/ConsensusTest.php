@@ -86,7 +86,5 @@ class ConsensusTest
         } else {
             $this->assertEquals($result, $r);
         }
-
-
     }
 }

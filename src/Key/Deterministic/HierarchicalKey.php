@@ -67,7 +67,6 @@ class HierarchicalKey
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
         $this->key = $key;
-
     }
 
     /**
@@ -205,7 +204,6 @@ class HierarchicalKey
             $parser
                 ->writeBytes(1, '00')
                 ->writeBytes(32, $this->getPrivateKey()->getBuffer());
-
         } else {
             $parser->writeBytes(33, $this->getPublicKey()->getBuffer());
         }

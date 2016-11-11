@@ -151,6 +151,5 @@ class RedeemScriptTest extends AbstractTestCase
         $outputScript = $rs->getOutputScript();
         $parsed = $outputScript->getScriptParser()->parse();
         $this->assertEquals($hash, $parsed[1]->getBinary());
-
     }
 }

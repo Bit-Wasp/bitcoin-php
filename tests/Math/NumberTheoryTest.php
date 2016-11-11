@@ -67,7 +67,6 @@ class NumberTheoryTest extends AbstractTestCase
             $root1 = $theory->squareRootModP($r->a, $r->p);
             $this->assertTrue(in_array($root1, $r->res));
             $this->assertTrue(in_array($root1, $r->res));
-
         }
     }
 

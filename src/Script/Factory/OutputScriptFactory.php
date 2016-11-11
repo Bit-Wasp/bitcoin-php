@@ -40,7 +40,6 @@ class OutputScriptFactory
                 ->push(Buffer::hex($address->getHash()))
                 ->op('OP_EQUALVERIFY')
                 ->op('OP_CHECKSIG'));
-
     }
 
     /**

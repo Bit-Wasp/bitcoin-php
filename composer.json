@@ -27,19 +27,20 @@
     "ext-json": "*",
     "ext-openssl": "*",
     "ext-mcrypt": "*",
-    "mdanter/ecc": "~0.3",
-    "pleonasm/merkle-tree": "1.0.0",
-    "doctrine/cache": "~1.4",
-    "fguillot/json-rpc": "0.0.1",
-    "rych/hash_pbkdf2-compat": "~1.0",
-    "lastguest/murmurhash": "~1.0",
-    "rgooding/protobuf-php": "~0.0",
-    "react/react": "~0.4",
-    "react/socket-client": "~0.4",
-    "bitwasp/buffertools": "~0.1",
-    "bitwasp/stratum": "~0.1"
+    "mdanter/ecc": "v0.3.0",
+    "pleonasm/merkle-tree": "v1.0.0",
+    "doctrine/cache": "v1.4",
+    "fguillot/json-rpc": "v0.0.1",
+    "rych/hash_pbkdf2-compat": "v1.0.0",
+    "lastguest/murmurhash": "v1.0",
+    "rgooding/protobuf-php": "v0.0.1",
+    "react/react": "v0.4.0",
+    "react/socket-client": "^0.4.0",
+    "bitwasp/buffertools": "v0.1.5",
+    "bitwasp/stratum": "v0.1.0"
   },
   "require-dev": {
+    "phpunit/phpunit": "4.0",
     "bitwasp/testing-php": "~0.0",
     "symfony/yaml": "~2.6"
   }

@@ -85,7 +85,6 @@ class EcAdapterTest extends AbstractTestCase
             $key = Buffer::hex($key, 32);
             $this->assertFalse($ecAdapter->validatePrivateKey($key));
         }
-
     }
 
     /**
