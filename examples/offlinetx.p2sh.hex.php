@@ -3,12 +3,13 @@
 require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 
 $ecAdapter = Bitcoin::getEcAdapter();
@@ -41,7 +42,7 @@ $spendTx = TransactionFactory::build()
     ->get();
 
 // Two parties sign the transaction (can be done in steps)
-$signer = new \BitWasp\Bitcoin\Transaction\Factory\Signer($spendTx, $ecAdapter);
+$signer = new Signer($spendTx, $ecAdapter);
 $signer
     ->sign(0, $pk1, $txOut, $redeemScript)
     ->sign(0, $pk2, $txOut, $redeemScript);

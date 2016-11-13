@@ -3,8 +3,8 @@
 require_once __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Crypto\Random\Random;
-use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
+use BitWasp\Bitcoin\Mnemonic\MnemonicFactory;
 
 // Generate a mnemonic
 $random = new Random();

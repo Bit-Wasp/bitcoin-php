@@ -2,12 +2,14 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Transaction\Factory\Signer;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
-Bitcoin::setNetwork(\BitWasp\Bitcoin\Network\NetworkFactory::bitcoinTestnet());
+Bitcoin::setNetwork(NetworkFactory::bitcoinTestnet());
 $network = Bitcoin::getNetwork();
 $ecAdapter = Bitcoin::getEcAdapter();
 
@@ -28,7 +30,7 @@ $spendTx = TransactionFactory::build()
     ->get();
 
 echo "Sign transaction\n";
-$signer = new \BitWasp\Bitcoin\Transaction\Factory\Signer($spendTx, $ecAdapter);
+$signer = new Signer($spendTx, $ecAdapter);
 $signer->sign(0, $privateKey, $myTx->getOutput($spendOutput));
 
 echo "Generate transaction: \n";
