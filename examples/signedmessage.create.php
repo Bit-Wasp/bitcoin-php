@@ -1,9 +1,10 @@
 <?php
+
 require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 
 $ec = Bitcoin::getEcAdapter();
 $privateKey = PrivateKeyFactory::create(true);

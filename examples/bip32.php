@@ -1,7 +1,6 @@
 <?php
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Address;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 
 require __DIR__ . "/../vendor/autoload.php";
