@@ -12,7 +12,7 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
     private $position = 0;
 
     /**
-     * @var array
+     * @var BufferInterface[]
      */
     private $values = [];
 
@@ -35,6 +35,9 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
         return $this->values;
     }
 
+    /**
+     * @return BufferInterface
+     */
     public function current()
     {
         return $this->values[$this->position];
@@ -45,11 +48,17 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
         ++$this->position;
     }
 
+    /**
+     * @return int
+     */
     public function key()
     {
         return $this->position;
     }
 
+    /**
+     * @return bool
+     */
     public function valid()
     {
         return isset($this->values[$this->position]);
@@ -60,16 +69,25 @@ class Stack implements \Countable, \ArrayAccess, \Iterator
         $this->position = 0;
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return count($this->values);
     }
 
+    /**
+     * @return bool
+     */
     public function isEmpty()
     {
         return count($this->values) === 0;
     }
 
+    /**
+     * @return BufferInterface
+     */
     public function bottom()
     {
         $count = count($this);
