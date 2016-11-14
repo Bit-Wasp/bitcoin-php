@@ -137,6 +137,24 @@ class OutputClassifierTest extends AbstractTestCase
         ;
     }
 
+    public function testIsNullData()
+    {
+        $classifier = new OutputClassifier();
+        $embedded = Buffer::hex('41');
+
+        $nullDataScript = ScriptFactory::sequence([Opcodes::OP_RETURN, $embedded]);
+
+        $this->assertFalse($classifier->isNullData(new Script(new Buffer())));
+        $this->assertFalse($classifier->isNullData(ScriptFactory::sequence([Buffer::hex('6a')])));
+        $this->assertTrue($classifier->isNullData($nullDataScript));
+
+        /** @var BufferInterface $extracted */
+        $extracted = '';
+        $classify = $classifier->classify($nullDataScript, $extracted);
+        $this->assertEquals(OutputClassifier::NULLDATA, $classify);
+        $this->assertTrue($embedded->equals($extracted));
+    }
+
     public function testIsPayToScriptHash()
     {
         $classifier = new OutputClassifier();

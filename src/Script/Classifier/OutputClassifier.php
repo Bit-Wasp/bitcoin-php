@@ -16,6 +16,7 @@ class OutputClassifier
     const WITNESS_V0_KEYHASH = 'witness_v0_keyhash';
     const WITNESS_V0_SCRIPTHASH = 'witness_v0_scripthash';
     const MULTISIG = 'multisig';
+    const NULLDATA = 'nulldata';
     const UNKNOWN = 'unknown';
 
     /**
@@ -281,6 +282,37 @@ class OutputClassifier
     }
 
     /**
+     * @param Operation[] $decoded
+     * @return false|BufferInterface
+     */
+    private function decodeNullData(array $decoded)
+    {
+        if (count($decoded) !== 2) {
+            return false;
+        }
+
+        if ($decoded[0]->getOp() === Opcodes::OP_RETURN && $decoded[1]->isPush()) {
+            return $decoded[1]->getData();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @return bool
+     */
+    public function isNullData(ScriptInterface $script)
+    {
+        try {
+            return $this->decodeNullData($script->getScriptParser()->decode()) !== false;
+        } catch (\Exception $e) {
+        }
+
+        return false;
+    }
+
+    /**
      * @param ScriptInterface $script
      * @param mixed $solution
      * @return string
@@ -309,6 +341,9 @@ class OutputClassifier
         } else if (($witnessKeyHash = $this->decodeP2WKH($script, $decoded))) {
             $type = self::WITNESS_V0_KEYHASH;
             $solution = $witnessKeyHash;
+        } else if (($nullData = $this->decodeNullData($decoded))) {
+            $type = self::NULLDATA;
+            $solution = $nullData;
         }
 
         return $type;
