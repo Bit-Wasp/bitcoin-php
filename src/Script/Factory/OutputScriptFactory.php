@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Script\Factory;
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -52,20 +51,6 @@ class OutputScriptFactory
     }
 
     /**
-     * Create a P2PKH output script from a hash.
-     *
-     * @param BufferInterface $hash
-     * @return ScriptInterface
-     */
-    public function payToPubKeyHashFromHash(BufferInterface $hash)
-    {
-        if ($hash->getSize() !== 20) {
-            throw new \RuntimeException('pub-key-hash should be 20 bytes');
-        }
-
-        return ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
-    }
-
     /**
      * Create a P2SH output script
      *
