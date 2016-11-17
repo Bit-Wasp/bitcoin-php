@@ -58,8 +58,11 @@ class AddressTest extends AbstractTestCase
     {
         if ($type === 'pubkeyhash') {
             $obj = PublicKeyFactory::fromHex($data)->getAddress();
+            $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
         } else if ($type === 'script') {
-            $obj = AddressFactory::fromScript(new Script(Buffer::hex($data)));
+            $p2shScript = new Script(Buffer::hex($data));
+            $obj = AddressFactory::fromScript($p2shScript);
+            $script = ScriptFactory::scriptPubKey()->payToScriptHash($obj->getHash());
         } else {
             throw new \Exception('Unknown address type');
         }
@@ -70,6 +73,9 @@ class AddressTest extends AbstractTestCase
         $this->assertTrue($obj->getHash()->equals($fromString->getHash()));
         $this->assertEquals($obj->getPrefixByte($network), $fromString->getPrefixByte($network));
         $this->assertEquals($obj->getAddress($network), $fromString->getAddress($network));
+
+        $toScript = $fromString->getScriptPubKey();
+        $this->assertTrue($script->equals($toScript));
     }
 
     /**

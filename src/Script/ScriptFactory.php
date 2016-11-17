@@ -2,9 +2,14 @@
 
 namespace BitWasp\Bitcoin\Script;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
@@ -15,6 +20,11 @@ use BitWasp\Buffertools\BufferInterface;
 
 class ScriptFactory
 {
+    /**
+     * @var OutputScriptFactory
+     */
+    private static $outputScriptFactory = null;
+
     /**
      * @param BufferInterface|string $string
      * @return ScriptInterface
@@ -49,7 +59,11 @@ class ScriptFactory
      */
     public static function scriptPubKey()
     {
-        return new OutputScriptFactory();
+        if (self::$outputScriptFactory === null) {
+            self::$outputScriptFactory = new OutputScriptFactory();
+        }
+
+        return self::$outputScriptFactory;
     }
 
     /**
