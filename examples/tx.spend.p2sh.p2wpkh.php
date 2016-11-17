@@ -2,6 +2,7 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
+use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -35,7 +36,7 @@ $tx = (new TxBuilder())
 
 // Sign transaction
 $signed = (new Signer($tx, Bitcoin::getEcAdapter()))
-    ->sign(0, $key, $txOut, $destination->getScript())
+    ->sign(0, $key, $txOut, (new SignData())->p2sh($destination->getScript()))
     ->get();
 
 $consensus = ScriptFactory::consensus();

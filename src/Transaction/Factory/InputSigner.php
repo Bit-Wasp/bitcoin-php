@@ -213,16 +213,15 @@ class InputSigner
         }, $buffers));
     }
 
-
     /**
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param ScriptWitnessInterface|null $scriptWitness
      * @return bool
      */
-    private function verifySolution(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, ScriptWitnessInterface $scriptWitness = null)
+    private function verifySolution($flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, ScriptWitnessInterface $scriptWitness = null)
     {
-        return $this->interpreter->verify($scriptSig, $scriptPubKey, $this->flags, $this->signatureChecker, $scriptWitness);
+        return $this->interpreter->verify($scriptSig, $scriptPubKey, $flags, $this->signatureChecker, $scriptWitness);
     }
 
     /**
@@ -253,6 +252,7 @@ class InputSigner
     private function solve(SignData $signData)
     {
         $scriptPubKey = $this->txOut->getScript();
+        $solveFlags = Interpreter::VERIFY_SIGPUSHONLY;
         $solution = $this->scriptPubKey = $this->classifier->decode($scriptPubKey);
         if ($solution->getType() !== OutputClassifier::PAYTOSCRIPTHASH && !in_array($solution->getType(), self::$validP2sh)) {
             throw new \RuntimeException('scriptPubKey not supported');
@@ -260,7 +260,7 @@ class InputSigner
 
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $redeemScript = $signData->getRedeemScript();
-            if (!$this->verifySolution(ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
+            if (!$this->verifySolution($solveFlags, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
                 throw new \Exception('Redeem script fails to solve pay-to-script-hash');
             }
             $solution = $this->redeemScript = $this->classifier->decode($redeemScript);
@@ -273,7 +273,7 @@ class InputSigner
             $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $witnessScript = $signData->getWitnessScript();
-            if (!$this->verifySolution(ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript())) {
+            if (!$this->verifySolution($solveFlags, ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript())) {
                 throw new \Exception('Witness script fails to solve witness-script-hash');
             }
             $this->witnessScript = $this->classifier->decode($witnessScript);

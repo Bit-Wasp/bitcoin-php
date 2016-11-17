@@ -43,21 +43,15 @@ class Signer
      * @param int $nIn
      * @param PrivateKeyInterface $key
      * @param TransactionOutputInterface $txOut
-     * @param ScriptInterface|null $redeemScript
-     * @param ScriptInterface|null $witnessScript
+     * @param SignData $signData
      * @param int $sigHashType
      * @return $this
      */
-    public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null, $sigHashType = SigHash::ALL)
+    public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, $sigHashType = SigHash::ALL)
     {
-        $signData = new SignData();
-        if ($redeemScript) {
-            $signData->p2sh($redeemScript);
+        if (null === $signData) {
+            $signData = new SignData();
         }
-        if ($witnessScript) {
-            $signData->p2wsh($witnessScript);
-        }
-
         if (!$this->signer($nIn, $txOut, $signData)->sign($key, $sigHashType)) {
             throw new \RuntimeException('Unsignable script');
         }

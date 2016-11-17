@@ -41,11 +41,13 @@ $spendTx = TransactionFactory::build()
     ->payToAddress($amountAfterFee, $pk1->getAddress())
     ->get();
 
+$signData = new \BitWasp\Bitcoin\Transaction\Factory\SignData();
+$signData->p2sh($redeemScript);
 // Two parties sign the transaction (can be done in steps)
 $signer = new Signer($spendTx, $ecAdapter);
 $signer
-    ->sign(0, $pk1, $txOut, $redeemScript)
-    ->sign(0, $pk2, $txOut, $redeemScript);
+    ->sign(0, $pk1, $txOut, $signData)
+    ->sign(0, $pk2, $txOut, $signData);
 
 $signed = $signer->get();
 

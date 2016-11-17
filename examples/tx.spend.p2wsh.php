@@ -19,9 +19,11 @@ Bitcoin::setNetwork(NetworkFactory::bitcoinSegnet());
 
 $key = PrivateKeyFactory::fromWif('QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7');
 
+$signData = new \BitWasp\Bitcoin\Transaction\Factory\SignData();
+$signData->p2wsh(ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash()));
+
 // scriptPubKey is P2WSH | P2PKH
-$destScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash());
-$program = new WitnessProgram(0, Hash::sha256($destScript->getBuffer()));
+$program = new WitnessProgram(0, Hash::sha256($signData->getRedeemScript()->getBuffer()));
 
 // UTXO
 $outpoint = new OutPoint(Buffer::hex('c2197f15d510304f1463230c0e61566bfb8dcadb7e1c510d3c0470bcfbca2194', 32), 0);
@@ -35,7 +37,7 @@ $tx = (new TxBuilder())
 
 // Sign4
 $signed = (new Signer($tx, Bitcoin::getEcAdapter()))
-    ->sign(0, $key, $txOut, null, $destScript)
+    ->sign(0, $key, $txOut, $signData)
     ->get();
 
 // Check signatures

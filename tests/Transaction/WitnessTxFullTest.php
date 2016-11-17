@@ -134,8 +134,16 @@ class WitnessTxFullTest extends AbstractTestCase
             ->payToAddress($spendAmount, $key->getPublicKey()->getAddress())
             ->get();
 
+        $signData = new SignData();
+        if ($redeemScript) {
+            $signData->p2sh($redeemScript);
+        }
+        if ($witnessScript) {
+            $signData->p2wsh($witnessScript);
+        }
+
         $signed = (new Signer($tx, $ec))
-            ->sign(0, $key, $utxo->getOutput(), $redeemScript, $witnessScript)
+            ->sign(0, $key, $utxo->getOutput(), $signData)
             ->get();
 
         $flags = InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_WITNESS;
@@ -145,13 +153,6 @@ class WitnessTxFullTest extends AbstractTestCase
         $this->assertTrue($check);
         $this->assertEquals($expectedTx, $signed->getWitnessBuffer()->getHex());
 
-        $signData = new SignData();
-        if ($redeemScript instanceof ScriptInterface) {
-            $signData->p2sh($redeemScript);
-        }
-        if ($witnessScript instanceof ScriptInterface) {
-            $signData->p2wsh($witnessScript);
-        }
         $signer = new InputSigner($ec, $signed, 0, $utxo->getOutput(), $signData);
         $this->assertTrue($signer->isFullySigned());
     }
