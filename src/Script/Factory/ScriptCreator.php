@@ -97,31 +97,25 @@ class ScriptCreator
     public function push(BufferInterface $data)
     {
         $length = $data->getSize();
-        $parsed = new Parser('', $this->math);
 
-        /** Note that larger integers are serialized without flipping bits - Big endian */
-
-        if ($length < $this->opcodes->getOpByName('OP_PUSHDATA1')) {
-            $varInt = Buffertools::numToVarInt($length);
-            $data = new Buffer($varInt->getBinary() . $data->getBinary(), null, $this->math);
-            $parsed->writeBytes($data->getSize(), $data);
+        if ($length < Opcodes::OP_PUSHDATA1) {
+            $this->script .= pack('C', $length) . $data->getBinary();
         } else {
             if ($length <= 0xff) {
                 $lengthSize = 1;
+                $code = 'C';
             } elseif ($length <= 0xffff) {
                 $lengthSize = 2;
+                $code = 'S';
             } else {
                 $lengthSize = 4;
+                $code = 'V';
             }
 
-            $op = $this->opcodes->getOpByName('OP_PUSHDATA' . $lengthSize);
-            $parsed
-                ->writeBytes(1, Buffer::int($op))
-                ->writeBytes($lengthSize, Buffer::int($length), true)
-                ->writeBytes($length, $data);
+            $opCode = constant("BitWasp\\Bitcoin\\Script\\Opcodes::OP_PUSHDATA" . $lengthSize);
+            $this->script .= pack('C', $opCode) . pack($code, $length) . $data->getBinary();
         }
 
-        $this->script .= $parsed->getBuffer()->getBinary();
         return $this;
     }
 
