@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\BufferInterface;
 
 interface AddressInterface
@@ -23,4 +24,9 @@ interface AddressInterface
      * @return BufferInterface
      */
     public function getHash();
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getScriptPubKey();
 }

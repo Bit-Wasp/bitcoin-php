@@ -4,6 +4,8 @@ namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class PayToPubKeyHashAddress extends Address
 {
@@ -15,5 +17,13 @@ class PayToPubKeyHashAddress extends Address
     {
         $network = $network ?: Bitcoin::getNetwork();
         return pack("H*", $network->getAddressByte());
+    }
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getScriptPubKey()
+    {
+        return ScriptFactory::scriptPubKey()->payToPubKeyHash($this->getHash());
     }
 }
