@@ -23,7 +23,7 @@ $signData = new \BitWasp\Bitcoin\Transaction\Factory\SignData();
 $signData->p2wsh(ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash()));
 
 // scriptPubKey is P2WSH | P2PKH
-$program = new WitnessProgram(0, Hash::sha256($signData->getRedeemScript()->getBuffer()));
+$program = new WitnessProgram(0, Hash::sha256($signData->getWitnessScript()->getBuffer()));
 
 // UTXO
 $outpoint = new OutPoint(Buffer::hex('c2197f15d510304f1463230c0e61566bfb8dcadb7e1c510d3c0470bcfbca2194', 32), 0);

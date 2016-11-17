@@ -25,7 +25,7 @@ $p2shScript = ScriptFactory::scriptPubKey()->witnessScriptHash(Hash::sha256($wit
 $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash($p2shScript->getScriptHash());
 
 $signData = (new SignData())
-    ->p2sh($program->getScript())
+    ->p2sh($p2shScript)
     ->p2wsh($witnessScript);
 
 // Utxo
