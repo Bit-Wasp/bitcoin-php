@@ -287,22 +287,21 @@ class InputSigner
 
     /**
      * This function is strictly for $canSign types.
-     * It will extract signatures/publicKeys when given $scriptType, $scriptCode, and $stack.
+     * It will extract signatures/publicKeys when given $outputData, and $stack.
      * $stack is the result of decompiling a scriptSig, or taking the witness data.
-     *
-     * @param string $type - the scriptCode type
-     * @param ScriptInterface $scriptCode - the script being solved by $stack
-     * @param BufferInterface[] $stack - list of elements which satisfy $scriptCode
-     * @param int $sigVersion - tx signature hashing version
-     * @return string
+     * @param OutputData $outputData
+     * @param array $stack
+     * @param $sigVersion
+     * @return mixed
      */
-    public function extractFromValues($type, ScriptInterface $scriptCode, array $stack, $sigVersion)
+    public function extractFromValues(OutputData $outputData, array $stack, $sigVersion)
     {
+        $type = $outputData->getType();
         $size = count($stack);
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
             $this->requiredSigs = 1;
             if ($size === 2) {
-                if (!$this->evaluateSolution($scriptCode, $stack, $sigVersion)) {
+                if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
                 $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
@@ -313,15 +312,17 @@ class InputSigner
         if ($type === OutputClassifier::PAYTOPUBKEY && count($stack) === 1) {
             $this->requiredSigs = 1;
             if ($size === 1) {
-                if (!$this->evaluateSolution($scriptCode, $stack, $sigVersion)) {
+                if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
+
                 $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
+                $this->publicKeys = [PublicKeyFactory::fromHex($outputData->getSolution())];
             }
         }
 
         if ($type === OutputClassifier::MULTISIG) {
-            $info = new Multisig($scriptCode);
+            $info = new Multisig($outputData->getScript());
             $this->requiredSigs = $info->getRequiredSigCount();
             $this->publicKeys = $info->getKeys();
 
@@ -331,13 +332,13 @@ class InputSigner
                     $vars[] = TransactionSignatureFactory::fromHex($stack[$i], $this->ecAdapter);
                 }
 
-                $sigs = $this->sortMultiSigs($sigVersion, $vars, $scriptCode);
+                $sigs = $this->sortMultiSigs($sigVersion, $vars, $outputData->getScript());
                 foreach ($this->publicKeys as $idx => $key) {
-                    $this->signatures[$idx] = isset($sigs[$key]) ? $sigs[$key]->getBuffer() : null;
+                    $this->signatures[$idx] = isset($sigs[$key]) ? $sigs[$key] : null;
                 }
 
                 if (count(array_filter($this->signatures, 'is_null')) === count($this->publicKeys)) {
-                    if (!$this->evaluateSolution($scriptCode, $stack, $sigVersion)) {
+                    if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
                         throw new \RuntimeException('Existing signatures are invalid!');
                     }
                 }
@@ -394,7 +395,7 @@ class InputSigner
             }
         }
 
-        $this->extractFromValues($solution->getType(), $solution->getScript(), $chunks, $sigVersion);
+        $this->extractFromValues($solution, $chunks, $sigVersion);
 
         return $this;
     }
