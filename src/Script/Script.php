@@ -71,6 +71,14 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
+     * @return BufferInterface
+     */
+    public function getWitnessScriptHash()
+    {
+        return Hash::sha256($this->getBuffer());
+    }
+
+    /**
      * @param bool|true $accurate
      * @return int
      */

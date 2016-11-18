@@ -147,7 +147,6 @@ class InputSigner
         $this->flags = $signData->hasSignaturePolicy() ? $signData->getSignaturePolicy() : Interpreter::VERIFY_NONE;
         $this->publicKeys = [];
         $this->signatures = [];
-
         $this->solve($signData);
         $this->extractSignatures();
     }
@@ -232,7 +231,20 @@ class InputSigner
      */
     private function evaluateSolution(ScriptInterface $scriptPubKey, array $chunks, $sigVersion)
     {
-        return $this->interpreter->evaluate($scriptPubKey, new Stack($chunks), $sigVersion, $this->flags, $this->signatureChecker);
+        $stack = new Stack($chunks);
+        if (!$this->interpreter->evaluate($scriptPubKey, $stack, $sigVersion, $this->flags, $this->signatureChecker)) {
+            return false;
+        }
+
+        if ($stack->isEmpty()) {
+            return false;
+        }
+
+        if (false === $this->interpreter->castToBool($stack[-1])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -261,11 +273,11 @@ class InputSigner
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $redeemScript = $signData->getRedeemScript();
             if (!$this->verifySolution($solveFlags, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
-                throw new \Exception('Redeem script fails to solve pay-to-script-hash');
+                throw new \RuntimeException('Redeem script fails to solve pay-to-script-hash');
             }
             $solution = $this->redeemScript = $this->classifier->decode($redeemScript);
             if (!in_array($solution->getType(), self::$validP2sh)) {
-                throw new \Exception('Unsupported pay-to-script-hash script');
+                throw new \RuntimeException('Unsupported pay-to-script-hash script');
             }
         }
 
@@ -273,12 +285,12 @@ class InputSigner
             $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $witnessScript = $signData->getWitnessScript();
-            if (!$this->verifySolution($solveFlags, ScriptFactory::sequence([$witnessScript->getBuffer()]), $solution->getScript())) {
-                throw new \Exception('Witness script fails to solve witness-script-hash');
+            if (!$witnessScript->getWitnessScriptHash()->equals($solution->getSolution())) {
+                throw new \RuntimeException('Witness script fails to solve witness-script-hash');
             }
             $this->witnessScript = $this->classifier->decode($witnessScript);
             if (!in_array($this->witnessScript->getType(), self::$canSign)) {
-                throw new \Exception('Unsupported witness-script-hash script');
+                throw new \RuntimeException('Unsupported witness-script-hash script');
             }
         }
 
@@ -325,23 +337,26 @@ class InputSigner
             $info = new Multisig($outputData->getScript());
             $this->requiredSigs = $info->getRequiredSigCount();
             $this->publicKeys = $info->getKeys();
-
             if ($size > 1) {
                 $vars = [];
                 for ($i = 1, $j = $size - 1; $i <= $j; $i++) {
                     $vars[] = TransactionSignatureFactory::fromHex($stack[$i], $this->ecAdapter);
                 }
 
+                $this->signatures = array_fill(0, count($this->publicKeys), null);
                 $sigs = $this->sortMultiSigs($sigVersion, $vars, $outputData->getScript());
+                $count = 0;
                 foreach ($this->publicKeys as $idx => $key) {
-                    $this->signatures[$idx] = isset($sigs[$key]) ? $sigs[$key] : null;
-                }
-
-                if (count(array_filter($this->signatures, 'is_null')) === count($this->publicKeys)) {
-                    if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
-                        throw new \RuntimeException('Existing signatures are invalid!');
+                    if (isset($sigs[$key])) {
+                        $this->signatures[$idx] = $sigs[$key];
+                        $count++;
                     }
                 }
+
+                if (count($vars) !== $count) {
+                    throw new \RuntimeException('Existing signatures are invalid!');
+                }
+                // Don't evaluate, already checked sigs during sort. Todo: fix this.
             }
         }
 
@@ -356,6 +371,7 @@ class InputSigner
      */
     public function extractSignatures()
     {
+
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
         $witnesses = $this->tx->getWitnesses();
         $witness = isset($witnesses[$this->nInput]) ? $witnesses[$this->nInput]->all() : [];

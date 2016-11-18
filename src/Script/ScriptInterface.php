@@ -14,6 +14,11 @@ interface ScriptInterface extends SerializableInterface
     public function getScriptHash();
 
     /**
+     * @return BufferInterface
+     */
+    public function getWitnessScriptHash();
+
+    /**
      * @return Parser
      */
     public function getScriptParser();

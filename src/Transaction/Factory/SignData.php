@@ -6,6 +6,8 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class SignData
 {
+    // Todo: review for useful exception?
+
     /**
      * @var ScriptInterface
      */
@@ -104,7 +106,7 @@ class SignData
     public function getSignaturePolicy()
     {
         if (null === $this->signaturePolicy) {
-            throw new \RuntimeException('Requested signature policy but not set');
+            throw new \RuntimeException('Signature policy requested but not set');
         }
         return $this->signaturePolicy;
     }
