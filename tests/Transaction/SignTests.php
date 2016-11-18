@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\Factory\InputSigner;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
@@ -138,16 +139,15 @@ class SignTests extends AbstractTestCase
             ->spendOutPoint($utxo->getOutPoint())
             ->output($txOut->getValue() - 6000, $txOut->getScript())
             ->get();
-        echo $txOut->getScript()->getScriptParser()->getHumanReadable().PHP_EOL;
-        $signData = new SignData();
+
+        $signData = (new SignData())
+            ->signaturePolicy($flags)
+        ;
         if ($redeemScript) {
             $signData->p2sh($redeemScript);
         }
         if ($witnessScript) {
             $signData->p2wsh($witnessScript);
-        }
-        if ($flags) {
-            $signData->signaturePolicy($flags);
         }
 
         $signer = new Signer($unsigned, $ecAdapter);
@@ -161,7 +161,7 @@ class SignTests extends AbstractTestCase
         $this->assertEquals($inSigner->getRequiredSigs(), count($privateKeys), '# sigs should match # keys');
 
         $this->checkWeCanVerifySignatures($spendTx, $utxo->getOutput(), $flags);
-        $this->checkWeCanRecoverState($spendTx, $privateKeys, $utxo, $signData);
+        $this->checkWeCanRecoverState($spendTx, $utxo, $signData, $inSigner);
     }
 
     /**
@@ -176,16 +176,27 @@ class SignTests extends AbstractTestCase
 
     /**
      * @param TransactionInterface $spendTx
-     * @param array $keys
      * @param Utxo $utxo
      * @param SignData $signData
+     * @param InputSigner $origSigner
      */
-    public function checkWeCanRecoverState(TransactionInterface $spendTx, array $keys, Utxo $utxo, SignData $signData)
+    public function checkWeCanRecoverState(TransactionInterface $spendTx, Utxo $utxo, SignData $signData, InputSigner $origSigner)
     {
         $recovered = new Signer($spendTx);
         $inSigner = $recovered->signer(0, $utxo->getOutput(), $signData);
 
-        $this->assertTrue($inSigner->isFullySigned());
-        $this->assertEquals($inSigner->getRequiredSigs(), count($keys), '# sigs should match # keys');
+        $this->assertEquals(count($origSigner->getPublicKeys()), count($inSigner->getPublicKeys()), 'should recover same # public keys');
+        $this->assertEquals(count($origSigner->getSignatures()), count($inSigner->getSignatures()), 'should recover same # signatures');
+
+        for ($i = 0, $l = count($origSigner->getPublicKeys()); $i < $l; $i++) {
+            $this->assertEquals($origSigner->getPublicKeys()[$i], $inSigner->getPublicKeys()[$i]);
+        }
+
+        for ($i = 0, $l = count($origSigner->getSignatures()); $i < $l; $i++) {
+            $this->assertEquals($origSigner->getSignatures()[$i], $inSigner->getSignatures()[$i]);
+        }
+
+        $this->assertEquals($origSigner->isFullySigned(), count($inSigner->isFullySigned()), 'should recover same isFullySigned');
+        $this->assertEquals($origSigner->getRequiredSigs(), count($inSigner->getRequiredSigs()), 'should recover same # requiredSigs');
     }
 }

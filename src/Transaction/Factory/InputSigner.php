@@ -327,7 +327,7 @@ class InputSigner
 
             if ($size > 1) {
                 $vars = [];
-                for ($i = 1, $j = $size - 1; $i < $j; $i++) {
+                for ($i = 1, $j = $size - 1; $i <= $j; $i++) {
                     $vars[] = TransactionSignatureFactory::fromHex($stack[$i], $this->ecAdapter);
                 }
 
@@ -369,7 +369,7 @@ class InputSigner
         if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
             $chunks = $this->evalPushOnly($scriptSig);
             if (count($chunks) > 0) {
-                if (!end($chunks)->equals($this->redeemScript->getScript()->getBuffer())) {
+                if (!$chunks[count($chunks) - 1]->equals($this->redeemScript->getScript()->getBuffer())) {
                     throw new \RuntimeException('Extracted redeemScript did not match script-hash');
                 }
 
