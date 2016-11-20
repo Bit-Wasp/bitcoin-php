@@ -1,0 +1,14 @@
+{
+  "fixtures": [
+    {
+      "redeemScript": "",
+      "witnessScript": "",
+      "signaturePolicy": ""
+    },
+    {
+      "redeemScript": "a914e8e09279b0fb7de2bc00aba8aaf6f9fc923c0db587",
+      "witnessScript": "0020f84c658c03f9c569edec9f553dfccd59f5687a2894fca7a3850f6bccce6f5e7c",
+      "signaturePolicy": "NONE"
+    }
+  ]
+}
