@@ -609,8 +609,15 @@ class InputSigner
         $mutator = TransactionFactory::mutate($this->tx);
         $mutator->inputsMutator()[$this->nInput]->script($sig->getScriptSig());
         if ($this->sigVersion === 1) {
-            $witness = array_fill(0, count($this->tx->getInputs()), null);
-            $witness[$this->nInput] = $sig->getScriptWitness();
+            $witness = [];
+            for ($i = 0, $j = count($this->tx->getInputs()); $i < $j; $i++) {
+                if ($i === $this->nInput) {
+                    $witness[] = $sig->getScriptWitness();
+                } else {
+                    $witness[] = new ScriptWitness([]);
+                }
+            }
+
             $mutator->witness($witness);
         }
 

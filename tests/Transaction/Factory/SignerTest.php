@@ -127,7 +127,8 @@ class SignerTest extends AbstractTestCase
         foreach ($this->jsonDataFile('signer_fixtures.json')['valid'] as $fixture) {
             $inputs = $fixture['raw']['ins'];
             $outputs = $fixture['raw']['outs'];
-            $policy = Interpreter::VERIFY_NONE;
+            $locktime = isset($fixture['raw']['locktime']) ? $fixture['raw']['locktime'] : 0;
+            $policy = Interpreter::VERIFY_NONE | Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_MINIMALDATA;
             if (isset($fixture['signaturePolicy'])) {
                 $policy = $this->getScriptFlagsFromString($fixture['signaturePolicy']);
             }
@@ -136,13 +137,14 @@ class SignerTest extends AbstractTestCase
             $keys = [];
             $signDatas = [];
             $txb = new TxBuilder();
+            $txb->locktime($locktime);
             foreach ($inputs as $input) {
                 $hash = Buffer::hex($input['hash']);
                 $txid = $hash->flip();
                 $outpoint = new OutPoint($txid, $input['index']);
                 $txOut = new TransactionOutput($input['value'], ScriptFactory::fromHex($input['scriptPubKey']));
 
-                $txb->spendOutPoint($outpoint);
+                $txb->spendOutPoint($outpoint, null, $input['sequence']);
                 $keys[] = array_map(function ($array) use ($ecAdapter) {
                     return [PrivateKeyFactory::fromWif($array['key'], $ecAdapter, NetworkFactory::bitcoinTestnet()), $array['sigHashType']];
                 }, $input['keys']);
@@ -169,7 +171,7 @@ class SignerTest extends AbstractTestCase
             if (isset($fixture['whex']) && $fixture['whex'] !== '') {
                 $optExtra['whex'] = $fixture['whex'];
             }
-            $results[] = [$fixture['description'], $ecAdapter, $outs, $utxos, $signDatas, $keys, $optExtra];
+            $results[] = [$fixture['description'], $ecAdapter, $txb, $utxos, $signDatas, $keys, $optExtra];
         }
 
         return $results;
@@ -228,22 +230,15 @@ class SignerTest extends AbstractTestCase
     /**
      * @param string $description
      * @param EcAdapterInterface $ecAdapter
-     * @param TransactionOutputInterface[] $txOuts
      * @param Utxo[] $utxos
+     * @param TxBuilder $builder
      * @param SignData[] $signDatas
      * @param array $keys
      * @param array $optExtra
      * @dataProvider getVectors
      */
-    public function testCases($description, EcAdapterInterface $ecAdapter, array $txOuts, array $utxos, array $signDatas, array $keys, array $optExtra)
+    public function testCases($description, EcAdapterInterface $ecAdapter, TxBuilder $builder, array $utxos, array $signDatas, array $keys, array $optExtra)
     {
-        $builder = new TxBuilder();
-        for ($i = 0, $count = count($txOuts); $i < $count; $i++) {
-            $builder->output($txOuts[$i]->getValue(), $txOuts[$i]->getScript());
-        }
-        for ($i = 0, $count = count($utxos); $i < $count; $i++) {
-            $builder->spendOutPoint($utxos[$i]->getOutPoint());
-        }
 
         $signer = new Signer($builder->get(), $ecAdapter);
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {

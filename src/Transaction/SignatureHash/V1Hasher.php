@@ -60,6 +60,7 @@ class V1Hasher extends SigHash
             foreach ($this->tx->getInputs() as $input) {
                 $binary .= Buffer::int($input->getSequence())->flip()->getBinary();
             }
+
             return Hash::sha256d(new Buffer($binary));
         }
 
