@@ -48,10 +48,7 @@ class Signer
      */
     public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, $sigHashType = SigHash::ALL)
     {
-        if (null === $signData) {
-            $signData = new SignData();
-        }
-        if (!$this->signer($nIn, $txOut, $signData)->sign($key, $sigHashType)) {
+        if (!$this->input($nIn, $txOut, $signData)->sign($key, $sigHashType)) {
             throw new \RuntimeException('Unsignable script');
         }
 
@@ -64,8 +61,12 @@ class Signer
      * @param SignData $signData
      * @return InputSigner
      */
-    public function signer($nIn, TransactionOutputInterface $txOut, SignData $signData)
+    public function input($nIn, TransactionOutputInterface $txOut, SignData $signData = null)
     {
+        if (null === $signData) {
+            $signData = new SignData();
+        }
+
         if (!isset($this->signatureCreator[$nIn])) {
             $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData);
         }

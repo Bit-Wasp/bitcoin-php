@@ -588,13 +588,17 @@ class InputSigner
     }
 
     /**
+     * @param int $flags
      * @return bool
      */
-    public function verify()
+    public function verify($flags = null)
     {
         $consensus = ScriptFactory::consensus();
 
-        $flags = $this->flags;
+        if ($flags === null) {
+            $flags = $this->flags;
+        }
+
         $flags |= Interpreter::VERIFY_P2SH;
         if ($this->sigVersion === 1) {
             $flags |= Interpreter::VERIFY_WITNESS;

@@ -36,13 +36,13 @@ $tx = (new TxBuilder())
     ->get();
 
 // Sign4
-$signed = (new Signer($tx, Bitcoin::getEcAdapter()))
-    ->sign(0, $key, $txOut, $signData)
-    ->get();
+$signer = new Signer($tx);
+$input = $signer->input(0, $txOut, $signData);
+$input->sign($key);
+$signed = $signer->get();
 
 // Check signatures
-$consensus = ScriptFactory::consensus();
-echo "Script validation result: " . ($signed->validator()->checkSignature($consensus, I::VERIFY_P2SH | I::VERIFY_WITNESS, 0, $txOut) ? "yay\n" : "nay\n");
+echo "Script validation result: " . ($input->verify(I::VERIFY_P2SH | I::VERIFY_WITNESS) ? "yay\n" : "nay\n");
 
 echo PHP_EOL;
 echo "Witness serialized transaction: " . $signed->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;

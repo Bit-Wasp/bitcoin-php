@@ -124,48 +124,12 @@ class SignerTest extends AbstractTestCase
     public function getScriptVectors(EcAdapterInterface $ecAdapter)
     {
         $results = [];
-        // Supported sign types can be represented in numerous ways
-        foreach ($this->getSupportedSignTypes() as $type) {
-            list ($script, $keys) = $this->getScriptAndKeys($type, $ecAdapter);
-            $start = [$ecAdapter, $keys];
-            $results[] = array_merge($start, [$script, null, null]);
-            $results[] = array_merge($start, $this->p2shScript($script));
-            $results[] = array_merge($start, $this->p2wshScript($script));
-            $results[] = array_merge($start, $this->p2shp2wshScript($script));
-        }
-
-        // P2WPKH cannot be represented in P2WSH, created here:
-        $results = array_merge($results, $this->p2wpkhTests($ecAdapter));
-
-        // Autogen has: key [s,rs,ws]
-        // => gen: txid vout value sigHashType and funnel into below
-
-        // Test fixtures produce the following:
-
-        /**
-         * signaturePolicy =>
-         * inputs => [
-         *   {txid, index, value, scriptPubKey, < <key, sigHash> >, [redeemScript], [witnessScript]
-         * ],
-         * outputs => [
-         *   {value, scriptPubKey}
-         * ],
-         * opt: hex: ""
-         *
-         */
-
-        /**
-         * Fixtures:
-         *  (EcAdapterInterface $ec, $signaturePolicy, txBuilder, <signData>, <utxo>, <<key,sigHash>>
-         */
-        $va = [];
-        $a = $this->jsonDataFile('signer_fixtures.json')['valid'];
-        foreach ($a as $vectors) {
-            $inputs = $vectors['raw']['ins'];
-            $outputs = $vectors['raw']['outs'];
+        foreach ($this->jsonDataFile('signer_fixtures.json')['valid'] as $fixture) {
+            $inputs = $fixture['raw']['ins'];
+            $outputs = $fixture['raw']['outs'];
             $policy = Interpreter::VERIFY_NONE;
-            if (isset($vectors['signaturePolicy'])) {
-                $policy = $this->getScriptFlagsFromString($vectors['signaturePolicy']);
+            if (isset($fixture['signaturePolicy'])) {
+                $policy = $this->getScriptFlagsFromString($fixture['signaturePolicy']);
             }
 
             $utxos = [];
@@ -199,16 +163,16 @@ class SignerTest extends AbstractTestCase
             }
 
             $optExtra = [];
-            if (isset($vectors['hex']) && $vectors['hex'] !== '') {
-                $optExtra['hex'] = $vectors['hex'];
+            if (isset($fixture['hex']) && $fixture['hex'] !== '') {
+                $optExtra['hex'] = $fixture['hex'];
             }
-            if (isset($vectors['whex']) && $vectors['whex'] !== '') {
-                $optExtra['whex'] = $vectors['whex'];
+            if (isset($fixture['whex']) && $fixture['whex'] !== '') {
+                $optExtra['whex'] = $fixture['whex'];
             }
-            $va[] = [$vectors['description'], $ecAdapter, $outs, $utxos, $signDatas, $keys, $optExtra];
+            $results[] = [$fixture['description'], $ecAdapter, $outs, $utxos, $signDatas, $keys, $optExtra];
         }
 
-        return $va;
+        return $results;
     }
 
     /**
@@ -286,7 +250,7 @@ class SignerTest extends AbstractTestCase
             $utxo = $utxos[$i];
             $signData = $signDatas[$i];
             $signSteps = $keys[$i];
-            $inSigner = $signer->signer($i, $utxo->getOutput(), $signData);
+            $inSigner = $signer->input($i, $utxo->getOutput(), $signData);
             $this->assertFalse($inSigner->isFullySigned());
             $this->assertFalse($inSigner->verify());
 
@@ -310,8 +274,8 @@ class SignerTest extends AbstractTestCase
 
         $recovered = new Signer($signed);
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {
-            $origSigner = $signer->signer($i, $utxos[$i]->getOutput(), $signDatas[$i]);
-            $inSigner = $recovered->signer($i, $utxos[$i]->getOutput(), $signDatas[$i]);
+            $origSigner = $signer->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
+            $inSigner = $recovered->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
             $this->assertEquals(count($origSigner->getPublicKeys()), count($inSigner->getPublicKeys()), 'should recover same # public keys');
             $this->assertEquals(count($origSigner->getSignatures()), count($inSigner->getSignatures()), 'should recover same # signatures');
 
@@ -336,16 +300,6 @@ class SignerTest extends AbstractTestCase
 
     /**
      * @param TransactionInterface $spendTx
-     * @param TransactionOutputInterface $txOut
-     * @param $flags
-     */
-    public function checkWeCanVerifySignatures(TransactionInterface $spendTx, TransactionOutputInterface $txOut, $flags)
-    {
-        $this->assertTrue($spendTx->validator()->checkSignature(ScriptFactory::consensus(), $flags, 0, $txOut));
-    }
-
-    /**
-     * @param TransactionInterface $spendTx
      * @param Utxo $utxo
      * @param SignData $signData
      * @param InputSigner $origSigner
@@ -353,7 +307,7 @@ class SignerTest extends AbstractTestCase
     public function checkWeCanRecoverState(TransactionInterface $spendTx, Utxo $utxo, SignData $signData, InputSigner $origSigner)
     {
         $recovered = new Signer($spendTx);
-        $inSigner = $recovered->signer(0, $utxo->getOutput(), $signData);
+        $inSigner = $recovered->input(0, $utxo->getOutput(), $signData);
 
         $this->assertEquals(count($origSigner->getPublicKeys()), count($inSigner->getPublicKeys()), 'should recover same # public keys');
         $this->assertEquals(count($origSigner->getSignatures()), count($inSigner->getSignatures()), 'should recover same # signatures');

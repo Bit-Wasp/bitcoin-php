@@ -144,13 +144,14 @@ class WitnessTxFullTest extends AbstractTestCase
             $flags |= InterpreterInterface::VERIFY_WITNESS;
         }
 
-        $signed = (new Signer($tx, $ec))
-            ->sign(0, $key, $utxo->getOutput(), $signData)
-            ->get();
+        $signer = new Signer($tx, $ec);
+        $input = $signer->input(0, $utxo->getOutput(), $signData);
+        $input->sign($key);
+        $signed = $signer->get();
 
         $consensus = ScriptFactory::consensus();
 
-        $check = $signed->validator()->checkSignature($consensus, $flags, 0, $utxo->getOutput());
+        $check = $input->verify($flags);
         $this->assertTrue($check);
         $this->assertEquals($expectedTx, $signed->getWitnessBuffer()->getHex());
 

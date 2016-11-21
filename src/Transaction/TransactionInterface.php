@@ -126,11 +126,6 @@ interface TransactionInterface extends SerializableInterface
     public function equals(TransactionInterface $tx);
 
     /**
-     * @return Validator
-     */
-    public function validator();
-
-    /**
      * @return BufferInterface
      */
     public function getWitnessBuffer();
