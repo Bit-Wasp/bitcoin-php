@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
-
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

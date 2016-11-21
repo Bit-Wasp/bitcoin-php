@@ -149,7 +149,9 @@ class SignerTest extends AbstractTestCase
          * ],
          * outputs => [
          *   {value, scriptPubKey}
-         * ]
+         * ],
+         * opt: hex: ""
+         *
          */
 
         /**
@@ -185,7 +187,6 @@ class SignerTest extends AbstractTestCase
                 $signData = new SignData();
                 $signData->p2sh(ScriptFactory::fromHex($input['redeemScript']));
                 $signData->p2wsh(ScriptFactory::fromHex($input['witnessScript']));
-
                 $signData->signaturePolicy(isset($input['signaturePolicy']) ? $this->getScriptFlagsFromString($input['signaturePolicy']) : $policy);
                 $signDatas[] = $signData;
             }
@@ -197,7 +198,14 @@ class SignerTest extends AbstractTestCase
                 $txb->output($output['value'], ScriptFactory::fromHex($output['script']));
             }
 
-            $va[] = [$ecAdapter, $outs, $utxos, $signDatas, $keys];
+            $optExtra = [];
+            if (isset($vectors['hex']) && $vectors['hex'] !== '') {
+                $optExtra['hex'] = $vectors['hex'];
+            }
+            if (isset($vectors['whex']) && $vectors['whex'] !== '') {
+                $optExtra['whex'] = $vectors['whex'];
+            }
+            $va[] = [$vectors['description'], $ecAdapter, $outs, $utxos, $signDatas, $keys, $optExtra];
         }
 
         return $va;
@@ -254,17 +262,17 @@ class SignerTest extends AbstractTestCase
 
 
     /**
+     * @param string $description
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionOutputInterface[] $txOuts
      * @param Utxo[] $utxos
      * @param SignData[] $signDatas
      * @param array $keys
+     * @param array $optExtra
      * @dataProvider getVectors
      */
-    public function testCases(EcAdapterInterface $ecAdapter, array $txOuts, array $utxos, array $signDatas, array $keys)
+    public function testCases($description, EcAdapterInterface $ecAdapter, array $txOuts, array $utxos, array $signDatas, array $keys, array $optExtra)
     {
-        $flags = Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_WITNESS | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_CLEAN_STACK;
-
         $builder = new TxBuilder();
         for ($i = 0, $count = count($txOuts); $i < $count; $i++) {
             $builder->output($txOuts[$i]->getValue(), $txOuts[$i]->getScript());
@@ -278,21 +286,26 @@ class SignerTest extends AbstractTestCase
             $utxo = $utxos[$i];
             $signData = $signDatas[$i];
             $signSteps = $keys[$i];
+            $inSigner = $signer->signer($i, $utxo->getOutput(), $signData);
+            $this->assertFalse($inSigner->isFullySigned());
+            $this->assertFalse($inSigner->verify());
+
             foreach ($signSteps as $keyAndHashType) {
                 list ($privateKey, $sigHashType) = $keyAndHashType;
                 $signer->sign($i, $privateKey, $utxo->getOutput(), $signData, $sigHashType);
             }
 
-            $inSigner = $signer->signer($i, $utxo->getOutput(), $signData);
             $this->assertTrue($inSigner->isFullySigned());
             $this->assertEquals(count($signSteps), $inSigner->getRequiredSigs());
+            $this->assertTrue($inSigner->verify());
         }
 
-        // Check we can verify signatures
         $signed = $signer->get();
-        $validator = $signed->validator();
-        foreach ($utxos as $idx => $utxo) {
-            $this->assertTrue($validator->checkSignature(ScriptFactory::consensus(), $flags, $idx, $utxo->getOutput()));
+        if (isset($optExtra['hex'])) {
+            $this->assertEquals($optExtra['hex'], $signed->getHex());
+        }
+        if (isset($optExtra['whex'])) {
+            $this->assertEquals($optExtra['whex'], $signed->getWitnessBuffer()->getHex());
         }
 
         $recovered = new Signer($signed);
@@ -317,6 +330,7 @@ class SignerTest extends AbstractTestCase
             $inValues = $inSigner->serializeSignatures();
             $this->assertTrue($origValues->getScriptSig()->equals($inValues->getScriptSig()));
             $this->assertTrue($origValues->getScriptWitness()->equals($inValues->getScriptWitness()));
+            $this->assertTrue($inSigner->verify());
         }
     }
 

@@ -31,7 +31,7 @@ class Validator implements ValidatorInterface
     {
         $witnesses = $this->transaction->getWitnesses();
         $witness = isset($witnesses[$nInput]) ? $witnesses[$nInput] : null;
-        return $consensus->verify($this->transaction, $output->getScript(), $flags, $nInput, $output->getValue(), $witness);
+        return $consensus->verify($this->transaction, $output->getScript(), $flags, $nInput, $output->getValue());
     }
 
     /**
