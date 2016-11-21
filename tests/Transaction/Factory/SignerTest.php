@@ -302,7 +302,7 @@ class SignerTest extends AbstractTestCase
 
         $signed = $signer->get();
         if (isset($optExtra['hex'])) {
-            $this->assertEquals($optExtra['hex'], $signed->getHex());
+            $this->assertEquals($optExtra['hex'], $signed->getHex(), 'transaction matches expected hex');
         }
         if (isset($optExtra['whex'])) {
             $this->assertEquals($optExtra['whex'], $signed->getWitnessBuffer()->getHex());
@@ -315,12 +315,12 @@ class SignerTest extends AbstractTestCase
             $this->assertEquals(count($origSigner->getPublicKeys()), count($inSigner->getPublicKeys()), 'should recover same # public keys');
             $this->assertEquals(count($origSigner->getSignatures()), count($inSigner->getSignatures()), 'should recover same # signatures');
 
-            for ($i = 0, $l = count($origSigner->getPublicKeys()); $i < $l; $i++) {
-                $this->assertEquals($origSigner->getPublicKeys()[$i]->getBinary(), $inSigner->getPublicKeys()[$i]->getBinary());
+            for ($j = 0, $l = count($origSigner->getPublicKeys()); $j < $l; $j++) {
+                $this->assertEquals($origSigner->getPublicKeys()[$j]->getBinary(), $inSigner->getPublicKeys()[$j]->getBinary());
             }
 
-            for ($i = 0, $l = count($origSigner->getSignatures()); $i < $l; $i++) {
-                $this->assertEquals($origSigner->getSignatures()[$i]->getBinary(), $inSigner->getSignatures()[$i]->getBinary());
+            for ($j = 0, $l = count($origSigner->getSignatures()); $j < $l; $j++) {
+                $this->assertEquals($origSigner->getSignatures()[$j]->getBinary(), $inSigner->getSignatures()[$j]->getBinary());
             }
 
             $this->assertEquals($origSigner->isFullySigned(), $inSigner->isFullySigned(), 'should recover same isFullySigned');
