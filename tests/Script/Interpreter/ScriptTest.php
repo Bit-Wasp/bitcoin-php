@@ -93,29 +93,6 @@ class ScriptTest extends AbstractTestCase
     }
 
     /**
-     * @return array
-     */
-    public function calcMapFlagNames()
-    {
-        return [
-            "NONE" => Interpreter::VERIFY_NONE,
-            "P2SH" => Interpreter::VERIFY_P2SH,
-            "STRICTENC" => Interpreter::VERIFY_STRICTENC,
-            "DERSIG" => Interpreter::VERIFY_DERSIG,
-            "LOW_S" => Interpreter::VERIFY_LOW_S,
-            "SIGPUSHONLY" => Interpreter::VERIFY_SIGPUSHONLY,
-            "MINIMALDATA" => Interpreter::VERIFY_MINIMALDATA,
-            "NULLDUMMY" => Interpreter::VERIFY_NULL_DUMMY,
-            "DISCOURAGE_UPGRADABLE_NOPS" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_NOPS,
-            "CLEANSTACK" => Interpreter::VERIFY_CLEAN_STACK,
-            "CHECKLOCKTIMEVERIFY" => Interpreter::VERIFY_CHECKLOCKTIMEVERIFY,
-            "CHECKSEQUENCEVERIFY" => Interpreter::VERIFY_CHECKSEQUENCEVERIFY,
-            "WITNESS" => Interpreter::VERIFY_WITNESS,
-            "DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
-        ];
-    }
-
-    /**
      * @param Opcodes $opcodes
      * @return array
      */
@@ -169,30 +146,6 @@ class ScriptTest extends AbstractTestCase
     }
 
     /**
-     * @param array $mapFlagNames
-     * @param string $string
-     * @return int
-     */
-    public function calcScriptFlags(array $mapFlagNames, $string)
-    {
-        if (strlen($string) === 0) {
-            return Interpreter::VERIFY_NONE;
-        }
-
-        $flags = 0;
-        $words = explode(",", $string);
-        foreach ($words as $word) {
-            if (!isset($mapFlagNames[$word])) {
-                throw new \RuntimeException('Unknown verification flag: ' . $word);
-            }
-
-            $flags |= $mapFlagNames[$word];
-        }
-
-        return $flags;
-    }
-
-    /**
      * @return array
      */
     public function prepareTests()
@@ -200,7 +153,6 @@ class ScriptTest extends AbstractTestCase
         $ecAdapter = Bitcoin::getEcAdapter();
         $opcodes = new Opcodes();
         $mapOpNames = $this->calcMapOpNames($opcodes);
-        $mapFlagNames = $this->calcMapFlagNames();
         $object = json_decode($this->dataFile("script_tests.json"), true);
         $testCount = count($object);
         $vectors = [];
@@ -236,7 +188,7 @@ class ScriptTest extends AbstractTestCase
             $scriptPubKeyString = $test[$pos++];
             $scriptPubKey = $this->calcScriptFromString($mapOpNames, $scriptPubKeyString);
 
-            $flags = $this->calcScriptFlags($mapFlagNames, $test[$pos++]);
+            $flags = $this->getScriptFlagsFromString($test[$pos++]);
             $returns = ($test[$pos++]) === 'OK' ? true : false;
 
             if ($ecAdapter instanceof EcAdapter) {
@@ -267,10 +219,7 @@ class ScriptTest extends AbstractTestCase
         $create = $this->buildCreditingTransaction($scriptPubKey, $amount);
         $tx = $this->buildSpendTransaction($create, $scriptSig, $scriptWitness);
         $check = $interpreter->verify($scriptSig, $scriptPubKey, $flags, new Checker($ecAdapter, $tx, 0, $amount), $scriptWitness);
-        if ($check == $expectedResult) {
-            ob_clean();
-        }
-        
+
         $this->assertEquals($expectedResult, $check, $strTest);
     }
 }

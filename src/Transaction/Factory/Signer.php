@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Transaction\Factory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -43,22 +42,13 @@ class Signer
      * @param int $nIn
      * @param PrivateKeyInterface $key
      * @param TransactionOutputInterface $txOut
-     * @param ScriptInterface|null $redeemScript
-     * @param ScriptInterface|null $witnessScript
+     * @param SignData $signData
      * @param int $sigHashType
      * @return $this
      */
-    public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, ScriptInterface $redeemScript = null, ScriptInterface $witnessScript = null, $sigHashType = SigHash::ALL)
+    public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, $sigHashType = SigHash::ALL)
     {
-        $signData = new SignData();
-        if ($redeemScript) {
-            $signData->p2sh($redeemScript);
-        }
-        if ($witnessScript) {
-            $signData->p2wsh($witnessScript);
-        }
-
-        if (!$this->signer($nIn, $txOut, $signData)->sign($key, $sigHashType)) {
+        if (!$this->input($nIn, $txOut, $signData)->sign($key, $sigHashType)) {
             throw new \RuntimeException('Unsignable script');
         }
 
@@ -71,8 +61,12 @@ class Signer
      * @param SignData $signData
      * @return InputSigner
      */
-    public function signer($nIn, TransactionOutputInterface $txOut, SignData $signData)
+    public function input($nIn, TransactionOutputInterface $txOut, SignData $signData = null)
     {
+        if (null === $signData) {
+            $signData = new SignData();
+        }
+
         if (!isset($this->signatureCreator[$nIn])) {
             $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData);
         }

@@ -17,6 +17,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
@@ -104,8 +105,12 @@ class InterpreterTest extends AbstractTestCase
         // Here is where
         $spend = $builder->spendOutputFrom($fake, 0)->get();
 
+        $signData = new SignData();
+        if ($rs) {
+            $signData->p2sh($rs);
+        }
         $signer = new Signer($spend, $ec);
-        $signer->sign(0, $privateKey, $fake->getOutput(0), $rs);
+        $signer->sign(0, $privateKey, $fake->getOutput(0), $signData);
 
         $spendTx = $signer->get();
         $scriptSig = $spendTx->getInput(0)->getScript();
