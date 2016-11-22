@@ -68,7 +68,6 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertSame($publicKeyUncomp->getHex(), $parsed[0]->getData()->getHex());
         $this->assertSame(Opcodes::OP_CHECKSIG, $parsed[1]->getOp());
         $this->assertEquals(OutputClassifier::PAYTOPUBKEY, $classifier->classify($script));
-
     }
 
     public function testPayToPubKeyInvalid()

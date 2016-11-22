@@ -1,3 +1,4 @@
+
 language: php
 
 php:
@@ -6,32 +7,48 @@ php:
   - 7.0
 
 env:
-  - EXT_SECP256K1="-dextension=secp256k1.so" EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
-  - EXT_SECP256K1="-dextension=secp256k1.so"
-  - EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
-  - EXT_SECP256K1=""
+  - EXT_SECP256K1=0 EXT_CONSENSUS=0
+  - EXT_SECP256K1=1 EXT_CONSENSUS=0
+  - EXT_SECP256K1=0 EXT_CONSENSUS=1
+  - EXT_CONSENSUS=1 EXT_SECP256K1=1
+
+matrix:
+  include:
+    - php: 7.0
+      env: CODE_STYLE=1
+    - php: 7.0
+      env: EXAMPLES=1
+    - php: 7.0
+      env: COVERAGE=1
+  exclude:
+    - php: hhvm
+      env: EXT_SECP256K1=1 EXT_CONSENSUS=0
+    - php: hhvm
+      env: EXT_SECP256K1=0 EXT_CONSENSUS=1
+    - php: hhvm
+      env: EXT_CONSENSUS=1 EXT_SECP256K1=1
 
 install:
     - |
-        sh -c 'if [ "$EXT_SECP256K1" != "" ]; then \
+        sh -c 'if [ "$EXT_SECP256K1" = "1" ]; then \
             git clone https://github.com/bitcoin/secp256k1.git \
             && cd secp256k1 \
             && ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-module-schnorr --enable-experimental && make && sudo make install \
             && cd ..; fi'
     - |
-        sh -c 'if [ "$EXT_SECP256K1" != "" ] && [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then \
+        sh -c 'if [ "$EXT_SECP256K1" = "1" ] && [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then \
               git clone -b v0.0 https://github.com/Bit-Wasp/secp256k1-php \
                        && cd secp256k1-php/secp256k1 \
                        && phpize && ./configure && make && sudo make install \
                        && cd ../..; fi';
     - |
-        sh -c 'if [ "$EXT_SECP256K1" != "" ] && [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then \
+        sh -c 'if [ "$EXT_SECP256K1" = "1" ] && [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then \
              git clone -b v0.1 https://github.com/Bit-Wasp/secp256k1-php \
                       && cd secp256k1-php/secp256k1 \
                       && phpize && ./configure && make && sudo make install \
                       && cd ../..; fi';
-    - | 
-        sh -c 'if [ "$EXT_BITCOINCONSENSUS" != "" ]; then \
+    - |
+        sh -c 'if [ "$EXT_CONSENSUS" = "1" ]; then \
          wget https://bitcoin.org/bin/bitcoin-core-0.13.1/bitcoin-0.13.1-x86_64-linux-gnu.tar.gz && \
          tar xvf bitcoin-0.13.1-x86_64-linux-gnu.tar.gz && \
          cd bitcoin-0.13.1 && \
@@ -47,32 +64,16 @@ install:
     - composer update
 
 script:
-  - php $EXT_SECP256K1 $EXT_BITCOINCONSENSUS vendor/bin/phpunit --coverage-clover build/logs/clover.xml
-  - php vendor/bin/phpcs -n --standard=PSR1,PSR2 --report=full src/
-  - for f in ./examples/*.php; do echo $f; php $f; if [ $? -ne  0 ]; then exit 1; fi; done
-
-##  - php bin/phpmd src/ text build/rulesets/phpmd.xml
+  - export EXT_PHP=""
+  - if [ "$EXT_SECP256K1" = "1" ]; then export EXT_PHP="$EXT_PHP -dextension=secp256k1.so"; fi
+  - if [ "$EXT_CONSENSUS" = "1" ]; then export EXT_PHP="$EXT_PHP -dextension=bitcoinconsensus.so"; fi
+  - export PHPUNIT=""
+  - if [ "$COVERAGE" = "1" ]; then export PHPUNIT="$PHPUNIT --coverage-clover build/logs/clover.xml"; fi
+  - php $EXT_PHP vendor/bin/phpunit $PHPUNIT
+  - if [ "$CODE_STYLE" = "1" ]; then php vendor/bin/phpcs -n --standard=PSR1,PSR2 --report=full src/ tests/; fi
+  - if [ "$EXAMPLES" = "1" ]; then for f in ./examples/*.php; do echo $f; php $f; if [ $? -ne  0 ]; then exit 1; fi; done; fi
 
 after_script:
-   - wget https://scrutinizer-ci.com/ocular.phar
-   - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi;'
-
-matrix:
-    fast_finish: true
-    exclude:
-      - php: hhvm
-        env: EXT_SECP256K1="-dextension=secp256k1.so"
-
-      - php: hhvm
-        env: EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
-
-      - php: hhvm
-        env: EXT_SECP256K1="-dextension=secp256k1.so" EXT_BITCOINCONSENSUS="-dextension=bitcoinconsensus.so"
-
-notifications:
-  webhooks:
-    urls:
-      - https://webhooks.gitter.im/e/75311bf6cc64a613a399
-    on_success: change  # options: [always|never|change] default: always
-    on_failure: always  # options: [always|never|change] default: always
-    on_start: false     # default: false
+   - sh -c 'if [ "$COVERAGE" = "1" ]; then \
+      wget https://scrutinizer-ci.com/ocular.phar && \
+      php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi;'
