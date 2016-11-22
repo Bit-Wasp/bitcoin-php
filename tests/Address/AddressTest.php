@@ -73,6 +73,7 @@ class AddressTest extends AbstractTestCase
         $this->assertTrue($obj->getHash()->equals($fromString->getHash()));
         $this->assertEquals($obj->getPrefixByte($network), $fromString->getPrefixByte($network));
         $this->assertEquals($obj->getAddress($network), $fromString->getAddress($network));
+        $this->assertTrue(AddressFactory::isValidAddress($address, $network));
 
         $toScript = $fromString->getScriptPubKey();
         $this->assertTrue($script->equals($toScript));
@@ -84,6 +85,8 @@ class AddressTest extends AbstractTestCase
     public function testAddressFailswithBytes()
     {
         $add = 'LPjNgqp43ATwzMTJPM2SFoEYeyJV6pq6By';
+        $this->assertFalse(AddressFactory::isValidAddress($add));
+
         $network = Bitcoin::getNetwork();
         AddressFactory::fromString($add, $network);
     }
