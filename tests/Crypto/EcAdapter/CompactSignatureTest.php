@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

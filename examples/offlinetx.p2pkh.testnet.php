@@ -37,4 +37,3 @@ echo "Generate transaction: \n";
 $new = $signer->get();
 
 echo $new->getHex()."\n";
-

@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Script\ScriptInfo;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkey;
 use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 

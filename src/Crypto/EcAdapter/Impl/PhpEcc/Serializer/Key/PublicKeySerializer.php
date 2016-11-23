@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
-use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKeySerializer implements PublicKeySerializerInterface
 {

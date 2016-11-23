@@ -18,7 +18,6 @@ use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
 
@@ -200,32 +199,6 @@ class SignerTest extends AbstractTestCase
     {
         return new Utxo(new OutPoint(new Buffer(random_bytes(32)), 0), new TransactionOutput($value, $scriptPubKey));
     }
-
-    /**
-     * Return a 1-input transaction signed by a list of privateKeys, for constant $sigHashType.
-     * @param EcAdapterInterface $ecAdapter
-     * @param Utxo $utxo
-     * @param array $privateKeys
-     * @param int $sigHashType
-     * @param SignData $signData
-     * @return Signer
-     */
-    public function getPreparedSigner(EcAdapterInterface $ecAdapter, Utxo $utxo, array $privateKeys, $sigHashType, SignData $signData)
-    {
-        // Create signed transaction
-        $unsigned = (new TxBuilder)
-            ->spendOutPoint($utxo->getOutPoint())
-            ->output($utxo->getOutput()->getValue() - 6000, $utxo->getOutput()->getScript())
-            ->get();
-
-        $signer = new Signer($unsigned, $ecAdapter);
-        foreach ($privateKeys as $key) {
-            $signer->sign(0, $key, $utxo->getOutput(), $signData, $sigHashType);
-        }
-
-        return $signer;
-    }
-
 
     /**
      * @param string $description

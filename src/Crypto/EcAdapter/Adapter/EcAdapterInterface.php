@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Adapter;
 
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;

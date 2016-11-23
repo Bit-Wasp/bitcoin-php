@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class HierarchicalKeySequenceTest extends AbstractTestCase

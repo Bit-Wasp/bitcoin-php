@@ -56,4 +56,3 @@ $fundTx = TransactionFactory::build() ->input('4d7adb19fff03892a11924f2a9188e36d
 echo $fundTx->getHex(). "\n";
 echo $fundTx->getTxId()->getHex() . "\n";
 echo "Fully signed transaction: " . $signed->getHex() . "\n";
-

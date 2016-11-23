@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Script\Consensus;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
 interface ConsensusInterface
