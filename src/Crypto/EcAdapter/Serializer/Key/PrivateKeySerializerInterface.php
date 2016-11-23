@@ -3,7 +3,6 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 interface PrivateKeySerializerInterface

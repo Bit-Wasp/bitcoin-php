@@ -4,16 +4,12 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Factory\InputSigner;
-use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;

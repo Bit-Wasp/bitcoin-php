@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;

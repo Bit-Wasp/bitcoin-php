@@ -33,7 +33,7 @@ $tx = (new TxBuilder())
     ->get();
 
 // Sign transaction
-$signed = (new Signer($tx,  Bitcoin::getEcAdapter()))
+$signed = (new Signer($tx, Bitcoin::getEcAdapter()))
     ->sign(0, $key, $txOut)
     ->get();
 

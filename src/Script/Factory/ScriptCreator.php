@@ -10,8 +10,6 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
 
 class ScriptCreator
 {

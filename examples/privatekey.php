@@ -22,5 +22,3 @@ echo "Public Key\n";
 echo " - Hex: " . $publicKey->getHex() . "\n";
 echo " - Hash: " . $publicKey->getPubKeyHash()->getHex() . "\n";
 echo " - Address: " . $publicKey->getAddress()->getAddress() . "\n";
-
-

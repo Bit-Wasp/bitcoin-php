@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -68,7 +67,6 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertSame($publicKeyUncomp->getHex(), $parsed[0]->getData()->getHex());
         $this->assertSame(Opcodes::OP_CHECKSIG, $parsed[1]->getOp());
         $this->assertEquals(OutputClassifier::PAYTOPUBKEY, $classifier->classify($script));
-
     }
 
     public function testPayToPubKeyInvalid()

@@ -3,12 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
@@ -17,113 +12,14 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\Factory\SignData;
-use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
-use Mdanter\Ecc\EccFactory;
 
 class InterpreterTest extends AbstractTestCase
 {
 
-
-    /**
-     * Construct general test vectors to exercise Checksig operators.
-     * Given an output script (limited to those signable by TransactionBuilder), RedeemScript if required,
-     * and private key, the tests can attempt to spend a fake transaction. the scriptSig it produces should
-     * return true against the given outputScript/redeemScript
-     *
-     * @return array
-     */
-    public function ChecksigVectors()
-    {
-        $ec = EcAdapterFactory::getAdapter(new Math(), EccFactory::getSecgCurves()->generator256k1());
-        $privateKey = PrivateKeyFactory::fromHex('4141414141414141414141414141414141414141414141414141414141414141', false, $ec);
-
-        $standard = InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_STRICTENC | InterpreterInterface::VERIFY_DERSIG |
-            InterpreterInterface::VERIFY_LOW_S | InterpreterInterface::VERIFY_NULL_DUMMY | InterpreterInterface::VERIFY_SIGPUSHONLY |
-            InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS | InterpreterInterface::VERIFY_CLEAN_STACK |
-            InterpreterInterface::VERIFY_CHECKLOCKTIMEVERIFY | InterpreterInterface::VERIFY_WITNESS;
-
-        $vectors = [];
-
-        // Pay to pubkey hash that succeeds
-        $s0 = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPubKeyHash());
-        $vectors[] = [
-            true,
-            $ec,
-            $standard, // flags
-            $privateKey,        // privKey
-            $s0,
-            null,               // redeemscript,
-        ];
-
-        // Pay to pubkey that succeeds
-        $s1 = ScriptFactory::create()->push($privateKey->getPublicKey()->getBuffer())->op('OP_CHECKSIG')->getScript();
-        $vectors[] = [
-            true,
-            $ec,
-            $standard, // flags
-            $privateKey,        // privKey
-            $s1,
-            null,               // redeemscript
-        ];
-
-        $rs = ScriptFactory::scriptPubKey()->multisig(1, [$privateKey->getPublicKey()]);
-        $os = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($rs->getBuffer()));
-        $vectors[] = [
-            true,
-            $ec,
-                InterpreterInterface::VERIFY_P2SH |
-                InterpreterInterface::VERIFY_WITNESS |
-                InterpreterInterface::VERIFY_CLEAN_STACK
-            ,
-            $privateKey,
-            $os,
-            $rs
-        ];
-
-        return $vectors;
-    }
-
-    /**
-     * @dataProvider ChecksigVectors
-     * @param bool $eVerifyResult
-     * @param EcAdapterInterface $ec
-     * @param int $flags
-     * @param PrivateKeyInterface $privateKey
-     * @param ScriptInterface $outputScript
-     * @param ScriptInterface $rs
-     */
-    public function testChecksigVectors($eVerifyResult, EcAdapterInterface $ec, $flags, PrivateKeyInterface $privateKey, ScriptInterface $outputScript, ScriptInterface $rs = null)
-    {
-        // Create a fake tx to spend - an output script we supposedly can spend.
-        $builder = new TxBuilder();
-        $fake = $builder->output(1, $outputScript)->getAndReset();
-
-        // Here is where
-        $spend = $builder->spendOutputFrom($fake, 0)->get();
-
-        $signData = new SignData();
-        if ($rs) {
-            $signData->p2sh($rs);
-        }
-        $signer = new Signer($spend, $ec);
-        $signer->sign(0, $privateKey, $fake->getOutput(0), $signData);
-
-        $spendTx = $signer->get();
-        $scriptSig = $spendTx->getInput(0)->getScript();
-
-        $i = new Interpreter($ec);
-
-        $check = $i->verify($scriptSig, $outputScript, $flags, new Checker($ec, $spendTx, 0, 0));
-        $this->assertEquals($eVerifyResult, $check);
-    }
-
     public function getScripts()
     {
-
         $flags = Interpreter::VERIFY_NONE;
         $vectors[] = [
             $flags,
