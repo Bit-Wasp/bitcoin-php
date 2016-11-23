@@ -70,6 +70,8 @@ interface InterpreterInterface
 
     const VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM = 1 << 12;
 
+    const VERIFY_MINIMALIF = 1 << 13;
+
     // Verify CHECKSEQUENCEVERIFY
     //
     // See BIP112 for details.

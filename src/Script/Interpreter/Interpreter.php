@@ -499,6 +499,17 @@ class Interpreter implements InterpreterInterface
                                 if ($mainStack->isEmpty()) {
                                     throw new \RuntimeException('Unbalanced conditional');
                                 }
+                                $vch = $mainStack[-1];
+
+                                if ($sigVersion === SigHash::V1 && ($flags & self::VERIFY_MINIMALIF)) {
+                                    if ($vch->getSize() > 1) {
+                                        throw new ScriptRuntimeException(self::VERIFY_MINIMALIF, 'Input to OP_IF/NOTIF should be minimally encoded');
+                                    }
+
+                                    if ($vch->getSize() === 1 && $vch->getBinary() !== "\x01") {
+                                        throw new ScriptRuntimeException(self::VERIFY_MINIMALIF, 'Input to OP_IF/NOTIF should be minimally encoded');
+                                    }
+                                }
 
                                 $buffer = Number::buffer($mainStack->pop(), $minimal)->getBuffer();
                                 $value = $this->castToBool($buffer);
