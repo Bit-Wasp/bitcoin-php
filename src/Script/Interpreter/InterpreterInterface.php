@@ -72,6 +72,8 @@ interface InterpreterInterface
 
     const VERIFY_MINIMALIF = 1 << 13;
 
+    const VERIFY_NULLFAIL = 1 << 14;
+
     // Verify CHECKSEQUENCEVERIFY
     //
     // See BIP112 for details.

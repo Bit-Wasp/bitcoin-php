@@ -161,6 +161,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
                 "WITNESS" => Interpreter::VERIFY_WITNESS,
                 "DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM" => Interpreter::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
                 "MINIMALIF" => Interpreter::VERIFY_MINIMALIF,
+                "NULLFAIL" => Interpreter::VERIFY_NULLFAIL,
             ];
         }
 
