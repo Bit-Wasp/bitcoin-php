@@ -884,6 +884,10 @@ class Interpreter implements InterpreterInterface
                             $mainStack->pop();
                             $mainStack->push($success ? $this->vchTrue : $this->vchFalse);
 
+                            if (!$success && ($flags & self::VERIFY_NULLFAIL) && $vchSig->getSize() > 0) {
+                                throw new ScriptRuntimeException(self::VERIFY_NULLFAIL, 'Signature must be zero for failed OP_CHECK(MULTIS)SIG operation');
+                            }
+
                             if ($opCode === Opcodes::OP_CHECKSIGVERIFY) {
                                 if ($success) {
                                     $mainStack->pop();
@@ -910,6 +914,7 @@ class Interpreter implements InterpreterInterface
 
                             // Extract positions of the keys, and signatures, from the stack.
                             $ikey = ++$i;
+                            $ikey2 = $keyCount + 2;
                             $i += $keyCount;
                             if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
@@ -949,6 +954,15 @@ class Interpreter implements InterpreterInterface
                             }
 
                             while ($i-- > 1) {
+                                // If the operation failed, we require that all signatures must be empty vector
+                                if (!$fSuccess && ($flags & self::VERIFY_NULLFAIL) && !$ikey2 && $mainStack[-1]->getSize() > 0) {
+                                    throw new ScriptRuntimeException(self::VERIFY_NULLFAIL, 'Bad signature must be empty vector');
+                                }
+
+                                if ($ikey2 > 0) {
+                                    $ikey2--;
+                                }
+
                                 $mainStack->pop();
                             }
 
