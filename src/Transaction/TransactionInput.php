@@ -40,14 +40,6 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @return TransactionInput
-     */
-    public function __clone()
-    {
-        $this->script = clone $this->script;
-    }
-
-    /**
      * @return OutPointInterface
      */
     public function getOutPoint()
