@@ -17,46 +17,11 @@ use BitWasp\Buffertools\Buffertools;
 
 class OutputClassifierTest extends AbstractTestCase
 {
-    public function testIsMultisigFail()
-    {
-        $script = new Script();
-        $classifier = new OutputClassifier();
-        $this->assertFalse($classifier->isMultisig($script));
-    }
-
     public function testIsKnown()
     {
         $script = new Script();
         $classifier = new OutputClassifier();
-        $this->assertEquals(OutputClassifier::UNKNOWN, $classifier->classify($script));
-    }
-
-    public function generateVectors()
-    {
-        $publicKey1 = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
-        $buffer1 = $publicKey1->getBuffer();
-        $p2pk = ScriptFactory::sequence([$buffer1, Opcodes::OP_CHECKSIG]);
-
-        $hash160 = $publicKey1->getPubKeyHash();
-        $p2pkh = ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $hash160, Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
-
-        $publicKey2 = $publicKey1->tweakAdd(gmp_init(1));
-        $multisig = ScriptFactory::scriptPubKey()->multisig(1, [$publicKey1, $publicKey2], false);
-
-        $p2wpkh = (new WitnessProgram(0, $hash160))->getScript();
-
-        $hash256 = Hash::sha256($hash160);
-        $p2wsh = (new WitnessProgram(0, $hash256))->getScript();
-
-        $p2sh = ScriptFactory::sequence([Opcodes::OP_HASH160, $hash160, Opcodes::OP_EQUAL]);
-        return [
-            [$p2pk->getHex(), $buffer1->getHex(), OutputClassifier::PAYTOPUBKEY],
-            [$p2pkh->getHex(), $hash160->getHex(), OutputClassifier::PAYTOPUBKEYHASH],
-            [$multisig->getHex(), [$buffer1->getHex(), $publicKey2->getBuffer()->getHex()], OutputClassifier::MULTISIG],
-            [$p2wpkh->getHex(), $hash160->getHex(), OutputClassifier::WITNESS_V0_KEYHASH],
-            [$p2wsh->getHex(), $hash256->getHex(), OutputClassifier::WITNESS_V0_SCRIPTHASH],
-            [$p2sh->getHex(), $hash160->getHex(), OutputClassifier::PAYTOSCRIPTHASH]
-        ];
+        $this->assertEquals(OutputClassifier::NONSTANDARD, $classifier->classify($script));
     }
 
     public function getVectors()
@@ -181,9 +146,11 @@ class OutputClassifierTest extends AbstractTestCase
     {
         $solution = '';
         $type = $classifier->classify($script, $solution);
+        $decoded = $classifier->decode($script);
 
         $this->assertEquals($classification, $type);
-
+        $this->assertEquals($type, $decoded->getType());
+        $this->assertEquals($script, $decoded->getScript());
         if (is_array($eSolution)) {
             $this->assertInternalType('array', $solution);
 
@@ -199,24 +166,35 @@ class OutputClassifierTest extends AbstractTestCase
             /** @var BufferInterface $eSolution */
             $this->assertTrue($solution->equals($eSolution));
         }
+        $this->assertEquals($decoded->getSolution(), $solution);
 
-        if ($type !== OutputClassifier::PAYTOPUBKEY) {
+        if ($type === OutputClassifier::PAYTOPUBKEY) {
+            $this->assertTrue($classifier->isPayToPublicKey($script));
+        } else {
             $this->assertFalse($classifier->isPayToPublicKey($script));
         }
 
-        if ($type !== OutputClassifier::PAYTOPUBKEYHASH) {
+        if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
+            $this->assertTrue($classifier->isPayToPublicKeyHash($script));
+        } else {
             $this->assertFalse($classifier->isPayToPublicKeyHash($script));
         }
 
-        if ($type !== OutputClassifier::MULTISIG) {
+        if ($type === OutputClassifier::MULTISIG) {
+            $this->assertTrue($classifier->isMultisig($script));
+        } else {
             $this->assertFalse($classifier->isMultisig($script));
         }
 
-        if ($type !== OutputClassifier::PAYTOSCRIPTHASH) {
+        if ($type === OutputClassifier::PAYTOSCRIPTHASH) {
+            $this->assertTrue($classifier->isPayToScriptHash($script));
+        } else {
             $this->assertFalse($classifier->isPayToScriptHash($script));
         }
 
-        if ($type !== OutputClassifier::WITNESS_V0_KEYHASH && $type !== OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+        if ($type === OutputClassifier::WITNESS_V0_SCRIPTHASH || $type === OutputClassifier::WITNESS_V0_KEYHASH) {
+            $this->assertTrue($classifier->isWitness($script));
+        } else {
             $this->assertFalse($classifier->isWitness($script));
         }
     }
