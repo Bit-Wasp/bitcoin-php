@@ -52,6 +52,14 @@ interface ScriptInterface extends SerializableInterface
     public function countP2shSigOps(ScriptInterface $scriptSig);
 
     /**
+     * @param ScriptInterface $scriptSig
+     * @param ScriptWitnessInterface $witness
+     * @param int $flags
+     * @return int
+     */
+    public function countWitnessSigOps(ScriptInterface $scriptSig, ScriptWitnessInterface $witness, $flags);
+
+    /**
      * @param ScriptInterface $script
      * @return bool
      */

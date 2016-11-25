@@ -2,10 +2,13 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -241,5 +244,23 @@ class ScriptTest extends AbstractTestCase
         }
 
         $this->assertEquals($valid, $isWitness);
+    }
+
+    public function testDebugInfo()
+    {
+        $this->assertInternalType('array', (new Script)->__debugInfo());
+    }
+
+    public function testBadScriptZeroSigOps()
+    {
+        $script = new Script(new Buffer("\x41"));
+        $this->assertEquals(0, $script->countSigOps($script));
+        $this->assertEquals(0, $script->countP2shSigops(new Script));
+
+        $p2sh = ScriptFactory::scriptPubKey()->payToScriptHash($script->getScriptHash());
+        $this->assertEquals(0, $p2sh->countP2shSigOps(ScriptFactory::sequence([$script->getBuffer()])));
+
+        $p2wsh = ScriptFactory::scriptPubKey()->witnessScriptHash(Hash::sha256($script->getBuffer()));
+        $this->assertEquals(0, $p2wsh->countWitnessSigOps(new Script(), new ScriptWitness([$script->getBuffer()]), 0 | Interpreter::VERIFY_WITNESS));
     }
 }
