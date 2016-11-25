@@ -18,8 +18,6 @@ use Mdanter\Ecc\Primitives\Point;
 
 class OutputScriptFactoryTest extends AbstractTestCase
 {
-
-
     public function testPayToAddress()
     {
         $publicKey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
@@ -140,19 +138,20 @@ class OutputScriptFactoryTest extends AbstractTestCase
     public function testCoinbaseWitnessCommitment()
     {
         $witnessMerkleRoot = new Buffer(random_bytes(32), 32);
-        $reservedVal = new Buffer('', 32);
-        $commitment = ScriptFactory::create()
+        $reservedVal = new Buffer(random_bytes(32), 32);
+        $hash = Hash::sha256d(new Buffer($witnessMerkleRoot->getBinary() . $reservedVal->getBinary()));
+
+        $expected = ScriptFactory::create()
             ->op('OP_RETURN')
-            ->push(new Buffer("\xaa\x21\xa9\xed" . Hash::sha256d(new Buffer($witnessMerkleRoot->getBinary() . $reservedVal->getBinary()))->getBinary()))
+            ->push(new Buffer("\xaa\x21\xa9\xed" . $hash->getBinary()))
             ->getScript();
 
-        $check = ScriptFactory::scriptPubKey()->witnessCoinbaseCommitment($witnessMerkleRoot);
-        $this->assertEquals($check, $commitment);
+        $this->assertEquals($expected, ScriptFactory::scriptPubKey()->witnessCoinbaseCommitment($hash));
     }
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Witness Merkle Root must be exactly 32-bytes
+     * @expectedExceptionMessage Witness commitment hash must be exactly 32-bytes
      */
     public function testBadCoinbaseWitnessCommitment()
     {

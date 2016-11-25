@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class OutputClassifier
@@ -19,6 +20,14 @@ class OutputClassifier
     const NULLDATA = 'nulldata';
     const UNKNOWN = 'nonstandard';
     const NONSTANDARD = 'nonstandard';
+
+    const P2PK = 'pubkey';
+    const P2PKH = 'pubkeyhash';
+    const P2SH = 'scripthash';
+    const P2WSH = 'witness_v0_scripthash';
+    const P2WKH = 'witness_v0_keyhash';
+
+    const WITNESS_COINBASE_COMMITMENT = 'witness_coinbase_commitment';
 
     /**
      * @param Operation[] $decoded
@@ -314,6 +323,44 @@ class OutputClassifier
     }
 
     /**
+     * @param array $decoded
+     * @return bool|BufferInterface
+     */
+    private function decodeWitnessCoinbaseCommitment(array $decoded)
+    {
+        if (count($decoded) !== 2) {
+            return false;
+        }
+
+        if ($decoded[0]->isPush() || $decoded[0]->getOp() !== Opcodes::OP_RETURN) {
+            return false;
+        }
+
+        if ($decoded[1]->isPush()) {
+            $data = $decoded[1]->getData()->getBinary();
+            if ($decoded[1]->getDataSize() === 0x24 && substr($data, 0, 4) === "\xaa\x21\xa9\xed") {
+                return new Buffer(substr($data, 4));
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @return bool
+     */
+    public function isWitnessCoinbaseCommitment(ScriptInterface $script)
+    {
+        try {
+            return $this->decodeWitnessCoinbaseCommitment($script->getScriptParser()->decode()) !== false;
+        } catch (\Exception $e) {
+        }
+
+        return false;
+    }
+
+    /**
      * @param ScriptInterface $script
      * @param mixed $solution
      * @return string
@@ -342,6 +389,9 @@ class OutputClassifier
         } else if (($witnessKeyHash = $this->decodeP2WKH($script, $decoded))) {
             $type = self::WITNESS_V0_KEYHASH;
             $solution = $witnessKeyHash;
+        } else if (($witCommitHash = $this->decodeWitnessCoinbaseCommitment($decoded))) {
+            $type = self::WITNESS_COINBASE_COMMITMENT;
+            $solution = $witCommitHash;
         } else if (($nullData = $this->decodeNullData($decoded))) {
             $type = self::NULLDATA;
             $solution = $nullData;

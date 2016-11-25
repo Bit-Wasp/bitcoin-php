@@ -27,6 +27,50 @@ class OutputScriptFactory
     }
 
     /**
+     * @param PublicKeyInterface $publicKey
+     * @return ScriptInterface
+     */
+    public function p2pk(PublicKeyInterface $publicKey)
+    {
+        return $this->payToPubKey($publicKey);
+    }
+
+    /**
+     * @param BufferInterface $pubKeyHash
+     * @return ScriptInterface
+     */
+    public function p2pkh(BufferInterface $pubKeyHash)
+    {
+        return $this->payToPubKeyHash($pubKeyHash);
+    }
+
+    /**
+     * @param BufferInterface $scriptHash
+     * @return ScriptInterface
+     */
+    public function p2sh(BufferInterface $scriptHash)
+    {
+        return $this->payToScriptHash($scriptHash);
+    }
+
+    /**
+     * @param BufferInterface $witnessScriptHash
+     * @return ScriptInterface
+     */
+    public function p2wsh(BufferInterface $witnessScriptHash)
+    {
+        return $this->witnessScriptHash($witnessScriptHash);
+    }
+
+    /**
+     * @param BufferInterface $witnessKeyHash
+     * @return ScriptInterface
+     */
+    public function p2wkh(BufferInterface $witnessKeyHash)
+    {
+        return $this->witnessKeyHash($witnessKeyHash);
+    }
+    /**
      * Create a Pay to pubkey output
      *
      * @param PublicKeyInterface  $publicKey
@@ -133,23 +177,18 @@ class OutputScriptFactory
     }
 
     /**
-     * @param BufferInterface $witnessMerkleRoot
+     * @param BufferInterface $commitment
      * @return ScriptInterface
      */
-    public function witnessCoinbaseCommitment(BufferInterface $witnessMerkleRoot)
+    public function witnessCoinbaseCommitment(BufferInterface $commitment)
     {
-        if ($witnessMerkleRoot->getSize() !== 32) {
-            throw new \RuntimeException('Witness Merkle Root must be exactly 32-bytes');
-        }
-
-        static $reservedValue = null;
-        if ($reservedValue === null) {
-            $reservedValue = new Buffer('', 32);
+        if ($commitment->getSize() !== 32) {
+            throw new \RuntimeException('Witness commitment hash must be exactly 32-bytes');
         }
 
         return ScriptFactory::sequence([
             Opcodes::OP_RETURN,
-            new Buffer("\xaa\x21\xa9\xed" . Hash::sha256d(new Buffer($witnessMerkleRoot->getBinary() . $reservedValue->getBinary()))->getBinary())
+            new Buffer("\xaa\x21\xa9\xed" . $commitment->getBinary())
         ]);
     }
 }
