@@ -5,9 +5,11 @@ namespace BitWasp\Bitcoin\Script\Factory;
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
@@ -128,5 +130,26 @@ class OutputScriptFactory
         }
 
         return ScriptFactory::sequence([Opcodes::OP_0, $scriptHash]);
+    }
+
+    /**
+     * @param BufferInterface $witnessMerkleRoot
+     * @return ScriptInterface
+     */
+    public function witnessCoinbaseCommitment(BufferInterface $witnessMerkleRoot)
+    {
+        if ($witnessMerkleRoot->getSize() !== 32) {
+            throw new \RuntimeException('Witness Merkle Root must be exactly 32-bytes');
+        }
+
+        static $reservedValue = null;
+        if ($reservedValue === null) {
+            $reservedValue = new Buffer('', 32);
+        }
+
+        return ScriptFactory::sequence([
+            Opcodes::OP_RETURN,
+            new Buffer("\xaa\x21\xa9\xed" . Hash::sha256d(new Buffer($witnessMerkleRoot->getBinary() . $reservedValue->getBinary()))->getBinary())
+        ]);
     }
 }
