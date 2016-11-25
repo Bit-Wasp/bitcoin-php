@@ -8,8 +8,8 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -144,6 +144,7 @@ class OutputClassifierTest extends AbstractTestCase
      */
     public function testCases(OutputClassifier $classifier, ScriptInterface $script, $eSolution, $classification)
     {
+        $factory = ScriptFactory::scriptPubKey();
         $solution = '';
         $type = $classifier->classify($script, $solution);
         $decoded = $classifier->decode($script);
@@ -170,30 +171,52 @@ class OutputClassifierTest extends AbstractTestCase
 
         if ($type === OutputClassifier::PAYTOPUBKEY) {
             $this->assertTrue($classifier->isPayToPublicKey($script));
+            $this->assertEquals(OutputClassifier::P2PK, $type);
+            $this->assertEquals($script, $factory->p2pk(PublicKeyFactory::fromHex($solution)));
         } else {
             $this->assertFalse($classifier->isPayToPublicKey($script));
         }
 
         if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
             $this->assertTrue($classifier->isPayToPublicKeyHash($script));
+            $this->assertEquals(OutputClassifier::P2PKH, $type);
+            $this->assertEquals($script, $factory->p2pkh($solution));
         } else {
             $this->assertFalse($classifier->isPayToPublicKeyHash($script));
         }
 
         if ($type === OutputClassifier::MULTISIG) {
             $this->assertTrue($classifier->isMultisig($script));
+            $count = (new Multisig($script))->getRequiredSigCount();
+            $this->assertEquals($script, $factory->multisig($count, array_map([PublicKeyFactory::class, 'fromHex'], $solution), false));
         } else {
             $this->assertFalse($classifier->isMultisig($script));
         }
 
         if ($type === OutputClassifier::PAYTOSCRIPTHASH) {
             $this->assertTrue($classifier->isPayToScriptHash($script));
+            $this->assertEquals(OutputClassifier::P2SH, $type);
+            $this->assertEquals($script, $factory->p2sh($solution));
         } else {
             $this->assertFalse($classifier->isPayToScriptHash($script));
         }
 
+        if ($type === OutputClassifier::WITNESS_COINBASE_COMMITMENT) {
+            $this->assertTrue($classifier->isWitnessCoinbaseCommitment($script));
+            $this->assertEquals($script, $factory->witnessCoinbaseCommitment($solution));
+        } else {
+            $this->assertFalse($classifier->isWitnessCoinbaseCommitment($script));
+        }
+
         if ($type === OutputClassifier::WITNESS_V0_SCRIPTHASH || $type === OutputClassifier::WITNESS_V0_KEYHASH) {
             $this->assertTrue($classifier->isWitness($script));
+            if ($type === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+                $this->assertEquals(OutputClassifier::P2WSH, $type);
+                $this->assertEquals($script, $factory->p2wsh($solution));
+            } else {
+                $this->assertEquals(OutputClassifier::P2WKH, $type);
+                $this->assertEquals($script, $factory->p2wkh($solution));
+            }
         } else {
             $this->assertFalse($classifier->isWitness($script));
         }
