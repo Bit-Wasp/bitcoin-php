@@ -77,15 +77,6 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return Transaction
-     */
-    public function __clone()
-    {
-        //$this->inputs = clone $this->inputs;
-        //$this->outputs = clone $this->outputs;
-    }
-
-    /**
      * @return BufferInterface
      */
     public function getTxHash()

@@ -32,14 +32,6 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * @return void
-     */
-    public function __clone()
-    {
-        $this->script = clone $this->script;
-    }
-
-    /**
      * @see TransactionOutputInterface::getValue()
      */
     public function getValue()
