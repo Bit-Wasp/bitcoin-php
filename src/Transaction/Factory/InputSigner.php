@@ -223,6 +223,7 @@ class InputSigner
     }
 
     /**
+     * @param int $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param ScriptWitnessInterface|null $scriptWitness
@@ -294,7 +295,7 @@ class InputSigner
 
         if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
             $sigVersion = SigHash::V1;
-            $this->signCode = $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
+            $solution = $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
         } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
             $sigVersion = SigHash::V1;
             $witnessScript = $signData->getWitnessScript();
@@ -509,35 +510,32 @@ class InputSigner
     }
 
     /**
-     * The function only returns true when $scriptPubKey could be classified
-     *
      * @param PrivateKeyInterface $key
-     * @param OutputData $solution
      * @param int $sigHashType
-     * @param int $sigVersion
+     * @return $this
      */
-    private function doSignature(PrivateKeyInterface $key, OutputData $solution, $sigHashType, $sigVersion = SigHash::V0)
+    public function sign(PrivateKeyInterface $key, $sigHashType = SigHash::ALL)
     {
         if ($this->isFullySigned()) {
-            return;
+            return $this;
         }
 
-        if ($solution->getType() === OutputClassifier::PAYTOPUBKEY) {
-            if (!$key->getPublicKey()->getBuffer()->equals($solution->getSolution())) {
+        if ($this->signScript->getType() === OutputClassifier::PAYTOPUBKEY) {
+            if (!$key->getPublicKey()->getBuffer()->equals($this->signScript->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
-            $this->signatures[0] = $this->calculateSignature($key, $solution->getScript(), $sigHashType, $sigVersion);
+            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
             $this->publicKeys[0] = $key->getPublicKey();
             $this->requiredSigs = 1;
-        } else if ($solution->getType() === OutputClassifier::PAYTOPUBKEYHASH) {
-            if (!$key->getPubKeyHash()->equals($solution->getSolution())) {
+        } else if ($this->signScript->getType() === OutputClassifier::PAYTOPUBKEYHASH) {
+            if (!$key->getPubKeyHash()->equals($this->signScript->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
-            $this->signatures[0] = $this->calculateSignature($key, $solution->getScript(), $sigHashType, $sigVersion);
+            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
             $this->publicKeys[0] = $key->getPublicKey();
             $this->requiredSigs = 1;
-        } else if ($solution->getType() === OutputClassifier::MULTISIG) {
-            $info = new Multisig($solution->getScript());
+        } else if ($this->signScript->getType() === OutputClassifier::MULTISIG) {
+            $info = new Multisig($this->signScript->getScript());
             $this->publicKeys = $info->getKeys();
             $this->requiredSigs = $info->getRequiredSigCount();
 
@@ -545,7 +543,7 @@ class InputSigner
             $signed = false;
             foreach ($info->getKeys() as $keyIdx => $publicKey) {
                 if ($myKey->equals($publicKey->getBuffer())) {
-                    $this->signatures[$keyIdx] = $this->calculateSignature($key, $solution->getScript(), $sigHashType, $sigVersion);
+                    $this->signatures[$keyIdx] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
                     $signed = true;
                 }
             }
@@ -556,35 +554,8 @@ class InputSigner
         } else {
             throw new \RuntimeException('Cannot sign unknown script type');
         }
-    }
 
-    /**
-     * @param PrivateKeyInterface $key
-     * @param int $sigHashType
-     * @return bool
-     */
-    public function sign(PrivateKeyInterface $key, $sigHashType = SigHash::ALL)
-    {
-        $solution = $this->scriptPubKey;
-        $sigVersion = SigHash::V0;
-        if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
-            $solution = $this->redeemScript;
-        }
-
-        if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $solution = $this->witnessKeyHash;
-            $sigVersion = SigHash::V1;
-        } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
-            $solution = $this->witnessScript;
-            $sigVersion = SigHash::V1;
-        }
-
-        if ($solution->canSign()) {
-            $this->doSignature($key, $solution, $sigHashType, $sigVersion);
-            return true;
-        }
-
-        return false;
+        return $this;
     }
 
     /**
