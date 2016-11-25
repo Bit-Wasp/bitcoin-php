@@ -17,7 +17,8 @@ class OutputClassifier
     const WITNESS_V0_SCRIPTHASH = 'witness_v0_scripthash';
     const MULTISIG = 'multisig';
     const NULLDATA = 'nulldata';
-    const UNKNOWN = 'unknown';
+    const UNKNOWN = 'nonstandard';
+    const NONSTANDARD = 'nonstandard';
 
     /**
      * @param Operation[] $decoded
@@ -320,7 +321,7 @@ class OutputClassifier
     public function classify(ScriptInterface $script, &$solution = null)
     {
         $decoded = $script->getScriptParser()->decode();
-        $type = self::UNKNOWN;
+        $type = self::NONSTANDARD;
         $solution = null;
 
         if (($pubKey = $this->decodeP2PK($decoded))) {
