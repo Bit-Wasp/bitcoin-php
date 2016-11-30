@@ -74,4 +74,16 @@ class Base58Test extends AbstractTestCase
 
         Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
     }
+
+    /**
+     * @expectedException \BitWasp\Bitcoin\Exceptions\Base58InvalidCharacter
+     */
+    public function testDecodeBadCharacter()
+    {
+        // 12D2adLM3UKy4bH891ZFDkWmXmotrMoF <-- valid
+        // 12D2adLM3UKy4bH891ZFDkWmXmotrM0F <-- 0 is not allowed in base58 strings
+        //                               ^
+
+        Base58::decode('12D2adLM3UKy4cH891ZFDkWmXmotrM0F');
+    }
 }
