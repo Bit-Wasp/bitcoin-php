@@ -24,8 +24,6 @@ class NetworkFactory
     public static function bitcoin()
     {
         $network = self::create('00', '05', '80')
-            ->setP2WPKHByte('06')
-            ->setP2WSHByte('0a')
             ->setHDPubByte('0488b21e')
             ->setHDPrivByte('0488ade4')
             ->setNetMagicBytes('d9b4bef9');
@@ -40,8 +38,6 @@ class NetworkFactory
     public static function bitcoinTestnet()
     {
         $network = self::create('6f', 'c4', 'ef', true)
-            ->setP2WPKHByte('03')
-            ->setP2WSHByte('28')
             ->setHDPubByte('043587cf')
             ->setHDPrivByte('04358394')
             ->setNetMagicBytes('0709110b');
