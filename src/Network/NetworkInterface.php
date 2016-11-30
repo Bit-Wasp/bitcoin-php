@@ -19,11 +19,6 @@ interface NetworkInterface
     public function getP2shByte();
 
     /**
-     * @return string
-     */
-    public function getP2WPKHByte();
-
-    /**
      * Get the private key byte for the network
      *
      * @return string
