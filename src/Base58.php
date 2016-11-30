@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Exceptions\Base58InvalidCharacter;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
@@ -53,9 +54,9 @@ class Base58
 
     /**
      * Decode a base58 string
-     *
      * @param string $base58
-     * @return BufferInterface
+     * @return Buffer
+     * @throws Base58InvalidCharacter
      */
     public static function decode($base58)
     {
@@ -69,7 +70,11 @@ class Base58
         $return = gmp_init(0);
         $_58 = gmp_init(58);
         for ($i = 0; $i < $length; $i++) {
-            $return = $math->add($math->mul($return, $_58), gmp_init(strpos(self::$base58chars, $base58[$i]), 10));
+            $loc = strpos(self::$base58chars, $base58[$i]);
+            if ($loc === false) {
+                throw new Base58InvalidCharacter('Found character that is not allowed in base58: ' . $base58[$i]);
+            }
+            $return = $math->add($math->mul($return, $_58), gmp_init($loc, 10));
         }
 
         $binary = $math->cmp($return, gmp_init(0)) === 0 ? '' : Buffer::int(gmp_strval($return, 10))->getBinary();

@@ -153,6 +153,6 @@ class PrivateKeyTest extends AbstractTestCase
      */
     public function testInvalidWif()
     {
-        PrivateKeyFactory::fromWif('50akdglashdgkjadsl');
+        PrivateKeyFactory::fromWif('5akdgashdgkjads');
     }
 }
