@@ -364,6 +364,10 @@ class InputSigner
             $redeemScript = null;
             if (count($chunks) > 0) {
                 $redeemScript = new Script($chunks[count($chunks) - 1]);
+            } else {
+                if (!$signData->hasRedeemScript()) {
+                    throw new \RuntimeException('Redeem script not provided in sign data or scriptSig');
+                }
             }
 
             if ($signData->hasRedeemScript()) {
@@ -398,6 +402,10 @@ class InputSigner
             $witnessScript = null;
             if (count($witness) > 0) {
                 $witnessScript = new Script($witness[count($witness) - 1]);
+            } else {
+                if (!$signData->hasWitnessScript()) {
+                    throw new \RuntimeException('Witness script not provided in sign data or witness');
+                }
             }
 
             if ($signData->hasWitnessScript()) {
@@ -549,8 +557,6 @@ class InputSigner
             if (!$signed) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
-        } else {
-            throw new \RuntimeException('Cannot sign unknown script type');
         }
 
         return $this;
@@ -615,8 +621,6 @@ class InputSigner
                     $result[] = $this->signatures[$i]->getBuffer();
                 }
             }
-        } else {
-            throw new \RuntimeException('Cannot serialize this script sig');
         }
 
         return $result;

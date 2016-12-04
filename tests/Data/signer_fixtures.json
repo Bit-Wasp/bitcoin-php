@@ -35,7 +35,6 @@
             "value": "10000000",
             "script": "76a91454d0e925d5ee0ee26768a237067dee793d01a70688ac"
           }
-
         ]
       }
     },
@@ -1588,6 +1587,60 @@
         "redeemScript": "00208072dc42c78d479a0c9932775e28f476694dd2909df6a9828d896ca99d5d17e6",
         "witnessScript": "76a914f1b7234a297cc5a04a0bfb3d372788ee920ec57288ac"
       }
+    },
+    {
+      "description": "Can't proceed when redeem script not available",
+      "exception": {
+        "type": "\\RuntimeException",
+        "message": "Redeem script not provided in sign data or scriptSig"
+      },
+      "txOut": {
+        "value": "1",
+        "script": "a914113f9652187f5bb0f35077f65b7c6cb65d57826687"
+      },
+      "inputs": [
+        {
+          "scriptSig": ""
+        }
+      ],
+      "signData": {
+      }
+    },
+    {
+      "description": "Can't proceed when witness script not available",
+      "exception": {
+        "type": "\\RuntimeException",
+        "message": "Witness script not provided in sign data or witness"
+      },
+      "txOut": {
+        "value": "1",
+        "script": "0020bd268e6fa4fb4ba60535cab6da62a2980aee09cc65ea75df095852ad98fcd09b"
+      },
+      "inputs": [
+        {
+          "scriptSig": "",
+          "witness": []
+        }
+      ],
+      "signData": {}
+    },
+    {
+      "description": "P2SH script in signdata and scriptSig must match",
+      "exception": {
+        "type": "\\RuntimeException",
+        "message": "Witness script not provided in sign data or witness"
+      },
+      "txOut": {
+        "value": "1",
+        "script": "0020bd268e6fa4fb4ba60535cab6da62a2980aee09cc65ea75df095852ad98fcd09b"
+      },
+      "inputs": [
+        {
+          "scriptSig": "",
+          "witness": []
+        }
+      ],
+      "signData": {}
     }
   ]
 }
