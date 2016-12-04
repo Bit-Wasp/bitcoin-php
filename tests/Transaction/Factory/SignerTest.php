@@ -366,5 +366,4 @@ class SignerTest extends AbstractTestCase
 
         $signer->input(0, $txOut)->getSigHash(20);
     }
-
 }
