@@ -557,8 +557,6 @@ class InputSigner
             if (!$signed) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
-        } else {
-            throw new \RuntimeException('Cannot sign unknown script type');
         }
 
         return $this;
@@ -623,8 +621,6 @@ class InputSigner
                     $result[] = $this->signatures[$i]->getBuffer();
                 }
             }
-        } else {
-            throw new \RuntimeException('Cannot serialize this script sig');
         }
 
         return $result;

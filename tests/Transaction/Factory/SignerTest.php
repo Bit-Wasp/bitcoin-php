@@ -2,12 +2,15 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -16,6 +19,8 @@ use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Utxo\Utxo;
@@ -295,5 +300,54 @@ class SignerTest extends AbstractTestCase
         $inValues = $inSigner->serializeSignatures();
         $this->assertTrue($origValues->getScriptSig()->equals($inValues->getScriptSig()));
         $this->assertTrue($origValues->getScriptWitness()->equals($inValues->getScriptWitness()));
+    }
+
+    /**
+     * @return ScriptInterface[]
+     */
+    public function getSimpleSpendCases()
+    {
+        $publicKey = PublicKeyFactory::fromHex('038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b');
+        return [
+            ScriptFactory::scriptPubKey()->p2pk($publicKey),
+            ScriptFactory::scriptPubKey()->p2pkh($publicKey->getPubKeyHash()),
+            ScriptFactory::scriptPubKey()->multisig(1, [$publicKey])
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getSimpleSpendVectors()
+    {
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $vectors = [];
+        foreach ($this->getSimpleSpendCases() as $script) {
+            $vectors[] = [$ecAdapter, $script];
+        }
+        return $vectors;
+    }
+
+    /**
+     * @param EcAdapterInterface $ecAdapter
+     * @param ScriptInterface $script
+     * @dataProvider getSimpleSpendVectors
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Signing with the wrong private key
+     */
+    public function testRejectsWrongKey(EcAdapterInterface $ecAdapter, ScriptInterface $script)
+    {
+        $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
+
+        $txOut = new TransactionOutput(5000000000, $script);
+
+        $tx = (new TxBuilder())
+            ->inputs([new TransactionInput($outpoint, new Script())])
+            ->outputs([new TransactionOutput(4900000000, $script)])
+            ->get();
+
+        $privateKey = PrivateKeyFactory::fromInt(1);
+        $signer = new Signer($tx, $ecAdapter);
+        $signer->input(0, $txOut)->sign($privateKey, SigHash::ALL);
     }
 }
