@@ -16,6 +16,10 @@ use BitWasp\Buffertools\Buffer;
 
 class InputSignerTest extends AbstractTestCase
 {
+    /**
+     * @param array $signDataArr
+     * @return SignData
+     */
     private function decodeSignData(array $signDataArr)
     {
         $signData = new SignData();
@@ -31,11 +35,18 @@ class InputSignerTest extends AbstractTestCase
         return $signData;
     }
 
+    /**
+     * @param array $txOutArr
+     * @return TransactionOutput
+     */
     private function decodeTxOut(array $txOutArr)
     {
         return new TransactionOutput($txOutArr['value'], ScriptFactory::fromHex($txOutArr['script']));
     }
 
+    /**
+     * @return array
+     */
     public function getVectors()
     {
         $fixtures = json_decode($this->dataFile('signer_fixtures.json'), true)['invalid_solve'];
@@ -81,6 +92,6 @@ class InputSignerTest extends AbstractTestCase
             return;
         }
 
-        throw new \RuntimeException('Didn\'t lead to exception as expected');
+        throw new \RuntimeException("Didn't lead to exception: expected {$exception} with message {$exceptionMsg}");
     }
 }

@@ -1529,7 +1529,7 @@
       "description": "Bad P2SH script found during extraction",
       "exception": {
         "type": "\\RuntimeException",
-        "message": "Extracted redeemScript did not match script-hash"
+        "message": "Extracted redeemScript did not match sign data"
       },
       "txOut": {
         "value": "1",
@@ -1548,7 +1548,7 @@
       "description": "Bad P2WSH script found during extraction",
       "exception": {
         "type": "\\RuntimeException",
-        "message": "Extracted witnessScript did not match witness-script-hash"
+        "message": "Extracted witnessScript did not match sign data"
       },
       "txOut": {
         "value": "1",
@@ -1570,7 +1570,7 @@
       "description": "Bad P2SH|P2WSH script found during extraction",
       "exception": {
         "type": "\\RuntimeException",
-        "message": "Extracted witnessScript did not match witness-script-hash"
+        "message": "Extracted witnessScript did not match sign data"
       },
       "txOut": {
         "value": "1",
