@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -339,15 +340,31 @@ class SignerTest extends AbstractTestCase
     {
         $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
 
-        $txOut = new TransactionOutput(5000000000, $script);
-
         $tx = (new TxBuilder())
             ->inputs([new TransactionInput($outpoint, new Script())])
             ->outputs([new TransactionOutput(4900000000, $script)])
             ->get();
 
         $privateKey = PrivateKeyFactory::fromInt(1);
+        $txOut = new TransactionOutput(5000000000, $script);
         $signer = new Signer($tx, $ecAdapter);
         $signer->input(0, $txOut)->sign($privateKey, SigHash::ALL);
     }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Invalid sigHashType requested
+     */
+    public function testRejectsInvalidSigHashType()
+    {
+        $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
+        $txOut = new TransactionOutput(5000000000, ScriptFactory::scriptPubKey()->p2pkh((new Random())->bytes(20)));
+        $signer = new Signer((new TxBuilder())
+            ->inputs([new TransactionInput($outpoint, new Script())])
+            ->outputs([new TransactionOutput(4900000000, new Script)])
+            ->get(), Bitcoin::getEcAdapter());
+
+        $signer->input(0, $txOut)->getSigHash(20);
+    }
+
 }
