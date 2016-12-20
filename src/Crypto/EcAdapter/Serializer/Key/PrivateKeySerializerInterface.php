@@ -14,11 +14,6 @@ interface PrivateKeySerializerInterface
     public function serialize(PrivateKeyInterface $privateKey);
 
     /**
-     * @return $this
-     */
-    public function setNextCompressed();
-
-    /**
      * @param string|BufferInterface $data
      * @return PrivateKeyInterface
      */

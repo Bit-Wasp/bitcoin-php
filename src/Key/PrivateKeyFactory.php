@@ -11,9 +11,22 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class PrivateKeyFactory
 {
+    /**
+     * @param bool $compressed
+     * @param EcAdapterInterface|null $ecAdapter
+     * @return PrivateKeyInterface
+     */
+    public static function create($compressed = false, EcAdapterInterface $ecAdapter = null)
+    {
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        return self::fromHex(self::generateSecret(), $compressed, $ecAdapter);
+    }
+
     /**
      * Generate a buffer containing a valid key
      *
@@ -34,53 +47,7 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param int|string $int
-     * @param bool $compressed
-     * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKeyInterface
-     */
-    public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
-    {
-        if (!(is_int($int) || is_string($int) && preg_match('/^[0-9]*$/', $int))) {
-            $debugFxn = __CLASS__ . "::" . __FUNCTION__;
-            throw new \InvalidArgumentException("Input to {$debugFxn} must be an base10 integer");
-        }
-
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        return $ecAdapter->getPrivateKey(gmp_init($int, 10), $compressed);
-    }
-
-    /**
-     * @param bool $compressed
-     * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKeyInterface
-     */
-    public static function create($compressed = false, EcAdapterInterface $ecAdapter = null)
-    {
-        $secret = self::generateSecret();
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        return self::fromInt($secret->getInt(), $compressed, $ecAdapter);
-    }
-
-    /**
-     * @param string $wif
-     * @param EcAdapterInterface|null $ecAdapter
-     * @param NetworkInterface $network
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface
-     * @throws InvalidPrivateKey
-     */
-    public static function fromWif($wif, EcAdapterInterface $ecAdapter = null, NetworkInterface $network = null)
-    {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $network = $network ?: Bitcoin::getNetwork();
-        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class);
-        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $serializer);
-
-        return $wifSerializer->parse($wif, $network);
-    }
-
-    /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $hex
+     * @param BufferInterface|string $hex
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyInterface
@@ -98,5 +65,35 @@ class PrivateKeyFactory
         }
 
         return $parsed;
+    }
+
+    /**
+     * @param int|string $int
+     * @param bool $compressed
+     * @param EcAdapterInterface|null $ecAdapter
+     * @return PrivateKeyInterface
+     */
+    public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
+    {
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $secret = Buffer::int($int, 32, $ecAdapter->getMath())->getGmp();
+        return $ecAdapter->getPrivateKey($secret, $compressed);
+    }
+
+    /**
+     * @param string $wif
+     * @param EcAdapterInterface|null $ecAdapter
+     * @param NetworkInterface $network
+     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface
+     * @throws InvalidPrivateKey
+     */
+    public static function fromWif($wif, EcAdapterInterface $ecAdapter = null, NetworkInterface $network = null)
+    {
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $network = $network ?: Bitcoin::getNetwork();
+        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class);
+        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $serializer);
+
+        return $wifSerializer->parse($wif, $network);
     }
 }

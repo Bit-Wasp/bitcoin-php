@@ -18,11 +18,6 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     private $ecAdapter;
 
     /**
-     * @var bool
-     */
-    private $haveNextCompressed = false;
-
-    /**
      * @param EcAdapter $ecAdapter
      */
     public function __construct(EcAdapter $ecAdapter)
@@ -36,20 +31,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      */
     public function serialize(PrivateKeyInterface $privateKey)
     {
-        return Buffer::int(
-            gmp_strval($privateKey->getSecret(), 10),
-            32,
-            $this->ecAdapter->getMath()
-        );
-    }
-
-    /**
-     * @return $this
-     */
-    public function setNextCompressed()
-    {
-        $this->haveNextCompressed = true;
-        return $this;
+        return Buffer::int(gmp_strval($privateKey->getSecret(), 10), 32, $this->ecAdapter->getMath());
     }
 
     /**
@@ -58,10 +40,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      */
     public function fromParser(Parser $parser)
     {
-        $compressed = $this->haveNextCompressed;
-        $this->haveNextCompressed = false;
-        $int = gmp_init($parser->readBytes(32)->getHex(), 16);
-        return $this->ecAdapter->getPrivateKey($int, $compressed);
+        return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getGmp());
     }
 
     /**
