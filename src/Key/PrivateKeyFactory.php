@@ -41,6 +41,11 @@ class PrivateKeyFactory
      */
     public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
+        if (!(is_int($int) || is_string($int) && preg_match('/^[0-9]*$/', $int))) {
+            $debugFxn = __CLASS__ . "::" . __FUNCTION__;
+            throw new \InvalidArgumentException("Input to {$debugFxn} must be an base10 integer");
+        }
+
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         return $ecAdapter->getPrivateKey(gmp_init($int, 10), $compressed);
     }
