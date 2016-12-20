@@ -200,7 +200,7 @@ class HierarchicalKey
     public function getHmacSeed($sequence)
     {
         if ($sequence < 0 || $sequence > pow(2, 32) - 1) {
-            throw new \RuntimeException('Sequence is outside valid range, must be >= 0 && <= 2^32-1');
+            throw new \InvalidArgumentException('Sequence is outside valid range, must be >= 0 && <= 2^32-1');
         }
 
         if (($sequence >> 31) === 1) {
