@@ -103,20 +103,8 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     public function tweakAdd(\GMP $tweak)
     {
         $adapter = $this->ecAdapter;
-        return $adapter->getPrivateKey(
-            $adapter
-                ->getMath()
-                ->getModularArithmetic(
-                    $adapter
-                        ->getGenerator()
-                        ->getOrder()
-                )
-                ->add(
-                    $tweak,
-                    $this->getSecret()
-                ),
-            $this->compressed
-        );
+        $modMath = $adapter->getMath()->getModularArithmetic($adapter->getGenerator()->getOrder());
+        return $adapter->getPrivateKey($modMath->add($tweak, $this->getSecret()), $this->compressed);
     }
 
     /**
@@ -126,20 +114,8 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     public function tweakMul(\GMP $tweak)
     {
         $adapter = $this->ecAdapter;
-        return $adapter->getPrivateKey(
-            $adapter
-            ->getMath()
-            ->getModularArithmetic(
-                $adapter
-                    ->getGenerator()
-                    ->getOrder()
-            )
-            ->mul(
-                $tweak,
-                $this->getSecret()
-            ),
-            $this->compressed
-        );
+        $modMath = $adapter->getMath()->getModularArithmetic($adapter->getGenerator()->getOrder());
+        return $adapter->getPrivateKey($modMath->mul($tweak, $this->getSecret()), $this->compressed);
     }
 
     /**
@@ -159,12 +135,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     {
         if (null === $this->publicKey) {
             $adapter = $this->ecAdapter;
-            $this->publicKey = $adapter->getPublicKey(
-                $adapter
-                    ->getGenerator()
-                    ->mul($this->secretMultiplier),
-                $this->compressed
-            );
+            $this->publicKey = $adapter->getPublicKey($adapter->getGenerator()->mul($this->secretMultiplier), $this->compressed);
         }
 
         return $this->publicKey;
