@@ -222,6 +222,10 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
+        if ($sequence < 0 || $sequence > pow(2, 32) - 1) {
+            throw new \RuntimeException('Sequence is outside valid range, must be >= 0 && <= 2^32-1');
+        }
+
         $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $this->getChainCode());
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
