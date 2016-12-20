@@ -9,10 +9,10 @@ class Math extends GmpMath
 {
 
     /**
-     * @param $integer
+     * @param \GMP $integer
      * @return bool
      */
-    public function isEven($integer)
+    public function isEven(\GMP $integer)
     {
         return $this->cmp($this->mod($integer, gmp_init(2)), gmp_init(0)) === 0;
     }
@@ -52,6 +52,10 @@ class Math extends GmpMath
      */
     public function decodeCompact($compact, &$isNegative, &$isOverflow)
     {
+        if ($compact < 0 || $compact > pow(2, 32) - 1) {
+            throw new \RuntimeException('Compact integer must be 32bit');
+        }
+
         $compact = gmp_init($compact, 10);
         $size = $this->rightShift($compact, 24);
         $word = $this->bitwiseAnd($compact, gmp_init(0x007fffff));
