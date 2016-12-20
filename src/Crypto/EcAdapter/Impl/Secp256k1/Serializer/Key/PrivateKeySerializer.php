@@ -16,11 +16,6 @@ use BitWasp\Buffertools\Parser;
 class PrivateKeySerializer implements PrivateKeySerializerInterface
 {
     /**
-     * @var bool
-     */
-    private $haveNextCompressed = false;
-
-    /**
      * @var EcAdapter
      */
     private $ecAdapter;
@@ -53,30 +48,13 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * Tells the serializer the next key to be parsed should be compressed.
-     *
-     * @return $this
-     */
-    public function setNextCompressed()
-    {
-        $this->haveNextCompressed = true;
-        return $this;
-    }
-
-    /**
      * @param Parser $parser
      * @return PrivateKey
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser $parser)
     {
-        $compressed = $this->haveNextCompressed;
-        $this->haveNextCompressed = false;
-
-        return $this->ecAdapter->getPrivateKey(
-            gmp_init($parser->readBytes(32)->getHex(), 16),
-            $compressed
-        );
+        return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getGmp());
     }
 
     /**
