@@ -5,8 +5,8 @@ namespace BitWasp\Bitcoin\Key\Deterministic;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Util\IntMax;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
@@ -60,6 +60,18 @@ class HierarchicalKey
      */
     public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, BufferInterface $chainCode, KeyInterface $key)
     {
+        if ($depth < 0 || $depth > 255) {
+            throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0-255] inclusive');
+        }
+
+        if ($parentFingerprint < 0 || $parentFingerprint > IntMax::U32) {
+            throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0-255] inclusive');
+        }
+
+        if ($sequence < 0 || $sequence > IntMax::U32) {
+            throw new \InvalidArgumentException('Invalid sequence for BIP32 key, must be in range [0-255] inclusive');
+        }
+
         if ($chainCode->getSize() !== 32) {
             throw new \RuntimeException('Chaincode should be 32 bytes');
         }
@@ -199,8 +211,8 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
-        if ($sequence < 0 || $sequence > pow(2, 32) - 1) {
-            throw new \InvalidArgumentException('Sequence is outside valid range, must be >= 0 && <= 2^32-1');
+        if ($sequence < 0 || $sequence > IntMax::U32) {
+            throw new \InvalidArgumentException("Sequence is outside valid range, must be >= 0 && <= 2^32-1");
         }
 
         if (($sequence >> 31) === 1) {
@@ -227,7 +239,12 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $this->getChainCode());
+        $nextDepth = $this->depth + 1;
+        if ($nextDepth > 255) {
+            throw new \InvalidArgumentException('Invalid depth for BIP32 key, cannot exceed 255');
+        }
+
+        $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $this->chainCode);
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
 
@@ -240,7 +257,7 @@ class HierarchicalKey
 
         return new HierarchicalKey(
             $this->ecAdapter,
-            $this->getDepth() + 1,
+            $nextDepth,
             $this->getChildFingerprint(),
             $sequence,
             $chain,
@@ -278,6 +295,7 @@ class HierarchicalKey
         $sequences = new HierarchicalKeySequence();
         return $this->deriveFromList($sequences->decodePath($path));
     }
+
 
     /**
      * Serializes the instance according to whether it wraps a private or public key.
