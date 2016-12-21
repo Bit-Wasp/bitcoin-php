@@ -243,6 +243,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      * @expectedException \Exception
      */
     public function testGetExtendedPrivateKeyFailure(EcAdapterInterface $ecAdapter)
@@ -356,6 +357,41 @@ class HierarchicalKeyTest extends AbstractTestCase
         $k = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
         $key = HierarchicalKeyFactory::fromExtended($k, $this->network, $ecAdapter);
         $key->deriveChild('2147483648');
+    }
+
+    public function getInvalidSequences()
+    {
+        return [
+            [-1],
+            [pow(2, 32)],
+            [pow(2, 64)],
+        ];
+    }
+
+    /**
+     * @dataProvider getInvalidSequences
+     * @param int $sequence
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= 2^32-1
+     */
+    public function testInvalidSequenceGetHmac($sequence)
+    {
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network, $ecAdapter);
+        $key->getHmacSeed($sequence);
+    }
+
+    /**
+     * @dataProvider getInvalidSequences
+     * @param int $sequence
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= 2^32-1
+     */
+    public function testInvalidSequenceDeriveChild($sequence)
+    {
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network, $ecAdapter);
+        $key->deriveChild($sequence);
     }
 
     /**

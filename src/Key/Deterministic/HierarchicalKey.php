@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
@@ -44,7 +45,7 @@ class HierarchicalKey
     private $chainCode;
 
     /**
-     * @var KeyInterface
+     * @var PublicKeyInterface|PrivateKeyInterface
      */
     private $key;
 
@@ -146,7 +147,7 @@ class HierarchicalKey
     /**
      * Get the public key the private key or public key.
      *
-     * @return PublicKey
+     * @return PublicKeyInterface
      */
     public function getPublicKey()
     {
@@ -198,6 +199,10 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
+        if ($sequence < 0 || $sequence > pow(2, 32) - 1) {
+            throw new \InvalidArgumentException('Sequence is outside valid range, must be >= 0 && <= 2^32-1');
+        }
+
         if (($sequence >> 31) === 1) {
             if ($this->isPrivate() === false) {
                 throw new \Exception("Can't derive a hardened key without the private key");
@@ -222,10 +227,6 @@ class HierarchicalKey
      */
     public function deriveChild($sequence)
     {
-        if ($sequence < 0 || $sequence > pow(2, 32) - 1) {
-            throw new \RuntimeException('Sequence is outside valid range, must be >= 0 && <= 2^32-1');
-        }
-
         $hash = Hash::hmac('sha512', $this->getHmacSeed($sequence), $this->getChainCode());
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
