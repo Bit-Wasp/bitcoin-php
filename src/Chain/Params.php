@@ -113,7 +113,7 @@ class Params implements ParamsInterface
 
         $inputScript = ScriptFactory::create()
             ->push(Buffer::int('486604799', 4, $this->math)->flip())
-            ->push(Buffer::int('4', null, $this->math))
+            ->push(Buffer::int('4', 1, $this->math))
             ->push($timestamp)
             ->getScript();
 
