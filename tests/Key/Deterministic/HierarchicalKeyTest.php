@@ -372,7 +372,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @dataProvider getInvalidSequences
      * @param int $sequence
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= 2^32-1
+     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= (2^31)-1
      */
     public function testInvalidSequenceGetHmac($sequence)
     {
@@ -385,7 +385,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @dataProvider getInvalidSequences
      * @param int $sequence
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= 2^32-1
+     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= (2^31)-1
      */
     public function testInvalidSequenceDeriveChild($sequence)
     {

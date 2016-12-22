@@ -48,6 +48,7 @@ class EcAdapterTest extends AbstractTestCase
     {
         $priv = PrivateKeyFactory::fromHex($privHex, false, $ec);
         $this->assertSame($priv->getPublicKey()->getHex(), $pubHex);
+        $this->assertSame($privHex, $priv->getHex());
 
         $priv = PrivateKeyFactory::fromHex($privHex, true, $ec);
         $this->assertSame($priv->getPublicKey()->getHex(), $compressedHex);

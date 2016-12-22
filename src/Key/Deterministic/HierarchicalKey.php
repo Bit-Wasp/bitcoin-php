@@ -60,16 +60,16 @@ class HierarchicalKey
      */
     public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, BufferInterface $chainCode, KeyInterface $key)
     {
-        if ($depth < 0 || $depth > 255) {
-            throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0-255] inclusive');
+        if ($depth < 0 || $depth > IntMax::U8) {
+            throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0 - 255] inclusive');
         }
 
         if ($parentFingerprint < 0 || $parentFingerprint > IntMax::U32) {
-            throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0-255] inclusive');
+            throw new \InvalidArgumentException('Invalid fingerprint for BIP32 key, must be in range [0 - (2^31)-1] inclusive');
         }
 
         if ($sequence < 0 || $sequence > IntMax::U32) {
-            throw new \InvalidArgumentException('Invalid sequence for BIP32 key, must be in range [0-255] inclusive');
+            throw new \InvalidArgumentException('Invalid sequence for BIP32 key, must be in range [0 - (2^31)-1] inclusive');
         }
 
         if ($chainCode->getSize() !== 32) {
@@ -212,7 +212,7 @@ class HierarchicalKey
     public function getHmacSeed($sequence)
     {
         if ($sequence < 0 || $sequence > IntMax::U32) {
-            throw new \InvalidArgumentException("Sequence is outside valid range, must be >= 0 && <= 2^32-1");
+            throw new \InvalidArgumentException("Sequence is outside valid range, must be >= 0 && <= (2^31)-1");
         }
 
         if (($sequence >> 31) === 1) {
