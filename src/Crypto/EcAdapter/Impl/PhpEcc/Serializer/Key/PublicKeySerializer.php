@@ -83,6 +83,8 @@ class PublicKeySerializer implements PublicKeySerializerInterface
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
-        return $this->ecAdapter->publicKeyFromBuffer($buffer);
+        /** @var PublicKey $key */
+        $key = $this->ecAdapter->publicKeyFromBuffer($buffer);
+        return $key;
     }
 }
