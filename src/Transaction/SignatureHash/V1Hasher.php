@@ -58,7 +58,7 @@ class V1Hasher extends SigHash
         if (!($sighashType & SigHash::ANYONECANPAY) && ($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
             $binary = '';
             foreach ($this->tx->getInputs() as $input) {
-                $binary .= Buffer::int($input->getSequence())->flip()->getBinary();
+                $binary .= Buffer::int($input->getSequence(), 4)->flip()->getBinary();
             }
 
             return Hash::sha256d(new Buffer($binary));
