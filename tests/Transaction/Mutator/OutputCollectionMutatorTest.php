@@ -12,9 +12,9 @@ class OutputCollectionMutatorTest extends AbstractTestCase
 {
     public function testMutatesOutputCollection()
     {
-        $value1 = -1;
+        $value1 = 12;
         $script1 = new Script(new Buffer('0'));
-        $value2 = -2;
+        $value2 = 20;
         $script2 = new Script(new Buffer('1'));
         $collection = [
             new TransactionOutput(5, new Script()),

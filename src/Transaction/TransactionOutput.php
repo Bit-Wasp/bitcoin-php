@@ -27,6 +27,9 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      */
     public function __construct($value, ScriptInterface $script)
     {
+        if ($value < 0) {
+            throw new \RuntimeException('Transaction output value cannot be negative');
+        }
         $this->value = $value;
         $this->script = $script;
     }

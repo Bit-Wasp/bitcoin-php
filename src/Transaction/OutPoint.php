@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
+use BitWasp\Bitcoin\Util\IntMax;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
@@ -28,6 +29,10 @@ class OutPoint extends Serializable implements OutPointInterface
     {
         if ($hashPrevOutput->getSize() !== 32) {
             throw new \InvalidArgumentException('OutPoint: hashPrevOut must be a 32-byte Buffer');
+        }
+
+        if ($nPrevOutput < 0 || $nPrevOutput > IntMax::U32) {
+            throw new \InvalidArgumentException('nPrevOut must be between 0 and 0xffffffff');
         }
 
         $this->hashPrevOutput = $hashPrevOutput;
