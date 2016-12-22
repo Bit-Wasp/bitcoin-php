@@ -50,19 +50,15 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     {
         $math = $this->ecAdapter->getMath();
         $point = $publicKey->getPoint();
-        $compressed = $publicKey->isCompressed();
 
-        $parser = new Parser('', $math);
-        $parser->writeBytes(1, new Buffer($this->getPrefix($publicKey)));
+        $length = 33;
+        $data = $this->getPrefix($publicKey) . Buffer::int(gmp_strval($point->getX(), 10), 32, $math)->getBinary();
+        if (!$publicKey->isCompressed()) {
+            $length = 65;
+            $data .= Buffer::int(gmp_strval($point->getY(), 10), 32, $math)->getBinary();
+        }
 
-        $compressed
-            ? $parser
-            ->writeBytes(32, Buffer::int(gmp_strval($point->getX(), 10), null, $math))
-            : $parser
-            ->writeBytes(32, Buffer::int(gmp_strval($point->getX(), 10), null, $math))
-            ->writeBytes(32, Buffer::int(gmp_strval($point->getY(), 10), null, $math));
-
-        return $parser->getBuffer();
+        return new Buffer($data, $length, $math);
     }
 
     /**
