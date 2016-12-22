@@ -173,8 +173,8 @@ class Checker
             ->checkPublicKeyEncoding($keyBuf, $flags);
 
         try {
-            $txSignature = TransactionSignatureFactory::fromHex($sigBuf->getHex());
-            $publicKey = PublicKeyFactory::fromHex($keyBuf->getHex());
+            $txSignature = TransactionSignatureFactory::fromHex($sigBuf);
+            $publicKey = PublicKeyFactory::fromHex($keyBuf);
 
             if ($sigVersion === 1) {
                 $hasher = new V1Hasher($this->transaction, $this->amount);
