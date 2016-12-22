@@ -25,6 +25,7 @@
   "require": {
     "php-64bit": ">=5.6",
     "ext-gmp": "*",
+    "ext-bcmath": "*",
     "ext-openssl": "*",
     "paragonie/random_compat": "^1.4.0|^2.0.0",
     "pleonasm/merkle-tree": "1.0.0",
