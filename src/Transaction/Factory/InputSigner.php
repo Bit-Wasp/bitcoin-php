@@ -305,7 +305,11 @@ class InputSigner
             if ($size > 1) {
                 $vars = [];
                 for ($i = 1, $j = $size - 1; $i <= $j; $i++) {
-                    $vars[] = TransactionSignatureFactory::fromHex($stack[$i], $this->ecAdapter);
+                    try {
+                        $vars[] = TransactionSignatureFactory::fromHex($stack[$i], $this->ecAdapter);
+                    } catch (\Exception $e) {
+                        // Try-catch block necessary because we don't know it's actually a TransactionSignature
+                    }
                 }
 
                 $this->signatures = array_fill(0, count($this->publicKeys), null);
