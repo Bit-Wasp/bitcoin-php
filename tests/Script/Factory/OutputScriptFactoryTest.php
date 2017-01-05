@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use Mdanter\Ecc\Primitives\Point;
@@ -31,7 +32,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertTrue($p2pkh->getHash()->equals($parsedScript[2]->getData()));
         $this->assertEquals(Opcodes::OP_EQUALVERIFY, $parsedScript[3]->getOp());
         $this->assertEquals(Opcodes::OP_CHECKSIG, $parsedScript[4]->getOp());
-        $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, $classifier->classify($p2pkhScript));
+        $this->assertEquals(ScriptType::P2PKH, $classifier->classify($p2pkhScript));
 
         $p2sh = AddressFactory::fromScript(ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]));
         $p2shScript = ScriptFactory::scriptPubKey()->payToAddress($p2sh);
@@ -39,7 +40,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[0]->getOp());
         $this->assertTrue($p2sh->getHash()->equals($parsedScript[1]->getData()));
         $this->assertEquals(Opcodes::OP_EQUAL, $parsedScript[2]->getOp());
-        $this->assertEquals(OutputClassifier::PAYTOSCRIPTHASH, $classifier->classify($p2shScript));
+        $this->assertEquals(ScriptType::P2SH, $classifier->classify($p2shScript));
     }
 
     public function testPayToPubKey()
@@ -58,14 +59,14 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $parsed = $script->getScriptParser()->decode();
         $this->assertSame($publicKeyComp->getHex(), $parsed[0]->getData()->getHex());
         $this->assertSame(Opcodes::OP_CHECKSIG, $parsed[1]->getOp());
-        $this->assertEquals(OutputClassifier::PAYTOPUBKEY, $classifier->classify($script));
+        $this->assertEquals(ScriptType::P2PK, $classifier->classify($script));
 
         $publicKeyUncomp = new PublicKey($phpecc, $point, false);
         $script = ScriptFactory::scriptPubKey()->payToPubKey($publicKeyUncomp);
         $parsed = $script->getScriptParser()->decode();
         $this->assertSame($publicKeyUncomp->getHex(), $parsed[0]->getData()->getHex());
         $this->assertSame(Opcodes::OP_CHECKSIG, $parsed[1]->getOp());
-        $this->assertEquals(OutputClassifier::PAYTOPUBKEY, $classifier->classify($script));
+        $this->assertEquals(ScriptType::P2PK, $classifier->classify($script));
     }
 
     public function testPayToPubKeyInvalid()
@@ -96,7 +97,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertSame(Opcodes::OP_EQUALVERIFY, $parsed[3]->getOp());
 
         $classifier = new OutputClassifier();
-        $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, $classifier->classify($script));
+        $this->assertEquals(ScriptType::P2PKH, $classifier->classify($script));
     }
 
     public function testClassifyMultisig()
@@ -111,7 +112,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
             ->getScript();
 
         $classifier = new OutputClassifier();
-        $this->assertEquals(OutputClassifier::MULTISIG, $classifier->classify($script));
+        $this->assertEquals(ScriptType::MULTISIG, $classifier->classify($script));
     }
 
     public function testPayToScriptHash()
@@ -132,7 +133,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertSame(Opcodes::OP_HASH160, $parsed[0]->getOp());
         $this->assertSame('f7c29c0c6d319e33c9250fca0cb61a500621d93e', $parsed[1]->getData()->getHex());
         $this->assertSame(Opcodes::OP_EQUAL, $parsed[2]->getOp());
-        $this->assertEquals(OutputClassifier::PAYTOSCRIPTHASH, (new OutputClassifier())->classify($scriptHash));
+        $this->assertEquals(ScriptType::P2SH, (new OutputClassifier())->classify($scriptHash));
     }
 
     public function testCoinbaseWitnessCommitment()

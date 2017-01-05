@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class PayToPubkeyHashTest extends AbstractTestCase
@@ -17,7 +18,7 @@ class PayToPubkeyHashTest extends AbstractTestCase
 
         $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pub->getPubKeyHash());
         $classifier = new OutputClassifier();
-        $this->assertEquals(OutputClassifier::PAYTOPUBKEYHASH, $classifier->classify($script));
+        $this->assertEquals(ScriptType::P2PKH, $classifier->classify($script));
 
         $info = new PayToPubkeyHash($script);
         $this->assertEquals(1, $info->getRequiredSigCount());
