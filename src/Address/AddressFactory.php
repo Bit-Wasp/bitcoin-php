@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Buffertools\BufferInterface;
 
 class AddressFactory
@@ -43,10 +44,10 @@ class AddressFactory
     {
         $decode = (new OutputClassifier())->decode($outputScript);
         switch ($decode->getType()) {
-            case OutputClassifier::PAYTOPUBKEYHASH:
+            case ScriptType::P2PKH:
                 /** @var BufferInterface $solution */
                 return new PayToPubKeyHashAddress($decode->getSolution());
-            case OutputClassifier::PAYTOSCRIPTHASH:
+            case ScriptType::P2SH:
                 /** @var BufferInterface $solution */
                 return new ScriptHashAddress($decode->getSolution());
             default:
@@ -94,6 +95,9 @@ class AddressFactory
     }
 
     /**
+     * Following a loose definition of 'associated', returns
+     * the current script types, and a PayToPubKeyHash address for P2PK.
+     *
      * @param ScriptInterface $script
      * @return AddressInterface
      * @throws \RuntimeException
@@ -102,7 +106,7 @@ class AddressFactory
     {
         $classifier = new OutputClassifier();
         $decode = $classifier->decode($script);
-        if ($decode->getType() === OutputClassifier::PAYTOPUBKEY) {
+        if ($decode->getType() === ScriptType::P2PK) {
             return PublicKeyFactory::fromHex($decode->getSolution())->getAddress();
         } else {
             return self::fromOutputScript($script);

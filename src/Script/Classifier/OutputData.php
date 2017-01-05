@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script\Classifier;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptType;
 
 class OutputData
 {
@@ -63,6 +64,6 @@ class OutputData
      */
     public function canSign()
     {
-        return in_array($this->type, [OutputClassifier::MULTISIG, OutputClassifier::PAYTOPUBKEY, OutputClassifier::PAYTOPUBKEYHASH]);
+        return in_array($this->type, [ScriptType::MULTISIG, ScriptType::P2PK, ScriptType::P2PKH]);
     }
 }

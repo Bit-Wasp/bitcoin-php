@@ -6,27 +6,85 @@ use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class OutputClassifier
 {
+    /**
+     * @deprecated
+     */
     const PAYTOPUBKEY = 'pubkey';
+
+    /**
+     * @deprecated
+     */
     const PAYTOPUBKEYHASH = 'pubkeyhash';
+
+    /**
+     * @deprecated
+     */
     const PAYTOSCRIPTHASH = 'scripthash';
+
+    /**
+     * @deprecated
+     */
     const WITNESS_V0_KEYHASH = 'witness_v0_keyhash';
+
+    /**
+     * @deprecated
+     */
     const WITNESS_V0_SCRIPTHASH = 'witness_v0_scripthash';
+
+    /**
+     * @deprecated
+     */
     const MULTISIG = 'multisig';
+
+    /**
+     * @deprecated
+     */
     const NULLDATA = 'nulldata';
+
+    /**
+     * @deprecated
+     */
     const UNKNOWN = 'nonstandard';
+
+    /**
+     * @deprecated
+     */
     const NONSTANDARD = 'nonstandard';
 
+    /**
+     * @deprecated
+     */
     const P2PK = 'pubkey';
+
+    /**
+     * @deprecated
+     */
     const P2PKH = 'pubkeyhash';
+
+    /**
+     * @deprecated
+     */
     const P2SH = 'scripthash';
+
+    /**
+     * @deprecated
+     */
     const P2WSH = 'witness_v0_scripthash';
+
+    /**
+     * @deprecated
+     */
     const P2WKH = 'witness_v0_keyhash';
 
+    /**
+     * @deprecated
+     */
     const WITNESS_COINBASE_COMMITMENT = 'witness_coinbase_commitment';
 
     /**
@@ -368,32 +426,32 @@ class OutputClassifier
     public function classify(ScriptInterface $script, &$solution = null)
     {
         $decoded = $script->getScriptParser()->decode();
-        $type = self::NONSTANDARD;
+        $type = ScriptType::NONSTANDARD;
         $solution = null;
 
         if (($pubKey = $this->decodeP2PK($decoded))) {
-            $type = self::PAYTOPUBKEY;
+            $type = ScriptType::P2PK;
             $solution = $pubKey;
         } else if (($pubKeyHash = $this->decodeP2PKH($decoded))) {
-            $type = self::PAYTOPUBKEYHASH;
+            $type = ScriptType::P2PKH;
             $solution = $pubKeyHash;
         } else if (($multisig = $this->decodeMultisig($decoded))) {
-            $type = self::MULTISIG;
+            $type = ScriptType::MULTISIG;
             $solution = $multisig;
         } else if (($scriptHash = $this->decodeP2SH($decoded))) {
-            $type = self::PAYTOSCRIPTHASH;
+            $type = ScriptType::P2SH;
             $solution = $scriptHash;
         } else if (($witnessScriptHash = $this->decodeP2WSH($script, $decoded))) {
-            $type = self::WITNESS_V0_SCRIPTHASH;
+            $type = ScriptType::P2WSH;
             $solution = $witnessScriptHash;
         } else if (($witnessKeyHash = $this->decodeP2WKH($script, $decoded))) {
-            $type = self::WITNESS_V0_KEYHASH;
+            $type = ScriptType::P2WKH;
             $solution = $witnessKeyHash;
         } else if (($witCommitHash = $this->decodeWitnessCoinbaseCommitment($decoded))) {
-            $type = self::WITNESS_COINBASE_COMMITMENT;
+            $type = ScriptType::WITNESS_COINBASE_COMMITMENT;
             $solution = $witCommitHash;
         } else if (($nullData = $this->decodeNullData($decoded))) {
-            $type = self::NULLDATA;
+            $type = ScriptType::NULLDATA;
             $solution = $nullData;
         }
 
