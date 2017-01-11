@@ -47,6 +47,20 @@ class NetworkFactory
 
     /**
      * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function bitcoinRegtest()
+    {
+        $network = self::create('6f', 'c4', 'ef', true)
+            ->setHDPubByte('043587cf')
+            ->setHDPrivByte('04358394')
+            ->setNetMagicBytes('dab5bffa');
+
+        return $network;
+    }
+
+    /**
+     * @return NetworkInterface
      */
     public static function bitcoinSegnet()
     {

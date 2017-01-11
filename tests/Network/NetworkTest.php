@@ -135,8 +135,7 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals(NetworkFactory::bitcoin()->getNetMagicBytes(), 'd9b4bef9');
         $this->assertEquals('36PrZ1KHYMpqSyAQXSG8VwbUiq2EogxLo2', $p2sh->getAddress(NetworkFactory::bitcoin()));
         $this->assertEquals('1dice8EMZmqKvrGE4Qc9bUFf9PX3xaYDp', $p2pk->getAddress(NetworkFactory::bitcoin()));
-
-
+        // Testnet
         $this->assertEquals(NetworkFactory::bitcoinTestnet()->getAddressByte(), '6f');
         $this->assertEquals(NetworkFactory::bitcoinTestnet()->getP2shByte(), 'c4');
         $this->assertEquals(NetworkFactory::bitcoinTestnet()->getPrivByte(), 'ef');
@@ -144,6 +143,14 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals(NetworkFactory::bitcoinTestnet()->getHDPrivByte(), '04358394');
         $this->assertEquals(NetworkFactory::bitcoinTestnet()->getHDPubByte(), '043587cf');
         $this->assertEquals(NetworkFactory::bitcoinTestnet()->getNetMagicBytes(), '0709110b');
+        // Regtest
+        $this->assertEquals(NetworkFactory::bitcoinRegtest()->getAddressByte(), NetworkFactory::bitcoinTestnet()->getAddressByte());
+        $this->assertEquals(NetworkFactory::bitcoinRegtest()->getP2shByte(), NetworkFactory::bitcoinTestnet()->getP2shByte());
+        $this->assertEquals(NetworkFactory::bitcoinRegtest()->getPrivByte(), NetworkFactory::bitcoinTestnet()->getPrivByte());
+        $this->assertEquals(NetworkFactory::bitcoinRegtest()->getHDPrivByte(), NetworkFactory::bitcoinTestnet()->getHDPrivByte());
+        $this->assertEquals(NetworkFactory::bitcoinRegtest()->getHDPubByte(), NetworkFactory::bitcoinTestnet()->getHDPubByte());
+        $this->assertEquals(NetworkFactory::bitcoinRegtest()->isTestnet(), NetworkFactory::bitcoinTestnet()->isTestnet());
+        $this->assertEquals(NetworkFactory::bitcoinRegtest()->getNetMagicBytes(), 'dab5bffa');
 
         $this->assertEquals('2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV', $p2sh->getAddress(NetworkFactory::bitcoinTestnet()));
         $this->assertEquals('mg9fuhDDAbD673KswdNyyWgaX8zDxJT8QY', $p2pk->getAddress(NetworkFactory::bitcoinTestnet()));
