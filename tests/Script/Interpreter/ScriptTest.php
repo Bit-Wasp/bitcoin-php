@@ -126,6 +126,10 @@ class ScriptTest extends AbstractTestCase
         $builder = ScriptFactory::create();
         $split = explode(" ", $string);
         foreach ($split as $item) {
+            if ($item === 'NOP3') {
+                $item = 'OP_CHECKSEQUENCEVERIFY';
+            }
+
             if (strlen($item) == '') {
             } else if (preg_match("/^[0-9]*$/", $item) || substr($item, 0, 1) === "-" && preg_match("/^[0-9]*$/", substr($item, 1))) {
                 $builder->int($item);
