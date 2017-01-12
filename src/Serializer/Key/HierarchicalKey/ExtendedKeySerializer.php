@@ -17,30 +17,16 @@ use BitWasp\Buffertools\TemplateFactory;
 class ExtendedKeySerializer
 {
     /**
-     * @var NetworkInterface
-     */
-    private $network;
-
-    /**
      * @var EcAdapterInterface
      */
     private $ecAdapter;
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param NetworkInterface $network
      * @throws \Exception
      */
-    public function __construct(EcAdapterInterface $ecAdapter, NetworkInterface $network)
+    public function __construct(EcAdapterInterface $ecAdapter)
     {
-        try {
-            $network->getHDPrivByte();
-            $network->getHDPubByte();
-        } catch (\Exception $e) {
-            throw new \Exception('Network not configured for HD wallets');
-        }
-
-        $this->network = $network;
         $this->ecAdapter = $ecAdapter;
     }
 
@@ -60,14 +46,31 @@ class ExtendedKeySerializer
     }
 
     /**
-     * @param HierarchicalKey $key
-     * @return BufferInterface
+     * @param NetworkInterface $network
+     * @throws \Exception
      */
-    public function serialize(HierarchicalKey $key)
+    private function checkNetwork(NetworkInterface $network)
     {
+        try {
+            $network->getHDPrivByte();
+            $network->getHDPubByte();
+        } catch (\Exception $e) {
+            throw new \Exception('Network not configured for HD wallets');
+        }
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @param HierarchicalKey $key
+     * @return Buffer
+     */
+    public function serialize(NetworkInterface $network, HierarchicalKey $key)
+    {
+        $this->checkNetwork($network);
+
         list ($prefix, $data) = ($key->isPrivate())
-            ? [$this->network->getHDPrivByte(), '00' . $key->getPrivateKey()->getHex()]
-            : [$this->network->getHDPubByte(), $key->getPublicKey()->getHex()];
+            ? [$network->getHDPrivByte(), '00' . $key->getPrivateKey()->getHex()]
+            : [$network->getHDPubByte(), $key->getPublicKey()->getHex()];
 
         return $this->getTemplate()->write([
             Buffer::hex($prefix, 4),
@@ -80,12 +83,15 @@ class ExtendedKeySerializer
     }
 
     /**
+     * @param NetworkInterface $network
      * @param Parser $parser
      * @return HierarchicalKey
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(NetworkInterface $network, Parser $parser)
     {
+        $this->checkNetwork($network);
+
         try {
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->getTemplate()->parse($parser);
             /** @var BufferInterface $keyData */
@@ -95,11 +101,11 @@ class ExtendedKeySerializer
             throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
         }
 
-        if ($bytes !== $this->network->getHDPubByte() && $bytes !== $this->network->getHDPrivByte()) {
+        if ($bytes !== $network->getHDPubByte() && $bytes !== $network->getHDPrivByte()) {
             throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
         }
 
-        $key = ($this->network->getHDPrivByte() === $bytes)
+        $key = ($network->getHDPrivByte() === $bytes)
             ? PrivateKeyFactory::fromHex($keyData->slice(1)->getHex(), true, $this->ecAdapter)
             : PublicKeyFactory::fromHex($keyData->getHex(), $this->ecAdapter);
 
@@ -107,14 +113,13 @@ class ExtendedKeySerializer
     }
 
     /**
+     * @param NetworkInterface $network
      * @param BufferInterface $buffer
      * @return HierarchicalKey
-     * @throws ParserOutOfRange
-     * @throws \Exception
      */
-    public function parse(BufferInterface $buffer)
+    public function parse(NetworkInterface $network, BufferInterface $buffer)
     {
         $parser = new Parser($buffer);
-        return $this->fromParser($parser);
+        return $this->fromParser($network, $parser);
     }
 }

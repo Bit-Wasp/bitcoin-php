@@ -306,8 +306,8 @@ class HierarchicalKey
     {
         $network = $network ?: Bitcoin::getNetwork();
 
-        $extendedSerializer = new Base58ExtendedKeySerializer(new ExtendedKeySerializer($this->ecAdapter, $network));
-        $extended = $extendedSerializer->serialize($this);
+        $extendedSerializer = new Base58ExtendedKeySerializer(new ExtendedKeySerializer($this->ecAdapter));
+        $extended = $extendedSerializer->serialize($network, $this);
         return $extended;
     }
 

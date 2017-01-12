@@ -65,8 +65,7 @@ class HierarchicalKeyFactory
      */
     public static function fromExtended($extendedKey, NetworkInterface $network = null, EcAdapterInterface $ecAdapter = null)
     {
-        $network = $network ?: Bitcoin::getNetwork();
-        $extSerializer = self::getSerializer($ecAdapter ?: Bitcoin::getEcAdapter(), $network);
-        return $extSerializer->parse($extendedKey);
+        $extSerializer = self::getSerializer($ecAdapter ?: Bitcoin::getEcAdapter());
+        return $extSerializer->parse($network ?: Bitcoin::getNetwork(), $extendedKey);
     }
 }
