@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 
 class Base58ExtendedKeySerializer
 {
@@ -21,21 +22,22 @@ class Base58ExtendedKeySerializer
     }
 
     /**
+     * @param NetworkInterface $network
      * @param HierarchicalKey $key
      * @return string
      */
-    public function serialize(HierarchicalKey $key)
+    public function serialize(NetworkInterface $network, HierarchicalKey $key)
     {
-        return Base58::encodeCheck($this->serializer->serialize($key));
+        return Base58::encodeCheck($this->serializer->serialize($network, $key));
     }
 
     /**
+     * @param NetworkInterface $network
      * @param string $base58
      * @return HierarchicalKey
-     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
-    public function parse($base58)
+    public function parse(NetworkInterface $network, $base58)
     {
-        return $this->serializer->parse(Base58::decodeCheck($base58));
+        return $this->serializer->parse($network, Base58::decodeCheck($base58));
     }
 }

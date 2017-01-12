@@ -28,12 +28,12 @@ class WifPrivateKeySerializer
 
     /**
      * @param Math $math
-     * @param PrivateKeySerializerInterface $hexSerializer
+     * @param PrivateKeySerializerInterface $serializer
      */
-    public function __construct(Math $math, PrivateKeySerializerInterface $hexSerializer)
+    public function __construct(Math $math, PrivateKeySerializerInterface $serializer)
     {
         $this->math = $math;
-        $this->keySerializer = $hexSerializer;
+        $this->keySerializer = $serializer;
     }
 
     /**
@@ -61,7 +61,7 @@ class WifPrivateKeySerializer
     /**
      * @param string $wif
      * @param NetworkInterface|null $network
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey
+     * @return PrivateKeyInterface
      * @throws Base58ChecksumFailure
      * @throws InvalidPrivateKey
      */
