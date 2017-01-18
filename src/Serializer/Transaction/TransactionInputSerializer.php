@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Buffertools\Template;
-use BitWasp\Buffertools\TemplateFactory;
 
 class TransactionInputSerializer
 {
@@ -31,15 +30,7 @@ class TransactionInputSerializer
     public function __construct(OutPointSerializerInterface $outPointSerializer)
     {
         $this->outpointSerializer = $outPointSerializer;
-        $this->template = $this->getInputTemplate();
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    private function getInputTemplate()
-    {
-        return new Template([
+        $this->template = new Template([
             Types::varstring(),
             Types::uint32le()
         ]);
@@ -68,18 +59,9 @@ class TransactionInputSerializer
     public function fromParser(Parser $parser)
     {
         $outpoint = $this->outpointSerializer->fromParser($parser);
+        list ($scriptBuf, $sequence) = $this->template->parse($parser);
 
-        /**
-         * @var BufferInterface $scriptBuf
-         * @var int $sequence
-         */
-        list ($scriptBuf, $sequence) = $this->getInputTemplate()->parse($parser);
-
-        return new TransactionInput(
-            $outpoint,
-            new Script($scriptBuf),
-            $sequence
-        );
+        return new TransactionInput($outpoint, new Script($scriptBuf), $sequence);
     }
 
     /**
@@ -89,7 +71,6 @@ class TransactionInputSerializer
      */
     public function parse($string)
     {
-        $parser = new Parser($string);
-        return $this->fromParser($parser);
+        return $this->fromParser(new Parser($string));
     }
 }

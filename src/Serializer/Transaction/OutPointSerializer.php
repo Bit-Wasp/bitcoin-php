@@ -17,15 +17,7 @@ class OutPointSerializer implements OutPointSerializerInterface
 
     public function __construct()
     {
-        $this->template = $this->getTemplate();
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    public function getTemplate()
-    {
-        return new Template([
+        $this->template = new Template([
             Types::bytestringle(32),
             Types::uint32le()
         ]);
