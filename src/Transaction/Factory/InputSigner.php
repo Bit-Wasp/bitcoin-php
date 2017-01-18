@@ -3,10 +3,12 @@
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
@@ -20,9 +22,9 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
+use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\SignatureSort;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
@@ -154,6 +156,8 @@ class InputSigner
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
+        $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
+        $this->txSigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $ecAdapter));
         $this->classifier = new OutputClassifier();
         $this->interpreter = new Interpreter();
         $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue());
@@ -282,8 +286,8 @@ class InputSigner
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
-                $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
-                $this->publicKeys = [PublicKeyFactory::fromHex($stack[1], $this->ecAdapter)];
+                $this->signatures = [$this->txSigSerializer->parse($stack[0])];
+                $this->publicKeys = [$this->pubKeySerializer->parse($stack[1])];
             }
         }
 
@@ -294,8 +298,8 @@ class InputSigner
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
 
-                $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
-                $this->publicKeys = [PublicKeyFactory::fromHex($outputData->getSolution())];
+                $this->signatures = [$this->txSigSerializer->parse($stack[0])];
+                $this->publicKeys = [$this->pubKeySerializer->parse($outputData->getSolution())];
             }
         }
 
@@ -307,7 +311,7 @@ class InputSigner
                 $vars = [];
                 for ($i = 1, $j = $size - 1; $i <= $j; $i++) {
                     try {
-                        $vars[] = TransactionSignatureFactory::fromHex($stack[$i], $this->ecAdapter);
+                        $vars[] = $this->txSigSerializer->parse($stack[$i]);
                     } catch (\Exception $e) {
                         // Try-catch block necessary because we don't know it's actually a TransactionSignature
                     }
@@ -531,14 +535,14 @@ class InputSigner
         }
 
         if ($this->signScript->getType() === ScriptType::P2PK) {
-            if (!$key->getPublicKey()->getBuffer()->equals($this->signScript->getSolution())) {
+            if (!$this->pubKeySerializer->serialize($key->getPublicKey())->equals($this->signScript->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
             $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
             $this->publicKeys[0] = $key->getPublicKey();
             $this->requiredSigs = 1;
         } else if ($this->signScript->getType() === ScriptType::P2PKH) {
-            if (!$key->getPubKeyHash()->equals($this->signScript->getSolution())) {
+            if (!$key->getPubKeyHash($this->pubKeySerializer)->equals($this->signScript->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
             $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
@@ -549,10 +553,9 @@ class InputSigner
             $this->publicKeys = $info->getKeys();
             $this->requiredSigs = $info->getRequiredSigCount();
 
-            $myKey = $key->getPublicKey()->getBuffer();
             $signed = false;
             foreach ($info->getKeys() as $keyIdx => $publicKey) {
-                if ($myKey->equals($publicKey->getBuffer())) {
+                if ($key->getPublicKey()->equals($publicKey)) {
                     $this->signatures[$keyIdx] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
                     $signed = true;
                 }
@@ -612,17 +615,17 @@ class InputSigner
         $result = [];
         if ($outputType === ScriptType::P2PK) {
             if (count($this->signatures) === 1) {
-                $result = [$this->signatures[0]->getBuffer()];
+                $result = [$this->txSigSerializer->serialize($this->signatures[0])];
             }
         } else if ($outputType === ScriptType::P2PKH) {
             if (count($this->signatures) === 1 && count($this->publicKeys) === 1) {
-                $result = [$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()];
+                $result = [$this->txSigSerializer->serialize($this->signatures[0]), $this->pubKeySerializer->serialize($this->publicKeys[0])];
             }
         } else if ($outputType === ScriptType::MULTISIG) {
             $result[] = new Buffer();
             for ($i = 0, $nPubKeys = count($this->publicKeys); $i < $nPubKeys; $i++) {
                 if (isset($this->signatures[$i])) {
-                    $result[] = $this->signatures[$i]->getBuffer();
+                    $result[] = $this->txSigSerializer->serialize($this->signatures[$i]);
                 }
             }
         }

@@ -33,6 +33,12 @@ interface PublicKeyInterface extends KeyInterface
     const KEY_COMPRESSED_ODD = "\x03";
 
     /**
+     * @param PublicKeyInterface $other
+     * @return bool
+     */
+    public function equals(PublicKeyInterface $other);
+
+    /**
      * @param BufferInterface $msg32
      * @param SignatureInterface $signature
      * @return bool

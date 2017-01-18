@@ -59,6 +59,32 @@ class PublicKey extends Key implements PublicKeyInterface
     }
 
     /**
+     * @param PublicKey $other
+     * @return bool
+     */
+    private function doEquals(self $other)
+    {
+        $context = $this->ecAdapter->getContext();
+        $pubA = '';
+        $pubB = '';
+        if (!(secp256k1_ec_pubkey_serialize($context, $pubA, $this->pubkey_t, $this->compressed) && secp256k1_ec_pubkey_serialize($context, $pubB, $other->pubkey_t, $this->compressed))) {
+            throw new \RuntimeException('Unable to serialize public key during equals');
+        }
+
+        return hash_equals($pubA, $pubB);
+    }
+
+    /**
+     * @param PublicKeyInterface $other
+     * @return bool
+     */
+    public function equals(PublicKeyInterface $other)
+    {
+        /** @var self $other */
+        return $this->doEquals($other);
+    }
+
+    /**
      * @return bool|false
      */
     public function isCompressed()

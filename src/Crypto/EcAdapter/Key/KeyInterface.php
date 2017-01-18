@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -24,9 +25,10 @@ interface KeyInterface extends SerializableInterface
     /**
      * Return the hash of the public key.
      *
+     * @param PublicKeySerializerInterface|null $serializer
      * @return BufferInterface
      */
-    public function getPubKeyHash();
+    public function getPubKeyHash(PublicKeySerializerInterface $serializer = null);
 
     /**
      * @return \BitWasp\Bitcoin\Address\PayToPubKeyHashAddress
