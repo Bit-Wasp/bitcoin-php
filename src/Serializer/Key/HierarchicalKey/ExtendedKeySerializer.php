@@ -3,6 +3,7 @@
 
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Buffertools\BufferInterface;
@@ -12,6 +13,7 @@ use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 
 class ExtendedKeySerializer
@@ -43,6 +45,16 @@ class ExtendedKeySerializer
             ->bytestring(32)
             ->bytestring(33)
             ->getTemplate();
+        $uint32 = Types::uint32();
+        return new Template([
+            Types::bytestring(4),
+            Types::uint8(),
+            $uint32,
+            $uint32,
+            Types::bytestring(32),
+            Types::bytestring(33)
+        ]);
+
     }
 
     /**

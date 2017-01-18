@@ -2,10 +2,12 @@
 
 namespace BitWasp\Bitcoin\Serializer\Block;
 
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
+use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 
 class BlockHeaderSerializer
@@ -35,14 +37,16 @@ class BlockHeaderSerializer
      */
     public function getTemplate()
     {
-        return (new TemplateFactory())
-            ->int32le()
-            ->bytestringle(32)
-            ->bytestringle(32)
-            ->uint32le()
-            ->uint32le()
-            ->uint32le()
-            ->getTemplate();
+        $bsLE = Types::bytestringle(32);
+        $uint32le = Types::uint32le();
+        return new Template([
+            Types::int32le(),
+            $bsLE,
+            $bsLE,
+            $uint32le,
+            $uint32le,
+            $uint32le
+        ]);
     }
 
     /**
@@ -52,7 +56,6 @@ class BlockHeaderSerializer
      */
     public function fromParser(Parser $parser)
     {
-
         try {
             list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->template->parse($parser);
 

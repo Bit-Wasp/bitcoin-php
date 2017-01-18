@@ -81,7 +81,7 @@ class Hasher extends SigHash
             Buffertools::concat(
                 $tx
                     ->done()
-                    ->getBuffer(),
+                    ->getBaseSerialization(),
                 Buffertools::flipBytes(Buffer::int($sighashType, 4, $math))
             )
         );

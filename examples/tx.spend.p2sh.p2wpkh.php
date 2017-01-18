@@ -46,5 +46,5 @@ $flags = I::VERIFY_P2SH | I::VERIFY_WITNESS;
 echo "Script validation result: " . ($input->verify() ? "yay\n" : "nay\n");
 
 echo PHP_EOL;
-echo "Witness serialized transaction: " . $signed->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;
-echo "Base serialized transaction: " . $signed->getHex() . PHP_EOL;
+echo "Witness serialized transaction: " . $signed->getHex() . PHP_EOL. PHP_EOL;
+echo "Base serialized transaction: " . $signed->getBaseSerialization()->getHex() . PHP_EOL;

@@ -2,12 +2,14 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
+use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 
 class TransactionInputSerializer
@@ -37,10 +39,10 @@ class TransactionInputSerializer
      */
     private function getInputTemplate()
     {
-        return (new TemplateFactory())
-            ->varstring()
-            ->uint32le()
-            ->getTemplate();
+        return new Template([
+            Types::varstring(),
+            Types::uint32le()
+        ]);
     }
 
     /**

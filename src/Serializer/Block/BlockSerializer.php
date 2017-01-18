@@ -4,12 +4,13 @@ namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializerInterface;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockInterface;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Template;
 
 class BlockSerializer implements BlockSerializerInterface
 {
@@ -51,11 +52,11 @@ class BlockSerializer implements BlockSerializerInterface
      */
     private function getTxsTemplate()
     {
-        return (new TemplateFactory())
-            ->vector(function (Parser $parser) {
+        return new Template([
+            Types::vector(function (Parser $parser) {
                 return $this->txSerializer->fromParser($parser);
             })
-            ->getTemplate();
+        ]);
     }
 
     /**
@@ -92,9 +93,12 @@ class BlockSerializer implements BlockSerializerInterface
      */
     public function serialize(BlockInterface $block)
     {
-        return Buffertools::concat(
-            $this->headerSerializer->serialize($block->getHeader()),
-            $this->txsTemplate->write([$block->getTransactions()])
-        );
+        $parser = new Parser($this->headerSerializer->serialize($block->getHeader()));
+        $parser->appendBuffer(Buffertools::numToVarInt(count($block->getTransactions())));
+        foreach ($block->getTransactions() as $tx) {
+            $parser->appendBuffer($this->txSerializer->serialize($tx));
+        }
+
+        return $parser->getBuffer();
     }
 }

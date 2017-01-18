@@ -2,19 +2,14 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\ByteOrder;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\Types\Int32;
-use BitWasp\Buffertools\Types\Int8;
-use BitWasp\Buffertools\Types\Uint32;
-use BitWasp\Buffertools\Types\VarInt;
-use BitWasp\Buffertools\Types\Vector;
 
 class TransactionSerializer implements TransactionSerializerInterface
 {
@@ -46,10 +41,9 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     public function fromParser(Parser $parser)
     {
-        $math = Bitcoin::getMath();
-        $int32le = new Int32($math, ByteOrder::LE);
-        $uint32le = new Uint32($math, ByteOrder::LE);
-        $varint = new VarInt($math, ByteOrder::LE);
+        $int32le = Types::int32le();
+        $uint32le = Types::uint32le();
+        $varint = Types::varint();
 
         $version = $int32le->read($parser);
 
@@ -121,18 +115,13 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     public function serialize(TransactionInterface $transaction)
     {
-        $math = Bitcoin::getMath();
-        $int8le = new Int8($math, ByteOrder::LE);
-        $int32le = new Int32($math, ByteOrder::LE);
-        $uint32le = new Uint32($math, ByteOrder::LE);
-        $varint = new VarInt($math, ByteOrder::LE);
-        $vector = new Vector($varint, function () {
-        });
-
-        $binary = $int32le->write($transaction->getVersion());
+        $int8le = Types::int8le();
+        $int32le = Types::int32le();
+        $uint32le = Types::uint32le();
         $flags = 0;
 
-        if (!empty($transaction->getWitnesses())) {
+        $binary = $int32le->write($transaction->getVersion());
+        if ($transaction->hasWitness()) {
             $flags |= 1;
         }
 
@@ -141,17 +130,25 @@ class TransactionSerializer implements TransactionSerializerInterface
             $binary .= $int8le->write($flags);
         }
 
-        $binary .= $vector->write($transaction->getInputs());
-        $binary .= $vector->write($transaction->getOutputs());
+        $parser = new Parser(new Buffer($binary));
+        $parser->appendBuffer(Buffertools::numToVarInt(count($transaction->getInputs())), true);
+        foreach ($transaction->getInputs() as $input) {
+            $parser->appendBuffer($this->inputSerializer->serialize($input));
+        }
+
+        $parser->appendBuffer(Buffertools::numToVarInt(count($transaction->getOutputs())), true);
+        foreach ($transaction->getOutputs() as $output) {
+            $parser->appendBuffer($this->outputSerializer->serialize($output));
+        }
 
         if ($flags & 1) {
             foreach ($transaction->getWitnesses() as $witness) {
-                $binary .= $witness->getBuffer()->getBinary();
+                $parser->appendBuffer($this->witnessSerializer->serialize($witness));
             }
         }
 
-        $binary .= $uint32le->write($transaction->getLockTime());
+        $parser->writeRawBinary(4, $uint32le->write($transaction->getLockTime()));
 
-        return new Buffer($binary);
+        return $parser->getBuffer();
     }
 }

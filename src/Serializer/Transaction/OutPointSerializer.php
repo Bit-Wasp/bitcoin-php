@@ -2,10 +2,11 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Template;
 
 class OutPointSerializer implements OutPointSerializerInterface
 {
@@ -24,10 +25,10 @@ class OutPointSerializer implements OutPointSerializerInterface
      */
     public function getTemplate()
     {
-        return (new TemplateFactory())
-            ->bytestringle(32)
-            ->uint32le()
-            ->getTemplate();
+        return new Template([
+            Types::bytestringle(32),
+            Types::uint32le()
+        ]);
     }
 
     /**
