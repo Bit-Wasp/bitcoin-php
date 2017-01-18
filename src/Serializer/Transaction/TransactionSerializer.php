@@ -91,13 +91,7 @@ class TransactionSerializer implements TransactionSerializerInterface
 
         $lockTime = $uint32le->read($parser);
 
-        return new Transaction(
-            $version,
-            $vin,
-            $vout,
-            $vwit,
-            $lockTime
-        );
+        return new Transaction($version, $vin, $vout, $vwit, $lockTime);
     }
 
     /**
@@ -120,17 +114,16 @@ class TransactionSerializer implements TransactionSerializerInterface
         $uint32le = Types::uint32le();
         $flags = 0;
 
-        $binary = $int32le->write($transaction->getVersion());
+        $parser = new Parser();
+        $parser->writeRawBinary(4, $int32le->write($transaction->getVersion()));
         if ($transaction->hasWitness()) {
             $flags |= 1;
         }
 
         if ($flags) {
-            $binary .= $int8le->write(0);
-            $binary .= $int8le->write($flags);
+            $parser->writeRawBinary(2, "\x00" . chr($flags));
         }
-
-        $parser = new Parser(new Buffer($binary));
+        
         $parser->appendBuffer(Buffertools::numToVarInt(count($transaction->getInputs())), true);
         foreach ($transaction->getInputs() as $input) {
             $parser->appendBuffer($this->inputSerializer->serialize($input));
