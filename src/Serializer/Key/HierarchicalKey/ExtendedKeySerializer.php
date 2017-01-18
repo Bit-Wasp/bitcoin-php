@@ -63,9 +63,9 @@ class ExtendedKeySerializer
     {
         $this->checkNetwork($network);
 
-        list ($prefix, $data) = ($key->isPrivate())
-            ? [$network->getHDPrivByte(), '00' . $key->getPrivateKey()->getHex()]
-            : [$network->getHDPubByte(), $key->getPublicKey()->getHex()];
+        list ($prefix, $data) = $key->isPrivate()
+            ? [$network->getHDPrivByte(), new Buffer("\x00". $key->getPrivateKey()->getBinary(), 33)]
+            : [$network->getHDPubByte(), $key->getPublicKey()->getBuffer()];
 
         return $this->template->write([
             Buffer::hex($prefix, 4),
@@ -73,7 +73,7 @@ class ExtendedKeySerializer
             $key->getFingerprint(),
             $key->getSequence(),
             $key->getChainCode(),
-            Buffer::hex($data, 33)
+            $data
         ]);
     }
 
@@ -89,6 +89,7 @@ class ExtendedKeySerializer
 
         try {
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->template->parse($parser);
+
             /** @var BufferInterface $keyData */
             /** @var BufferInterface $bytes */
             $bytes = $bytes->getHex();
@@ -114,7 +115,6 @@ class ExtendedKeySerializer
      */
     public function parse(NetworkInterface $network, BufferInterface $buffer)
     {
-        $parser = new Parser($buffer);
-        return $this->fromParser($network, $parser);
+        return $this->fromParser($network, new Parser($buffer));
     }
 }

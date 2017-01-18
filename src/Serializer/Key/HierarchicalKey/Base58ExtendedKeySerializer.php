@@ -14,11 +14,11 @@ class Base58ExtendedKeySerializer
     private $serializer;
 
     /**
-     * @param ExtendedKeySerializer $hexSerializer
+     * @param ExtendedKeySerializer $hdSerializer
      */
-    public function __construct(ExtendedKeySerializer $hexSerializer)
+    public function __construct(ExtendedKeySerializer $hdSerializer)
     {
-        $this->serializer = $hexSerializer;
+        $this->serializer = $hdSerializer;
     }
 
     /**

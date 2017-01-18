@@ -3,9 +3,10 @@
 namespace BitWasp\Bitcoin\Serializer\Chain;
 
 use BitWasp\Bitcoin\Chain\BlockLocator;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Template;
 
 class BlockLocatorSerializer
 {
@@ -14,12 +15,13 @@ class BlockLocatorSerializer
      */
     public function getTemplate()
     {
-        return (new TemplateFactory())
-            ->vector(function (Parser $parser) {
-                return $parser->readBytes(32, true);
-            })
-            ->bytestringle(32)
-            ->getTemplate();
+        $bytestring32 = Types::bytestringle(32);
+        return new Template([
+            Types::vector(function (Parser $parser) use ($bytestring32) {
+                return $bytestring32->read($parser);
+            }),
+            $bytestring32
+        ]);
     }
 
     /**
@@ -28,12 +30,9 @@ class BlockLocatorSerializer
      */
     public function fromParser(Parser $parser)
     {
-        list($hashes, $hashStop) = $this->getTemplate()->parse($parser);
+        list ($hashes, $hashStop) = $this->getTemplate()->parse($parser);
 
-        return new BlockLocator(
-            $hashes,
-            $hashStop
-        );
+        return new BlockLocator($hashes, $hashStop);
     }
 
     /**
