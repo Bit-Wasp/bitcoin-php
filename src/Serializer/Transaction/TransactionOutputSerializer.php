@@ -3,26 +3,29 @@
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
-use BitWasp\Buffertools\Template;
 
 class TransactionOutputSerializer
 {
     /**
-     * @var \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\Uint64
      */
-    private $template;
+    private $uint64le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\VarString
+     */
+    private $varstring;
 
     public function __construct()
     {
-        $this->template = new Template([
-            Types::uint64le(),
-            Types::varstring()
-        ]);
+        $this->uint64le = Types::uint64le();
+        $this->varstring = Types::varstring();
     }
 
     /**
@@ -31,10 +34,10 @@ class TransactionOutputSerializer
      */
     public function serialize(TransactionOutputInterface $output)
     {
-        return $this->template->write([
-            $output->getValue(),
-            $output->getScript()->getBuffer()
-        ]);
+        return new Buffer(
+            $this->uint64le->write($output->getValue()) .
+            $this->varstring->write($output->getScript()->getBuffer())
+        );
     }
 
     /**
@@ -44,8 +47,10 @@ class TransactionOutputSerializer
      */
     public function fromParser(Parser $parser)
     {
-        $parse = $this->template->parse($parser);
-        return new TransactionOutput($parse[0], new Script($parse[1]));
+        return new TransactionOutput(
+            $this->uint64le->read($parser),
+            new Script($this->varstring->read($parser))
+        );
     }
 
     /**

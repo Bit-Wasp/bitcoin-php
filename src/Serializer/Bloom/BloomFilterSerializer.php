@@ -3,14 +3,12 @@
 namespace BitWasp\Bitcoin\Serializer\Bloom;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Serializer\Types;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Template;
-use BitWasp\Buffertools\TemplateFactory;
 
 class BloomFilterSerializer
 {
@@ -21,14 +19,15 @@ class BloomFilterSerializer
 
     public function __construct()
     {
-        $uint32le = Types::uint32le();
+        $this->uint32le = Types::uint32le();
+        $this->uint8le = Types::uint8le();
         $this->template = new Template([
             Types::vector(function (Parser $parser) {
                 return $parser->readBytes(1)->getInt();
             }),
-            $uint32le,
-            $uint32le,
-            Types::uint8le()
+            $this->uint32le,
+            $this->uint32le,
+            $this->uint8le
         ]);
     }
 
@@ -38,19 +37,17 @@ class BloomFilterSerializer
      */
     public function serialize(BloomFilter $filter)
     {
-        $math = new Math();
-
-        $vBuf = [];
+        $parser = new Parser();
+        $parser->appendBuffer(Buffertools::numToVarInt(count($filter->getData())));
         foreach ($filter->getData() as $i) {
-            $vBuf[] = Buffer::int($i, 1, $math);
+            $parser->writeRawBinary(1, pack('c', $i));
         }
 
-        return $this->template->write([
-            $vBuf,
-            $filter->getNumHashFuncs(),
-            $filter->getTweak(),
-            (string) $filter->getFlags()
-        ]);
+        $parser->writeRawBinary(4, $this->uint32le->write($filter->getNumHashFuncs()));
+        $parser->writeRawBinary(4, $this->uint32le->write($filter->getTweak()));
+        $parser->writeRawBinary(1, $this->uint8le->write($filter->getFlags()));
+
+        return $parser->getBuffer();
     }
 
     /**
@@ -71,7 +68,7 @@ class BloomFilterSerializer
     }
 
     /**
-     * @param $data
+     * @param string|BufferInterface $data
      * @return BloomFilter
      */
     public function parse($data)

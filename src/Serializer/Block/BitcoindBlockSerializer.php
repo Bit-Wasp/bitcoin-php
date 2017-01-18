@@ -4,9 +4,10 @@ namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Template;
 
 class BitcoindBlockSerializer
 {
@@ -28,17 +29,10 @@ class BitcoindBlockSerializer
     {
         $this->network = $network;
         $this->blockSerializer = $blockSerializer;
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    private function getHeaderTemplate()
-    {
-        return (new TemplateFactory())
-            ->bytestringle(4)
-            ->uint32le()
-            ->getTemplate();
+        $this->template = new Template([
+            Types::bytestringle(4),
+            Types::uint32le()
+        ]);
     }
 
     /**
@@ -47,14 +41,13 @@ class BitcoindBlockSerializer
      */
     public function serialize(BlockInterface $block)
     {
-        $buffer = $block->getBuffer();
-        $size = $buffer->getSize();
-        $data = new Parser($this->getHeaderTemplate()->write([
+        $buffer = $this->blockSerializer->serialize($block);
+        $data = new Parser($this->template->write([
             Buffer::hex($this->network->getNetMagicBytes()),
-            $size
+            $buffer->getSize()
         ]));
 
-        $data->writeBytes($size, $buffer);
+        $data->appendBuffer($buffer);
 
         return $data->getBuffer();
     }
@@ -68,7 +61,7 @@ class BitcoindBlockSerializer
     {
         /** @var Buffer $bytes */
         /** @var int|string $blockSize */
-        list ($bytes, $blockSize) = $this->getHeaderTemplate()->parse($parser);
+        list ($bytes, $blockSize) = $this->template->parse($parser);
         if ($bytes->getHex() !== $this->network->getNetMagicBytes()) {
             throw new \RuntimeException('Block version bytes did not match network');
         }
