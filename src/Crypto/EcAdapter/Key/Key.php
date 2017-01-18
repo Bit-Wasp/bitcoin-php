@@ -3,6 +3,8 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
 
@@ -17,9 +19,10 @@ abstract class Key extends Serializable implements KeyInterface
     }
 
     /**
+     * @param PublicKeySerializerInterface|null $serializer
      * @return \BitWasp\Buffertools\BufferInterface
      */
-    public function getPubKeyHash()
+    public function getPubKeyHash(PublicKeySerializerInterface $serializer = null)
     {
         if ($this instanceof PrivateKeyInterface) {
             $publicKey = $this->getPublicKey();
@@ -27,7 +30,7 @@ abstract class Key extends Serializable implements KeyInterface
             $publicKey = $this;
         }
 
-        return Hash::sha256ripe160($publicKey->getBuffer());
+        return Hash::sha256ripe160($serializer ? $serializer->serialize($publicKey) : $publicKey->getBuffer());
     }
 
     /**

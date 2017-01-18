@@ -38,13 +38,15 @@ class TransactionSignatureSerializer
      */
     public function parse($string)
     {
-        $buffer = (new Parser($string))->getBuffer()->getBinary();
+        $adapter = $this->sigSerializer->getEcAdapter();
+        $math = $adapter->getMath();
+        $buffer = (new Parser($string, $math))->getBuffer()->getBinary();
         $sig2 = substr($buffer, 0, -1);
         $ht2 = unpack('C', substr($buffer, -1))[1];
 
         return new TransactionSignature(
-            $this->sigSerializer->getEcAdapter(),
-            $this->sigSerializer->parse(new Buffer($sig2)),
+            $adapter,
+            $this->sigSerializer->parse(new Buffer($sig2, null, $math)),
             $ht2
         );
     }
