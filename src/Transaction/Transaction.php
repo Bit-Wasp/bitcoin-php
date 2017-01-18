@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Transaction\OldTransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
@@ -81,7 +80,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxHash()
     {
-        return Hash::sha256d($this->getBuffer());
+        return Hash::sha256d($this->getBaseSerialization());
     }
 
     /**
@@ -292,6 +291,6 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBaseSerialization()
     {
-        return (new OldTransactionSerializer())->serialize($this);
+        return (new TransactionSerializer())->serialize($this, TransactionSerializer::NO_WITNESS);
     }
 }

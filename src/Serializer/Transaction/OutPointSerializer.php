@@ -11,14 +11,7 @@ use BitWasp\Buffertools\Parser;
 
 class OutPointSerializer implements OutPointSerializerInterface
 {
-    /**
-     * @var \BitWasp\Buffertools\Types\ByteString
-     */
     private $txid;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\Uint32
-     */
     private $vout;
 
     public function __construct()

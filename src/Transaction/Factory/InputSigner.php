@@ -354,7 +354,6 @@ class InputSigner
     {
         $sigVersion = SigHash::V0;
         $sigChunks = [];
-
         $solution = $this->scriptPubKey = $this->classifier->decode($scriptPubKey);
         if ($solution->getType() !== ScriptType::P2SH && !in_array($solution->getType(), self::$validP2sh)) {
             throw new \RuntimeException('scriptPubKey not supported');
@@ -439,7 +438,7 @@ class InputSigner
         $this->sigVersion = $sigVersion;
         $this->signScript = $solution;
 
-        $this->extractFromValues($solution, $sigChunks, $sigVersion);
+        $this->extractFromValues($solution, $sigChunks, $this->sigVersion);
 
         return $this;
     }

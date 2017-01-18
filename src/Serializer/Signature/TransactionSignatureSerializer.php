@@ -29,7 +29,7 @@ class TransactionSignatureSerializer
      */
     public function serialize(TransactionSignature $txSig)
     {
-        return new Buffer($this->sigSerializer->serialize($txSig->getSignature())->getBinary() . chr($txSig->getHashType()));
+        return new Buffer($this->sigSerializer->serialize($txSig->getSignature())->getBinary() . pack('C', $txSig->getHashType()));
     }
 
     /**
@@ -40,7 +40,7 @@ class TransactionSignatureSerializer
     {
         $buffer = (new Parser($string))->getBuffer()->getBinary();
         $sig2 = substr($buffer, 0, -1);
-        $ht2 = ord(substr($buffer, -1));
+        $ht2 = unpack('C', substr($buffer, -1))[1];
 
         return new TransactionSignature(
             $this->sigSerializer->getEcAdapter(),
