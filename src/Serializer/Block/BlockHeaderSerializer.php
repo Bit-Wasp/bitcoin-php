@@ -8,7 +8,6 @@ use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Buffertools\Template;
-use BitWasp\Buffertools\TemplateFactory;
 
 class BlockHeaderSerializer
 {
@@ -19,7 +18,16 @@ class BlockHeaderSerializer
 
     public function __construct()
     {
-        $this->template = $this->getTemplate();
+        $bsLE = Types::bytestringle(32);
+        $uint32le = Types::uint32le();
+        $this->template = new Template([
+            Types::int32le(),
+            $bsLE,
+            $bsLE,
+            $uint32le,
+            $uint32le,
+            $uint32le
+        ]);
     }
 
     /**
@@ -30,23 +38,6 @@ class BlockHeaderSerializer
     public function parse($string)
     {
         return $this->fromParser(new Parser($string));
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    public function getTemplate()
-    {
-        $bsLE = Types::bytestringle(32);
-        $uint32le = Types::uint32le();
-        return new Template([
-            Types::int32le(),
-            $bsLE,
-            $bsLE,
-            $uint32le,
-            $uint32le,
-            $uint32le
-        ]);
     }
 
     /**

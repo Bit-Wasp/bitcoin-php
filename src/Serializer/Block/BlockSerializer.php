@@ -67,11 +67,13 @@ class BlockSerializer implements BlockSerializerInterface
     public function fromParser(Parser $parser)
     {
         try {
-            return new Block(
-                $this->math,
-                $this->headerSerializer->fromParser($parser),
-                $this->txsTemplate->parse($parser)[0]
-            );
+            $header = $this->headerSerializer->fromParser($parser);
+            $nTx = Types::varint()->read($parser);
+            $vTx = [];
+            for ($i = 0; $i < $nTx; $i++) {
+                $vTx[] = $this->txSerializer->fromParser($parser);
+            }
+            return new Block($this->math, $header, $vTx);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }
