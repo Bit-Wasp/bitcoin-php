@@ -129,4 +129,9 @@ interface TransactionInterface extends SerializableInterface
      * @return BufferInterface
      */
     public function getBaseSerialization();
+
+    /**
+     * @return BufferInterface
+     */
+    public function getWitnessSerialization();
 }

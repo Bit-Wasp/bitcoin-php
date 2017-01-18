@@ -44,15 +44,15 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     private $witnessSerializer;
 
-    public function __construct(TransactionInputSerializer $txInSer = null, TransactionOutputSerializer $txOutSer = null, ScriptWitnessSerializer $witSer = null)
+    public function __construct(TransactionInputSerializer $inputSerializer = null, TransactionOutputSerializer $outputSerializer = null, ScriptWitnessSerializer $witnessSerializer = null)
     {
         $this->int32le = Types::int32le();
         $this->uint32le = Types::uint32le();
         $this->varint = Types::varint();
 
-        $this->inputSerializer = $txInSer ?: new TransactionInputSerializer(new OutPointSerializer());
-        $this->outputSerializer = $txOutSer ?: new TransactionOutputSerializer;
-        $this->witnessSerializer = $witSer ?: new ScriptWitnessSerializer();
+        $this->inputSerializer = $inputSerializer ?: new TransactionInputSerializer(new OutPointSerializer());
+        $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer;
+        $this->witnessSerializer = $witnessSerializer ?: new ScriptWitnessSerializer();
     }
 
     /**

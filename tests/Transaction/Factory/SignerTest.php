@@ -240,8 +240,17 @@ class SignerTest extends AbstractTestCase
         $signed = $signer->get();
         if (isset($optExtra['whex'])) {
             $this->assertEquals($optExtra['whex'], $signed->getHex());
+            $this->assertEquals($optExtra['whex'], $signed->getWitnessSerialization()->getHex());
         } else {
-            $this->assertEquals($optExtra['hex'], $signed->getHex(), 'transaction matches expected hex');
+            $this->assertThrows([$signed, 'getWitnessSerialization'], \RuntimeException::class, 'Cannot get witness serialization for transaction without witnesses');
+            if (isset($optExtra['hex'])) {
+                // If base tx is set, it should be safe to check getHex against that.
+                $this->assertEquals($optExtra['hex'], $signed->getHex(), 'transaction matches expected hex');
+            }
+        }
+
+        if (isset($optExtra['hex'])) {
+            $this->assertEquals($optExtra['hex'], $signed->getBaseSerialization()->getHex(), 'transaction matches expected hex');
         }
 
         $recovered = new Signer($signed);
