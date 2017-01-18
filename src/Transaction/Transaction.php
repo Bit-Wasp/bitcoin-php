@@ -305,4 +305,12 @@ class Transaction extends Serializable implements TransactionInterface
 
         return $this->getBuffer();
     }
+
+    /**
+     * @return BufferInterface
+     */
+    public function getWitnessBuffer()
+    {
+        return $this->getWitnessSerialization();
+    }
 }
