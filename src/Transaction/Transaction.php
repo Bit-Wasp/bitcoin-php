@@ -293,4 +293,16 @@ class Transaction extends Serializable implements TransactionInterface
     {
         return (new TransactionSerializer())->serialize($this, TransactionSerializer::NO_WITNESS);
     }
+
+    /**
+     * @return BufferInterface
+     */
+    public function getWitnessSerialization()
+    {
+        if (!$this->hasWitness()) {
+            throw new \RuntimeException('Cannot get witness serialization for transaction without witnesses');
+        }
+
+        return $this->getBuffer();
+    }
 }

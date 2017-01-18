@@ -34,6 +34,26 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param callable|\Closure $closure
+     * @param string $error - exception FQDN
+     * @param null $errorMessage - optional, assert exception matches this error message
+     */
+    public function assertThrows($closure, $error, $errorMessage = null) {
+        $err = null;
+        try {
+            $closure();
+        } catch (\Exception $e) {
+            $err = $e;
+        }
+
+        $this->assertInstanceOf($error, $err, 'should have thrown exception ' . $error);
+
+        if (is_string($errorMessage)) {
+            $this->assertEquals($errorMessage, $err->getMessage());
+        }
+    }
+
+    /**
      * @param string $file
      * @return string
      */
