@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
 class BitcoindBlockSerializer
@@ -41,7 +42,7 @@ class BitcoindBlockSerializer
         $buffer = $this->blockSerializer->serialize($block);
         $size = $buffer->getSize();
         return new Buffer(
-            pack("H*", $this->network->getNetMagicBytes()) .
+            Buffertools::flipBytes(pack("H*", $this->network->getNetMagicBytes())) .
             $this->size->write($size) .
             $buffer->getBinary()
         );
