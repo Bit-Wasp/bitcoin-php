@@ -14,7 +14,6 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Buffertools\Template;
-use BitWasp\Buffertools\TemplateFactory;
 
 class ExtendedKeySerializer
 {
@@ -30,23 +29,8 @@ class ExtendedKeySerializer
     public function __construct(EcAdapterInterface $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    public function getTemplate()
-    {
-        return (new TemplateFactory())
-            ->bytestring(4)
-            ->uint8()
-            ->uint32()
-            ->uint32()
-            ->bytestring(32)
-            ->bytestring(33)
-            ->getTemplate();
         $uint32 = Types::uint32();
-        return new Template([
+        $this->template = new Template([
             Types::bytestring(4),
             Types::uint8(),
             $uint32,
@@ -54,7 +38,6 @@ class ExtendedKeySerializer
             Types::bytestring(32),
             Types::bytestring(33)
         ]);
-
     }
 
     /**
@@ -84,7 +67,7 @@ class ExtendedKeySerializer
             ? [$network->getHDPrivByte(), '00' . $key->getPrivateKey()->getHex()]
             : [$network->getHDPubByte(), $key->getPublicKey()->getHex()];
 
-        return $this->getTemplate()->write([
+        return $this->template->write([
             Buffer::hex($prefix, 4),
             $key->getDepth(),
             $key->getFingerprint(),
@@ -105,7 +88,7 @@ class ExtendedKeySerializer
         $this->checkNetwork($network);
 
         try {
-            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->getTemplate()->parse($parser);
+            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->template->parse($parser);
             /** @var BufferInterface $keyData */
             /** @var BufferInterface $bytes */
             $bytes = $bytes->getHex();
@@ -118,8 +101,8 @@ class ExtendedKeySerializer
         }
 
         $key = ($network->getHDPrivByte() === $bytes)
-            ? PrivateKeyFactory::fromHex($keyData->slice(1)->getHex(), true, $this->ecAdapter)
-            : PublicKeyFactory::fromHex($keyData->getHex(), $this->ecAdapter);
+            ? PrivateKeyFactory::fromHex($keyData->slice(1), true, $this->ecAdapter)
+            : PublicKeyFactory::fromHex($keyData, $this->ecAdapter);
 
         return new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
     }

@@ -44,14 +44,14 @@ class WifPrivateKeySerializer
     public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey)
     {
         $serialized = Buffertools::concat(
-            Buffer::hex($network->getPrivByte()),
+            Buffer::hex($network->getPrivByte(), 1, $this->math),
             $this->keySerializer->serialize($privateKey)
         );
 
         if ($privateKey->isCompressed()) {
             $serialized = Buffertools::concat(
                 $serialized,
-                new Buffer("\x01", 1)
+                new Buffer("\x01", 1, $this->math)
             );
         }
 

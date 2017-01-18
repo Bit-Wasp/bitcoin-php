@@ -9,10 +9,12 @@ use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Template;
-use BitWasp\Buffertools\TemplateFactory;
 
 class ScriptWitnessSerializer
 {
+    /**
+     * @var Template
+     */
     private $template;
 
     public function __construct()
@@ -45,11 +47,9 @@ class ScriptWitnessSerializer
     public function serialize(ScriptWitnessInterface $witness)
     {
         $parser = new Parser();
-        $size = Buffertools::numToVarInt($witness->count());
-        $parser->writeBuffer($size->getSize(), $size);
+        $parser->appendBuffer(Buffertools::numToVarInt($witness->count()));
         foreach ($witness as $value) {
-            $serialized = $this->template->write([$value]);
-            $parser->writeBytes($serialized->getSize(), $serialized);
+            $parser->appendBuffer($this->template->write([$value]));
         }
 
         return $parser->getBuffer();
