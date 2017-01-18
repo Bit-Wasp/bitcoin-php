@@ -3,31 +3,19 @@
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
-use BitWasp\Buffertools\Template;
 
 class BlockHeaderSerializer
 {
-    /**
-     * @var \BitWasp\Buffertools\Template
-     */
-    private $template;
-
     public function __construct()
     {
-        $bsLE = Types::bytestringle(32);
-        $uint32le = Types::uint32le();
-        $this->template = new Template([
-            Types::int32le(),
-            $bsLE,
-            $bsLE,
-            $uint32le,
-            $uint32le,
-            $uint32le
-        ]);
+        $this->hash = Types::bytestringle(32);
+        $this->uint32le = Types::uint32le();
+        $this->int32le = Types::int32le();
     }
 
     /**
@@ -48,15 +36,13 @@ class BlockHeaderSerializer
     public function fromParser(Parser $parser)
     {
         try {
-            list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->template->parse($parser);
-
             return new BlockHeader(
-                $version,
-                $prevHash,
-                $merkleHash,
-                $time,
-                (int) $nBits,
-                $nonce
+                $this->int32le->read($parser),
+                $this->hash->read($parser),
+                $this->hash->read($parser),
+                (int) $this->uint32le->read($parser),
+                (int) $this->uint32le->read($parser),
+                (int) $this->uint32le->read($parser)
             );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
@@ -69,13 +55,13 @@ class BlockHeaderSerializer
      */
     public function serialize(BlockHeaderInterface $header)
     {
-        return $this->template->write([
-            $header->getVersion(),
-            $header->getPrevBlock(),
-            $header->getMerkleRoot(),
-            $header->getTimestamp(),
-            $header->getBits(),
-            $header->getNonce()
-        ]);
+        return new Buffer(
+            $this->int32le->write($header->getVersion()) .
+            $this->hash->write($header->getPrevBlock()) .
+            $this->hash->write($header->getMerkleRoot()) .
+            $this->uint32le->write($header->getTimestamp()) .
+            $this->uint32le->write($header->getBits()) .
+            $this->uint32le->write($header->getNonce())
+        );
     }
 }
