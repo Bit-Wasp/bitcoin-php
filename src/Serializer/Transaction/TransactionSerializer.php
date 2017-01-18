@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
@@ -109,7 +108,6 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     public function serialize(TransactionInterface $transaction)
     {
-        $int8le = Types::int8le();
         $int32le = Types::int32le();
         $uint32le = Types::uint32le();
         $flags = 0;
@@ -123,7 +121,7 @@ class TransactionSerializer implements TransactionSerializerInterface
         if ($flags) {
             $parser->writeRawBinary(2, "\x00" . chr($flags));
         }
-        
+
         $parser->appendBuffer(Buffertools::numToVarInt(count($transaction->getInputs())), true);
         foreach ($transaction->getInputs() as $input) {
             $parser->appendBuffer($this->inputSerializer->serialize($input));
