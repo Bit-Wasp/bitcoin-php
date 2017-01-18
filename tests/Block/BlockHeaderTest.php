@@ -57,9 +57,9 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertInternalType('int', $result->getBits());
         $this->assertEquals(0x1d00ffff, $result->getBits());
 
-        $this->assertEquals('1231006505', $result->getTimestamp());
+        $this->assertEquals(1231006505, $result->getTimestamp());
 
-        $this->assertSame('2083236893', $result->getNonce());
+        $this->assertEquals(2083236893, $result->getNonce());
     }
 
     public function testSerialize()

@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\Template;
 
 class BitcoindBlockSerializer
 {
@@ -27,12 +26,10 @@ class BitcoindBlockSerializer
      */
     public function __construct(NetworkInterface $network, BlockSerializer $blockSerializer)
     {
-        $this->network = $network;
         $this->blockSerializer = $blockSerializer;
-        $this->template = new Template([
-            Types::bytestringle(4),
-            Types::uint32le()
-        ]);
+        $this->magic = Types::bytestringle(4);
+        $this->size = Types::uint32le();
+        $this->network = $network;
     }
 
     /**
@@ -42,26 +39,24 @@ class BitcoindBlockSerializer
     public function serialize(BlockInterface $block)
     {
         $buffer = $this->blockSerializer->serialize($block);
-        $data = new Parser($this->template->write([
-            Buffer::hex($this->network->getNetMagicBytes()),
-            $buffer->getSize()
-        ]));
-
-        $data->appendBuffer($buffer);
-
-        return $data->getBuffer();
+        $size = $buffer->getSize();
+        return new Buffer(
+            pack("H*", $this->network->getNetMagicBytes()) .
+            $this->size->write($size) .
+            $buffer->getBinary()
+        );
     }
 
     /**
      * @param Parser $parser
-     * @return \BitWasp\Bitcoin\Block\Block
+     * @return BlockInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser $parser)
     {
         /** @var Buffer $bytes */
         /** @var int|string $blockSize */
-        list ($bytes, $blockSize) = $this->template->parse($parser);
+        list ($bytes, $blockSize) = [$this->magic->read($parser), $this->size->read($parser)];
         if ($bytes->getHex() !== $this->network->getNetMagicBytes()) {
             throw new \RuntimeException('Block version bytes did not match network');
         }
@@ -71,7 +66,7 @@ class BitcoindBlockSerializer
 
     /**
      * @param \BitWasp\Buffertools\BufferInterface|string $data
-     * @return \BitWasp\Bitcoin\Block\Block
+     * @return BlockInterface
      */
     public function parse($data)
     {
