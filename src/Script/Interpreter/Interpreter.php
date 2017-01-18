@@ -164,9 +164,7 @@ class Interpreter implements InterpreterInterface
 
                 $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
                 $stackValues = $scriptWitness->slice(0, -1);
-                $hashScriptPubKey = Hash::sha256($scriptPubKey->getBuffer());
-
-                if (!$hashScriptPubKey->equals($buffer)) {
+                if (!$buffer->equals($scriptPubKey->getWitnessScriptHash())) {
                     return false;
                 }
             } elseif ($buffer->getSize() === 20) {
