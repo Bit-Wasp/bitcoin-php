@@ -5,26 +5,31 @@ namespace BitWasp\Bitcoin\Serializer\Bloom;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 
 class BloomFilterSerializer
 {
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var Template
      */
-    public function getTemplate()
+    private $template;
+
+    public function __construct()
     {
-        return (new TemplateFactory())
-            ->vector(function (Parser $parser) {
+        $uint32le = Types::uint32le();
+        $this->template = new Template([
+            Types::vector(function (Parser $parser) {
                 return $parser->readBytes(1)->getInt();
-            })
-            ->uint32le()
-            ->uint32le()
-            ->uint8()
-            ->getTemplate();
+            }),
+            $uint32le,
+            $uint32le,
+            Types::uint8le()
+        ]);
     }
 
     /**
@@ -40,7 +45,7 @@ class BloomFilterSerializer
             $vBuf[] = Buffer::int($i, 1, $math);
         }
 
-        return $this->getTemplate()->write([
+        return $this->template->write([
             $vBuf,
             $filter->getNumHashFuncs(),
             $filter->getTweak(),
@@ -54,7 +59,7 @@ class BloomFilterSerializer
      */
     public function fromParser(Parser $parser)
     {
-        list ($vData, $numHashFuncs, $nTweak, $flags) = $this->getTemplate()->parse($parser);
+        list ($vData, $numHashFuncs, $nTweak, $flags) = $this->template->parse($parser);
 
         return new BloomFilter(
             Bitcoin::getMath(),
