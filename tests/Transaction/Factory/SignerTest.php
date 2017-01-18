@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -240,11 +239,10 @@ class SignerTest extends AbstractTestCase
         }
 
         $signed = $signer->get();
-        if (isset($optExtra['hex'])) {
-            $this->assertEquals($optExtra['hex'], $signed->getHex(), 'transaction matches expected hex');
-        }
         if (isset($optExtra['whex'])) {
-            $this->assertEquals($optExtra['whex'], $signed->getWitnessBuffer()->getHex());
+            $this->assertEquals($optExtra['whex'], $signed->getHex());
+        } else {
+            $this->assertEquals($optExtra['hex'], $signed->getHex(), 'transaction matches expected hex');
         }
 
         $recovered = new Signer($signed);

@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -48,7 +49,7 @@ class OldTransactionSerializer
 
     /**
      * @param TransactionInterface $transaction
-     * @return string
+     * @return BufferInterface
      */
     public function serialize(TransactionInterface $transaction)
     {
@@ -62,15 +63,13 @@ class OldTransactionSerializer
 
     /**
      * @param Parser $parser
-     * @return Transaction
+     * @return TransactionInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
     public function fromParser(Parser $parser)
     {
-        $p  = $this->getTemplate()->parse($parser);
-
-        list ($nVersion, $inputArray, $outputArray, $nLockTime) = $p;
+        list ($nVersion, $inputArray, $outputArray, $nLockTime) = $this->getTemplate()->parse($parser);
 
         return (new TxBuilder())
             ->version($nVersion)

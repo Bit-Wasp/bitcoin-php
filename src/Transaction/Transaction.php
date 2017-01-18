@@ -97,7 +97,7 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getWitnessTxId()
     {
-        return Hash::sha256d($this->getWitnessBuffer())->flip();
+        return Hash::sha256d($this->getBuffer())->flip();
     }
 
     /**
@@ -284,14 +284,14 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
-        return (new OldTransactionSerializer())->serialize($this);
+        return (new TransactionSerializer())->serialize($this);
     }
 
     /**
      * @return BufferInterface
      */
-    public function getWitnessBuffer()
+    public function getBaseSerialization()
     {
-        return (new TransactionSerializer())->serialize($this);
+        return (new OldTransactionSerializer())->serialize($this);
     }
 }
