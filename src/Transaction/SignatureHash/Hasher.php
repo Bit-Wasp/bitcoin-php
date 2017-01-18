@@ -77,13 +77,12 @@ class Hasher extends SigHash
             $inputs->null()->add($input);
         }
 
-        return Hash::sha256d(
-            Buffertools::concat(
-                $tx
-                    ->done()
-                    ->getBaseSerialization(),
-                Buffertools::flipBytes(Buffer::int($sighashType, 4, $math))
-            )
-        );
+        return Hash::sha256d(new Buffer(
+            $tx
+                ->done()
+                ->getBaseSerialization()
+                ->getBinary() .
+            pack('V', $sighashType)
+        ));
     }
 }
