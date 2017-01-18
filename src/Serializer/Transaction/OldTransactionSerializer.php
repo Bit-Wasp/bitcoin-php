@@ -85,7 +85,6 @@ class OldTransactionSerializer
      */
     public function parse($hex)
     {
-        $parser = new Parser($hex);
-        return $this->fromParser($parser);
+        return $this->fromParser(new Parser($hex));
     }
 }
