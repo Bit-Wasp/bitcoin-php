@@ -12,6 +12,23 @@ use BitWasp\Buffertools\Parser;
 
 class TransactionSerializer implements TransactionSerializerInterface
 {
+    const NO_WITNESS = 1;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Int32
+     */
+    private $int32le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $uint32le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\VarInt
+     */
+    private $varint;
+
     /**
      * @var TransactionInputSerializer
      */
@@ -29,6 +46,10 @@ class TransactionSerializer implements TransactionSerializerInterface
 
     public function __construct(TransactionInputSerializer $txInSer = null, TransactionOutputSerializer $txOutSer = null, ScriptWitnessSerializer $witSer = null)
     {
+        $this->int32le = Types::int32le();
+        $this->uint32le = Types::uint32le();
+        $this->varint = Types::varint();
+
         $this->inputSerializer = $txInSer ?: new TransactionInputSerializer(new OutPointSerializer());
         $this->outputSerializer = $txOutSer ?: new TransactionOutputSerializer;
         $this->witnessSerializer = $witSer ?: new ScriptWitnessSerializer();
@@ -40,14 +61,10 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     public function fromParser(Parser $parser)
     {
-        $int32le = Types::int32le();
-        $uint32le = Types::uint32le();
-        $varint = Types::varint();
-
-        $version = $int32le->read($parser);
+        $version = $this->int32le->read($parser);
 
         $vin = [];
-        $vinCount = $varint->read($parser);
+        $vinCount = $this->varint->read($parser);
         for ($i = 0; $i < $vinCount; $i++) {
             $vin[] = $this->inputSerializer->fromParser($parser);
         }
@@ -55,20 +72,20 @@ class TransactionSerializer implements TransactionSerializerInterface
         $vout = [];
         $flags = 0;
         if (count($vin) === 0) {
-            $flags = (int) $varint->read($parser);
+            $flags = (int) $this->varint->read($parser);
             if ($flags !== 0) {
-                $vinCount = $varint->read($parser);
+                $vinCount = $this->varint->read($parser);
                 for ($i = 0; $i < $vinCount; $i++) {
                     $vin[] = $this->inputSerializer->fromParser($parser);
                 }
 
-                $voutCount = $varint->read($parser);
+                $voutCount = $this->varint->read($parser);
                 for ($i = 0; $i < $voutCount; $i++) {
                     $vout[] = $this->outputSerializer->fromParser($parser);
                 }
             }
         } else {
-            $voutCount = $varint->read($parser);
+            $voutCount = $this->varint->read($parser);
             for ($i = 0; $i < $voutCount; $i++) {
                 $vout[] = $this->outputSerializer->fromParser($parser);
             }
@@ -79,7 +96,7 @@ class TransactionSerializer implements TransactionSerializerInterface
             $flags ^= 1;
             $witCount = count($vin);
             for ($i = 0; $i < $witCount; $i++) {
-                $vectorCount = $varint->read($parser);
+                $vectorCount = $this->varint->read($parser);
                 $vwit[] = $this->witnessSerializer->fromParser($parser, $vectorCount);
             }
         }
@@ -88,7 +105,7 @@ class TransactionSerializer implements TransactionSerializerInterface
             throw new \RuntimeException('Flags byte was 0');
         }
 
-        $lockTime = $uint32le->read($parser);
+        $lockTime = $this->uint32le->read($parser);
 
         return new Transaction($version, $vin, $vout, $vwit, $lockTime);
     }
@@ -104,17 +121,17 @@ class TransactionSerializer implements TransactionSerializerInterface
 
     /**
      * @param TransactionInterface $transaction
+     * @param int $opt
      * @return BufferInterface
      */
-    public function serialize(TransactionInterface $transaction)
+    public function serialize(TransactionInterface $transaction, $opt = 0)
     {
-        $int32le = Types::int32le();
-        $uint32le = Types::uint32le();
-        $flags = 0;
-
         $parser = new Parser();
-        $parser->writeRawBinary(4, $int32le->write($transaction->getVersion()));
-        if ($transaction->hasWitness()) {
+        $parser->writeRawBinary(4, $this->int32le->write($transaction->getVersion()));
+
+        $flags = 0;
+        $allowWitness = !($opt & self::NO_WITNESS);
+        if ($allowWitness && $transaction->hasWitness()) {
             $flags |= 1;
         }
 
@@ -138,7 +155,7 @@ class TransactionSerializer implements TransactionSerializerInterface
             }
         }
 
-        $parser->writeRawBinary(4, $uint32le->write($transaction->getLockTime()));
+        $parser->writeRawBinary(4, $this->uint32le->write($transaction->getLockTime()));
 
         return $parser->getBuffer();
     }

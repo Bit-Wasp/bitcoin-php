@@ -218,7 +218,6 @@ class SignerTest extends AbstractTestCase
      */
     public function testCases($description, EcAdapterInterface $ecAdapter, TxBuilder $builder, array $utxos, array $signDatas, array $keys, array $optExtra)
     {
-
         $signer = new Signer($builder->get(), $ecAdapter);
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {
             $utxo = $utxos[$i];

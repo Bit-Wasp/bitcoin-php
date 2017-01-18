@@ -22,7 +22,7 @@ class BitcoinConsensus implements ConsensusInterface
         if ($flags & InterpreterInterface::VERIFY_WITNESS) {
             $verify = (bool) bitcoinconsensus_verify_script_with_amount($scriptPubKey->getBinary(), $amount, $tx->getBinary(), $nInputToSign, $flags, $error);
         } else {
-            $verify = (bool) bitcoinconsensus_verify_script($scriptPubKey->getBinary(), $tx->getBinary(), $nInputToSign, $flags, $error);
+            $verify = (bool) bitcoinconsensus_verify_script($scriptPubKey->getBinary(), $tx->getBaseSerialization()->getBinary(), $nInputToSign, $flags, $error);
         }
 
         return $verify;
