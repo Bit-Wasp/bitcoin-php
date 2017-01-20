@@ -325,7 +325,10 @@ class Transaction extends Serializable implements TransactionInterface
     }
 
     /**
-     * @return BufferInterface
+     * {@inheritdoc}
+     * @see TransactionInterface::getWitnessBuffer()
+     * @see TransactionInterface::getWitnessSerialization()
+     * @deprecated
      */
     public function getWitnessBuffer()
     {
