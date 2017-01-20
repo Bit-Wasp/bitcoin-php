@@ -2,10 +2,10 @@
 
 namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 
 class PayToPubkey implements ScriptInfoInterface
 {

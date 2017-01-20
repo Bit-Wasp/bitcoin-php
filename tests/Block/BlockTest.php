@@ -3,14 +3,14 @@
 
 namespace BitWasp\Bitcoin\Tests\Block;
 
+use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Block\Block;
-use BitWasp\Bitcoin\Block\BlockHeader;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class BlockTest extends AbstractTestCase
 {

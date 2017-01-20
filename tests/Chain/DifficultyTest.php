@@ -3,8 +3,8 @@
 namespace BitWasp\Bitcoin\Tests\Chain;
 
 use BitWasp\Bitcoin\Chain\Params;
-use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Chain\ProofOfWork;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class DifficultyTest extends AbstractTestCase
 {

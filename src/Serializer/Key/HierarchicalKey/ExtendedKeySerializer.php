@@ -3,16 +3,16 @@
 
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
-use BitWasp\Bitcoin\Serializer\Types;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Buffertools\Template;
 
 class ExtendedKeySerializer

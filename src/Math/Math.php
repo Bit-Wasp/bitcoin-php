@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Math;
 
-use \Mdanter\Ecc\Math\GmpMath;
+use Mdanter\Ecc\Math\GmpMath;
 use Mdanter\Ecc\Util\NumberSize;
 
 class Math extends GmpMath

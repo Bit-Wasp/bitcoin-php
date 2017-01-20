@@ -3,11 +3,11 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1;
 use BitWasp\Bitcoin\Math\Math;
 use Composer\Semver\Semver;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter as Secp256k1;
 
 class EcAdapterFactory
 {

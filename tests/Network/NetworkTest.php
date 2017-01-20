@@ -4,10 +4,10 @@ namespace BitWasp\Bitcoin\Tests\Network;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Network\NetworkFactory;
 
 class NetworkTest extends AbstractTestCase
 {

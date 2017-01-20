@@ -4,10 +4,10 @@ namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use Mdanter\Ecc\EccFactory;
-use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {

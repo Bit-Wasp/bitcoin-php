@@ -2,10 +2,10 @@
 
 namespace BitWasp\Bitcoin\Tests\Block;
 
+use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Block\BlockHeader;
 
 class BlockHeaderTest extends AbstractTestCase
 {
