@@ -64,20 +64,20 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @param TransactionInputInterface $input
+     * @param TransactionInputInterface $other
      * @return bool
      */
-    public function equals(TransactionInputInterface $input)
+    public function equals(TransactionInputInterface $other)
     {
-        if (!$this->outPoint->equals($input->getOutPoint())) {
+        if (!$this->outPoint->equals($other->getOutPoint())) {
             return false;
         }
 
-        if (!$this->script->equals($input->getScript())) {
+        if (!$this->script->equals($other->getScript())) {
             return false;
         }
 
-        return gmp_cmp(gmp_init($this->sequence), gmp_init($input->getSequence())) === 0;
+        return gmp_cmp(gmp_init($this->sequence), gmp_init($other->getSequence())) === 0;
     }
 
     /**

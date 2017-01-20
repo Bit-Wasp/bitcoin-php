@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
 class TransactionSerializer implements TransactionSerializerInterface
@@ -127,7 +126,7 @@ class TransactionSerializer implements TransactionSerializerInterface
     public function serialize(TransactionInterface $transaction, $opt = 0)
     {
         $parser = new Parser();
-        $parser->writeRawBinary(4, $this->int32le->write($transaction->getVersion()));
+        $parser->appendBinary($this->int32le->write($transaction->getVersion()));
 
         $flags = 0;
         $allowWitness = !($opt & self::NO_WITNESS);
@@ -136,15 +135,15 @@ class TransactionSerializer implements TransactionSerializerInterface
         }
 
         if ($flags) {
-            $parser->writeRawBinary(2, "\x00" . chr($flags));
+            $parser->appendBinary(pack("CC", 0, $flags));
         }
 
-        $parser->appendBuffer(Buffertools::numToVarInt(count($transaction->getInputs())), true);
+        $parser->appendBinary($this->varint->write(count($transaction->getInputs())), true);
         foreach ($transaction->getInputs() as $input) {
             $parser->appendBuffer($this->inputSerializer->serialize($input));
         }
 
-        $parser->appendBuffer(Buffertools::numToVarInt(count($transaction->getOutputs())), true);
+        $parser->appendBinary($this->varint->write(count($transaction->getOutputs())), true);
         foreach ($transaction->getOutputs() as $output) {
             $parser->appendBuffer($this->outputSerializer->serialize($output));
         }
