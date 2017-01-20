@@ -11,7 +11,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
-use BitWasp\Bitcoin\Util\IntMax;
+use BitWasp\Bitcoin\Util\IntRange;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
@@ -60,15 +60,15 @@ class HierarchicalKey
      */
     public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, BufferInterface $chainCode, KeyInterface $key)
     {
-        if ($depth < 0 || $depth > IntMax::U8) {
+        if ($depth < 0 || $depth > IntRange::U8_MAX) {
             throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0 - 255] inclusive');
         }
 
-        if ($parentFingerprint < 0 || $parentFingerprint > IntMax::U32) {
+        if ($parentFingerprint < 0 || $parentFingerprint > IntRange::U32_MAX) {
             throw new \InvalidArgumentException('Invalid fingerprint for BIP32 key, must be in range [0 - (2^31)-1] inclusive');
         }
 
-        if ($sequence < 0 || $sequence > IntMax::U32) {
+        if ($sequence < 0 || $sequence > IntRange::U32_MAX) {
             throw new \InvalidArgumentException('Invalid sequence for BIP32 key, must be in range [0 - (2^31)-1] inclusive');
         }
 
@@ -211,7 +211,7 @@ class HierarchicalKey
      */
     public function getHmacSeed($sequence)
     {
-        if ($sequence < 0 || $sequence > IntMax::U32) {
+        if ($sequence < 0 || $sequence > IntRange::U32_MAX) {
             throw new \InvalidArgumentException("Sequence is outside valid range, must be >= 0 && <= (2^31)-1");
         }
 

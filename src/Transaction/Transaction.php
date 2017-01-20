@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Util\IntRange;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -63,7 +64,7 @@ class Transaction extends Serializable implements TransactionInterface
         array $vwit = [],
         $nLockTime = 0
     ) {
-        if ($nVersion < -2147483648 || $nVersion > 2147483647) {
+        if ($nVersion < IntRange::I32_MIN || $nVersion > IntRange::I32_MAX) {
             throw new \InvalidArgumentException('Transaction version is outside valid range');
         }
 

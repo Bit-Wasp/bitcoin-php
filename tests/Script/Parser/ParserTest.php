@@ -3,10 +3,10 @@
 namespace BitWasp\Bitcoin\Tests\Script\Parser;
 
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 
 class ParserTest extends AbstractTestCase
 {
