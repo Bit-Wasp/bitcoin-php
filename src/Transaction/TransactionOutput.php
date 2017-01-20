@@ -10,7 +10,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
 {
 
     /**
-     * @var string|int
+     * @var int
      */
     private $value;
 
@@ -35,6 +35,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
+     * {@inheritdoc}
      * @see TransactionOutputInterface::getValue()
      */
     public function getValue()
@@ -43,6 +44,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
+     * {@inheritdoc}
      * @see TransactionOutputInterface::getScript()
      */
     public function getScript()
@@ -51,8 +53,8 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
-     * @param TransactionOutputInterface $output
-     * @return bool
+     * {@inheritdoc}
+     * @see TransactionOutputInterface::equals()
      */
     public function equals(TransactionOutputInterface $output)
     {
@@ -65,6 +67,7 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
+     * {@inheritdoc}
      * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
      */
     public function getBuffer()

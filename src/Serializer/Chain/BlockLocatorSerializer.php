@@ -4,19 +4,25 @@ namespace BitWasp\Bitcoin\Serializer\Chain;
 
 use BitWasp\Bitcoin\Chain\BlockLocator;
 use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Template;
 
 class BlockLocatorSerializer
 {
+
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var Template
      */
-    public function getTemplate()
+    private $template;
+
+    public function __construct()
     {
-        $bytestring32 = Types::bytestringle(32);
-        return new Template([
+        $this->varint = Types::varint();
+        $this->bytestring32 = $bytestring32 = Types::bytestringle(32);
+        $this->template = new Template([
             Types::vector(function (Parser $parser) use ($bytestring32) {
                 return $bytestring32->read($parser);
             }),
@@ -30,7 +36,13 @@ class BlockLocatorSerializer
      */
     public function fromParser(Parser $parser)
     {
-        list ($hashes, $hashStop) = $this->getTemplate()->parse($parser);
+        $numHashes = $this->varint->read($parser);
+        $hashes = [];
+        for ($i = 0; $i < $numHashes; $i++) {
+            $hashes[] = $this->bytestring32->read($parser);
+        }
+
+        $hashStop = $this->bytestring32->read($parser);
 
         return new BlockLocator($hashes, $hashStop);
     }
@@ -50,14 +62,12 @@ class BlockLocatorSerializer
      */
     public function serialize(BlockLocator $blockLocator)
     {
-        $hashes = [];
+        $binary = Buffertools::numToVarInt(count($blockLocator->getHashes()))->getBinary();
         foreach ($blockLocator->getHashes() as $hash) {
-            $hashes[] = $hash->flip();
+            $binary .= Buffertools::flipBytes($hash->getBinary());
         }
 
-        return $this->getTemplate()->write([
-            $hashes,
-            $blockLocator->getHashStop()
-        ]);
+        $binary .= $blockLocator->getHashStop()->getBinary();
+        return new Buffer($binary);
     }
 }

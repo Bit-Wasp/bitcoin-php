@@ -38,6 +38,16 @@ class Transaction extends Serializable implements TransactionInterface
     private $lockTime;
 
     /**
+     * @var BufferInterface
+     */
+    private $wtxid;
+
+    /**
+     * @var BufferInterface
+     */
+    private $hash;
+
+    /**
      * Transaction constructor.
      *
      * @param int $nVersion
@@ -80,7 +90,10 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxHash()
     {
-        return Hash::sha256d($this->getBaseSerialization());
+        if (null === $this->hash) {
+            $this->hash = Hash::sha256d($this->getBaseSerialization());
+        }
+        return $this->hash;
     }
 
     /**
@@ -96,7 +109,11 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getWitnessTxId()
     {
-        return Hash::sha256d($this->getBuffer())->flip();
+        if (null === $this->wtxid) {
+            $this->wtxid = Hash::sha256d($this->getBuffer())->flip();
+        }
+
+        return $this->wtxid;
     }
 
     /**

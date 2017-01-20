@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\Script;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
@@ -15,13 +16,11 @@ class ScriptWitnessSerializer
     /**
      * @var Template
      */
-    private $template;
+    private $varstring;
 
     public function __construct()
     {
-        $this->template = new Template([
-            Types::varstring()
-        ]);
+        $this->varstring = Types::varstring();
     }
 
     /**
@@ -33,7 +32,7 @@ class ScriptWitnessSerializer
     {
         $entries = [];
         for ($j = 0; $j < $size; $j++) {
-            list ($data) = $this->template->parse($parser);
+            $data = $this->varstring->parse($parser);
             $entries[] = $data;
         }
 
@@ -49,7 +48,7 @@ class ScriptWitnessSerializer
         $parser = new Parser();
         $parser->appendBuffer(Buffertools::numToVarInt($witness->count()));
         foreach ($witness as $value) {
-            $parser->appendBuffer($this->template->write([$value]));
+            $parser->appendBuffer(new Buffer($this->varstring->write($value)));
         }
 
         return $parser->getBuffer();

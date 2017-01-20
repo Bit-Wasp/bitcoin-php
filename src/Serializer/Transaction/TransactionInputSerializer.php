@@ -18,6 +18,16 @@ class TransactionInputSerializer
     private $outpointSerializer;
 
     /**
+     * @var \BitWasp\Buffertools\Types\VarString
+     */
+    private $varstring;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $uint32le;
+
+    /**
      * TransactionInputSerializer constructor.
      * @param OutPointSerializerInterface $outPointSerializer
      */
