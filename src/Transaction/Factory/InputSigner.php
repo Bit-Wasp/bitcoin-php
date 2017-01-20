@@ -564,6 +564,8 @@ class InputSigner
             if (!$signed) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
+        } else {
+            throw new \RuntimeException('Unexpected error - sign script had an unexpected type');
         }
 
         return $this;
