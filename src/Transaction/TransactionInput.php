@@ -87,10 +87,9 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function isCoinbase()
     {
-        $math = Bitcoin::getMath();
         $outpoint = $this->outPoint;
         return $outpoint->getTxId()->getBinary() === str_pad('', 32, "\x00")
-            && $math->cmp(gmp_init($outpoint->getVout()), gmp_init(0xffffffff)) === 0;
+            && $outpoint->getVout() == 0xffffffff;
     }
 
     /**

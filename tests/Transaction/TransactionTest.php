@@ -44,7 +44,8 @@ class TransactionTest extends AbstractTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Transaction version is outside valid range
      */
     public function testSetVersionException()
     {

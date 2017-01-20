@@ -63,8 +63,8 @@ class Transaction extends Serializable implements TransactionInterface
         array $vwit = [],
         $nLockTime = 0
     ) {
-        if ($nVersion > TransactionInterface::MAX_VERSION) {
-            throw new \InvalidArgumentException('Version must be less than ' . TransactionInterface::MAX_VERSION);
+        if ($nVersion < -2147483648 || $nVersion > 2147483647) {
+            throw new \InvalidArgumentException('Transaction version is outside valid range');
         }
 
         if ($nLockTime < 0 || $nLockTime > TransactionInterface::MAX_LOCKTIME) {
