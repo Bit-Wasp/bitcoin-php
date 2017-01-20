@@ -5,6 +5,7 @@ php:
   - hhvm
   - 5.6
   - 7.0
+  - 7.1
 
 env:
   - PHPUNIT=true
@@ -13,15 +14,6 @@ env:
   - PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true
 
 matrix:
-  include:
-    - php: 7.0
-      env: CODE_STYLE=true
-    - php: 7.0
-      env: EXAMPLES=true
-    - php: 7.0
-      env: PHPUNIT=true COVERAGE=true
-    - php: 7.0
-      env: PHPUNIT=true COVERAGE=true EXT_SECP256K1=true
   exclude:
     - php: hhvm
       env: PHPUNIT=true EXT_SECP256K1=true
@@ -29,6 +21,20 @@ matrix:
       env: PHPUNIT=true EXT_CONSENSUS=true
     - php: hhvm
       env: PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true
+
+  include:
+    - php: 7.0
+      env: CODE_STYLE=true
+
+    - php: 7.0
+      env: EXAMPLES=true
+
+    - php: 7.0
+      env: PHPUNIT=true COVERAGE=true
+
+    - php: 7.0
+      env: PHPUNIT=true COVERAGE=true EXT_SECP256K1=true
+
 
 install:
     - |
@@ -47,27 +53,27 @@ install:
         fi
 
     - |
-        if [ "$EXT_SECP256K1" = "true" ] && [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then \
-            git clone -b v0.1.1 https://github.com/Bit-Wasp/secp256k1-php && \
-            cd secp256k1-php/secp256k1 && \
-            phpize && ./configure && \
-            make && sudo make install && cd ../..; \
+        if [ "$EXT_SECP256K1" = "true" ] && [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
+            git clone -b v0.1.1 https://github.com/Bit-Wasp/secp256k1-php &&
+            cd secp256k1-php/secp256k1 &&
+            phpize && ./configure &&
+            make && sudo make install && cd ../..;
         fi
 
     - |
-        if [ "$EXT_CONSENSUS" = "true" ]; then \
-            wget https://bitcoin.org/bin/bitcoin-core-0.13.1/bitcoin-0.13.1-x86_64-linux-gnu.tar.gz && \
-            tar xvf bitcoin-0.13.1-x86_64-linux-gnu.tar.gz && \
-            cd bitcoin-0.13.1 && \
-            sudo cp include/bitcoinconsensus.h /usr/include && \
-            sudo cp lib/libbitcoinconsensus.so.0.0.0 /usr/lib && \
-            sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so && \
-            sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so.0 && \
-            cd .. && \
-            git clone https://github.com/Bit-Wasp/bitcoinconsensus-php && \
-            cd bitcoinconsensus-php/bitcoinconsensus && \
-            phpize && ./configure --with-bitcoinconsensus && \
-            make && sudo make install && cd ../..; \
+        if [ "$EXT_CONSENSUS" = "true" ]; then
+            wget https://bitcoin.org/bin/bitcoin-core-0.13.1/bitcoin-0.13.1-x86_64-linux-gnu.tar.gz &&
+            tar xvf bitcoin-0.13.1-x86_64-linux-gnu.tar.gz &&
+            cd bitcoin-0.13.1 &&
+            sudo cp include/bitcoinconsensus.h /usr/include &&
+            sudo cp lib/libbitcoinconsensus.so.0.0.0 /usr/lib &&
+            sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so &&
+            sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so.0 &&
+            cd .. &&
+            git clone https://github.com/Bit-Wasp/bitcoinconsensus-php &&
+            cd bitcoinconsensus-php/bitcoinconsensus &&
+            phpize && ./configure --with-bitcoinconsensus &&
+            make && sudo make install && cd ../..;
         fi
 
     - composer update
