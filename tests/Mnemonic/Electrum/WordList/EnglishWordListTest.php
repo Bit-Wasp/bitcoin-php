@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Electrum\WordList;
 
-use \BitWasp\Bitcoin\Mnemonic\Electrum\Wordlist\EnglishWordList;
+use BitWasp\Bitcoin\Mnemonic\Electrum\Wordlist\EnglishWordList;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class EnglishWordListTest extends AbstractTestCase

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\PaymentProtocol\PaymentVerifier;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment;
@@ -12,7 +13,6 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\Random\Random;
 
 class PaymentVerifierTest extends Bip70Test
 {
