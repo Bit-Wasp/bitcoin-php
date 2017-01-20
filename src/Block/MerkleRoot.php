@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Block;
 
+use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
 
 class MerkleRoot

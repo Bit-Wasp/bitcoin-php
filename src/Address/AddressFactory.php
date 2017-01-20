@@ -5,10 +5,10 @@ namespace BitWasp\Bitcoin\Address;
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Buffertools\BufferInterface;
 

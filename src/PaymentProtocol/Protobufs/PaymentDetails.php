@@ -5,7 +5,7 @@ namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 use DrSlump\Protobuf;
 use DrSlump\Protobuf\Descriptor;
 use DrSlump\Protobuf\Field;
-use \DrSlump\Protobuf\Message;
+use DrSlump\Protobuf\Message;
 
 class PaymentDetails extends Message
 {

@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Adapter;
 
-use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
+use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Buffertools\BufferInterface;
 
 interface EcAdapterInterface

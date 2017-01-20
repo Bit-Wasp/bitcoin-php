@@ -3,10 +3,10 @@
 namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Block\BlockFactory;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
-use BitWasp\Bitcoin\Serializer\Block\FilteredBlockSerializer;
+use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\FilteredBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Block\PartialMerkleTreeSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;

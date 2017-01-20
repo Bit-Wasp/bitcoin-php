@@ -4,14 +4,14 @@ namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
-use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
+use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
 
 class WifPrivateKeySerializer

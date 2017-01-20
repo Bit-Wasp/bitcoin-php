@@ -66,5 +66,4 @@ interface TransactionInputInterface extends SerializableInterface
      * @return bool
      */
     public function isFinal();
-
 }

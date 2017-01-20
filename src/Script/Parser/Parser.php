@@ -2,8 +2,8 @@
 
 namespace BitWasp\Bitcoin\Script\Parser;
 
-use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;

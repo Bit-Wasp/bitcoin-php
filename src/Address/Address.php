@@ -4,8 +4,8 @@ namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 /**

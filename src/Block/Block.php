@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Block;
 
+use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
-use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 
