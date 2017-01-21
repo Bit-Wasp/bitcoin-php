@@ -335,6 +335,64 @@ class InputSigner
     }
 
     /**
+     * @param array $chunks
+     * @param SignData $signData
+     * @return Script|ScriptInterface|null
+     */
+    private function findRedeemScript(array $chunks, SignData $signData)
+    {
+        $redeemScript = null;
+        if (count($chunks) > 0) {
+            $redeemScript = new Script($chunks[count($chunks) - 1]);
+        } else {
+            if (!$signData->hasRedeemScript()) {
+                throw new \RuntimeException('Redeem script not provided in sign data or scriptSig');
+            }
+        }
+
+        if ($signData->hasRedeemScript()) {
+            if ($redeemScript === null) {
+                $redeemScript = $signData->getRedeemScript();
+            }
+
+            if (!$redeemScript->equals($signData->getRedeemScript())) {
+                throw new \RuntimeException('Extracted redeemScript did not match sign data');
+            }
+        }
+
+        return $redeemScript;
+    }
+
+    /**
+     * @param array $witness
+     * @param SignData $signData
+     * @return Script|ScriptInterface|null
+     */
+    private function findWitnessScript(array $witness, SignData $signData)
+    {
+        $witnessScript = null;
+        if (count($witness) > 0) {
+            $witnessScript = new Script($witness[count($witness) - 1]);
+        } else {
+            if (!$signData->hasWitnessScript()) {
+                throw new \RuntimeException('Witness script not provided in sign data or witness');
+            }
+        }
+
+        if ($signData->hasWitnessScript()) {
+            if ($witnessScript === null) {
+                $witnessScript = $signData->getWitnessScript();
+            } else {
+                if (!$witnessScript->equals($signData->getWitnessScript())) {
+                    throw new \RuntimeException('Extracted witnessScript did not match sign data');
+                }
+            }
+        }
+
+        return $witnessScript;
+    }
+
+    /**
      * Called upon instance creation.
      * This function must throw an exception whenever execution
      * does not yield a signable script.
@@ -366,25 +424,7 @@ class InputSigner
 
         if ($solution->getType() === ScriptType::P2SH) {
             $chunks = $this->evalPushOnly($scriptSig);
-            $redeemScript = null;
-            if (count($chunks) > 0) {
-                $redeemScript = new Script($chunks[count($chunks) - 1]);
-            } else {
-                if (!$signData->hasRedeemScript()) {
-                    throw new \RuntimeException('Redeem script not provided in sign data or scriptSig');
-                }
-            }
-
-            if ($signData->hasRedeemScript()) {
-                if ($redeemScript === null) {
-                    $redeemScript = $signData->getRedeemScript();
-                }
-
-                if (!$redeemScript->equals($signData->getRedeemScript())) {
-                    throw new \RuntimeException('Extracted redeemScript did not match sign data');
-                }
-            }
-
+            $redeemScript = $this->findRedeemScript($chunks, $signData);
             if (!$this->verifySolution(Interpreter::VERIFY_SIGPUSHONLY, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
                 throw new \RuntimeException('Redeem script fails to solve pay-to-script-hash');
             }
@@ -403,25 +443,7 @@ class InputSigner
             $sigChunks = $witness;
         } else if ($solution->getType() === ScriptType::P2WSH) {
             $sigVersion = SigHash::V1;
-
-            $witnessScript = null;
-            if (count($witness) > 0) {
-                $witnessScript = new Script($witness[count($witness) - 1]);
-            } else {
-                if (!$signData->hasWitnessScript()) {
-                    throw new \RuntimeException('Witness script not provided in sign data or witness');
-                }
-            }
-
-            if ($signData->hasWitnessScript()) {
-                if ($witnessScript === null) {
-                    $witnessScript = $signData->getWitnessScript();
-                } else {
-                    if (!$witnessScript->equals($signData->getWitnessScript())) {
-                        throw new \RuntimeException('Extracted witnessScript did not match sign data');
-                    }
-                }
-            }
+            $witnessScript = $this->findWitnessScript($witness, $signData);
 
             // Essentially all the reference implementation does
             if (!$witnessScript->getWitnessScriptHash()->equals($solution->getSolution())) {
