@@ -201,8 +201,7 @@ class InputSigner
     private function evalPushOnly(ScriptInterface $script)
     {
         $stack = new Stack();
-        $interpreter = new Interpreter();
-        $interpreter->evaluate($script, $stack, SigHash::V0, $this->flags | Interpreter::VERIFY_SIGPUSHONLY, $this->signatureChecker);
+        $this->interpreter->evaluate($script, $stack, SigHash::V0, $this->flags | Interpreter::VERIFY_SIGPUSHONLY, $this->signatureChecker);
         return $stack->all();
     }
 
