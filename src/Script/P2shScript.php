@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 
 class P2shScript extends Script
