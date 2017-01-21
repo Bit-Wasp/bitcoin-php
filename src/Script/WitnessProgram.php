@@ -19,12 +19,30 @@ class WitnessProgram
     private $program;
 
     /**
+     * @var ScriptInterface
+     */
+    private $script;
+
+    /**
      * WitnessProgram constructor.
      * @param int $version
      * @param BufferInterface $program
      */
     public function __construct($version, BufferInterface $program)
     {
+        if (self::V0 === $version) {
+            $size = $program->getSize();
+            if ($size === 20) {
+                $this->script = ScriptFactory::scriptPubKey()->p2wkh($program);
+            } else if ($size === 32) {
+                $this->script = ScriptFactory::scriptPubKey()->p2wsh($program);
+            } else {
+                throw new \RuntimeException('Invalid size for V0 witness program - must be 20 or 32 bytes');
+            }
+        } else {
+            throw new \InvalidArgumentException('Invalid witness version');
+        }
+
         $this->version = $version;
         $this->program = $program;
     }
@@ -35,13 +53,7 @@ class WitnessProgram
      */
     public static function v0(BufferInterface $program)
     {
-        if ($program->getSize() === 20) {
-            return new self(self::V0, $program);
-        } else if ($program->getSize() === 20) {
-            return new self(self::V0, $program);
-        } else {
-            throw new \RuntimeException('Invalid size for V0 witness program - must be 20 or 32 bytes');
-        }
+        return new self(self::V0, $program);
     }
 
     /**
@@ -65,9 +77,6 @@ class WitnessProgram
      */
     public function getScript()
     {
-        return ScriptFactory::create()
-            ->int($this->version)
-            ->push($this->program)
-            ->getScript();
+        return $this->script;
     }
 }

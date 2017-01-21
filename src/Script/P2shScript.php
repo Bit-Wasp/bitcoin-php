@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\ScriptHashAddress;
 
 class P2shScript extends Script
 {
@@ -13,6 +13,11 @@ class P2shScript extends Script
     private $outputScript;
 
     /**
+     * @var ScriptHashAddress
+     */
+    private $address;
+
+    /**
      * P2shScript constructor.
      * @param ScriptInterface $script
      * @param Opcodes|null $opcodes
@@ -20,7 +25,10 @@ class P2shScript extends Script
     public function __construct(ScriptInterface $script, Opcodes $opcodes = null)
     {
         parent::__construct($script->getBuffer(), $opcodes);
-        $this->outputScript = ScriptFactory::scriptPubKey()->payToScriptHash($script->getScriptHash());
+
+        $hash = $script->getScriptHash();
+        $this->outputScript = ScriptFactory::scriptPubKey()->p2sh($hash);
+        $this->address = new ScriptHashAddress($hash);
     }
 
     /**
@@ -36,6 +44,6 @@ class P2shScript extends Script
      */
     public function getAddress()
     {
-        return AddressFactory::fromScript($this);
+        return $this->address;
     }
 }
