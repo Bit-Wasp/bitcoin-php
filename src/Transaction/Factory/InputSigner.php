@@ -289,21 +289,16 @@ class InputSigner
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
                 $this->publicKeys = [$this->pubKeySerializer->parse($stack[1])];
             }
-        }
-
-        if ($type === ScriptType::P2PK && count($stack) === 1) {
+        } else if ($type === ScriptType::P2PK) {
             $this->requiredSigs = 1;
             if ($size === 1) {
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
-
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
-                $this->publicKeys = [$this->pubKeySerializer->parse($outputData->getSolution())];
             }
-        }
-
-        if ($type === ScriptType::MULTISIG) {
+            $this->publicKeys = [$this->pubKeySerializer->parse($outputData->getSolution())];
+        } else if ($type === ScriptType::MULTISIG) {
             $info = new Multisig($outputData->getScript());
             $this->requiredSigs = $info->getRequiredSigCount();
             $this->publicKeys = $info->getKeys();
@@ -332,6 +327,8 @@ class InputSigner
                 }
                 // Don't evaluate, already checked sigs during sort. Todo: fix this.
             }
+        } else {
+            throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
 
         return $type;
