@@ -123,11 +123,6 @@ class InputSigner
     private $requiredSigs = 0;
 
     /**
-     * @var OutputClassifier
-     */
-    private $classifier;
-
-    /**
      * @var Interpreter
      */
     private $interpreter;
@@ -158,7 +153,6 @@ class InputSigner
         $this->txOut = $txOut;
         $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
         $this->txSigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $ecAdapter));
-        $this->classifier = new OutputClassifier();
         $this->interpreter = new Interpreter();
         $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue());
         $this->flags = $signData->hasSignaturePolicy() ? $signData->getSignaturePolicy() : Interpreter::VERIFY_NONE;
@@ -363,7 +357,7 @@ class InputSigner
     }
 
     /**
-     * @param array $witness
+     * @param BufferInterface[] $witness
      * @param SignData $signData
      * @return Script|ScriptInterface|null
      */
@@ -406,13 +400,13 @@ class InputSigner
      * @param ScriptInterface $scriptSig
      * @param BufferInterface[] $witness
      * @return $this
-     * @throws \Exception
      */
     private function solve(SignData $signData, ScriptInterface $scriptPubKey, ScriptInterface $scriptSig, array $witness)
     {
+        $classifier = new OutputClassifier();
         $sigVersion = SigHash::V0;
         $sigChunks = [];
-        $solution = $this->scriptPubKey = $this->classifier->decode($scriptPubKey);
+        $solution = $this->scriptPubKey = $classifier->decode($scriptPubKey);
         if ($solution->getType() !== ScriptType::P2SH && !in_array($solution->getType(), self::$validP2sh)) {
             throw new \RuntimeException('scriptPubKey not supported');
         }
@@ -428,7 +422,7 @@ class InputSigner
                 throw new \RuntimeException('Redeem script fails to solve pay-to-script-hash');
             }
 
-            $solution = $this->redeemScript = $this->classifier->decode($redeemScript);
+            $solution = $this->redeemScript = $classifier->decode($redeemScript);
             if (!in_array($solution->getType(), self::$validP2sh)) {
                 throw new \RuntimeException('Unsupported pay-to-script-hash script');
             }
@@ -438,7 +432,7 @@ class InputSigner
 
         if ($solution->getType() === ScriptType::P2WKH) {
             $sigVersion = SigHash::V1;
-            $solution = $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
+            $solution = $this->witnessKeyHash = $classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
             $sigChunks = $witness;
         } else if ($solution->getType() === ScriptType::P2WSH) {
             $sigVersion = SigHash::V1;
@@ -449,7 +443,7 @@ class InputSigner
                 throw new \RuntimeException('Witness script fails to solve witness-script-hash');
             }
 
-            $solution = $this->witnessScript = $this->classifier->decode($witnessScript);
+            $solution = $this->witnessScript = $classifier->decode($witnessScript);
             if (!in_array($this->witnessScript->getType(), self::$canSign)) {
                 throw new \RuntimeException('Unsupported witness-script-hash script');
             }
@@ -550,6 +544,10 @@ class InputSigner
     {
         if ($this->isFullySigned()) {
             return $this;
+        }
+
+        if ($this->sigVersion === 1 && !$key->isCompressed()) {
+            throw new \RuntimeException('Uncompressed keys are disallowed in segwit scripts - refusing to sign');
         }
 
         if ($this->signScript->getType() === ScriptType::P2PK) {
