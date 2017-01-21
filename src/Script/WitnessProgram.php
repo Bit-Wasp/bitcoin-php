@@ -6,7 +6,7 @@ use BitWasp\Buffertools\BufferInterface;
 
 class WitnessProgram
 {
-    const V0 = 0;
+    const V0 = Opcodes::OP_0;
 
     /**
      * @var int
@@ -25,8 +25,14 @@ class WitnessProgram
      */
     public function __construct($version, BufferInterface $program)
     {
-        $this->version = $version;
-        $this->program = $program;
+        if (self::V0 === $version) {
+            $size = $program->getSize();
+            if (!($size === 20 || $size === 32)) {
+                throw new \RuntimeException('Invalid size for V0 witness program - must be 20 or 32 bytes');
+            }
+        } else {
+            throw new \InvalidArgumentException('Invalid witness version');
+        }
     }
 
     /**
@@ -35,13 +41,7 @@ class WitnessProgram
      */
     public static function v0(BufferInterface $program)
     {
-        if ($program->getSize() === 20) {
-            return new self(self::V0, $program);
-        } else if ($program->getSize() === 20) {
-            return new self(self::V0, $program);
-        } else {
-            throw new \RuntimeException('Invalid size for V0 witness program - must be 20 or 32 bytes');
-        }
+        return new self(self::V0, $program);
     }
 
     /**
