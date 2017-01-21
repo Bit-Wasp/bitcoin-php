@@ -649,6 +649,8 @@ class InputSigner
                     $result[] = $this->txSigSerializer->serialize($this->signatures[$i]);
                 }
             }
+        } else {
+            throw new \RuntimeException('Parameter 0 for serializeSolution was a non-standard input type');
         }
 
         return $result;
