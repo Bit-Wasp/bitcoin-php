@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Serializer\MessageSigner;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Bitcoin\MessageSigner\SignedMessage;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class SignedMessageSerializer
 {
@@ -29,7 +30,7 @@ class SignedMessageSerializer
 
     /**
      * @param SignedMessage $signedMessage
-     * @return string
+     * @return BufferInterface
      */
     public function serialize(SignedMessage $signedMessage)
     {

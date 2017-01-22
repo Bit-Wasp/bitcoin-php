@@ -80,8 +80,8 @@ class Checker
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, $nInput, $amount, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
     {
-        $this->sigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $ecAdapter));
-        $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
+        $this->sigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter));
+        $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
         $this->adapter = $ecAdapter;
         $this->transaction = $transaction;
         $this->nInput = $nInput;

@@ -50,8 +50,8 @@ class Signer
     {
         $this->tx = $tx;
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $this->sigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $this->ecAdapter));
-        $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, $this->ecAdapter);
+        $this->sigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $this->ecAdapter));
+        $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $this->ecAdapter);
     }
 
     /**

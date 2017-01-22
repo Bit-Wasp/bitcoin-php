@@ -57,7 +57,7 @@ class PrivateKeyFactory
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
 
         /** @var PrivateKeySerializerInterface $serializer */
-        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class);
+        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
 
         $parsed = $serializer->parse($hex);
         if ($compressed) {
@@ -91,7 +91,7 @@ class PrivateKeyFactory
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $network = $network ?: Bitcoin::getNetwork();
-        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class);
+        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
         $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $serializer);
 
         return $wifSerializer->parse($wif, $network);
