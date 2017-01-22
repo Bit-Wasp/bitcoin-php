@@ -159,7 +159,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
      * @param PublicKey $other
      * @return bool
      */
-    private function doEquals(self $other)
+    private function doEquals(PublicKey $other)
     {
         return $this->compressed === $other->compressed
             && $this->point->equals($other->point)
