@@ -16,7 +16,7 @@ use BitWasp\Buffertools\BufferInterface;
 class Hasher extends SigHash
 {
     /**
-     * @var TransactionSerializer
+     * @var TransactionSerializerInterface
      */
     private $txSerializer;
 
