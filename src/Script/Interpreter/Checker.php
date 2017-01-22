@@ -41,6 +41,11 @@ class Checker
     private $amount;
 
     /**
+     * @var array
+     */
+    private $cache = [];
+
+    /**
      * Checker constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
@@ -53,6 +58,7 @@ class Checker
         $this->transaction = $transaction;
         $this->nInput = $nInput;
         $this->amount = $amount;
+        $this->cache = [];
     }
 
     /**
@@ -173,18 +179,24 @@ class Checker
             ->checkPublicKeyEncoding($keyBuf, $flags);
 
         try {
-            $txSignature = TransactionSignatureFactory::fromHex($sigBuf);
-            $publicKey = PublicKeyFactory::fromHex($keyBuf);
+            $cacheCheck = $flags . $sigVersion . $keyBuf->getBinary() . $sigBuf->getBinary();
+            if (!isset($this->cache[$cacheCheck])) {
+                $txSignature = TransactionSignatureFactory::fromHex($sigBuf);
+                $publicKey = PublicKeyFactory::fromHex($keyBuf);
 
-            if ($sigVersion === 1) {
-                $hasher = new V1Hasher($this->transaction, $this->amount);
+                if ($sigVersion === 1) {
+                    $hasher = new V1Hasher($this->transaction, $this->amount);
+                } else {
+                    $hasher = new Hasher($this->transaction);
+                }
+
+                $hash = $hasher->calculate($script, $this->nInput, $txSignature->getHashType());
+                $result = $this->cache[$cacheCheck] = $this->adapter->verify($hash, $publicKey, $txSignature->getSignature());
             } else {
-                $hasher = new Hasher($this->transaction);
+                $result = $this->cache[$cacheCheck];
             }
 
-            $hash = $hasher->calculate($script, $this->nInput, $txSignature->getHashType());
-
-            return $this->adapter->verify($hash, $publicKey, $txSignature->getSignature());
+            return $result;
         } catch (\Exception $e) {
             return false;
         }
