@@ -158,7 +158,7 @@ class InputSigner
         $this->txSigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $ecAdapter));
         $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
         $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
-        $this->interpreter = new Interpreter();
+        $this->interpreter = new Interpreter($this->ecAdapter);
 
         $this->solve($signData, $txOut->getScript(), $inputs[$nInput]->getScript(), isset($tx->getWitnesses()[$nInput]) ? $tx->getWitnesses()[$nInput]->all() : []);
     }
