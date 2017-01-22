@@ -29,15 +29,11 @@ class ExtendedKeySerializer
     public function __construct(EcAdapterInterface $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
-        $uint32 = Types::uint32();
-        $this->template = new Template([
-            Types::bytestring(4),
-            Types::uint8(),
-            $uint32,
-            $uint32,
-            Types::bytestring(32),
-            Types::bytestring(33)
-        ]);
+        $this->bytestring4 = Types::bytestring(4);
+        $this->uint8 = Types::uint8();
+        $this->uint32 = Types::uint32();
+        $this->bytestring32 = Types::bytestring(32);
+        $this->bytestring33 = Types::bytestring(33);
     }
 
     /**
@@ -67,14 +63,14 @@ class ExtendedKeySerializer
             ? [$network->getHDPrivByte(), new Buffer("\x00". $key->getPrivateKey()->getBinary(), 33)]
             : [$network->getHDPubByte(), $key->getPublicKey()->getBuffer()];
 
-        return $this->template->write([
-            Buffer::hex($prefix, 4),
-            $key->getDepth(),
-            $key->getFingerprint(),
-            $key->getSequence(),
-            $key->getChainCode(),
-            $data
-        ]);
+        return new Buffer(
+            pack("H*", $prefix) .
+            $this->uint8->write($key->getDepth()) .
+            $this->uint32->write($key->getFingerprint()) .
+            $this->uint32->write($key->getSequence()) .
+            $this->bytestring32->write($key->getChainCode()) .
+            $this->bytestring33->write($data)
+        );
     }
 
     /**
@@ -88,10 +84,15 @@ class ExtendedKeySerializer
         $this->checkNetwork($network);
 
         try {
-            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = $this->template->parse($parser);
+            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = [
+                $this->bytestring4->read($parser),
+                $this->uint8->read($parser),
+                $this->uint32->read($parser),
+                $this->uint32->read($parser),
+                $this->bytestring32->read($parser),
+                $this->bytestring33->read($parser),
+            ];
 
-            /** @var BufferInterface $keyData */
-            /** @var BufferInterface $bytes */
             $bytes = $bytes->getHex();
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
