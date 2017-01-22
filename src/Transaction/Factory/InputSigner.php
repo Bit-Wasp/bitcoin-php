@@ -163,15 +163,18 @@ class InputSigner
     }
 
     /**
+     * A snipped from OP_CHECKMULTISIG - verifies signatures according to the
+     * order of the given public keys (taken from the script).
+     *
      * @param ScriptInterface $script
-     * @param BufferInterface[] $mainStack
+     * @param BufferInterface[] $signatures
      * @param BufferInterface[] $publicKeys
      * @param int $sigVersion
      * @return \SplObjectStorage
      */
-    private function sortMultisigs(ScriptInterface $script, array $mainStack, array $publicKeys, $sigVersion)
+    private function sortMultisigs(ScriptInterface $script, array $signatures, array $publicKeys, $sigVersion)
     {
-        $sigCount = count($mainStack);
+        $sigCount = count($signatures);
         $keyCount = count($publicKeys);
         $ikey = $isig = 0;
         $fSuccess = true;
@@ -179,7 +182,7 @@ class InputSigner
 
         while ($fSuccess && $sigCount > 0) {
             // Fetch the signature and public key
-            $sig = $mainStack[$isig];
+            $sig = $signatures[$isig];
             $pubkey = $publicKeys[$ikey];
 
             if ($this->signatureChecker->checkSig($script, $sig, $pubkey, $sigVersion, $this->flags)) {
@@ -214,6 +217,9 @@ class InputSigner
     }
 
     /**
+     * Create a script consisting only of push-data operations.
+     * Suitable for a scriptSig.
+     *
      * @param BufferInterface[] $buffers
      * @return ScriptInterface
      */
@@ -239,6 +245,9 @@ class InputSigner
     }
 
     /**
+     * Verify a scriptSig / scriptWitness against a scriptPubKey.
+     * Useful for checking the outcome of certain things, like hash locks (p2sh)
+     *
      * @param int $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
@@ -251,6 +260,8 @@ class InputSigner
     }
 
     /**
+     * Evaluates a scriptPubKey against the provided chunks.
+     *
      * @param ScriptInterface $scriptPubKey
      * @param array $chunks
      * @param int $sigVersion
@@ -278,10 +289,11 @@ class InputSigner
      * This function is strictly for $canSign types.
      * It will extract signatures/publicKeys when given $outputData, and $stack.
      * $stack is the result of decompiling a scriptSig, or taking the witness data.
+     *
      * @param OutputData $outputData
      * @param array $stack
-     * @param $sigVersion
-     * @return mixed
+     * @param int $sigVersion
+     * @return string
      */
     public function extractFromValues(OutputData $outputData, array $stack, $sigVersion)
     {
@@ -339,15 +351,13 @@ class InputSigner
             throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
 
-
-
         return $type;
     }
 
     /**
-     * @param array $chunks
+     * @param BufferInterface[] $chunks
      * @param SignData $signData
-     * @return Script|ScriptInterface|null
+     * @return ScriptInterface
      */
     private function findRedeemScript(array $chunks, SignData $signData)
     {
@@ -376,7 +386,7 @@ class InputSigner
     /**
      * @param BufferInterface[] $witness
      * @param SignData $signData
-     * @return Script|ScriptInterface|null
+     * @return ScriptInterface
      */
     private function findWitnessScript(array $witness, SignData $signData)
     {
@@ -404,14 +414,12 @@ class InputSigner
 
     /**
      * Called upon instance creation.
-     * This function must throw an exception whenever execution
-     * does not yield a signable script.
      *
-     * It ensures:
+     * It ensures that violating the following prevents instance creation
      *  - the scriptPubKey can be directly signed, or leads to P2SH/P2WSH/P2WKH
      *  - the P2SH script covers signable types and P2WSH/P2WKH
      *  - the witnessScript covers signable types only
-     *  - violating the above prevents instance creation
+     *
      * @param SignData $signData
      * @param ScriptInterface $scriptPubKey
      * @param ScriptInterface $scriptSig
@@ -547,6 +555,8 @@ class InputSigner
     }
 
     /**
+     * Sign the input using $key and $sigHashTypes
+     *
      * @param PrivateKeyInterface $key
      * @param int $sigHashType
      * @return $this
@@ -566,19 +576,14 @@ class InputSigner
                 throw new \RuntimeException('Signing with the wrong private key');
             }
             $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
-            $this->publicKeys[0] = $key->getPublicKey();
-            $this->requiredSigs = 1;
         } else if ($this->signScript->getType() === ScriptType::P2PKH) {
             if (!$key->getPubKeyHash($this->pubKeySerializer)->equals($this->signScript->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
             $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
             $this->publicKeys[0] = $key->getPublicKey();
-            $this->requiredSigs = 1;
         } else if ($this->signScript->getType() === ScriptType::MULTISIG) {
             $info = new Multisig($this->signScript->getScript(), $this->pubKeySerializer);
-            $this->publicKeys = $info->getKeys();
-            $this->requiredSigs = $info->getRequiredSigCount();
 
             $signed = false;
             foreach ($info->getKeys() as $keyIdx => $publicKey) {
@@ -599,6 +604,8 @@ class InputSigner
     }
 
     /**
+     * Verifies the input using $flags for script verification
+     *
      * @param int $flags
      * @return bool
      */
@@ -617,6 +624,7 @@ class InputSigner
 
         $sig = $this->serializeSignatures();
 
+        // Take serialized signatures, and use mutator to add this inputs sig data
         $mutator = TransactionFactory::mutate($this->tx);
         $mutator->inputsMutator()[$this->nInput]->script($sig->getScriptSig());
         if ($this->sigVersion === 1) {
@@ -636,6 +644,8 @@ class InputSigner
     }
 
     /**
+     * Produces the script stack that solves the $outputType
+     *
      * @param string $outputType
      * @return BufferInterface[]
      */
@@ -665,6 +675,8 @@ class InputSigner
     }
 
     /**
+     * Produces a SigValues instance containing the scriptSig & script witness
+     *
      * @return SigValues
      */
     public function serializeSignatures()
