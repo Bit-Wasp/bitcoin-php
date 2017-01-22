@@ -23,7 +23,6 @@ use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
-use BitWasp\Bitcoin\Signature\SignatureSort;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
@@ -164,26 +163,43 @@ class InputSigner
     }
 
     /**
-     * @param TransactionSignatureInterface[] $stack
-     * @param PublicKeyInterface[] $publicKeys
+     * @param ScriptInterface $script
+     * @param BufferInterface[] $mainStack
+     * @param BufferInterface[] $publicKeys
+     * @param int $sigVersion
      * @return \SplObjectStorage
      */
-    private function sortMultiSigs($stack, array $publicKeys)
+    private function sortMultisigs(ScriptInterface $script, array $mainStack, array $publicKeys, $sigVersion)
     {
-        $sigSort = new SignatureSort($this->ecAdapter);
-        $sigs = new \SplObjectStorage;
+        $sigCount = count($mainStack);
+        $keyCount = count($publicKeys);
+        $ikey = $isig = 0;
+        $fSuccess = true;
+        $result = new \SplObjectStorage;
 
-        foreach ($stack as $txSig) {
-            $hash = $this->getSigHash($txSig->getHashType());
-            $linked = $sigSort->link([$txSig->getSignature()], $publicKeys, $hash);
-            foreach ($publicKeys as $key) {
-                if ($linked->contains($key)) {
-                    $sigs[$key] = $txSig;
-                }
+        while ($fSuccess && $sigCount > 0) {
+            // Fetch the signature and public key
+            $sig = $mainStack[$isig];
+            $pubkey = $publicKeys[$ikey];
+
+            if ($this->signatureChecker->checkSig($script, $sig, $pubkey, $sigVersion, $this->flags)) {
+                $result[$pubkey] = $sig;
+                $isig++;
+                $sigCount--;
+            }
+
+            $ikey++;
+            $keyCount--;
+
+            // If there are more signatures left than keys left,
+            // then too many signatures have failed. Exit early,
+            // without checking any further signatures.
+            if ($sigCount > $keyCount) {
+                $fSuccess = false;
             }
         }
 
-        return $sigs;
+        return $result;
     }
 
     /**
@@ -271,6 +287,7 @@ class InputSigner
     {
         $type = $outputData->getType();
         $size = count($stack);
+
         if ($type === ScriptType::P2PKH) {
             $this->requiredSigs = 1;
             if ($size === 2) {
@@ -290,37 +307,39 @@ class InputSigner
             }
             $this->publicKeys = [$this->pubKeySerializer->parse($outputData->getSolution())];
         } else if ($type === ScriptType::MULTISIG) {
-            $info = new Multisig($outputData->getScript());
+            $info = new Multisig($outputData->getScript(), $this->pubKeySerializer);
             $this->requiredSigs = $info->getRequiredSigCount();
             $this->publicKeys = $info->getKeys();
+            $keyBufs = $info->getKeyBuffers();
             if ($size > 1) {
-                $vars = [];
-                for ($i = 1, $j = $size - 1; $i <= $j; $i++) {
-                    try {
-                        $vars[] = $this->txSigSerializer->parse($stack[$i]);
-                    } catch (\Exception $e) {
-                        // Try-catch block necessary because we don't know it's actually a TransactionSignature
-                    }
-                }
+                // Check signatures irrespective of scriptSig size, primes Checker cache, and need info
+                $check = $this->evaluateSolution($outputData->getScript(), $stack, $sigVersion);
+                $sigBufs = array_slice($stack, 1, $size - 1);
+                $sigBufCount = count($sigBufs);
 
-                $this->signatures = array_fill(0, count($this->publicKeys), null);
-                $sigs = $this->sortMultiSigs($vars, $this->publicKeys);
-                $count = 0;
-                foreach ($this->publicKeys as $idx => $key) {
-                    if (isset($sigs[$key])) {
-                        $this->signatures[$idx] = $sigs[$key];
-                        $count++;
-                    }
-                }
-
-                if (count($vars) !== $count) {
+                // If we seem to have all signatures but fail evaluation, abort
+                if ($sigBufCount === $this->requiredSigs && !$check) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
-                // Don't evaluate, already checked sigs during sort. Todo: fix this.
+
+                $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBufs, $sigVersion);
+
+                // Here we learn if any signatures were invalid, it won't be in the map.
+                if ($sigBufCount !== count($keyToSigMap)) {
+                    throw new \RuntimeException('Existing signatures are invalid!');
+                }
+
+                foreach ($keyBufs as $idx => $key) {
+                    if (isset($keyToSigMap[$key])) {
+                        $this->signatures[$idx] = $this->txSigSerializer->parse($keyToSigMap[$key]);
+                    }
+                }
             }
         } else {
             throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
+
+
 
         return $type;
     }
@@ -557,7 +576,7 @@ class InputSigner
             $this->publicKeys[0] = $key->getPublicKey();
             $this->requiredSigs = 1;
         } else if ($this->signScript->getType() === ScriptType::MULTISIG) {
-            $info = new Multisig($this->signScript->getScript());
+            $info = new Multisig($this->signScript->getScript(), $this->pubKeySerializer);
             $this->publicKeys = $info->getKeys();
             $this->requiredSigs = $info->getRequiredSigCount();
 
