@@ -154,7 +154,7 @@ class TransactionSerializer implements TransactionSerializerInterface
             }
         }
 
-        $parser->writeRawBinary(4, $this->uint32le->write($transaction->getLockTime()));
+        $parser->appendBinary($this->uint32le->write($transaction->getLockTime()));
 
         return $parser->getBuffer();
     }
