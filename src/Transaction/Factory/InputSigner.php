@@ -300,7 +300,7 @@ class InputSigner
         $type = $outputData->getType();
         $size = count($stack);
 
-        if ($type === ScriptType::P2PKH) {
+        if (ScriptType::P2PKH === $type) {
             $this->requiredSigs = 1;
             if ($size === 2) {
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
@@ -309,7 +309,7 @@ class InputSigner
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
                 $this->publicKeys = [$this->pubKeySerializer->parse($stack[1])];
             }
-        } else if ($type === ScriptType::P2PK) {
+        } else if (ScriptType::P2PK === $type) {
             $this->requiredSigs = 1;
             if ($size === 1) {
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
@@ -318,7 +318,7 @@ class InputSigner
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
             }
             $this->publicKeys = [$this->pubKeySerializer->parse($outputData->getSolution())];
-        } else if ($type === ScriptType::MULTISIG) {
+        } else if (ScriptType::MULTISIG === $type) {
             $info = new Multisig($outputData->getScript(), $this->pubKeySerializer);
             $this->requiredSigs = $info->getRequiredSigCount();
             $this->publicKeys = $info->getKeys();
@@ -575,7 +575,7 @@ class InputSigner
             return $this;
         }
 
-        if ($this->sigVersion === 1 && !$key->isCompressed()) {
+        if (SigHash::V1 === $this->sigVersion && !$key->isCompressed()) {
             throw new \RuntimeException('Uncompressed keys are disallowed in segwit scripts - refusing to sign');
         }
 
@@ -624,7 +624,7 @@ class InputSigner
         }
 
         $flags |= Interpreter::VERIFY_P2SH;
-        if ($this->sigVersion === 1) {
+        if (SigHash::V1 === $this->sigVersion) {
             $flags |= Interpreter::VERIFY_WITNESS;
         }
 
@@ -633,7 +633,8 @@ class InputSigner
         // Take serialized signatures, and use mutator to add this inputs sig data
         $mutator = TransactionFactory::mutate($this->tx);
         $mutator->inputsMutator()[$this->nInput]->script($sig->getScriptSig());
-        if ($this->sigVersion === 1) {
+
+        if (SigHash::V1 === $this->sigVersion) {
             $witness = [];
             for ($i = 0, $j = count($this->tx->getInputs()); $i < $j; $i++) {
                 if ($i === $this->nInput) {
@@ -658,15 +659,15 @@ class InputSigner
     private function serializeSolution($outputType)
     {
         $result = [];
-        if ($outputType === ScriptType::P2PK) {
+        if (ScriptType::P2PK === $outputType) {
             if (count($this->signatures) === 1) {
                 $result = [$this->txSigSerializer->serialize($this->signatures[0])];
             }
-        } else if ($outputType === ScriptType::P2PKH) {
+        } else if (ScriptType::P2PKH === $outputType) {
             if (count($this->signatures) === 1 && count($this->publicKeys) === 1) {
                 $result = [$this->txSigSerializer->serialize($this->signatures[0]), $this->pubKeySerializer->serialize($this->publicKeys[0])];
             }
-        } else if ($outputType === ScriptType::MULTISIG) {
+        } else if (ScriptType::MULTISIG === $outputType) {
             $result[] = new Buffer();
             for ($i = 0, $nPubKeys = count($this->publicKeys); $i < $nPubKeys; $i++) {
                 if (isset($this->signatures[$i])) {
