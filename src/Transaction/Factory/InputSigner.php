@@ -365,23 +365,18 @@ class InputSigner
      */
     private function findRedeemScript(array $chunks, SignData $signData)
     {
-        $redeemScript = null;
         if (count($chunks) > 0) {
             $redeemScript = new Script($chunks[count($chunks) - 1]);
+            if ($signData->hasRedeemScript()) {
+                if (!$redeemScript->equals($signData->getRedeemScript())) {
+                    throw new \RuntimeException('Extracted redeemScript did not match sign data');
+                }
+            }
         } else {
             if (!$signData->hasRedeemScript()) {
                 throw new \RuntimeException('Redeem script not provided in sign data or scriptSig');
             }
-        }
-
-        if ($signData->hasRedeemScript()) {
-            if ($redeemScript === null) {
-                $redeemScript = $signData->getRedeemScript();
-            }
-
-            if (!$redeemScript->equals($signData->getRedeemScript())) {
-                throw new \RuntimeException('Extracted redeemScript did not match sign data');
-            }
+            $redeemScript = $signData->getRedeemScript();
         }
 
         return $redeemScript;
@@ -398,23 +393,18 @@ class InputSigner
      */
     private function findWitnessScript(array $witness, SignData $signData)
     {
-        $witnessScript = null;
         if (count($witness) > 0) {
             $witnessScript = new Script($witness[count($witness) - 1]);
-        } else {
-            if (!$signData->hasWitnessScript()) {
-                throw new \RuntimeException('Witness script not provided in sign data or witness');
-            }
-        }
-
-        if ($signData->hasWitnessScript()) {
-            if ($witnessScript === null) {
-                $witnessScript = $signData->getWitnessScript();
-            } else {
+            if ($signData->hasWitnessScript()) {
                 if (!$witnessScript->equals($signData->getWitnessScript())) {
                     throw new \RuntimeException('Extracted witnessScript did not match sign data');
                 }
             }
+        } else {
+            if (!$signData->hasWitnessScript()) {
+                throw new \RuntimeException('Witness script not provided in sign data or witness');
+            }
+            $witnessScript = $signData->getWitnessScript();
         }
 
         return $witnessScript;
