@@ -130,6 +130,16 @@ class InputSigner
     private $signatureChecker;
 
     /**
+     * @var TransactionSignatureSerializer
+     */
+    private $txSigSerializer;
+
+    /**
+     * @var PublicKeySerializerInterface
+     */
+    private $pubKeySerializer;
+
+    /**
      * InputSigner constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
