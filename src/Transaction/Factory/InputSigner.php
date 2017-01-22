@@ -26,9 +26,7 @@ use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\SignatureSort;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
-use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
@@ -133,14 +131,16 @@ class InputSigner
     private $signatureChecker;
 
     /**
-     * TxInputSigning constructor.
+     * InputSigner constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
-     * @param int $nInput
+     * @param $nInput
      * @param TransactionOutputInterface $txOut
      * @param SignData $signData
+     * @param TransactionSignatureSerializer|null $sigSerializer
+     * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
     {
         $inputs = $tx->getInputs();
         if (!isset($inputs[$nInput])) {
@@ -151,18 +151,16 @@ class InputSigner
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
-        $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
-        $this->txSigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $ecAdapter));
-        $this->interpreter = new Interpreter();
-        $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue());
         $this->flags = $signData->hasSignaturePolicy() ? $signData->getSignaturePolicy() : Interpreter::VERIFY_NONE;
         $this->publicKeys = [];
         $this->signatures = [];
 
-        $scriptSig = $inputs[$nInput]->getScript();
-        $witness = isset($tx->getWitnesses()[$nInput]) ? $tx->getWitnesses()[$nInput]->all() : [];
+        $this->txSigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $ecAdapter));
+        $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
+        $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
+        $this->interpreter = new Interpreter();
 
-        $this->solve($signData, $txOut->getScript(), $scriptSig, $witness);
+        $this->solve($signData, $txOut->getScript(), $inputs[$nInput]->getScript(), isset($tx->getWitnesses()[$nInput]) ? $tx->getWitnesses()[$nInput]->all() : []);
     }
 
     /**
@@ -471,13 +469,7 @@ class InputSigner
             throw new \RuntimeException('Invalid sigHashType requested');
         }
 
-        if ($sigVersion === SigHash::V1) {
-            $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
-        } else {
-            $hasher = new Hasher($this->tx);
-        }
-
-        return $hasher->calculate($scriptCode, $this->nInput, $sigHashType);
+        return $this->signatureChecker->getSigHash($scriptCode, $sigHashType, $sigVersion);
     }
 
     /**

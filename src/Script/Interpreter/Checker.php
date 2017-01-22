@@ -3,19 +3,23 @@
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class Checker
@@ -41,24 +45,47 @@ class Checker
     private $amount;
 
     /**
+     * @var Hasher
+     */
+    private $hasherV0;
+
+    /**
      * @var array
      */
-    private $cache = [];
+    private $sigHashCache = [];
+
+    /**
+     * @var array
+     */
+    private $sigCache = [];
+
+    /**
+     * @var TransactionSignatureSerializer
+     */
+    private $sigSerializer;
+
+    /**
+     * @var PublicKeySerializerInterface
+     */
+    private $pubKeySerializer;
 
     /**
      * Checker constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
      * @param int $nInput
-     * @param int|string $amount
+     * @param int $amount
+     * @param TransactionSignatureSerializer|null $sigSerializer
+     * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, $nInput, $amount)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, $nInput, $amount, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
     {
+        $this->sigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $ecAdapter));
+        $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
         $this->adapter = $ecAdapter;
         $this->transaction = $transaction;
         $this->nInput = $nInput;
         $this->amount = $amount;
-        $this->cache = [];
     }
 
     /**
@@ -165,6 +192,35 @@ class Checker
 
     /**
      * @param ScriptInterface $script
+     * @param int $sigHashType
+     * @param int $sigVersion
+     * @return BufferInterface
+     */
+    public function getSigHash(ScriptInterface $script, $sigHashType, $sigVersion)
+    {
+        $cacheCheck = $sigVersion . $sigHashType . $script->getBuffer()->getBinary();
+        if (!isset($this->sigHashCache[$cacheCheck])) {
+            if ($sigVersion === 1) {
+                $hasher = new V1Hasher($this->transaction, $this->amount);
+            } else {
+                if ($this->hasherV0) {
+                    $hasher = $this->hasherV0;
+                } else {
+                    $hasher = $this->hasherV0 = new Hasher($this->transaction, new TransactionSerializer());
+                }
+            }
+
+            $hash = $hasher->calculate($script, $this->nInput, $sigHashType);
+            $this->sigHashCache[$cacheCheck] = $hash->getBinary();
+        } else {
+            $hash = new Buffer($this->sigHashCache[$cacheCheck], 32, $this->adapter->getMath());
+        }
+
+        return $hash;
+    }
+
+    /**
+     * @param ScriptInterface $script
      * @param BufferInterface $sigBuf
      * @param BufferInterface $keyBuf
      * @param int $sigVersion
@@ -180,20 +236,14 @@ class Checker
 
         try {
             $cacheCheck = $flags . $sigVersion . $keyBuf->getBinary() . $sigBuf->getBinary();
-            if (!isset($this->cache[$cacheCheck])) {
-                $txSignature = TransactionSignatureFactory::fromHex($sigBuf);
-                $publicKey = PublicKeyFactory::fromHex($keyBuf);
+            if (!isset($this->sigCache[$cacheCheck])) {
+                $txSignature = $this->sigSerializer->parse($sigBuf);
+                $publicKey = $this->pubKeySerializer->parse($keyBuf);
 
-                if ($sigVersion === 1) {
-                    $hasher = new V1Hasher($this->transaction, $this->amount);
-                } else {
-                    $hasher = new Hasher($this->transaction);
-                }
-
-                $hash = $hasher->calculate($script, $this->nInput, $txSignature->getHashType());
-                $result = $this->cache[$cacheCheck] = $this->adapter->verify($hash, $publicKey, $txSignature->getSignature());
+                $hash = $this->getSigHash($script, $txSignature->getHashType(), $sigVersion);
+                $result = $this->sigCache[$cacheCheck] = $this->adapter->verify($hash, $publicKey, $txSignature->getSignature());
             } else {
-                $result = $this->cache[$cacheCheck];
+                $result = $this->sigCache[$cacheCheck];
             }
 
             return $result;

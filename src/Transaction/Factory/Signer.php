@@ -4,7 +4,11 @@ namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
+use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -23,6 +27,16 @@ class Signer
     private $tx;
 
     /**
+     * @var TransactionSignatureSerializer
+     */
+    private $sigSerializer;
+
+    /**
+     * @var PublicKeySerializerInterface
+     */
+    private $pubKeySerializer;
+
+    /**
      * @var InputSigner[]
      */
     private $signatureCreator = [];
@@ -36,6 +50,8 @@ class Signer
     {
         $this->tx = $tx;
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
+        $this->sigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, $this->ecAdapter));
+        $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, $this->ecAdapter);
     }
 
     /**
