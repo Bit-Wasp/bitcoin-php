@@ -11,6 +11,21 @@ use BitWasp\Buffertools\Parser;
 
 class BlockHeaderSerializer
 {
+    /**
+     * @var \BitWasp\Buffertools\Types\Int32
+     */
+    private $int32le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\ByteString
+     */
+    private $hash;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $uint32le;
+
     public function __construct()
     {
         $this->hash = Types::bytestringle(32);
