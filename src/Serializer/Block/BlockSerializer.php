@@ -7,10 +7,8 @@ use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializerInterface;
 use BitWasp\Bitcoin\Serializer\Types;
-use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\Template;
 
 class BlockSerializer implements BlockSerializerInterface
 {
@@ -25,14 +23,14 @@ class BlockSerializer implements BlockSerializerInterface
     private $headerSerializer;
 
     /**
+     * @var \BitWasp\Buffertools\Types\VarInt
+     */
+    private $varint;
+
+    /**
      * @var TransactionSerializerInterface
      */
     private $txSerializer;
-
-    /**
-     * @var \BitWasp\Buffertools\Template
-     */
-    private $txsTemplate;
 
     /**
      * @param Math $math
@@ -43,20 +41,8 @@ class BlockSerializer implements BlockSerializerInterface
     {
         $this->math = $math;
         $this->headerSerializer = $headerSerializer;
+        $this->varint = Types::varint();
         $this->txSerializer = $txSerializer;
-        $this->txsTemplate = $this->getTxsTemplate();
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    private function getTxsTemplate()
-    {
-        return new Template([
-            Types::vector(function (Parser $parser) {
-                return $this->txSerializer->fromParser($parser);
-            })
-        ]);
     }
 
     /**
@@ -68,7 +54,7 @@ class BlockSerializer implements BlockSerializerInterface
     {
         try {
             $header = $this->headerSerializer->fromParser($parser);
-            $nTx = Types::varint()->read($parser);
+            $nTx = $this->varint->read($parser);
             $vTx = [];
             for ($i = 0; $i < $nTx; $i++) {
                 $vTx[] = $this->txSerializer->fromParser($parser);
@@ -96,7 +82,7 @@ class BlockSerializer implements BlockSerializerInterface
     public function serialize(BlockInterface $block)
     {
         $parser = new Parser($this->headerSerializer->serialize($block->getHeader()));
-        $parser->appendBuffer(Buffertools::numToVarInt(count($block->getTransactions())));
+        $parser->appendBinary($this->varint->write(count($block->getTransactions())));
         foreach ($block->getTransactions() as $tx) {
             $parser->appendBuffer($this->txSerializer->serialize($tx));
         }
