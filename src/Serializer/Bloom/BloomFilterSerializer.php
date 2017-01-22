@@ -10,6 +10,21 @@ use BitWasp\Buffertools\Parser;
 
 class BloomFilterSerializer
 {
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $uint32le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint8
+     */
+    private $uint8le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\VarInt
+     */
+    private $varint;
+
     public function __construct()
     {
         $this->uint32le = Types::uint32le();
