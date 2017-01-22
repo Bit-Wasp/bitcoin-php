@@ -355,6 +355,10 @@ class InputSigner
     }
 
     /**
+     * Checks $chunks (a decompiled scriptSig) for it's last element,
+     * or defers to SignData. If both are provided, it checks the
+     * value from $chunks against SignData.
+     *
      * @param BufferInterface[] $chunks
      * @param SignData $signData
      * @return ScriptInterface
@@ -384,6 +388,10 @@ class InputSigner
     }
 
     /**
+     * Checks $witness (a witness structure) for it's last element,
+     * or defers to SignData. If both are provided, it checks the
+     * value from $chunks against SignData.
+     *
      * @param BufferInterface[] $witness
      * @param SignData $signData
      * @return ScriptInterface
@@ -513,7 +521,7 @@ class InputSigner
      * @param ScriptInterface $scriptCode
      * @param int $sigHashType
      * @param int $sigVersion
-     * @return TransactionSignature
+     * @return TransactionSignatureInterface
      */
     private function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
@@ -583,10 +591,8 @@ class InputSigner
             $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
             $this->publicKeys[0] = $key->getPublicKey();
         } else if ($this->signScript->getType() === ScriptType::MULTISIG) {
-            $info = new Multisig($this->signScript->getScript(), $this->pubKeySerializer);
-
             $signed = false;
-            foreach ($info->getKeys() as $keyIdx => $publicKey) {
+            foreach ($this->publicKeys as $keyIdx => $publicKey) {
                 if ($key->getPublicKey()->equals($publicKey)) {
                     $this->signatures[$keyIdx] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
                     $signed = true;
