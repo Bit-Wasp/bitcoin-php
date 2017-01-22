@@ -200,7 +200,7 @@ class Checker
     {
         $cacheCheck = $sigVersion . $sigHashType . $script->getBuffer()->getBinary();
         if (!isset($this->sigHashCache[$cacheCheck])) {
-            if ($sigVersion === 1) {
+            if (SigHash::V1 === $sigVersion) {
                 $hasher = new V1Hasher($this->transaction, $this->amount);
             } else {
                 if ($this->hasherV0) {
