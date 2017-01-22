@@ -41,13 +41,11 @@ class TransactionSignatureSerializer
         $adapter = $this->sigSerializer->getEcAdapter();
         $math = $adapter->getMath();
         $buffer = (new Parser($string, $math))->getBuffer()->getBinary();
-        $sig2 = substr($buffer, 0, -1);
-        $ht2 = unpack('C', substr($buffer, -1))[1];
 
         return new TransactionSignature(
             $adapter,
-            $this->sigSerializer->parse(new Buffer($sig2, null, $math)),
-            $ht2
+            $this->sigSerializer->parse(new Buffer(substr($buffer, 0, -1), null, $math)),
+            unpack('C', substr($buffer, -1))[1]
         );
     }
 }
