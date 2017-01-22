@@ -84,7 +84,7 @@ class Signer
         }
 
         if (!isset($this->signatureCreator[$nIn])) {
-            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData);
+            $this->signatureCreator[$nIn] = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData, $this->sigSerializer, $this->pubKeySerializer);
         }
 
         return $this->signatureCreator[$nIn];
