@@ -13,7 +13,6 @@ use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\Template;
 
 class ExtendedKeySerializer
 {
@@ -21,6 +20,31 @@ class ExtendedKeySerializer
      * @var EcAdapterInterface
      */
     private $ecAdapter;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\ByteString
+     */
+    private $bytestring4;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint8
+     */
+    private $uint8;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $uint32;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\ByteString
+     */
+    private $bytestring32;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\ByteString
+     */
+    private $bytestring33;
 
     /**
      * @param EcAdapterInterface $ecAdapter
