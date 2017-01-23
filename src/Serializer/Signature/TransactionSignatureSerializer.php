@@ -33,7 +33,7 @@ class TransactionSignatureSerializer
     }
 
     /**
-     * @param string $string
+     * @param string|BufferInterface $string
      * @return TransactionSignature
      */
     public function parse($string)
