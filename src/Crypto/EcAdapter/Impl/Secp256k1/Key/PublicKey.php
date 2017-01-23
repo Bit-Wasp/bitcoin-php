@@ -62,7 +62,7 @@ class PublicKey extends Key implements PublicKeyInterface
      * @param PublicKey $other
      * @return bool
      */
-    private function doEquals(self $other)
+    private function doEquals(PublicKey $other)
     {
         $context = $this->ecAdapter->getContext();
         $pubA = '';
@@ -80,7 +80,7 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function equals(PublicKeyInterface $other)
     {
-        /** @var self $other */
+        /** @var PublicKey $other */
         return $this->doEquals($other);
     }
 

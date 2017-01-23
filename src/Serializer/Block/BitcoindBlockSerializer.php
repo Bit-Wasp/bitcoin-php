@@ -22,6 +22,16 @@ class BitcoindBlockSerializer
     private $blockSerializer;
 
     /**
+     * @var \BitWasp\Buffertools\Types\ByteString
+     */
+    private $magic;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $size;
+
+    /**
      * @param NetworkInterface $network
      * @param BlockSerializer $blockSerializer
      */
