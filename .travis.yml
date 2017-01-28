@@ -51,15 +51,13 @@ install:
             phpize && ./configure &&
             make && sudo make install && cd ../..;
         fi
-
     - |
-        if [ "$EXT_SECP256K1" = "true" ] && [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
+        if [ "$EXT_SECP256K1" = "true" ] && [ "$TRAVIS_PHP_VERSION" != "5.6" ]; then
             git clone -b v0.1.1 https://github.com/Bit-Wasp/secp256k1-php &&
             cd secp256k1-php/secp256k1 &&
             phpize && ./configure &&
             make && sudo make install && cd ../..;
         fi
-
     - |
         if [ "$EXT_CONSENSUS" = "true" ]; then
             wget https://bitcoin.org/bin/bitcoin-core-0.13.1/bitcoin-0.13.1-x86_64-linux-gnu.tar.gz &&
