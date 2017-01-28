@@ -9,12 +9,24 @@ php:
 
 env:
   - PHPUNIT=true
+  - PHPUNIT=true COVERAGE=true
   - PHPUNIT=true EXT_SECP256K1=true
   - PHPUNIT=true EXT_CONSENSUS=true
   - PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true
 
 matrix:
   exclude:
+      # dont want coverage on all runs, will include runs with just PHPUNIT
+    - php: hhvm
+      env: PHPUNIT=true COVERAGE=true
+    - php: 5.6
+      env: PHPUNIT=true COVERAGE=true
+    - php: 7.1
+      env: PHPUNIT=true COVERAGE=true
+    - php: 7.0
+      env: PHPUNIT=true
+
+      # hhvm doesn't support our extensions
     - php: hhvm
       env: PHPUNIT=true EXT_SECP256K1=true
     - php: hhvm
@@ -23,17 +35,14 @@ matrix:
       env: PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true
 
   include:
-    - php: 7.0
-      env: CODE_STYLE=true
-
-    - php: 7.0
-      env: EXAMPLES=true
-
-    - php: 7.0
-      env: PHPUNIT=true COVERAGE=true
-
+      # add tests without coverage
+      # add extra test runs for php7: secp256k1+coverage, codestyle, examples
     - php: 7.0
       env: PHPUNIT=true COVERAGE=true EXT_SECP256K1=true
+    - php: 7.0
+      env: CODE_STYLE=true
+    - php: 7.0
+      env: EXAMPLES=true
 
 
 install:
@@ -84,8 +93,8 @@ script:
   - if [ "$EXT_SECP256K1" = "true" ]; then export EXT_PHP="$EXT_PHP -dextension=secp256k1.so"; fi
   - if [ "$EXT_CONSENSUS" = "true" ]; then export EXT_PHP="$EXT_PHP -dextension=bitcoinconsensus.so"; fi
   - EXT_PHP=${EXT_PHP} && if [ "$PHPUNIT" = "true" ]; then make phpunit-ci; fi
-  - if [ "$CODE_STYLE" = "true" ]; then make phpcs; fi
-  - if [ "$EXAMPLES" = "true" ]; then make test-examples; fi
+  - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
+  - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
 
 after_script:
   - if [ "${COVERAGE}" = "true" ]; then make scrutinizer; fi
