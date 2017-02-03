@@ -66,4 +66,41 @@ interface TransactionInputInterface extends SerializableInterface
      * @return bool
      */
     public function isFinal();
+
+    /**
+     * Checks whether the SEQUENCE_LOCKTIME_DISABLE_FLAG is set
+     * Always returns true if txin is coinbase.
+     *
+     * @return int
+     */
+    public function isSequenceLockDisabled();
+
+    /**
+     * Indicates whether the input is locked with a time based lock (as opposed to block)
+     *
+     * @return bool
+     */
+    public function isLockedToTime();
+
+    /**
+     * Returns whether the input is locked with a block based lock (as opposed to time)
+     *
+     * @return bool
+     */
+    public function isLockedToBlock();
+
+    /**
+     * Returns the relative block time for the input.
+     * Range limited to 0 - 33553920 (approx 1 yr)
+     * @return int
+     */
+    public function getRelativeBlockLock();
+
+    /**
+     * Returns the relative locktime for the input in seconds.
+     * Range limited to 0 - 65535
+     *
+     * @return int
+     */
+    public function getRelativeTimeLock();
 }
