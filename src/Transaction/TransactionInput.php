@@ -102,6 +102,59 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
+     * @return int
+     */
+    public function isSequenceLockDisabled()
+    {
+        if ($this->isCoinbase()) {
+            return true;
+        }
+
+        return ($this->sequence & self::SEQUENCE_LOCKTIME_DISABLE_FLAG) !== 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLockedToTime()
+    {
+        return !$this->isSequenceLockDisabled() && (($this->sequence & self::SEQUENCE_LOCKTIME_TYPE_FLAG) === self::SEQUENCE_LOCKTIME_TYPE_FLAG);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLockedToBlock()
+    {
+        return !$this->isSequenceLockDisabled() && (($this->sequence & self::SEQUENCE_LOCKTIME_TYPE_FLAG) === 0);
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelativeTimeLock()
+    {
+        if (!$this->isLockedToTime()) {
+            throw new \RuntimeException('Cannot decode time based locktime when disable flag set/timelock flag unset/tx is coinbase');
+        }
+
+        // Multiply by 512 to convert locktime to seconds
+        return ($this->sequence & self::SEQUENCE_LOCKTIME_MASK) * 512;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelativeBlockLock()
+    {
+        if (!$this->isLockedToBlock()) {
+            throw new \RuntimeException('Cannot decode block locktime when disable flag set/timelock flag set/tx is coinbase');
+        }
+
+        return $this->sequence & self::SEQUENCE_LOCKTIME_MASK;
+    }
+
+    /**
      * @return BufferInterface
      */
     public function getBuffer()
