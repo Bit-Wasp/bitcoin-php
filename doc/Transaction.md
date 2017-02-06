@@ -160,7 +160,7 @@ $privateKey = PrivateKeyFactory::fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtb
 
 // Utxo is: outpoint.txid, outpoint.vout, txout.scriptPubKey, txout.amount
 $outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1'), 0);
-$outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPublicKey());
+$outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPubKeyHash());
 $amount = 1501000;
 $txOut = new TransactionOutput($amount, $outputScript);
 
