@@ -8,14 +8,19 @@ class P2shScript extends Script
 {
 
     /**
+     * @var ScriptHashAddress
+     */
+    private $address;
+
+    /**
      * @var ScriptInterface
      */
     private $outputScript;
 
     /**
-     * @var ScriptHashAddress
+     * @var \BitWasp\Buffertools\BufferInterface
      */
-    private $address;
+    private $scriptHash;
 
     /**
      * P2shScript constructor.
@@ -25,9 +30,17 @@ class P2shScript extends Script
     public function __construct(ScriptInterface $script, Opcodes $opcodes = null)
     {
         parent::__construct($script->getBuffer(), $opcodes);
-        $hash = $script->getScriptHash();
-        $this->outputScript = ScriptFactory::scriptPubKey()->p2sh($hash);
-        $this->address = new ScriptHashAddress($hash);
+        $this->scriptHash = $script->getScriptHash();
+        $this->outputScript = ScriptFactory::scriptPubKey()->p2sh($this->scriptHash);
+        $this->address = new ScriptHashAddress($this->scriptHash);
+    }
+
+    /**
+     * @return \BitWasp\Buffertools\BufferInterface
+     */
+    public function getScriptHash()
+    {
+        return $this->scriptHash;
     }
 
     /**
