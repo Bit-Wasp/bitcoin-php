@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Script\Parser;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -24,6 +25,11 @@ class Parser implements \Iterator
      * @var ScriptInterface
      */
     private $script;
+
+    /**
+     * @var int
+     */
+    private $count = 0;
 
     /**
      * @var int
@@ -129,8 +135,33 @@ class Parser implements \Iterator
         }
 
         $this->array[$ptr] = new Operation($opCode, $pushData, $dataSize);
+        $this->count++;
 
         return $this->array[$ptr];
+    }
+
+    /**
+     * @param $begin
+     * @param null|int $length
+     * @return Script
+     */
+    public function slice($begin, $length = null)
+    {
+        if ($begin < 0) {
+            throw new \RuntimeException("Invalid start of script - cannot be negative or ");
+        }
+
+        $maxLength = $this->end - $begin;
+
+        if (null === $length) {
+            $length = $maxLength;
+        } else {
+            if ($length > $maxLength) {
+                throw new \RuntimeException("Cannot slice this much from script");
+            }
+        }
+
+        return new Script(new Buffer(substr($this->data, $begin, $length)));
     }
 
     /**
@@ -139,6 +170,7 @@ class Parser implements \Iterator
     public function rewind()
     {
         $this->execPtr = 0;
+        $this->position = 0;
     }
 
     /**
