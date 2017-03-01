@@ -4,11 +4,9 @@ namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializerInterface;
-use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -46,58 +44,18 @@ class Hasher extends SigHash
     public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL)
     {
         $math = Bitcoin::getMath();
-        $tx = new TxMutator($this->tx);
-        $inputs = $tx->inputsMutator();
-        $outputs = $tx->outputsMutator();
-
-        // Default SIGHASH_ALL procedure: null all input scripts
-        foreach ($inputs as $input) {
-            $input->script(new Script);
+        if ($inputToSign >= count($this->tx->getInputs())) {
+            return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
         }
 
-        $inputs[$inputToSign]->script($txOutScript);
-
-        if (($sighashType & 31) === SigHash::NONE) {
-            // Set outputs to empty vector, and set sequence number of inputs to 0.
-            $outputs->null();
-
-            // Let the others update at will. Set sequence of inputs we're not signing to 0.
-            foreach ($inputs as $i => $input) {
-                if ($i !== $inputToSign) {
-                    $input->sequence(0);
-                }
-            }
-        } elseif (($sighashType & 31) === SigHash::SINGLE) {
-            // Resize output array to $inputToSign + 1, set remaining scripts to null,
-            // and set sequence's to zero.
-            $nOutput = $inputToSign;
-            if ($nOutput >= count($this->tx->getOutputs())) {
+        if (($sighashType & 0x1f) == SigHash::SINGLE) {
+            if ($inputToSign >= count($this->tx->getOutputs())) {
                 return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
             }
-
-            // Resize, set to null
-            $outputs->slice(0, $nOutput + 1);
-            for ($i = 0; $i < $nOutput; $i++) {
-                $outputs[$i]->null();
-            }
-
-            // Let the others update at will. Set sequence of inputs we're not signing to 0
-            foreach ($inputs as $i => $input) {
-                if ($i !== $inputToSign) {
-                    $input->sequence(0);
-                }
-            }
         }
 
-        // This can happen regardless of whether it's ALL, NONE, or SINGLE
-        if (($sighashType & SigHash::ANYONECANPAY) > 0) {
-            $input = $inputs[$inputToSign]->done();
-            $inputs->null()->add($input);
-        }
-
-        return Hash::sha256d(new Buffer(
-            $this->txSerializer->serialize($tx->done(), TransactionSerializer::NO_WITNESS)->getBinary() .
-            pack('V', $sighashType)
-        ));
+        $serializer = new TxSigHashSerializer($this->tx, $txOutScript, $inputToSign, $sighashType);
+        $sigHashData = new Buffer($serializer->serializeTransaction() . pack('V', $sighashType));
+        return Hash::sha256d($sigHashData);
     }
 }
