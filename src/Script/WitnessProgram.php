@@ -19,6 +19,11 @@ class WitnessProgram
     private $program;
 
     /**
+     * @var
+     */
+    private $outputScript;
+
+    /**
      * WitnessProgram constructor.
      * @param int $version
      * @param BufferInterface $program
@@ -37,7 +42,7 @@ class WitnessProgram
     {
         if ($program->getSize() === 20) {
             return new self(self::V0, $program);
-        } else if ($program->getSize() === 20) {
+        } else if ($program->getSize() === 32) {
             return new self(self::V0, $program);
         } else {
             throw new \RuntimeException('Invalid size for V0 witness program - must be 20 or 32 bytes');
@@ -65,9 +70,10 @@ class WitnessProgram
      */
     public function getScript()
     {
-        return ScriptFactory::create()
-            ->int($this->version)
-            ->push($this->program)
-            ->getScript();
+        if (null === $this->outputScript) {
+            $this->outputScript = ScriptFactory::sequence([$this->version, $this->program]);
+        }
+
+        return $this->outputScript;
     }
 }

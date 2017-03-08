@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Exceptions\P2shScriptException;
 
 class P2shScript extends Script
 {
@@ -18,17 +19,19 @@ class P2shScript extends Script
     private $outputScript;
 
     /**
-     * @var \BitWasp\Buffertools\BufferInterface
-     */
-    private $scriptHash;
-
-    /**
      * P2shScript constructor.
      * @param ScriptInterface $script
      * @param Opcodes|null $opcodes
+     * @throws P2shScriptException
      */
     public function __construct(ScriptInterface $script, Opcodes $opcodes = null)
     {
+        if ($script instanceof WitnessScript) {
+            $script = $script->getOutputScript();
+        } else if ($script instanceof self) {
+            throw new P2shScriptException("Cannot nest P2SH scripts.");
+        }
+
         parent::__construct($script->getBuffer(), $opcodes);
         $this->scriptHash = $script->getScriptHash();
         $this->outputScript = ScriptFactory::scriptPubKey()->p2sh($this->scriptHash);
@@ -36,11 +39,11 @@ class P2shScript extends Script
     }
 
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @throws P2shScriptException
      */
-    public function getScriptHash()
+    public function getWitnessScriptHash()
     {
-        return $this->scriptHash;
+        throw new P2shScriptException("Cannot compute witness-script-hash for a P2shScript");
     }
 
     /**
