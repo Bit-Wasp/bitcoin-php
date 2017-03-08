@@ -25,6 +25,16 @@ class Script extends Serializable implements ScriptInterface
     protected $script;
 
     /**
+     * @var BufferInterface|null
+     */
+    protected $scriptHash;
+
+    /**
+     * @var BufferInterface|null
+     */
+    protected $witnessScriptHash;
+
+    /**
      * @param BufferInterface $script
      * @param Opcodes|null $opCodes
      */
@@ -61,21 +71,31 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * Return a buffer containing the hash of this script.
+     * Return a buffer containing the HASH160 of this script.
      *
      * @return BufferInterface
      */
     public function getScriptHash()
     {
-        return Hash::sha256ripe160($this->getBuffer());
+        if (null === $this->scriptHash) {
+            $this->scriptHash = Hash::sha256ripe160($this->getBuffer());
+        }
+
+        return $this->scriptHash;
     }
 
     /**
+     * Return a buffer containing the SHA256 of this script.
+     *
      * @return BufferInterface
      */
     public function getWitnessScriptHash()
     {
-        return Hash::sha256($this->getBuffer());
+        if (null === $this->witnessScriptHash) {
+            $this->witnessScriptHash = Hash::sha256($this->getBuffer());
+        }
+
+        return $this->witnessScriptHash;
     }
 
     /**
