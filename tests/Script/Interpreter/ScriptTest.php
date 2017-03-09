@@ -195,13 +195,7 @@ class ScriptTest extends AbstractTestCase
             $flags = $this->getScriptFlagsFromString($test[$pos++]);
             $returns = ($test[$pos++]) === 'OK' ? true : false;
 
-            if ($ecAdapter instanceof EcAdapter) {
-                if ($flags & Interpreter::VERIFY_DERSIG) {
-                    $vectors[] = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-                }
-            } else {
-                $vectors[] = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
-            }
+            $vectors[] = [$ecAdapter, new Interpreter($ecAdapter), $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
         }
 
         return $vectors;
