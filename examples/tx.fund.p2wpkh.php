@@ -13,11 +13,11 @@ use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
+// Setup network and private key to segnet
 Bitcoin::setNetwork(NetworkFactory::bitcoinSegnet());
-
 $key = PrivateKeyFactory::fromWif('QP3p9tRpTGTefG4a8jKoktSWC7Um8qzvt8wGKMxwWyW3KTNxMxN7');
+
 $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash());
-echo $key->getPublicKey()->getAddress()->getAddress() . PHP_EOL;
 
 // Utxo
 $outpoint = new OutPoint(Buffer::hex('874381bb431eaaae16e94f8b88e4ea7baf2ebf541b2ae11ec10d54c8e03a237f', 32), 0);

@@ -29,7 +29,7 @@ phpcs: pretest
 endif
 
 phpcbf: pretest
-		vendor/bin/phpcbf --standard=PSR1,PSR2 -n src tests/
+		vendor/bin/phpcbf --standard=PSR1,PSR2 -n src tests/ examples/
 
 ocular:
 		wget https://scrutinizer-ci.com/ocular.phar
