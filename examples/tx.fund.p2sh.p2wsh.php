@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Script\P2shScript;
+use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
@@ -24,7 +25,7 @@ $outpoint = new OutPoint(Buffer::hex('703f50920bff10e1622117af81b622d8bbd625460e
 $txOut = new TransactionOutput(100000000, $scriptPubKey);
 
 // Script is P2SH | P2WSH | P2PKH
-$p2wsh = new \BitWasp\Bitcoin\Script\WitnessScript($scriptPubKey);
+$p2wsh = new WitnessScript($scriptPubKey);
 $p2sh = new P2shScript($p2wsh);
 
 $unsigned = (new TxBuilder())
