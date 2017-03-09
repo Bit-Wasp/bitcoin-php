@@ -9,8 +9,9 @@ use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Transaction\Factory\SignData;
+use BitWasp\Bitcoin\Script\P2shScript;
 
 $ecAdapter = Bitcoin::getEcAdapter();
 $math = $ecAdapter->getMath();
@@ -29,20 +30,21 @@ $pk1 = PrivateKeyFactory::fromHex($privHex1);
 $pk2 = PrivateKeyFactory::fromHex($privHex2);
 
 $outpoint = new OutPoint(Buffer::hex($txid), $vout);
-$redeemScript = ScriptFactory::fromHex($redeemScriptHex);
-$os = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($redeemScript->getBuffer()));
-$txOut = new TransactionOutput(
-    $amount,
-    $os
-);
+$redeemScript = new P2shScript(ScriptFactory::fromHex($redeemScriptHex));
+$txOut = new TransactionOutput($amount, $redeemScript->getOutputScript());
+
 // One party (pk1) wants to spend funds. He creates a transaction spending the funding tx to his address.
 $spendTx = TransactionFactory::build()
     ->spendOutPoint($outpoint)
     ->payToAddress($amountAfterFee, $pk1->getAddress())
     ->get();
 
-$signData = new \BitWasp\Bitcoin\Transaction\Factory\SignData();
+echo "Unsigned transaction: " . $spendTx->getHex() . PHP_EOL;
+
+// A redeem script is required for this transaction
+$signData = new SignData();
 $signData->p2sh($redeemScript);
+
 // Two parties sign the transaction (can be done in steps)
 $signer = new Signer($spendTx, $ecAdapter);
 $signer
@@ -51,8 +53,4 @@ $signer
 
 $signed = $signer->get();
 
-
-$fundTx = TransactionFactory::build() ->input('4d7adb19fff03892a11924f2a9188e36dbbdf0f3bb341b6514475e4df238184b', 0) ->output(1000000, $os) ->get();
-echo $fundTx->getHex(). "\n";
-echo $fundTx->getTxId()->getHex() . "\n";
 echo "Fully signed transaction: " . $signed->getHex() . "\n";
