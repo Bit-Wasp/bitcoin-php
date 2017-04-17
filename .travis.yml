@@ -1,6 +1,9 @@
 
 language: php
 
+sudo: required
+dist: trusty
+
 php:
   - hhvm
   - 5.6
