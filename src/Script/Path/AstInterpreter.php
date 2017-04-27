@@ -100,15 +100,53 @@ class AstInterpreter
         return $bool ? $this->vchTrue : $this->vchFalse;
     }
 
+    /**
+     * @param ScriptInterface $script
+     * @return AstNode
+     */
+    public function getAstForLogicalOps(ScriptInterface $script)
+    {
+        $root = new AstNode(null);
+        $nextId = 1;
+        $current = $root;
+        $segments = [$root];
+
+        foreach ($script->getScriptParser()->decode() as $op) {
+            switch ($op->getOp()) {
+                case Opcodes::OP_IF:
+                    list ($node0, $node1) = $current->split();
+                    $segments[$nextId++] = $node0;
+                    $segments[$nextId++] = $node1;
+                    $current = $node1;
+                    break;
+                case Opcodes::OP_NOTIF:
+                    list ($node0, $node1) = $current->split();
+                    $segments[$nextId++] = $node0;
+                    $segments[$nextId++] = $node1;
+                    $current = $node0;
+                    break;
+                case Opcodes::OP_ENDIF:
+                    $current = $current->getParent();
+                    break;
+                case Opcodes::OP_ELSE:
+                    if ($current->getValue() === false) {
+                        throw new \RuntimeException("Unbalanced conditional");
+                    }
+                    $current = $current->getParent()->getChild(0);
+                    break;
+            }
+        }
+
+        return $root;
+    }
 
     /**
      * @param ScriptInterface $script
      * @param Stack $mainStack
-     * @param int $flags
      * @return array
      * @throws ScriptRuntimeException
      */
-    public function evaluateUsingStack(ScriptInterface $script, Stack $mainStack, $flags)
+    public function evaluateUsingStack(ScriptInterface $script, Stack $mainStack)
     {
         $vfStack = new Stack();
         $parser = $script->getScriptParser();
@@ -189,6 +227,5 @@ class AstInterpreter
         }
 
         return $segments;
-
     }
 }

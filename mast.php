@@ -44,7 +44,7 @@ $ast = new AstFactory($script);
 $branches = $ast->getScriptBranches();
 
 foreach($ast->getScriptBranches() as $branch) {
-    var_dump($branch->branch);
+    var_dump($branch->getBranchDescriptor());
     $steps = $branch->getSignSteps();
     foreach ($steps as $step) {
         print_r(ScriptFactory::fromOperations($step));
