@@ -44,7 +44,8 @@ class ScriptFactory
      * @param Operation[] $operations
      * @return ScriptInterface
      */
-    public static function fromOperations(array $operations) {
+    public static function fromOperations(array $operations)
+    {
         $sequence = [];
         foreach ($operations as $operation) {
             $sequence[] = $operation->encode();

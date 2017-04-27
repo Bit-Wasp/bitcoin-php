@@ -248,6 +248,5 @@ class PathInterpreter
         }
 
         return $log;
-
     }
 }

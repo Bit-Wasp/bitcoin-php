@@ -8,17 +8,70 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 class ScriptBranch
 {
     /**
+     * @var ScriptInterface
+     */
+    private $fullScript;
+
+    /**
+     * @var array|\array[]
+     */
+    private $segments;
+
+    /**
+     * @var array|\bool[]
+     */
+    private $branch;
+
+    /**
      * ScriptBranch constructor.
      * @param ScriptInterface $fullScript
      * @param bool[] $branch
      * @param array[] $segments
-     * @param ScriptInterface $script
      */
-    public function __construct(ScriptInterface $fullScript, array $branch, array $segments, ScriptInterface $script)
+    public function __construct(ScriptInterface $fullScript, array $branch, array $segments)
     {
-        $this->script = $script;
-        $this->segments = $segments;
+        $this->fullScript = $fullScript;
         $this->branch = $branch;
+        $this->segments = $segments;
+    }
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getFullScript()
+    {
+        return $this->fullScript;
+    }
+
+    /**
+     * @return array|\bool[]
+     */
+    public function getBranchDescriptor()
+    {
+        return $this->branch;
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getSegments()
+    {
+        return $this->segments;
+    }
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getNeuteredScript()
+    {
+        $sequence = [];
+        foreach ($this->segments as $segment) {
+            foreach ($segment as $operation) {
+                $sequence[] = $operation;
+            }
+        }
+
+        return ScriptFactory::fromOperations($sequence);
     }
 
     /**
@@ -50,7 +103,6 @@ class ScriptBranch
         $steps = [];
         foreach ($this->segments as $segment) {
             if (count($segment) === 1 && $segment[0]->isLogical()) {
-                
             } else {
                 $steps[] = $segment;
             }
