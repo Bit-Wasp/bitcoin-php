@@ -41,6 +41,18 @@ class ScriptFactory
     }
 
     /**
+     * @param Operation[] $operations
+     * @return ScriptInterface
+     */
+    public static function fromOperations(array $operations) {
+        $sequence = [];
+        foreach ($operations as $operation) {
+            $sequence[] = $operation->encode();
+        }
+        return self::sequence($sequence);
+    }
+
+    /**
      * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return ScriptInterface
      */

@@ -8,6 +8,13 @@ use BitWasp\Buffertools\BufferInterface;
 class Operation
 {
     /**
+     * @var int[]
+     */
+    protected static $logical = [
+        Opcodes::OP_IF, Opcodes::OP_NOTIF, Opcodes::OP_ELSE, Opcodes::OP_ENDIF,
+    ];
+
+    /**
      * @var bool
      */
     private $push;
@@ -42,12 +49,33 @@ class Operation
     }
 
     /**
+     * @return string
+     */
+    public function encode()
+    {
+        if ($this->push) {
+            return $this->pushData;
+        } else {
+            return $this->opCode;
+        }
+    }
+
+    /**
      * @return bool
      */
     public function isPush()
     {
         return $this->push;
     }
+
+    /**
+     * @return bool
+     */
+    public function isLogical()
+    {
+        return !$this->isPush() && in_array($this->opCode, self::$logical);
+    }
+
 
     /**
      * @return int
