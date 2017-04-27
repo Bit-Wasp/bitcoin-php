@@ -1,8 +1,6 @@
 <?php
-namespace BitWasp\Bitcoin\Script\Path;
 
-use BitWasp\Bitcoin\Script\Interpreter\Stack;
-use BitWasp\Buffertools\Buffer;
+namespace BitWasp\Bitcoin\Script\Path;
 
 class AstNode
 {
@@ -24,10 +22,10 @@ class AstNode
 
     /**
      * MASTNode constructor.
-     * @param AstNode|null $parent
+     * @param self|null $parent
      * @param bool|null $value
      */
-    public function __construct(AstNode $parent = null, $value = null)
+    public function __construct(self $parent = null, $value = null)
     {
         $this->parent = $parent;
         $this->value = $value;
@@ -85,7 +83,7 @@ class AstNode
     public function getChild($value)
     {
         if (!isset($this->children[$value])) {
-            throw new \RuntimeException();
+            throw new \RuntimeException("Child not found");
         }
         return $this->children[$value];
     }
