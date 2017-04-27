@@ -2,33 +2,12 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
-use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\BufferInterface;
 
-class AstInterpreter
+class BranchInterpreter
 {
-
-    /**
-     * @var \BitWasp\Bitcoin\Math\Math
-     */
-    private $math;
-
-    /**
-     * @var BufferInterface
-     */
-    private $vchFalse;
-
-    /**
-     * @var BufferInterface
-     */
-    private $vchTrue;
 
     /**
      * @var array
@@ -39,17 +18,6 @@ class AstInterpreter
         Opcodes::OP_2MUL,   Opcodes::OP_2DIV,   Opcodes::OP_MUL,   Opcodes::OP_DIV,
         Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
-
-    /**
-     * @param EcAdapterInterface $ecAdapter
-     */
-    public function __construct(EcAdapterInterface $ecAdapter = null)
-    {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $this->math = $ecAdapter->getMath();
-        $this->vchFalse = new Buffer("", 0, $this->math);
-        $this->vchTrue = new Buffer("\x01", 1, $this->math);
-    }
 
     /**
      * @param ScriptInterface $script
@@ -73,12 +41,13 @@ class AstInterpreter
     }
 
     /**
+     * Build tree of dependent logical ops
      * @param ScriptInterface $script
-     * @return AstNode
+     * @return LogicOpNode
      */
     public function getAstForLogicalOps(ScriptInterface $script)
     {
-        $root = new AstNode(null);
+        $root = new LogicOpNode(null);
         $nextId = 1;
         $current = $root;
         $segments = [$root];
@@ -113,6 +82,8 @@ class AstInterpreter
     }
 
     /**
+     * Given a script and path, attempt to produce a ScriptBranch instance
+     *
      * @param ScriptInterface $script
      * @param bool[] $path
      * @return ScriptBranch
@@ -125,7 +96,6 @@ class AstInterpreter
         }
 
         $segments = $this->evaluateUsingStack($script, $stack);
-
         return new ScriptBranch($script, $path, $segments);
     }
 
@@ -149,23 +119,17 @@ class AstInterpreter
     /**
      * @param ScriptInterface $script
      * @param Stack $mainStack
-     * @return array
-     * @throws ScriptRuntimeException
+     * @return PathTrace
      */
     public function evaluateUsingStack(ScriptInterface $script, Stack $mainStack)
     {
         $vfStack = new Stack();
         $parser = $script->getScriptParser();
+        $tracer = new PathTracer();
 
-        $segments = [];
-        $trace = [];
         foreach ($parser as $i => $operation) {
             $opCode = $operation->getOp();
             $fExec = !$this->checkExec($vfStack, false);
-
-            if ($operation->isPush() && $operation->getDataSize() > Interpreter::MAX_SCRIPT_ELEMENT_SIZE) {
-                throw new \RuntimeException('Error - push size');
-            }
 
             if (in_array($opCode, $this->disabledOps, true)) {
                 throw new \RuntimeException('Disabled Opcode');
@@ -205,13 +169,12 @@ class AstInterpreter
 
                         break;
                 }
-                if (count($trace) > 0) {
-                    $segments[] = $trace;
-                }
-                $segments[] = [$operation];
-                $trace = [];
+
+                $tracer->operation($operation);
+
             } else if ($fExec) {
-                $trace[] = $operation;
+                // Fill up trace with executed opcodes
+                $tracer->operation($operation);
             }
         }
 
@@ -223,10 +186,6 @@ class AstInterpreter
             throw new \RuntimeException('Values remaining after script execution - invalid branch data');
         }
 
-        if (count($trace) > 0) {
-            $segments[] = $trace;
-        }
-
-        return $segments;
+        return $tracer->done();
     }
 }
