@@ -21,3 +21,4 @@ $script = ScriptFactory::sequence([
 $ast = new AstFactory($script);
 $branches = $ast->getScriptBranches();
 print_r($branches);
+
