@@ -25,10 +25,10 @@ class ScriptBranch
     /**
      * ScriptBranch constructor.
      * @param ScriptInterface $fullScript
-     * @param bool[] $branch
-     * @param array[] $segments
+     * @param array $branch
+     * @param PathTrace $segments
      */
-    public function __construct(ScriptInterface $fullScript, array $branch, array $segments)
+    public function __construct(ScriptInterface $fullScript, array $branch, PathTrace $segments)
     {
         $this->fullScript = $fullScript;
         $this->branch = $branch;
@@ -52,7 +52,7 @@ class ScriptBranch
     }
 
     /**
-     * @return array[]
+     * @return array|\array[]|PathTrace
      */
     public function getSegments()
     {
@@ -66,9 +66,7 @@ class ScriptBranch
     {
         $sequence = [];
         foreach ($this->segments as $segment) {
-            foreach ($segment as $operation) {
-                $sequence[] = $operation;
-            }
+            $sequence = array_merge($sequence, $segment->all());
         }
 
         return ScriptFactory::fromOperations($sequence);
@@ -96,17 +94,17 @@ class ScriptBranch
     }
 
     /**
-     * @return array
+     * @return OperationContainer[]
      */
     public function getSignSteps()
     {
         $steps = [];
         foreach ($this->segments as $segment) {
-            if (count($segment) === 1 && $segment[0]->isLogical()) {
-            } else {
+            if (!$segment->isLoneLogicalOp()) {
                 $steps[] = $segment;
             }
         }
+
         return $steps;
     }
 }

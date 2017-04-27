@@ -2,11 +2,11 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-class AstNode
+class LogicOpNode
 {
 
     /**
-     * @var AstNode|null
+     * @var LogicOpNode|null
      */
     private $parent;
 
@@ -16,7 +16,7 @@ class AstNode
     private $value;
 
     /**
-     * @var AstNode[]
+     * @var LogicOpNode[]
      */
     private $children = [];
 
@@ -61,7 +61,7 @@ class AstNode
     }
 
     /**
-     * @return AstNode|null
+     * @return LogicOpNode|null
      */
     public function getParent()
     {
@@ -78,7 +78,7 @@ class AstNode
 
     /**
      * @param $value
-     * @return AstNode
+     * @return LogicOpNode
      */
     public function getChild($value)
     {
@@ -97,7 +97,7 @@ class AstNode
             throw new \RuntimeException("Sanity check - dont split twice");
         }
 
-        $children = [new AstNode($this, false), new AstNode($this, true)];
+        $children = [new LogicOpNode($this, false), new LogicOpNode($this, true)];
         foreach ($children as $child) {
             $this->children[] = $child;
         }
