@@ -57,24 +57,31 @@ class AstFactory
         return $root;
     }
 
+    /**
+     * @param array $path
+     * @return ScriptBranch
+     */
     private function getBranchForPath(array $path)
     {
         $stack = new Stack();
-        foreach(array_reverse($path) as $el) {
+        foreach (array_reverse($path) as $el) {
             $stack->push($el);
         }
+
         $segments = $this->interpreter->evaluateUsingStack($this->script, $stack, 0);
         $sequence = [];
         foreach ($segments as $segment) {
-            echo " have " . count($segment) . "opcodes in segment\n";
             foreach ($segment as $operation) {
                 $sequence[] = $operation;
             }
         }
 
-        return new ScriptBranch($path, $segments, ScriptFactory::fromOperations($sequence));
+        return new ScriptBranch($this->script, $path, $segments, ScriptFactory::fromOperations($sequence));
     }
 
+    /**
+     * @return ScriptBranch[]
+     */
     public function getScriptBranches()
     {
         $paths = $this->ast->flags();
@@ -90,5 +97,4 @@ class AstFactory
 
         return $results;
     }
-
 }
