@@ -52,50 +52,24 @@ class AstInterpreter
     }
 
     /**
-     * @param Stack $vfStack
-     * @param bool $value
-     * @return bool
+     * @param ScriptInterface $script
+     * @return ScriptBranch[]
      */
-    private function checkExec(Stack $vfStack, $value)
+    public function getScriptBranches(ScriptInterface $script)
     {
-        $ret = 0;
-        foreach ($vfStack as $item) {
-            if ($item === $value) {
-                $ret++;
+        $ast = $this->getAstForLogicalOps($script);
+        $paths = $ast->flags();
+        $results = [];
+
+        if (count($paths) > 1) {
+            foreach ($paths as $path) {
+                $results[] = $this->getBranchForPath($script, $path);
             }
+        } else {
+            $results[] = $this->getBranchForPath($script, []);
         }
 
-        return $ret;
-    }
-
-    /**
-     * Cast the value to a boolean
-     *
-     * @param BufferInterface $value
-     * @return bool
-     */
-    public function castToBool(BufferInterface $value)
-    {
-        $val = $value->getBinary();
-        for ($i = 0, $size = strlen($val); $i < $size; $i++) {
-            $chr = ord($val[$i]);
-            if ($chr !== 0) {
-                if (($i === ($size - 1)) && $chr === 0x80) {
-                    return false;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @param $bool
-     * @return Buffer|BufferInterface
-     */
-    public function boolToVector($bool)
-    {
-        return $bool ? $this->vchTrue : $this->vchFalse;
+        return $results;
     }
 
     /**
@@ -136,6 +110,40 @@ class AstInterpreter
         }
 
         return $root;
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @param bool[] $path
+     * @return ScriptBranch
+     */
+    public function getBranchForPath(ScriptInterface $script, array $path)
+    {
+        $stack = new Stack();
+        foreach (array_reverse($path) as $setting) {
+            $stack->push($setting);
+        }
+
+        $segments = $this->evaluateUsingStack($script, $stack);
+
+        return new ScriptBranch($script, $path, $segments);
+    }
+
+    /**
+     * @param Stack $vfStack
+     * @param bool $value
+     * @return bool
+     */
+    private function checkExec(Stack $vfStack, $value)
+    {
+        $ret = 0;
+        foreach ($vfStack as $item) {
+            if ($item === $value) {
+                $ret++;
+            }
+        }
+
+        return $ret;
     }
 
     /**
