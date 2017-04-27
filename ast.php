@@ -20,9 +20,8 @@ $alicePub = $alicePriv->getPublicKey();
 $bobPriv = \BitWasp\Bitcoin\Key\PrivateKeyFactory::create(true);
 $bobPub = $bobPriv->getPublicKey();
 
-$rhash1 = $random->bytes(20);
-$rhash2 = $random->bytes(20);
-
+$rhash1 = $alicePub->getPubKeyHash();
+$rhash2 = $bobPub->getPubKeyHash();
 
 $script = ScriptFactory::sequence([
     Opcodes::OP_HASH160, Opcodes::OP_DUP, $rhash1, Opcodes::OP_EQUAL,
