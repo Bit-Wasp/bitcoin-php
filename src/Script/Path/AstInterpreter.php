@@ -6,10 +6,8 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
-use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -153,7 +151,6 @@ class AstInterpreter
 
         $segments = [];
         $trace = [];
-        $log = [];
         foreach ($parser as $i => $operation) {
             $opCode = $operation->getOp();
             $fExec = !$this->checkExec($vfStack, false);
@@ -167,8 +164,6 @@ class AstInterpreter
             }
 
             if (Opcodes::OP_IF <= $opCode && $opCode <= Opcodes::OP_ENDIF) {
-                $log[] = $operation;
-
                 switch ($opCode) {
                     case Opcodes::OP_IF:
                     case Opcodes::OP_NOTIF:
@@ -208,8 +203,6 @@ class AstInterpreter
                 $segments[] = [$operation];
                 $trace = [];
             } else if ($fExec) {
-                //echo $script->getOpcodes()->getOp($opCode).PHP_EOL;
-                $log[] = $operation;
                 $trace[] = $operation;
             }
         }
