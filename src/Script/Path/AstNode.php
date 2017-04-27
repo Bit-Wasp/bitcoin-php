@@ -2,15 +2,13 @@
 namespace BitWasp\Bitcoin\Script\Path;
 
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
-use BitWasp\Bitcoin\Script\Parser\Operation;
-use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 
-class MASTNode
+class AstNode
 {
 
     /**
-     * @var MASTNode|null
+     * @var AstNode|null
      */
     private $parent;
 
@@ -20,25 +18,19 @@ class MASTNode
     private $value;
 
     /**
-     * @var MASTNode[]
+     * @var AstNode[]
      */
     private $children = [];
 
-    private $operations = [];
-
     /**
      * MASTNode constructor.
-     * @param MASTNode|null $parent
+     * @param AstNode|null $parent
      * @param bool|null $value
      */
-    public function __construct(MASTNode $parent = null, $value = null)
+    public function __construct(AstNode $parent = null, $value = null)
     {
         $this->parent = $parent;
         $this->value = $value;
-    }
-
-    public function assign($fExec, Operation $op) {
-        $this->operations[] = [$fExec, $op];
     }
 
     /**
@@ -63,24 +55,6 @@ class MASTNode
     }
 
     /**
-     * @return Stack[]
-     */
-    public function stacks()
-    {
-        $vchFalse = new Buffer("", 0);
-        $vchTrue = new Buffer("\x01", 1);
-        $stacks = [];
-        foreach ($this->flags() as $flagSet) {
-            $stack = new Stack();
-            foreach (array_reverse($flagSet) as $item) {
-                $stack->push($item ? $vchTrue : $vchFalse);
-            }
-            $stacks[] = $stack;
-        }
-        return $stacks;
-    }
-
-    /**
      * @return bool
      */
     public function isRoot()
@@ -89,7 +63,7 @@ class MASTNode
     }
 
     /**
-     * @return MASTNode|null
+     * @return AstNode|null
      */
     public function getParent()
     {
@@ -106,7 +80,7 @@ class MASTNode
 
     /**
      * @param $value
-     * @return MASTNode
+     * @return AstNode
      */
     public function getChild($value)
     {
@@ -116,42 +90,19 @@ class MASTNode
         return $this->children[$value];
     }
 
-
     /**
      * @return array
      */
     public function split()
     {
         if (count($this->children) > 0) {
-            throw new \RuntimeException("santity - dont split twice");
+            throw new \RuntimeException("Sanity check - dont split twice");
         }
-        $children = [new MASTNode($this, false), new MASTNode($this, true)];
+
+        $children = [new AstNode($this, false), new AstNode($this, true)];
         foreach ($children as $child) {
             $this->children[] = $child;
         }
         return $children;
-    }
-
-    public function codes() {
-        return $this->operations;
-    }
-
-    public function getNodesInPath(array $path) {
-        $current = $this;
-        $nodes = [$current];
-        foreach ($path as $node) {
-            $current = $current->getChild($node);
-            $nodes[] = $current;
-        }
-        return $nodes;
-    }
-
-    public function getPaths() {
-        $paths = [];
-        foreach ($this->flags() as $flags) {
-            $nodes = $this->getNodes($flags);
-            print_r($nodes);
-        }
-        return $paths;
     }
 }

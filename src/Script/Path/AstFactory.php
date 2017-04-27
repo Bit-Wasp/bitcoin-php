@@ -2,59 +2,29 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
-use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class AstFactory
 {
+    /**
+     * @var ScriptInterface
+     */
+    private $script;
+
+    /**
+     * @var AstInterpreter
+     */
+    private $interpreter;
+
+    /**
+     * AstFactory constructor.
+     * @param ScriptInterface $script
+     */
     public function __construct(ScriptInterface $script)
     {
         $this->script = $script;
-        $this->ast = $this->ast($script);
         $this->interpreter = new AstInterpreter();
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @return MASTNode
-     */
-    public function ast(ScriptInterface $script)
-    {
-        $root = new MASTNode(null);
-        $nextId = 1;
-        $current = $root;
-        $segments = [$root];
-
-        foreach ($script->getScriptParser()->decode() as $op) {
-            switch ($op->getOp()) {
-                case Opcodes::OP_IF:
-                    list ($node0, $node1) = $current->split();
-                    $segments[$nextId++] = $node0;
-                    $segments[$nextId++] = $node1;
-                    $current = $node1;
-                    break;
-                case Opcodes::OP_NOTIF:
-                    list ($node0, $node1) = $current->split();
-                    $segments[$nextId++] = $node0;
-                    $segments[$nextId++] = $node1;
-                    $current = $node0;
-                    break;
-                case Opcodes::OP_ENDIF:
-                    $current = $current->getParent();
-                    break;
-                case Opcodes::OP_ELSE:
-                    if ($current->getValue() === false) {
-                        throw new \RuntimeException("Unbalanced conditional");
-                    }
-                    $current = $current->getParent()->getChild(0);
-                    break;
-            }
-        }
-
-        return $root;
     }
 
     /**
@@ -64,19 +34,13 @@ class AstFactory
     private function getBranchForPath(array $path)
     {
         $stack = new Stack();
-        foreach (array_reverse($path) as $el) {
-            $stack->push($el);
+        foreach (array_reverse($path) as $setting) {
+            $stack->push($setting);
         }
 
-        $segments = $this->interpreter->evaluateUsingStack($this->script, $stack, 0);
-        $sequence = [];
-        foreach ($segments as $segment) {
-            foreach ($segment as $operation) {
-                $sequence[] = $operation;
-            }
-        }
+        $segments = $this->interpreter->evaluateUsingStack($this->script, $stack);
 
-        return new ScriptBranch($this->script, $path, $segments, ScriptFactory::fromOperations($sequence));
+        return new ScriptBranch($this->script, $path, $segments);
     }
 
     /**
@@ -84,7 +48,8 @@ class AstFactory
      */
     public function getScriptBranches()
     {
-        $paths = $this->ast->flags();
+        $ast = $this->interpreter->getAstForLogicalOps($this->script);
+        $paths = $ast->flags();
         $results = [];
 
         if (count($paths) > 1) {
