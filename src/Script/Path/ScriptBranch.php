@@ -60,16 +60,23 @@ class ScriptBranch
     }
 
     /**
-     * @return ScriptInterface
+     * @return array
      */
-    public function getNeuteredScript()
+    public function getOps()
     {
         $sequence = [];
         foreach ($this->segments as $segment) {
             $sequence = array_merge($sequence, $segment->all());
         }
+        return $sequence;
+    }
 
-        return ScriptFactory::fromOperations($sequence);
+    /**
+     * @return ScriptInterface
+     */
+    public function getNeuteredScript()
+    {
+        return ScriptFactory::fromOperations($this->getOps());
     }
 
     /**
@@ -79,7 +86,7 @@ class ScriptBranch
     {
         $m = [];
         foreach ($this->segments as $segment) {
-            $m[] = ScriptFactory::fromOperations($segment);
+            $m[] = ScriptFactory::fromOperations($segment->all());
         }
 
         $path = [];

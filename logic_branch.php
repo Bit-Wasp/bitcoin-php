@@ -5,6 +5,7 @@ require "vendor/autoload.php";
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Path\AstFactory;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Path\BranchInterpreter;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 
@@ -18,7 +19,8 @@ $script = ScriptFactory::sequence([
     Opcodes::OP_DUP, Opcodes::OP_HASH160, $alice->getPubKeyHash(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG,
 ]);
 
-$ast = new AstFactory($script);
-$branches = $ast->getScriptBranches();
-print_r($branches);
+$ast = new BranchInterpreter();
+$branches = $ast->getScriptBranches($script);
+print_R($branches);
+
 
