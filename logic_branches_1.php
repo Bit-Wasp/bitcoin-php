@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Path\AstFactory;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Path\BranchInterpreter;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 
@@ -14,10 +15,10 @@ $bob = PrivateKeyFactory::fromInt(2);
 
 $random = new Random();
 
-$alicePriv = \BitWasp\Bitcoin\Key\PrivateKeyFactory::create(true);
+$alicePriv = PrivateKeyFactory::create(true);
 $alicePub = $alicePriv->getPublicKey();
 
-$bobPriv = \BitWasp\Bitcoin\Key\PrivateKeyFactory::create(true);
+$bobPriv = PrivateKeyFactory::create(true);
 $bobPub = $bobPriv->getPublicKey();
 
 $rhash1 = $alicePub->getPubKeyHash();
@@ -39,6 +40,12 @@ $script = ScriptFactory::sequence([
     Opcodes::OP_CHECKSIG
 ]);
 
-$ast = new AstFactory($script);
-$branches = $ast->getScriptBranches();
-print_r($branches);
+$ast = new BranchInterpreter();
+$branches = $ast->getScriptBranches($script);
+foreach ($branches as $branch) {
+    var_dump($branch->getBranchDescriptor());
+    foreach ($branch->getSegments() as $segment) {
+        echo " * " . $segment->makeScript()->getScriptParser()->getHumanReadable() . PHP_EOL;
+    }
+}
+//print_r($branches);
