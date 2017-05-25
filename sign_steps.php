@@ -33,12 +33,13 @@ $script = ScriptFactory::sequence([
     Opcodes::OP_NOTIF,
     Number::int(6000)->getBuffer(), Opcodes::OP_CHECKLOCKTIMEVERIFY,
     Opcodes::OP_DROP,
+
     Opcodes::OP_ENDIF,
     $bobPub->getBuffer(),
     Opcodes::OP_ENDIF,
     Opcodes::OP_CHECKSIG
 ]);
-
+echo $script->getHex().PHP_EOL;
 $ast = new BranchInterpreter();
 $branches = $ast->getScriptBranches($script);
 
