@@ -14,6 +14,9 @@ env:
   - PHPUNIT=true EXT_CONSENSUS=true
   - PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true
 
+dist: trusty
+sudo: required
+
 matrix:
   exclude:
       # dont want coverage on all runs, will include runs with just PHPUNIT
