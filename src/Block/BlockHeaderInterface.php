@@ -15,6 +15,13 @@ interface BlockHeaderInterface extends SerializableInterface
     public function getVersion();
 
     /**
+     * Return the version of this block.
+     *
+     * @return bool
+     */
+    public function hasBip9Prefix();
+
+    /**
      * Return the previous blocks hash.
      *
      * @return BufferInterface
