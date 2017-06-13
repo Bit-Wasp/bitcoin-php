@@ -40,6 +40,8 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      */
     private $nonce;
 
+    const BIP9_PREFIX = 1 << 29;
+
     /**
      * @param int $version
      * @param BufferInterface $prevBlock
@@ -83,6 +85,14 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     public function getVersion()
     {
         return $this->version;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasBip9Prefix()
+    {
+        return ($this->version & self::BIP9_PREFIX) != 0;
     }
 
     /**
