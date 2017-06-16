@@ -163,7 +163,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     {
         return $this->compressed === $other->compressed
             && $this->point->equals($other->point)
-            && (($this->prefix === null || $this->prefix === null) || ($this->prefix === $other->prefix));
+            && (($this->prefix === null || $other->prefix === null) || ($this->prefix === $other->prefix));
     }
 
     /**
