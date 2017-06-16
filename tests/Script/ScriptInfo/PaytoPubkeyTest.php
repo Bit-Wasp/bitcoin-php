@@ -7,6 +7,7 @@ use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkey;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class PaytoPubkeyTest extends AbstractTestCase
@@ -18,7 +19,7 @@ class PaytoPubkeyTest extends AbstractTestCase
 
         $script = ScriptFactory::sequence([$pub->getBuffer(), Opcodes::OP_CHECKSIG]);
         $classifier = new OutputClassifier();
-        $this->assertEquals(OutputClassifier::PAYTOPUBKEY, $classifier->classify($script));
+        $this->assertEquals(ScriptType::P2PK, $classifier->classify($script));
 
         $info = new PayToPubkey($script);
         $this->assertEquals(1, $info->getRequiredSigCount());

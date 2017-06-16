@@ -2,10 +2,9 @@
 
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
-use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Buffertools\Buffertools;
+use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Buffertools\Buffertools;
 
 class MultisigHD
 {
@@ -30,7 +29,7 @@ class MultisigHD
     private $sequences;
 
     /**
-     * @var \BitWasp\Bitcoin\Script\P2shScript
+     * @var P2shScript
      */
     private $redeemScript;
 
@@ -65,13 +64,12 @@ class MultisigHD
         $this->path = $path;
         $this->sort = $sort;
         $this->sequences = $sequences;
-        $this->redeemScript = ScriptFactory::scriptPubKey()->multisig($m, array_map(
+        $this->redeemScript = new P2shScript(ScriptFactory::scriptPubKey()->multisig($m, array_map(
             function (HierarchicalKey $key) {
                 return $key->getPublicKey();
             },
             $this->keys
-        ), false);
-        $this->outputScript = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($this->redeemScript->getBuffer()));
+        ), false));
     }
 
     /**
@@ -107,7 +105,7 @@ class MultisigHD
     /**
      * Returns the redeemScript. Note - keys are already sorted in the constructor, so this is not required in ScriptFactory.
      *
-     * @return \BitWasp\Bitcoin\Script\P2shScript
+     * @return P2shScript
      */
     public function getRedeemScript()
     {
@@ -115,11 +113,19 @@ class MultisigHD
     }
 
     /**
+     * @return \BitWasp\Bitcoin\Script\ScriptInterface
+     */
+    public function getScriptPubKey()
+    {
+        return $this->redeemScript->getOutputScript();
+    }
+
+    /**
      * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
      */
     public function getAddress()
     {
-        return AddressFactory::fromScript($this->getRedeemScript());
+        return $this->redeemScript->getAddress();
     }
 
     /**

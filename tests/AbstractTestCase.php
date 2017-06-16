@@ -4,10 +4,10 @@ namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Block\BlockFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use Mdanter\Ecc\EccFactory;
-use \BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -31,6 +31,27 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         }
 
         return self::$secp256k1Context;
+    }
+
+    /**
+     * @param callable|\Closure $closure
+     * @param string $error - exception FQDN
+     * @param null $errorMessage - optional, assert exception matches this error message
+     */
+    public function assertThrows($closure, $error, $errorMessage = null)
+    {
+        $err = null;
+        try {
+            $closure();
+        } catch (\Exception $e) {
+            $err = $e;
+        }
+
+        $this->assertInstanceOf($error, $err, 'should have thrown exception ' . $error);
+
+        if (is_string($errorMessage)) {
+            $this->assertEquals($errorMessage, $err->getMessage());
+        }
     }
 
     /**

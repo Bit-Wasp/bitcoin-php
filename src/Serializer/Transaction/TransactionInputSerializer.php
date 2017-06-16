@@ -2,13 +2,13 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Parser;
 
 class TransactionInputSerializer
 {
@@ -18,9 +18,14 @@ class TransactionInputSerializer
     private $outpointSerializer;
 
     /**
-     * @var \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\VarString
      */
-    private $template;
+    private $varstring;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $uint32le;
 
     /**
      * TransactionInputSerializer constructor.
@@ -29,18 +34,8 @@ class TransactionInputSerializer
     public function __construct(OutPointSerializerInterface $outPointSerializer)
     {
         $this->outpointSerializer = $outPointSerializer;
-        $this->template = $this->getInputTemplate();
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    private function getInputTemplate()
-    {
-        return (new TemplateFactory())
-            ->varstring()
-            ->uint32le()
-            ->getTemplate();
+        $this->varstring = Types::varstring();
+        $this->uint32le = Types::uint32le();
     }
 
     /**
@@ -49,12 +44,10 @@ class TransactionInputSerializer
      */
     public function serialize(TransactionInputInterface $input)
     {
-        return Buffertools::concat(
-            $this->outpointSerializer->serialize($input->getOutPoint()),
-            $this->template->write([
-                $input->getScript()->getBuffer(),
-                $input->getSequence()
-            ])
+        return new Buffer(
+            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary() .
+            $this->varstring->write($input->getScript()->getBuffer()) .
+            $this->uint32le->write($input->getSequence())
         );
     }
 
@@ -65,18 +58,10 @@ class TransactionInputSerializer
      */
     public function fromParser(Parser $parser)
     {
-        $outpoint = $this->outpointSerializer->fromParser($parser);
-
-        /**
-         * @var BufferInterface $scriptBuf
-         * @var int $sequence
-         */
-        list ($scriptBuf, $sequence) = $this->getInputTemplate()->parse($parser);
-
         return new TransactionInput(
-            $outpoint,
-            new Script($scriptBuf),
-            $sequence
+            $this->outpointSerializer->fromParser($parser),
+            new Script($this->varstring->read($parser)),
+            $this->uint32le->read($parser)
         );
     }
 
@@ -87,7 +72,6 @@ class TransactionInputSerializer
      */
     public function parse($string)
     {
-        $parser = new Parser($string);
-        return $this->fromParser($parser);
+        return $this->fromParser(new Parser($string));
     }
 }

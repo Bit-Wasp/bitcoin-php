@@ -50,8 +50,8 @@ class EcSerializer
     private static $cache = [];
 
     /**
-     * @param $interface
-     * @return mixed
+     * @param string $interface
+     * @return string
      */
     public static function getImplRelPath($interface)
     {

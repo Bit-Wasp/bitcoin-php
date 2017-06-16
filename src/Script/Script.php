@@ -3,12 +3,12 @@
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use BitWasp\Bitcoin\Script\Parser\Parser;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class Script extends Serializable implements ScriptInterface
@@ -23,6 +23,16 @@ class Script extends Serializable implements ScriptInterface
      * @var string
      */
     protected $script;
+
+    /**
+     * @var BufferInterface|null
+     */
+    protected $scriptHash;
+
+    /**
+     * @var BufferInterface|null
+     */
+    protected $witnessScriptHash;
 
     /**
      * @param BufferInterface $script
@@ -61,21 +71,31 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
-     * Return a buffer containing the hash of this script.
+     * Return a buffer containing the HASH160 of this script.
      *
      * @return BufferInterface
      */
     public function getScriptHash()
     {
-        return Hash::sha256ripe160($this->getBuffer());
+        if (null === $this->scriptHash) {
+            $this->scriptHash = Hash::sha256ripe160($this->getBuffer());
+        }
+
+        return $this->scriptHash;
     }
 
     /**
+     * Return a buffer containing the SHA256 of this script.
+     *
      * @return BufferInterface
      */
     public function getWitnessScriptHash()
     {
-        return Hash::sha256($this->getBuffer());
+        if (null === $this->witnessScriptHash) {
+            $this->witnessScriptHash = Hash::sha256($this->getBuffer());
+        }
+
+        return $this->witnessScriptHash;
     }
 
     /**

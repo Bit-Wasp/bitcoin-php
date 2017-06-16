@@ -3,10 +3,13 @@
 namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializerInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class V1Hasher extends SigHash
@@ -22,13 +25,27 @@ class V1Hasher extends SigHash
     protected $amount;
 
     /**
+     * @var TransactionOutputSerializer
+     */
+    protected $outputSerializer;
+
+    /**
+     * @var TransactionOutputSerializer
+     */
+    protected $outpointSerializer;
+
+    /**
      * V1Hasher constructor.
      * @param TransactionInterface $transaction
      * @param int $amount
+     * @param OutPointSerializerInterface $outpointSerializer
+     * @param TransactionOutputSerializer|null $outputSerializer
      */
-    public function __construct(TransactionInterface $transaction, $amount)
+    public function __construct(TransactionInterface $transaction, $amount, OutPointSerializerInterface $outpointSerializer = null, TransactionOutputSerializer $outputSerializer = null)
     {
         $this->amount = $amount;
+        $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer();
+        $this->outpointSerializer = $outpointSerializer ?: new OutPointSerializer();
         parent::__construct($transaction);
     }
 
@@ -41,7 +58,7 @@ class V1Hasher extends SigHash
         if (!($sighashType & SigHash::ANYONECANPAY)) {
             $binary = '';
             foreach ($this->tx->getInputs() as $input) {
-                $binary .= $input->getOutPoint()->getBinary();
+                $binary .= $this->outpointSerializer->serialize($input->getOutPoint())->getBinary();
             }
             return Hash::sha256d(new Buffer($binary));
         }
@@ -58,7 +75,7 @@ class V1Hasher extends SigHash
         if (!($sighashType & SigHash::ANYONECANPAY) && ($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
             $binary = '';
             foreach ($this->tx->getInputs() as $input) {
-                $binary .= Buffer::int($input->getSequence(), 4)->flip()->getBinary();
+                $binary .= pack('V', $input->getSequence());
             }
 
             return Hash::sha256d(new Buffer($binary));
@@ -77,11 +94,11 @@ class V1Hasher extends SigHash
         if (($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
             $binary = '';
             foreach ($this->tx->getOutputs() as $output) {
-                $binary .= $output->getBinary();
+                $binary .= $this->outputSerializer->serialize($output)->getBinary();
             }
             return Hash::sha256d(new Buffer($binary));
         } elseif (($sighashType & 0x1f) === SigHash::SINGLE && $inputToSign < count($this->tx->getOutputs())) {
-            return Hash::sha256d($this->tx->getOutput($inputToSign)->getBuffer());
+            return Hash::sha256d($this->outputSerializer->serialize($this->tx->getOutput($inputToSign)));
         }
 
         return new Buffer('', 32);
@@ -112,9 +129,9 @@ class V1Hasher extends SigHash
             pack("V", $this->tx->getVersion()) .
             $hashPrevOuts->getBinary() .
             $hashSequence->getBinary() .
-            $input->getOutPoint()->getBinary() .
+            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary() .
             Buffertools::numToVarInt($scriptBuf->getSize())->getBinary() . $scriptBuf->getBinary() .
-            Buffer::int($this->amount, 8)->flip()->getBinary() .
+            pack("P", $this->amount) .
             pack("V", $input->getSequence()) .
             $hashOutputs->getBinary() .
             pack("V", $this->tx->getLockTime()) .

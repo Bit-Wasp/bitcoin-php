@@ -4,8 +4,8 @@ namespace BitWasp\Bitcoin\MessageSigner;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
-use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
+use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
 
 class SignedMessage
 {

@@ -4,13 +4,13 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Block;
 
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BitcoindBlockSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
+use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Parser;
 
 class BitcoindBlockSerializerTest extends AbstractTestCase
 {

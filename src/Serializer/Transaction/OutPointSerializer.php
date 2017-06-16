@@ -2,44 +2,41 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\TemplateFactory;
 
 class OutPointSerializer implements OutPointSerializerInterface
 {
     /**
-     * @var \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\ByteString
      */
-    private $template;
+    private $txid;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $vout;
 
     public function __construct()
     {
-        $this->template = $this->getTemplate();
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    public function getTemplate()
-    {
-        return (new TemplateFactory())
-            ->bytestringle(32)
-            ->uint32le()
-            ->getTemplate();
+        $this->txid = Types::bytestringle(32);
+        $this->vout = Types::uint32le();
     }
 
     /**
      * @param OutPointInterface $outpoint
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
     public function serialize(OutPointInterface $outpoint)
     {
-        return $this->template->write([
-            $outpoint->getTxId(),
-            $outpoint->getVout()
-        ]);
+        return new Buffer(
+            $this->txid->write($outpoint->getTxId()) .
+            $this->vout->write($outpoint->getVout())
+        );
     }
 
     /**
@@ -48,9 +45,7 @@ class OutPointSerializer implements OutPointSerializerInterface
      */
     public function fromParser(Parser $parser)
     {
-        list ($txid, $vout) = $this->template->parse($parser);
-
-        return new OutPoint($txid, $vout);
+        return new OutPoint($this->txid->read($parser), $this->vout->read($parser));
     }
 
     /**

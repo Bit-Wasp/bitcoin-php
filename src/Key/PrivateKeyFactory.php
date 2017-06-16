@@ -3,10 +3,10 @@
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -57,7 +57,7 @@ class PrivateKeyFactory
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
 
         /** @var PrivateKeySerializerInterface $serializer */
-        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class);
+        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
 
         $parsed = $serializer->parse($hex);
         if ($compressed) {
@@ -91,7 +91,7 @@ class PrivateKeyFactory
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $network = $network ?: Bitcoin::getNetwork();
-        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class);
+        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
         $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $serializer);
 
         return $wifSerializer->parse($wif, $network);

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\PaymentProtocol\Protobufs;
 
-use \DrSlump\Protobuf\Message;
+use DrSlump\Protobuf\Message;
 
 class X509Certificates extends Message
 {

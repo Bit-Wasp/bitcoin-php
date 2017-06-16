@@ -9,11 +9,11 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Factory\InputSigner;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
@@ -36,9 +36,9 @@ class SignerTest extends AbstractTestCase
     public function getSupportedSignTypes()
     {
         return [
-            OutputClassifier::PAYTOPUBKEYHASH,
-            OutputClassifier::PAYTOPUBKEY,
-            OutputClassifier::MULTISIG
+            ScriptType::P2PKH,
+            ScriptType::P2PK,
+            ScriptType::MULTISIG
         ];
     }
 
@@ -49,19 +49,19 @@ class SignerTest extends AbstractTestCase
      */
     public function getScriptAndKeys($type, EcAdapterInterface $ecAdapter)
     {
-        if ($type === OutputClassifier::WITNESS_V0_KEYHASH) {
+        if ($type === ScriptType::P2PKH) {
             $privateKey = PrivateKeyFactory::create(true, $ecAdapter);
             $script = ScriptFactory::scriptPubKey()->witnessKeyHash($privateKey->getPublicKey()->getPubKeyHash());
             return [$script, [$privateKey]];
-        } else if ($type === OutputClassifier::PAYTOPUBKEY) {
+        } else if ($type === ScriptType::P2PK) {
             $privateKey = PrivateKeyFactory::create(true, $ecAdapter);
             $script = ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey());
             return [$script, [$privateKey]];
-        } else if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
+        } else if ($type === ScriptType::P2PKH) {
             $privateKey = PrivateKeyFactory::create(true, $ecAdapter);
             $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPubKeyHash());
             return [$script, [$privateKey]];
-        } else if ($type === OutputClassifier::MULTISIG) {
+        } else if ($type === ScriptType::MULTISIG) {
             $privateKey1 = PrivateKeyFactory::create(true, $ecAdapter);
             $privateKey2 = PrivateKeyFactory::create(true, $ecAdapter);
             $script = ScriptFactory::scriptPubKey()->multisig(2, [$privateKey1->getPublicKey(), $privateKey2->getPublicKey()]);
@@ -114,7 +114,7 @@ class SignerTest extends AbstractTestCase
      */
     private function p2wpkhTests(EcAdapterInterface $ecAdapter)
     {
-        list ($p2wpkh, $keys)  = $this->getScriptAndKeys(OutputClassifier::WITNESS_V0_KEYHASH, $ecAdapter);
+        list ($p2wpkh, $keys)  = $this->getScriptAndKeys(ScriptType::P2WKH, $ecAdapter);
         return [
             [$ecAdapter, $keys, $p2wpkh, null, null],
             array_merge([$ecAdapter, $keys], $this->p2shScript($p2wpkh))
@@ -218,7 +218,6 @@ class SignerTest extends AbstractTestCase
      */
     public function testCases($description, EcAdapterInterface $ecAdapter, TxBuilder $builder, array $utxos, array $signDatas, array $keys, array $optExtra)
     {
-
         $signer = new Signer($builder->get(), $ecAdapter);
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {
             $utxo = $utxos[$i];
@@ -239,11 +238,19 @@ class SignerTest extends AbstractTestCase
         }
 
         $signed = $signer->get();
-        if (isset($optExtra['hex'])) {
-            $this->assertEquals($optExtra['hex'], $signed->getHex(), 'transaction matches expected hex');
-        }
         if (isset($optExtra['whex'])) {
-            $this->assertEquals($optExtra['whex'], $signed->getWitnessBuffer()->getHex());
+            $this->assertEquals($optExtra['whex'], $signed->getHex());
+            $this->assertEquals($optExtra['whex'], $signed->getWitnessSerialization()->getHex());
+        } else {
+            $this->assertThrows([$signed, 'getWitnessSerialization'], \RuntimeException::class, 'Cannot get witness serialization for transaction without witnesses');
+            if (isset($optExtra['hex'])) {
+                // If base tx is set, it should be safe to check getHex against that.
+                $this->assertEquals($optExtra['hex'], $signed->getHex(), 'transaction matches expected hex');
+            }
+        }
+
+        if (isset($optExtra['hex'])) {
+            $this->assertEquals($optExtra['hex'], $signed->getBaseSerialization()->getHex(), 'transaction matches expected hex');
         }
 
         $recovered = new Signer($signed);

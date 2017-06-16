@@ -156,6 +156,27 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     }
 
     /**
+     * @param PublicKey $other
+     * @return bool
+     */
+    private function doEquals(PublicKey $other)
+    {
+        return $this->compressed === $other->compressed
+            && $this->point->equals($other->point)
+            && (($this->prefix === null || $this->prefix === null) || ($this->prefix === $other->prefix));
+    }
+
+    /**
+     * @param PublicKeyInterface $other
+     * @return bool
+     */
+    public function equals(PublicKeyInterface $other)
+    {
+        /** @var self $other */
+        return $this->doEquals($other);
+    }
+
+    /**
      * @return BufferInterface
      */
     public function getBuffer()

@@ -3,10 +3,12 @@
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
@@ -17,15 +19,13 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
-use BitWasp\Bitcoin\Signature\SignatureSort;
+use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
-use BitWasp\Bitcoin\Signature\TransactionSignatureFactory;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
-use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
@@ -38,20 +38,20 @@ class InputSigner
      * @var array
      */
     protected static $canSign = [
-        OutputClassifier::PAYTOPUBKEYHASH,
-        OutputClassifier::PAYTOPUBKEY,
-        OutputClassifier::MULTISIG
+        ScriptType::P2PKH,
+        ScriptType::P2PK,
+        ScriptType::MULTISIG
     ];
 
     /**
      * @var array
      */
     protected static $validP2sh = [
-        OutputClassifier::WITNESS_V0_KEYHASH,
-        OutputClassifier::WITNESS_V0_SCRIPTHASH,
-        OutputClassifier::PAYTOPUBKEYHASH,
-        OutputClassifier::PAYTOPUBKEY,
-        OutputClassifier::MULTISIG
+        ScriptType::P2WKH,
+        ScriptType::P2WSH,
+        ScriptType::P2PKH,
+        ScriptType::P2PK,
+        ScriptType::MULTISIG
     ];
 
     /**
@@ -120,11 +120,6 @@ class InputSigner
     private $requiredSigs = 0;
 
     /**
-     * @var OutputClassifier
-     */
-    private $classifier;
-
-    /**
      * @var Interpreter
      */
     private $interpreter;
@@ -135,14 +130,26 @@ class InputSigner
     private $signatureChecker;
 
     /**
-     * TxInputSigning constructor.
+     * @var TransactionSignatureSerializer
+     */
+    private $txSigSerializer;
+
+    /**
+     * @var PublicKeySerializerInterface
+     */
+    private $pubKeySerializer;
+
+    /**
+     * InputSigner constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
-     * @param int $nInput
+     * @param $nInput
      * @param TransactionOutputInterface $txOut
      * @param SignData $signData
+     * @param TransactionSignatureSerializer|null $sigSerializer
+     * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
     {
         $inputs = $tx->getInputs();
         if (!isset($inputs[$nInput])) {
@@ -153,40 +160,59 @@ class InputSigner
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
-        $this->classifier = new OutputClassifier();
-        $this->interpreter = new Interpreter();
-        $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue());
         $this->flags = $signData->hasSignaturePolicy() ? $signData->getSignaturePolicy() : Interpreter::VERIFY_NONE;
         $this->publicKeys = [];
         $this->signatures = [];
 
-        $scriptSig = $inputs[$nInput]->getScript();
-        $witness = isset($tx->getWitnesses()[$nInput]) ? $tx->getWitnesses()[$nInput]->all() : [];
+        $this->txSigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter));
+        $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
+        $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
+        $this->interpreter = new Interpreter($this->ecAdapter);
 
-        $this->solve($signData, $txOut->getScript(), $scriptSig, $witness);
+        $this->solve($signData, $txOut->getScript(), $inputs[$nInput]->getScript(), isset($tx->getWitnesses()[$nInput]) ? $tx->getWitnesses()[$nInput]->all() : []);
     }
 
     /**
-     * @param TransactionSignatureInterface[] $stack
-     * @param PublicKeyInterface[] $publicKeys
+     * A snipped from OP_CHECKMULTISIG - verifies signatures according to the
+     * order of the given public keys (taken from the script).
+     *
+     * @param ScriptInterface $script
+     * @param BufferInterface[] $signatures
+     * @param BufferInterface[] $publicKeys
+     * @param int $sigVersion
      * @return \SplObjectStorage
      */
-    private function sortMultiSigs($stack, array $publicKeys)
+    private function sortMultisigs(ScriptInterface $script, array $signatures, array $publicKeys, $sigVersion)
     {
-        $sigSort = new SignatureSort($this->ecAdapter);
-        $sigs = new \SplObjectStorage;
+        $sigCount = count($signatures);
+        $keyCount = count($publicKeys);
+        $ikey = $isig = 0;
+        $fSuccess = true;
+        $result = new \SplObjectStorage;
 
-        foreach ($stack as $txSig) {
-            $hash = $this->getSigHash($txSig->getHashType());
-            $linked = $sigSort->link([$txSig->getSignature()], $publicKeys, $hash);
-            foreach ($publicKeys as $key) {
-                if ($linked->contains($key)) {
-                    $sigs[$key] = $txSig;
-                }
+        while ($fSuccess && $sigCount > 0) {
+            // Fetch the signature and public key
+            $sig = $signatures[$isig];
+            $pubkey = $publicKeys[$ikey];
+
+            if ($this->signatureChecker->checkSig($script, $sig, $pubkey, $sigVersion, $this->flags)) {
+                $result[$pubkey] = $sig;
+                $isig++;
+                $sigCount--;
+            }
+
+            $ikey++;
+            $keyCount--;
+
+            // If there are more signatures left than keys left,
+            // then too many signatures have failed. Exit early,
+            // without checking any further signatures.
+            if ($sigCount > $keyCount) {
+                $fSuccess = false;
             }
         }
 
-        return $sigs;
+        return $result;
     }
 
     /**
@@ -196,12 +222,14 @@ class InputSigner
     private function evalPushOnly(ScriptInterface $script)
     {
         $stack = new Stack();
-        $interpreter = new Interpreter();
-        $interpreter->evaluate($script, $stack, SigHash::V0, $this->flags | Interpreter::VERIFY_SIGPUSHONLY, $this->signatureChecker);
+        $this->interpreter->evaluate($script, $stack, SigHash::V0, $this->flags | Interpreter::VERIFY_SIGPUSHONLY, $this->signatureChecker);
         return $stack->all();
     }
 
     /**
+     * Create a script consisting only of push-data operations.
+     * Suitable for a scriptSig.
+     *
      * @param BufferInterface[] $buffers
      * @return ScriptInterface
      */
@@ -227,6 +255,9 @@ class InputSigner
     }
 
     /**
+     * Verify a scriptSig / scriptWitness against a scriptPubKey.
+     * Useful for checking the outcome of certain things, like hash locks (p2sh)
+     *
      * @param int $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
@@ -239,6 +270,8 @@ class InputSigner
     }
 
     /**
+     * Evaluates a scriptPubKey against the provided chunks.
+     *
      * @param ScriptInterface $scriptPubKey
      * @param array $chunks
      * @param int $sigVersion
@@ -266,96 +299,148 @@ class InputSigner
      * This function is strictly for $canSign types.
      * It will extract signatures/publicKeys when given $outputData, and $stack.
      * $stack is the result of decompiling a scriptSig, or taking the witness data.
+     *
      * @param OutputData $outputData
      * @param array $stack
-     * @param $sigVersion
-     * @return mixed
+     * @param int $sigVersion
+     * @return string
      */
     public function extractFromValues(OutputData $outputData, array $stack, $sigVersion)
     {
         $type = $outputData->getType();
         $size = count($stack);
-        if ($type === OutputClassifier::PAYTOPUBKEYHASH) {
+
+        if (ScriptType::P2PKH === $type) {
             $this->requiredSigs = 1;
             if ($size === 2) {
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
-                $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
-                $this->publicKeys = [PublicKeyFactory::fromHex($stack[1], $this->ecAdapter)];
+                $this->signatures = [$this->txSigSerializer->parse($stack[0])];
+                $this->publicKeys = [$this->pubKeySerializer->parse($stack[1])];
             }
-        }
-
-        if ($type === OutputClassifier::PAYTOPUBKEY && count($stack) === 1) {
+        } else if (ScriptType::P2PK === $type) {
             $this->requiredSigs = 1;
             if ($size === 1) {
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
-
-                $this->signatures = [TransactionSignatureFactory::fromHex($stack[0], $this->ecAdapter)];
-                $this->publicKeys = [PublicKeyFactory::fromHex($outputData->getSolution())];
+                $this->signatures = [$this->txSigSerializer->parse($stack[0])];
             }
-        }
-
-        if ($type === OutputClassifier::MULTISIG) {
-            $info = new Multisig($outputData->getScript());
+            $this->publicKeys = [$this->pubKeySerializer->parse($outputData->getSolution())];
+        } else if (ScriptType::MULTISIG === $type) {
+            $info = new Multisig($outputData->getScript(), $this->pubKeySerializer);
             $this->requiredSigs = $info->getRequiredSigCount();
             $this->publicKeys = $info->getKeys();
+            $keyBufs = $info->getKeyBuffers();
             if ($size > 1) {
-                $vars = [];
-                for ($i = 1, $j = $size - 1; $i <= $j; $i++) {
-                    try {
-                        $vars[] = TransactionSignatureFactory::fromHex($stack[$i], $this->ecAdapter);
-                    } catch (\Exception $e) {
-                        // Try-catch block necessary because we don't know it's actually a TransactionSignature
-                    }
-                }
+                // Check signatures irrespective of scriptSig size, primes Checker cache, and need info
+                $check = $this->evaluateSolution($outputData->getScript(), $stack, $sigVersion);
+                $sigBufs = array_slice($stack, 1, $size - 1);
+                $sigBufCount = count($sigBufs);
 
-                $this->signatures = array_fill(0, count($this->publicKeys), null);
-                $sigs = $this->sortMultiSigs($vars, $this->publicKeys);
-                $count = 0;
-                foreach ($this->publicKeys as $idx => $key) {
-                    if (isset($sigs[$key])) {
-                        $this->signatures[$idx] = $sigs[$key];
-                        $count++;
-                    }
-                }
-
-                if (count($vars) !== $count) {
+                // If we seem to have all signatures but fail evaluation, abort
+                if ($sigBufCount === $this->requiredSigs && !$check) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
-                // Don't evaluate, already checked sigs during sort. Todo: fix this.
+
+                $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBufs, $sigVersion);
+
+                // Here we learn if any signatures were invalid, it won't be in the map.
+                if ($sigBufCount !== count($keyToSigMap)) {
+                    throw new \RuntimeException('Existing signatures are invalid!');
+                }
+
+                foreach ($keyBufs as $idx => $key) {
+                    if (isset($keyToSigMap[$key])) {
+                        $this->signatures[$idx] = $this->txSigSerializer->parse($keyToSigMap[$key]);
+                    }
+                }
             }
+        } else {
+            throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
 
         return $type;
     }
 
     /**
-     * Called upon instance creation.
-     * This function must throw an exception whenever execution
-     * does not yield a signable script.
+     * Checks $chunks (a decompiled scriptSig) for it's last element,
+     * or defers to SignData. If both are provided, it checks the
+     * value from $chunks against SignData.
      *
-     * It ensures:
+     * @param BufferInterface[] $chunks
+     * @param SignData $signData
+     * @return ScriptInterface
+     */
+    private function findRedeemScript(array $chunks, SignData $signData)
+    {
+        if (count($chunks) > 0) {
+            $redeemScript = new Script($chunks[count($chunks) - 1]);
+            if ($signData->hasRedeemScript()) {
+                if (!$redeemScript->equals($signData->getRedeemScript())) {
+                    throw new \RuntimeException('Extracted redeemScript did not match sign data');
+                }
+            }
+        } else {
+            if (!$signData->hasRedeemScript()) {
+                throw new \RuntimeException('Redeem script not provided in sign data or scriptSig');
+            }
+            $redeemScript = $signData->getRedeemScript();
+        }
+
+        return $redeemScript;
+    }
+
+    /**
+     * Checks $witness (a witness structure) for it's last element,
+     * or defers to SignData. If both are provided, it checks the
+     * value from $chunks against SignData.
+     *
+     * @param BufferInterface[] $witness
+     * @param SignData $signData
+     * @return ScriptInterface
+     */
+    private function findWitnessScript(array $witness, SignData $signData)
+    {
+        if (count($witness) > 0) {
+            $witnessScript = new Script($witness[count($witness) - 1]);
+            if ($signData->hasWitnessScript()) {
+                if (!$witnessScript->equals($signData->getWitnessScript())) {
+                    throw new \RuntimeException('Extracted witnessScript did not match sign data');
+                }
+            }
+        } else {
+            if (!$signData->hasWitnessScript()) {
+                throw new \RuntimeException('Witness script not provided in sign data or witness');
+            }
+            $witnessScript = $signData->getWitnessScript();
+        }
+
+        return $witnessScript;
+    }
+
+    /**
+     * Called upon instance creation.
+     *
+     * It ensures that violating the following prevents instance creation
      *  - the scriptPubKey can be directly signed, or leads to P2SH/P2WSH/P2WKH
      *  - the P2SH script covers signable types and P2WSH/P2WKH
      *  - the witnessScript covers signable types only
-     *  - violating the above prevents instance creation
+     *
      * @param SignData $signData
      * @param ScriptInterface $scriptPubKey
      * @param ScriptInterface $scriptSig
      * @param BufferInterface[] $witness
      * @return $this
-     * @throws \Exception
      */
     private function solve(SignData $signData, ScriptInterface $scriptPubKey, ScriptInterface $scriptSig, array $witness)
     {
+        $classifier = new OutputClassifier();
         $sigVersion = SigHash::V0;
         $sigChunks = [];
-
-        $solution = $this->scriptPubKey = $this->classifier->decode($scriptPubKey);
-        if ($solution->getType() !== OutputClassifier::PAYTOSCRIPTHASH && !in_array($solution->getType(), self::$validP2sh)) {
+        $solution = $this->scriptPubKey = $classifier->decode($scriptPubKey);
+        if ($solution->getType() !== ScriptType::P2SH && !in_array($solution->getType(), self::$validP2sh)) {
             throw new \RuntimeException('scriptPubKey not supported');
         }
 
@@ -363,32 +448,14 @@ class InputSigner
             $sigChunks = $this->evalPushOnly($scriptSig);
         }
 
-        if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
+        if ($solution->getType() === ScriptType::P2SH) {
             $chunks = $this->evalPushOnly($scriptSig);
-            $redeemScript = null;
-            if (count($chunks) > 0) {
-                $redeemScript = new Script($chunks[count($chunks) - 1]);
-            } else {
-                if (!$signData->hasRedeemScript()) {
-                    throw new \RuntimeException('Redeem script not provided in sign data or scriptSig');
-                }
-            }
-
-            if ($signData->hasRedeemScript()) {
-                if ($redeemScript === null) {
-                    $redeemScript = $signData->getRedeemScript();
-                }
-
-                if (!$redeemScript->equals($signData->getRedeemScript())) {
-                    throw new \RuntimeException('Extracted redeemScript did not match sign data');
-                }
-            }
-
+            $redeemScript = $this->findRedeemScript($chunks, $signData);
             if (!$this->verifySolution(Interpreter::VERIFY_SIGPUSHONLY, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
                 throw new \RuntimeException('Redeem script fails to solve pay-to-script-hash');
             }
 
-            $solution = $this->redeemScript = $this->classifier->decode($redeemScript);
+            $solution = $this->redeemScript = $classifier->decode($redeemScript);
             if (!in_array($solution->getType(), self::$validP2sh)) {
                 throw new \RuntimeException('Unsupported pay-to-script-hash script');
             }
@@ -396,38 +463,20 @@ class InputSigner
             $sigChunks = array_slice($chunks, 0, -1);
         }
 
-        if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
+        if ($solution->getType() === ScriptType::P2WKH) {
             $sigVersion = SigHash::V1;
-            $solution = $this->witnessKeyHash = $this->classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
+            $solution = $this->witnessKeyHash = $classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
             $sigChunks = $witness;
-        } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+        } else if ($solution->getType() === ScriptType::P2WSH) {
             $sigVersion = SigHash::V1;
-
-            $witnessScript = null;
-            if (count($witness) > 0) {
-                $witnessScript = new Script($witness[count($witness) - 1]);
-            } else {
-                if (!$signData->hasWitnessScript()) {
-                    throw new \RuntimeException('Witness script not provided in sign data or witness');
-                }
-            }
-
-            if ($signData->hasWitnessScript()) {
-                if ($witnessScript === null) {
-                    $witnessScript = $signData->getWitnessScript();
-                } else {
-                    if (!$witnessScript->equals($signData->getWitnessScript())) {
-                        throw new \RuntimeException('Extracted witnessScript did not match sign data');
-                    }
-                }
-            }
+            $witnessScript = $this->findWitnessScript($witness, $signData);
 
             // Essentially all the reference implementation does
             if (!$witnessScript->getWitnessScriptHash()->equals($solution->getSolution())) {
                 throw new \RuntimeException('Witness script fails to solve witness-script-hash');
             }
 
-            $solution = $this->witnessScript = $this->classifier->decode($witnessScript);
+            $solution = $this->witnessScript = $classifier->decode($witnessScript);
             if (!in_array($this->witnessScript->getType(), self::$canSign)) {
                 throw new \RuntimeException('Unsupported witness-script-hash script');
             }
@@ -438,7 +487,7 @@ class InputSigner
         $this->sigVersion = $sigVersion;
         $this->signScript = $solution;
 
-        $this->extractFromValues($solution, $sigChunks, $sigVersion);
+        $this->extractFromValues($solution, $sigChunks, $this->sigVersion);
 
         return $this;
     }
@@ -455,13 +504,7 @@ class InputSigner
             throw new \RuntimeException('Invalid sigHashType requested');
         }
 
-        if ($sigVersion === SigHash::V1) {
-            $hasher = new V1Hasher($this->tx, $this->txOut->getValue());
-        } else {
-            $hasher = new Hasher($this->tx);
-        }
-
-        return $hasher->calculate($scriptCode, $this->nInput, $sigHashType);
+        return $this->signatureChecker->getSigHash($scriptCode, $sigHashType, $sigVersion);
     }
 
     /**
@@ -478,7 +521,7 @@ class InputSigner
      * @param ScriptInterface $scriptCode
      * @param int $sigHashType
      * @param int $sigVersion
-     * @return TransactionSignature
+     * @return TransactionSignatureInterface
      */
     private function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
@@ -520,6 +563,8 @@ class InputSigner
     }
 
     /**
+     * Sign the input using $key and $sigHashTypes
+     *
      * @param PrivateKeyInterface $key
      * @param int $sigHashType
      * @return $this
@@ -530,29 +575,25 @@ class InputSigner
             return $this;
         }
 
-        if ($this->signScript->getType() === OutputClassifier::PAYTOPUBKEY) {
-            if (!$key->getPublicKey()->getBuffer()->equals($this->signScript->getSolution())) {
-                throw new \RuntimeException('Signing with the wrong private key');
-            }
-            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
-            $this->publicKeys[0] = $key->getPublicKey();
-            $this->requiredSigs = 1;
-        } else if ($this->signScript->getType() === OutputClassifier::PAYTOPUBKEYHASH) {
-            if (!$key->getPubKeyHash()->equals($this->signScript->getSolution())) {
-                throw new \RuntimeException('Signing with the wrong private key');
-            }
-            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
-            $this->publicKeys[0] = $key->getPublicKey();
-            $this->requiredSigs = 1;
-        } else if ($this->signScript->getType() === OutputClassifier::MULTISIG) {
-            $info = new Multisig($this->signScript->getScript());
-            $this->publicKeys = $info->getKeys();
-            $this->requiredSigs = $info->getRequiredSigCount();
+        if (SigHash::V1 === $this->sigVersion && !$key->isCompressed()) {
+            throw new \RuntimeException('Uncompressed keys are disallowed in segwit scripts - refusing to sign');
+        }
 
-            $myKey = $key->getPublicKey()->getBuffer();
+        if ($this->signScript->getType() === ScriptType::P2PK) {
+            if (!$this->pubKeySerializer->serialize($key->getPublicKey())->equals($this->signScript->getSolution())) {
+                throw new \RuntimeException('Signing with the wrong private key');
+            }
+            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+        } else if ($this->signScript->getType() === ScriptType::P2PKH) {
+            if (!$key->getPubKeyHash($this->pubKeySerializer)->equals($this->signScript->getSolution())) {
+                throw new \RuntimeException('Signing with the wrong private key');
+            }
+            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+            $this->publicKeys[0] = $key->getPublicKey();
+        } else if ($this->signScript->getType() === ScriptType::MULTISIG) {
             $signed = false;
-            foreach ($info->getKeys() as $keyIdx => $publicKey) {
-                if ($myKey->equals($publicKey->getBuffer())) {
+            foreach ($this->publicKeys as $keyIdx => $publicKey) {
+                if ($key->getPublicKey()->equals($publicKey)) {
                     $this->signatures[$keyIdx] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
                     $signed = true;
                 }
@@ -561,12 +602,16 @@ class InputSigner
             if (!$signed) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
+        } else {
+            throw new \RuntimeException('Unexpected error - sign script had an unexpected type');
         }
 
         return $this;
     }
 
     /**
+     * Verifies the input using $flags for script verification
+     *
      * @param int $flags
      * @return bool
      */
@@ -579,15 +624,17 @@ class InputSigner
         }
 
         $flags |= Interpreter::VERIFY_P2SH;
-        if ($this->sigVersion === 1) {
+        if (SigHash::V1 === $this->sigVersion) {
             $flags |= Interpreter::VERIFY_WITNESS;
         }
 
         $sig = $this->serializeSignatures();
 
+        // Take serialized signatures, and use mutator to add this inputs sig data
         $mutator = TransactionFactory::mutate($this->tx);
         $mutator->inputsMutator()[$this->nInput]->script($sig->getScriptSig());
-        if ($this->sigVersion === 1) {
+
+        if (SigHash::V1 === $this->sigVersion) {
             $witness = [];
             for ($i = 0, $j = count($this->tx->getInputs()); $i < $j; $i++) {
                 if ($i === $this->nInput) {
@@ -604,33 +651,39 @@ class InputSigner
     }
 
     /**
+     * Produces the script stack that solves the $outputType
+     *
      * @param string $outputType
      * @return BufferInterface[]
      */
     private function serializeSolution($outputType)
     {
         $result = [];
-        if ($outputType === OutputClassifier::PAYTOPUBKEY) {
+        if (ScriptType::P2PK === $outputType) {
             if (count($this->signatures) === 1) {
-                $result = [$this->signatures[0]->getBuffer()];
+                $result = [$this->txSigSerializer->serialize($this->signatures[0])];
             }
-        } else if ($outputType === OutputClassifier::PAYTOPUBKEYHASH) {
+        } else if (ScriptType::P2PKH === $outputType) {
             if (count($this->signatures) === 1 && count($this->publicKeys) === 1) {
-                $result = [$this->signatures[0]->getBuffer(), $this->publicKeys[0]->getBuffer()];
+                $result = [$this->txSigSerializer->serialize($this->signatures[0]), $this->pubKeySerializer->serialize($this->publicKeys[0])];
             }
-        } else if ($outputType === OutputClassifier::MULTISIG) {
+        } else if (ScriptType::MULTISIG === $outputType) {
             $result[] = new Buffer();
             for ($i = 0, $nPubKeys = count($this->publicKeys); $i < $nPubKeys; $i++) {
                 if (isset($this->signatures[$i])) {
-                    $result[] = $this->signatures[$i]->getBuffer();
+                    $result[] = $this->txSigSerializer->serialize($this->signatures[$i]);
                 }
             }
+        } else {
+            throw new \RuntimeException('Parameter 0 for serializeSolution was a non-standard input type');
         }
 
         return $result;
     }
 
     /**
+     * Produces a SigValues instance containing the scriptSig & script witness
+     *
      * @return SigValues
      */
     public function serializeSignatures()
@@ -650,7 +703,7 @@ class InputSigner
 
         $solution = $this->scriptPubKey;
         $p2sh = false;
-        if ($solution->getType() === OutputClassifier::PAYTOSCRIPTHASH) {
+        if ($solution->getType() === ScriptType::P2SH) {
             $p2sh = true;
             if ($this->redeemScript->canSign()) {
                 $scriptSigChunks = $this->serializeSolution($this->redeemScript->getType());
@@ -658,9 +711,9 @@ class InputSigner
             $solution = $this->redeemScript;
         }
 
-        if ($solution->getType() === OutputClassifier::WITNESS_V0_KEYHASH) {
-            $witness = $this->serializeSolution(OutputClassifier::PAYTOPUBKEYHASH);
-        } else if ($solution->getType() === OutputClassifier::WITNESS_V0_SCRIPTHASH) {
+        if ($solution->getType() === ScriptType::P2WKH) {
+            $witness = $this->serializeSolution(ScriptType::P2PKH);
+        } else if ($solution->getType() === ScriptType::P2WSH) {
             if ($this->witnessScript->canSign()) {
                 $witness = $this->serializeSolution($this->witnessScript->getType());
                 $witness[] = $this->witnessScript->getScript()->getBuffer();

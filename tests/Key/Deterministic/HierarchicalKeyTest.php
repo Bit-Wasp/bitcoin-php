@@ -2,15 +2,16 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Network\Network;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -392,6 +393,23 @@ class HierarchicalKeyTest extends AbstractTestCase
         $ecAdapter = Bitcoin::getEcAdapter();
         $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network, $ecAdapter);
         $key->deriveChild($sequence);
+    }
+
+    public function testDerivedKeyWithLeadingZeroes()
+    {
+        $seed = "d13de7bd1e54422d1a3b3b699a27fb460de2849e7e66a005c647e8e4a54075cb";
+        $buffer = Buffer::hex($seed);
+        $root = HierarchicalKeyFactory::fromEntropy($buffer);
+
+        $this->assertEquals("c23ab32b36ddff49fae350a1bed8ec6b4d9fc252238dd789b7273ba4416054eb", $root->getChainCode()->getHex());
+        $this->assertEquals("xpub661MyMwAqRbcGUbHLLJ5n2DzFAt8mmaDxbmbdimh68m8EiXGEQPiJya4BJat5yMzy4e68VSUoLGCu5uvzf8dUoGvwuJsLE6F1cibmWsxFNn", $root->toExtendedPublicKey());
+        $this->assertEquals("xprv9s21ZrQH143K3zWpEJm5QtHFh93eNJrNbNqzqLN5XoE9MvC7gs5TmBFaL2PpaXpDc8FBYVe5EChc73ApjSQ5fWsXS7auHy1MmG6hdpywE1q", $root->toExtendedPrivateKey());
+        $this->assertEquals("0000081d1e4bad6731c84450c9a3dbb70e8ba30118d3419f2c74077b7996a078", $root->getPrivateKey()->getHex());
+
+        $child = $root->derivePath("m/44'/0'/0'/0/0'");
+        $this->assertEquals("ca27553aa89617e982e621637d6478f564b32738f8bbe2e48d0a58a8e0f6da40", $child->getChainCode()->getHex());
+        $this->assertEquals("xpub6GcBnm7FfDg5ERWACCvtuotN6Tdoc37r3SZ1asBHvCWzPkqWn3MVKPWKzy6GsfmdMUGanR3D12dH1cp5tJauuubwc4FAJDn67SH2uUjwAT1", $child->toExtendedPublicKey());
+        $this->assertEquals("xprvA3cqPFaMpr7n1wRh6BPtYfwdYRoKCaPzgDdQnUmgMrz1WxWNEW3EmbBr9ieh9BJAsRGKFPLvotb4p4Aq79jddUVKPVJt7exVzLHcv777JVf", $child->toExtendedPrivateKey());
     }
 
     /**

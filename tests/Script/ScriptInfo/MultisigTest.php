@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class MultisigTest extends AbstractTestCase
@@ -17,7 +18,7 @@ class MultisigTest extends AbstractTestCase
 
         $script = ScriptFactory::scriptPubKey()->multisig(2, [$pub, $otherpub]);
         $classifier = new OutputClassifier();
-        $this->assertEquals(OutputClassifier::MULTISIG, $classifier->classify($script));
+        $this->assertEquals(ScriptType::MULTISIG, $classifier->classify($script));
 
         $info = new Multisig($script);
         $this->assertEquals(2, $info->getRequiredSigCount());

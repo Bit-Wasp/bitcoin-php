@@ -3,17 +3,17 @@
 namespace BitWasp\Bitcoin\Tests\Bloom;
 
 use BitWasp\Bitcoin\Amount;
+use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
+use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class BloomFilterTest extends AbstractTestCase
 {

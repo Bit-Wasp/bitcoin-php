@@ -5,8 +5,8 @@ namespace BitWasp\Bitcoin\Script\Interpreter;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
+use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -164,9 +164,7 @@ class Interpreter implements InterpreterInterface
 
                 $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
                 $stackValues = $scriptWitness->slice(0, -1);
-                $hashScriptPubKey = Hash::sha256($scriptPubKey->getBuffer());
-
-                if (!$hashScriptPubKey->equals($buffer)) {
+                if (!$buffer->equals($scriptPubKey->getWitnessScriptHash())) {
                     return false;
                 }
             } elseif ($buffer->getSize() === 20) {

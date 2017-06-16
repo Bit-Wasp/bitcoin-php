@@ -3,9 +3,9 @@
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -64,20 +64,20 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     }
 
     /**
-     * @param TransactionInputInterface $input
+     * @param TransactionInputInterface $other
      * @return bool
      */
-    public function equals(TransactionInputInterface $input)
+    public function equals(TransactionInputInterface $other)
     {
-        if (!$this->outPoint->equals($input->getOutPoint())) {
+        if (!$this->outPoint->equals($other->getOutPoint())) {
             return false;
         }
 
-        if (!$this->script->equals($input->getScript())) {
+        if (!$this->script->equals($other->getScript())) {
             return false;
         }
 
-        return gmp_cmp(gmp_init($this->sequence), gmp_init($input->getSequence())) === 0;
+        return gmp_cmp(gmp_init($this->sequence), gmp_init($other->getSequence())) === 0;
     }
 
     /**
@@ -87,10 +87,9 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      */
     public function isCoinbase()
     {
-        $math = Bitcoin::getMath();
         $outpoint = $this->outPoint;
         return $outpoint->getTxId()->getBinary() === str_pad('', 32, "\x00")
-            && $math->cmp(gmp_init($outpoint->getVout()), gmp_init(0xffffffff)) === 0;
+            && $outpoint->getVout() == 0xffffffff;
     }
 
     /**
@@ -100,6 +99,59 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     {
         $math = Bitcoin::getMath();
         return $math->cmp(gmp_init($this->getSequence()), gmp_init(self::SEQUENCE_FINAL)) === 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function isSequenceLockDisabled()
+    {
+        if ($this->isCoinbase()) {
+            return true;
+        }
+
+        return ($this->sequence & self::SEQUENCE_LOCKTIME_DISABLE_FLAG) !== 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLockedToTime()
+    {
+        return !$this->isSequenceLockDisabled() && (($this->sequence & self::SEQUENCE_LOCKTIME_TYPE_FLAG) === self::SEQUENCE_LOCKTIME_TYPE_FLAG);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLockedToBlock()
+    {
+        return !$this->isSequenceLockDisabled() && (($this->sequence & self::SEQUENCE_LOCKTIME_TYPE_FLAG) === 0);
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelativeTimeLock()
+    {
+        if (!$this->isLockedToTime()) {
+            throw new \RuntimeException('Cannot decode time based locktime when disable flag set/timelock flag unset/tx is coinbase');
+        }
+
+        // Multiply by 512 to convert locktime to seconds
+        return ($this->sequence & self::SEQUENCE_LOCKTIME_MASK) * 512;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelativeBlockLock()
+    {
+        if (!$this->isLockedToBlock()) {
+            throw new \RuntimeException('Cannot decode block locktime when disable flag set/timelock flag set/tx is coinbase');
+        }
+
+        return $this->sequence & self::SEQUENCE_LOCKTIME_MASK;
     }
 
     /**

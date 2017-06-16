@@ -2,9 +2,9 @@
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
-use BitWasp\Bitcoin\PaymentProtocol\RequestSigner;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest;
+use BitWasp\Bitcoin\PaymentProtocol\RequestSigner;
 
 class RequestSignerTest extends Bip70Test
 {

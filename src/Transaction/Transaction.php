@@ -6,8 +6,8 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Bitcoin\Serializer\Transaction\OldTransactionSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Bitcoin\Util\IntRange;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -39,6 +39,16 @@ class Transaction extends Serializable implements TransactionInterface
     private $lockTime;
 
     /**
+     * @var BufferInterface
+     */
+    private $wtxid;
+
+    /**
+     * @var BufferInterface
+     */
+    private $hash;
+
+    /**
      * Transaction constructor.
      *
      * @param int $nVersion
@@ -54,8 +64,8 @@ class Transaction extends Serializable implements TransactionInterface
         array $vwit = [],
         $nLockTime = 0
     ) {
-        if ($nVersion > TransactionInterface::MAX_VERSION) {
-            throw new \InvalidArgumentException('Version must be less than ' . TransactionInterface::MAX_VERSION);
+        if ($nVersion < IntRange::I32_MIN || $nVersion > IntRange::I32_MAX) {
+            throw new \InvalidArgumentException('Transaction version is outside valid range');
         }
 
         if ($nLockTime < 0 || $nLockTime > TransactionInterface::MAX_LOCKTIME) {
@@ -81,7 +91,10 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getTxHash()
     {
-        return Hash::sha256d($this->getBuffer());
+        if (null === $this->hash) {
+            $this->hash = Hash::sha256d($this->getBaseSerialization());
+        }
+        return $this->hash;
     }
 
     /**
@@ -97,7 +110,11 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getWitnessTxId()
     {
-        return Hash::sha256d($this->getWitnessBuffer())->flip();
+        if (null === $this->wtxid) {
+            $this->wtxid = Hash::sha256d($this->getBuffer())->flip();
+        }
+
+        return $this->wtxid;
     }
 
     /**
@@ -284,14 +301,37 @@ class Transaction extends Serializable implements TransactionInterface
      */
     public function getBuffer()
     {
-        return (new OldTransactionSerializer())->serialize($this);
+        return (new TransactionSerializer())->serialize($this);
     }
 
     /**
      * @return BufferInterface
      */
+    public function getBaseSerialization()
+    {
+        return (new TransactionSerializer())->serialize($this, TransactionSerializer::NO_WITNESS);
+    }
+
+    /**
+     * @return BufferInterface
+     */
+    public function getWitnessSerialization()
+    {
+        if (!$this->hasWitness()) {
+            throw new \RuntimeException('Cannot get witness serialization for transaction without witnesses');
+        }
+
+        return $this->getBuffer();
+    }
+
+    /**
+     * {@inheritdoc}
+     * @see TransactionInterface::getWitnessBuffer()
+     * @see TransactionInterface::getWitnessSerialization()
+     * @deprecated
+     */
     public function getWitnessBuffer()
     {
-        return (new TransactionSerializer())->serialize($this);
+        return $this->getWitnessSerialization();
     }
 }

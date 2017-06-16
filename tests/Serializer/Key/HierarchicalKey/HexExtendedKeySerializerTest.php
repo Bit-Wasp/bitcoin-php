@@ -19,6 +19,6 @@ class HexExtendedKeySerializerTest extends AbstractTestCase
     {
         $network = NetworkFactory::bitcoinTestnet();
         $serializer = new ExtendedKeySerializer($adapter, $network);
-        $serializer->parse(new Buffer());
+        $serializer->parse($network, new Buffer());
     }
 }

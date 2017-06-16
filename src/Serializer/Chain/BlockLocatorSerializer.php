@@ -3,23 +3,28 @@
 namespace BitWasp\Bitcoin\Serializer\Chain;
 
 use BitWasp\Bitcoin\Chain\BlockLocator;
+use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\TemplateFactory;
 
 class BlockLocatorSerializer
 {
+
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\VarInt
      */
-    public function getTemplate()
+    private $varint;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\ByteString
+     */
+    private $bytestring32le;
+
+    public function __construct()
     {
-        return (new TemplateFactory())
-            ->vector(function (Parser $parser) {
-                return $parser->readBytes(32, true);
-            })
-            ->bytestringle(32)
-            ->getTemplate();
+        $this->varint = Types::varint();
+        $this->bytestring32le = Types::bytestringle(32);
     }
 
     /**
@@ -28,12 +33,15 @@ class BlockLocatorSerializer
      */
     public function fromParser(Parser $parser)
     {
-        list($hashes, $hashStop) = $this->getTemplate()->parse($parser);
+        $numHashes = $this->varint->read($parser);
+        $hashes = [];
+        for ($i = 0; $i < $numHashes; $i++) {
+            $hashes[] = $this->bytestring32le->read($parser);
+        }
 
-        return new BlockLocator(
-            $hashes,
-            $hashStop
-        );
+        $hashStop = $this->bytestring32le->read($parser);
+
+        return new BlockLocator($hashes, $hashStop);
     }
 
     /**
@@ -51,14 +59,12 @@ class BlockLocatorSerializer
      */
     public function serialize(BlockLocator $blockLocator)
     {
-        $hashes = [];
+        $binary = $this->varint->write(count($blockLocator->getHashes()));
         foreach ($blockLocator->getHashes() as $hash) {
-            $hashes[] = $hash->flip();
+            $binary .= $this->bytestring32le->write($hash);
         }
 
-        return $this->getTemplate()->write([
-            $hashes,
-            $blockLocator->getHashStop()
-        ]);
+        $binary .= $this->bytestring32le->write($blockLocator->getHashStop());
+        return new Buffer($binary);
     }
 }

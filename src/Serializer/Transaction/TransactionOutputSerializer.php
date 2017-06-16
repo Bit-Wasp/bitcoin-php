@@ -2,34 +2,30 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Parser;
 
 class TransactionOutputSerializer
 {
     /**
-     * @var \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\Uint64
      */
-    private $template;
+    private $uint64le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\VarString
+     */
+    private $varstring;
 
     public function __construct()
     {
-        $this->template = $this->getTemplate();
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    private function getTemplate()
-    {
-        return (new TemplateFactory())
-            ->uint64le()
-            ->varstring()
-            ->getTemplate();
+        $this->uint64le = Types::uint64le();
+        $this->varstring = Types::varstring();
     }
 
     /**
@@ -38,10 +34,10 @@ class TransactionOutputSerializer
      */
     public function serialize(TransactionOutputInterface $output)
     {
-        return $this->template->write([
-            $output->getValue(),
-            $output->getScript()->getBuffer()
-        ]);
+        return new Buffer(
+            $this->uint64le->write($output->getValue()) .
+            $this->varstring->write($output->getScript()->getBuffer())
+        );
     }
 
     /**
@@ -51,15 +47,9 @@ class TransactionOutputSerializer
      */
     public function fromParser(Parser $parser)
     {
-        $parse = $this->template->parse($parser);
-        /** @var int $value */
-        $value = $parse[0];
-        /** @var BufferInterface $scriptBuf */
-        $scriptBuf = $parse[1];
-
         return new TransactionOutput(
-            $value,
-            new Script($scriptBuf)
+            $this->uint64le->read($parser),
+            new Script($this->varstring->read($parser))
         );
     }
 
@@ -70,7 +60,6 @@ class TransactionOutputSerializer
      */
     public function parse($string)
     {
-        $parser = new Parser($string);
-        return $this->fromParser($parser);
+        return $this->fromParser(new Parser($string));
     }
 }
