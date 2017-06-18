@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-
 class PathTrace implements \ArrayAccess, \Iterator, \Countable
 {
     /**
@@ -46,32 +45,37 @@ class PathTrace implements \ArrayAccess, \Iterator, \Countable
     /**
      *
      */
-    public function rewind() {
+    public function rewind()
+    {
         $this->position = 0;
     }
 
     /**
      * @return OperationContainer
      */
-    public function current() {
+    public function current()
+    {
         return $this->container[$this->position];
     }
 
     /**
      * @return int
      */
-    public function key() {
+    public function key()
+    {
         return $this->position;
     }
 
-    public function next() {
+    public function next()
+    {
         ++$this->position;
     }
 
     /**
      * @return bool
      */
-    public function valid() {
+    public function valid()
+    {
         return isset($this->container[$this->position]);
     }
 
@@ -79,7 +83,8 @@ class PathTrace implements \ArrayAccess, \Iterator, \Countable
      * @param int $offset
      * @param OperationContainer $value
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         throw new \RuntimeException("Not implemented");
     }
 
@@ -87,14 +92,16 @@ class PathTrace implements \ArrayAccess, \Iterator, \Countable
      * @param int $offset
      * @return bool
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->container[$offset]);
     }
 
     /**
      * @param int $offset
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->container[$offset]);
     }
 
@@ -102,7 +109,8 @@ class PathTrace implements \ArrayAccess, \Iterator, \Countable
      * @param int $offset
      * @return OperationContainer|null
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
 }
