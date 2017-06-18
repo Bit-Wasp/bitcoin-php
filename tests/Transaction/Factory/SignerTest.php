@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -28,58 +27,6 @@ use BitWasp\Buffertools\Buffer;
 
 class SignerTest extends AbstractTestCase
 {
-
-    /**
-     * @return string[]
-     */
-    public function getSupportedSignTypes()
-    {
-        return [
-            ScriptType::P2PKH,
-            ScriptType::P2PK,
-            ScriptType::MULTISIG
-        ];
-    }
-
-    /**
-     * @param string $type
-     * @param EcAdapterInterface $ecAdapter
-     * @return array
-     */
-    public function getScriptAndKeys($type, EcAdapterInterface $ecAdapter)
-    {
-        if ($type === ScriptType::P2PKH) {
-            $privateKey = PrivateKeyFactory::create(true, $ecAdapter);
-            $script = ScriptFactory::scriptPubKey()->witnessKeyHash($privateKey->getPublicKey()->getPubKeyHash());
-            return [$script, [$privateKey]];
-        } else if ($type === ScriptType::P2PK) {
-            $privateKey = PrivateKeyFactory::create(true, $ecAdapter);
-            $script = ScriptFactory::scriptPubKey()->payToPubKey($privateKey->getPublicKey());
-            return [$script, [$privateKey]];
-        } else if ($type === ScriptType::P2PKH) {
-            $privateKey = PrivateKeyFactory::create(true, $ecAdapter);
-            $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPubKeyHash());
-            return [$script, [$privateKey]];
-        } else if ($type === ScriptType::MULTISIG) {
-            $privateKey1 = PrivateKeyFactory::create(true, $ecAdapter);
-            $privateKey2 = PrivateKeyFactory::create(true, $ecAdapter);
-            $script = ScriptFactory::scriptPubKey()->multisig(2, [$privateKey1->getPublicKey(), $privateKey2->getPublicKey()]);
-            return [$script, [$privateKey1, $privateKey2]];
-        } else {
-            throw new \RuntimeException('Unexpected scriptPubKey type requested for vector');
-        }
-    }
-
-    /**
-     * Convenience function to create P2SH version of given script
-     * @param ScriptInterface $p2shScript
-     * @return array
-     */
-    private function p2shScript(ScriptInterface $p2shScript)
-    {
-        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2shScript->getBuffer()));
-        return [$scriptPubKey, $p2shScript, null];
-    }
 
     /**
      * Produces scripts for signing
@@ -194,16 +141,22 @@ class SignerTest extends AbstractTestCase
             $this->assertEquals($signData->hasRedeemScript(), $inSigner->isP2SH());
             $this->assertEquals($signData->hasWitnessScript(), $inSigner->isP2WSH());
             $this->assertTrue($inSigner->getSignScript() instanceof OutputData);
+            $this->assertTrue($inSigner->getSignScript()->canSign());
+
             $this->assertNotEquals(ScriptType::P2SH, $inSigner->getSignScript());
             $this->assertNotEquals(ScriptType::P2WSH, $inSigner->getSignScript());
 
             if ($signData->hasRedeemScript()) {
                 $this->assertEquals(ScriptType::P2SH, $inSigner->getScriptPubKey()->getType());
+                $this->assertTrue($inSigner->getRedeemScript()->getScript()->getScriptHash()->equals($inSigner->getScriptPubKey()->getSolution()));
+
                 if ($signData->hasWitnessScript()) {
                     $this->assertEquals(ScriptType::P2WSH, $inSigner->getRedeemScript()->getType());
+                    $this->assertTrue($inSigner->getWitnessScript()->getScript()->getWitnessScriptHash()->equals($inSigner->getRedeemScript()->getSolution()));
                 }
             } else if ($signData->hasWitnessScript()) {
                 $this->assertEquals(ScriptType::P2WSH, $inSigner->getScriptPubKey()->getType());
+                $this->assertTrue($inSigner->getWitnessScript()->getScript()->getWitnessScriptHash()->equals($inSigner->getScriptPubKey()->getSolution()));
             }
 
             foreach ($signSteps as $keyAndHashType) {
