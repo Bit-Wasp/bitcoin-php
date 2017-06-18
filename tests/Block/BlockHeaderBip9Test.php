@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Block;
 
-
 use BitWasp\Bitcoin\Block\BlockHeaderFactory;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
