@@ -1,0 +1,70 @@
+{
+  "vectors": [
+    [
+      "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL IF 7017 CHECKSEQUENCEVERIFY 2DROP 0x21 0x0228d9678b4edc130efb1fd3e31fc33004237c53632657ebd18244fe6cf05fb4d3 ELSE 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUAL NOTIF 7017 CHECKLOCKTIMEVERIFY DROP ENDIF 0x21 0x02d99b5b59775b152861a62a068896d9eecd550c9acfb18df1cb05cadef26a2b7e ENDIF CHECKSIG",
+      [
+        [
+          [
+            true
+          ],
+          "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL IF 7017 CHECKSEQUENCEVERIFY 2DROP 0x21 0x0228d9678b4edc130efb1fd3e31fc33004237c53632657ebd18244fe6cf05fb4d3 ELSE NOTIF ENDIF ENDIF CHECKSIG",
+          "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL 7017 CHECKSEQUENCEVERIFY 2DROP 0x21 0x0228d9678b4edc130efb1fd3e31fc33004237c53632657ebd18244fe6cf05fb4d3 CHECKSIG"
+        ],
+        [
+          [
+            false,
+            false
+          ],
+          "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL IF ELSE 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUAL NOTIF 7017 CHECKLOCKTIMEVERIFY DROP ENDIF 0x21 0x02d99b5b59775b152861a62a068896d9eecd550c9acfb18df1cb05cadef26a2b7e ENDIF CHECKSIG",
+          "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUAL 7017 CHECKLOCKTIMEVERIFY DROP 0x21 0x02d99b5b59775b152861a62a068896d9eecd550c9acfb18df1cb05cadef26a2b7e CHECKSIG"
+        ],
+        [
+          [
+            false,
+            true
+          ],
+          "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL IF ELSE 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUAL NOTIF ENDIF 0x21 0x02d99b5b59775b152861a62a068896d9eecd550c9acfb18df1cb05cadef26a2b7e ENDIF CHECKSIG",
+          "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUAL NOTIF DROP 0x21 0x02d99b5b59775b152861a62a068896d9eecd550c9acfb18df1cb05cadef26a2b7e CHECKSIG"
+        ]
+      ]
+    ],
+    [
+      "IF DUP HASH160 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUALVERIFY CHECKSIG ELSE DUP HASH160 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUALVERIFY CHECKSIG ENDIF",
+      [
+        [
+          [
+            true
+          ],
+          "IF DUP HASH160 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUALVERIFY CHECKSIG ELSE ENDIF",
+          "DUP HASH160 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUALVERIFY CHECKSIG"
+        ],
+        [
+          [
+            false
+          ],
+          "IF ELSE DUP HASH160 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUALVERIFY CHECKSIG ENDIF",
+          "DUP HASH160 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUALVERIFY CHECKSIG"
+        ]
+      ]
+    ],
+    [
+      "IF DUP HASH160 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea ELSE DUP HASH160 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 ENDIF EQUALVERIFY CHECKSIG",
+      [
+        [
+          [
+            true
+          ],
+          "IF DUP HASH160 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea ELSE ENDIF EQUALVERIFY CHECKSIG",
+          "DUP HASH160 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUALVERIFY CHECKSIG"
+        ],
+        [
+          [
+            false
+          ],
+          "IF ELSE DUP HASH160 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 ENDIF EQUALVERIFY CHECKSIG ",
+          "DUP HASH160 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUALVERIFY CHECKSIG"
+        ]
+      ]
+    ]
+  ]
+}
