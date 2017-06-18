@@ -235,6 +235,15 @@ class SignerTest extends AbstractTestCase
             $this->assertEquals($signData->hasRedeemScript(), $inSigner->isP2SH());
             $this->assertEquals($signData->hasWitnessScript(), $inSigner->isP2WSH());
 
+            if ($signData->hasRedeemScript()) {
+                $this->assertEquals(ScriptType::P2SH, $inSigner->getScriptPubKey()->getType());
+                if ($signData->hasWitnessScript()) {
+                    $this->assertEquals(ScriptType::P2WSH, $inSigner->getRedeemScript()->getType());
+                }
+            } else if ($signData->hasWitnessScript()) {
+                $this->assertEquals(ScriptType::P2WSH, $inSigner->getScriptPubKey()->getType());
+            }
+
             foreach ($signSteps as $keyAndHashType) {
                 list ($privateKey, $sigHashType) = $keyAndHashType;
                 $signer->sign($i, $privateKey, $utxo->getOutput(), $signData, $sigHashType);

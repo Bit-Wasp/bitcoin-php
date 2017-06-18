@@ -571,6 +571,38 @@ class InputSigner
     }
 
     /**
+     * @return OutputData
+     */
+    public function getScriptPubKey()
+    {
+        return $this->scriptPubKey;
+    }
+
+    /**
+     * @return OutputData
+     */
+    public function getRedeemScript()
+    {
+        if (null === $this->redeemScript) {
+            throw new \RuntimeException("Input has no redeemScript, cannot call getRedeemScript");
+        }
+
+        return $this->redeemScript;
+    }
+
+    /**
+     * @return OutputData
+     */
+    public function getWitnessScript()
+    {
+        if (null === $this->witnessScript) {
+            throw new \RuntimeException("Input has no witnessScript, cannot call getWitnessScript");
+        }
+
+        return $this->witnessScript;
+    }
+
+    /**
      * @return bool
      */
     public function isP2SH()
