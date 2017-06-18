@@ -96,28 +96,6 @@ class ScriptBranchTest extends AbstractTestCase
         $bs3 = "HASH160 DUP {$r1} EQUAL IF ELSE {$r2} EQUAL NOTIF ENDIF {$bob} ENDIF CHECKSIG";
         $bmu3 = "HASH160 DUP {$r1} EQUAL {$r2} EQUAL NOTIF DROP {$bob} CHECKSIG";
 
-        $s2 = "IF DUP HASH160 {$r1} EQUALVERIFY CHECKSIG ELSE DUP HASH160 {$r2} EQUALVERIFY CHECKSIG ENDIF";
-        $ba1_1 = [true];
-        $bs1_1 = "IF DUP HASH160 {$r1} EQUALVERIFY CHECKSIG ELSE ENDIF";
-        $bmu1_1 = "DUP HASH160 {$r1} EQUALVERIFY CHECKSIG";
-
-        $ba1_2 = [false];
-        $bs1_2 = "IF ELSE DUP HASH160 {$r2} EQUALVERIFY CHECKSIG ENDIF";
-        $bmu1_2 = "DUP HASH160 {$r2} EQUALVERIFY CHECKSIG";
-
-        $s3 = "IF DUP HASH160 {$r1} ELSE DUP HASH160 {$r2} ENDIF EQUALVERIFY CHECKSIG";
-        $ba2_1 = [true];
-        $bs2_1 = "IF DUP HASH160 {$r1} ELSE ENDIF EQUALVERIFY CHECKSIG";
-        $bmu2_1 = "DUP HASH160 {$r1} EQUALVERIFY CHECKSIG";
-        $ba2_2 = [false];
-        $bs2_2 = "IF ELSE DUP HASH160 {$r2} ENDIF EQUALVERIFY CHECKSIG ";
-        $bmu2_2 = "DUP HASH160 {$r2} EQUALVERIFY CHECKSIG";
-
-        $s4 = "DUP HASH160 {$r1} EQUALVERIFY CHECKSIG";
-        $ba3_1 = [];
-        $bs3_1 = "DUP HASH160 {$r1} EQUALVERIFY CHECKSIG";
-        $bmu3_1 = "DUP HASH160 {$r1} EQUALVERIFY CHECKSIG";
-
         $sfix = [
             [
                 $s1,
@@ -127,38 +105,9 @@ class ScriptBranchTest extends AbstractTestCase
                     [$ba3, $bs3, $bmu3],
                 ],
             ],
-            [
-                $s2,
-                [
-                    [$ba1_1, $bs1_1, $bmu1_1,],
-                    [$ba1_2, $bs1_2, $bmu1_2,],
-                ]
-            ],
-            [
-                $s3,
-                [
-                    [$ba2_1, $bs2_1, $bmu2_1,],
-                    [$ba2_2, $bs2_2, $bmu2_2,],
-                ]
-            ],
-            [
-                $s4,
-                [
-                    [$ba3_1, $bs3_1, $bmu3_1,],
-                ]
-            ]
         ];
 
         echo json_encode($sfix, JSON_PRETTY_PRINT).PHP_EOL;
-
-        foreach ($sfix as &$fixture) {
-            $fixture[0]= $this->calcScriptFromString($mapOps, $fixture[0]);
-            foreach ($fixture[1] as &$record) {
-                $record[1] = $this->calcScriptFromString($mapOps, $record[1]);
-                $record[2] = $this->calcScriptFromString($mapOps, $record[2]);
-            }
-        }
-        return $sfix;
     }
 
 
@@ -184,7 +133,7 @@ class ScriptBranchTest extends AbstractTestCase
     /**
      * @param ScriptInterface $script
      * @param array $fixtureData
-     * @dataProvider getScriptBranchFixtures2
+     * @dataProvider getScriptBranchFixtures3
      */
     public function testBranchTest(ScriptInterface $script, array $fixtureData)
     {

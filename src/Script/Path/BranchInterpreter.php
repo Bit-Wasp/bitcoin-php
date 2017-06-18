@@ -171,7 +171,6 @@ class BranchInterpreter
                 }
 
                 $tracer->operation($operation);
-
             } else if ($fExec) {
                 // Fill up trace with executed opcodes
                 $tracer->operation($operation);

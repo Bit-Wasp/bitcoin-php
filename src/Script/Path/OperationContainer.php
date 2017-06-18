@@ -21,7 +21,8 @@ class OperationContainer implements \ArrayAccess, \Countable
      * OperationContainer constructor.
      * @param array $operations
      */
-    public function __construct(array $operations = []) {
+    public function __construct(array $operations = [])
+    {
         foreach ($operations as $operation) {
             if (!($operation instanceof Operation)) {
                 throw new \InvalidArgumentException("Invalid argument - array of Operations required");
@@ -51,14 +52,16 @@ class OperationContainer implements \ArrayAccess, \Countable
     /**
      * @return array|Operation[]
      */
-    public function all() {
+    public function all()
+    {
         return $this->container;
     }
 
     /**
      * @return int
      */
-    public function count() {
+    public function count()
+    {
         return $this->count;
     }
 
@@ -66,7 +69,8 @@ class OperationContainer implements \ArrayAccess, \Countable
      * @param int $offset
      * @param Operation $value
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         throw new \RuntimeException("Not implemented");
     }
 
@@ -74,14 +78,16 @@ class OperationContainer implements \ArrayAccess, \Countable
      * @param int $offset
      * @return bool
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->container[$offset]);
     }
 
     /**
      * @param int $offset
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->container[$offset]);
     }
 
@@ -89,7 +95,8 @@ class OperationContainer implements \ArrayAccess, \Countable
      * @param int $offset
      * @return Operation|null
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
 }
