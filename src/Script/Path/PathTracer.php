@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-
 use BitWasp\Bitcoin\Script\Parser\Operation;
 
 class PathTracer
@@ -63,7 +62,6 @@ class PathTracer
 
             $this->addToCurrent($operation);
             $this->makeSegment();
-
         } else {
             $this->addToCurrent($operation);
         }
