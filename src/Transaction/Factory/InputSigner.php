@@ -563,6 +563,44 @@ class InputSigner
     }
 
     /**
+     * @return OutputData
+     */
+    public function getSignScript()
+    {
+        return $this->signScript;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isP2SH()
+    {
+        if ($this->scriptPubKey->getType() === ScriptType::P2SH && ($this->redeemScript instanceof OutputData)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isP2WSH()
+    {
+        if ($this->redeemScript instanceof OutputData) {
+            if ($this->redeemScript->getType() === ScriptType::P2WSH && ($this->witnessScript instanceof OutputData)) {
+                return true;
+            }
+        }
+
+        if ($this->scriptPubKey->getType() === ScriptType::P2WSH && ($this->witnessScript instanceof OutputData)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Sign the input using $key and $sigHashTypes
      *
      * @param PrivateKeyInterface $key
