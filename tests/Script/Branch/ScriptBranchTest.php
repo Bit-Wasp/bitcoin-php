@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Branch;
 
-use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Path\BranchInterpreter;
 use BitWasp\Bitcoin\Script\Script;
@@ -70,46 +69,6 @@ class ScriptBranchTest extends AbstractTestCase
 
         return $builder->getScript();
     }
-
-    public function getScriptBranchFixtures2()
-    {
-        $opcodes = new Opcodes();
-        $mapOps = $this->calcMapOpNames($opcodes);
-        $r1 = "0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea";
-        $r2 = "0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6";
-        $alice = "0x21 0x0228d9678b4edc130efb1fd3e31fc33004237c53632657ebd18244fe6cf05fb4d3";
-        $bob = "0x21 0x02d99b5b59775b152861a62a068896d9eecd550c9acfb18df1cb05cadef26a2b7e";
-        $csvTime = Number::int(6000)->getHex();
-        $cltvTime = Number::int(6000)->getHex();
-
-        $s1 = "HASH160 DUP {$r1} EQUAL IF {$csvTime} CHECKSEQUENCEVERIFY 2DROP {$alice} ELSE {$r2} EQUAL NOTIF {$cltvTime} CHECKLOCKTIMEVERIFY DROP ENDIF {$bob} ENDIF CHECKSIG";
-
-        $ba1 = [true];
-        $bs1 = "HASH160 DUP {$r1} EQUAL IF {$csvTime} CHECKSEQUENCEVERIFY 2DROP {$alice} ELSE NOTIF ENDIF ENDIF CHECKSIG";
-        $bmu1 = "HASH160 DUP {$r1} EQUAL {$csvTime} CHECKSEQUENCEVERIFY 2DROP {$alice} CHECKSIG";
-
-        $ba2 = [false, false];
-        $bs2 = "HASH160 DUP {$r1} EQUAL IF ELSE {$r2} EQUAL NOTIF {$cltvTime} CHECKLOCKTIMEVERIFY DROP ENDIF {$bob} ENDIF CHECKSIG";
-        $bmu2 = "HASH160 DUP {$r1} EQUAL {$r2} EQUAL {$cltvTime} CHECKLOCKTIMEVERIFY DROP {$bob} CHECKSIG";
-
-        $ba3 = [false, true];
-        $bs3 = "HASH160 DUP {$r1} EQUAL IF ELSE {$r2} EQUAL NOTIF ENDIF {$bob} ENDIF CHECKSIG";
-        $bmu3 = "HASH160 DUP {$r1} EQUAL {$r2} EQUAL NOTIF DROP {$bob} CHECKSIG";
-
-        $sfix = [
-            [
-                $s1,
-                [
-                    [$ba1, $bs1, $bmu1],
-                    [$ba2, $bs2, $bmu2],
-                    [$ba3, $bs3, $bmu3],
-                ],
-            ],
-        ];
-
-        echo json_encode($sfix, JSON_PRETTY_PRINT).PHP_EOL;
-    }
-
 
     public function getScriptBranchFixtures3()
     {
