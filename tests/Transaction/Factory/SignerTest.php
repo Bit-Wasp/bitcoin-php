@@ -274,15 +274,21 @@ class SignerTest extends AbstractTestCase
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {
             $origSigner = $signer->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
             $inSigner = $recovered->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
-            $this->assertEquals(count($origSigner->getPublicKeys()), count($inSigner->getPublicKeys()), 'should recover same # public keys');
-            $this->assertEquals(count($origSigner->getSignatures()), count($inSigner->getSignatures()), 'should recover same # signatures');
 
-            for ($j = 0, $l = count($origSigner->getPublicKeys()); $j < $l; $j++) {
-                $this->assertEquals($origSigner->getPublicKeys()[$j]->getBinary(), $inSigner->getPublicKeys()[$j]->getBinary());
+            $okey = $origSigner->getPublicKeys();
+            $osig = $origSigner->getSignatures();
+            $ikey = $inSigner->getPublicKeys();
+            $isig = $inSigner->getSignatures();
+            
+            $this->assertEquals(count($okey), count($ikey), 'should recover same # public keys');
+            $this->assertEquals(count($osig), count($isig), 'should recover same # signatures');
+
+            for ($j = 0, $l = count($okey); $j < $l; $j++) {
+                $this->assertTrue($okey[$j]->equals($ikey[$j]));
             }
 
-            for ($j = 0, $l = count($origSigner->getSignatures()); $j < $l; $j++) {
-                $this->assertEquals($origSigner->getSignatures()[$j]->getBinary(), $inSigner->getSignatures()[$j]->getBinary());
+            for ($j = 0, $l = count($osig); $j < $l; $j++) {
+                $this->assertTrue($osig[$j]->equals($isig[$j]));
             }
 
             $this->assertEquals($origSigner->isFullySigned(), $inSigner->isFullySigned(), 'should recover same isFullySigned');
@@ -290,41 +296,11 @@ class SignerTest extends AbstractTestCase
 
             $origValues = $origSigner->serializeSignatures();
             $inValues = $inSigner->serializeSignatures();
+
             $this->assertTrue($origValues->getScriptSig()->equals($inValues->getScriptSig()));
             $this->assertTrue($origValues->getScriptWitness()->equals($inValues->getScriptWitness()));
             $this->assertTrue($inSigner->verify());
         }
-    }
-
-    /**
-     * @param TransactionInterface $spendTx
-     * @param Utxo $utxo
-     * @param SignData $signData
-     * @param InputSigner $origSigner
-     */
-    public function checkWeCanRecoverState(TransactionInterface $spendTx, Utxo $utxo, SignData $signData, InputSigner $origSigner)
-    {
-        $recovered = new Signer($spendTx);
-        $inSigner = $recovered->input(0, $utxo->getOutput(), $signData);
-
-        $this->assertEquals(count($origSigner->getPublicKeys()), count($inSigner->getPublicKeys()), 'should recover same # public keys');
-        $this->assertEquals(count($origSigner->getSignatures()), count($inSigner->getSignatures()), 'should recover same # signatures');
-
-        for ($i = 0, $l = count($origSigner->getPublicKeys()); $i < $l; $i++) {
-            $this->assertEquals($origSigner->getPublicKeys()[$i]->getBinary(), $inSigner->getPublicKeys()[$i]->getBinary());
-        }
-
-        for ($i = 0, $l = count($origSigner->getSignatures()); $i < $l; $i++) {
-            $this->assertEquals($origSigner->getSignatures()[$i]->getBinary(), $inSigner->getSignatures()[$i]->getBinary());
-        }
-
-        $this->assertEquals($origSigner->isFullySigned(), $inSigner->isFullySigned(), 'should recover same isFullySigned');
-        $this->assertEquals($origSigner->getRequiredSigs(), $inSigner->getRequiredSigs(), 'should recover same # requiredSigs');
-
-        $origValues = $origSigner->serializeSignatures();
-        $inValues = $inSigner->serializeSignatures();
-        $this->assertTrue($origValues->getScriptSig()->equals($inValues->getScriptSig()));
-        $this->assertTrue($origValues->getScriptWitness()->equals($inValues->getScriptWitness()));
     }
 
     /**
