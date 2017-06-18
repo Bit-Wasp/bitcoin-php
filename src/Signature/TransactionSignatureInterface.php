@@ -16,4 +16,10 @@ interface TransactionSignatureInterface extends SerializableInterface
      * @return int|string
      */
     public function getHashType();
+
+    /**
+     * @param TransactionSignatureInterface $other
+     * @return bool
+     */
+    public function equals(TransactionSignatureInterface $other);
 }
