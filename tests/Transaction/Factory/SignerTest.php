@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Script\Classifier\OutputData;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -156,8 +157,12 @@ class SignerTest extends AbstractTestCase
                 $utxos[] = new Utxo($outpoint, $txOut);
 
                 $signData = new SignData();
-                $signData->p2sh(ScriptFactory::fromHex($input['redeemScript']));
-                $signData->p2wsh(ScriptFactory::fromHex($input['witnessScript']));
+                if (array_key_exists('redeemScript', $input) && "" !== $input['redeemScript']) {
+                    $signData->p2sh(ScriptFactory::fromHex($input['redeemScript']));
+                }
+                if (array_key_exists('witnessScript', $input) && "" !== $input['witnessScript']) {
+                    $signData->p2wsh(ScriptFactory::fromHex($input['witnessScript']));
+                }
                 $signData->signaturePolicy(isset($input['signaturePolicy']) ? $this->getScriptFlagsFromString($input['signaturePolicy']) : $policy);
                 $signDatas[] = $signData;
             }
@@ -226,6 +231,9 @@ class SignerTest extends AbstractTestCase
             $inSigner = $signer->input($i, $utxo->getOutput(), $signData);
             $this->assertFalse($inSigner->isFullySigned());
             $this->assertFalse($inSigner->verify());
+            $this->assertTrue($inSigner->getSignScript() instanceof OutputData);
+            $this->assertEquals($signData->hasRedeemScript(), $inSigner->isP2SH());
+            $this->assertEquals($signData->hasWitnessScript(), $inSigner->isP2WSH());
 
             foreach ($signSteps as $keyAndHashType) {
                 list ($privateKey, $sigHashType) = $keyAndHashType;
@@ -301,7 +309,7 @@ class SignerTest extends AbstractTestCase
             $this->assertEquals($origSigner->getSignatures()[$i]->getBinary(), $inSigner->getSignatures()[$i]->getBinary());
         }
 
-        $this->assertEquals($origSigner->isFullySigned(), count($inSigner->isFullySigned()), 'should recover same isFullySigned');
+        $this->assertEquals($origSigner->isFullySigned(), $inSigner->isFullySigned(), 'should recover same isFullySigned');
         $this->assertEquals($origSigner->getRequiredSigs(), $inSigner->getRequiredSigs(), 'should recover same # requiredSigs');
 
         $origValues = $origSigner->serializeSignatures();
