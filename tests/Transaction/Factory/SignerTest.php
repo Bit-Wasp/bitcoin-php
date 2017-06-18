@@ -16,14 +16,12 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Bitcoin\Transaction\Factory\InputSigner;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\Buffer;
@@ -81,45 +79,6 @@ class SignerTest extends AbstractTestCase
     {
         $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2shScript->getBuffer()));
         return [$scriptPubKey, $p2shScript, null];
-    }
-
-    /**
-     * Convenience function to create P2WSH version of given script
-     * @param ScriptInterface $witnessScript
-     * @return array
-     */
-    private function p2wshScript(ScriptInterface $witnessScript)
-    {
-        $scriptPubKey = ScriptFactory::scriptPubKey()->witnessScriptHash(Hash::sha256($witnessScript->getBuffer()));
-        return [$scriptPubKey, null, $witnessScript];
-    }
-
-    /**
-     * Convenience function to create P2WSH version of given script
-     * @param ScriptInterface $witnessScript
-     * @return array
-     */
-    private function p2shp2wshScript(ScriptInterface $witnessScript)
-    {
-        $p2shScript = ScriptFactory::scriptPubKey()->witnessScriptHash(Hash::sha256($witnessScript->getBuffer()));
-        $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2shScript->getBuffer()));
-
-        return [$scriptPubKey, $p2shScript, $witnessScript];
-    }
-
-    /**
-     * Produces test vectors for allowed P2WPKH representations
-     *
-     * @param EcAdapterInterface $ecAdapter
-     * @return array
-     */
-    private function p2wpkhTests(EcAdapterInterface $ecAdapter)
-    {
-        list ($p2wpkh, $keys)  = $this->getScriptAndKeys(ScriptType::P2WKH, $ecAdapter);
-        return [
-            [$ecAdapter, $keys, $p2wpkh, null, null],
-            array_merge([$ecAdapter, $keys], $this->p2shScript($p2wpkh))
-        ];
     }
 
     /**
@@ -231,9 +190,12 @@ class SignerTest extends AbstractTestCase
             $inSigner = $signer->input($i, $utxo->getOutput(), $signData);
             $this->assertFalse($inSigner->isFullySigned());
             $this->assertFalse($inSigner->verify());
-            $this->assertTrue($inSigner->getSignScript() instanceof OutputData);
+
             $this->assertEquals($signData->hasRedeemScript(), $inSigner->isP2SH());
             $this->assertEquals($signData->hasWitnessScript(), $inSigner->isP2WSH());
+            $this->assertTrue($inSigner->getSignScript() instanceof OutputData);
+            $this->assertNotEquals(ScriptType::P2SH, $inSigner->getSignScript());
+            $this->assertNotEquals(ScriptType::P2WSH, $inSigner->getSignScript());
 
             if ($signData->hasRedeemScript()) {
                 $this->assertEquals(ScriptType::P2SH, $inSigner->getScriptPubKey()->getType());
