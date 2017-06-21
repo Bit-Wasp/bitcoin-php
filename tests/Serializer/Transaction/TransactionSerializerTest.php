@@ -17,7 +17,7 @@ class TransactionSerializerTest extends AbstractTestCase
         $vectors = [];
         foreach ($fixtures['valid'] as $vector) {
             if (array_key_exists('hex', $vector) && $vector['hex'] !== '') {
-                $vectors[] = [TransactionSerializer::NO_WITNESS, $vector['hex']];
+                $vectors[] = [0, $vector['hex']];
             }
             if (array_key_exists('whex', $vector)&& $vector['whex'] !== '') {
                 $vectors[] = [0, $vector['whex']];
@@ -42,7 +42,7 @@ class TransactionSerializerTest extends AbstractTestCase
 
     public function testValidTxinVarint()
     {
-        $hex = $this->dataFile("biginputtx.valid.txt");
+        $hex = trim($this->dataFile("biginputtx.valid.txt"));
         $tx = TransactionFactory::fromHex($hex);
         $this->assertEquals(300, count($tx->getInputs()));
         
@@ -57,7 +57,7 @@ class TransactionSerializerTest extends AbstractTestCase
     public function testInvalidTxinVarint()
     {
         // not perfect, but gotta explode somewhere
-        $hex = file_get_contents('biginputtx.invalid.txt');
+        $hex = trim($this->dataFile('biginputtx.invalid.txt'));
         TransactionFactory::fromHex($hex);
     }
 }
