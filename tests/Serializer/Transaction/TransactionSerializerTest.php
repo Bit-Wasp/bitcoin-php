@@ -57,7 +57,7 @@ class TransactionSerializerTest extends AbstractTestCase
     public function testInvalidTxinVarint()
     {
         // not perfect, but gotta explode somewhere
-        $hex = file_get_contents('biginputtx.invalid.txt');
+        $hex = $this->dataFile('biginputtx.invalid.txt');
         TransactionFactory::fromHex($hex);
     }
 }
