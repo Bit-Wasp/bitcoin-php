@@ -95,8 +95,7 @@ class TransactionSerializer implements TransactionSerializerInterface
             $flags ^= 1;
             $witCount = count($vin);
             for ($i = 0; $i < $witCount; $i++) {
-                $vectorCount = $this->varint->read($parser);
-                $vwit[] = $this->witnessSerializer->fromParser($parser, $vectorCount);
+                $vwit[] = $this->witnessSerializer->fromParser($parser);
             }
         }
 
@@ -138,12 +137,12 @@ class TransactionSerializer implements TransactionSerializerInterface
             $parser->appendBinary(pack("CC", 0, $flags));
         }
 
-        $parser->appendBinary($this->varint->write(count($transaction->getInputs())), true);
+        $parser->appendBinary($this->varint->write(count($transaction->getInputs())));
         foreach ($transaction->getInputs() as $input) {
             $parser->appendBuffer($this->inputSerializer->serialize($input));
         }
 
-        $parser->appendBinary($this->varint->write(count($transaction->getOutputs())), true);
+        $parser->appendBinary($this->varint->write(count($transaction->getOutputs())));
         foreach ($transaction->getOutputs() as $output) {
             $parser->appendBuffer($this->outputSerializer->serialize($output));
         }
