@@ -40,7 +40,7 @@ class SignerTest extends AbstractTestCase
             $inputs = $fixture['raw']['ins'];
             $outputs = $fixture['raw']['outs'];
             $locktime = isset($fixture['raw']['locktime']) ? $fixture['raw']['locktime'] : 0;
-            $policy = Interpreter::VERIFY_NONE | Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_MINIMALDATA;
+            $policy = Interpreter::VERIFY_NONE | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY;
             if (isset($fixture['signaturePolicy'])) {
                 $policy = $this->getScriptFlagsFromString($fixture['signaturePolicy']);
             }
@@ -69,7 +69,8 @@ class SignerTest extends AbstractTestCase
                 if (array_key_exists('witnessScript', $input) && "" !== $input['witnessScript']) {
                     $signData->p2wsh(ScriptFactory::fromHex($input['witnessScript']));
                 }
-                $signData->signaturePolicy(isset($input['signaturePolicy']) ? $this->getScriptFlagsFromString($input['signaturePolicy']) : $policy);
+                $inputPolicy = isset($input['signaturePolicy']) ? $this->getScriptFlagsFromString($input['signaturePolicy']) : $policy;
+                $signData->signaturePolicy($inputPolicy);
                 $signDatas[] = $signData;
             }
 
