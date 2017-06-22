@@ -38,6 +38,7 @@
   },
   "require-dev": {
     "ext-json": "*",
-    "bitwasp/testing-php": "~0.1.0"
+    "phpunit/phpunit": "^5.4.0",
+    "squizlabs/php_codesniffer": "^2.0.0"
   }
 }

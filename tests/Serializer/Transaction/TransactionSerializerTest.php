@@ -8,38 +8,7 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 
 class TransactionSerializerTest extends AbstractTestCase
 {
-    public function getTransactionSerializationFixtures()
-    {
-        $fixtures = json_decode($this->dataFile('signer_fixtures.json'), true);
-        if (!$fixtures) {
-            throw new \RuntimeException("bad tx serialization fixtures");
-        }
-        $vectors = [];
-        foreach ($fixtures['valid'] as $vector) {
-            if (array_key_exists('hex', $vector) && $vector['hex'] !== '') {
-                $vectors[] = [0, $vector['hex']];
-            }
-            if (array_key_exists('whex', $vector)&& $vector['whex'] !== '') {
-                $vectors[] = [0, $vector['whex']];
-            }
-        }
-        return $vectors;
-    }
-
-    /**
-     * @param int $flags
-     * @param string $tx
-     * @dataProvider getTransactionSerializationFixtures
-     */
-    public function testTransactionSerializer($flags, $tx)
-    {
-        $serializer = new TransactionSerializer();
-        $parsed = $serializer->parse($tx);
     
-        $serialized = $serializer->serialize($parsed);
-        $this->assertEquals($tx, $serialized->getHex());
-    }
-
     public function testValidTxinVarint()
     {
         $hex = trim($this->dataFile("biginputtx.valid.txt"));
