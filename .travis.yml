@@ -82,7 +82,7 @@ install:
             sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so &&
             sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so.0 &&
             cd .. &&
-            git clone https://github.com/Bit-Wasp/bitcoinconsensus-php &&
+            git clone -b v2.0.0 https://github.com/Bit-Wasp/bitcoinconsensus-php &&
             cd bitcoinconsensus-php/bitcoinconsensus &&
             phpize && ./configure --with-bitcoinconsensus &&
             make && sudo make install && cd ../..;
