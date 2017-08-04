@@ -29,7 +29,7 @@ $outpoint = new OutPoint(Buffer::hex('5df04c88810066136619ce715ae9350113b0d4157f
 $txOut = new TransactionOutput(95590000, $p2shScript->getOutputScript());
 
 // Move UTXO to pub-key-hash
-($builder = new TxBuilder())
+$builder = (new TxBuilder())
     ->spendOutPoint($outpoint)
     ->payToAddress(94550000, $key->getPublicKey()->getAddress());
 
