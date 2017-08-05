@@ -20,7 +20,7 @@ class WitnessScriptTest extends AbstractTestCase
     {
         return [
             [new WitnessScript(new Script(new Buffer())), "Cannot nest V0 P2WSH scripts."],
-            [new P2shScript(new Script(new Buffer())), "Cannot embed a P2SH script in a V2 P2WSH script."],
+            [new P2shScript(new Script(new Buffer())), "Cannot embed a P2SH script in a V0 P2WSH script."],
         ];
     }
 

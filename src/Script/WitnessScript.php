@@ -13,6 +13,11 @@ class WitnessScript extends Script
     private $outputScript;
 
     /**
+     * @var \BitWasp\Buffertools\BufferInterface
+     */
+    protected $witnessScriptHash;
+
+    /**
      * @var WitnessProgram|null
      */
     private $witnessProgram;
@@ -28,7 +33,7 @@ class WitnessScript extends Script
         if ($script instanceof self) {
             throw new WitnessScriptException("Cannot nest V0 P2WSH scripts.");
         } else if ($script instanceof P2shScript) {
-            throw new WitnessScriptException("Cannot embed a P2SH script in a V2 P2WSH script.");
+            throw new WitnessScriptException("Cannot embed a P2SH script in a V0 P2WSH script.");
         }
 
         parent::__construct($script->getBuffer(), $opcodes);
