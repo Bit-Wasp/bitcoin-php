@@ -30,6 +30,10 @@ class WitnessProgram
      */
     public function __construct($version, BufferInterface $program)
     {
+        if ($this->version < 0 || $this->version > 16) {
+            throw new \RuntimeException("Invalid witness program version");
+        }
+
         $this->version = $version;
         $this->program = $program;
     }
@@ -71,7 +75,7 @@ class WitnessProgram
     public function getScript()
     {
         if (null === $this->outputScript) {
-            $this->outputScript = ScriptFactory::sequence([$this->version, $this->program]);
+            $this->outputScript = ScriptFactory::sequence([encodeOpN($this->version), $this->program]);
         }
 
         return $this->outputScript;
