@@ -7,16 +7,20 @@ use BitWasp\Bitcoin\Exceptions\P2shScriptException;
 
 class P2shScript extends Script
 {
-
     /**
-     * @var ScriptHashAddress
+     * @var \BitWasp\Buffertools\BufferInterface
      */
-    private $address;
+    protected $scriptHash;
 
     /**
      * @var ScriptInterface
      */
     private $outputScript;
+
+    /**
+     * @var ScriptHashAddress
+     */
+    private $address;
 
     /**
      * P2shScript constructor.
@@ -33,6 +37,7 @@ class P2shScript extends Script
         }
 
         parent::__construct($script->getBuffer(), $opcodes);
+
         $this->scriptHash = $script->getScriptHash();
         $this->outputScript = ScriptFactory::scriptPubKey()->p2sh($this->scriptHash);
         $this->address = new ScriptHashAddress($this->scriptHash);
