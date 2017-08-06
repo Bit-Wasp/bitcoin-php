@@ -166,9 +166,6 @@ class Bech32Test extends AbstractTestCase
         $wp = Bech32::decodeSegwit($hrp, $bech32);
         $this->assertEquals($hexScript, $wp->getScript()->getHex());
 
-        $script = $wp->getScript();
-        $this->assertEquals($hexScript, $script->getHex());
-
         $addr = Bech32::encodeSegwit($hrp, $wp);
         $this->assertEquals(strtolower($bech32), strtolower($addr));
     }
