@@ -80,9 +80,24 @@ class InputSigner
     private $signScript;
 
     /**
+     * @var bool
+     */
+    private $tolerateInvalidPublicKey = false;
+
+    /**
+     * @var SignData
+     */
+    private $signData;
+
+    /**
      * @var int
      */
     private $sigVersion;
+
+    /**
+     * @var int
+     */
+    private $flags;
 
     /**
      * @var OutputData $witnessKeyHash
@@ -151,15 +166,11 @@ class InputSigner
      */
     public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
     {
-        $inputs = $tx->getInputs();
-        if (!isset($inputs[$nInput])) {
-            throw new \RuntimeException('No input at this index');
-        }
-
         $this->ecAdapter = $ecAdapter;
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
+        $this->signData = $signData;
         $this->flags = $signData->hasSignaturePolicy() ? $signData->getSignaturePolicy() : Interpreter::VERIFY_NONE;
         $this->publicKeys = [];
         $this->signatures = [];
@@ -168,8 +179,50 @@ class InputSigner
         $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
         $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
         $this->interpreter = new Interpreter($this->ecAdapter);
+    }
 
-        $this->solve($signData, $txOut->getScript(), $inputs[$nInput]->getScript(), isset($tx->getWitnesses()[$nInput]) ? $tx->getWitnesses()[$nInput]->all() : []);
+    /**
+     * @return InputSigner
+     */
+    public function extract()
+    {
+        $witnesses = $this->tx->getWitnesses();
+        $witness = array_key_exists($this->nInput, $witnesses) ? $witnesses[$this->nInput]->all() : [];
+
+        return $this->solve(
+            $this->signData,
+            $this->txOut->getScript(),
+            $this->tx->getInput($this->nInput)->getScript(),
+            $witness
+        );
+    }
+
+    /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function tolerateInvalidPublicKey($setting)
+    {
+        $this->tolerateInvalidPublicKey = (bool) $setting;
+        return $this;
+    }
+
+    /**
+     * @param BufferInterface $vchPubKey
+     * @return PublicKeyInterface|null
+     * @throws \Exception
+     */
+    protected function parseStepPublicKey(BufferInterface $vchPubKey)
+    {
+        try {
+            return $this->pubKeySerializer->parse($vchPubKey);
+        } catch (\Exception $e) {
+            if ($this->tolerateInvalidPublicKey) {
+                return null;
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -317,7 +370,7 @@ class InputSigner
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
-                $this->publicKeys = [$this->pubKeySerializer->parse($stack[1])];
+                $this->publicKeys = [$this->parseStepPublicKey($stack[1])];
             }
         } else if (ScriptType::P2PK === $type) {
             $this->requiredSigs = 1;
@@ -327,12 +380,17 @@ class InputSigner
                 }
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
             }
-            $this->publicKeys = [$this->pubKeySerializer->parse($outputData->getSolution())];
+            $this->publicKeys = [$this->parseStepPublicKey($outputData->getSolution())];
         } else if (ScriptType::MULTISIG === $type) {
             $info = new Multisig($outputData->getScript(), $this->pubKeySerializer);
             $this->requiredSigs = $info->getRequiredSigCount();
-            $this->publicKeys = $info->getKeys();
-            $keyBufs = $info->getKeyBuffers();
+
+            $keyBuffers = $info->getKeyBuffers();
+            $this->publicKeys = [];
+            for ($i = 0; $i < $info->getKeyCount(); $i++) {
+                $this->publicKeys[$i] = $this->parseStepPublicKey($keyBuffers[$i]);
+            }
+
             if ($size > 1) {
                 // Check signatures irrespective of scriptSig size, primes Checker cache, and need info
                 $check = $this->evaluateSolution($outputData->getScript(), $stack, $sigVersion);
@@ -344,14 +402,14 @@ class InputSigner
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
 
-                $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBufs, $sigVersion);
+                $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBuffers, $sigVersion);
 
                 // Here we learn if any signatures were invalid, it won't be in the map.
                 if ($sigBufCount !== count($keyToSigMap)) {
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
 
-                foreach ($keyBufs as $idx => $key) {
+                foreach ($keyBuffers as $idx => $key) {
                     if (isset($keyToSigMap[$key])) {
                         $this->signatures[$idx] = $this->txSigSerializer->parse($keyToSigMap[$key]);
                     }
@@ -635,37 +693,44 @@ class InputSigner
     /**
      * Sign the input using $key and $sigHashTypes
      *
-     * @param PrivateKeyInterface $key
+     * @param PrivateKeyInterface $privateKey
      * @param int $sigHashType
      * @return $this
      */
-    public function sign(PrivateKeyInterface $key, $sigHashType = SigHash::ALL)
+    public function sign(PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
     {
         if ($this->isFullySigned()) {
             return $this;
         }
 
-        if (SigHash::V1 === $this->sigVersion && !$key->isCompressed()) {
+        if (SigHash::V1 === $this->sigVersion && !$privateKey->isCompressed()) {
             throw new \RuntimeException('Uncompressed keys are disallowed in segwit scripts - refusing to sign');
         }
 
         if ($this->signScript->getType() === ScriptType::P2PK) {
-            if (!$this->pubKeySerializer->serialize($key->getPublicKey())->equals($this->signScript->getSolution())) {
+            if (!$this->pubKeySerializer->serialize($privateKey->getPublicKey())->equals($this->signScript->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
-            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+            $this->signatures[0] = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
         } else if ($this->signScript->getType() === ScriptType::P2PKH) {
-            if (!$key->getPubKeyHash($this->pubKeySerializer)->equals($this->signScript->getSolution())) {
+            $publicKey = $privateKey->getPublicKey();
+            if (!$publicKey->getPubKeyHash()->equals($this->signScript->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
-            $this->signatures[0] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
-            $this->publicKeys[0] = $key->getPublicKey();
+
+            if (!array_key_exists(0, $this->signatures)) {
+                $this->signatures[0] = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+            }
+
+            $this->publicKeys[0] = $publicKey;
         } else if ($this->signScript->getType() === ScriptType::MULTISIG) {
             $signed = false;
             foreach ($this->publicKeys as $keyIdx => $publicKey) {
-                if ($key->getPublicKey()->equals($publicKey)) {
-                    $this->signatures[$keyIdx] = $this->calculateSignature($key, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
-                    $signed = true;
+                if ($publicKey instanceof PublicKeyInterface) {
+                    if ($privateKey->getPublicKey()->equals($publicKey)) {
+                        $this->signatures[$keyIdx] = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+                        $signed = true;
+                    }
                 }
             }
 

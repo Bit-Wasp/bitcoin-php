@@ -6,9 +6,15 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Buffertools\BufferInterface;
 
 abstract class Key extends Serializable implements KeyInterface
 {
+    /**
+     * @var BufferInterface
+     */
+    protected $pubKeyHash;
+
     /**
      * @return bool
      */
@@ -29,7 +35,11 @@ abstract class Key extends Serializable implements KeyInterface
             $publicKey = $this;
         }
 
-        return Hash::sha256ripe160($serializer ? $serializer->serialize($publicKey) : $publicKey->getBuffer());
+        if (null === $this->pubKeyHash) {
+            $this->pubKeyHash = Hash::sha256ripe160($serializer ? $serializer->serialize($publicKey) : $publicKey->getBuffer());
+        }
+
+        return $this->pubKeyHash;
     }
 
     /**

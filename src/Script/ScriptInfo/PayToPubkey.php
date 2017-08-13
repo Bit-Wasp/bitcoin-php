@@ -3,14 +3,14 @@
 namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Buffertools\BufferInterface;
 
-class PayToPubkey implements ScriptInfoInterface
+class PayToPubkey
 {
     /**
-     * @var PublicKeyInterface
+     * @var BufferInterface
      */
     private $publicKey;
 
@@ -23,7 +23,7 @@ class PayToPubkey implements ScriptInfoInterface
         if (count($chunks) !== 2 || !$chunks[0]->isPush() || $chunks[1]->getOp() !== Opcodes::OP_CHECKSIG) {
             throw new \InvalidArgumentException('Malformed pay-to-pubkey script');
         }
-        $this->publicKey = PublicKeyFactory::fromHex($chunks[0]->getData());
+        $this->publicKey = $chunks[0]->getData();
     }
 
     /**
@@ -48,14 +48,14 @@ class PayToPubkey implements ScriptInfoInterface
      */
     public function checkInvolvesKey(PublicKeyInterface $publicKey)
     {
-        return $publicKey->getBinary() === $this->publicKey->getBinary();
+        return $publicKey->getBuffer()->equals($this->publicKey);
     }
 
     /**
-     * @return PublicKeyInterface[]
+     * @return BufferInterface[]
      */
-    public function getKeys()
+    public function getKeyBuffer()
     {
-        return [$this->publicKey];
+        return $this->publicKey;
     }
 }

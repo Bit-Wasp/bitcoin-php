@@ -15,8 +15,9 @@ class PayToPubkeyHashTest extends AbstractTestCase
     {
         $priv = PrivateKeyFactory::create();
         $pub = $priv->getPublicKey();
+        $keyHash = $pub->getPubKeyHash();
+        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($keyHash);
 
-        $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($pub->getPubKeyHash());
         $classifier = new OutputClassifier();
         $this->assertEquals(ScriptType::P2PKH, $classifier->classify($script));
 
@@ -28,5 +29,7 @@ class PayToPubkeyHashTest extends AbstractTestCase
         $otherpriv = PrivateKeyFactory::create();
         $otherpub = $otherpriv->getPublicKey();
         $this->assertFalse($info->checkInvolvesKey($otherpub));
+
+        $this->assertTrue($keyHash->equals($info->getPubKeyHash()));
     }
 }
