@@ -28,8 +28,8 @@ class ScriptFactoryTest extends AbstractTestCase
 
         $redeemScript = ScriptFactory::scriptPubKey()->multisig($m, $arbitrary, false);
         $info = new Multisig($redeemScript);
-        foreach ($info->getKeys() as $i => $key) {
-            $this->assertEquals($arbitrary[$i]->getBinary(), $key->getBinary(), 'verify false flag disables sorting');
+        foreach ($info->getKeyBuffers() as $i => $key) {
+            $this->assertTrue($arbitrary[$i]->getBuffer()->equals($key), 'verify false flag disables sorting');
         }
 
         $sorted = ScriptFactory::scriptPubKey()->multisig($m, $arbitrary, true);

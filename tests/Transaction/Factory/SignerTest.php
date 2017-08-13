@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -206,7 +207,14 @@ class SignerTest extends AbstractTestCase
             $this->assertEquals(count($osig), count($isig), 'should recover same # signatures');
 
             for ($j = 0, $l = count($okey); $j < $l; $j++) {
-                $this->assertTrue($okey[$j]->equals($ikey[$j]));
+                if ($okey[$j] === null) {
+                    $this->assertEquals(null, $ikey[$j]);
+                } else if ($okey[$j] instanceof PublicKeyInterface) {
+                    $this->assertInstanceOf(PublicKeyInterface::class, $ikey[$j]);
+                    $this->assertTrue($okey[$j]->equals($ikey[$j]));
+                } else {
+                    throw new \RuntimeException("Strange - getPublicKeys returned a value that was neither null or PublicKeyInterface");
+                }
             }
 
             for ($j = 0, $l = count($osig); $j < $l; $j++) {
@@ -287,5 +295,74 @@ class SignerTest extends AbstractTestCase
             ->get(), Bitcoin::getEcAdapter());
 
         $signer->input(0, $txOut)->getSigHash(20);
+    }
+
+    public function testDiscouragesInvalidKeysInScripts()
+    {
+        $caught = false;
+
+        try {
+            $this->doTestSignerInvalidKeyInteraction();
+        } catch (\Exception $e) {
+            $caught = true;
+        }
+
+        $this->assertTrue($caught, "Expect exception to be thrown in default state");
+    }
+
+    public function testCanRequireValidKeys()
+    {
+        $caught = false;
+        try {
+            $this->doTestSignerInvalidKeyInteraction(false);
+        } catch (\Exception $e) {
+            $caught = true;
+        }
+
+        $this->assertTrue($caught, "Expect exception with invalid key");
+    }
+
+    public function testCanDisablePublicKeyValidCheck()
+    {
+        $caught = false;
+        try {
+            $this->doTestSignerInvalidKeyInteraction(true);
+        } catch (\Exception $e) {
+            echo $e->getMessage().PHP_EOL;
+            $caught = true;
+        }
+        $this->assertFalse($caught, "No exception expected when tolerate=true");
+    }
+
+    /**
+     * @param null $tolerateBadKey
+     */
+    protected function doTestSignerInvalidKeyInteraction($tolerateBadKey = null)
+    {
+        $myKey = PrivateKeyFactory::create();
+        $badKey = Buffer::hex("031234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd");
+        $script = ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$myKey->getPublicKey()->getBuffer(), $badKey], false);
+
+        $txOut = new TransactionOutput(123123, $script);
+
+        $dest = $myKey->getPublicKey()->getAddress();
+
+        $tx = (new TxBuilder())
+            ->input("abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234", 0)
+            ->payToAddress(121000, $dest)
+            ->get();
+
+        $signer = new Signer($tx);
+        if ($tolerateBadKey != null) {
+            $signer->tolerateInvalidPublicKey($tolerateBadKey);
+        }
+
+        $input = $signer->input(0, $txOut);
+
+        if ($tolerateBadKey) {
+            // test case has just one invalid key.
+            $this->assertInstanceOf(PublicKeyInterface::class, $input->getPublicKeys()[0]);
+            $this->assertEquals(null, $input->getPublicKeys()[1]);
+        }
     }
 }

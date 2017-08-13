@@ -16,7 +16,7 @@ class MultisigTest extends AbstractTestCase
         $pub = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $otherpub = $pub->tweakAdd(gmp_init(1));
 
-        $script = ScriptFactory::scriptPubKey()->multisig(2, [$pub, $otherpub]);
+        $script = ScriptFactory::scriptPubKey()->multisig(2, [$pub, $otherpub], false);
         $classifier = new OutputClassifier();
         $this->assertEquals(ScriptType::MULTISIG, $classifier->classify($script));
 
@@ -28,5 +28,8 @@ class MultisigTest extends AbstractTestCase
 
         $unrelatedPub = $otherpub->tweakAdd(gmp_init(1));
         $this->assertFalse($info->checkInvolvesKey($unrelatedPub));
+
+        $this->assertTrue($info->getKeyBuffers()[0]->equals($pub->getBuffer()));
+        $this->assertTrue($info->getKeyBuffers()[1]->equals($otherpub->getBuffer()));
     }
 }

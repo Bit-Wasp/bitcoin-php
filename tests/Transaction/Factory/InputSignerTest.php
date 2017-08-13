@@ -85,7 +85,8 @@ class InputSignerTest extends AbstractTestCase
     public function testInvalidSolveSignData($description, EcAdapterInterface $ecAdapter, TransactionInterface $tx, TransactionOutput $txOut, SignData $signData, $exception, $exceptionMsg)
     {
         try {
-            new InputSigner($ecAdapter, $tx, 0, $txOut, $signData);
+            (new InputSigner($ecAdapter, $tx, 0, $txOut, $signData))
+                ->extract();
         } catch (\Exception $caught) {
             $this->assertInstanceOf($exception, $caught);
             $this->assertEquals($exceptionMsg, $caught->getMessage());
