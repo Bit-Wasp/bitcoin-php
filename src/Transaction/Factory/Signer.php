@@ -42,7 +42,7 @@ class Signer
     private $tolerateInvalidPublicKey = false;
 
     /**
-     * @var InputSigner[]
+     * @var InputSignerInterface[]
      */
     private $signatureCreator = [];
 
@@ -92,10 +92,10 @@ class Signer
     }
 
     /**
-     * @param $nIn
+     * @param int $nIn
      * @param TransactionOutputInterface $txOut
      * @param SignData|null $signData
-     * @return InputSigner
+     * @return InputSignerInterface
      */
     public function input($nIn, TransactionOutputInterface $txOut, SignData $signData = null)
     {
