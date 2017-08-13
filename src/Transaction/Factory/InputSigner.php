@@ -32,7 +32,7 @@ use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
-class InputSigner
+class InputSigner implements InputSignerInterface
 {
     /**
      * @var array
@@ -156,6 +156,8 @@ class InputSigner
 
     /**
      * InputSigner constructor.
+     *
+     * Note, the implementation of this
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
      * @param $nInput
@@ -479,7 +481,7 @@ class InputSigner
     }
 
     /**
-     * Called upon instance creation.
+     * Needs to be called before using the instance. By `extract`.
      *
      * It ensures that violating the following prevents instance creation
      *  - the scriptPubKey can be directly signed, or leads to P2SH/P2WSH/P2WKH
@@ -551,6 +553,8 @@ class InputSigner
     }
 
     /**
+     * Pure function to produce a signature hash for a given $scriptCode, $sigHashType, $sigVersion.
+     *
      * @param ScriptInterface $scriptCode
      * @param int $sigHashType
      * @param int $sigVersion
@@ -566,6 +570,8 @@ class InputSigner
     }
 
     /**
+     * Calculates the signature hash for the input for the given $sigHashType.
+     *
      * @param int $sigHashType
      * @return BufferInterface
      */
@@ -575,6 +581,8 @@ class InputSigner
     }
 
     /**
+     * Pure function to produce a signature for a given $key, $scriptCode, $sigHashType, $sigVersion.
+     *
      * @param PrivateKeyInterface $key
      * @param ScriptInterface $scriptCode
      * @param int $sigHashType
@@ -589,6 +597,8 @@ class InputSigner
     }
 
     /**
+     * Returns whether all required signatures have been provided.
+     *
      * @return bool
      */
     public function isFullySigned()
@@ -597,6 +607,8 @@ class InputSigner
     }
 
     /**
+     * Returns the required number of signatures for this input.
+     *
      * @return int
      */
     public function getRequiredSigs()
@@ -605,6 +617,9 @@ class InputSigner
     }
 
     /**
+     * Returns an array where the values are either null,
+     * or a TransactionSignatureInterface.
+     *
      * @return TransactionSignatureInterface[]
      */
     public function getSignatures()
@@ -613,6 +628,9 @@ class InputSigner
     }
 
     /**
+     * Returns an array where the values are either null,
+     * or a PublicKeyInterface.
+     *
      * @return PublicKeyInterface[]
      */
     public function getPublicKeys()
@@ -621,6 +639,10 @@ class InputSigner
     }
 
     /**
+     * OutputData for the script to be signed (will be
+     * equal to getScriptPubKey, or getRedeemScript, or
+     * getWitnessScript.
+     *
      * @return OutputData
      */
     public function getSignScript()
@@ -629,6 +651,8 @@ class InputSigner
     }
 
     /**
+     * OutputData for the txOut script.
+     *
      * @return OutputData
      */
     public function getScriptPubKey()
@@ -637,6 +661,8 @@ class InputSigner
     }
 
     /**
+     * Returns OutputData for the P2SH redeemScript.
+     *
      * @return OutputData
      */
     public function getRedeemScript()
@@ -649,6 +675,8 @@ class InputSigner
     }
 
     /**
+     * Returns OutputData for the P2WSH witnessScript.
+     *
      * @return OutputData
      */
     public function getWitnessScript()
@@ -661,6 +689,8 @@ class InputSigner
     }
 
     /**
+     * Returns whether the scriptPubKey is P2SH.
+     *
      * @return bool
      */
     public function isP2SH()
@@ -673,6 +703,8 @@ class InputSigner
     }
 
     /**
+     * Returns whether the scriptPubKey or redeemScript is P2WSH.
+     *
      * @return bool
      */
     public function isP2WSH()
