@@ -157,10 +157,15 @@ class InputSigner implements InputSignerInterface
     /**
      * InputSigner constructor.
      *
-     * Note, the implementation of this
+     * Note, the implementation of this class is considered internal
+     * and only the methods exposed on InputSignerInterface should
+     * be depended on to avoid BC breaks.
+     *
+     * The only recommended way to produce this class is using Signer::input()
+     *
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $tx
-     * @param $nInput
+     * @param int $nInput
      * @param TransactionOutputInterface $txOut
      * @param SignData $signData
      * @param TransactionSignatureSerializer|null $sigSerializer
