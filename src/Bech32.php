@@ -3,8 +3,6 @@
 namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Exceptions\Bech32Exception;
-use BitWasp\Bitcoin\Script\WitnessProgram;
-use BitWasp\Buffertools\Buffer;
 
 class Bech32
 {
@@ -234,61 +232,5 @@ class Bech32
         }
 
         return [$hrp, array_slice($data, 0, -6)];
-    }
-
-    /**
-     * Takes the $hrp and $witnessProgram and produces a native segwit
-     * address.
-     *
-     * @param string $hrp
-     * @param WitnessProgram $witnessProgram
-     * @return string
-     */
-    public static function encodeSegwit($hrp, WitnessProgram $witnessProgram)
-    {
-        $programChars = array_values(unpack('C*', $witnessProgram->getProgram()->getBinary()));
-        $programBits = self::convertBits($programChars, count($programChars), 8, 5, true);
-        $encodeData = array_merge([$witnessProgram->getVersion()], $programBits);
-
-        return self::encode($hrp, $encodeData);
-    }
-
-    /**
-     * Decodes the provided $bech32 string, validating against
-     * the chosen prefix.
-     *
-     * @param string $hrp
-     * @param string $bech32
-     * @return WitnessProgram
-     * @throws Bech32Exception
-     */
-    public static function decodeSegwit($hrp, $bech32)
-    {
-        list ($hrpGot, $data) = self::decode($bech32);
-        if ($hrpGot !== $hrp) {
-            throw new Bech32Exception('Invalid prefix for address');
-        }
-
-        $decoded = self::convertBits(array_slice($data, 1), count($data) - 1, 5, 8, false);
-        $decodeLen = count($decoded);
-        if ($decodeLen < 2 || $decodeLen > 40) {
-            throw new Bech32Exception('Invalid segwit address');
-        }
-
-        if ($data[0] > 16) {
-            throw new Bech32Exception('Invalid witness program version');
-        }
-
-        $bytes = '';
-        foreach ($decoded as $char) {
-            $bytes .= chr($char);
-        }
-        $decoded = new Buffer($bytes);
-
-        if (0 === $data[0]) {
-            return WitnessProgram::v0($decoded);
-        }
-
-        return new WitnessProgram($data[0], $decoded);
     }
 }

@@ -2,9 +2,13 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
+use BitWasp\Bitcoin\Address\SegwitBech32;
 use BitWasp\Bitcoin\Bech32;
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Exceptions\Bech32Exception;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 use function BitWasp\Bitcoin\Script\encodeOpN;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
@@ -20,24 +24,27 @@ class Bech32Test extends AbstractTestCase
         $p2wsh = WitnessProgram::v0($publicKeyScript->getWitnessScriptHash());
         $p2wpkh = WitnessProgram::v0($publicKey->getPubKeyHash());
 
+        $bc = NetworkFactory::bitcoin();
+        $tb = NetworkFactory::bitcoinTestnet();
+
         return [
             [
-                "bc",
+                $bc,
                 'bc1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3qccfmv3',
                 $p2wsh->getScript()->getBuffer()->getHex(),
             ],
             [
-                "tb",
+                $tb,
                 'tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7',
                 $p2wsh->getScript()->getBuffer()->getHex(),
             ],
             [
-                "bc",
+                $bc,
                 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
                 $p2wpkh->getScript()->getBuffer()->getHex(),
             ],
             [
-                "tb",
+                $tb,
                 'tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx',
                 $p2wpkh->getScript()->getBuffer()->getHex(),
             ],
@@ -70,8 +77,7 @@ class Bech32Test extends AbstractTestCase
             ["tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sL5k7"],
             ["tb1pw508d6qejxtdg4y5r3zarqfsj6c3"],
             ["tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3pjxtptv"],
-        ]
-        ;
+        ];
     }
 
     /**
@@ -79,34 +85,37 @@ class Bech32Test extends AbstractTestCase
      */
     public function getAddressVectors()
     {
+        $bc = NetworkFactory::bitcoin();
+        $tb = NetworkFactory::bitcoinTestnet();
+
         return [
             [
-                "bc",
+                $bc,
                 "BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4",
                 "0014751e76e8199196d454941c45d1b3a323f1433bd6"
             ],
             [
-                "tb",
+                $tb,
                 "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7",
                 "00201863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262"
             ],
             [
-                "bc",
+                $bc,
                 "bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx",
                 "5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6"
             ],
             [
-                "bc",
+                $bc,
                 "BC1SW50QA3JX3S",
                 "6002751e"
             ],
             [
-                "bc",
+                $bc,
                 "bc1zw508d6qejxtdg4y5r3zarvaryvg6kdaj",
                 "5210751e76e8199196d454941c45d1b3a323"
             ],
             [
-                "tb",
+                $tb,
                 "tb1qqqqqp399et2xygdj5xreqhjjvcmzhxw4aywxecjdzew6hylgvsesrxh6hy",
                 "0020000000c4a5cad46221b2a187905e5266362b99d5e91c6ce24d165dab93e86433"
             ],
@@ -124,14 +133,14 @@ class Bech32Test extends AbstractTestCase
     }
 
     /**
-     * @param string $hrp
+     * @param NetworkInterface $network
      * @param string $bech32
      * @param string $scriptHex
      * @dataProvider getBip173Fixtures
      */
-    public function test173Fixtures($hrp, $bech32, $scriptHex)
+    public function test173Fixtures(NetworkInterface $network, $bech32, $scriptHex)
     {
-        $wp = Bech32::decodeSegwit($hrp, $bech32);
+        $wp = SegwitBech32::decode($bech32, $network);
         $this->assertEquals($scriptHex, $wp->getScript()->getHex());
     }
 
@@ -157,16 +166,17 @@ class Bech32Test extends AbstractTestCase
     }
 
     /**
+     * @param NetworkInterface $network
      * @param string $bech32
      * @param string $hexScript
      * @dataProvider getAddressVectors
      */
-    public function testValidAddress($hrp, $bech32, $hexScript)
+    public function testValidAddress(NetworkInterface $network, $bech32, $hexScript)
     {
-        $wp = Bech32::decodeSegwit($hrp, $bech32);
+        $wp = SegwitBech32::decode($bech32, $network);
         $this->assertEquals($hexScript, $wp->getScript()->getHex());
 
-        $addr = Bech32::encodeSegwit($hrp, $wp);
+        $addr = SegwitBech32::encode($wp, $network);
         $this->assertEquals(strtolower($bech32), strtolower($addr));
     }
 
@@ -177,7 +187,7 @@ class Bech32Test extends AbstractTestCase
     public function testInvalidAddress($bech32)
     {
         try {
-            Bech32::decodeSegwit("bc", $bech32);
+            SegwitBech32::decode($bech32, NetworkFactory::bitcoin());
             $threw = false;
         } catch (\Exception $e) {
             $threw = true;
@@ -186,7 +196,7 @@ class Bech32Test extends AbstractTestCase
         $this->assertTrue($threw, "expected mainnet hrp to fail");
 
         try {
-            Bech32::decodeSegwit("tb", $bech32);
+            SegwitBech32::decode($bech32, NetworkFactory::bitcoinTestnet());
             $threw = false;
         } catch (\Exception $e) {
             $threw = true;
@@ -224,5 +234,30 @@ class Bech32Test extends AbstractTestCase
         $this->expectException(Bech32Exception::class);
         $this->expectExceptionMessage($exceptionMsg);
         Bech32::decode($bech32);
+    }
+
+    public function testSegwitAddrDefaultNetwork()
+    {
+        $bech32 = strtolower("BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4");
+        $p2wpkh = ScriptFactory::fromHex("0014751e76e8199196d454941c45d1b3a323f1433bd6");
+
+        $witnessProgram = null;
+        $this->assertTrue($p2wpkh->isWitness($witnessProgram));
+        /** @var WitnessProgram $witnessProgram */
+        $this->assertInstanceOf(WitnessProgram::class, $witnessProgram);
+
+        $this->assertEquals(NetworkFactory::bitcoin()->getSegwitBech32Prefix(), Bitcoin::getDefaultNetwork()->getSegwitBech32Prefix());
+
+        $encodedDefault = SegwitBech32::encode($witnessProgram);
+        $encodedBitcoin = SegwitBech32::encode($witnessProgram, NetworkFactory::bitcoin());
+
+        $this->assertEquals($bech32, $encodedDefault);
+        $this->assertEquals($bech32, $encodedBitcoin);
+
+        $testnet = SegwitBech32::encode($witnessProgram, NetworkFactory::bitcoinTestnet());
+        $decodedTestnet = SegwitBech32::decode($testnet, NetworkFactory::bitcoinTestnet());
+
+        $this->assertEquals($decodedTestnet->getVersion(), $witnessProgram->getVersion());
+        $this->assertTrue($decodedTestnet->getProgram()->equals($witnessProgram->getProgram()));
     }
 }

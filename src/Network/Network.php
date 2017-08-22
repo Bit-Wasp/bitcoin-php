@@ -40,6 +40,11 @@ class Network implements NetworkInterface
     private $netMagicBytes;
 
     /**
+     * @var null|string
+     */
+    private $segwitAddrPrefix;
+
+    /**
      * Load basic data, throw exception if it's not provided
      *
      * @param string $addressByte
@@ -185,5 +190,28 @@ class Network implements NetworkInterface
         }
 
         return $this->netMagicBytes;
+    }
+
+    /**
+     * @param string $hrp
+     * @return $this
+     */
+    public function setSegwitBech32Prefix($hrp)
+    {
+        $this->segwitAddrPrefix = $hrp;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     * @throws \Exception
+     */
+    public function getSegwitBech32Prefix()
+    {
+        if ($this->segwitAddrPrefix === null) {
+            throw new \Exception("No bech32 prefix for segwit addresses set");
+        }
+
+        return $this->segwitAddrPrefix;
     }
 }
