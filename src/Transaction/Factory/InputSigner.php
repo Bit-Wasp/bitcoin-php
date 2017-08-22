@@ -16,6 +16,7 @@ use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Path\BranchInterpreter;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
@@ -281,8 +282,7 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
-     * A snipped from OP_CHECKMULTISIG - verifies signatures according to the
-     * order of the given public keys (taken from the script).
+     * A snippet from OP_CHECKMULTISIG - links keys to signatures
      *
      * @param ScriptInterface $script
      * @param BufferInterface[] $signatures
@@ -631,6 +631,10 @@ class InputSigner implements InputSignerInterface
 
         $this->sigVersion = $sigVersion;
         $this->signScript = $solution;
+
+        $logicInterpreter = new BranchInterpreter();
+        $branches = $logicInterpreter->getScriptBranches($solution->getScript());
+        var_dump($branches);
 
         $this->extractFromValues($solution, $sigChunks, $this->sigVersion);
 
