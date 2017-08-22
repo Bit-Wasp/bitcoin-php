@@ -11,6 +11,8 @@ interface NetworkInterface
      */
     public function getAddressByte();
 
+    public function getSegwitBech32Prefix();
+
     /**
      * Return the p2sh byte for the network
      *
