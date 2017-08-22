@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
@@ -77,6 +78,16 @@ class ScriptBranch
     public function getNeuteredScript()
     {
         return ScriptFactory::fromOperations($this->getOps());
+    }
+
+    /**
+     * @return ScriptInterface
+     */
+    public function getScript()
+    {
+        return ScriptFactory::fromOperations(array_filter($this->getOps(), function (Operation $operation) {
+            return !$operation->isLogical();
+        }));
     }
 
     /**
