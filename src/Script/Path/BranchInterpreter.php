@@ -70,10 +70,7 @@ class BranchInterpreter
                     $current = $current->getParent();
                     break;
                 case Opcodes::OP_ELSE:
-                    if ($current->getValue() === false) {
-                        throw new \RuntimeException("Unbalanced conditional");
-                    }
-                    $current = $current->getParent()->getChild(0);
+                    $current = $current->getParent()->getChild(!$current->getValue());
                     break;
             }
         }
