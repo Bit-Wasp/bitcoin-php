@@ -6,7 +6,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\BufferInterface;
 
-class PayToPubkeyHash implements ScriptInfoInterface
+class PayToPubkeyHash
 {
 
     /**
@@ -51,14 +51,14 @@ class PayToPubkeyHash implements ScriptInfoInterface
      */
     public function checkInvolvesKey(PublicKeyInterface $publicKey)
     {
-        return $publicKey->getPubKeyHash()->getBinary() === $this->hash->getBinary();
+        return $publicKey->getPubKeyHash()->equals($this->hash);
     }
 
     /**
-     * @return PublicKeyInterface[]
+     * @return BufferInterface
      */
-    public function getKeys()
+    public function getPubKeyHash()
     {
-        return [];
+        return $this->hash;
     }
 }

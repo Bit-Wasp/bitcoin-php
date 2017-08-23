@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Script\Factory;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -119,6 +120,19 @@ class OutputScriptFactory
      */
     public function multisig($m, array $keys = [], $sort = true)
     {
+        return self::multisigKeyBuffers($m, array_map(function (PublicKeyInterface $key) {
+            return $key->getBuffer();
+        }, $keys), $sort);
+    }
+
+    /**
+     * @param int $m
+     * @param BufferInterface[] $keys
+     * @param bool|true $sort
+     * @return ScriptInterface
+     */
+    public function multisigKeyBuffers($m, array $keys = [], $sort = true)
+    {
         $n = count($keys);
         if ($m < 0) {
             throw new \LogicException('Number of signatures cannot be less than zero');
@@ -139,11 +153,11 @@ class OutputScriptFactory
         $new = ScriptFactory::create();
         $new->int($m);
         foreach ($keys as $key) {
-            if (!$key instanceof PublicKeyInterface) {
-                throw new \LogicException('Values in $keys[] must be a PublicKey');
+            if ($key->getSize() != PublicKey::LENGTH_COMPRESSED && $key->getSize() != PublicKey::LENGTH_UNCOMPRESSED) {
+                throw new \RuntimeException("Invalid length for public key buffer");
             }
 
-            $new->push($key->getBuffer());
+            $new->push($key);
         }
 
         return $new->int($n)->op('OP_CHECKMULTISIG')->getScript();

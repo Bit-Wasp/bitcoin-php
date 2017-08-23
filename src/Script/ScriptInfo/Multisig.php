@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\BufferInterface;
 
-class Multisig implements ScriptInfoInterface
+class Multisig
 {
     /**
      * @var int
@@ -21,11 +21,6 @@ class Multisig implements ScriptInfoInterface
      * @var int
      */
     private $n;
-
-    /**
-     * @var PublicKeyInterface[]
-     */
-    private $keys = [];
 
     /**
      * @var BufferInterface[]
@@ -48,7 +43,6 @@ class Multisig implements ScriptInfoInterface
             $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, false, Bitcoin::getEcAdapter());
         }
 
-        $publicKeys = [];
         $parse = $script->getScriptParser()->decode();
         if (count($parse) < 4 || end($parse)->getOp() !== Opcodes::OP_CHECKMULTISIG) {
             throw new \InvalidArgumentException('Malformed multisig script');
@@ -66,16 +60,13 @@ class Multisig implements ScriptInfoInterface
             }
 
             $buffer = $key->getData();
-            $publicKeys[] = $pubKeySerializer->parse($buffer);
             $publicKeyBuffers[] = $buffer;
         }
 
         $this->n = \BitWasp\Bitcoin\Script\decodeOpN($nCode);
-        if ($this->n === 0 || $this->n !== count($publicKeys)) {
+        if ($this->n === 0 || $this->n !== count($publicKeyBuffers)) {
             throw new \LogicException('No public keys found in script');
         }
-
-        $this->keys = $publicKeys;
         $this->keyBuffers = $publicKeyBuffers;
         $this->pubKeySerializer = $pubKeySerializer;
     }
@@ -110,14 +101,6 @@ class Multisig implements ScriptInfoInterface
         }
 
         return false;
-    }
-
-    /**
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface[]
-     */
-    public function getKeys()
-    {
-        return $this->keys;
     }
 
     /**

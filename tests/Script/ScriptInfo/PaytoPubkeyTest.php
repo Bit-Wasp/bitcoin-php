@@ -24,7 +24,7 @@ class PaytoPubkeyTest extends AbstractTestCase
         $info = new PayToPubkey($script);
         $this->assertEquals(1, $info->getRequiredSigCount());
         $this->assertEquals(1, $info->getKeyCount());
-        $this->assertEquals($pub->getBuffer(), $info->getKeys()[0]->getBuffer());
+        $this->assertTrue($pub->getBuffer()->equals($info->getKeyBuffer()));
         $this->assertTrue($info->checkInvolvesKey($pub));
 
         $otherPriv = PrivateKeyFactory::create();
