@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Address;
 
-
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
 interface Base58AddressInterface extends AddressInterface

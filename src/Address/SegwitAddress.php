@@ -2,10 +2,10 @@
 
 namespace BitWasp\Bitcoin\Address;
 
-
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
+use BitWasp\Bitcoin\SegwitBech32;
 
 class SegwitAddress extends Address implements Bech32AddressInterface
 {
