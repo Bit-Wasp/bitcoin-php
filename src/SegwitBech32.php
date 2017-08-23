@@ -20,7 +20,9 @@ class SegwitBech32
     public static function encode(WitnessProgram $witnessProgram, NetworkInterface $network = null)
     {
         // do this first, why bother encoding if the network doesn't support it..
-        $hrp = ($network ?: Bitcoin::getNetwork())->getSegwitBech32Prefix();
+        $network = $network ?: Bitcoin::getNetwork();
+        $hrp = $network->getSegwitBech32Prefix();
+
         $programChars = array_values(unpack('C*', $witnessProgram->getProgram()->getBinary()));
         $programBits = Bech32::convertBits($programChars, count($programChars), 8, 5, true);
         $encodeData = array_merge([$witnessProgram->getVersion()], $programBits);
@@ -39,7 +41,8 @@ class SegwitBech32
      */
     public static function decode($bech32, NetworkInterface $network = null)
     {
-        $hrp = ($network ? $network : Bitcoin::getNetwork())->getSegwitBech32Prefix();
+        $network = $network ?: Bitcoin::getNetwork();
+        $hrp = $network->getSegwitBech32Prefix();
 
         list ($hrpGot, $data) = Bech32::decode($bech32);
         if ($hrpGot !== $hrp) {
