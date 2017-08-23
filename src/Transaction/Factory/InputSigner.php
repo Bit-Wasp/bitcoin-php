@@ -178,13 +178,11 @@ class InputSigner implements InputSignerInterface
         $this->nInput = $nInput;
         $this->txOut = $txOut;
         $this->signData = $signData;
-        $this->flags = $signData->hasSignaturePolicy() ? $signData->getSignaturePolicy() : Interpreter::VERIFY_NONE;
         $this->publicKeys = [];
         $this->signatures = [];
 
         $this->txSigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter));
         $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
-        $this->signatureChecker = new Checker($this->ecAdapter, $this->tx, $nInput, $txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
         $this->interpreter = new Interpreter($this->ecAdapter);
     }
 
@@ -193,6 +191,12 @@ class InputSigner implements InputSignerInterface
      */
     public function extract()
     {
+        $defaultFlags = Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY | Interpreter::VERIFY_WITNESS;
+        $checker = new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
+
+        $this->flags = $this->signData->hasSignaturePolicy() ? $this->signData->getSignaturePolicy() : $defaultFlags;
+        $this->signatureChecker = $checker;
+
         $witnesses = $this->tx->getWitnesses();
         $witness = array_key_exists($this->nInput, $witnesses) ? $witnesses[$this->nInput]->all() : [];
 
