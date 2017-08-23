@@ -55,6 +55,7 @@ class AddressFactory
     {
         $wp = null;
         if ($outputScript->isWitness($wp)) {
+            /** @var WitnessProgram $wp */
             return new SegwitAddress($wp);
         }
 
