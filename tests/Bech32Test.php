@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
-use BitWasp\Bitcoin\Address\SegwitBech32;
+use BitWasp\Bitcoin\SegwitBech32;
 use BitWasp\Bitcoin\Bech32;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Exceptions\Bech32Exception;
