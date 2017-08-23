@@ -198,6 +198,10 @@ class Network implements NetworkInterface
      */
     public function setSegwitBech32Prefix($hrp)
     {
+        if ($hrp !== strtoupper($hrp) && $hrp !== strtolower($hrp)) {
+            throw new \RuntimeException("Bech32 prefix for segwit address contains mixed case characters");
+        }
+
         $this->segwitAddrPrefix = $hrp;
         return $this;
     }
