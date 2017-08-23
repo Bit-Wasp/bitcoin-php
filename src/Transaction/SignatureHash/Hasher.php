@@ -14,18 +14,12 @@ use BitWasp\Buffertools\BufferInterface;
 class Hasher extends SigHash
 {
     /**
-     * @var TransactionSerializerInterface
-     */
-    private $txSerializer;
-
-    /**
      * Hasher constructor.
      * @param TransactionInterface $transaction
      * @param TransactionSerializerInterface|null $txSerializer
      */
     public function __construct(TransactionInterface $transaction, TransactionSerializerInterface $txSerializer = null)
     {
-        $this->txSerializer = $txSerializer ?: new TransactionSerializer();
         parent::__construct($transaction);
     }
 
