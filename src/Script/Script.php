@@ -238,7 +238,7 @@ class Script extends Serializable implements ScriptInterface
     {
         $buffer = $this->getBuffer();
         $size = $buffer->getSize();
-        if ($size < 4 || $size > 34) {
+        if ($size < 4 || $size > 42) {
             return false;
         }
 

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script;
 
+use BitWasp\Bitcoin\Address\SegwitAddress;
 use BitWasp\Bitcoin\Exceptions\WitnessScriptException;
 
 class WitnessScript extends Script
@@ -21,6 +22,11 @@ class WitnessScript extends Script
      * @var WitnessProgram|null
      */
     private $witnessProgram;
+
+    /**
+     * @var SegwitAddress
+     */
+    private $address;
 
     /**
      * WitnessScript constructor.
@@ -52,6 +58,18 @@ class WitnessScript extends Script
         }
 
         return $this->witnessProgram;
+    }
+
+    /**
+     * @return SegwitAddress
+     */
+    public function getAddress()
+    {
+        if (null === $this->address) {
+            $this->address = new SegwitAddress($this->getWitnessProgram());
+        }
+
+        return $this->address;
     }
 
     /**

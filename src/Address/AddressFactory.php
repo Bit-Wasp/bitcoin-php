@@ -10,6 +10,8 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
+use BitWasp\Bitcoin\Script\WitnessProgram;
+use BitWasp\Bitcoin\SegwitBech32;
 use BitWasp\Buffertools\BufferInterface;
 
 class AddressFactory
@@ -37,11 +39,25 @@ class AddressFactory
     }
 
     /**
+     * @param WitnessProgram $wp
+     * @return SegwitAddress
+     */
+    public static function fromWitnessProgram(WitnessProgram $wp)
+    {
+        return new SegwitAddress($wp);
+    }
+
+    /**
      * @param ScriptInterface $outputScript
-     * @return PayToPubKeyHashAddress|ScriptHashAddress
+     * @return AddressInterface
      */
     public static function fromOutputScript(ScriptInterface $outputScript)
     {
+        $wp = null;
+        if ($outputScript->isWitness($wp)) {
+            return new SegwitAddress($wp);
+        }
+
         $decode = (new OutputClassifier())->decode($outputScript);
         switch ($decode->getType()) {
             case ScriptType::P2PKH:
@@ -64,16 +80,27 @@ class AddressFactory
     public static function fromString($address, NetworkInterface $network = null)
     {
         $network = $network ?: Bitcoin::getNetwork();
-        $data = Base58::decodeCheck($address);
-        $prefixByte = $data->slice(0, 1)->getHex();
 
-        if ($prefixByte === $network->getP2shByte()) {
-            return new ScriptHashAddress($data->slice(1));
-        } else if ($prefixByte === $network->getAddressByte()) {
-            return new PayToPubKeyHashAddress($data->slice(1));
-        } else {
-            throw new \InvalidArgumentException("Invalid prefix [{$prefixByte}]");
+        try {
+            $data = Base58::decodeCheck($address);
+            $prefixByte = $data->slice(0, 1)->getHex();
+
+            if ($prefixByte === $network->getP2shByte()) {
+                return new ScriptHashAddress($data->slice(1));
+            } else if ($prefixByte === $network->getAddressByte()) {
+                return new PayToPubKeyHashAddress($data->slice(1));
+            }
+        } catch (\Exception $e) {
+            // continue on for Bech32
         }
+
+        try {
+            return new SegwitAddress(SegwitBech32::decode($address, $network));
+        } catch (\Exception $e) {
+            // continue on
+        }
+
+        throw new \InvalidArgumentException("Address not recognized");
     }
 
     /**

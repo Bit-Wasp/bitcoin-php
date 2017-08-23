@@ -34,6 +34,10 @@ class WitnessProgram
             throw new \RuntimeException("Invalid witness program version");
         }
 
+        if ($this->version === 0 && ($program->getSize() !== 20 && $program->getSize() !== 32)) {
+            throw new \RuntimeException('Invalid size for V0 witness program - must be 20 or 32 bytes');
+        }
+
         $this->version = $version;
         $this->program = $program;
     }

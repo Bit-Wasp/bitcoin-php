@@ -1,5 +1,38 @@
 {
     "test": "addresses",
+    "witness": [
+        {
+            "network": "btc",
+            "program": "0014751e76e8199196d454941c45d1b3a323f1433bd6",
+            "address": "BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4"
+        },
+        {
+            "network": "tbtc",
+            "program": "00201863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262",
+            "address": "tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7"
+        },
+
+        {
+            "network": "btc",
+            "program": "5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6",
+            "address": "bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx"
+        },
+        {
+            "network": "btc",
+            "program": "6002751e",
+            "address": "BC1SW50QA3JX3S"
+        },
+        {
+            "network": "btc",
+            "program": "5210751e76e8199196d454941c45d1b3a323",
+            "address": "bc1zw508d6qejxtdg4y5r3zarvaryvg6kdaj"
+        },
+        {
+            "network": "tbtc",
+            "program": "0020000000c4a5cad46221b2a187905e5266362b99d5e91c6ce24d165dab93e86433",
+            "address": "tb1qqqqqp399et2xygdj5xreqhjjvcmzhxw4aywxecjdzew6hylgvsesrxh6hy"
+        }
+    ],
     "scriptHash": [
         {
             "script": "5241044da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f3126da0a0909f11998130c2d0e86a485f4e79ee466a183a476c432c68758ab9e630b21034da006f958beba78ec54443df4a3f52237253f7ae8cbdb17dccf3feaa57f312652ae",
