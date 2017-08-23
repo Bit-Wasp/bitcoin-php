@@ -5,30 +5,11 @@ namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializerInterface;
-use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class Hasher extends SigHash
 {
-    /**
-     * @var TransactionSerializerInterface
-     */
-    private $txSerializer;
-
-    /**
-     * Hasher constructor.
-     * @param TransactionInterface $transaction
-     * @param TransactionSerializerInterface|null $txSerializer
-     */
-    public function __construct(TransactionInterface $transaction, TransactionSerializerInterface $txSerializer = null)
-    {
-        $this->txSerializer = $txSerializer ?: new TransactionSerializer();
-        parent::__construct($transaction);
-    }
-
     /**
      * Calculate the hash of the current transaction, when you are looking to
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
