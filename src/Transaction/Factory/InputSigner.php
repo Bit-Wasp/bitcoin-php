@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializer
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
+use BitWasp\Bitcoin\Script\Interpreter\BitcoinCashChecker;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
@@ -83,6 +84,11 @@ class InputSigner implements InputSignerInterface
      * @var bool
      */
     private $tolerateInvalidPublicKey = false;
+
+    /**
+     * @var bool
+     */
+    private $redeemBitcoinCash = false;
 
     /**
      * @var SignData
@@ -194,6 +200,19 @@ class InputSigner implements InputSignerInterface
         $defaultFlags = Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY | Interpreter::VERIFY_WITNESS;
         $checker = new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
 
+        if ($this->redeemBitcoinCash) {
+            // unset VERIFY_WITNESS default
+            $defaultFlags = $defaultFlags & (~Interpreter::VERIFY_WITNESS);
+
+            if ($this->signData->hasSignaturePolicy()) {
+                if ($this->signData->getSignaturePolicy() & Interpreter::VERIFY_WITNESS) {
+                    throw new \RuntimeException("VERIFY_WITNESS is not possible for bitcoin cash");
+                }
+            }
+
+            $checker = new BitcoinCashChecker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
+        }
+
         $this->flags = $this->signData->hasSignaturePolicy() ? $this->signData->getSignaturePolicy() : $defaultFlags;
         $this->signatureChecker = $checker;
 
@@ -215,6 +234,16 @@ class InputSigner implements InputSignerInterface
     public function tolerateInvalidPublicKey($setting)
     {
         $this->tolerateInvalidPublicKey = (bool) $setting;
+        return $this;
+    }
+
+    /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function redeemBitcoinCash($setting)
+    {
+        $this->redeemBitcoinCash = (bool) $setting;
         return $this;
     }
 
