@@ -12,12 +12,6 @@ interface AddressInterface
      * @param NetworkInterface $network
      * @return string
      */
-    public function getPrefixByte(NetworkInterface $network);
-
-    /**
-     * @param NetworkInterface $network
-     * @return string
-     */
     public function getAddress(NetworkInterface $network = null);
 
     /**
