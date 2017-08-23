@@ -5,7 +5,11 @@
       "valid": true
     },
     {
-      "script": "00210123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef11",
+      "script": "5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6",
+      "valid": true
+    },
+    {
+      "script": "5129751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd629",
       "valid": false
     },
     {

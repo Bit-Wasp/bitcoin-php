@@ -3,8 +3,11 @@
 namespace BitWasp\Bitcoin\Tests\Address;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\Base58AddressInterface;
+use BitWasp\Bitcoin\Address\Bech32AddressInterface;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
+use BitWasp\Bitcoin\Address\SegwitAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -12,8 +15,8 @@ use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
-use BitWasp\Buffertools\Buffer;
 
 class AddressTest extends AbstractTestCase
 {
@@ -34,12 +37,33 @@ class AddressTest extends AbstractTestCase
                 $vector['address'],
             ];
         }
+
         foreach ($data['pubKeyHash'] as $vector) {
             $datasets[] = [
                 'pubkeyhash',
                 Bitcoin::getDefaultNetwork(),
                 $vector['publickey'],
                 $vector['address'],
+            ];
+        }
+        foreach ($data['witness'] as $vector) {
+            switch ($vector['network']) {
+                case 'btc':
+                    $network = NetworkFactory::bitcoin();
+                    break;
+                case 'tbtc':
+                    $network = NetworkFactory::bitcoinTestnet();
+                    break;
+                default:
+                    throw new \RuntimeException("Invalid test fixture, unknown network");
+            }
+
+            $datasets[] = [
+                'witness',
+                $network,
+                $vector['program'],
+                strtolower($vector['address']),
+                $vector['network'],
             ];
         }
 
@@ -54,24 +78,38 @@ class AddressTest extends AbstractTestCase
      * @param $address
      * @throws \Exception
      */
-    public function testAddress($type, NetworkInterface $network, $data, $address)
+    public function testAddress($type, NetworkInterface $network, $data, $address, $t1 = null)
     {
         if ($type === 'pubkeyhash') {
             $obj = PublicKeyFactory::fromHex($data)->getAddress();
             $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
         } else if ($type === 'script') {
-            $p2shScript = new Script(Buffer::hex($data));
+            $p2shScript = ScriptFactory::fromHex($data);
             $obj = AddressFactory::fromScript($p2shScript);
             $script = ScriptFactory::scriptPubKey()->payToScriptHash($obj->getHash());
+        } else if ($type === 'witness') {
+            $script = ScriptFactory::fromHex($data);
+            $witnessProgram = null;
+            var_dump($data);
+            $this->assertTrue($script->isWitness($witnessProgram));
+            /** @var WitnessProgram $witnessProgram */
+            $obj = AddressFactory::fromWitnessProgram($witnessProgram);
+            $this->assertInstanceOf(SegwitAddress::class, $obj);
         } else {
             throw new \Exception('Unknown address type');
         }
 
         $this->assertEquals($address, $obj->getAddress($network));
 
-        $fromString = AddressFactory::fromString($address);
+        $fromString = AddressFactory::fromString($address, $network);
         $this->assertTrue($obj->getHash()->equals($fromString->getHash()));
-        $this->assertEquals($obj->getPrefixByte($network), $fromString->getPrefixByte($network));
+
+        if ($fromString instanceof Base58AddressInterface) {
+            $this->assertEquals($obj->getPrefixByte($network), $fromString->getPrefixByte($network));
+        } else if ($fromString instanceof Bech32AddressInterface) {
+            $this->assertEquals($obj->getHRP($network), $fromString->getHRP($network));
+        }
+
         $this->assertEquals($obj->getAddress($network), $fromString->getAddress($network));
         $this->assertTrue(AddressFactory::isValidAddress($address, $network));
 
