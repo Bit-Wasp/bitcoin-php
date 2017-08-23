@@ -90,7 +90,6 @@ class AddressTest extends AbstractTestCase
         } else if ($type === 'witness') {
             $script = ScriptFactory::fromHex($data);
             $witnessProgram = null;
-            var_dump($data);
             $this->assertTrue($script->isWitness($witnessProgram));
             /** @var WitnessProgram $witnessProgram */
             $obj = AddressFactory::fromWitnessProgram($witnessProgram);
