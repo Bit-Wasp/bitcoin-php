@@ -42,6 +42,11 @@ class Signer
     private $tolerateInvalidPublicKey = false;
 
     /**
+     * @var bool
+     */
+    private $redeemBitcoinCash = false;
+
+    /**
      * @var InputSignerInterface[]
      */
     private $signatureCreator = [];
@@ -57,6 +62,21 @@ class Signer
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->sigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $this->ecAdapter));
         $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $this->ecAdapter);
+    }
+
+    /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function redeemBitcoinCash($setting)
+    {
+        if (!is_bool($setting)) {
+            throw new \InvalidArgumentException("Boolean value expected");
+        }
+
+        $this->redeemBitcoinCash = $setting;
+
+        return $this;
     }
 
     /**
@@ -106,6 +126,7 @@ class Signer
         if (!isset($this->signatureCreator[$nIn])) {
             $input = (new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData, $this->sigSerializer, $this->pubKeySerializer))
                 ->tolerateInvalidPublicKey($this->tolerateInvalidPublicKey)
+                ->redeemBitcoinCash($this->redeemBitcoinCash)
                 ->extract();
 
             $this->signatureCreator[$nIn] = $input;
