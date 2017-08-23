@@ -199,6 +199,12 @@ class InputSigner implements InputSignerInterface
     {
         $defaultFlags = Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY;
         if ($this->redeemBitcoinCash) {
+            if ($this->signData->hasSignaturePolicy()) {
+                if ($this->signData->getSignaturePolicy() & Interpreter::VERIFY_WITNESS) {
+                    throw new \RuntimeException("VERIFY_WITNESS is not possible for bitcoin cash");
+                }
+            }
+
             $checker = new BitcoinCashChecker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
         } else {
             $defaultFlags |= Interpreter::VERIFY_WITNESS;
