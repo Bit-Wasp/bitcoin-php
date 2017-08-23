@@ -27,37 +27,37 @@ class Checker
     /**
      * @var EcAdapterInterface
      */
-    private $adapter;
+    protected $adapter;
 
     /**
      * @var TransactionInterface
      */
-    private $transaction;
+    protected $transaction;
 
     /**
      * @var int
      */
-    private $nInput;
+    protected $nInput;
 
     /**
      * @var int|string
      */
-    private $amount;
+    protected $amount;
 
     /**
      * @var Hasher
      */
-    private $hasherV0;
+    protected $hasherV0;
 
     /**
      * @var array
      */
-    private $sigHashCache = [];
+    protected $sigHashCache = [];
 
     /**
      * @var array
      */
-    private $sigCache = [];
+    protected $sigCache = [];
 
     /**
      * @var TransactionSignatureSerializer
@@ -68,6 +68,11 @@ class Checker
      * @var PublicKeySerializerInterface
      */
     private $pubKeySerializer;
+
+    /**
+     * @var int
+     */
+    protected $sigHashOptionalBits = SigHash::ANYONECANPAY;
 
     /**
      * Checker constructor.
@@ -130,7 +135,7 @@ class Checker
      */
     public function isDefinedHashtype($hashType)
     {
-        $nHashType = $hashType & (~(SigHash::ANYONECANPAY));
+        $nHashType = $hashType & (~($this->sigHashOptionalBits));
 
         return !(($nHashType < SigHash::ALL) || ($nHashType > SigHash::SINGLE));
     }
