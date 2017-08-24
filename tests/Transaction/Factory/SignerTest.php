@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
+use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -364,5 +365,38 @@ class SignerTest extends AbstractTestCase
             $this->assertInstanceOf(PublicKeyInterface::class, $input->getPublicKeys()[0]);
             $this->assertEquals(null, $input->getPublicKeys()[1]);
         }
+    }
+
+    public function testBitcoinCash()
+    {
+        $expectSpend = '020000000113aaf49280ba92bddfcbdc30d6c7501c2575e4a80f539236df233f9218a2c8400000000049483045022100c5874e39da4dd427d35e24792bf31dcd63c25684deec66b426271b4043e21c3002201bfdc0621ad4237e8db05aa6cad69f3d5ab4ae32ebb2048f65b12165da6cc69341ffffffff0100f2052a010000001976a914cd29cc97826c37281ac61301e4d5ed374770585688ac00000000';
+        $value = 50 * 100000000;
+
+        $txid = "40c8a218923f23df3692530fa8e475251c50c7d630dccbdfbd92ba8092f4aa13";
+        $vout = 0;
+        $network = NetworkFactory::bitcoinTestnet();
+
+        $wif = "cTNwkxh7nVByhc3i7BH6eaBFQ4yVs6WvXBGBoA9xdKiorwcYVACc";
+        $keyPair = PrivateKeyFactory::fromWif($wif, null, $network);
+
+        $spk = ScriptFactory::scriptPubKey()->payToPubKey($keyPair->getPublicKey());
+        $dest = AddressFactory::fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
+
+        $txb = (new TxBuilder())
+            ->version(2)
+            ->input($txid, $vout)
+            ->output($value, $dest)
+        ;
+
+        $txs = new Signer($txb->get());
+        $txs->redeemBitcoinCash(true);
+
+        $hashType = SigHash::BITCOINCASH | SigHash::ALL;
+
+        $input = $txs->input(0, new TransactionOutput($value, $spk));
+        $input->sign($keyPair, $hashType);
+
+        $tx = $txs->get();
+        $this->assertEquals($expectSpend, $tx->getHex());
     }
 }
