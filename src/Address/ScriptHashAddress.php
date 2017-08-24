@@ -17,7 +17,7 @@ class ScriptHashAddress extends Base58Address
     public function __construct(BufferInterface $hash)
     {
         if ($hash->getSize() !== 20) {
-            throw new \RuntimeException("P2PKH address hash should be 20 bytes");
+            throw new \RuntimeException("P2SH address hash should be 20 bytes");
         }
 
         parent::__construct($hash);
