@@ -47,6 +47,11 @@ class Signer
     private $redeemBitcoinCash = false;
 
     /**
+     * @var bool
+     */
+    private $padUnsignedMultisigs = false;
+
+    /**
      * @var InputSignerInterface[]
      */
     private $signatureCreator = [];
@@ -75,7 +80,20 @@ class Signer
         }
 
         $this->redeemBitcoinCash = $setting;
+        return $this;
+    }
 
+    /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function padUnsignedMultisigs($setting)
+    {
+        if (!is_bool($setting)) {
+            throw new \InvalidArgumentException("Boolean value expected");
+        }
+
+        $this->padUnsignedMultisigs = $setting;
         return $this;
     }
 
@@ -90,7 +108,6 @@ class Signer
         }
 
         $this->tolerateInvalidPublicKey = $setting;
-
         return $this;
     }
 
@@ -125,6 +142,7 @@ class Signer
 
         if (!isset($this->signatureCreator[$nIn])) {
             $input = (new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData, $this->sigSerializer, $this->pubKeySerializer))
+                ->padUnsignedMultisigs($this->padUnsignedMultisigs)
                 ->tolerateInvalidPublicKey($this->tolerateInvalidPublicKey)
                 ->redeemBitcoinCash($this->redeemBitcoinCash)
                 ->extract();
