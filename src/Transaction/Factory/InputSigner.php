@@ -83,6 +83,11 @@ class InputSigner implements InputSignerInterface
     /**
      * @var bool
      */
+    private $padUnsignedMultisigs = false;
+
+    /**
+     * @var bool
+     */
     private $tolerateInvalidPublicKey = false;
 
     /**
@@ -225,6 +230,16 @@ class InputSigner implements InputSignerInterface
             $this->tx->getInput($this->nInput)->getScript(),
             $witness
         );
+    }
+
+    /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function padUnsignedMultisigs($setting)
+    {
+        $this->padUnsignedMultisigs = (bool) $setting;
+        return $this;
     }
 
     /**
@@ -873,10 +888,14 @@ class InputSigner implements InputSignerInterface
                 $result = [$this->txSigSerializer->serialize($this->signatures[0]), $this->pubKeySerializer->serialize($this->publicKeys[0])];
             }
         } else if (ScriptType::MULTISIG === $outputType) {
+            $isFullySigned = $this->isFullySigned();
+
             $result[] = new Buffer();
             for ($i = 0, $nPubKeys = count($this->publicKeys); $i < $nPubKeys; $i++) {
                 if (isset($this->signatures[$i])) {
                     $result[] = $this->txSigSerializer->serialize($this->signatures[$i]);
+                } else if ($this->padUnsignedMultisigs && !$isFullySigned) {
+                    $result[] = new Buffer();
                 }
             }
         } else {
