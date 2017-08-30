@@ -438,17 +438,46 @@ class InputSigner implements InputSignerInterface
             $this->publicKeys = [$this->parseStepPublicKey($outputData->getSolution())];
         } else if (ScriptType::MULTISIG === $type) {
             $info = new Multisig($outputData->getScript(), $this->pubKeySerializer);
-            $this->requiredSigs = $info->getRequiredSigCount();
 
             $keyBuffers = $info->getKeyBuffers();
+            $this->requiredSigs = $info->getRequiredSigCount();
             $this->publicKeys = [];
             for ($i = 0; $i < $info->getKeyCount(); $i++) {
                 $this->publicKeys[$i] = $this->parseStepPublicKey($keyBuffers[$i]);
             }
 
-            if ($size > 1) {
-                // Check signatures irrespective of scriptSig size, primes Checker cache, and need info
+            if ($this->padUnsignedMultisigs) {
+                // Multisig padding is only used for partially signed transactions,
+                // never fully signed. It is recognized by a scriptSig with $keyCount+1
+                // values (including the dummy), with one for each candidate signature,
+                // such that $this->signatures state is captured.
+                // The feature serves to skip validation/sorting an incomplete multisig.
+
+                if ($size === 1 + $info->getKeyCount()) {
+                    $sigBufCount = 0;
+                    $null = new Buffer();
+                    $keyToSigMap = new \SplObjectStorage();
+
+                    // Reproduce $keyToSigMap and $sigBufCount
+                    for ($i = 0; $i < $info->getKeyCount(); $i++) {
+                        if (!$stack[1 + $i]->equals($null)) {
+                            $keyToSigMap[$keyBuffers[$i]] = $stack[1 + $i];
+                            $sigBufCount++;
+                        }
+                    }
+
+                    // We observed $this->requiredSigs sigs, therefore we can
+                    // say the implementation is incompatible
+                    if ($sigBufCount === $this->requiredSigs) {
+                        throw new \RuntimeException("Padding is forbidden for a fully signed multisig script");
+                    }
+                }
+            }
+
+            if (!isset($keyToSigMap)) {
+                // Check signatures irrespective of scriptSig size, primes Checker for sorting
                 $check = $this->evaluateSolution($outputData->getScript(), $stack, $sigVersion);
+
                 $sigBufs = array_slice($stack, 1, $size - 1);
                 $sigBufCount = count($sigBufs);
 
@@ -457,19 +486,23 @@ class InputSigner implements InputSignerInterface
                     throw new \RuntimeException('Existing signatures are invalid!');
                 }
 
-                $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBuffers, $sigVersion);
+                if ($sigBufCount > 0) {
+                    $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBuffers, $sigVersion);
 
-                // Here we learn if any signatures were invalid, it won't be in the map.
-                if ($sigBufCount !== count($keyToSigMap)) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
-                }
-
-                foreach ($keyBuffers as $idx => $key) {
-                    if (isset($keyToSigMap[$key])) {
-                        $this->signatures[$idx] = $this->txSigSerializer->parse($keyToSigMap[$key]);
+                    if (count($keyToSigMap) !== $sigBufCount) {
+                        throw new \RuntimeException('Existing signatures are invalid!');
                     }
+                } else {
+                    $keyToSigMap = new \SplObjectStorage();
                 }
             }
+
+            foreach ($keyBuffers as $idx => $key) {
+                if (isset($keyToSigMap[$key])) {
+                    $this->signatures[$idx] = $this->txSigSerializer->parse($keyToSigMap[$key]);
+                }
+            }
+
         } else {
             throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
