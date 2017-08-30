@@ -76,4 +76,16 @@ class Operation
 
         return $this->pushDataSize;
     }
+
+    /**
+     * @return BufferInterface|int
+     */
+    public function encode()
+    {
+        if ($this->push) {
+            return $this->pushData;
+        } else {
+            return $this->opCode;
+        }
+    }
 }

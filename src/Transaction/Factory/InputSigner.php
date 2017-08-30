@@ -502,7 +502,6 @@ class InputSigner implements InputSignerInterface
                     $this->signatures[$idx] = $this->txSigSerializer->parse($keyToSigMap[$key]);
                 }
             }
-
         } else {
             throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
