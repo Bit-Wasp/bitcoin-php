@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -46,6 +47,24 @@ class ScriptFactory
     public static function sequence(array $sequence)
     {
         return self::create()->sequence($sequence)->getScript();
+    }
+
+    /**
+     * @param Operation[] $operations
+     * @return ScriptInterface
+     */
+    public static function fromOperations(array $operations)
+    {
+        $sequence = [];
+        foreach ($operations as $operation) {
+            if (!($operation instanceof Operation)) {
+                throw new \RuntimeException("Invalid input to fromOperations");
+            }
+
+            $sequence[] = $operation->encode();
+        }
+
+        return self::sequence($sequence);
     }
 
     /**
