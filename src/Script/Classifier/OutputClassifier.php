@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Script\Classifier;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Parser\Operation;
+use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Buffertools\Buffer;
@@ -335,6 +336,38 @@ class OutputClassifier
     }
 
     /**
+     * @param Operation[] $decoded
+     * @return BufferInterface|false
+     */
+    private function decodeP2WKH2(array $decoded)
+    {
+        if (count($decoded) === 2
+            && $decoded[0]->getOp() === Opcodes::OP_0
+            && $decoded[1]->isPush()
+            && $decoded[1]->getDataSize() === 20) {
+            return $decoded[1]->getData();
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Operation[] $decoded
+     * @return BufferInterface|false
+     */
+    private function decodeP2WSH2(array $decoded)
+    {
+        if (count($decoded) === 2
+            && $decoded[0]->getOp() === Opcodes::OP_0
+            && $decoded[1]->isPush()
+            && $decoded[1]->getDataSize() === 32) {
+            return $decoded[1]->getData();
+        }
+
+        return false;
+    }
+
+    /**
      * @param ScriptInterface $script
      * @return bool
      */
@@ -419,15 +452,13 @@ class OutputClassifier
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param mixed $solution
+     * @param array $decoded
+     * @param null $solution
      * @return string
      */
-    public function classify(ScriptInterface $script, &$solution = null)
+    private function classifyDecoded(array $decoded, &$solution = null)
     {
-        $decoded = $script->getScriptParser()->decode();
         $type = ScriptType::NONSTANDARD;
-        $solution = null;
 
         if (($pubKey = $this->decodeP2PK($decoded))) {
             $type = ScriptType::P2PK;
@@ -441,10 +472,10 @@ class OutputClassifier
         } else if (($scriptHash = $this->decodeP2SH($decoded))) {
             $type = ScriptType::P2SH;
             $solution = $scriptHash;
-        } else if (($witnessScriptHash = $this->decodeP2WSH($script, $decoded))) {
+        } else if (($witnessScriptHash = $this->decodeP2WSH2($decoded))) {
             $type = ScriptType::P2WSH;
             $solution = $witnessScriptHash;
-        } else if (($witnessKeyHash = $this->decodeP2WKH($script, $decoded))) {
+        } else if (($witnessKeyHash = $this->decodeP2WKH2($decoded))) {
             $type = ScriptType::P2WKH;
             $solution = $witnessKeyHash;
         } else if (($witCommitHash = $this->decodeWitnessCoinbaseCommitment($decoded))) {
@@ -460,6 +491,20 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
+     * @param mixed $solution
+     * @return string
+     */
+    public function classify(ScriptInterface $script, &$solution = null)
+    {
+        $decoded = $script->getScriptParser()->decode();
+
+        $type = $this->classifyDecoded($decoded, $solution);
+
+        return $type;
+    }
+
+    /**
+     * @param ScriptInterface $script
      * @return OutputData
      */
     public function decode(ScriptInterface $script)
@@ -468,4 +513,48 @@ class OutputClassifier
         $type = $this->classify($script, $solution);
         return new OutputData($type, $script, $solution);
     }
+
+    /**
+     * @param ScriptInterface $script
+     * @return OutputData[]
+     */
+    public function decodeSequence(ScriptInterface $script, $allowNonstandard = false)
+    {
+        $decoded = $script->getScriptParser()->decode();
+
+        $j = 0;
+        $l = count($decoded);
+        $result = [];
+        while ($j < $l) {
+            $type = null;
+            $slice = null;
+            $solution = null;
+
+            // increment the $last, and break if it's valid
+            for ($i = 0; $i < ($l - $j) + 1; $i++) {
+                $slice = array_slice($decoded, $j, $i);
+                $chkType = $this->classifyDecoded($slice, $solution);
+                if ($chkType !== ScriptType::NONSTANDARD) {
+                    $type = $chkType;
+                    break;
+                }
+            }
+
+            if (null === $type) {
+                if (!$allowNonstandard) {
+                    throw new \RuntimeException("Unable to classify script as a sequence of templated types");
+                }
+                $j++;
+            } else {
+                $j += $i;
+                /** @var Operation[] $slice */
+                /** @var mixed $solution */
+                $result[] = new OutputData($type, ScriptFactory::fromOperations($slice), $solution);
+            }
+        }
+
+        return $result;
+    }
+
+
 }

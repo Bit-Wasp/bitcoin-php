@@ -20,7 +20,7 @@ class MultisigTest extends AbstractTestCase
         $classifier = new OutputClassifier();
         $this->assertEquals(ScriptType::MULTISIG, $classifier->classify($script));
 
-        $info = new Multisig($script);
+        $info = Multisig::fromScript($script);
         $this->assertEquals(2, $info->getRequiredSigCount());
         $this->assertEquals(2, $info->getKeyCount());
         $this->assertTrue($info->checkInvolvesKey($pub));

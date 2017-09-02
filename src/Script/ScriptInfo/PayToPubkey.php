@@ -4,7 +4,9 @@ namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Buffertools\BufferInterface;
 
 class PayToPubkey
@@ -15,15 +17,63 @@ class PayToPubkey
     private $publicKey;
 
     /**
-     * @param ScriptInterface $script
+     * @var bool
      */
-    public function __construct(ScriptInterface $script)
+    private $verify;
+
+    /**
+     * @var int
+     */
+    private $opcode;
+
+    /**
+     * PayToPubkey constructor.
+     * @param int $opcode
+     * @param BufferInterface $publicKey
+     * @param bool $allowVerify
+     */
+    public function __construct($opcode, BufferInterface $publicKey, $allowVerify = false)
     {
-        $chunks = $script->getScriptParser()->decode();
-        if (count($chunks) !== 2 || !$chunks[0]->isPush() || $chunks[1]->getOp() !== Opcodes::OP_CHECKSIG) {
+        if ($opcode === Opcodes::OP_CHECKSIG) {
+            $verify = false;
+        } else if ($allowVerify && $opcode === Opcodes::OP_CHECKSIGVERIFY) {
+            $verify = true;
+        } else {
+            throw new \InvalidArgumentException('Malformed pay-to-pubkey script - invalid opcode');
+        }
+
+        $this->verify = $verify;
+        $this->opcode = $opcode;
+        $this->publicKey = $publicKey;
+    }
+
+    /**
+     * @param Operation[] $chunks
+     * @param bool $allowVerify
+     * @return static
+     */
+    public static function fromDecodedScript(array $chunks, $allowVerify = false)
+    {
+        if (count($chunks) !== 2 || !$chunks[0]->isPush() || $chunks[1]->isPush()) {
             throw new \InvalidArgumentException('Malformed pay-to-pubkey script');
         }
-        $this->publicKey = $chunks[0]->getData();
+
+        return new static($chunks[1]->getOp(), $chunks[0]->getData(), $allowVerify);
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @param bool $allowVerify
+     * @return PayToPubkey
+     */
+    public static function fromScript(ScriptInterface $script, $allowVerify = false)
+    {
+        return static::fromDecodedScript($script->getScriptParser()->decode(), $allowVerify);
+    }
+
+    public function getType()
+    {
+        return ScriptType::P2PK;
     }
 
     /**
@@ -42,6 +92,10 @@ class PayToPubkey
         return 1;
     }
 
+    public function isChecksigVerify() {
+        return $this->verify;
+    }
+
     /**
      * @param PublicKeyInterface $publicKey
      * @return bool
@@ -52,7 +106,7 @@ class PayToPubkey
     }
 
     /**
-     * @return BufferInterface[]
+     * @return BufferInterface
      */
     public function getKeyBuffer()
     {
