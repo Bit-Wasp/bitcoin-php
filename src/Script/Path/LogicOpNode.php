@@ -22,6 +22,9 @@ class LogicOpNode
      */
     private $children = [];
 
+    /**
+     * @var Operation[]
+     */
     private $ops = [];
 
     /**
@@ -65,6 +68,14 @@ class LogicOpNode
     }
 
     /**
+     * @return bool
+     */
+    public function hasChildren()
+    {
+        return count($this->children) > 0;
+    }
+
+    /**
      * @return LogicOpNode|null
      */
     public function getParent()
@@ -78,6 +89,14 @@ class LogicOpNode
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @param Operation $op
+     */
+    public function assign(Operation $op)
+    {
+        $this->ops[] = $op;
     }
 
     /**

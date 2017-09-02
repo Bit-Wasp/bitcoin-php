@@ -92,6 +92,11 @@ class InputSigner implements InputSignerInterface
     private $redeemBitcoinCash = false;
 
     /**
+     * @var bool
+     */
+    private $allowComplexScripts = false;
+
+    /**
      * @var SignData
      */
     private $signData;
@@ -245,6 +250,16 @@ class InputSigner implements InputSignerInterface
     public function redeemBitcoinCash($setting)
     {
         $this->redeemBitcoinCash = (bool) $setting;
+        return $this;
+    }
+
+    /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function allowComplexScripts($setting)
+    {
+        $this->allowComplexScripts = (bool) $setting;
         return $this;
     }
 
@@ -536,29 +551,30 @@ class InputSigner implements InputSignerInterface
     {
         $classifier = new OutputClassifier();
         $sigVersion = SigHash::V0;
-        $sigChunks = [];
         $solution = $this->scriptPubKey = $classifier->decode($scriptPubKey);
-        if ($solution->getType() !== ScriptType::P2SH && !in_array($solution->getType(), self::$validP2sh)) {
-            throw new \RuntimeException('scriptPubKey not supported');
+
+        if (!$this->allowComplexScripts) {
+            if ($solution->getType() !== ScriptType::P2SH && !in_array($solution->getType(), self::$validP2sh)) {
+                throw new \RuntimeException('scriptPubKey not supported');
+            }
         }
 
-        if ($solution->canSign()) {
-            $sigChunks = $this->evalPushOnly($scriptSig);
-        }
+        $sigChunks = $this->evalPushOnly($scriptSig);
 
         if ($solution->getType() === ScriptType::P2SH) {
-            $chunks = $this->evalPushOnly($scriptSig);
-            $redeemScript = $this->findRedeemScript($chunks, $signData);
+            $redeemScript = $this->findRedeemScript($sigChunks, $signData);
             if (!$this->verifySolution(Interpreter::VERIFY_SIGPUSHONLY, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
                 throw new \RuntimeException('Redeem script fails to solve pay-to-script-hash');
             }
 
             $solution = $this->redeemScript = $classifier->decode($redeemScript);
-            if (!in_array($solution->getType(), self::$validP2sh)) {
-                throw new \RuntimeException('Unsupported pay-to-script-hash script');
+            if (!$this->allowComplexScripts) {
+                if (!in_array($solution->getType(), self::$validP2sh)) {
+                    throw new \RuntimeException('Unsupported pay-to-script-hash script');
+                }
             }
 
-            $sigChunks = array_slice($chunks, 0, -1);
+            $sigChunks = array_slice($sigChunks, 0, -1);
         }
 
         if ($solution->getType() === ScriptType::P2WKH) {
@@ -575,8 +591,10 @@ class InputSigner implements InputSignerInterface
             }
 
             $solution = $this->witnessScript = $classifier->decode($witnessScript);
-            if (!in_array($this->witnessScript->getType(), self::$canSign)) {
-                throw new \RuntimeException('Unsupported witness-script-hash script');
+            if (!$this->allowComplexScripts) {
+                if (!in_array($this->witnessScript->getType(), self::$canSign)) {
+                    throw new \RuntimeException('Unsupported witness-script-hash script');
+                }
             }
 
             $sigChunks = array_slice($witness, 0, -1);
@@ -585,13 +603,52 @@ class InputSigner implements InputSignerInterface
         $this->sigVersion = $sigVersion;
         $this->signScript = $solution;
 
-        $logicInterpreter = new BranchInterpreter();
-        $branches = $logicInterpreter->getScriptBranches($solution->getScript());
-        var_dump($branches);
-
-        $this->extractFromValues($solution, $sigChunks, $this->sigVersion);
+        $this->extractScript($solution, $sigChunks, $signData);
 
         return $this;
+    }
+
+    public function extractScript(OutputData $solution, array $sigChunks, SignData $signData)
+    {
+        $logicInterpreter = new BranchInterpreter();
+        $tree = $logicInterpreter->getScriptTree($solution->getScript());
+
+        if ($tree->hasMultipleBranches()) {
+            throw new \RuntimeException("Not yet implemented");
+            $logicalPath = $signData->getLogicalPath();
+            // we need a function like findWitnessScript to 'check'
+            // partial signatures against _our_ path
+        } else {
+            $logicalPath = [];
+        }
+
+        $branch = $tree->getBranchByDesc($logicalPath);
+        $segments = $branch->getSegments();
+
+//        $copyPath = $logicalPath;
+//        foreach ($segments as $segment) {
+//            var_dump("Path: " . json_encode($copyPath));
+//
+//            if ($segment->isLoneLogicalOp()) {
+//                $op = $segment[0];
+//                switch ($op->getOp()) {
+//                    case Opcodes::OP_IF:
+//                    case Opcodes::OP_NOTIF:
+//                        echo "logical: " . $solution->getScript()->getOpcodes()->getOp($op->getOp()).PHP_EOL;
+//                        if (count($logicalPath) > 0) {
+//                            echo "pull from logicStack?\n";
+//                        }
+//                        break;
+//                }
+//            } else {
+//            }
+//
+//            echo " * " . $segment->makeScript()->getHex().PHP_EOL;
+//        }
+
+//        if (count($sigChunks) > 0) {
+            $this->extractFromValues($solution, $sigChunks, $this->sigVersion);
+//        }
     }
 
     /**

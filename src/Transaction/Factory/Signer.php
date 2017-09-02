@@ -47,6 +47,11 @@ class Signer
     private $redeemBitcoinCash = false;
 
     /**
+     * @var bool
+     */
+    private $allowComplexScripts = false;
+
+    /**
      * @var InputSignerInterface[]
      */
     private $signatureCreator = [];
@@ -95,6 +100,21 @@ class Signer
     }
 
     /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function allowComplexScripts($setting)
+    {
+        if (!is_bool($setting)) {
+            throw new \InvalidArgumentException("Boolean value expected");
+        }
+
+        $this->allowComplexScripts = $setting;
+
+        return $this;
+    }
+
+    /**
      * @param int $nIn
      * @param PrivateKeyInterface $key
      * @param TransactionOutputInterface $txOut
@@ -127,6 +147,7 @@ class Signer
             $input = (new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData, $this->sigSerializer, $this->pubKeySerializer))
                 ->tolerateInvalidPublicKey($this->tolerateInvalidPublicKey)
                 ->redeemBitcoinCash($this->redeemBitcoinCash)
+                ->allowComplexScripts($this->allowComplexScripts)
                 ->extract();
 
             $this->signatureCreator[$nIn] = $input;
