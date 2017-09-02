@@ -2,6 +2,8 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
+use BitWasp\Bitcoin\Script\Parser\Operation;
+
 class LogicOpNode
 {
 
@@ -19,6 +21,8 @@ class LogicOpNode
      * @var LogicOpNode[]
      */
     private $children = [];
+
+    private $ops = [];
 
     /**
      * MASTNode constructor.
