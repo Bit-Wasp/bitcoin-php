@@ -124,9 +124,9 @@ class Signer
      */
     public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, $sigHashType = SigHash::ALL)
     {
-        if (!$this->input($nIn, $txOut, $signData)->sign($key, $sigHashType)) {
-            throw new \RuntimeException('Unsignable script');
-        }
+        $this
+            ->input($nIn, $txOut, $signData)
+            ->sign($key, $sigHashType);
 
         return $this;
     }

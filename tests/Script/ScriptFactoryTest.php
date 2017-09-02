@@ -27,7 +27,7 @@ class ScriptFactoryTest extends AbstractTestCase
         $arbitrary = [$pk1->getPublicKey(), $pk2->getPublicKey()];
 
         $redeemScript = ScriptFactory::scriptPubKey()->multisig($m, $arbitrary, false);
-        $info = new Multisig($redeemScript);
+        $info = Multisig::fromScript($redeemScript);
         foreach ($info->getKeyBuffers() as $i => $key) {
             $this->assertTrue($arbitrary[$i]->getBuffer()->equals($key), 'verify false flag disables sorting');
         }
