@@ -41,6 +41,27 @@ class BranchInterpreter
     }
 
     /**
+     * @param ScriptInterface $script
+     * @return ParsedScript
+     */
+    public function getScriptTree(ScriptInterface $script)
+    {
+        $ast = $this->getAstForLogicalOps($script);
+        $paths = $ast->flags();
+        $results = [];
+
+        if (count($paths) > 1) {
+            foreach ($paths as $path) {
+                $results[] = $this->getBranchForPath($script, $path);
+            }
+        } else {
+            $results[] = $this->getBranchForPath($script, []);
+        }
+
+        return new ParsedScript($script, $ast, $results);
+    }
+
+    /**
      * Build tree of dependent logical ops
      * @param ScriptInterface $script
      * @return LogicOpNode
@@ -87,12 +108,11 @@ class BranchInterpreter
      */
     public function getBranchForPath(ScriptInterface $script, array $path)
     {
-        $stack = new Stack();
-        foreach (array_reverse($path) as $setting) {
-            $stack->push($setting);
-        }
+        // parses the opcodes which were actually run
+        $segments = $this->evaluateUsingStack($script, $path);
 
-        $segments = $this->evaluateUsingStack($script, $stack);
+        //
+
         return new ScriptBranch($script, $path, $segments);
     }
 
@@ -115,11 +135,16 @@ class BranchInterpreter
 
     /**
      * @param ScriptInterface $script
-     * @param Stack $mainStack
+     * @param int[] $path
      * @return PathTrace
      */
-    public function evaluateUsingStack(ScriptInterface $script, Stack $mainStack)
+    public function evaluateUsingStack(ScriptInterface $script, array $path)
     {
+        $mainStack = new Stack();
+        foreach (array_reverse($path) as $setting) {
+            $mainStack->push($setting);
+        }
+
         $vfStack = new Stack();
         $parser = $script->getScriptParser();
         $tracer = new PathTracer();
