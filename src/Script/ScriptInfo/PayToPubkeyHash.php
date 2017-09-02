@@ -58,8 +58,7 @@ class PayToPubkeyHash
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
         }
 
-        if (
-            $chunks[0]->getOp() !== Opcodes::OP_DUP
+        if ($chunks[0]->getOp() !== Opcodes::OP_DUP
             || $chunks[1]->getOp() !== Opcodes::OP_HASH160
             || $chunks[3]->getOp() !== Opcodes::OP_EQUALVERIFY
         ) {

@@ -555,6 +555,4 @@ class OutputClassifier
 
         return $result;
     }
-
-
 }
