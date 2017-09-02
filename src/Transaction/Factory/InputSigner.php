@@ -405,7 +405,6 @@ class InputSigner implements InputSignerInterface
             $solution = $details->getKeyBuffers();
             return $details;
         } catch (\Exception $e) {
-
         }
 
         try {
@@ -413,7 +412,6 @@ class InputSigner implements InputSignerInterface
             $solution = $details->getKeyBuffer();
             return $details;
         } catch (\Exception $e) {
-
         }
 
         try {
@@ -421,7 +419,6 @@ class InputSigner implements InputSignerInterface
             $solution = $details->getPubKeyHash();
             return $details;
         } catch (\Exception $e) {
-
         }
 
         return null;
@@ -483,7 +480,6 @@ class InputSigner implements InputSignerInterface
             if ($opValue !== $dataValue) {
                 throw new \RuntimeException("Current stack doesn't follow branch path");
             }
-
         } else {
             if (count($pathData) === 0) {
                 throw new \RuntimeException("Extracted conditional op without corresponding element in path data");
@@ -536,8 +532,6 @@ class InputSigner implements InputSignerInterface
                     case Opcodes::OP_NOTIF:
                         $steps[] = $this->extractConditionalOp($op, $stack, $pathCopy);
                         break;
-                    default:
-                        throw new \RuntimeException("Coding error!");
                 }
             } else {
                 $segmentScript = $segment->makeScript();
@@ -941,13 +935,18 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
-     * @param Checksig $checksig
+     * @param int $stepIdx
      * @param PrivateKeyInterface $privateKey
      * @param int $sigHashType
      * @return $this
      */
-    public function signChecksig(Checksig $checksig, PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
+    public function signStep($stepIdx, PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
     {
+        if (!array_key_exists($stepIdx, $this->steps)) {
+            throw new \RuntimeException("Unknown step index");
+        }
+
+        $checksig = $this->steps[$stepIdx];
         if ($checksig->isFullySigned()) {
             return $this;
         }
@@ -957,7 +956,7 @@ class InputSigner implements InputSignerInterface
         }
 
         if ($checksig->getType() === ScriptType::P2PK) {
-            if (!$this->pubKeySerializer->serialize($privateKey->getPublicKey())->equals($this->signScript->getSolution())) {
+            if (!$this->pubKeySerializer->serialize($privateKey->getPublicKey())->equals($checksig->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
 
@@ -965,7 +964,6 @@ class InputSigner implements InputSignerInterface
                 $signature = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
                 $checksig->setSignature(0, $signature);
             }
-
         } else if ($checksig->getType() === ScriptType::P2PKH) {
             $publicKey = $privateKey->getPublicKey();
             if (!$publicKey->getPubKeyHash()->equals($checksig->getSolution())) {
@@ -980,7 +978,6 @@ class InputSigner implements InputSignerInterface
             if (!$checksig->hasKey(0)) {
                 $checksig->setKey(0, $publicKey);
             }
-
         } else if ($this->signScript->getType() === ScriptType::MULTISIG) {
             $signed = false;
             foreach ($checksig->getKeys() as $keyIdx => $publicKey) {
@@ -1012,8 +1009,7 @@ class InputSigner implements InputSignerInterface
      */
     public function sign(PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
     {
-        $step = $this->steps[0];
-        return $this->signChecksig($step, $privateKey, $sigHashType);
+        return $this->signStep(0, $privateKey, $sigHashType);
     }
 
     /**
@@ -1097,9 +1093,11 @@ class InputSigner implements InputSignerInterface
     {
         $results = [];
         for ($i = 0, $n = count($this->steps); $i < $n; $i++) {
+            echo "step{$i}\n";
             $step = $this->steps[$i];
             if ($step instanceof Conditional) {
                 if (!$step->hasValue()) {
+                    echo "don't have conditionals value (wtf?)\n";
                     break;
                 }
                 $results[] = [$step->getValue() ? new Buffer("\x01") : new Buffer("", 0)];
@@ -1140,29 +1138,23 @@ class InputSigner implements InputSignerInterface
             $emptyWitness = new ScriptWitness([]);
         }
 
-        $scriptSigChunks = [];
         $witness = [];
-        if ($this->scriptPubKey->canSign()) {
-            $scriptSigChunks = $this->serializeSteps();
-        }
+        $scriptSigChunks = $this->serializeSteps();
 
         $solution = $this->scriptPubKey;
         $p2sh = false;
         if ($solution->getType() === ScriptType::P2SH) {
             $p2sh = true;
-            if ($this->redeemScript->canSign()) {
-                $scriptSigChunks = $this->serializeSteps();
-            }
             $solution = $this->redeemScript;
         }
 
         if ($solution->getType() === ScriptType::P2WKH) {
-            $witness = $this->serializeSteps();
+            $witness = $scriptSigChunks;
+            $scriptSigChunks = [];
         } else if ($solution->getType() === ScriptType::P2WSH) {
-            if ($this->witnessScript->canSign()) {
-                $witness = $this->serializeSteps();
-                $witness[] = $this->witnessScript->getScript()->getBuffer();
-            }
+            $witness = $scriptSigChunks;
+            $witness[] = $this->witnessScript->getScript()->getBuffer();
+            $scriptSigChunks = [];
         }
 
         if ($p2sh) {
@@ -1170,5 +1162,10 @@ class InputSigner implements InputSignerInterface
         }
 
         return new SigValues($this->pushAll($scriptSigChunks), new ScriptWitness($witness));
+    }
+
+    public function getSteps()
+    {
+        return $this->steps;
     }
 }
