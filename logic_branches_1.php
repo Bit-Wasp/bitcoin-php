@@ -42,7 +42,7 @@ $script = ScriptFactory::sequence([
 $ast = new BranchInterpreter();
 $branches = $ast->getScriptBranches($script);
 foreach ($branches as $branch) {
-    var_dump($branch->getBranchDescriptor());
+    var_dump($branch->getPath());
     foreach ($branch->getSegments() as $segment) {
         echo " * " . $segment->makeScript()->getScriptParser()->getHumanReadable() . PHP_EOL;
     }

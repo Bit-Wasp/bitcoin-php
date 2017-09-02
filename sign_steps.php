@@ -45,7 +45,7 @@ $branches = $ast->getScriptBranches($script);
 
 foreach($branches as $branch) {
     echo "Branch \n";
-    var_dump($branch->getBranchDescriptor());
+    var_dump($branch->getPath());
 
     echo "Sign Steps \n\n";
     $steps = $branch->getSignSteps();

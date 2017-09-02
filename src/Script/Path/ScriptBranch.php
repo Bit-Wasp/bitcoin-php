@@ -26,13 +26,13 @@ class ScriptBranch
     /**
      * ScriptBranch constructor.
      * @param ScriptInterface $fullScript
-     * @param array $branch
+     * @param array $logicalPath
      * @param PathTrace $segments
      */
-    public function __construct(ScriptInterface $fullScript, array $branch, PathTrace $segments)
+    public function __construct(ScriptInterface $fullScript, array $logicalPath, PathTrace $segments)
     {
         $this->fullScript = $fullScript;
-        $this->branch = $branch;
+        $this->branch = $logicalPath;
         $this->segments = $segments;
     }
 
@@ -47,7 +47,7 @@ class ScriptBranch
     /**
      * @return array|\bool[]
      */
-    public function getBranchDescriptor()
+    public function getPath()
     {
         return $this->branch;
     }
