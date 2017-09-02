@@ -109,7 +109,7 @@ class ScriptBranchTest extends AbstractTestCase
             $foundBranch = false;
             $ub = null;
             foreach ($branches as $branch) {
-                if ($branch->getBranchDescriptor() === $vfInput) {
+                if ($branch->getPath() === $vfInput) {
                     $foundBranch = true;
                     $this->assertTrue($expectedBranch->equals($branch->getNeuteredScript()));
                 }

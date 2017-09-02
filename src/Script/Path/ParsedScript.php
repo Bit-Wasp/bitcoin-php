@@ -48,7 +48,7 @@ class ParsedScript
         $keyedBranchMap = []; // idx => ScriptBranch
         $keyedIdxMap = []; // descriptor => ScriptBranch
         foreach ($branches as $branch) {
-            $descriptor = $branch->getBranchDescriptor();
+            $descriptor = $branch->getPath();
             $descriptorKey = json_encode($descriptor);
             if (array_key_exists($descriptorKey, $keyedBranchMap)) {
                 throw new \RuntimeException("Duplicate branch descriptor, invalid ScriptBranch found");
@@ -63,6 +63,14 @@ class ParsedScript
         $this->descriptorMap = $keyedIdxMap;
         $this->script = $script;
         $this->ast = $ast;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasMultipleBranches()
+    {
+        return $this->ast->hasChildren();
     }
 
     /**
@@ -113,7 +121,6 @@ class ParsedScript
      */
     public function getMutuallyExclusiveOps($branch)
     {
-
         if (!($branch = $this->getBranchByDesc($branch))) {
             return false;
         }

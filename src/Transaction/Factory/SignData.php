@@ -24,6 +24,11 @@ class SignData
     protected $signaturePolicy = null;
 
     /**
+     * @var bool[]
+     */
+    protected $logicalPath = null;
+
+    /**
      * @param ScriptInterface $redeemScript
      * @return $this
      */
@@ -52,6 +57,7 @@ class SignData
 
         return $this->redeemScript;
     }
+
     /**
      * @param ScriptInterface $witnessScript
      * @return $this
@@ -109,5 +115,41 @@ class SignData
             throw new \RuntimeException('Signature policy requested but not set');
         }
         return $this->signaturePolicy;
+    }
+
+    /**
+     * @param bool[] $vfPathTaken
+     * @return $this
+     */
+    public function logicalPath(array $vfPathTaken)
+    {
+        foreach ($vfPathTaken as $value) {
+            if (!is_bool($value)) {
+                throw new \RuntimeException("Invalid values for logical path, must be a boolean array");
+            }
+        }
+
+        $this->logicalPath = $vfPathTaken;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasLogicalPath()
+    {
+        return is_array($this->logicalPath);
+    }
+
+    /**
+     * @return bool[]
+     */
+    public function getLogicalPath()
+    {
+        if (null === $this->logicalPath) {
+            throw new \RuntimeException("Logical path requested but not set");
+        }
+
+        return $this->logicalPath;
     }
 }
