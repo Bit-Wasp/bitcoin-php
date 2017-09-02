@@ -186,7 +186,7 @@ class OutputClassifierTest extends AbstractTestCase
 
         if ($type === ScriptType::MULTISIG) {
             $this->assertTrue($classifier->isMultisig($script));
-            $count = (new Multisig($script))->getRequiredSigCount();
+            $count = Multisig::fromScript($script)->getRequiredSigCount();
             $this->assertEquals($script, $factory->multisig($count, array_map([PublicKeyFactory::class, 'fromHex'], $solution), false));
         } else {
             $this->assertFalse($classifier->isMultisig($script));
