@@ -92,7 +92,8 @@ class PayToPubkey
         return 1;
     }
 
-    public function isChecksigVerify() {
+    public function isChecksigVerify()
+    {
         return $this->verify;
     }
 

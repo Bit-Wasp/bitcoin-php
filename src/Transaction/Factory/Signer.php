@@ -141,9 +141,11 @@ class Signer
      */
     public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, $sigHashType = SigHash::ALL)
     {
-        $this
-            ->input($nIn, $txOut, $signData)
-            ->sign($key, $sigHashType);
+        $input = $this->input($nIn, $txOut, $signData);
+        foreach ($input->getSteps() as $idx => $step) {
+            $input->sign($key, $sigHashType);
+        }
+
 
         return $this;
     }
