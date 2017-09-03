@@ -100,7 +100,8 @@ class Checksig
         }
     }
 
-    public function setRequired($setting) {
+    public function setRequired($setting)
+    {
         if (!is_bool($setting)) {
             throw new \RuntimeException("Invalid input to setRequired");
         }
@@ -108,14 +109,9 @@ class Checksig
         return $this;
     }
 
-    public function isRequired() {
+    public function isRequired()
+    {
         return $this->required;
-    }
-
-    private function disable() {
-        for ($i = 0; $i < $this->requiredSigs; $i++) {
-
-        }
     }
 
     /**
@@ -262,6 +258,11 @@ class Checksig
         return $this->publicKeys;
     }
 
+    public function isVerify()
+    {
+        return $this->info->isChecksigVerify();
+    }
+
     /**
      * @return array
      */
@@ -279,16 +280,17 @@ class Checksig
                 }
             }
         } else if (ScriptType::P2PKH === $outputType) {
-            if ($this->hasSignature(0) && $this->hasKey(0)) {
-                $result = [$this->txSigSerializer->serialize($this->getSignature(0)), $this->pubKeySerializer->serialize($this->getKey(0))];
+            if (!$this->required && $this->hasKey(0)) {
+                $result = [new Buffer(), $this->pubKeySerializer->serialize($this->getKey(0))];
+            } else {
+                if ($this->hasSignature(0) && $this->hasKey(0)) {
+                    $result = [$this->txSigSerializer->serialize($this->getSignature(0)), $this->pubKeySerializer->serialize($this->getKey(0))];
+                }
             }
         } else if (ScriptType::MULTISIG === $outputType) {
-            echo "serializing multisig\n";
             if (!$this->isRequired()) {
-                echo "not required\n";
                 $result = array_fill(0, 1 + $this->getRequiredSigs(), new Buffer());
             } else {
-                echo "required\n";
                 $result[] = new Buffer();
                 for ($i = 0, $nPubKeys = count($this->getKeys()); $i < $nPubKeys; $i++) {
                     if ($this->hasSignature($i)) {

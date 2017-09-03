@@ -97,10 +97,10 @@ class ScriptFactory
      */
     public static function consensus(EcAdapterInterface $ecAdapter = null)
     {
-//        if (extension_loaded('bitcoinconsensus')) {
-//            return self::getBitcoinConsensus();
-//        } else {
+        if (extension_loaded('bitcoinconsensus')) {
+            return self::getBitcoinConsensus();
+        } else {
             return self::getNativeConsensus($ecAdapter);
-//        }
+        }
     }
 }
