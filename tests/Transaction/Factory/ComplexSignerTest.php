@@ -8,9 +8,13 @@ use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
+use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkey;
+use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\Factory\Checksig;
+use BitWasp\Bitcoin\Transaction\Factory\Conditional;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
@@ -115,9 +119,9 @@ class ComplexSignerTest extends AbstractTestCase
             ScriptFactory::sequence([
                 Opcodes::OP_2, $pkB1->getBuffer(), $pkB2->getBuffer(), Opcodes::OP_2, Opcodes::OP_CHECKMULTISIG,
                 Opcodes::OP_IF,
-                   $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
+                $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
                 Opcodes::OP_ELSE,
-                    $pkC->getBuffer(), Opcodes::OP_CHECKSIG,
+                $pkC->getBuffer(), Opcodes::OP_CHECKSIG,
                 Opcodes::OP_ENDIF,
             ]),
             [
@@ -154,9 +158,9 @@ class ComplexSignerTest extends AbstractTestCase
         return [
             ScriptFactory::sequence([
                 Opcodes::OP_IF,
-                    $pkB->getBuffer(), Opcodes::OP_CHECKSIG,
+                $pkB->getBuffer(), Opcodes::OP_CHECKSIG,
                 Opcodes::OP_ELSE,
-                    $pkC->getBuffer(), Opcodes::OP_CHECKSIG,
+                $pkC->getBuffer(), Opcodes::OP_CHECKSIG,
                 Opcodes::OP_ENDIF,
             ]),
             [
@@ -194,9 +198,9 @@ class ComplexSignerTest extends AbstractTestCase
         return [
             ScriptFactory::sequence([
                 Opcodes::OP_IF,
-                    Opcodes::OP_2, $pkB1->getBuffer(), $pkB2->getBuffer(), Opcodes::OP_2, Opcodes::OP_CHECKMULTISIG,
+                Opcodes::OP_2, $pkB1->getBuffer(), $pkB2->getBuffer(), Opcodes::OP_2, Opcodes::OP_CHECKMULTISIG,
                 Opcodes::OP_ELSE,
-                    $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
+                $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
                 Opcodes::OP_ENDIF,
             ]),
             [
@@ -236,14 +240,14 @@ class ComplexSignerTest extends AbstractTestCase
         return [
             ScriptFactory::sequence([
                 Opcodes::OP_IF,
-                    $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
+                $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
                 Opcodes::OP_ELSE,
-                    $pkB->getBuffer(), Opcodes::OP_CHECKSIG,
-                    Opcodes::OP_NOTIF,
-                        $pkC->getBuffer(), Opcodes::OP_CHECKSIG,
-                    Opcodes::OP_ELSE,
-                        $pkD->getBuffer(), Opcodes::OP_CHECKSIG,
-                    Opcodes::OP_ENDIF,
+                $pkB->getBuffer(), Opcodes::OP_CHECKSIG,
+                Opcodes::OP_NOTIF,
+                $pkC->getBuffer(), Opcodes::OP_CHECKSIG,
+                Opcodes::OP_ELSE,
+                $pkD->getBuffer(), Opcodes::OP_CHECKSIG,
+                Opcodes::OP_ENDIF,
                 Opcodes::OP_ENDIF,
             ]),
             [
@@ -279,7 +283,7 @@ class ComplexSignerTest extends AbstractTestCase
      */
     private function SimpleStillWorks()
     {
-        $pB = $this->getKeyFromStore(1);
+        $pB = $this->getKeyFromStore(0);
 
         $pkB = $pB->getPublicKey();
 
@@ -299,6 +303,120 @@ class ComplexSignerTest extends AbstractTestCase
     }
 
     /**
+     * [Alice] CHECKSIGVERIFY [Bob] CHECKSIG
+     * @return array
+     */
+    private function TwoMildlySimilarTemplates()
+    {
+        $pA = $this->getKeyFromStore(0);
+        $pB = $this->getKeyFromStore(1);
+
+        $pkA = $pA->getPublicKey();
+        $pkB = $pB->getPublicKey();
+
+        return [
+            ScriptFactory::sequence([
+                $pkA->getBuffer(), Opcodes::OP_CHECKSIGVERIFY,
+                $pkB->getBuffer(), Opcodes::OP_CHECKSIG,
+            ]),
+            [
+                [],
+            ],
+            [
+                [
+                    [$pA],
+                    [$pB],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * 2of3 CHECKMULTISIGVERIFY [Bob] CHECKSIG
+     * @return array
+     */
+    private function TwoRatherDifferentTemplates()
+    {
+        $pA = $this->getKeyFromStore(0);
+        $pB = $this->getKeyFromStore(1);
+        $pC = $this->getKeyFromStore(2);
+        $pD = $this->getKeyFromStore(3);
+
+        $pkA = $pA->getPublicKey();
+        $pkB = $pB->getPublicKey();
+        $pkC = $pC->getPublicKey();
+        $pkD = $pD->getPublicKey();
+
+        return [
+            ScriptFactory::sequence([
+                Opcodes::OP_2, $pkA->getBuffer(), $pkB->getBuffer(), $pkC->getBuffer(), Opcodes::OP_3, Opcodes::OP_CHECKMULTISIGVERIFY,
+                $pkD->getBuffer(), Opcodes::OP_CHECKSIG,
+            ]),
+            [
+                [],
+                [],
+                [],
+            ],
+            [
+                [
+                    [$pA, $pB],
+                    [$pD],
+                ],
+                [
+                    [$pA, $pC],
+                    [$pD],
+                ],
+                [
+                    [$pB, $pC],
+                    [$pD],
+                ],
+            ],
+        ];
+    }
+
+
+    /**
+     * 2of3 CHECKMULTISIGVERIFY [Bob] CHECKSIG
+     * @return array
+     */
+    private function LotsOfTemplates()
+    {
+        $pA = $this->getKeyFromStore(0);
+        $pB = $this->getKeyFromStore(1);
+        $pC = $this->getKeyFromStore(2);
+        $pD = $this->getKeyFromStore(3);
+
+        $pkA = $pA->getPublicKey();
+        $pkB = $pB->getPublicKey();
+        $pkC = $pC->getPublicKey();
+        $pkD = $pD->getPublicKey();
+
+        return [
+            ScriptFactory::sequence([
+                Opcodes::OP_1, $pkA->getBuffer(), $pkB->getBuffer(), Opcodes::OP_2, Opcodes::OP_CHECKMULTISIGVERIFY,
+                $pkC->getBuffer(), Opcodes::OP_CHECKSIGVERIFY,
+                Opcodes::OP_DUP, Opcodes::OP_HASH160, $pkD->getPubKeyHash(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG,
+            ]),
+            [
+                [],
+                [],
+            ],
+            [
+                [
+                    [$pA],
+                    [$pC],
+                    [$pD],
+                ],
+                [
+                    [$pB],
+                    [$pC],
+                    [$pD],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @return array
      */
     public function complexScriptProvider()
@@ -310,6 +428,9 @@ class ComplexSignerTest extends AbstractTestCase
             $this->DifferentlyTypedConditionalSection(),
             $this->OneNestedNotif(),
             $this->SimpleStillWorks(),
+            $this->TwoMildlySimilarTemplates(),
+            $this->TwoRatherDifferentTemplates(),
+            $this->LotsOfTemplates(),
         ];
     }
 
@@ -387,10 +508,40 @@ class ComplexSignerTest extends AbstractTestCase
         $sinput = $signed->input(0, $txOut, $signData);
 
         foreach ($branchKeyList as $i => $stepKeys) {
-            if (count($stepKeys) > 0) {
-                $step = $input->step($i);
-                $sstep = $sinput->step($i);
+            $step = $input->step($i);
+            $sstep = $sinput->step($i);
 
+            if ($step instanceof Checksig) {
+                $this->assertInstanceOf(Checksig::class, $sstep);
+                /** @var Checksig $sstep */
+                $this->assertEquals($step->getType(), $sstep->getType());
+                $this->assertEquals($step->getInfo()->getType(), $sstep->getInfo()->getType());
+
+                $this->assertEquals(get_class($step->getInfo()), get_class($sstep->getInfo()));
+                $info = $step->getInfo();
+                if ($info instanceof Multisig) {
+                    $other = $sstep->getInfo();
+                    $this->assertEquals($info->getKeyCount(), $other->getKeyCount());
+                    $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
+
+                    for ($i = 0, $keyCount = $info->getKeyCount(); $i < $keyCount; $i++) {
+                        $this->assertTrue($info->getKeyBuffers()[$i]->equals($other->getKeyBuffers()[$i]));
+                    }
+                } else if ($info instanceof PayToPubkey) {
+                    $other = $sstep->getInfo();
+                    $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
+                    $this->assertTrue($info->getKeyBuffer()->equals($other->getKeyBuffer()));
+                } else if ($info instanceof PayToPubkeyHash) {
+                    $other = $sstep->getInfo();
+                    $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
+                    $this->assertTrue($info->getPubKeyHash()->equals($other->getPubKeyHash()));
+                }
+            } else if ($step instanceof Conditional) {
+                /** @var Conditional $sstep */
+                $this->assertInstanceOf(Conditional::class, $sstep);
+            }
+
+            if (count($stepKeys) > 0) {
                 $this->assertInstanceOf(Checksig::class, $sstep);
                 $this->assertInstanceOf(Checksig::class, $step);
 
@@ -401,6 +552,7 @@ class ComplexSignerTest extends AbstractTestCase
 
                 $this->assertEquals($step->getRequiredSigs(), $sstep->getRequiredSigs(), "`requiredSigs` should match after extracting signatures");
                 $this->assertEquals(count($step->getSignatures()), count($sstep->getSignatures()), "number of signatures should match after extracting signatures");
+                $this->assertEquals($step->isFullySigned(), $sstep->isFullySigned(), "isFullySigned should match after extracting signatures");
 
                 for ($i = 0; $i < count($step->getKeys()); $i++) {
                     $this->assertEquals($step->hasKey($i), $sstep->hasKey($i));
