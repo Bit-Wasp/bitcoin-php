@@ -41,19 +41,6 @@ class ScriptFactory
     }
 
     /**
-     * @param Operation[] $operations
-     * @return ScriptInterface
-     */
-    public static function fromOperations(array $operations)
-    {
-        $sequence = [];
-        foreach ($operations as $operation) {
-            $sequence[] = $operation->encode();
-        }
-        return self::sequence($sequence);
-    }
-
-    /**
      * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return ScriptInterface
      */
@@ -115,10 +102,10 @@ class ScriptFactory
      */
     public static function consensus(EcAdapterInterface $ecAdapter = null)
     {
-        if (extension_loaded('bitcoinconsensus')) {
-            return self::getBitcoinConsensus();
-        } else {
+//        if (extension_loaded('bitcoinconsensus')) {
+//            return self::getBitcoinConsensus();
+//        } else {
             return self::getNativeConsensus($ecAdapter);
-        }
+//        }
     }
 }
