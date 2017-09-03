@@ -559,10 +559,10 @@ class InputSigner implements InputSignerInterface
 
                         $vfStack->push($value);
                         break;
-                    case Opcodes::OP_ENDIF;
+                    case Opcodes::OP_ENDIF:
                         $vfStack->pop();
                         break;
-                    case Opcodes::OP_ELSE;
+                    case Opcodes::OP_ELSE:
                         $vfStack->push(!$vfStack->pop());
                         break;
                 }

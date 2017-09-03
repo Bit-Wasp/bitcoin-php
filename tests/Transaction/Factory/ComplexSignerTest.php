@@ -64,7 +64,7 @@ class ComplexSignerTest extends AbstractTestCase
      * NOTIF [AliceKey] CHECKSIGVERIFY ENDIF [BobKey] CHECKSIG
      * @return array
      */
-    private function ConditionalBlockWithMandatoryEnding()
+    private function conditionalBlockWithMandatoryEnding()
     {
         $pA = $this->getKeyFromStore(0);
         $pB = $this->getKeyFromStore(1);
@@ -103,7 +103,7 @@ class ComplexSignerTest extends AbstractTestCase
      * 2-of-2 MULTISIG IF [Alice] CHECKSIG ELSE [BobKey] CHECKSIG ENDIF
      * @return array
      */
-    private function MandatoryStartWithConditionalEnding()
+    private function mandatoryStartWithConditionalEnding()
     {
         $pA = $this->getKeyFromStore(0);
         $pB1 = $this->getKeyFromStore(1);
@@ -147,7 +147,7 @@ class ComplexSignerTest extends AbstractTestCase
      * IF [Alice] CHECKSIG ELSE [Bob] CHECKSIG
      * @return array
      */
-    private function SimilarConditionalSection()
+    private function similarConditionalSection()
     {
         $pB = $this->getKeyFromStore(0);
         $pC = $this->getKeyFromStore(1);
@@ -185,7 +185,7 @@ class ComplexSignerTest extends AbstractTestCase
      * IF 2 of 2 MULTISIG ELSE [Alice] CHECKSIG ENDIF
      * @return array
      */
-    private function DifferentlyTypedConditionalSection()
+    private function differentlyTypedConditionalSection()
     {
         $pA = $this->getKeyFromStore(0);
         $pB1 = $this->getKeyFromStore(1);
@@ -225,7 +225,7 @@ class ComplexSignerTest extends AbstractTestCase
      * IF 2 of 2 MULTISIG ELSE [Alice] CHECKSIG ENDIF
      * @return array
      */
-    private function OneNestedNotif()
+    private function oneNestedNotif()
     {
         $pA = $this->getKeyFromStore(0);
         $pB = $this->getKeyFromStore(1);
@@ -276,12 +276,11 @@ class ComplexSignerTest extends AbstractTestCase
         ];
     }
 
-
     /**
      * [Alice] CHECKSIG
      * @return array
      */
-    private function SimpleStillWorks()
+    private function simpleStillWorks()
     {
         $pB = $this->getKeyFromStore(0);
 
@@ -306,7 +305,7 @@ class ComplexSignerTest extends AbstractTestCase
      * [Alice] CHECKSIGVERIFY [Bob] CHECKSIG
      * @return array
      */
-    private function TwoMildlySimilarTemplates()
+    private function twoMildlySimilarTemplates()
     {
         $pA = $this->getKeyFromStore(0);
         $pB = $this->getKeyFromStore(1);
@@ -335,7 +334,7 @@ class ComplexSignerTest extends AbstractTestCase
      * 2of3 CHECKMULTISIGVERIFY [Bob] CHECKSIG
      * @return array
      */
-    private function TwoRatherDifferentTemplates()
+    private function twoRatherDifferentTemplates()
     {
         $pA = $this->getKeyFromStore(0);
         $pB = $this->getKeyFromStore(1);
@@ -374,12 +373,11 @@ class ComplexSignerTest extends AbstractTestCase
         ];
     }
 
-
     /**
      * 2of3 CHECKMULTISIGVERIFY [Bob] CHECKSIG
      * @return array
      */
-    private function LotsOfTemplates()
+    private function lotsOfTemplates()
     {
         $pA = $this->getKeyFromStore(0);
         $pB = $this->getKeyFromStore(1);
@@ -422,15 +420,15 @@ class ComplexSignerTest extends AbstractTestCase
     public function complexScriptProvider()
     {
         return [
-            $this->ConditionalBlockWithMandatoryEnding(),
-            $this->MandatoryStartWithConditionalEnding(),
-            $this->SimilarConditionalSection(),
-            $this->DifferentlyTypedConditionalSection(),
-            $this->OneNestedNotif(),
-            $this->SimpleStillWorks(),
-            $this->TwoMildlySimilarTemplates(),
-            $this->TwoRatherDifferentTemplates(),
-            $this->LotsOfTemplates(),
+            $this->conditionalBlockWithMandatoryEnding(),
+            $this->mandatoryStartWithConditionalEnding(),
+            $this->similarConditionalSection(),
+            $this->differentlyTypedConditionalSection(),
+            $this->oneNestedNotif(),
+            $this->simpleStillWorks(),
+            $this->twoMildlySimilarTemplates(),
+            $this->twoRatherDifferentTemplates(),
+            $this->lotsOfTemplates(),
         ];
     }
 
