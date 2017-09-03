@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Buffertools\Buffer;
 
 class Conditional
 {
@@ -17,6 +18,11 @@ class Conditional
     private $value;
 
     /**
+     * @var null
+     */
+    private $providedBy = null;
+
+    /**
      * Conditional constructor.
      * @param int $opcode
      */
@@ -27,6 +33,14 @@ class Conditional
         }
 
         $this->opcode = $opcode;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOp()
+    {
+        return $this->opcode;
     }
 
     /**
@@ -59,5 +73,22 @@ class Conditional
         }
 
         return $this->value;
+    }
+
+    public function providedBy(Checksig $checksig)
+    {
+        $this->providedBy = $checksig;
+    }
+
+    /**
+     * @return array
+     */
+    public function serialize()
+    {
+        if ($this->hasValue() && null === $this->providedBy) {
+            return [$this->value ? new Buffer("\x01") : new Buffer()];
+        }
+
+        return [];
     }
 }
