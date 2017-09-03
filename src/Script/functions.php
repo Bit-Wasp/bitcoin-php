@@ -8,7 +8,10 @@ function decodeOpN($op)
         return 0;
     }
 
-    assert($op === Opcodes::OP_1NEGATE || $op >= Opcodes::OP_1 && $op <= Opcodes::OP_16);
+    if (!($op === Opcodes::OP_1NEGATE || $op >= Opcodes::OP_1 && $op <= Opcodes::OP_16)) {
+        throw new \RuntimeException("Invalid opcode");
+    }
+
     return (int) $op - (Opcodes::OP_1 - 1);
 }
 
@@ -18,6 +21,9 @@ function encodeOpN($op)
         return Opcodes::OP_0;
     }
 
-    assert($op === -1 || $op >= 1 && $op <= 16);
+    if (!($op === -1 || $op >= 1 && $op <= 16)) {
+        throw new \RuntimeException("Invalid value");
+    }
+
     return (int) Opcodes::OP_1 + $op - 1;
 }

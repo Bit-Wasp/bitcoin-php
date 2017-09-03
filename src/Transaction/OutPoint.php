@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Bitcoin\Util\IntRange;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
@@ -37,6 +38,14 @@ class OutPoint extends Serializable implements OutPointInterface
 
         $this->hashPrevOutput = $hashPrevOutput;
         $this->nPrevOutput = $nPrevOutput;
+    }
+
+    /**
+     * @return static
+     */
+    public static function makeCoinbase()
+    {
+        return new static(new Buffer("", 32), 0xffffffff);
     }
 
     /**

@@ -341,7 +341,7 @@ class Interpreter implements InterpreterInterface
      * @param bool $value
      * @return bool
      */
-    private function checkExec(Stack $vfStack, $value)
+    public function checkExec(Stack $vfStack, $value)
     {
         $ret = 0;
         foreach ($vfStack as $item) {

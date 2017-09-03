@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Serializer\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
@@ -24,17 +25,17 @@ class TransactionSignatureSerializer
     }
 
     /**
-     * @param TransactionSignature $txSig
+     * @param TransactionSignatureInterface $txSig
      * @return BufferInterface
      */
-    public function serialize(TransactionSignature $txSig)
+    public function serialize(TransactionSignatureInterface $txSig)
     {
         return new Buffer($this->sigSerializer->serialize($txSig->getSignature())->getBinary() . pack('C', $txSig->getHashType()));
     }
 
     /**
      * @param string|BufferInterface $string
-     * @return TransactionSignature
+     * @return TransactionSignatureInterface
      */
     public function parse($string)
     {

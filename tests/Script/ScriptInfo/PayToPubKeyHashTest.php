@@ -21,7 +21,7 @@ class PayToPubkeyHashTest extends AbstractTestCase
         $classifier = new OutputClassifier();
         $this->assertEquals(ScriptType::P2PKH, $classifier->classify($script));
 
-        $info = new PayToPubkeyHash($script);
+        $info = PayToPubkeyHash::fromScript($script);
         $this->assertEquals(1, $info->getRequiredSigCount());
         $this->assertEquals(1, $info->getKeyCount());
         $this->assertTrue($info->checkInvolvesKey($pub));

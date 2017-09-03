@@ -4,10 +4,13 @@ namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Buffertools\BufferInterface;
 
 class Multisig
@@ -23,6 +26,11 @@ class Multisig
     private $n;
 
     /**
+     * @var bool
+     */
+    private $verify = false;
+
+    /**
      * @var BufferInterface[]
      */
     private $keyBuffers = [];
@@ -34,26 +42,67 @@ class Multisig
 
     /**
      * Multisig constructor.
-     * @param ScriptInterface $script
+     * @param int $requiredSigs
+     * @param BufferInterface[] $keys
+     * @param int $opcode
+     * @param bool $allowVerify
      * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null)
+    public function __construct($requiredSigs, array $keys, $opcode, $allowVerify = false, PublicKeySerializerInterface $pubKeySerializer = null)
     {
+        if ($opcode === Opcodes::OP_CHECKMULTISIG) {
+            $verify = false;
+        } else if ($allowVerify && $opcode === Opcodes::OP_CHECKMULTISIGVERIFY) {
+            $verify = true;
+        } else {
+            throw new \InvalidArgumentException('Malformed multisig script');
+        }
+
+        foreach ($keys as $key) {
+            if (!PublicKey::isCompressedOrUncompressed($key)) {
+                throw new \RuntimeException("Malformed public key");
+            }
+        }
+
+        $keyCount = count($keys);
+        if ($requiredSigs < 0 || $requiredSigs > $keyCount) {
+            throw new \RuntimeException("Invalid number of required signatures");
+        }
+
+        if ($keyCount < 1 || $keyCount > 16) {
+            throw new \RuntimeException("Invalid number of public keys");
+        }
+
         if (null === $pubKeySerializer) {
             $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, false, Bitcoin::getEcAdapter());
         }
 
-        $parse = $script->getScriptParser()->decode();
-        if (count($parse) < 4 || end($parse)->getOp() !== Opcodes::OP_CHECKMULTISIG) {
+        $this->verify = $verify;
+        $this->m = $requiredSigs;
+        $this->n = $keyCount;
+        $this->keyBuffers = $keys;
+        $this->pubKeySerializer = $pubKeySerializer;
+    }
+
+    /**
+     * @param Operation[] $decoded
+     * @param PublicKeySerializerInterface|null $pubKeySerializer
+     * @param bool $allowVerify
+     * @return static
+     */
+    public static function fromDecodedScript(array $decoded, PublicKeySerializerInterface $pubKeySerializer = null, $allowVerify = false)
+    {
+        if (count($decoded) < 4) {
             throw new \InvalidArgumentException('Malformed multisig script');
         }
 
-        $mCode = $parse[0]->getOp();
-        $nCode = $parse[count($parse) - 2]->getOp();
+        $mCode = $decoded[0]->getOp();
+        $nCode = $decoded[count($decoded) - 2]->getOp();
+        $opCode = end($decoded)->getOp();
 
-        $this->m = \BitWasp\Bitcoin\Script\decodeOpN($mCode);
+        $requiredSigs = \BitWasp\Bitcoin\Script\decodeOpN($mCode);
         $publicKeyBuffers = [];
-        foreach (array_slice($parse, 1, -2) as $key) {
+        foreach (array_slice($decoded, 1, -2) as $key) {
             /** @var \BitWasp\Bitcoin\Script\Parser\Operation $key */
             if (!$key->isPush()) {
                 throw new \RuntimeException('Malformed multisig script');
@@ -63,12 +112,31 @@ class Multisig
             $publicKeyBuffers[] = $buffer;
         }
 
-        $this->n = \BitWasp\Bitcoin\Script\decodeOpN($nCode);
-        if ($this->n === 0 || $this->n !== count($publicKeyBuffers)) {
+        $keyCount = \BitWasp\Bitcoin\Script\decodeOpN($nCode);
+        if ($keyCount !== count($publicKeyBuffers)) {
             throw new \LogicException('No public keys found in script');
         }
-        $this->keyBuffers = $publicKeyBuffers;
-        $this->pubKeySerializer = $pubKeySerializer;
+
+        return new static($requiredSigs, $publicKeyBuffers, $opCode, $allowVerify, $pubKeySerializer);
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @param PublicKeySerializerInterface|null $pubKeySerializer
+     * @param bool $allowVerify
+     * @return Multisig
+     */
+    public static function fromScript(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null, $allowVerify = false)
+    {
+        return static::fromDecodedScript($script->getScriptParser()->decode(), $pubKeySerializer, $allowVerify);
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return ScriptType::MULTISIG;
     }
 
     /**
@@ -85,6 +153,14 @@ class Multisig
     public function getKeyCount()
     {
         return $this->n;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isChecksigVerify()
+    {
+        return $this->verify;
     }
 
     /**

@@ -21,7 +21,7 @@ class PaytoPubkeyTest extends AbstractTestCase
         $classifier = new OutputClassifier();
         $this->assertEquals(ScriptType::P2PK, $classifier->classify($script));
 
-        $info = new PayToPubkey($script);
+        $info = PayToPubkey::fromScript($script);
         $this->assertEquals(1, $info->getRequiredSigCount());
         $this->assertEquals(1, $info->getKeyCount());
         $this->assertTrue($pub->getBuffer()->equals($info->getKeyBuffer()));

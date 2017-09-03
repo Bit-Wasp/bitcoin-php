@@ -16,9 +16,13 @@ use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Parser\Operation;
+use BitWasp\Bitcoin\Script\Path\BranchInterpreter;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
+use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkey;
+use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Script\ScriptWitness;
@@ -91,6 +95,11 @@ class InputSigner implements InputSignerInterface
     private $redeemBitcoinCash = false;
 
     /**
+     * @var bool
+     */
+    private $allowComplexScripts = false;
+
+    /**
      * @var SignData
      */
     private $signData;
@@ -106,11 +115,6 @@ class InputSigner implements InputSignerInterface
     private $flags;
 
     /**
-     * @var OutputData $witnessKeyHash
-     */
-    private $witnessKeyHash;
-
-    /**
      * @var TransactionInterface
      */
     private $tx;
@@ -124,21 +128,6 @@ class InputSigner implements InputSignerInterface
      * @var TransactionOutputInterface
      */
     private $txOut;
-
-    /**
-     * @var PublicKeyInterface[]
-     */
-    private $publicKeys = [];
-
-    /**
-     * @var TransactionSignatureInterface[]
-     */
-    private $signatures = [];
-
-    /**
-     * @var int
-     */
-    private $requiredSigs = 0;
 
     /**
      * @var Interpreter
@@ -159,6 +148,11 @@ class InputSigner implements InputSignerInterface
      * @var PublicKeySerializerInterface
      */
     private $pubKeySerializer;
+
+    /**
+     * @var Conditional[]|Checksig[]
+     */
+    private $steps = [];
 
     /**
      * InputSigner constructor.
@@ -184,8 +178,6 @@ class InputSigner implements InputSignerInterface
         $this->nInput = $nInput;
         $this->txOut = $txOut;
         $this->signData = $signData;
-        $this->publicKeys = [];
-        $this->signatures = [];
 
         $this->txSigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter));
         $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
@@ -248,6 +240,16 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
+     * @param bool $setting
+     * @return $this
+     */
+    public function allowComplexScripts($setting)
+    {
+        $this->allowComplexScripts = (bool) $setting;
+        return $this;
+    }
+
+    /**
      * @param BufferInterface $vchPubKey
      * @return PublicKeyInterface|null
      * @throws \Exception
@@ -266,8 +268,7 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
-     * A snipped from OP_CHECKMULTISIG - verifies signatures according to the
-     * order of the given public keys (taken from the script).
+     * A snippet from OP_CHECKMULTISIG - links keys to signatures
      *
      * @param ScriptInterface $script
      * @param BufferInterface[] $signatures
@@ -363,29 +364,222 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
-     * Evaluates a scriptPubKey against the provided chunks.
-     *
-     * @param ScriptInterface $scriptPubKey
-     * @param array $chunks
-     * @param int $sigVersion
-     * @return bool
+     * @param array $decoded
+     * @param null $solution
+     * @return null|PayToPubkey|PayToPubkeyHash|Multisig
      */
-    private function evaluateSolution(ScriptInterface $scriptPubKey, array $chunks, $sigVersion)
+    private function classifySignStep(array $decoded, &$solution = null)
     {
-        $stack = new Stack($chunks);
-        if (!$this->interpreter->evaluate($scriptPubKey, $stack, $sigVersion, $this->flags, $this->signatureChecker)) {
-            return false;
+        try {
+            $details = Multisig::fromDecodedScript($decoded, $this->pubKeySerializer, true);
+            $solution = $details->getKeyBuffers();
+            return $details;
+        } catch (\Exception $e) {
         }
 
-        if ($stack->isEmpty()) {
-            return false;
+        try {
+            $details = PayToPubkey::fromDecodedScript($decoded, true);
+            $solution = $details->getKeyBuffer();
+            return $details;
+        } catch (\Exception $e) {
         }
 
-        if (false === $this->interpreter->castToBool($stack[-1])) {
-            return false;
+        try {
+            $details = PayToPubkeyHash::fromDecodedScript($decoded, true);
+            $solution = $details->getPubKeyHash();
+            return $details;
+        } catch (\Exception $e) {
         }
 
-        return true;
+        return null;
+    }
+
+    /**
+     * @param ScriptInterface $script
+     * @return Checksig[]
+     */
+    public function parseSequence(ScriptInterface $script)
+    {
+        $decoded = $script->getScriptParser()->decode();
+
+        $j = 0;
+        $l = count($decoded);
+        $result = [];
+        while ($j < $l) {
+            $step = null;
+            $slice = null;
+
+            // increment the $last, and break if it's valid
+            for ($i = 0; $i < ($l - $j) + 1; $i++) {
+                $slice = array_slice($decoded, $j, $i);
+                $step = $this->classifySignStep($slice, $solution);
+                if ($step !== null) {
+                    break;
+                }
+            }
+
+            if (null === $step) {
+                throw new \RuntimeException("Invalid script");
+            } else {
+                $j += $i;
+                $result[] = new Checksig($step, $this->txSigSerializer, $this->pubKeySerializer);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param Operation $operation
+     * @param Stack $mainStack
+     * @param bool[] $pathData
+     * @return Conditional
+     */
+    public function extractConditionalOp(Operation $operation, Stack $mainStack, array &$pathData)
+    {
+        $opValue = null;
+
+        if (!$mainStack->isEmpty()) {
+            if (count($pathData) === 0) {
+                throw new \RuntimeException("Extracted conditional op (including mainstack) without corresponding element in path data");
+            }
+
+            $opValue = $this->interpreter->castToBool($mainStack->pop());
+            $dataValue = array_shift($pathData);
+            if ($opValue !== $dataValue) {
+                throw new \RuntimeException("Current stack doesn't follow branch path");
+            }
+        } else {
+            if (count($pathData) === 0) {
+                throw new \RuntimeException("Extracted conditional op without corresponding element in path data");
+            }
+
+            $opValue = array_shift($pathData);
+        }
+
+        $conditional = new Conditional($operation->getOp());
+
+        if ($opValue !== null) {
+            if (!is_bool($opValue)) {
+                throw new \RuntimeException("Sanity check, path value (likely from pathData) was not a bool");
+            }
+
+            $conditional->setValue($opValue);
+        }
+
+        return $conditional;
+    }
+
+    /**
+     * @param int $idx
+     * @return Checksig|Conditional
+     */
+    public function step($idx)
+    {
+        if (!array_key_exists($idx, $this->steps)) {
+            throw new \RuntimeException("Out of range index for input sign step");
+        }
+
+        return $this->steps[$idx];
+    }
+
+    /**
+     * @param OutputData $solution
+     * @param array $sigChunks
+     * @param SignData $signData
+     */
+    public function extractScript(OutputData $solution, array $sigChunks, SignData $signData)
+    {
+        $logicInterpreter = new BranchInterpreter();
+        $tree = $logicInterpreter->getScriptTree($solution->getScript());
+
+        if ($tree->hasMultipleBranches()) {
+            $logicalPath = $signData->getLogicalPath();
+            // we need a function like findWitnessScript to 'check'
+            // partial signatures against _our_ path
+        } else {
+            $logicalPath = [];
+        }
+
+        $branch = $tree->getBranchByDesc($logicalPath);
+        $segments = $branch->getSegments();
+
+        $vfStack = new Stack();
+        $stack = new Stack($sigChunks);
+
+        $pathCopy = $logicalPath;
+        $steps = [];
+        foreach ($segments as $i => $segment) {
+            $fExec = !$this->interpreter->checkExec($vfStack, false);
+            if ($segment->isLoneLogicalOp()) {
+                $op = $segment[0];
+                switch ($op->getOp()) {
+                    case Opcodes::OP_IF:
+                    case Opcodes::OP_NOTIF:
+                        $value = false;
+                        if ($fExec) {
+                            // Pop from mainStack if $fExec
+                            $step = $this->extractConditionalOp($op, $stack, $pathCopy);
+
+                            // the Conditional has a value in this case:
+                            $value = $step->getValue();
+
+                            // Connect the last operation (if there is one)
+                            // with the last step with isRequired==$value
+                            for ($j = count($steps) - 1; $j >= 0; $j--) {
+                                if ($steps[$j] instanceof Checksig && $value === $steps[$j]->isRequired()) {
+                                    $step->providedBy($steps[$j]);
+                                    break;
+                                }
+                            }
+                        } else {
+                            $step = new Conditional($op->getOp());
+                        }
+
+                        $steps[] = $step;
+
+                        if ($op->getOp() === Opcodes::OP_NOTIF) {
+                            $value = !$value;
+                        }
+
+                        $vfStack->push($value);
+                        break;
+                    case Opcodes::OP_ENDIF:
+                        $vfStack->pop();
+                        break;
+                    case Opcodes::OP_ELSE:
+                        $vfStack->push(!$vfStack->pop());
+                        break;
+                }
+            } else {
+                $segmentScript = $segment->makeScript();
+                $templateTypes = $this->parseSequence($segmentScript);
+
+                // Detect if effect on vfStack is `false`
+                $resolvesFalse = count($pathCopy) > 0 && !$pathCopy[0];
+                if ($resolvesFalse) {
+                    if (count($templateTypes) > 1) {
+                        throw new \RuntimeException("Unsupported script, multiple steps to segment which is negated");
+                    }
+                }
+
+                foreach ($templateTypes as $k => $checksig) {
+                    if ($fExec) {
+                        $this->extractFromValues($solution->getScript(), $checksig, $stack, $this->sigVersion, $resolvesFalse);
+
+                        // If this statement results is later consumed
+                        // by a conditional which would be false, mark
+                        // this operation as not required
+                        if ($resolvesFalse) {
+                            $checksig->setRequired(false);
+                        }
+                        $steps[] = $checksig;
+                    }
+                }
+            }
+        }
+
+        $this->steps = $steps;
     }
 
     /**
@@ -393,73 +587,119 @@ class InputSigner implements InputSignerInterface
      * It will extract signatures/publicKeys when given $outputData, and $stack.
      * $stack is the result of decompiling a scriptSig, or taking the witness data.
      *
-     * @param OutputData $outputData
-     * @param array $stack
+     * @param ScriptInterface $script
+     * @param Checksig $checksig
+     * @param Stack $stack
      * @param int $sigVersion
-     * @return string
+     * @param bool $expectFalse
      */
-    public function extractFromValues(OutputData $outputData, array $stack, $sigVersion)
+    public function extractFromValues(ScriptInterface $script, Checksig $checksig, Stack $stack, $sigVersion, $expectFalse)
     {
-        $type = $outputData->getType();
         $size = count($stack);
 
-        if (ScriptType::P2PKH === $type) {
-            $this->requiredSigs = 1;
-            if ($size === 2) {
-                if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
-                }
-                $this->signatures = [$this->txSigSerializer->parse($stack[0])];
-                $this->publicKeys = [$this->parseStepPublicKey($stack[1])];
-            }
-        } else if (ScriptType::P2PK === $type) {
-            $this->requiredSigs = 1;
-            if ($size === 1) {
-                if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
-                }
-                $this->signatures = [$this->txSigSerializer->parse($stack[0])];
-            }
-            $this->publicKeys = [$this->parseStepPublicKey($outputData->getSolution())];
-        } else if (ScriptType::MULTISIG === $type) {
-            $info = new Multisig($outputData->getScript(), $this->pubKeySerializer);
-            $this->requiredSigs = $info->getRequiredSigCount();
+        if ($checksig->getType() === ScriptType::P2PKH) {
+            if ($size > 1) {
+                $vchPubKey = $stack->pop();
+                $vchSig = $stack->pop();
 
+                $value = false;
+                if (!$expectFalse) {
+                    $value = $this->signatureChecker->checkSig($script, $vchSig, $vchPubKey, $this->sigVersion, $this->flags);
+                    if (!$value) {
+                        throw new \RuntimeException('Existing signatures are invalid!');
+                    }
+                }
+
+                if (!$checksig->isVerify()) {
+                    $stack->push($value ? new Buffer("\x01") : new Buffer());
+                }
+
+                if ($expectFalse) {
+                    $checksig->setRequired(false);
+                } else {
+                    $checksig
+                        ->setSignature(0, $this->txSigSerializer->parse($vchSig))
+                        ->setKey(0, $this->parseStepPublicKey($vchPubKey))
+                    ;
+                }
+            }
+        } else if ($checksig->getType() === ScriptType::P2PK) {
+            if ($size > 0) {
+                $vchSig = $stack->pop();
+
+                $value = false;
+                if (!$expectFalse) {
+                    $value = $this->signatureChecker->checkSig($script, $vchSig, $checksig->getSolution(), $this->sigVersion, $this->flags);
+                    if (!$value) {
+                        throw new \RuntimeException('Existing signatures are invalid!');
+                    }
+                }
+
+                if (!$checksig->isVerify()) {
+                    $stack->push($value ? new Buffer("\x01") : new Buffer());
+                }
+
+                if ($expectFalse) {
+                    $checksig->setRequired(false);
+                } else {
+                    $checksig->setSignature(0, $this->txSigSerializer->parse($vchSig));
+                }
+            }
+            $checksig->setKey(0, $this->parseStepPublicKey($checksig->getSolution()));
+        } else if (ScriptType::MULTISIG === $checksig->getType()) {
+            /** @var Multisig $info */
+            $info = $checksig->getInfo();
             $keyBuffers = $info->getKeyBuffers();
-            $this->publicKeys = [];
-            for ($i = 0; $i < $info->getKeyCount(); $i++) {
-                $this->publicKeys[$i] = $this->parseStepPublicKey($keyBuffers[$i]);
+            foreach ($keyBuffers as $idx => $keyBuf) {
+                $checksig->setKey($idx, $this->parseStepPublicKey($keyBuf));
             }
 
+            $value = !$expectFalse;
             if ($size > 1) {
                 // Check signatures irrespective of scriptSig size, primes Checker cache, and need info
-                $check = $this->evaluateSolution($outputData->getScript(), $stack, $sigVersion);
-                $sigBufs = array_slice($stack, 1, $size - 1);
-                $sigBufCount = count($sigBufs);
-
-                // If we seem to have all signatures but fail evaluation, abort
-                if ($sigBufCount === $this->requiredSigs && !$check) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
+                $sigBufs = [];
+                $max = min($checksig->getRequiredSigs(), $size - 1);
+                for ($i = 0; $i < $max; $i++) {
+                    $vchSig = $stack[-1-$i];
+                    $sigBufs[] = $vchSig;
                 }
 
-                $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBuffers, $sigVersion);
+                $sigBufs = array_reverse($sigBufs);
+                $sigBufCount = count($sigBufs);
 
-                // Here we learn if any signatures were invalid, it won't be in the map.
-                if ($sigBufCount !== count($keyToSigMap)) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
+                if (!$expectFalse) {
+                    $keyToSigMap = $this->sortMultiSigs($script, $sigBufs, $keyBuffers, $sigVersion);
+
+                    // Here we learn if any signatures were invalid, it won't be in the map.
+                    if ($sigBufCount !== count($keyToSigMap)) {
+                        throw new \RuntimeException('Existing signatures are invalid!');
+                    }
+
+                    $toDelete = count($keyToSigMap);
+                } else {
+                    // should check that all signatures are zero
+                    $keyToSigMap = new \SplObjectStorage();
+                    $toDelete = $info->getRequiredSigCount();
+                }
+
+                $toDelete = 1 + $toDelete;
+                while ($toDelete--) {
+                    $stack->pop();
                 }
 
                 foreach ($keyBuffers as $idx => $key) {
                     if (isset($keyToSigMap[$key])) {
-                        $this->signatures[$idx] = $this->txSigSerializer->parse($keyToSigMap[$key]);
+                        $checksig->setSignature($idx, $this->txSigSerializer->parse($keyToSigMap[$key]));
                     }
                 }
+            }
+
+            if (!$checksig->isVerify()) {
+                $stack->push($value ? new Buffer("\x01") : new Buffer());
             }
         } else {
             throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
-
-        return $type;
     }
 
     /**
@@ -536,34 +776,35 @@ class InputSigner implements InputSignerInterface
     {
         $classifier = new OutputClassifier();
         $sigVersion = SigHash::V0;
-        $sigChunks = [];
         $solution = $this->scriptPubKey = $classifier->decode($scriptPubKey);
-        if ($solution->getType() !== ScriptType::P2SH && !in_array($solution->getType(), self::$validP2sh)) {
-            throw new \RuntimeException('scriptPubKey not supported');
+
+        if (!$this->allowComplexScripts) {
+            if ($solution->getType() !== ScriptType::P2SH && !in_array($solution->getType(), self::$validP2sh)) {
+                throw new \RuntimeException('scriptPubKey not supported');
+            }
         }
 
-        if ($solution->canSign()) {
-            $sigChunks = $this->evalPushOnly($scriptSig);
-        }
+        $sigChunks = $this->evalPushOnly($scriptSig);
 
         if ($solution->getType() === ScriptType::P2SH) {
-            $chunks = $this->evalPushOnly($scriptSig);
-            $redeemScript = $this->findRedeemScript($chunks, $signData);
+            $redeemScript = $this->findRedeemScript($sigChunks, $signData);
             if (!$this->verifySolution(Interpreter::VERIFY_SIGPUSHONLY, ScriptFactory::sequence([$redeemScript->getBuffer()]), $solution->getScript())) {
                 throw new \RuntimeException('Redeem script fails to solve pay-to-script-hash');
             }
 
             $solution = $this->redeemScript = $classifier->decode($redeemScript);
-            if (!in_array($solution->getType(), self::$validP2sh)) {
-                throw new \RuntimeException('Unsupported pay-to-script-hash script');
+            if (!$this->allowComplexScripts) {
+                if (!in_array($solution->getType(), self::$validP2sh)) {
+                    throw new \RuntimeException('Unsupported pay-to-script-hash script');
+                }
             }
 
-            $sigChunks = array_slice($chunks, 0, -1);
+            $sigChunks = array_slice($sigChunks, 0, -1);
         }
 
         if ($solution->getType() === ScriptType::P2WKH) {
             $sigVersion = SigHash::V1;
-            $solution = $this->witnessKeyHash = $classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
+            $solution = $classifier->decode(ScriptFactory::scriptPubKey()->payToPubKeyHash($solution->getSolution()));
             $sigChunks = $witness;
         } else if ($solution->getType() === ScriptType::P2WSH) {
             $sigVersion = SigHash::V1;
@@ -575,8 +816,10 @@ class InputSigner implements InputSignerInterface
             }
 
             $solution = $this->witnessScript = $classifier->decode($witnessScript);
-            if (!in_array($this->witnessScript->getType(), self::$canSign)) {
-                throw new \RuntimeException('Unsupported witness-script-hash script');
+            if (!$this->allowComplexScripts) {
+                if (!in_array($this->witnessScript->getType(), self::$canSign)) {
+                    throw new \RuntimeException('Unsupported witness-script-hash script');
+                }
             }
 
             $sigChunks = array_slice($witness, 0, -1);
@@ -585,7 +828,7 @@ class InputSigner implements InputSignerInterface
         $this->sigVersion = $sigVersion;
         $this->signScript = $solution;
 
-        $this->extractFromValues($solution, $sigChunks, $this->sigVersion);
+        $this->extractScript($solution, $sigChunks, $signData);
 
         return $this;
     }
@@ -641,7 +884,19 @@ class InputSigner implements InputSignerInterface
      */
     public function isFullySigned()
     {
-        return $this->requiredSigs !== 0 && $this->requiredSigs === count($this->signatures);
+        foreach ($this->steps as $step) {
+            if ($step instanceof Conditional) {
+                if (!$step->hasValue()) {
+                    return false;
+                }
+            } else if ($step instanceof Checksig) {
+                if (!$step->isFullySigned()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -651,7 +906,13 @@ class InputSigner implements InputSignerInterface
      */
     public function getRequiredSigs()
     {
-        return $this->requiredSigs;
+        $count = 0;
+        foreach ($this->steps as $step) {
+            if ($step instanceof Checksig) {
+                $count += $step->getRequiredSigs();
+            }
+        }
+        return $count;
     }
 
     /**
@@ -662,7 +923,7 @@ class InputSigner implements InputSignerInterface
      */
     public function getSignatures()
     {
-        return $this->signatures;
+        return $this->steps[0]->getSignatures();
     }
 
     /**
@@ -673,7 +934,7 @@ class InputSigner implements InputSignerInterface
      */
     public function getPublicKeys()
     {
-        return $this->publicKeys;
+        return $this->steps[0]->getKeys();
     }
 
     /**
@@ -761,15 +1022,19 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
-     * Sign the input using $key and $sigHashTypes
-     *
+     * @param int $stepIdx
      * @param PrivateKeyInterface $privateKey
      * @param int $sigHashType
      * @return $this
      */
-    public function sign(PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
+    public function signStep($stepIdx, PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
     {
-        if ($this->isFullySigned()) {
+        if (!array_key_exists($stepIdx, $this->steps)) {
+            throw new \RuntimeException("Unknown step index");
+        }
+
+        $checksig = $this->steps[$stepIdx];
+        if ($checksig->isFullySigned()) {
             return $this;
         }
 
@@ -777,28 +1042,36 @@ class InputSigner implements InputSignerInterface
             throw new \RuntimeException('Uncompressed keys are disallowed in segwit scripts - refusing to sign');
         }
 
-        if ($this->signScript->getType() === ScriptType::P2PK) {
-            if (!$this->pubKeySerializer->serialize($privateKey->getPublicKey())->equals($this->signScript->getSolution())) {
+        if ($checksig->getType() === ScriptType::P2PK) {
+            if (!$this->pubKeySerializer->serialize($privateKey->getPublicKey())->equals($checksig->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
-            $this->signatures[0] = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
-        } else if ($this->signScript->getType() === ScriptType::P2PKH) {
+
+            if (!$checksig->hasSignature(0)) {
+                $signature = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+                $checksig->setSignature(0, $signature);
+            }
+        } else if ($checksig->getType() === ScriptType::P2PKH) {
             $publicKey = $privateKey->getPublicKey();
-            if (!$publicKey->getPubKeyHash()->equals($this->signScript->getSolution())) {
+            if (!$publicKey->getPubKeyHash()->equals($checksig->getSolution())) {
                 throw new \RuntimeException('Signing with the wrong private key');
             }
 
-            if (!array_key_exists(0, $this->signatures)) {
-                $this->signatures[0] = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+            if (!$checksig->hasSignature(0)) {
+                $signature = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+                $checksig->setSignature(0, $signature);
             }
 
-            $this->publicKeys[0] = $publicKey;
-        } else if ($this->signScript->getType() === ScriptType::MULTISIG) {
+            if (!$checksig->hasKey(0)) {
+                $checksig->setKey(0, $publicKey);
+            }
+        } else if ($checksig->getType() === ScriptType::MULTISIG) {
             $signed = false;
-            foreach ($this->publicKeys as $keyIdx => $publicKey) {
-                if ($publicKey instanceof PublicKeyInterface) {
-                    if ($privateKey->getPublicKey()->equals($publicKey)) {
-                        $this->signatures[$keyIdx] = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+            foreach ($checksig->getKeys() as $keyIdx => $publicKey) {
+                if (!$checksig->hasSignature($keyIdx)) {
+                    if ($publicKey instanceof PublicKeyInterface && $privateKey->getPublicKey()->equals($publicKey)) {
+                        $signature = $this->calculateSignature($privateKey, $this->signScript->getScript(), $sigHashType, $this->sigVersion);
+                        $checksig->setSignature($keyIdx, $signature);
                         $signed = true;
                     }
                 }
@@ -812,6 +1085,18 @@ class InputSigner implements InputSignerInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Sign the input using $key and $sigHashTypes
+     *
+     * @param PrivateKeyInterface $privateKey
+     * @param int $sigHashType
+     * @return $this
+     */
+    public function sign(PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
+    {
+        return $this->signStep(0, $privateKey, $sigHashType);
     }
 
     /**
@@ -856,34 +1141,38 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
-     * Produces the script stack that solves the $outputType
-     *
-     * @param string $outputType
-     * @return BufferInterface[]
+     * @return array
      */
-    private function serializeSolution($outputType)
+    private function serializeSteps()
     {
-        $result = [];
-        if (ScriptType::P2PK === $outputType) {
-            if (count($this->signatures) === 1) {
-                $result = [$this->txSigSerializer->serialize($this->signatures[0])];
-            }
-        } else if (ScriptType::P2PKH === $outputType) {
-            if (count($this->signatures) === 1 && count($this->publicKeys) === 1) {
-                $result = [$this->txSigSerializer->serialize($this->signatures[0]), $this->pubKeySerializer->serialize($this->publicKeys[0])];
-            }
-        } else if (ScriptType::MULTISIG === $outputType) {
-            $result[] = new Buffer();
-            for ($i = 0, $nPubKeys = count($this->publicKeys); $i < $nPubKeys; $i++) {
-                if (isset($this->signatures[$i])) {
-                    $result[] = $this->txSigSerializer->serialize($this->signatures[$i]);
+        $results = [];
+        for ($i = 0, $n = count($this->steps); $i < $n; $i++) {
+            $step = $this->steps[$i];
+            if ($step instanceof Conditional) {
+                $results[] = $step->serialize();
+            } else if ($step instanceof Checksig) {
+                if ($step->isRequired()) {
+                    if (count($step->getSignatures()) === 0) {
+                        break;
+                    }
+                }
+
+                $results[] = $step->serialize();
+
+                if (!$step->isFullySigned()) {
+                    break;
                 }
             }
-        } else {
-            throw new \RuntimeException('Parameter 0 for serializeSolution was a non-standard input type');
         }
 
-        return $result;
+        $values = [];
+        foreach (array_reverse($results) as $v) {
+            foreach ($v as $value) {
+                $values[] = $value;
+            }
+        }
+
+        return $values;
     }
 
     /**
@@ -900,29 +1189,23 @@ class InputSigner implements InputSignerInterface
             $emptyWitness = new ScriptWitness([]);
         }
 
-        $scriptSigChunks = [];
         $witness = [];
-        if ($this->scriptPubKey->canSign()) {
-            $scriptSigChunks = $this->serializeSolution($this->scriptPubKey->getType());
-        }
+        $scriptSigChunks = $this->serializeSteps();
 
         $solution = $this->scriptPubKey;
         $p2sh = false;
         if ($solution->getType() === ScriptType::P2SH) {
             $p2sh = true;
-            if ($this->redeemScript->canSign()) {
-                $scriptSigChunks = $this->serializeSolution($this->redeemScript->getType());
-            }
             $solution = $this->redeemScript;
         }
 
         if ($solution->getType() === ScriptType::P2WKH) {
-            $witness = $this->serializeSolution(ScriptType::P2PKH);
+            $witness = $scriptSigChunks;
+            $scriptSigChunks = [];
         } else if ($solution->getType() === ScriptType::P2WSH) {
-            if ($this->witnessScript->canSign()) {
-                $witness = $this->serializeSolution($this->witnessScript->getType());
-                $witness[] = $this->witnessScript->getScript()->getBuffer();
-            }
+            $witness = $scriptSigChunks;
+            $witness[] = $this->witnessScript->getScript()->getBuffer();
+            $scriptSigChunks = [];
         }
 
         if ($p2sh) {
@@ -930,5 +1213,10 @@ class InputSigner implements InputSignerInterface
         }
 
         return new SigValues($this->pushAll($scriptSigChunks), new ScriptWitness($witness));
+    }
+
+    public function getSteps()
+    {
+        return $this->steps;
     }
 }
