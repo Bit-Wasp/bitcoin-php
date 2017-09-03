@@ -566,7 +566,6 @@ class InputSigner implements InputSignerInterface
                         $vfStack->push(!$vfStack->pop());
                         break;
                 }
-
             } else {
                 $segmentScript = $segment->makeScript();
                 $templateTypes = $this->parseSequence($segmentScript);
@@ -660,7 +659,6 @@ class InputSigner implements InputSignerInterface
                 } else {
                     $checksig->setSignature(0, $this->txSigSerializer->parse($vchSig));
                 }
-
             }
 
             $checksig->setKey(0, $this->parseStepPublicKey($checksig->getSolution()));
@@ -731,7 +729,7 @@ class InputSigner implements InputSignerInterface
                     $toDelete = min($stack->count(), 1 + $info->getRequiredSigCount());
                 }
             }
-
+            
             while($toDelete--) {
                 $stack->pop();
             }
@@ -746,7 +744,6 @@ class InputSigner implements InputSignerInterface
             if (!$checksig->isVerify()) {
                 $stack->push($value ? new Buffer("\x01") : new Buffer());
             }
-
         } else {
             throw new \RuntimeException('Unsupported output type passed to extractFromValues');
         }
