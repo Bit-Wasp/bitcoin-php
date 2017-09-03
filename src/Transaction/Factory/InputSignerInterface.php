@@ -98,6 +98,23 @@ interface InputSignerInterface
      */
     public function isP2WSH();
 
+    public function getSteps();
+
+    /**
+     * @param int $idx
+     * @return Checksig[]|Conditional[]
+     */
+    public function step($idx);
+
+    /**
+     * @param $idx
+     * @param PrivateKeyInterface $privateKey
+     * @param int $sigHashType
+     * @return mixed
+     */
+    public function signStep($idx, PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL);
+
+
     /**
      * Sign the input using $key and $sigHashTypes
      *

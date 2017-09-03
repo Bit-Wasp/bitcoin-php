@@ -3,11 +3,14 @@
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
 use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkey;
 use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
 use BitWasp\Bitcoin\Script\ScriptType;
+use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class Checksig
@@ -16,6 +19,11 @@ class Checksig
      * @var string
      */
     private $scriptType;
+
+    /**
+     * @var bool
+     */
+    private $required = true;
 
     /**
      * @var PayToPubkeyHash|PayToPubkey|Multisig
@@ -46,7 +54,7 @@ class Checksig
      * Checksig constructor.
      * @param $info
      */
-    public function __construct($info)
+    public function __construct($info, TransactionSignatureSerializer $txSigSerializer, PublicKeySerializerInterface $pubKeySerializer)
     {
         if (!is_object($info)) {
             throw new \RuntimeException("First value to checksig must be an object");
@@ -76,7 +84,38 @@ class Checksig
                 throw new \RuntimeException("Unsupported class passed to Checksig");
         }
 
+        $this->txSigSerializer = $txSigSerializer;
+        $this->pubKeySerializer = $pubKeySerializer;
         $this->info = $info;
+    }
+
+    public function receivesValue(Conditional $conditional)
+    {
+        if (!$conditional->hasValue()) {
+            throw new \RuntimeException("Sanity check, conditional requires value");
+        }
+
+        if ($conditional->getValue() === false) {
+            $this->setRequired(false);
+        }
+    }
+
+    public function setRequired($setting) {
+        if (!is_bool($setting)) {
+            throw new \RuntimeException("Invalid input to setRequired");
+        }
+        $this->required = $setting;
+        return $this;
+    }
+
+    public function isRequired() {
+        return $this->required;
+    }
+
+    private function disable() {
+        for ($i = 0; $i < $this->requiredSigs; $i++) {
+
+        }
     }
 
     /**
@@ -122,7 +161,11 @@ class Checksig
      */
     public function isFullySigned()
     {
-        return $this->requiredSigs !== 0 && $this->requiredSigs === count($this->signatures);
+        if ($this->required) {
+            return $this->requiredSigs === count($this->signatures);
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -217,5 +260,46 @@ class Checksig
     public function getKeys()
     {
         return $this->publicKeys;
+    }
+
+    /**
+     * @return array
+     */
+    public function serialize()
+    {
+        $outputType = $this->getType();
+        $result = [];
+
+        if (ScriptType::P2PK === $outputType) {
+            if (!$this->required) {
+                $result[0] = new Buffer();
+            } else {
+                if ($this->hasSignature(0)) {
+                    $result = [$this->txSigSerializer->serialize($this->getSignature(0))];
+                }
+            }
+        } else if (ScriptType::P2PKH === $outputType) {
+            if ($this->hasSignature(0) && $this->hasKey(0)) {
+                $result = [$this->txSigSerializer->serialize($this->getSignature(0)), $this->pubKeySerializer->serialize($this->getKey(0))];
+            }
+        } else if (ScriptType::MULTISIG === $outputType) {
+            echo "serializing multisig\n";
+            if (!$this->isRequired()) {
+                echo "not required\n";
+                $result = array_fill(0, 1 + $this->getRequiredSigs(), new Buffer());
+            } else {
+                echo "required\n";
+                $result[] = new Buffer();
+                for ($i = 0, $nPubKeys = count($this->getKeys()); $i < $nPubKeys; $i++) {
+                    if ($this->hasSignature($i)) {
+                        $result[] = $this->txSigSerializer->serialize($this->getSignature($i));
+                    }
+                }
+            }
+        } else {
+            throw new \RuntimeException('Parameter 0 for serializeSolution was a non-standard input type');
+        }
+
+        return $result;
     }
 }
