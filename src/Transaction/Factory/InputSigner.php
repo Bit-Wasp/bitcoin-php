@@ -730,7 +730,7 @@ class InputSigner implements InputSignerInterface
                 }
             }
             
-            while($toDelete--) {
+            while ($toDelete--) {
                 $stack->pop();
             }
 
