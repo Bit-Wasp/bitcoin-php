@@ -21,27 +21,6 @@ class BranchInterpreter
 
     /**
      * @param ScriptInterface $script
-     * @return ScriptBranch[]
-     */
-    public function getScriptBranches(ScriptInterface $script)
-    {
-        $ast = $this->getAstForLogicalOps($script);
-        $paths = $ast->flags();
-        $results = [];
-
-        if (count($paths) > 1) {
-            foreach ($paths as $path) {
-                $results[] = $this->getBranchForPath($script, $path);
-            }
-        } else {
-            $results[] = $this->getBranchForPath($script, []);
-        }
-
-        return $results;
-    }
-
-    /**
-     * @param ScriptInterface $script
      * @return ParsedScript
      */
     public function getScriptTree(ScriptInterface $script)
@@ -107,8 +86,6 @@ class BranchInterpreter
     {
         // parses the opcodes which were actually run
         $segments = $this->evaluateUsingStack($script, $path);
-
-        //
 
         return new ScriptBranch($script, $path, $segments);
     }

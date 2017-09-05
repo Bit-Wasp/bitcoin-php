@@ -69,6 +69,23 @@ class ParsedScript
     }
 
     /**
+     * Returns a list of paths for this script. This is not
+     * always guaranteed to be in order, so take care that
+     * you actually work out the paths in advance of signing,
+     * and hard code them somehow.
+     *
+     * @return array[] - array of paths
+     */
+    public function getPaths()
+    {
+        return array_map(function (ScriptBranch $branch) {
+            return $branch->getPath();
+        }, $this->branchMap);
+    }
+
+    /**
+     * Look up the branch idx by it's path
+     *
      * @param array $branchDesc
      * @return int
      */
@@ -84,10 +101,12 @@ class ParsedScript
     }
 
     /**
+     * Look up the branch by it's path
+     *
      * @param array $branchDesc
      * @return bool|ScriptBranch
      */
-    public function getBranchByDesc(array $branchDesc)
+    public function getBranchByPath(array $branchDesc)
     {
         $idx = $this->getBranchIdx($branchDesc);
         if (!array_key_exists($idx, $this->branchMap)) {
@@ -103,14 +122,14 @@ class ParsedScript
      */
     public function getMutuallyExclusiveOps($branch)
     {
-        if (!($branch = $this->getBranchByDesc($branch))) {
+        if (!($branch = $this->getBranchByPath($branch))) {
             return false;
         }
 
         $steps = $branch->getSignSteps();
         $ops = [];
         foreach ($steps as $step) {
-            $ops = array_merge($ops, $step->all());
+            $ops = array_merge($ops, $step);
         }
 
         return ScriptFactory::fromOperations($ops);

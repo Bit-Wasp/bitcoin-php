@@ -97,9 +97,9 @@ class ScriptBranchTest extends AbstractTestCase
     public function testBranchTest(ScriptInterface $script, array $fixtureData)
     {
         $bi = new BranchInterpreter();
-        $branches = $bi->getScriptBranches($script);
+        $tree = $bi->getScriptTree($script);
 
-        $this->assertEquals(count($fixtureData), count($branches));
+        $this->assertEquals(count($fixtureData), count($tree->getPaths()));
         foreach ($fixtureData as $fixture) {
             /**
              * @var ScriptInterface $expectedBranch
@@ -108,7 +108,8 @@ class ScriptBranchTest extends AbstractTestCase
 
             $foundBranch = false;
             $ub = null;
-            foreach ($branches as $branch) {
+            foreach ($tree->getPaths() as $path) {
+                $branch = $tree->getBranchByPath($path);
                 if ($branch->getPath() === $vfInput) {
                     $foundBranch = true;
                     $this->assertTrue($expectedBranch->equals($branch->getNeuteredScript()));
