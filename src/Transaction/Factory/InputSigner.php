@@ -514,15 +514,16 @@ class InputSigner implements InputSignerInterface
             $logicalPath = [];
         }
 
-        $branch = $tree->getBranchByPath($logicalPath);
-        $segments = $branch->getScriptSections();
+        $scriptSections = $tree
+            ->getBranchByPath($logicalPath)
+            ->getScriptSections();
 
         $vfStack = new Stack();
         $stack = new Stack($sigChunks);
 
         $pathCopy = $logicalPath;
         $steps = [];
-        foreach ($segments as $i => $scriptSection) {
+        foreach ($scriptSections as $i => $scriptSection) {
             /** @var Operation[] $scriptSection */
             $fExec = !$this->interpreter->checkExec($vfStack, false);
             if (count($scriptSection) === 1 && $scriptSection[0]->isLogical()) {
@@ -540,6 +541,7 @@ class InputSigner implements InputSignerInterface
 
                             // Connect the last operation (if there is one)
                             // with the last step with isRequired==$value
+                            // todo: check this part out..
                             for ($j = count($steps) - 1; $j >= 0; $j--) {
                                 if ($steps[$j] instanceof Checksig && $value === $steps[$j]->isRequired()) {
                                     $step->providedBy($steps[$j]);
@@ -568,7 +570,7 @@ class InputSigner implements InputSignerInterface
             } else {
                 $templateTypes = $this->parseSequence($scriptSection);
 
-                // Detect if effect on vfStack is `false`
+                // Detect if effect on mainStack is `false`
                 $resolvesFalse = count($pathCopy) > 0 && !$pathCopy[0];
                 if ($resolvesFalse) {
                     if (count($templateTypes) > 1) {
