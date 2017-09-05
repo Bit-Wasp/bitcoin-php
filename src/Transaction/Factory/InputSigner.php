@@ -410,15 +410,13 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
-     * @param ScriptInterface $script
+     * @param Operation[] $scriptOps
      * @return Checksig[]
      */
-    public function parseSequence(ScriptInterface $script)
+    public function parseSequence(array $scriptOps)
     {
-        $decoded = $script->getScriptParser()->decode();
-
         $j = 0;
-        $l = count($decoded);
+        $l = count($scriptOps);
         $result = [];
         while ($j < $l) {
             $step = null;
@@ -426,7 +424,7 @@ class InputSigner implements InputSignerInterface
 
             // increment the $last, and break if it's valid
             for ($i = 0; $i < ($l - $j) + 1; $i++) {
-                $slice = array_slice($decoded, $j, $i);
+                $slice = array_slice($scriptOps, $j, $i);
                 $step = $this->classifySignStep($slice, $solution);
                 if ($step !== null) {
                     break;
@@ -437,7 +435,7 @@ class InputSigner implements InputSignerInterface
                 throw new \RuntimeException("Invalid script");
             } else {
                 $j += $i;
-                $result[] = new Checksig($step, $this->txSigSerializer, $this->pubKeySerializer);
+                $result[] = new Checksig($step);
             }
         }
 
@@ -524,10 +522,11 @@ class InputSigner implements InputSignerInterface
 
         $pathCopy = $logicalPath;
         $steps = [];
-        foreach ($segments as $i => $segment) {
+        foreach ($segments as $i => $scriptSection) {
+            /** @var Operation[] $scriptSection */
             $fExec = !$this->interpreter->checkExec($vfStack, false);
-            if (count($segment) === 1 && $segment[0]->isLogical()) {
-                $op = $segment[0];
+            if (count($scriptSection) === 1 && $scriptSection[0]->isLogical()) {
+                $op = $scriptSection[0];
                 switch ($op->getOp()) {
                     case Opcodes::OP_IF:
                     case Opcodes::OP_NOTIF:
@@ -567,8 +566,7 @@ class InputSigner implements InputSignerInterface
                         break;
                 }
             } else {
-                $segmentScript = ScriptFactory::fromOperations($segment);
-                $templateTypes = $this->parseSequence($segmentScript);
+                $templateTypes = $this->parseSequence($scriptSection);
 
                 // Detect if effect on vfStack is `false`
                 $resolvesFalse = count($pathCopy) > 0 && !$pathCopy[0];
