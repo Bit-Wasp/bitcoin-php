@@ -52,9 +52,9 @@ class Checksig
 
     /**
      * Checksig constructor.
-     * @param $info
+     * @param Multisig|PayToPubkeyHash|PayToPubkey $info
      */
-    public function __construct($info, TransactionSignatureSerializer $txSigSerializer, PublicKeySerializerInterface $pubKeySerializer)
+    public function __construct($info)
     {
         if (!is_object($info)) {
             throw new \RuntimeException("First value to checksig must be an object");
@@ -84,22 +84,16 @@ class Checksig
                 throw new \RuntimeException("Unsupported class passed to Checksig");
         }
 
-        $this->txSigSerializer = $txSigSerializer;
-        $this->pubKeySerializer = $pubKeySerializer;
         $this->info = $info;
     }
 
-    public function receivesValue(Conditional $conditional)
-    {
-        if (!$conditional->hasValue()) {
-            throw new \RuntimeException("Sanity check, conditional requires value");
-        }
-
-        if ($conditional->getValue() === false) {
-            $this->setRequired(false);
-        }
-    }
-
+    /**
+     * Mark this Checksig operation as not required. Will use OP_0
+     * in place of all values (satisfying MINIMALDATA / MINIMALIF)
+     *
+     * @param bool $setting
+     * @return $this
+     */
     public function setRequired($setting)
     {
         if (!is_bool($setting)) {
@@ -109,12 +103,21 @@ class Checksig
         return $this;
     }
 
+    /**
+     * Returns whether this opcodes successful completion is
+     * necessary for the overall successful operation of the
+     * script
+     *
+     * @return bool
+     */
     public function isRequired()
     {
         return $this->required;
     }
 
     /**
+     * Returns the underlying script info class
+     *
      * @return Multisig|PayToPubkey|PayToPubkeyHash
      */
     public function getInfo()
@@ -123,6 +126,11 @@ class Checksig
     }
 
     /**
+     * Return the script type
+     * NB: Checksig overloads the various templates, returning 'multisig'
+     * even if the opcode was multisigverify. Check the getInfo() result,
+     * or isVerify() result, if this is important.
+     *
      * @return string
      */
     public function getType()
@@ -258,15 +266,20 @@ class Checksig
         return $this->publicKeys;
     }
 
+    /**
+     * @return bool
+     */
     public function isVerify()
     {
         return $this->info->isChecksigVerify();
     }
 
     /**
+     * @param TransactionSignatureSerializer $txSigSerializer
+     * @param PublicKeySerializerInterface $pubKeySerializer
      * @return array
      */
-    public function serialize()
+    public function serialize(TransactionSignatureSerializer $txSigSerializer, PublicKeySerializerInterface $pubKeySerializer)
     {
         $outputType = $this->getType();
         $result = [];
@@ -276,15 +289,17 @@ class Checksig
                 $result[0] = new Buffer();
             } else {
                 if ($this->hasSignature(0)) {
-                    $result = [$this->txSigSerializer->serialize($this->getSignature(0))];
+                    $result[0] = $txSigSerializer->serialize($this->getSignature(0));
                 }
             }
         } else if (ScriptType::P2PKH === $outputType) {
             if (!$this->required && $this->hasKey(0)) {
-                $result = [new Buffer(), $this->pubKeySerializer->serialize($this->getKey(0))];
+                $result[0] = new Buffer();
+                $result[1] = $pubKeySerializer->serialize($this->getKey(0));
             } else {
                 if ($this->hasSignature(0) && $this->hasKey(0)) {
-                    $result = [$this->txSigSerializer->serialize($this->getSignature(0)), $this->pubKeySerializer->serialize($this->getKey(0))];
+                    $result[0] = $txSigSerializer->serialize($this->getSignature(0));
+                    $result[1] = $pubKeySerializer->serialize($this->getKey(0));
                 }
             }
         } else if (ScriptType::MULTISIG === $outputType) {
@@ -294,7 +309,7 @@ class Checksig
                 $result[] = new Buffer();
                 for ($i = 0, $nPubKeys = count($this->getKeys()); $i < $nPubKeys; $i++) {
                     if ($this->hasSignature($i)) {
-                        $result[] = $this->txSigSerializer->serialize($this->getSignature($i));
+                        $result[] = $txSigSerializer->serialize($this->getSignature($i));
                     }
                 }
             }

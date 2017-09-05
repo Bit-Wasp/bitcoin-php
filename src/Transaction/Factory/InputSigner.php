@@ -666,6 +666,7 @@ class InputSigner implements InputSignerInterface
                 $checksig->setKey($idx, $this->parseStepPublicKey($keyBuf));
             }
 
+            $value = false;
             if ($this->padUnsignedMultisigs) {
                 // Multisig padding is only used for partially signed transactions,
                 // never fully signed. It is recognized by a scriptSig with $keyCount+1
@@ -693,10 +694,11 @@ class InputSigner implements InputSignerInterface
                     }
 
                     $toDelete = 1 + $info->getKeyCount();
+                    $value = true;
                 }
             }
 
-            if (!isset($keyToSigMap)) {
+            if (!isset($toDelete) || !isset($keyToSigMap)) {
                 // Check signatures irrespective of scriptSig size, primes Checker cache, and need info
                 $sigBufs = [];
                 $max = min($checksig->getRequiredSigs(), $size - 1);
@@ -718,14 +720,17 @@ class InputSigner implements InputSignerInterface
                         $toDelete = 1 + count($keyToSigMap);
                     } else {
                         $toDelete = 0;
+                        $keyToSigMap = new \SplObjectStorage();
                     }
+                    $value = true;
                 } else {
                     // should check that all signatures are zero
                     $keyToSigMap = new \SplObjectStorage();
                     $toDelete = min($stack->count(), 1 + $info->getRequiredSigCount());
+                    $value = false;
                 }
             }
-            
+
             while ($toDelete--) {
                 $stack->pop();
             }
@@ -736,7 +741,6 @@ class InputSigner implements InputSignerInterface
                 }
             }
 
-            $value = !$expectFalse;
             if (!$checksig->isVerify()) {
                 $stack->push($value ? new Buffer("\x01") : new Buffer());
             }
@@ -1206,7 +1210,7 @@ class InputSigner implements InputSignerInterface
                     }
                 }
 
-                $results[] = $step->serialize();
+                $results[] = $step->serialize($this->txSigSerializer, $this->pubKeySerializer);
 
                 if (!$step->isFullySigned()) {
                     break;
