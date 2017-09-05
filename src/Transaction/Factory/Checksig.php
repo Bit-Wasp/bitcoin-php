@@ -303,7 +303,7 @@ class Checksig
                 }
             }
         } else if (ScriptType::MULTISIG === $outputType) {
-            if (!$this->isRequired()) {
+            if (!$this->required) {
                 $result = array_fill(0, 1 + $this->getRequiredSigs(), new Buffer());
             } else {
                 $result[] = new Buffer();
