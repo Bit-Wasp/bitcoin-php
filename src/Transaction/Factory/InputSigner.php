@@ -629,9 +629,7 @@ class InputSigner implements InputSignerInterface
                     $stack->push($value ? new Buffer("\x01") : new Buffer());
                 }
 
-                if ($expectFalse) {
-                    $checksig->setRequired(false);
-                } else {
+                if (!$expectFalse) {
                     $checksig
                         ->setSignature(0, $this->txSigSerializer->parse($vchSig))
                         ->setKey(0, $this->parseStepPublicKey($vchPubKey))
@@ -654,9 +652,7 @@ class InputSigner implements InputSignerInterface
                     $stack->push($value ? new Buffer("\x01") : new Buffer());
                 }
 
-                if ($expectFalse) {
-                    $checksig->setRequired(false);
-                } else {
+                if (!$expectFalse) {
                     $checksig->setSignature(0, $this->txSigSerializer->parse($vchSig));
                 }
             }
