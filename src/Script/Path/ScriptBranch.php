@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
@@ -99,21 +98,5 @@ class ScriptBranch
             'branch' => implode(", ", $path),
             'segments' => $m,
         ];
-    }
-
-    /**
-     * @return array[]
-     */
-    public function getSignSteps()
-    {
-        $steps = [];
-        foreach ($this->scriptSections as $segment) {
-            /** @var Operation[] $segment */
-            if (!(count($segment) === 1 && $segment[1]->isLogical())) {
-                $steps[] = $segment;
-            }
-        }
-
-        return $steps;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
@@ -126,9 +127,13 @@ class ParsedScript
             return false;
         }
 
-        $steps = $branch->getSignSteps();
         $ops = [];
-        foreach ($steps as $step) {
+        foreach ($branch->getScriptSections() as $step) {
+            /** @var Operation[] $step */
+            if (count($step) === 1 && $step[0]->isLogical()) {
+                continue;
+            }
+
             $ops = array_merge($ops, $step);
         }
 
