@@ -112,13 +112,14 @@ class ScriptBranch
     }
 
     /**
-     * @return OperationContainer[]
+     * @return array[]
      */
     public function getSignSteps()
     {
         $steps = [];
         foreach ($this->segments as $segment) {
-            if (!$segment->isLoneLogicalOp()) {
+            /** @var Operation[] $segment */
+            if (!(count($segment) === 1 && $segment[1]->isLogical())) {
                 $steps[] = $segment;
             }
         }
