@@ -517,7 +517,7 @@ class InputSigner implements InputSignerInterface
         }
 
         $branch = $tree->getBranchByPath($logicalPath);
-        $segments = $branch->getSegments();
+        $segments = $branch->getScriptSections();
 
         $vfStack = new Stack();
         $stack = new Stack($sigChunks);

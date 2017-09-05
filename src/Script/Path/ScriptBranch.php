@@ -16,7 +16,7 @@ class ScriptBranch
     /**
      * @var array|\array[]
      */
-    private $segments;
+    private $scriptSections;
 
     /**
      * @var array|\bool[]
@@ -27,13 +27,13 @@ class ScriptBranch
      * ScriptBranch constructor.
      * @param ScriptInterface $fullScript
      * @param array $logicalPath
-     * @param array $segments
+     * @param array $scriptSections
      */
-    public function __construct(ScriptInterface $fullScript, array $logicalPath, array $segments)
+    public function __construct(ScriptInterface $fullScript, array $logicalPath, array $scriptSections)
     {
         $this->fullScript = $fullScript;
         $this->branch = $logicalPath;
-        $this->segments = $segments;
+        $this->scriptSections = $scriptSections;
     }
 
     /**
@@ -55,9 +55,9 @@ class ScriptBranch
     /**
      * @return array|\array[]
      */
-    public function getSegments()
+    public function getScriptSections()
     {
-        return $this->segments;
+        return $this->scriptSections;
     }
 
     /**
@@ -66,7 +66,7 @@ class ScriptBranch
     public function getOps()
     {
         $sequence = [];
-        foreach ($this->segments as $segment) {
+        foreach ($this->scriptSections as $segment) {
             $sequence = array_merge($sequence, $segment);
         }
         return $sequence;
@@ -81,22 +81,12 @@ class ScriptBranch
     }
 
     /**
-     * @return ScriptInterface
-     */
-    public function getScript()
-    {
-        return ScriptFactory::fromOperations(array_filter($this->getOps(), function (Operation $operation) {
-            return !$operation->isLogical();
-        }));
-    }
-
-    /**
      * @return array
      */
     public function __debugInfo()
     {
         $m = [];
-        foreach ($this->segments as $segment) {
+        foreach ($this->scriptSections as $segment) {
             $m[] = ScriptFactory::fromOperations($segment->all());
         }
 
@@ -117,7 +107,7 @@ class ScriptBranch
     public function getSignSteps()
     {
         $steps = [];
-        foreach ($this->segments as $segment) {
+        foreach ($this->scriptSections as $segment) {
             /** @var Operation[] $segment */
             if (!(count($segment) === 1 && $segment[1]->isLogical())) {
                 $steps[] = $segment;
