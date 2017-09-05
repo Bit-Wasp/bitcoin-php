@@ -136,7 +136,7 @@ class BranchInterpreter
     /**
      * @param ScriptInterface $script
      * @param int[] $path
-     * @return PathTrace
+     * @return array - array of Operation[] representing script segments
      */
     public function evaluateUsingStack(ScriptInterface $script, array $path)
     {
