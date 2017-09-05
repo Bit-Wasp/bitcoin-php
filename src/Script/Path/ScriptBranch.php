@@ -64,21 +64,13 @@ class ScriptBranch
     }
 
     /**
-     * @return ScriptInterface
-     */
-    public function getNeuteredScript()
-    {
-        return ScriptFactory::fromOperations($this->getOps());
-    }
-
-    /**
      * @return array
      */
     public function __debugInfo()
     {
         $m = [];
         foreach ($this->scriptSections as $segment) {
-            $m[] = ScriptFactory::fromOperations($segment->all());
+            $m[] = ScriptFactory::fromOperations($segment);
         }
 
         $path = [];

@@ -112,7 +112,7 @@ class ScriptBranchTest extends AbstractTestCase
                 $branch = $tree->getBranchByPath($path);
                 if ($branch->getPath() === $vfInput) {
                     $foundBranch = true;
-                    $this->assertTrue($expectedBranch->equals($branch->getNeuteredScript()));
+                    $this->assertTrue($expectedBranch->equals(ScriptFactory::fromOperations($branch->getOps())));
                 }
             }
 
