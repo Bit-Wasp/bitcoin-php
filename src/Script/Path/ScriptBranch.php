@@ -36,14 +36,6 @@ class ScriptBranch
     }
 
     /**
-     * @return ScriptInterface
-     */
-    public function getFullScript()
-    {
-        return $this->fullScript;
-    }
-
-    /**
      * @return array|\bool[]
      */
     public function getPath()
