@@ -69,23 +69,14 @@ class BranchInterpreter
     public function getAstForLogicalOps(ScriptInterface $script)
     {
         $root = new LogicOpNode(null);
-        $nextId = 1;
         $current = $root;
-        $segments = [$root];
 
         foreach ($script->getScriptParser()->decode() as $op) {
             switch ($op->getOp()) {
                 case Opcodes::OP_IF:
-                    list ($node0, $node1) = $current->split();
-                    $segments[$nextId++] = $node0;
-                    $segments[$nextId++] = $node1;
-                    $current = $node1;
-                    break;
                 case Opcodes::OP_NOTIF:
-                    list ($node0, $node1) = $current->split();
-                    $segments[$nextId++] = $node0;
-                    $segments[$nextId++] = $node1;
-                    $current = $node0;
+                    $split = $current->split();
+                    $current = $split[$op->getOp() & 1];
                     break;
                 case Opcodes::OP_ENDIF:
                     if (null === $current->getParent()) {
