@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-use BitWasp\Bitcoin\Script\Parser\Operation;
-
 class LogicOpNode
 {
     /**

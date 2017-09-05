@@ -26,18 +26,18 @@ class BranchInterpreter
     public function getScriptTree(ScriptInterface $script)
     {
         $ast = $this->getAstForLogicalOps($script);
-        $paths = $ast->flags();
-        $results = [];
+        $scriptPaths = $ast->flags();
 
-        if (count($paths) > 1) {
-            foreach ($paths as $path) {
-                $results[] = $this->getBranchForPath($script, $path);
+        $scriptBranches = [];
+        if (count($scriptPaths) > 1) {
+            foreach ($scriptPaths as $path) {
+                $scriptBranches[] = $this->getBranchForPath($script, $path);
             }
         } else {
-            $results[] = $this->getBranchForPath($script, []);
+            $scriptBranches[] = $this->getBranchForPath($script, []);
         }
 
-        return new ParsedScript($script, $ast, $results);
+        return new ParsedScript($script, $ast, $scriptBranches);
     }
 
     /**
