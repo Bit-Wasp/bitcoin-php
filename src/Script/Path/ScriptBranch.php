@@ -27,9 +27,9 @@ class ScriptBranch
      * ScriptBranch constructor.
      * @param ScriptInterface $fullScript
      * @param array $logicalPath
-     * @param PathTrace $segments
+     * @param array $segments
      */
-    public function __construct(ScriptInterface $fullScript, array $logicalPath, PathTrace $segments)
+    public function __construct(ScriptInterface $fullScript, array $logicalPath, array $segments)
     {
         $this->fullScript = $fullScript;
         $this->branch = $logicalPath;
@@ -53,7 +53,7 @@ class ScriptBranch
     }
 
     /**
-     * @return array|\array[]|PathTrace
+     * @return array|\array[]
      */
     public function getSegments()
     {
@@ -67,7 +67,7 @@ class ScriptBranch
     {
         $sequence = [];
         foreach ($this->segments as $segment) {
-            $sequence = array_merge($sequence, $segment->all());
+            $sequence = array_merge($sequence, $segment);
         }
         return $sequence;
     }

@@ -32,7 +32,7 @@ class PathTracer
      */
     private function makeSegment()
     {
-        $this->segments[] = new OperationContainer($this->current);
+        $this->segments[] = $this->current;
         $this->current = [];
     }
 
@@ -68,12 +68,12 @@ class PathTracer
     }
 
     /**
-     * @return PathTrace
+     * @return array
      */
     public function done()
     {
         if ($this->done) {
-            return new PathTrace($this->segments);
+            return $this->segments;
         }
 
         if (count($this->current) > 0) {
@@ -82,6 +82,6 @@ class PathTracer
 
         $this->done = true;
 
-        return new PathTrace($this->segments);
+        return $this->segments;
     }
 }

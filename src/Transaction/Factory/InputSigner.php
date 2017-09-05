@@ -526,7 +526,7 @@ class InputSigner implements InputSignerInterface
         $steps = [];
         foreach ($segments as $i => $segment) {
             $fExec = !$this->interpreter->checkExec($vfStack, false);
-            if ($segment->isLoneLogicalOp()) {
+            if (count($segment) === 1 && $segment[0]->isLogical()) {
                 $op = $segment[0];
                 switch ($op->getOp()) {
                     case Opcodes::OP_IF:
@@ -567,7 +567,7 @@ class InputSigner implements InputSignerInterface
                         break;
                 }
             } else {
-                $segmentScript = $segment->makeScript();
+                $segmentScript = ScriptFactory::fromOperations($segment);
                 $templateTypes = $this->parseSequence($segmentScript);
 
                 // Detect if effect on vfStack is `false`
