@@ -75,6 +75,9 @@ class Conditional
         return $this->value;
     }
 
+    /**
+     * @param Checksig $checksig
+     */
     public function providedBy(Checksig $checksig)
     {
         $this->providedBy = $checksig;
