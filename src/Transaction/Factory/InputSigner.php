@@ -1081,6 +1081,11 @@ class InputSigner implements InputSignerInterface
         }
 
         $checksig = $this->steps[$stepIdx];
+
+        if (!($checksig instanceof Checksig)) {
+            throw new \RuntimeException("That index is a conditional, so cannot be signed");
+        }
+
         if ($checksig->isFullySigned()) {
             return $this;
         }
