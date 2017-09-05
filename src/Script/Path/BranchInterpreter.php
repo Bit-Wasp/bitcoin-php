@@ -88,9 +88,15 @@ class BranchInterpreter
                     $current = $node0;
                     break;
                 case Opcodes::OP_ENDIF:
+                    if (null === $current->getParent()) {
+                        throw new \RuntimeException("Unexpected ENDIF, current scope had no parent");
+                    }
                     $current = $current->getParent();
                     break;
                 case Opcodes::OP_ELSE:
+                    if (null === $current->getParent()) {
+                        throw new \RuntimeException("Unexpected ELSE, current scope had no parent");
+                    }
                     $current = $current->getParent()->getChild(!$current->getValue());
                     break;
             }
