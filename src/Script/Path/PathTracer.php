@@ -16,7 +16,7 @@ class PathTracer
     /**
      * Store segments of scripts
      *
-     * @var OperationContainer[]
+     * @var array[]
      */
     private $segments = [];
 
