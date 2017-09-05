@@ -6,7 +6,6 @@ use BitWasp\Bitcoin\Script\Parser\Operation;
 
 class LogicOpNode
 {
-
     /**
      * @var LogicOpNode|null
      */
@@ -21,11 +20,6 @@ class LogicOpNode
      * @var LogicOpNode[]
      */
     private $children = [];
-
-    /**
-     * @var Operation[]
-     */
-    private $ops = [];
 
     /**
      * MASTNode constructor.
@@ -89,14 +83,6 @@ class LogicOpNode
     public function getValue()
     {
         return $this->value;
-    }
-
-    /**
-     * @param Operation $op
-     */
-    public function assign(Operation $op)
-    {
-        $this->ops[] = $op;
     }
 
     /**
