@@ -20,11 +20,6 @@ class ParsedScript
     /**
      * @var array
      */
-    private $branches;
-
-    /**
-     * @var array
-     */
     private $branchMap;
 
     /**
@@ -100,19 +95,6 @@ class ParsedScript
         }
 
         return $this->branchMap[$idx];
-    }
-
-    /**
-     * @param int $idx
-     * @return bool|ScriptBranch
-     */
-    public function getBranchByIdx($idx)
-    {
-        if (array_key_exists($idx, $this->branchMap)) {
-            return $this->branchMap[$idx];
-        }
-
-        throw new \RuntimeException("Unknown branch index");
     }
 
     /**
