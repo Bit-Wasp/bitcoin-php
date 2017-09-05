@@ -354,7 +354,7 @@ class InputSigner implements InputSignerInterface
                 return Opcodes::OP_0;
             }
 
-            $first = ord($buffer->getBinary());
+            $first = ord($buffer->getBinary()[0]);
             if ($size === 1 && $first >= 1 && $first <= 16) {
                 return \BitWasp\Bitcoin\Script\encodeOpN($first);
             } else {
