@@ -49,7 +49,6 @@ class Checksig
      * @var PublicKeyInterface[]|null[]
      */
     protected $publicKeys = [];
-
     /**
      * Checksig constructor.
      * @param Multisig|PayToPubkeyHash|PayToPubkey $info
