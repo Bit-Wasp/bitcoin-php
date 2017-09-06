@@ -104,7 +104,7 @@ class LogicOpNode
     public function split()
     {
         if (count($this->children) > 0) {
-            throw new \RuntimeException("Sanity check - dont split twice");
+            throw new \RuntimeException("Sanity check - don't split twice");
         }
 
         $children = [new LogicOpNode($this, false), new LogicOpNode($this, true)];
