@@ -92,4 +92,60 @@ class BranchInterpreterTest extends AbstractTestCase
 
         $bi->evaluateUsingStack($script, $path);
     }
+
+    public function testDetectsUnbalancedAtEndif()
+    {
+        $script = ScriptFactory::sequence([
+            Opcodes::OP_ENDIF,
+        ]);
+        $path = [];
+        $bi = new BranchInterpreter();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unbalanced conditional at OP_ENDIF");
+
+        $bi->evaluateUsingStack($script, $path);
+    }
+
+    public function testDetectsUnbalancedAtElse()
+    {
+        $script = ScriptFactory::sequence([
+            Opcodes::OP_ELSE,
+        ]);
+        $path = [];
+        $bi = new BranchInterpreter();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unbalanced conditional at OP_ELSE");
+
+        $bi->evaluateUsingStack($script, $path);
+    }
+
+    public function testDetectsUnbalancedUnfinishedScript()
+    {
+        $script = ScriptFactory::sequence([
+            Opcodes::OP_IF,
+        ]);
+        $path = [true];
+        $bi = new BranchInterpreter();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unbalanced conditional at script end");
+
+        $bi->evaluateUsingStack($script, $path);
+    }
+
+    public function testDetectsUnbalancedPath()
+    {
+        $script = ScriptFactory::sequence([
+            Opcodes::OP_IF, Opcodes::OP_ENDIF,
+        ]);
+        $path = [true, true];
+        $bi = new BranchInterpreter();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Values remaining after script execution - invalid branch data");
+
+        $bi->evaluateUsingStack($script, $path);
+    }
 }

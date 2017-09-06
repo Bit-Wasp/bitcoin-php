@@ -157,14 +157,14 @@ class BranchInterpreter
 
                     case Opcodes::OP_ELSE:
                         if ($vfStack->isEmpty()) {
-                            throw new \RuntimeException('Unbalanced conditional');
+                            throw new \RuntimeException('Unbalanced conditional at OP_ELSE');
                         }
                         $vfStack->push(!$vfStack->pop());
                         break;
 
                     case Opcodes::OP_ENDIF:
                         if ($vfStack->isEmpty()) {
-                            throw new \RuntimeException('Unbalanced conditional');
+                            throw new \RuntimeException('Unbalanced conditional at OP_ENDIF');
                         }
                         $vfStack->pop();
 
