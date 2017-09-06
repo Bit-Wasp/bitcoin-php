@@ -37,4 +37,19 @@ class BranchInterpreterTest extends AbstractTestCase
 
         $bi->getAstForLogicalOps($script);
     }
+
+
+    public function testDetectsUnbalancedIfBranch()
+    {
+        $script = ScriptFactory::sequence([
+            Opcodes::OP_1, Opcodes::OP_IF, Opcodes::OP_DROP
+        ]);
+
+        $bi = new BranchInterpreter();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unbalanced conditional - vfStack not empty at script termination");
+
+        $bi->getAstForLogicalOps($script);
+    }
 }

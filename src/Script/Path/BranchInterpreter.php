@@ -72,6 +72,10 @@ class BranchInterpreter
             }
         }
 
+        if (!$current->isRoot()) {
+            throw new \RuntimeException("Unbalanced conditional - vfStack not empty at script termination");
+        }
+
         return $root;
     }
 
