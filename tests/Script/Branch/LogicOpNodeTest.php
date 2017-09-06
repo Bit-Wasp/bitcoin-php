@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Branch;
 
-
 use BitWasp\Bitcoin\Script\Path\LogicOpNode;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
