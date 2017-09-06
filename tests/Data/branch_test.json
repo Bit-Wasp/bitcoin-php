@@ -221,6 +221,16 @@
           "ADD 2 EQUAL 1"
         ]
       ]
+    ],
+    [
+      "3DUP ADD 12 EQUALVERIFY ADD 9 EQUALVERIFY ADD 7 EQUALVERIFY 1",
+      [
+        [
+          [],
+          "3DUP ADD 12 EQUALVERIFY ADD 9 EQUALVERIFY ADD 7 EQUALVERIFY 1",
+          "3DUP ADD 12 EQUALVERIFY ADD 9 EQUALVERIFY ADD 7 EQUALVERIFY 1"
+        ]
+      ]
     ]
   ]
 }
