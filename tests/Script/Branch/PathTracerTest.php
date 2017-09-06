@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Branch;
 
-
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\Path\PathTracer;
