@@ -519,6 +519,7 @@ class ComplexSignerTest extends AbstractTestCase
                 $info = $step->getInfo();
                 if ($info instanceof Multisig) {
                     $other = $sstep->getInfo();
+                    $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
                     $this->assertEquals($info->getKeyCount(), $other->getKeyCount());
                     $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
 
