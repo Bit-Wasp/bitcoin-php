@@ -47,6 +47,9 @@ class LogicOpNode
             return $values;
         } else {
             $value = $this->value;
+            if ($value === null) {
+                return [[]];
+            }
             return [$value];
         }
     }
