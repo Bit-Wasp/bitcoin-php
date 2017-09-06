@@ -70,7 +70,7 @@ class ScriptBranchTest extends AbstractTestCase
         return $builder->getScript();
     }
 
-    public function getScriptBranchFixtures3()
+    public function getScriptBranchFixtures()
     {
         $opcodes = new Opcodes();
         $mapOps = $this->calcMapOpNames($opcodes);
@@ -92,7 +92,7 @@ class ScriptBranchTest extends AbstractTestCase
     /**
      * @param ScriptInterface $script
      * @param array $fixtureData
-     * @dataProvider getScriptBranchFixtures3
+     * @dataProvider getScriptBranchFixtures
      */
     public function testBranchTest(ScriptInterface $script, array $fixtureData)
     {
@@ -118,6 +118,31 @@ class ScriptBranchTest extends AbstractTestCase
             }
 
             $this->assertTrue($foundBranch);
+        }
+    }
+
+
+    /**
+     * @param ScriptInterface $script
+     * @param array $fixtureData
+     * @dataProvider getScriptBranchFixtures
+     */
+    public function testScriptAst(ScriptInterface $script, array $fixtureData)
+    {
+        $bi = new BranchInterpreter();
+        $tree = $bi->getAstForLogicalOps($script);
+
+        $flags = $tree->flags();
+        $this->assertEquals(count($fixtureData), count($flags));
+
+        $search = [];
+        foreach ($flags as $logicalPath) {
+            $search[json_encode($logicalPath)] = 1;
+        }
+
+        foreach ($fixtureData as $fixture) {
+            $searchKey = json_encode($fixture[0]);
+            $this->assertTrue(array_key_exists($searchKey, $search));
         }
     }
 }
