@@ -93,7 +93,7 @@ class ParsedScript
     }
 
     /**
-     * @param $branch
+     * @param array $branch
      * @return ScriptInterface|bool
      */
     public function getMutuallyExclusiveOps($branch)
