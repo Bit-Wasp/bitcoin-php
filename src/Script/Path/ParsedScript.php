@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-use BitWasp\Bitcoin\Script\Parser\Operation;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class ParsedScript
@@ -90,28 +88,5 @@ class ParsedScript
         }
 
         return $this->descriptorMap[$key];
-    }
-
-    /**
-     * @param array $branch
-     * @return ScriptInterface|bool
-     */
-    public function getMutuallyExclusiveOps($branch)
-    {
-        if (!($branch = $this->getBranchByPath($branch))) {
-            return false;
-        }
-
-        $ops = [];
-        foreach ($branch->getScriptSections() as $step) {
-            /** @var Operation[] $step */
-            if (count($step) === 1 && $step[0]->isLogical()) {
-                continue;
-            }
-
-            $ops = array_merge($ops, $step);
-        }
-
-        return ScriptFactory::fromOperations($ops);
     }
 }
