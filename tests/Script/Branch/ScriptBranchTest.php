@@ -121,7 +121,6 @@ class ScriptBranchTest extends AbstractTestCase
         }
     }
 
-
     /**
      * @param ScriptInterface $script
      * @param array $fixtureData
