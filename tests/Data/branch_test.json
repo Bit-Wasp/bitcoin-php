@@ -1,6 +1,16 @@
 {
   "vectors": [
     [
+      "",
+      [
+        [
+          [],
+          "",
+          ""
+        ]
+      ]
+    ],
+    [
       "HASH160 DUP 0x14 0xa16ce1cfc1ca2dfc93f8f9aff31f1a4d3ebb96ea EQUAL IF 7017 CHECKSEQUENCEVERIFY 2DROP 0x21 0x0228d9678b4edc130efb1fd3e31fc33004237c53632657ebd18244fe6cf05fb4d3 ELSE 0x14 0x376eb254c19e918752f00420da03a45ff6c9c7f6 EQUAL NOTIF 7017 CHECKLOCKTIMEVERIFY DROP ENDIF 0x21 0x02d99b5b59775b152861a62a068896d9eecd550c9acfb18df1cb05cadef26a2b7e ENDIF CHECKSIG",
       [
         [
@@ -144,6 +154,51 @@
           [false],
           "SHA256 0x14 0x20245404ec8c84e7cfde9eaf475e8526b17abd35 EQUAL IF ELSE 460000 CHECKLOCKTIMEVERIFY DROP 0x21 0x03f807fbe4670d021805ad5a3d33b38222461b79bbc98dcd2e73b1f6f2534b475e ENDIF CHECKSIG",
           "SHA256 0x14 0x20245404ec8c84e7cfde9eaf475e8526b17abd35 EQUAL 460000 CHECKLOCKTIMEVERIFY DROP 0x21 0x03f807fbe4670d021805ad5a3d33b38222461b79bbc98dcd2e73b1f6f2534b475e CHECKSIG"
+        ]
+      ]
+    ],
+    [
+      "ADD 2 EQUAL",
+      [
+        [
+          [],
+          "ADD 2 EQUAL",
+          "ADD 2 EQUAL"
+        ]
+      ]
+    ],
+    [
+      "ADD 2 EQUAL IF 1 ELSE 0 ENDIF",
+      [
+        [
+          [true],
+          "ADD 2 EQUAL IF 1 ELSE ENDIF",
+          "ADD 2 EQUAL 1"
+        ],
+        [
+          [false],
+          "ADD 2 EQUAL IF ELSE 0 ENDIF",
+          "ADD 2 EQUAL 0"
+        ]
+      ]
+    ],
+    [
+      "ADD 2 EQUAL IF IF 1 ELSE 0 ENDIF ELSE 1 ENDIF",
+      [
+        [
+          [true, true],
+          "ADD 2 EQUAL IF IF 1 ELSE ENDIF ELSE ENDIF",
+          "ADD 2 EQUAL 1"
+        ],
+        [
+          [true, false],
+          "ADD 2 EQUAL IF IF ELSE 0 ENDIF ELSE ENDIF",
+          "ADD 2 EQUAL 0"
+        ],
+        [
+          [false],
+          "ADD 2 EQUAL IF IF ELSE ENDIF ELSE 1 ENDIF",
+          "ADD 2 EQUAL 1"
         ]
       ]
     ]
