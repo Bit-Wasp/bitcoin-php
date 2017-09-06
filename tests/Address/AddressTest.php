@@ -17,6 +17,7 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Buffertools\Buffer;
 
 class AddressTest extends AbstractTestCase
 {
@@ -114,6 +115,10 @@ class AddressTest extends AbstractTestCase
 
         $toScript = $fromString->getScriptPubKey();
         $this->assertTrue($script->equals($toScript));
+
+        // check ourselves a bit, do we get the test fixture when
+        // we pass our addresses output script?
+        $addrAgain = AddressFactory::fromOutputScript($fromString->getScriptPubKey());
     }
 
     /**
@@ -183,5 +188,19 @@ class AddressTest extends AbstractTestCase
     {
         $s = new Script();
         AddressFactory::getAssociatedAddress($s);
+    }
+
+    public function testP2pkhIs20Bytes()
+    {
+        $buffer = new Buffer();
+        $this->expectExceptionMessage("P2PKH address hash should be 20 bytes");
+        new PayToPubKeyHashAddress($buffer);
+    }
+
+    public function testP2shIs20Bytes()
+    {
+        $buffer = new Buffer();
+        $this->expectExceptionMessage("P2SH address hash should be 20 bytes");
+        new ScriptHashAddress($buffer);
     }
 }
