@@ -57,7 +57,7 @@ class ScriptBranch
     public function getOps()
     {
         $sequence = [];
-        foreach ($this->scriptSections as $segment) {
+        foreach ($this->getScriptSections() as $segment) {
             $sequence = array_merge($sequence, $segment);
         }
         return $sequence;
