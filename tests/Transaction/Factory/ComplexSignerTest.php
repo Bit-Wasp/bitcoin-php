@@ -534,9 +534,14 @@ class ComplexSignerTest extends AbstractTestCase
                     $this->assertEquals($info->isChecksigVerify(), $other->isChecksigVerify());
                     $this->assertTrue($info->getPubKeyHash()->equals($other->getPubKeyHash()));
                 }
-            } else if ($step instanceof Conditional) {
+            } else if ($step instanceof Conditional || $sstep instanceof Conditional) {
                 /** @var Conditional $sstep */
                 $this->assertInstanceOf(Conditional::class, $sstep);
+                $this->assertInstanceOf(Conditional::class, $step);
+                $this->assertEquals($step->hasValue(), $sstep->hasValue());
+                if ($step->hasValue()) {
+                    $this->assertEquals($step->getValue(), $sstep->getValue());
+                }
             }
 
             if (count($stepKeys) > 0) {
