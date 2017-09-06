@@ -21,11 +21,6 @@ class ParsedScript
     /**
      * @var array
      */
-    private $branchMap;
-
-    /**
-     * @var array
-     */
     private $descriptorMap;
 
     /**
@@ -37,25 +32,22 @@ class ParsedScript
     public function __construct(ScriptInterface $script, LogicOpNode $ast, array $branches)
     {
         if (!$ast->isRoot()) {
-            throw new \RuntimeException("AST is for invalid node, wasn't root");
+            throw new \RuntimeException("LogicOpNode was not for root");
         }
 
         $descriptorIdx = 0;
-        $keyedBranchMap = []; // idx => ScriptBranch
         $keyedIdxMap = []; // descriptor => ScriptBranch
         foreach ($branches as $branch) {
             $descriptor = $branch->getPath();
             $descriptorKey = json_encode($descriptor);
-            if (array_key_exists($descriptorKey, $keyedBranchMap)) {
-                throw new \RuntimeException("Duplicate branch descriptor, invalid ScriptBranch found");
+            if (array_key_exists($descriptorKey, $keyedIdxMap)) {
+                throw new \RuntimeException("Duplicate logical pathway, invalid ScriptBranch found");
             }
 
-            $keyedBranchMap[] = $branch;
-            $keyedIdxMap[$descriptorKey] = $descriptorIdx;
+            $keyedIdxMap[$descriptorKey] = $branch;
             $descriptorIdx++;
         }
 
-        $this->branchMap = $keyedBranchMap;
         $this->descriptorMap = $keyedIdxMap;
         $this->script = $script;
         $this->ast = $ast;
@@ -81,7 +73,7 @@ class ParsedScript
     {
         return array_map(function (ScriptBranch $branch) {
             return $branch->getPath();
-        }, $this->branchMap);
+        }, $this->descriptorMap);
     }
 
     /**
@@ -92,7 +84,7 @@ class ParsedScript
      */
     private function getBranchIdx(array $branchDesc)
     {
-        $descriptorKey = json_encode($branchDesc);
+
 
         if (array_key_exists($descriptorKey, $this->descriptorMap)) {
             return $this->descriptorMap[$descriptorKey];
@@ -109,12 +101,12 @@ class ParsedScript
      */
     public function getBranchByPath(array $branchDesc)
     {
-        $idx = $this->getBranchIdx($branchDesc);
-        if (!array_key_exists($idx, $this->branchMap)) {
+        $key = json_encode($branchDesc);
+        if (!array_key_exists($key, $this->descriptorMap)) {
             throw new \RuntimeException("Coding error, missing entry in branch map for desc");
         }
 
-        return $this->branchMap[$idx];
+        return $this->descriptorMap[$key];
     }
 
     /**
