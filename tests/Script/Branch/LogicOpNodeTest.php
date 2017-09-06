@@ -8,20 +8,16 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class LogicOpNodeTest extends AbstractTestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Child not found
-     */
     public function testGetChildWithNoneThrowsError()
     {
         $logicNode = new LogicOpNode();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Child not found");
+
         $logicNode->getChild(0);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Child not found
-     */
     public function testNodeWontSplitTwice()
     {
         $threw = false;
