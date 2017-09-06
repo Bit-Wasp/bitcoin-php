@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Path;
 
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class ScriptBranch
