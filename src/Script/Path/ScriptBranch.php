@@ -62,25 +62,4 @@ class ScriptBranch
         }
         return $sequence;
     }
-
-    /**
-     * @return array
-     */
-    public function __debugInfo()
-    {
-        $m = [];
-        foreach ($this->scriptSections as $segment) {
-            $m[] = ScriptFactory::fromOperations($segment);
-        }
-
-        $path = [];
-        foreach ($this->branch as $flag) {
-            $path[] = $flag ? 'true' : 'false';
-        }
-
-        return [
-            'branch' => implode(", ", $path),
-            'segments' => $m,
-        ];
-    }
 }
