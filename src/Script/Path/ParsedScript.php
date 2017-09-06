@@ -77,23 +77,6 @@ class ParsedScript
     }
 
     /**
-     * Look up the branch idx by it's path
-     *
-     * @param array $branchDesc
-     * @return int
-     */
-    private function getBranchIdx(array $branchDesc)
-    {
-
-
-        if (array_key_exists($descriptorKey, $this->descriptorMap)) {
-            return $this->descriptorMap[$descriptorKey];
-        }
-
-        throw new \RuntimeException("Unknown branch");
-    }
-
-    /**
      * Look up the branch by it's path
      *
      * @param array $branchDesc
