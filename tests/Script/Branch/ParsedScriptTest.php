@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Branch;
 
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\Path\LogicOpNode;
 use BitWasp\Bitcoin\Script\Path\ParsedScript;
 use BitWasp\Bitcoin\Script\Path\ScriptBranch;
@@ -22,15 +23,32 @@ class ParsedScriptTest extends AbstractTestCase
         new ParsedScript(new Script(new Buffer()), $child, []);
     }
 
+    public function testGetBranchByPathWroks()
+    {
+        $script = new Script(new Buffer("\x01\x01"));
+        $onlyPath = [];
+        $onlyBranch = new ScriptBranch($script, $onlyPath, [
+            [new Operation(1, new Buffer("\x01"))]
+        ]);
+
+        $ps = new ParsedScript($script, new LogicOpNode(), [
+            $onlyBranch,
+        ]);
+
+        $branch = $ps->getBranchByPath($onlyPath);
+        $this->assertSame($onlyBranch, $branch);
+    }
+
     public function testRejectsDuplicatePaths()
     {
+        $script = new Script(new Buffer("\x0101"));
+        $branch = new ScriptBranch($script, [], [
+            [new Operation(1, new Buffer("\x01"))]
+        ]);
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage("Duplicate logical pathway, invalid ScriptBranch found");
-
-        $script = new Script(new Buffer());
-        new ParsedScript($script, new LogicOpNode(), [
-            new ScriptBranch($script, [], []),
-            new ScriptBranch($script, [], []),
-        ]);
+        
+        new ParsedScript($script, new LogicOpNode(), [$branch, $branch]);
     }
 }
