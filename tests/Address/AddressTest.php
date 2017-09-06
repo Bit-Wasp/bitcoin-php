@@ -119,6 +119,7 @@ class AddressTest extends AbstractTestCase
         // check ourselves a bit, do we get the test fixture when
         // we pass our addresses output script?
         $addrAgain = AddressFactory::fromOutputScript($fromString->getScriptPubKey());
+        $this->assertEquals($addrAgain->getAddress($network), $fromString->getAddress($network));
     }
 
     /**
