@@ -113,13 +113,13 @@ class BranchInterpreter
 
     /**
      * @param ScriptInterface $script
-     * @param int[] $path
+     * @param int[] $logicalPath
      * @return array - array of Operation[] representing script segments
      */
-    public function evaluateUsingStack(ScriptInterface $script, array $path)
+    public function evaluateUsingStack(ScriptInterface $script, array $logicalPath)
     {
         $mainStack = new Stack();
-        foreach (array_reverse($path) as $setting) {
+        foreach (array_reverse($logicalPath) as $setting) {
             $mainStack->push($setting);
         }
 
@@ -143,7 +143,8 @@ class BranchInterpreter
                         $value = false;
                         if ($fExec) {
                             if ($mainStack->isEmpty()) {
-                                throw new \RuntimeException('Unbalanced conditional');
+                                $op = $script->getOpcodes()->getOp($opCode & 1 ? Opcodes::OP_IF : Opcodes::OP_NOTIF);
+                                throw new \RuntimeException("Unbalanced conditional at {$op} - not included in logicalPath");
                             }
 
                             $value = $mainStack->pop();

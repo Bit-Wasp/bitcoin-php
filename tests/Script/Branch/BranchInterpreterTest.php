@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Tests\Script\Branch;
 
-
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Path\BranchInterpreter;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -52,7 +51,6 @@ class BranchInterpreterTest extends AbstractTestCase
         $bi->getAstForLogicalOps($script);
     }
 
-
     public function testDetectsReservedOpcodes()
     {
         $script = ScriptFactory::sequence([
@@ -65,5 +63,33 @@ class BranchInterpreterTest extends AbstractTestCase
         $this->expectExceptionMessage("Disabled Opcode");
 
         $bi->evaluateUsingStack($script, []);
+    }
+
+    public function testDetectsIfEvaluationWithoutStackValue()
+    {
+        $script = ScriptFactory::sequence([
+            Opcodes::OP_IF, Opcodes::OP_ENDIF,
+        ]);
+        $path = [];
+        $bi = new BranchInterpreter();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unbalanced conditional at OP_IF - not included in logicalPath");
+
+        $bi->evaluateUsingStack($script, $path);
+    }
+
+    public function testDetectsNotIfEvaluationWithoutStackValue()
+    {
+        $script = ScriptFactory::sequence([
+            Opcodes::OP_NOTIF, Opcodes::OP_ENDIF,
+        ]);
+        $path = [];
+        $bi = new BranchInterpreter();
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unbalanced conditional at OP_NOTIF - not included in logicalPath");
+
+        $bi->evaluateUsingStack($script, $path);
     }
 }
