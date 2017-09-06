@@ -10,7 +10,7 @@ class LogicOpNodeTest extends AbstractTestCase
     public function testGetChildWithNoneThrowsError()
     {
         $logicNode = new LogicOpNode();
-
+        $this->assertFalse($logicNode->hasChildren());
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage("Child not found");
 
@@ -22,12 +22,14 @@ class LogicOpNodeTest extends AbstractTestCase
         $threw = false;
         try {
             $logicNode = new LogicOpNode();
+            $this->assertFalse($logicNode->hasChildren());
             $logicNode->split();
         } catch (\Exception $e) {
             $threw = true;
         }
 
         $this->assertFalse($threw, "control split should not fail");
+        $this->assertTrue($logicNode->hasChildren());
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage("Sanity check - don't split twice");
