@@ -201,6 +201,26 @@
           "ADD 2 EQUAL 1"
         ]
       ]
+    ],
+    [
+      "ADD 2 EQUAL IF NOTIF 1 ELSE 0 ENDIF ELSE 1 ENDIF",
+      [
+        [
+          [true, false],
+          "ADD 2 EQUAL IF NOTIF 1 ELSE ENDIF ELSE ENDIF",
+          "ADD 2 EQUAL 1"
+        ],
+        [
+          [true, true],
+          "ADD 2 EQUAL IF NOTIF ELSE 0 ENDIF ELSE ENDIF",
+          "ADD 2 EQUAL 0"
+        ],
+        [
+          [false],
+          "ADD 2 EQUAL IF NOTIF ELSE ENDIF ELSE 1 ENDIF",
+          "ADD 2 EQUAL 1"
+        ]
+      ]
     ]
   ]
 }
