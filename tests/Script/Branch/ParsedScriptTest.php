@@ -39,6 +39,24 @@ class ParsedScriptTest extends AbstractTestCase
         $this->assertSame($onlyBranch, $branch);
     }
 
+    public function testGetBranchByPathFailsForUnknownPath()
+    {
+        $script = new Script(new Buffer("\x01\x01"));
+        $onlyPath = [];
+        $onlyBranch = new ScriptBranch($script, $onlyPath, [
+            [new Operation(1, new Buffer("\x01"))]
+        ]);
+
+        $ps = new ParsedScript($script, new LogicOpNode(), [
+            $onlyBranch,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unknown logical pathway");
+
+        $ps->getBranchByPath([true, false, false, true]);
+    }
+
     public function testRejectsDuplicatePaths()
     {
         $script = new Script(new Buffer("\x0101"));
@@ -48,7 +66,7 @@ class ParsedScriptTest extends AbstractTestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage("Duplicate logical pathway, invalid ScriptBranch found");
-        
+
         new ParsedScript($script, new LogicOpNode(), [$branch, $branch]);
     }
 }

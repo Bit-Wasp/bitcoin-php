@@ -86,7 +86,7 @@ class ParsedScript
     {
         $key = json_encode($branchDesc);
         if (!array_key_exists($key, $this->descriptorMap)) {
-            throw new \RuntimeException("Coding error, missing entry in branch map for desc");
+            throw new \RuntimeException("Unknown logical pathway");
         }
 
         return $this->descriptorMap[$key];
