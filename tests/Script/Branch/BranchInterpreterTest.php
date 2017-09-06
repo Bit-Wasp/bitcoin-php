@@ -240,6 +240,7 @@ class BranchInterpreterTest extends AbstractTestCase
         $tree = $bi->getScriptTree($script);
 
         $this->assertEquals(count($fixtureData), count($tree->getPaths()));
+        $this->assertEquals(count($fixtureData) > 1, $tree->hasMultipleBranches());
         foreach ($fixtureData as $fixture) {
             /**
              * @var ScriptInterface $expectedBranch
