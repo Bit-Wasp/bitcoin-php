@@ -191,7 +191,7 @@ class SignData
             throw new \RuntimeException("CLTV time is out of range");
         }
 
-        $this->cltvTime = $this;
+        $this->cltvTime = $time;
         return $this;
     }
 }
