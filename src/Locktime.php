@@ -19,6 +19,15 @@ class Locktime
     const TIME_MAX = self::INT_MAX - self::BLOCK_MAX;
 
     /**
+     * @param int $nLockTime
+     * @return bool
+     */
+    public function isLockedToBlock($nLockTime)
+    {
+        return $nLockTime > 0 && $nLockTime <= self::BLOCK_MAX;
+    }
+
+    /**
      * Convert a $timestamp to a locktime.
      * Max timestamp is 3794967296 - 04/04/2090 @ 5:34am (UTC)
      *
