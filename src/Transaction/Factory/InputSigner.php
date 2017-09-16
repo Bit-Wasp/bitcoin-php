@@ -597,7 +597,7 @@ class InputSigner implements InputSignerInterface
                                 $checksig->setRequired(false);
                             }
                         } else if ($checksig instanceof TimeLock) {
-
+                            $this->checkTimeLock($checksig, $signData);
                         }
 
                         $steps[] = $checksig;

@@ -96,8 +96,11 @@ class ComplexSignerTest extends AbstractTestCase
                 [$pB],
             ],
         ];
-
-        return [$script_1, $paths_1, $keys_1,];
+        $signOptData = [
+            [],
+            [],
+        ];
+        return [$script_1, $paths_1, $keys_1,$signOptData,];
     }
 
     /**
@@ -126,9 +129,61 @@ class ComplexSignerTest extends AbstractTestCase
                 [$pA],
             ],
         ];
-
-        return [$script_1, $paths_1, $keys_1,];
+        $signOptData = [
+            [
+                'cltv_time' => 491000,
+            ],
+        ];
+        return [$script_1, $paths_1, $keys_1,$signOptData,];
     }
+
+    /**
+     * NOTIF [AliceKey] CHECKSIGVERIFY ENDIF [BobKey] CHECKSIG
+     * @return array
+     */
+    private function ifCltvOutput()
+    {
+        $pA = $this->getKeyFromStore(0);
+        $pB = $this->getKeyFromStore(1);
+
+        $pkA = $pA->getPublicKey();
+        $pkB = $pB->getPublicKey();
+
+        $height = Number::int(490000);
+        $script_1 = ScriptFactory::sequence([
+            Opcodes::OP_IF,
+                $height->getBuffer(), Opcodes::OP_CHECKLOCKTIMEVERIFY, Opcodes::OP_DROP,
+                $pkB->getBuffer(), Opcodes::OP_CHECKSIG,
+            Opcodes::OP_ELSE,
+                $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
+            Opcodes::OP_ENDIF,
+        ]);
+
+        $paths_1 = [
+            [true,],
+            [false,],
+        ];
+
+        $keys_1 = [
+            [
+                [],
+                [],
+                [$pB],
+            ],
+            [
+                [],
+                [$pA],
+            ],
+        ];
+        $scriptOptData = [
+            [
+                'cltv_time' => 491000,
+            ],
+            [],
+        ];
+        return [$script_1, $paths_1, $keys_1,$scriptOptData,];
+    }
+
 
     /**
      * 2-of-2 MULTISIG IF [Alice] CHECKSIG ELSE [BobKey] CHECKSIG ENDIF
@@ -171,6 +226,10 @@ class ComplexSignerTest extends AbstractTestCase
                     [$pC],
                 ],
             ],
+            [
+                [],
+                [],
+            ],
         ];
     }
 
@@ -209,6 +268,10 @@ class ComplexSignerTest extends AbstractTestCase
                     [$pC],
                 ],
             ],
+            [
+                [],
+                [],
+            ],
         ];
     }
 
@@ -243,11 +306,14 @@ class ComplexSignerTest extends AbstractTestCase
                     [],
                     [$pB1, $pB2]
                 ],
-
                 [
                     [],
                     [$pA]
                 ],
+            ],
+            [
+                [],
+                [],
             ],
         ];
     }
@@ -304,6 +370,11 @@ class ComplexSignerTest extends AbstractTestCase
                     [$pC],
                 ],
             ],
+            [
+                [],
+                [],
+                [],
+            ],
         ];
     }
 
@@ -328,6 +399,9 @@ class ComplexSignerTest extends AbstractTestCase
                 [
                     [$pB]
                 ],
+            ],
+            [
+                [],
             ],
         ];
     }
@@ -357,6 +431,9 @@ class ComplexSignerTest extends AbstractTestCase
                     [$pA],
                     [$pB],
                 ],
+            ],
+            [
+                [],
             ],
         ];
     }
@@ -401,6 +478,11 @@ class ComplexSignerTest extends AbstractTestCase
                     [$pD],
                 ],
             ],
+            [
+                [],
+                [],
+                [],
+            ]
         ];
     }
 
@@ -442,6 +524,10 @@ class ComplexSignerTest extends AbstractTestCase
                     [$pD],
                 ],
             ],
+            [
+                [],
+                [],
+            ]
         ];
     }
 
@@ -461,6 +547,7 @@ class ComplexSignerTest extends AbstractTestCase
             $this->twoRatherDifferentTemplates(),
             $this->lotsOfTemplates(),
             $this->cltvOutput(),
+            $this->ifCltvOutput(),
         ];
     }
 
@@ -478,7 +565,7 @@ class ComplexSignerTest extends AbstractTestCase
              * @var array $vPaths
              * @var array $vPathStepKeys
              */
-            list ($script, $vPaths, $vPathStepKeys) = $fixture;
+            list ($script, $vPaths, $vPathStepKeys, $vOptData) = $fixture;
 
             if (count($vPaths) != count($vPathStepKeys)) {
                 throw new \RuntimeException("Invalid data provider");
@@ -491,6 +578,7 @@ class ComplexSignerTest extends AbstractTestCase
                     new TransactionOutput(100000000, $script),
                     $vPaths[$i],
                     $vPathStepKeys[$i],
+                    $vOptData[$i],
                 ];
             }
         }
@@ -505,13 +593,16 @@ class ComplexSignerTest extends AbstractTestCase
      * @param array $branchKeyList
      * @dataProvider complexTestProvider
      */
-    public function testCase(TransactionInterface $unsigned, TransactionOutputInterface $txOut, array $branch, array $branchKeyList)
+    public function testCase(TransactionInterface $unsigned, TransactionOutputInterface $txOut, array $branch, array $branchKeyList, array $signOptData = [])
     {
         $signer = new Signer($unsigned);
         $signer->allowComplexScripts(true);
 
         $signData = new SignData();
         $signData->logicalPath($branch);
+        if (array_key_exists('cltv_time', $signOptData)) {
+            $signData->setCltvTime($signOptData['cltv_time']);
+        }
 
         $input = $signer->input(0, $txOut, $signData);
 
