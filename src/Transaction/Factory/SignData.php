@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
+use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 
 class SignData
@@ -27,6 +28,11 @@ class SignData
      * @var bool[]
      */
     protected $logicalPath = null;
+
+    /**
+     * @var int
+     */
+    protected $cltvTime = null;
 
     /**
      * @param ScriptInterface $redeemScript
@@ -151,5 +157,41 @@ class SignData
         }
 
         return $this->logicalPath;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCltvTime() {
+        if (null === $this->cltvTime) {
+            throw new \RuntimeException("CLTV time requested but not set");
+        }
+        return $this->cltvTime;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCltvTime()
+    {
+        return is_int($this->cltvTime);
+    }
+
+    /**
+     * @param int $time
+     * @return $this
+     */
+    public function setCltvTime($time)
+    {
+        if (!is_int($time)) {
+            throw new \RuntimeException("CLTV time must be an integer");
+        }
+
+        if ($time < 0 || $time > Locktime::TIME_MAX) {
+            throw new \RuntimeException("CLTV time is out of range");
+        }
+
+        $this->cltvTime = $this;
+        return $this;
     }
 }

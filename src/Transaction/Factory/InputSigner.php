@@ -30,6 +30,7 @@ use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
+use BitWasp\Bitcoin\Transaction\Factory\ScriptInfo\CheckLocktimeVerify;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -381,28 +382,34 @@ class InputSigner implements InputSignerInterface
     /**
      * @param array $decoded
      * @param null $solution
-     * @return null|PayToPubkey|PayToPubkeyHash|Multisig
+     * @return null|TimeLock|Checksig
      */
     private function classifySignStep(array $decoded, &$solution = null)
     {
         try {
             $details = Multisig::fromDecodedScript($decoded, $this->pubKeySerializer, true);
             $solution = $details->getKeyBuffers();
-            return $details;
+            return new Checksig($details);
         } catch (\Exception $e) {
         }
 
         try {
             $details = PayToPubkey::fromDecodedScript($decoded, true);
             $solution = $details->getKeyBuffer();
-            return $details;
+            return new Checksig($details);
         } catch (\Exception $e) {
         }
 
         try {
             $details = PayToPubkeyHash::fromDecodedScript($decoded, true);
             $solution = $details->getPubKeyHash();
-            return $details;
+            return new Checksig($details);
+        } catch (\Exception $e) {
+        }
+
+        try {
+            $details = CheckLocktimeVerify::fromDecodedScript($decoded);
+            return new TimeLock($details);
         } catch (\Exception $e) {
         }
 
@@ -435,7 +442,7 @@ class InputSigner implements InputSignerInterface
                 throw new \RuntimeException("Invalid script");
             } else {
                 $j += $i;
-                $result[] = new Checksig($step);
+                $result[] = $step;
             }
         }
 
@@ -580,14 +587,19 @@ class InputSigner implements InputSignerInterface
 
                 foreach ($templateTypes as $k => $checksig) {
                     if ($fExec) {
-                        $this->extractFromValues($solution->getScript(), $checksig, $stack, $this->sigVersion, $resolvesFalse);
+                        if ($checksig instanceof Checksig) {
+                            $this->extractChecksig($solution->getScript(), $checksig, $stack, $this->sigVersion, $resolvesFalse);
 
-                        // If this statement results is later consumed
-                        // by a conditional which would be false, mark
-                        // this operation as not required
-                        if ($resolvesFalse) {
-                            $checksig->setRequired(false);
+                            // If this statement results is later consumed
+                            // by a conditional which would be false, mark
+                            // this operation as not required
+                            if ($resolvesFalse) {
+                                $checksig->setRequired(false);
+                            }
+                        } else if ($checksig instanceof TimeLock) {
+
                         }
+
                         $steps[] = $checksig;
                     }
                 }
@@ -595,6 +607,24 @@ class InputSigner implements InputSignerInterface
         }
 
         $this->steps = $steps;
+    }
+
+    /**
+     * @param TimeLock $timelock
+     * @param SignData $signData
+     */
+    public function checkTimeLock(TimeLock $timelock, SignData $signData)
+    {
+        $info = $timelock->getInfo();
+        if ($info instanceof CheckLocktimeVerify) {
+            $cltvTime = $signData->getCltvTime();
+            if (!$info->isSpendable($cltvTime)) {
+                $requiredTime = "{$info->getLocktime()} " . ($info->isLockedToBlock() ? " (block height)" : " (seconds)");
+                throw new \RuntimeException("Output is not yet spendable, must wait until {$requiredTime}");
+            }
+        } else {
+            throw new \RuntimeException("Sanity check, unsupported script info for timelock");
+        }
     }
 
     /**
@@ -608,7 +638,7 @@ class InputSigner implements InputSignerInterface
      * @param int $sigVersion
      * @param bool $expectFalse
      */
-    public function extractFromValues(ScriptInterface $script, Checksig $checksig, Stack $stack, $sigVersion, $expectFalse)
+    public function extractChecksig(ScriptInterface $script, Checksig $checksig, Stack $stack, $sigVersion, $expectFalse)
     {
         $size = count($stack);
 

@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
+use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInfo\Multisig;
@@ -93,6 +94,36 @@ class ComplexSignerTest extends AbstractTestCase
                 [],
                 [$pA],
                 [$pB],
+            ],
+        ];
+
+        return [$script_1, $paths_1, $keys_1,];
+    }
+
+    /**
+     * NOTIF [AliceKey] CHECKSIGVERIFY ENDIF [BobKey] CHECKSIG
+     * @return array
+     */
+    private function cltvOutput()
+    {
+        $pA = $this->getKeyFromStore(0);
+
+        $pkA = $pA->getPublicKey();
+
+        $height = Number::int(490000);
+        $script_1 = ScriptFactory::sequence([
+            $height->getBuffer(), Opcodes::OP_CHECKLOCKTIMEVERIFY, Opcodes::OP_DROP,
+            $pkA->getBuffer(), Opcodes::OP_CHECKSIG,
+        ]);
+
+        $paths_1 = [
+            [],
+        ];
+
+        $keys_1 = [
+            [
+                [],
+                [$pA],
             ],
         ];
 
@@ -429,6 +460,7 @@ class ComplexSignerTest extends AbstractTestCase
             $this->twoMildlySimilarTemplates(),
             $this->twoRatherDifferentTemplates(),
             $this->lotsOfTemplates(),
+            $this->cltvOutput(),
         ];
     }
 
