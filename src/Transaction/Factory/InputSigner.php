@@ -31,6 +31,7 @@ use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Transaction\Factory\ScriptInfo\CheckLocktimeVerify;
+use BitWasp\Bitcoin\Transaction\Factory\ScriptInfo\CheckSequenceVerify;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -413,6 +414,12 @@ class InputSigner implements InputSignerInterface
         } catch (\Exception $e) {
         }
 
+        try {
+            $details = CheckSequenceVerify::fromDecodedScript($decoded);
+            return new TimeLock($details);
+        } catch (\Exception $e) {
+        }
+
         return null;
     }
 
@@ -622,6 +629,8 @@ class InputSigner implements InputSignerInterface
                 $requiredTime = "{$info->getLocktime()} " . ($info->isLockedToBlock() ? " (block height)" : " (seconds)");
                 throw new \RuntimeException("Output is not yet spendable, must wait until {$requiredTime}");
             }
+        } else if ($info instanceof CheckSequenceVerify) {
+
         } else {
             throw new \RuntimeException("Sanity check, unsupported script info for timelock");
         }
