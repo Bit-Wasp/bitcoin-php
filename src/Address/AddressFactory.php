@@ -8,9 +8,11 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Script\WitnessProgram;
+use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Bitcoin\SegwitBech32;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -53,6 +55,10 @@ class AddressFactory
      */
     public static function fromOutputScript(ScriptInterface $outputScript)
     {
+        if ($outputScript instanceof P2shScript || $outputScript instanceof WitnessScript) {
+            throw new \RuntimeException("P2shScript & WitnessScript's are not accepted by fromOutputScript");
+        }
+
         $wp = null;
         if ($outputScript->isWitness($wp)) {
             /** @var WitnessProgram $wp */
