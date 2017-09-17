@@ -17,6 +17,7 @@ use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
@@ -258,36 +259,31 @@ class Checker
     }
 
     /**
-     * @param int $txLockTime
-     * @param int $nThreshold
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
+     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $scriptLockTime
      * @return bool
      */
-    private function verifyLockTime($txLockTime, $nThreshold, \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime)
+    public function checkLockTime(\BitWasp\Bitcoin\Script\Interpreter\Number $scriptLockTime)
     {
-        $nTime = $lockTime->getInt();
-        if (($txLockTime < $nThreshold && $nTime < $nThreshold) ||
-            ($txLockTime >= $nThreshold && $nTime >= $nThreshold)
+        $input = $this->transaction->getInput($this->nInput);
+
+        $nLockTime = $scriptLockTime->getInt();
+        $txLockTime = $this->transaction->getLockTime();
+        if (!(($txLockTime < Locktime::BLOCK_MAX && $nLockTime < Locktime::BLOCK_MAX) ||
+            ($txLockTime >= Locktime::BLOCK_MAX && $nLockTime >= Locktime::BLOCK_MAX))
         ) {
             return false;
         }
 
-        return $nTime >= $txLockTime;
-    }
-
-    /**
-     * @param \BitWasp\Bitcoin\Script\Interpreter\Number $lockTime
-     * @return bool
-     */
-    public function checkLockTime(\BitWasp\Bitcoin\Script\Interpreter\Number $lockTime)
-    {
-        if ($this->transaction->getInput($this->nInput)->isFinal()) {
+        if ($nLockTime > $txLockTime) {
             return false;
         }
 
-        return $this->verifyLockTime($this->transaction->getLockTime(), Locktime::BLOCK_MAX, $lockTime);
-    }
+        if ($input->isFinal()) {
+            return false;
+        }
 
+        return true;
+    }
 
     /**
      * @param \BitWasp\Bitcoin\Script\Interpreter\Number $sequence
@@ -305,10 +301,19 @@ class Checker
         }
 
         $mask = TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG | TransactionInputInterface::SEQUENCE_LOCKTIME_MASK;
-        return $this->verifyLockTime(
-            $txSequence & $mask,
-            TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG,
-            Number::int($sequence->getInt() & $mask)
-        );
+        $txToSequenceMasked = $txSequence & $mask;
+        $nSequenceMasked = $sequence->getInt() & $mask;
+
+        if (!(($txToSequenceMasked < TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked < TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG) ||
+            ($txToSequenceMasked >= TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG && $nSequenceMasked >= TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG))
+        ) {
+            return false;
+        }
+
+        if ($nSequenceMasked > $txToSequenceMasked) {
+            return false;
+        }
+
+        return true;
     }
 }

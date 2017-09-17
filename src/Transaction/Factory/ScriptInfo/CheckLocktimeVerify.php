@@ -2,7 +2,6 @@
 
 namespace BitWasp\Bitcoin\Transaction\Factory\ScriptInfo;
 
-
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -17,9 +16,9 @@ class CheckLocktimeVerify
     private $nLockTime;
 
     /**
-     * @var Locktime
+     * @var bool
      */
-    private $locktime;
+    private $toBlock;
 
     /**
      * CheckLocktimeVerify constructor.
@@ -27,10 +26,16 @@ class CheckLocktimeVerify
      */
     public function __construct($nLockTime)
     {
-        $this->checkLockTimeRange($nLockTime);
+        if ($nLockTime < 0) {
+            throw new \RuntimeException("locktime cannot be negative");
+        }
+
+        if ($nLockTime > Locktime::INT_MAX) {
+            throw new \RuntimeException("nLockTime exceeds maximum value");
+        }
 
         $this->nLockTime = $nLockTime;
-        $this->locktime = new Locktime();
+        $this->toBlock = (new Locktime())->isLockedToBlock($nLockTime);
     }
 
     /**
@@ -71,37 +76,6 @@ class CheckLocktimeVerify
     }
 
     /**
-     * @param int $nLockTime
-     */
-    private function checkLockTimeRange($nLockTime)
-    {
-        if ($nLockTime < 0) {
-            throw new \RuntimeException("locktime cannot be negative");
-        }
-
-        if ($nLockTime > Locktime::INT_MAX) {
-            throw new \RuntimeException("nLockTime exceeds maximum value");
-        }
-    }
-
-    /**
-     * @param int $nLockTime
-     * @param bool $isLockedToBlock
-     */
-    private function checkAgainstRange($nLockTime, $isLockedToBlock)
-    {
-        if ($isLockedToBlock) {
-            if ($nLockTime > Locktime::BLOCK_MAX) {
-                throw new \RuntimeException("This CLTV is locked to block-height, but timeNowOrBlock was in timestamp range");
-            }
-        } else {
-            if ($nLockTime < Locktime::BLOCK_MAX) {
-                throw new \RuntimeException("This CLTV is locked to timetsamp, but timeNowOrBlock was in block-height range");
-            }
-        }
-    }
-
-    /**
      * @return int
      */
     public function getLocktime()
@@ -114,18 +88,6 @@ class CheckLocktimeVerify
      */
     public function isLockedToBlock()
     {
-        return $this->locktime->isLockedToBlock($this->nLockTime);
-    }
-
-    /**
-     * @param int $timeNowOrBlock
-     * @return bool
-     */
-    public function isSpendable($timeNowOrBlock)
-    {
-        $this->checkLockTimeRange($timeNowOrBlock);
-        $this->checkAgainstRange($timeNowOrBlock, $this->isLockedToBlock());
-
-        return $timeNowOrBlock >= $this->nLockTime;
+        return $this->toBlock;
     }
 }

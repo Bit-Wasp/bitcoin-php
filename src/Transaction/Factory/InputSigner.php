@@ -9,11 +9,13 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
+use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
 use BitWasp\Bitcoin\Script\Interpreter\BitcoinCashChecker;
 use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
+use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Parser\Operation;
@@ -34,6 +36,7 @@ use BitWasp\Bitcoin\Transaction\Factory\ScriptInfo\CheckLocktimeVerify;
 use BitWasp\Bitcoin\Transaction\Factory\ScriptInfo\CheckSequenceVerify;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\Buffer;
@@ -604,7 +607,7 @@ class InputSigner implements InputSignerInterface
                                 $checksig->setRequired(false);
                             }
                         } else if ($checksig instanceof TimeLock) {
-                            $this->checkTimeLock($checksig, $signData);
+                            $this->checkTimeLock($checksig);
                         }
 
                         $steps[] = $checksig;
@@ -618,21 +621,44 @@ class InputSigner implements InputSignerInterface
 
     /**
      * @param TimeLock $timelock
-     * @param SignData $signData
      */
-    public function checkTimeLock(TimeLock $timelock, SignData $signData)
+    public function checkTimeLock(TimeLock $timelock)
     {
         $info = $timelock->getInfo();
-        if ($info instanceof CheckLocktimeVerify) {
-            $cltvTime = $signData->getCltvTime();
-            if (!$info->isSpendable($cltvTime)) {
-                $requiredTime = "{$info->getLocktime()} " . ($info->isLockedToBlock() ? " (block height)" : " (seconds)");
+        if ($this->flags & Interpreter::VERIFY_CHECKLOCKTIMEVERIFY != 0 && $info instanceof CheckLocktimeVerify) {
+            $verifyLocktime = $info->getLocktime();
+            if (!$this->signatureChecker->checkLockTime(Number::int($verifyLocktime))) {
+                $input = $this->tx->getInput($this->nInput);
+                if ($input->isFinal()) {
+                    throw new \RuntimeException("Input sequence is set to max, therefore CHECKLOCKTIMEVERIFY would fail");
+                }
+
+                $locktime = $this->tx->getLockTime();
+                if ($verifyLocktime <= Locktime::BLOCK_MAX && $locktime > Locktime::BLOCK_MAX) {
+                    throw new \RuntimeException("CLTV was for block height, but tx locktime was in timestamp range");
+                }
+
+                if ($verifyLocktime > Locktime::BLOCK_MAX && $locktime <= Locktime::BLOCK_MAX) {
+                    throw new \RuntimeException("CLTV was for timestamp, but tx locktime was in block range");
+                }
+
+                $requiredTime = ($info->isLockedToBlock() ? "block {$info->getLocktime()}" : "{$info->getLocktime()}s (median time past)");
                 throw new \RuntimeException("Output is not yet spendable, must wait until {$requiredTime}");
             }
-        } else if ($info instanceof CheckSequenceVerify) {
+        }
 
-        } else {
-            throw new \RuntimeException("Sanity check, unsupported script info for timelock");
+        if ($this->flags & Interpreter::VERIFY_CHECKSEQUENCEVERIFY != 0 && $info instanceof CheckSequenceVerify) {
+            $nSequence = $this->tx->getInput($this->nInput)->getSequence();
+            // No CSV if input is final
+            if ($nSequence & TransactionInput::SEQUENCE_LOCKTIME_DISABLE_FLAG != 0) {
+                return;
+            }
+
+            if (!$this->signatureChecker->checkSequence(Number::int($nSequence))) {
+                $masked = $info->getLocktime() & TransactionInput::SEQUENCE_LOCKTIME_MASK;
+                $requiredLock = "{$masked} " . ($info->isRelativeToBlock() ? " (blocks)" : "(seconds after txOut)");
+                throw new \RuntimeException("Output unspendable with this sequence, must be locked for {$requiredLock}");
+            }
         }
     }
 
