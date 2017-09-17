@@ -37,4 +37,3 @@ echo "HARDENED PATH\n";
 $hardened2 = $master->derivePath("0/999999'");
 echo " - m/0/999999' " . $hardened2->toExtendedPublicKey() . "\n";
 echo "   Address: " . $hardened2->getPublicKey()->getAddress()->getAddress() . "\n\n";
-
