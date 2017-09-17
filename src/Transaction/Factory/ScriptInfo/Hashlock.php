@@ -49,6 +49,7 @@ class Hashlock
         if (!array_key_exists($opcode, self::$sizeMap)) {
             throw new \RuntimeException("Unknown opcode");
         }
+
         $size = self::$sizeMap[$opcode];
         if ($hash->getSize() !== $size) {
             throw new \RuntimeException("Unexpected size for hash");
@@ -81,7 +82,7 @@ class Hashlock
      */
     public function checkPreimage(BufferInterface $preimage)
     {
-        switch($this->opcode) {
+        switch ($this->opcode) {
             case Opcodes::OP_SHA1:
                 $hash = Hash::sha1($preimage);
                 break;
@@ -103,5 +104,4 @@ class Hashlock
 
         return $hash->equals($preimage);
     }
-
 }

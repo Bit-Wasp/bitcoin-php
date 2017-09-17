@@ -2,12 +2,12 @@
 
 namespace BitWasp\Bitcoin\Transaction\Factory\ScriptInfo;
 
-
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\TransactionInput;
 
 class CheckSequenceVerify
 {
@@ -22,7 +22,13 @@ class CheckSequenceVerify
      */
     public function __construct($relativeTimeLock)
     {
-        $this->checkLockTimeRange($relativeTimeLock);
+        if ($relativeTimeLock < 0) {
+            throw new \RuntimeException("relative locktime cannot be negative");
+        }
+
+        if ($relativeTimeLock > Locktime::INT_MAX) {
+            throw new \RuntimeException("nLockTime exceeds maximum value");
+        }
 
         $this->relativeTimeLock = $relativeTimeLock;
     }
@@ -35,7 +41,7 @@ class CheckSequenceVerify
     public static function fromDecodedScript(array $chunks, $fMinimal = false)
     {
         if (count($chunks) !== 3) {
-            throw new \RuntimeException("Invalid number of items for CLTV");
+            throw new \RuntimeException("Invalid number of items for CSV");
         }
 
         if (!$chunks[0]->isPush()) {
@@ -65,61 +71,30 @@ class CheckSequenceVerify
     }
 
     /**
-     * @param int $nLockTime
+     * @return int
      */
-    private function checkRelativeLockTimeRange($nLockTime)
+    public function getRelativeLockTime()
     {
-        if ($nLockTime < 0) {
-            throw new \RuntimeException("locktime cannot be negative");
-        }
-
-        if ($nLockTime > Locktime::INT_MAX) {
-            throw new \RuntimeException("nLockTime exceeds maximum value");
-        }
+        return $this->relativeTimeLock;
     }
 
     /**
-     * @param int $nLockTime
-     * @param bool $isLockedToBlock
+     * @return bool
      */
-    private function checkAgainstRange($nLockTime, $isLockedToBlock)
+    public function isRelativeToBlock()
     {
-        if ($isLockedToBlock) {
-            if ($nLockTime > Locktime::BLOCK_MAX) {
-                throw new \RuntimeException("This CLTV is locked to block-height, but timeNowOrBlock was in timestamp range");
-            }
-        } else {
-            if ($nLockTime < Locktime::BLOCK_MAX) {
-                throw new \RuntimeException("This CLTV is locked to timetsamp, but timeNowOrBlock was in block-height range");
-            }
+        if ($this->isDisabled()) {
+            throw new \RuntimeException("This opcode seems to be disabled");
         }
+
+        return ($this->relativeTimeLock & TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG) === 0;
     }
 
     /**
      * @return int
      */
-    public function getLocktime()
+    public function isDisabled()
     {
-        return $this->nLockTime;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLockedToBlock()
-    {
-        return $this->locktime->isLockedToBlock($this->nLockTime);
-    }
-
-    /**
-     * @param int $timeNowOrBlock
-     * @return bool
-     */
-    public function isSpendable($timeNowOrBlock)
-    {
-        $this->checkLockTimeRange($timeNowOrBlock);
-        $this->checkAgainstRange($timeNowOrBlock, $this->isLockedToBlock());
-
-        return $timeNowOrBlock >= $this->nLockTime;
+        return $this->relativeTimeLock & TransactionInput::SEQUENCE_LOCKTIME_DISABLE_FLAG;
     }
 }
