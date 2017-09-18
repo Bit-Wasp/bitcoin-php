@@ -620,6 +620,25 @@ class InputSigner implements InputSignerInterface
     }
 
     /**
+     * @param int $verify
+     * @param int $input
+     * @param int $threshold
+     * @return int
+     */
+    private function compareRangeAgainstThreshold($verify, $input, $threshold)
+    {
+        if ($verify <= $threshold && $input > $threshold) {
+            return -1;
+        }
+
+        if ($verify > $threshold && $input <= $threshold) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
      * @param TimeLock $timelock
      */
     public function checkTimeLock(TimeLock $timelock)
@@ -634,11 +653,10 @@ class InputSigner implements InputSignerInterface
                 }
 
                 $locktime = $this->tx->getLockTime();
-                if ($verifyLocktime <= Locktime::BLOCK_MAX && $locktime > Locktime::BLOCK_MAX) {
+                $cmp = $this->compareRangeAgainstThreshold($verifyLocktime, $locktime, Locktime::BLOCK_MAX);
+                if ($cmp === -1) {
                     throw new \RuntimeException("CLTV was for block height, but tx locktime was in timestamp range");
-                }
-
-                if ($verifyLocktime > Locktime::BLOCK_MAX && $locktime <= Locktime::BLOCK_MAX) {
+                } else if ($cmp === 1) {
                     throw new \RuntimeException("CLTV was for timestamp, but tx locktime was in block range");
                 }
 
@@ -654,8 +672,19 @@ class InputSigner implements InputSignerInterface
                 return;
             }
 
-            if (!$this->signatureChecker->checkSequence(Number::int($nSequence))) {
-                $masked = $info->getLocktime() & TransactionInput::SEQUENCE_LOCKTIME_MASK;
+            if (!$this->signatureChecker->checkSequence(Number::int($info->getRelativeLockTime()))) {
+                if ($this->tx->getVersion() < 2) {
+                    throw new \RuntimeException("Transaction version must be 2 or greater for CSV");
+                }
+
+                $cmp = $this->compareRangeAgainstThreshold($info->getRelativeLockTime(), $nSequence, TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG);
+                if ($cmp === -1) {
+                    throw new \RuntimeException("CSV was for block height, but txin sequence was in timestamp range");
+                } else if ($cmp === 1) {
+                    throw new \RuntimeException("CSV was for timestamp, but txin sequence was in block range");
+                }
+
+                $masked = $info->getRelativeLockTime() & TransactionInput::SEQUENCE_LOCKTIME_MASK;
                 $requiredLock = "{$masked} " . ($info->isRelativeToBlock() ? " (blocks)" : "(seconds after txOut)");
                 throw new \RuntimeException("Output unspendable with this sequence, must be locked for {$requiredLock}");
             }
