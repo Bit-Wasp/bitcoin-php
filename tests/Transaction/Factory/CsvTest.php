@@ -43,11 +43,13 @@ class CsvTest extends AbstractTestCase
     public function getCltvCases()
     {
         $blocks100 = 100;
-        $seconds100 = TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG | 100;
+        $seconds512 = TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG | 1;
 
         $errTxVersion = "Transaction version must be 2 or greater for CSV";
         $errCsvNotSeconds = "CSV was for timestamp, but txin sequence was in block range";
         $errCsvNotBlocks = "CSV was for block height, but txin sequence was in timestamp range";
+        $errSequenceFinal = "Sequence LOCKTIME_DISABLE_FLAG is set - not allowed on CSV output";
+
         return [
             [
                 $blocks100, $this->txFixture(0, $blocks100, 0), \RuntimeException::class, $errTxVersion,
@@ -59,10 +61,16 @@ class CsvTest extends AbstractTestCase
                 $blocks100, $this->txFixture(0, $blocks100, 2), null, null,
             ],
             [
-                $seconds100, $this->txFixture(0, $blocks100, 2), \RuntimeException::class, $errCsvNotSeconds,
+                $seconds512, $this->txFixture(0, $seconds512, 2), null, null,
             ],
             [
-                $blocks100, $this->txFixture(0, $seconds100, 2), \RuntimeException::class, $errCsvNotBlocks,
+                $seconds512, $this->txFixture(0, $blocks100, 2), \RuntimeException::class, $errCsvNotSeconds,
+            ],
+            [
+                $blocks100, $this->txFixture(0, $seconds512, 2), \RuntimeException::class, $errCsvNotBlocks,
+            ],
+            [
+                $blocks100, $this->txFixture(0, 0xffffffff, 2), \RuntimeException::class, $errSequenceFinal,
             ],
         ];
     }

@@ -644,7 +644,7 @@ class InputSigner implements InputSignerInterface
     public function checkTimeLock(TimeLock $timelock)
     {
         $info = $timelock->getInfo();
-        if ($this->flags & Interpreter::VERIFY_CHECKLOCKTIMEVERIFY != 0 && $info instanceof CheckLocktimeVerify) {
+        if (($this->flags & Interpreter::VERIFY_CHECKLOCKTIMEVERIFY) != 0 && $info instanceof CheckLocktimeVerify) {
             $verifyLocktime = $info->getLocktime();
             if (!$this->signatureChecker->checkLockTime(Number::int($verifyLocktime))) {
                 $input = $this->tx->getInput($this->nInput);
@@ -665,10 +665,9 @@ class InputSigner implements InputSignerInterface
             }
         }
 
-        if ($this->flags & Interpreter::VERIFY_CHECKSEQUENCEVERIFY != 0 && $info instanceof CheckSequenceVerify) {
-            $nSequence = $this->tx->getInput($this->nInput)->getSequence();
-            // No CSV if input is final
-            if ($nSequence & TransactionInput::SEQUENCE_LOCKTIME_DISABLE_FLAG != 0) {
+        if (($this->flags & Interpreter::VERIFY_CHECKSEQUENCEVERIFY) != 0 && $info instanceof CheckSequenceVerify) {
+            // Future soft-fork extensibility, NOP if disabled flag
+            if (($info->getRelativeLockTime() & TransactionInput::SEQUENCE_LOCKTIME_DISABLE_FLAG) != 0) {
                 return;
             }
 
@@ -677,7 +676,12 @@ class InputSigner implements InputSignerInterface
                     throw new \RuntimeException("Transaction version must be 2 or greater for CSV");
                 }
 
-                $cmp = $this->compareRangeAgainstThreshold($info->getRelativeLockTime(), $nSequence, TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG);
+                $input = $this->tx->getInput($this->nInput);
+                if ($input->isFinal()) {
+                    throw new \RuntimeException("Sequence LOCKTIME_DISABLE_FLAG is set - not allowed on CSV output");
+                }
+
+                $cmp = $this->compareRangeAgainstThreshold($info->getRelativeLockTime(), $input->getSequence(), TransactionInput::SEQUENCE_LOCKTIME_TYPE_FLAG);
                 if ($cmp === -1) {
                     throw new \RuntimeException("CSV was for block height, but txin sequence was in timestamp range");
                 } else if ($cmp === 1) {

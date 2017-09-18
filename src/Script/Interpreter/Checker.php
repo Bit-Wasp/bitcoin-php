@@ -12,7 +12,6 @@ use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\SignatureHash\Hasher;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
@@ -212,7 +211,7 @@ class Checker
                 if ($this->hasherV0) {
                     $hasher = $this->hasherV0;
                 } else {
-                    $hasher = $this->hasherV0 = new Hasher($this->transaction, new TransactionSerializer());
+                    $hasher = $this->hasherV0 = new Hasher($this->transaction);
                 }
             }
 
@@ -265,9 +264,9 @@ class Checker
     public function checkLockTime(\BitWasp\Bitcoin\Script\Interpreter\Number $scriptLockTime)
     {
         $input = $this->transaction->getInput($this->nInput);
-
         $nLockTime = $scriptLockTime->getInt();
         $txLockTime = $this->transaction->getLockTime();
+
         if (!(($txLockTime < Locktime::BLOCK_MAX && $nLockTime < Locktime::BLOCK_MAX) ||
             ($txLockTime >= Locktime::BLOCK_MAX && $nLockTime >= Locktime::BLOCK_MAX))
         ) {
@@ -297,7 +296,7 @@ class Checker
         }
 
         if (($txSequence & TransactionInputInterface::SEQUENCE_LOCKTIME_DISABLE_FLAG) !== 0) {
-            return true;
+            return false;
         }
 
         $mask = TransactionInputInterface::SEQUENCE_LOCKTIME_TYPE_FLAG | TransactionInputInterface::SEQUENCE_LOCKTIME_MASK;
