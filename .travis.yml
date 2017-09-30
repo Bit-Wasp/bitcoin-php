@@ -8,43 +8,30 @@ php:
   - 7.1
 
 env:
-  - PHPUNIT=true
-  - PHPUNIT=true COVERAGE=true
-  - PHPUNIT=true EXT_SECP256K1=true
-  - PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.13.0
-  - PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
-  - PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
+  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.15.0"
+  - RPC_TEST=true BITCOIN_VERSION="0.15.0"
 
 dist: trusty
 sudo: required
 
+cache:
+  directories:
+    ${HOME}/bitcoin
+
 matrix:
   exclude:
-      # dont want coverage on all runs, will include runs with just PHPUNIT
-    - php: 5.6
-      env: PHPUNIT=true COVERAGE=true
     - php: hhvm
-      env: PHPUNIT=true COVERAGE=true
-    - php: 7.1
-      env: PHPUNIT=true COVERAGE=true
-    - php: 7.0
-      env: PHPUNIT=true
-
-      # hhvm doesn't support our extensions
-    - php: hhvm
-      env: PHPUNIT=true EXT_SECP256K1=true
-    - php: hhvm
-      env: PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.13.0
-    - php: hhvm
-      env: PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
-    - php: hhvm
-      env: PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.15.0"
 
   include:
+    # hhvm with normal tests
+    - php: hhvm
+      env: PHPUNIT=true
+
       # add tests without coverage
       # add extra test runs for php7: secp256k1+coverage, codestyle, examples
     - php: 7.0
-      env: PHPUNIT=true COVERAGE=true EXT_SECP256K1=true
+      env: PHPUNIT=true BITCOIN_VERSION="0.15.0" PHPUNIT_EXT=true COVERAGE=true
     - php: 7.0
       env: CODE_STYLE=true
     - php: 7.0
@@ -52,54 +39,67 @@ matrix:
 
 install:
     - |
-        if [ "$EXT_SECP256K1" = "true" ]; then
+        if [ "$BITCOIN_VERSION" != "" ] && [ ! -e "${HOME}/bitcoin" ]; then
+            mkdir ${HOME}/bitcoin
+        fi
+    - |
+        if [ "$BITCOIN_VERSION" != "" ] && [ ! -e "${HOME}/bitcoin/bitcoin-$BITCOIN_VERSION" ]; then
+            cd ${HOME}/bitcoin &&
+            rm bitcoin-* -rf &&
+            wget https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz &&
+            mv bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz bitcoin.tar.gz &&
+            tar xvf bitcoin.tar.gz &&
+            cd ${TRAVIS_BUILD_DIR}
+        else
+            echo "Had bitcoind"
+        fi
+    - |
+        if [ "$PHPUNIT_EXT" = "true" ]; then
             git clone https://github.com/bitcoin/secp256k1.git &&
             cd secp256k1 &&
             ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-experimental &&
             make && sudo make install && cd ..;
         fi
     - |
-        if [ "$EXT_SECP256K1" = "true" ] && [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
+        if [ "$PHPUNIT_EXT" = "true" ] && [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
             git clone -b v0.0 https://github.com/Bit-Wasp/secp256k1-php &&
             cd secp256k1-php/secp256k1 &&
             phpize && ./configure &&
             make && sudo make install && cd ../..;
         fi
     - |
-        if [ "$EXT_SECP256K1" = "true" ] && [ "$TRAVIS_PHP_VERSION" != "5.6" ]; then
+        if [ "$PHPUNIT_EXT" = "true" ] && [ "$TRAVIS_PHP_VERSION" != "5.6" ]; then
             git clone -b v0.1.2 https://github.com/Bit-Wasp/secp256k1-php &&
             cd secp256k1-php/secp256k1 &&
             phpize && ./configure &&
             make && sudo make install && cd ../..;
         fi
     - |
-        if [ "$EXT_CONSENSUS" = "true" ]; then
-            wget https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz &&
-            tar xvf bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz &&
-            cd bitcoin-${BITCOIN_VERSION} &&
-            sudo cp include/bitcoinconsensus.h /usr/include &&
-            sudo cp lib/libbitcoinconsensus.so.0.0.0 /usr/lib &&
+        if [ "$PHPUNIT_EXT" = "true" ]; then
+            sudo cp ${HOME}/bitcoin/bitcoin-${BITCOIN_VERSION}/include/bitcoinconsensus.h /usr/include &&
+            sudo cp ${HOME}/bitcoin/bitcoin-${BITCOIN_VERSION}/lib/libbitcoinconsensus.so.0.0.0 /usr/lib &&
             sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so &&
             sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so.0 &&
-            cd .. &&
             git clone -b v2.0.0 https://github.com/Bit-Wasp/bitcoinconsensus-php &&
             cd bitcoinconsensus-php/bitcoinconsensus &&
             phpize && ./configure --with-bitcoinconsensus &&
             make && sudo make install && cd ../..;
         fi
-
     - composer update
 
 before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
 
 script:
-  - export EXT_PHP=""
-  - if [ "$EXT_SECP256K1" = "true" ]; then export EXT_PHP="$EXT_PHP -dextension=secp256k1.so"; fi
-  - if [ "$EXT_CONSENSUS" = "true" ]; then export EXT_PHP="$EXT_PHP -dextension=bitcoinconsensus.so"; fi
-  - EXT_PHP=${EXT_PHP} && if [ "$PHPUNIT" = "true" ]; then make phpunit-ci; fi
+  - if [ "$PHPUNIT" = "true" ]; then make phpunit-ci; fi
+  - if [ "$PHPUNIT_EXT" = "true" ]; then EXT_PHP=" -dextension=secp256k1.so " make phpunit-ci; fi
+  - if [ "$PHPUNIT_EXT" = "true" ]; then EXT_PHP=" -dextension=bitcoinconsensus.so " make phpunit-ci; fi
+  - if [ "$PHPUNIT_EXT" = "true" ]; then EXT_PHP=" -dextension=bitcoinconsensus.so -dextension=secp256k1.so " make phpunit-ci; fi
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
+  - if [ "$RPC_TEST" = "true" ]; then export BITCOIND_PATH="$HOME/bitcoin/bitcoin-$BITCOIN_VERSION/bin/bitcoind"; fi
+  - if [ "$RPC_TEST" = "true" ]; then vendor/bin/phpunit --debug -c phpunit.rpc.xml; fi
 
 after_script:
   - if [ "${COVERAGE}" = "true" ]; then make scrutinizer; fi
+  - if [ "${RPC_TEST}" = "true" ]; then ${HOME}/bitcoin/bitcoin-$BITCOIN_VERSION/bin/bitcoin-cli stop; fi
