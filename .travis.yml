@@ -11,12 +11,16 @@ env:
   - PHPUNIT=true
   - PHPUNIT=true COVERAGE=true
   - PHPUNIT=true EXT_SECP256K1=true
-  - PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.13.0
-  - PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
-  - PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
+  - PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.15.0
+  - PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true BITCOIN_VERSION=0.15.0
+  - RPC_TEST=true BITCOIN_VERSION=0.15.0 RPC_NETWORK=bitcoinTestnet RPC_TEST_HOST=127.0.0.1 RPC_TEST_PORT=18443 RPC_TEST_USERNAME=rpcuser RPC_TEST_PASSWORD=rpcpassword
 
 dist: trusty
 sudo: required
+
+cache:
+  directories:
+    ${HOME}/bitcoin
 
 matrix:
   exclude:
@@ -34,8 +38,6 @@ matrix:
     - php: hhvm
       env: PHPUNIT=true EXT_SECP256K1=true
     - php: hhvm
-      env: PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.13.0
-    - php: hhvm
       env: PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
     - php: hhvm
       env: PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
@@ -49,8 +51,6 @@ matrix:
       env: CODE_STYLE=true
     - php: 7.0
       env: EXAMPLES=true
-    - php: 7.0
-      env: RPC_TEST=true BITCOIN_VERSION=0.15.0 RPC_NETWORK=bitcoinTestnet RPC_TEST_HOST=127.0.0.1 RPC_TEST_PORT=18443 RPC_TEST_USERNAME=rpcuser RPC_TEST_PASSWORD=rpcpassword
 
 install:
     - |
@@ -76,13 +76,21 @@ install:
         fi
     - |
         if [ "$BITCOIN_VERSION" != "" ]; then
-            wget https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz &&
-            tar xvf bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz &&
-            mv bitcoin-${BITCOIN_VERSION} bitcoin;
+          if [ ! -e "${HOME}/bitcoin"];
+              mkdir ${HOME}/bitcoin
+          fi
+          if [ ! -e "${HOME}/bitcoin/bitcoin-{$BITCOIN_VERSION}" ]; then
+              cd ${HOME}/bitcoin &&
+              rm bitcoin-* -rf &&
+              wget https://bitcoin.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz -o bitcoin.tar.gz &&
+              tar xvf bitcoin.tar.gz
+          else
+              echo "Had bitcoind"
+          fi
         fi
     - |
         if [ "$EXT_CONSENSUS" = "true" ]; then
-            cd bitcoin &&
+            cd ${HOME}/bitcoin/bitcoin-${BITCOIN_VERSION} &&
             sudo cp include/bitcoinconsensus.h /usr/include &&
             sudo cp lib/libbitcoinconsensus.so.0.0.0 /usr/lib &&
             sudo ln -s /usr/lib/libbitcoinconsensus.so.0.0.0 /usr/lib/libbitcoinconsensus.so &&
@@ -97,10 +105,11 @@ install:
         if [ "$RPC_TEST" = "true" ]; then
             mkdir ~/.bitcoin && touch ~/.bitcoin/bitcoin.conf &&
             ./travis/configure_bitcoin.sh > ~/.bitcoin/bitcoin.conf &&
-            ./bitcoin/bin/bitcoind &&
+            ${HOME}/bitcoin/bitcoin-{$BITCOIN_VERSION}/bin/bitcoind &&
             echo "Regtest bitcoin started"
         fi
     - composer update
+
 
 before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
@@ -116,4 +125,4 @@ script:
 
 after_script:
   - if [ "${COVERAGE}" = "true" ]; then make scrutinizer; fi
-  - if { "$RPC_TEST" = "true" ]; then bitcoin/bin/bitcoin-cli stop; fi
+  - if { "${RPC_TEST}" = "true" ]; then ${HOME}/bitcoin/bitcoin-{$BITCOIN_VERSION}/bin/bitcoin-cli stop; fi
