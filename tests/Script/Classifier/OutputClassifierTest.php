@@ -203,6 +203,8 @@ class OutputClassifierTest extends AbstractTestCase
             $this->assertTrue($scriptHash->equals($solution));
         } else {
             $this->assertFalse($classifier->isPayToScriptHash($script));
+            $sh = null;
+            $this->assertFalse($script->isP2SH($sh));
         }
 
         if ($type === ScriptType::WITNESS_COINBASE_COMMITMENT) {
