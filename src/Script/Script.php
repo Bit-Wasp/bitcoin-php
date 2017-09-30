@@ -262,6 +262,24 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
+     * @param BufferInterface $scriptHash
+     * @return bool
+     */
+    public function isP2SH(& $scriptHash)
+    {
+        if (strlen($this->script) === 23
+            && $this->script[0] = Opcodes::OP_HASH160
+            && $this->script[1] = 20
+            && $this->script[22] = Opcodes::OP_EQUAL
+        ) {
+            $scriptHash = new Buffer(substr($this->script, 2, 20));
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param ScriptInterface $script
      * @return bool
      */
