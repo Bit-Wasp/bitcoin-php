@@ -196,6 +196,11 @@ class OutputClassifierTest extends AbstractTestCase
             $this->assertTrue($classifier->isPayToScriptHash($script));
             $this->assertEquals(ScriptType::P2SH, $type);
             $this->assertEquals($script, $factory->p2sh($solution));
+            $scriptHash = null;
+            $this->assertTrue($script->isP2SH($scriptHash));
+            /** @var BufferInterface $scriptHash */
+            $this->assertInstanceOf(BufferInterface::class, $scriptHash);
+            $this->assertTrue($scriptHash->equals($solution));
         } else {
             $this->assertFalse($classifier->isPayToScriptHash($script));
         }
