@@ -22,7 +22,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
     public function testPayToAddress()
     {
         $publicKey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $p2pkh = $publicKey->getAddress();
+        $p2pkh = AddressFactory::fromKey($publicKey);
         $p2pkhScript = ScriptFactory::scriptPubKey()->payToAddress($p2pkh);
         $parsedScript = $p2pkhScript->getScriptParser()->decode();
 
