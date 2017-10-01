@@ -141,7 +141,8 @@ class AddressFactory
         $classifier = new OutputClassifier();
         $decode = $classifier->decode($script);
         if ($decode->getType() === ScriptType::P2PK) {
-            return PublicKeyFactory::fromHex($decode->getSolution())->getAddress();
+            $pubKey = PublicKeyFactory::fromHex($decode->getSolution());
+            return new PayToPubKeyHashAddress($pubKey->getPubKeyHash());
         } else {
             return self::fromOutputScript($script);
         }

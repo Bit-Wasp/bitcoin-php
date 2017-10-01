@@ -31,11 +31,6 @@ interface KeyInterface extends SerializableInterface
     public function getPubKeyHash(PublicKeySerializerInterface $serializer = null);
 
     /**
-     * @return \BitWasp\Bitcoin\Address\PayToPubKeyHashAddress
-     */
-    public function getAddress();
-
-    /**
      * @param \GMP $offset
      * @return KeyInterface
      */

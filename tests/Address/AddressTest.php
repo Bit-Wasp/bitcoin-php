@@ -22,6 +22,17 @@ use BitWasp\Buffertools\Buffer;
 class AddressTest extends AbstractTestCase
 {
 
+    public function getNetwork($network) {
+        switch ($network) {
+            case 'btc':
+                return NetworkFactory::bitcoin();
+            case 'tbtc':
+                return NetworkFactory::bitcoinTestnet();
+            default:
+                throw new \RuntimeException("Invalid test fixture, unknown network");
+        }
+    }
+
     /**
      * @return array
      */
@@ -33,38 +44,29 @@ class AddressTest extends AbstractTestCase
         foreach ($data['scriptHash'] as $vector) {
             $datasets[] = [
                 'script',
-                Bitcoin::getDefaultNetwork(),
+                $this->getNetwork($vector['network']),
                 $vector['script'],
                 $vector['address'],
+                $vector['hash'],
             ];
         }
 
         foreach ($data['pubKeyHash'] as $vector) {
             $datasets[] = [
                 'pubkeyhash',
-                Bitcoin::getDefaultNetwork(),
+                $this->getNetwork($vector['network']),
                 $vector['publickey'],
                 $vector['address'],
+                $vector['hash'],
             ];
         }
         foreach ($data['witness'] as $vector) {
-            switch ($vector['network']) {
-                case 'btc':
-                    $network = NetworkFactory::bitcoin();
-                    break;
-                case 'tbtc':
-                    $network = NetworkFactory::bitcoinTestnet();
-                    break;
-                default:
-                    throw new \RuntimeException("Invalid test fixture, unknown network");
-            }
-
             $datasets[] = [
                 'witness',
-                $network,
+                $this->getNetwork($vector['network']),
                 $vector['program'],
                 strtolower($vector['address']),
-                $vector['network'],
+                null,
             ];
         }
 
@@ -79,19 +81,32 @@ class AddressTest extends AbstractTestCase
      * @param $address
      * @throws \Exception
      */
-    public function testAddress($type, NetworkInterface $network, $data, $address, $t1 = null)
+    public function testAddress($type, NetworkInterface $network, $data, $address)
     {
         if ($type === 'pubkeyhash') {
-            $obj = PublicKeyFactory::fromHex($data)->getAddress();
+            $pubKey = PublicKeyFactory::fromHex($data);
+            $obj = AddressFactory::fromKey($pubKey);
+            $this->assertInstanceOf(PayToPubKeyHashAddress::class, $obj);
+
+            $pubKeyHash = $pubKey->getPubKeyHash();
+            $this->assertTrue($pubKeyHash->equals($obj->getHash()));
+
             $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
         } else if ($type === 'script') {
-            $p2shScript = ScriptFactory::fromHex($data);
-            $obj = AddressFactory::fromScript($p2shScript);
+            $redeemScript = ScriptFactory::fromHex($data);
+            $obj = AddressFactory::fromScript($redeemScript);
+            $this->assertInstanceOf(ScriptHashAddress::class, $obj);
+
+            $scriptHash = $redeemScript->getScriptHash() ;
+            $this->assertTrue($scriptHash->equals($obj->getHash()));
+
             $script = ScriptFactory::scriptPubKey()->payToScriptHash($obj->getHash());
         } else if ($type === 'witness') {
             $script = ScriptFactory::fromHex($data);
+
             $witnessProgram = null;
             $this->assertTrue($script->isWitness($witnessProgram));
+
             /** @var WitnessProgram $witnessProgram */
             $obj = AddressFactory::fromWitnessProgram($witnessProgram);
             $this->assertInstanceOf(SegwitAddress::class, $obj);
@@ -99,13 +114,18 @@ class AddressTest extends AbstractTestCase
             throw new \Exception('Unknown address type');
         }
 
+        // The object should be able to serialize itself correctly
         $this->assertEquals($address, $obj->getAddress($network));
 
         $fromString = AddressFactory::fromString($address, $network);
         $this->assertTrue($obj->getHash()->equals($fromString->getHash()));
 
         if ($fromString instanceof Base58AddressInterface) {
-            $this->assertEquals($obj->getPrefixByte($network), $fromString->getPrefixByte($network));
+            if ($fromString instanceof ScriptHashAddress) {
+                $this->assertEquals(hex2bin($network->getP2shByte()), $obj->getPrefixByte($network));
+            } else if ($fromString instanceof PayToPubKeyHashAddress) {
+                $this->assertEquals(hex2bin($network->getAddressByte()), $obj->getPrefixByte($network));
+            }
         } else if ($fromString instanceof Bech32AddressInterface) {
             $this->assertEquals($obj->getHRP($network), $fromString->getHRP($network));
         }
@@ -176,9 +196,10 @@ class AddressTest extends AbstractTestCase
         $this->assertEquals($p2pkhAddress, $p2pkhResult);
 
         $publicKey = PublicKeyFactory::fromHex('03a3f20be479bce0b17589cc526983f544dce3f80ff8b7ec46d2ee3362c3c6e775');
+        $pubKeyHash = AddressFactory::fromKey($publicKey);
         $p2pubkey = ScriptFactory::scriptPubKey()->payToPubKey($publicKey);
         $address = AddressFactory::getAssociatedAddress($p2pubkey);
-        $this->assertEquals($publicKey->getAddress()->getAddress($network), $address->getAddress($network));
+        $this->assertEquals($pubKeyHash->getAddress($network), $address->getAddress($network));
     }
 
     /**
