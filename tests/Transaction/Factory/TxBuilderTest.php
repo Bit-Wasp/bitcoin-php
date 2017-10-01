@@ -131,7 +131,7 @@ class TxBuilderTest extends AbstractTestCase
     {
         $key = PrivateKeyFactory::create(false);
         $script = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
-        $scriptAddress = AddressFactory::fromScript($script);
+        $scriptAddress = AddressFactory::p2sh($script);
         return [
             [$key->getAddress()],
             [$scriptAddress],

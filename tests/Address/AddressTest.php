@@ -22,7 +22,8 @@ use BitWasp\Buffertools\Buffer;
 class AddressTest extends AbstractTestCase
 {
 
-    public function getNetwork($network) {
+    public function getNetwork($network)
+    {
         switch ($network) {
             case 'btc':
                 return NetworkFactory::bitcoin();
@@ -85,7 +86,7 @@ class AddressTest extends AbstractTestCase
     {
         if ($type === 'pubkeyhash') {
             $pubKey = PublicKeyFactory::fromHex($data);
-            $obj = AddressFactory::fromKey($pubKey);
+            $obj = AddressFactory::p2pkh($pubKey);
             $this->assertInstanceOf(PayToPubKeyHashAddress::class, $obj);
 
             $pubKeyHash = $pubKey->getPubKeyHash();
@@ -94,12 +95,11 @@ class AddressTest extends AbstractTestCase
             $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
         } else if ($type === 'script') {
             $redeemScript = ScriptFactory::fromHex($data);
-            $obj = AddressFactory::fromScript($redeemScript);
+            $obj = AddressFactory::p2sh($redeemScript);
             $this->assertInstanceOf(ScriptHashAddress::class, $obj);
 
             $scriptHash = $redeemScript->getScriptHash() ;
             $this->assertTrue($scriptHash->equals($obj->getHash()));
-
             $script = ScriptFactory::scriptPubKey()->payToScriptHash($obj->getHash());
         } else if ($type === 'witness') {
             $script = ScriptFactory::fromHex($data);
@@ -196,7 +196,7 @@ class AddressTest extends AbstractTestCase
         $this->assertEquals($p2pkhAddress, $p2pkhResult);
 
         $publicKey = PublicKeyFactory::fromHex('03a3f20be479bce0b17589cc526983f544dce3f80ff8b7ec46d2ee3362c3c6e775');
-        $pubKeyHash = AddressFactory::fromKey($publicKey);
+        $pubKeyHash = AddressFactory::p2pkh($publicKey);
         $p2pubkey = ScriptFactory::scriptPubKey()->payToPubKey($publicKey);
         $address = AddressFactory::getAssociatedAddress($p2pubkey);
         $this->assertEquals($pubKeyHash->getAddress($network), $address->getAddress($network));
