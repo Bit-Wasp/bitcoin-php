@@ -184,6 +184,7 @@ class TransactionTest extends AbstractTestCase
         $tx = $signer->get();
         $result = $this->makeRpcRequest('sendrawtransaction', [$tx->getHex(), true]);
         $this->assertEquals(null, $result['error']);
+        
         $txid = $result['result'];
         $this->assertEquals(64, strlen($txid));
     }
