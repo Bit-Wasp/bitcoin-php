@@ -36,4 +36,3 @@ You can install this library via Composer: `composer require bitwasp/bitcoin`
  - Easy serialization to binary representation of most classes
  - SIGHASH types when creating transactions
  - Payment Protocol (BIP70)
-
