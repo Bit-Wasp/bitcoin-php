@@ -47,6 +47,6 @@ abstract class Key extends Serializable implements KeyInterface
      */
     public function getAddress()
     {
-        return AddressFactory::fromKey($this);
+        return AddressFactory::p2pkh($this);
     }
 }

@@ -24,7 +24,7 @@ class AddressFactory
      * @param KeyInterface $key
      * @return PayToPubKeyHashAddress
      */
-    public static function fromKey(KeyInterface $key)
+    public static function p2pkh(KeyInterface $key)
     {
         return new PayToPubKeyHashAddress($key->getPubKeyHash());
     }
@@ -35,7 +35,7 @@ class AddressFactory
      * @param ScriptInterface $p2shScript
      * @return ScriptHashAddress
      */
-    public static function fromScript(ScriptInterface $p2shScript)
+    public static function p2sh(ScriptInterface $p2shScript)
     {
         return new ScriptHashAddress($p2shScript->getScriptHash());
     }
