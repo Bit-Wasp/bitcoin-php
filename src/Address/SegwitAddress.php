@@ -36,6 +36,14 @@ class SegwitAddress extends Address implements Bech32AddressInterface
     }
 
     /**
+     * @return WitnessProgram
+     */
+    public function getWitnessProgram()
+    {
+        return $this->witnessProgram;
+    }
+
+    /**
      * @return \BitWasp\Bitcoin\Script\ScriptInterface
      */
     public function getScriptPubKey()
