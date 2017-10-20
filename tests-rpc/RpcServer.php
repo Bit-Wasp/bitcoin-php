@@ -201,7 +201,6 @@ class RpcServer
      */
     public function request($method, array $params = [])
     {
-        echo "Request: {$method}\n";
         $unsorted = $this->makeClient()->sendCommand(new Command($method, $params));
         $jsonResult = $unsorted->getBody()->getContents();
         $json = json_decode($jsonResult, true);

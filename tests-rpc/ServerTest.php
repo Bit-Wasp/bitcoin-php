@@ -26,17 +26,14 @@ class ServerTest extends AbstractTestCase
      */
     public function testIfRegtest()
     {
-        echo "startBitcoind\n";
         $server = $this->rpcFactory->startBitcoind();
 
-        echo "getblockchaininfo\n";
         $result = $server->makeRpcRequest("getblockchaininfo");
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey('result', $result);
         $this->assertArrayHasKey('chain', $result['result']);
         $this->assertEquals('regtest', $result['result']['chain']);
 
-        echo "stop\n";
         $server->destroy();
     }
 
