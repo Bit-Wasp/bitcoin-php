@@ -36,4 +36,3 @@ $input2->sign($privKey);
 
 $signed = $signer->get();
 echo $signed->getHex().PHP_EOL;
-
