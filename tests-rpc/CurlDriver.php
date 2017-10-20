@@ -8,7 +8,6 @@
 namespace BitWasp\Bitcoin\RpcTest;
 
 use Nbobtc\Http\Driver\DriverInterface;
-use Psr\Http\Message\UriInterface;
 use Psr\Http\Message\RequestInterface;
 use Nbobtc\Http\Message\Response;
 
@@ -34,7 +33,6 @@ class CurlDriver implements DriverInterface
      */
     public function __destruct()
     {
-        echo __FUNCTION__ ." " . sha1(spl_object_hash($this)) . "\n";
         if (null !== $this->ch) {
             curl_close($this->ch);
             $this->ch=null;
@@ -50,7 +48,6 @@ class CurlDriver implements DriverInterface
         $uri = $request->getUri();
 
         if (null === $this->ch) {
-            echo "set ch " . sha1(spl_object_hash($this)) . "\n";
             $this->ch = curl_init();
         }
 

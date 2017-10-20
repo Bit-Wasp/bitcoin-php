@@ -24,12 +24,11 @@ matrix:
       env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.15.0"
 
   include:
-    # hhvm with normal tests
+    # hhvm with normal tests (no extension tests)
     - php: hhvm
       env: PHPUNIT=true
 
-      # add tests without coverage
-      # add extra test runs for php7: secp256k1+coverage, codestyle, examples
+    # add extra test runs for php7: coverage, codestyle, examples
     - php: 7.0
       env: PHPUNIT=true BITCOIN_VERSION="0.15.0" PHPUNIT_EXT=true COVERAGE=true
     - php: 7.0
@@ -102,4 +101,3 @@ script:
 
 after_script:
   - if [ "${COVERAGE}" = "true" ]; then make scrutinizer; fi
-  - if [ "${RPC_TEST}" = "true" ]; then ${HOME}/bitcoin/bitcoin-$BITCOIN_VERSION/bin/bitcoin-cli stop; fi
