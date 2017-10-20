@@ -216,6 +216,7 @@ class AddressTest extends AbstractTestCase
     {
         $buffer = new Buffer();
         $this->expectExceptionMessage("P2PKH address hash should be 20 bytes");
+        $this->expectException(\RuntimeException::class);
         new PayToPubKeyHashAddress($buffer);
     }
 
@@ -223,6 +224,7 @@ class AddressTest extends AbstractTestCase
     {
         $buffer = new Buffer();
         $this->expectExceptionMessage("P2SH address hash should be 20 bytes");
+        $this->expectException(\RuntimeException::class);
         new ScriptHashAddress($buffer);
     }
 }
