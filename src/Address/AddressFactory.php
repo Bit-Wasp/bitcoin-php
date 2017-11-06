@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Base58;
@@ -44,7 +46,7 @@ class AddressFactory
      * @param WitnessProgram $wp
      * @return SegwitAddress
      */
-    public static function fromWitnessProgram(WitnessProgram $wp)
+    public static function fromWitnessProgram(WitnessProgram $wp): SegwitAddress
     {
         return new SegwitAddress($wp);
     }
@@ -53,7 +55,7 @@ class AddressFactory
      * @param ScriptInterface $outputScript
      * @return AddressInterface
      */
-    public static function fromOutputScript(ScriptInterface $outputScript)
+    public static function fromOutputScript(ScriptInterface $outputScript): AddressInterface
     {
         if ($outputScript instanceof P2shScript || $outputScript instanceof WitnessScript) {
             throw new \RuntimeException("P2shScript & WitnessScript's are not accepted by fromOutputScript");
@@ -84,7 +86,7 @@ class AddressFactory
      * @return AddressInterface
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
-    public static function fromString($address, NetworkInterface $network = null)
+    public static function fromString(string $address, NetworkInterface $network = null): AddressInterface
     {
         $network = $network ?: Bitcoin::getNetwork();
 
@@ -116,7 +118,7 @@ class AddressFactory
      * @return bool
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
-    public static function isValidAddress($address, NetworkInterface $network = null)
+    public static function isValidAddress(string $address, NetworkInterface $network = null): bool
     {
         try {
             self::fromString($address, $network);
@@ -136,7 +138,7 @@ class AddressFactory
      * @return AddressInterface
      * @throws \RuntimeException
      */
-    public static function getAssociatedAddress(ScriptInterface $script)
+    public static function getAssociatedAddress(ScriptInterface $script): AddressInterface
     {
         $classifier = new OutputClassifier();
         $decode = $classifier->decode($script);

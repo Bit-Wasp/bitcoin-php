@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -12,22 +14,22 @@ class ScriptHashAddress extends Base58Address
 {
     /**
      * ScriptHashAddress constructor.
-     * @param BufferInterface $hash
+     * @param BufferInterface $data
      */
-    public function __construct(BufferInterface $hash)
+    public function __construct(BufferInterface $data)
     {
-        if ($hash->getSize() !== 20) {
+        if ($data->getSize() !== 20) {
             throw new \RuntimeException("P2SH address hash should be 20 bytes");
         }
 
-        parent::__construct($hash);
+        parent::__construct($data);
     }
 
     /**
      * @param NetworkInterface $network
      * @return string
      */
-    public function getPrefixByte(NetworkInterface $network = null)
+    public function getPrefixByte(NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
         return pack("H*", $network->getP2shByte());
@@ -36,7 +38,7 @@ class ScriptHashAddress extends Base58Address
     /**
      * @return ScriptInterface
      */
-    public function getScriptPubKey()
+    public function getScriptPubKey(): ScriptInterface
     {
         return ScriptFactory::scriptPubKey()->payToScriptHash($this->getHash());
     }
