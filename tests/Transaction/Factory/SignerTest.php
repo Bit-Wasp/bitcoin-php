@@ -399,4 +399,278 @@ class SignerTest extends AbstractTestCase
         $tx = $txs->get();
         $this->assertEquals($expectSpend, $tx->getHex());
     }
+
+    public function testDontSignInput()
+    {
+        $expectSpend = '020000000113aaf49280ba92bddfcbdc30d6c7501c2575e4a80f539236df233f9218a2c8400000000000ffffffff0100f2052a010000001976a914cd29cc97826c37281ac61301e4d5ed374770585688ac00000000';
+        $value = 50 * 100000000;
+
+        $txid = "40c8a218923f23df3692530fa8e475251c50c7d630dccbdfbd92ba8092f4aa13";
+        $vout = 0;
+        $network = NetworkFactory::bitcoinTestnet();
+
+        $dest = AddressFactory::fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
+
+        $txb = (new TxBuilder())
+            ->version(2)
+            ->input($txid, $vout)
+            ->output($value, $dest);
+
+        $txs = new Signer($txb->get());
+
+        $tx = $txs->get();
+        $this->assertEquals($expectSpend, $tx->getHex());
+    }
+
+    public function paddedMultisigsProvider()
+    {
+        $keys = [
+            PrivateKeyFactory::fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
+            PrivateKeyFactory::fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
+            PrivateKeyFactory::fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
+        ];
+
+        $multisig = ScriptFactory::scriptPubKey()->multisig(2, array_map(function (PrivateKeyInterface $key) {
+            return $key->getPublicKey();
+        }, $keys), false);
+
+        $p2sh = new P2shScript($multisig);
+        $p2wsh = new WitnessScript($multisig);
+
+        $value = 40000;
+
+        $p2shTxout = new TransactionOutput($value, $p2sh->getOutputScript());
+        $p2shSignData = (new SignData())
+            ->p2sh($p2sh);
+        $p2wshTxout = new TransactionOutput($value, $p2wsh->getOutputScript());
+        $p2wshSignData = (new SignData())
+            ->p2wsh($p2wsh);
+
+        $unsigned = (new TxBuilder())
+            ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
+            ->payToAddress($value, AddressFactory::fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
+            ->get();
+
+        $experimentsPart = [
+            [0],
+            [1],
+            [2],
+        ];
+
+        $experimentsFull = [
+            [0, 1],
+            [1, 2],
+            [0, 2],
+        ];
+
+        $mkFixture = function (array $experiment, TransactionOutputInterface $txOut, SignData $signData) use ($keys, $unsigned) {
+            $use = [];
+            foreach ($experiment as $idx) {
+                $use[] = $keys[$idx];
+            }
+
+            return [$use, $unsigned, $txOut, $signData];
+        };
+
+        $mkP2sh = function (array $experiment) use ($p2shTxout, $p2shSignData, $mkFixture) {
+            return $mkFixture($experiment, $p2shTxout, $p2shSignData);
+        };
+        $mkP2wsh = function (array $experiment) use ($p2wshTxout, $p2wshSignData, $mkFixture) {
+            return $mkFixture($experiment, $p2wshTxout, $p2wshSignData);
+        };
+
+        return array_merge(
+            array_map($mkP2sh, $experimentsPart),
+            array_map($mkP2wsh, $experimentsPart),
+            array_map($mkP2sh, $experimentsFull),
+            array_map($mkP2wsh, $experimentsFull)
+        );
+    }
+
+    /**
+     * @param array $privKeys
+     * @param TransactionInterface $tx
+     * @param TransactionOutputInterface $txOut
+     * @param SignData $signData
+     * @dataProvider paddedMultisigsProvider
+     */
+    public function testPaddingMultisig(array $privKeys, TransactionInterface $tx, TransactionOutputInterface $txOut, SignData $signData)
+    {
+        $signer = (new Signer($tx))
+            ->padUnsignedMultisigs(true)
+        ;
+
+        $input = $signer->input(0, $txOut, $signData);
+
+        $lastCount = count($input->getSignatures());
+        foreach ($privKeys as $key) {
+            $input->sign($key, SigHash::ALL);
+
+            // Check it signed, for the sake of the test
+            $this->assertEquals($lastCount + 1, count($input->getSignatures()));
+            $lastCount++;
+        }
+
+        $signed = $signer->get();
+
+        $signerAgain = (new Signer($signed))->padUnsignedMultisigs(true);
+        $inputAgain = $signerAgain->input(0, $txOut, $signData);
+
+        for ($i = 0; $i < $input->getRequiredSigs(); $i++) {
+            if (array_key_exists($i, $input->getSignatures())) {
+                $this->assertTrue(array_key_exists($i, $inputAgain->getSignatures()), "Missing or misplaced signature");
+
+                $a = $input->getSignatures()[$i];
+                $b = $input->getSignatures()[$i];
+                if ($a instanceof TransactionSignatureInterface) {
+                    $this->assertInstanceOf(TransactionSignatureInterface::class, $b);
+                    $this->assertTrue($a->equals($b));
+                }
+            }
+        }
+
+        $this->assertEquals($input->isFullySigned(), $inputAgain->isFullySigned());
+    }
+
+    public function testFullySignedMultisigIsNotPadded()
+    {
+        $keys = [
+            PrivateKeyFactory::fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
+            PrivateKeyFactory::fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
+            PrivateKeyFactory::fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
+        ];
+
+        $multisig = ScriptFactory::scriptPubKey()->multisig(2, array_map(function (PrivateKeyInterface $key) {
+            return $key->getPublicKey();
+        }, $keys), false);
+
+        $p2sh = new P2shScript($multisig);
+        $addr = $p2sh->getAddress();
+
+        $value = 40000;
+        $txOut = new TransactionOutput($value, $addr->getScriptPubKey());
+
+        $unsigned = (new TxBuilder())
+            ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
+            ->payToAddress($value, AddressFactory::fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
+            ->get();
+
+        $signData = (new SignData())
+            ->p2sh($p2sh);
+
+        $signer = (new Signer($unsigned))
+            ->padUnsignedMultisigs(true)
+        ;
+
+        $signer
+            ->input(0, $txOut, $signData)
+            ->sign($keys[0], SigHash::ALL)
+            ->sign($keys[1], SigHash::ALL)
+        ;
+
+        $signed = $signer->get();
+
+        $fullySigned = $signed->getInput(0)->getScript();
+        $chunks = $fullySigned->getScriptParser()->decode();
+        $op_0 = new Operation(Opcodes::OP_0, new Buffer());
+
+        for ($i = 0; $i < count($chunks); ++$i) {
+            $copy =[];
+            foreach ($chunks as $j => $c) {
+                if ($i == $j) {
+                    $copy[] = $op_0;
+                }
+                $copy[] = $c;
+            }
+
+            $txMut = new TxMutator($signed);
+            $txMut->inputsMutator()[0]->script(ScriptFactory::fromOperations($copy));
+            $txInvalid = $txMut->done();
+
+            $exception = null;
+            try {
+                $signerAgain = (new Signer($txInvalid))
+                    ->padUnsignedMultisigs(true)
+                ;
+
+                $signerAgain->input(0, $txOut, $signData);
+            } catch (\Exception $e) {
+                $exception = $e;
+            }
+
+            $this->assertInstanceOf(\RuntimeException::class, $exception);
+            $this->assertEquals("Padding is forbidden for a fully signed multisig script", $exception->getMessage());
+        }
+    }
+
+    public function testFullySignedWitnessMultisigIsNotPadded()
+    {
+        $keys = [
+            PrivateKeyFactory::fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
+            PrivateKeyFactory::fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
+            PrivateKeyFactory::fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
+        ];
+
+        $multisig = ScriptFactory::scriptPubKey()->multisig(2, array_map(function (PrivateKeyInterface $key) {
+            return $key->getPublicKey();
+        }, $keys), false);
+
+        $p2wsh = new WitnessScript($multisig);
+
+        $value = 40000;
+        $txOut = new TransactionOutput($value, $p2wsh->getOutputScript());
+
+        $unsigned = (new TxBuilder())
+            ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
+            ->payToAddress($value, AddressFactory::fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
+            ->get();
+
+        $signData = (new SignData())
+            ->p2wsh($p2wsh);
+
+        $signer = (new Signer($unsigned))
+            ->padUnsignedMultisigs(true)
+        ;
+
+        $signer
+            ->input(0, $txOut, $signData)
+            ->sign($keys[0], SigHash::ALL)
+            ->sign($keys[1], SigHash::ALL)
+        ;
+
+        $signed = $signer->get();
+
+        $chunks = $signed->getWitness(0)->all();
+        $op_0 = new Buffer();
+
+        for ($i = 0; $i < count($chunks); ++$i) {
+            $copy =[];
+            foreach ($chunks as $j => $c) {
+                if ($i == $j) {
+                    $copy[] = $op_0;
+                }
+                $copy[] = $c;
+            }
+
+            $txMut = new TxMutator($signed);
+            $txMut->witness([
+                new ScriptWitness($copy)
+            ]);
+            $txInvalid = $txMut->done();
+
+            $exception = null;
+            try {
+                $signerAgain = (new Signer($txInvalid))
+                    ->padUnsignedMultisigs(true)
+                ;
+
+                $signerAgain->input(0, $txOut, $signData);
+            } catch (\Exception $e) {
+                $exception = $e;
+            }
+
+            $this->assertInstanceOf(\RuntimeException::class, $exception);
+            $this->assertEquals("Padding is forbidden for a fully signed multisig script", $exception->getMessage());
+        }
+    }
 }
