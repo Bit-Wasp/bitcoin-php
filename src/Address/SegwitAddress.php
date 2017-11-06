@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\SegwitBech32;
 
@@ -27,9 +30,9 @@ class SegwitAddress extends Address implements Bech32AddressInterface
 
     /**
      * @param NetworkInterface|null $network
-     * @return bool
+     * @return string
      */
-    public function getHRP(NetworkInterface $network = null)
+    public function getHRP(NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
         return $network->getSegwitBech32Prefix();
@@ -46,7 +49,7 @@ class SegwitAddress extends Address implements Bech32AddressInterface
     /**
      * @return \BitWasp\Bitcoin\Script\ScriptInterface
      */
-    public function getScriptPubKey()
+    public function getScriptPubKey(): ScriptInterface
     {
         return $this->witnessProgram->getScript();
     }
@@ -55,7 +58,7 @@ class SegwitAddress extends Address implements Bech32AddressInterface
      * @param NetworkInterface|null $network
      * @return string
      */
-    public function getAddress(NetworkInterface $network = null)
+    public function getAddress(NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
 

@@ -79,7 +79,7 @@ class WorkflowTest extends Bip70Test
         $refundScript = ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $random->bytes(20), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
         $refundOutput = new Output();
         $refundOutput->setScript($refundScript->getBinary());
-        $payment->setRefundTo($refundOutput, 0);
+        $payment->addRefundTo($refundOutput);
 
         $sendPayment = $http->payment($payment);
         $this->assertEquals($payment->serialize(), $sendPayment->getContent());
