@@ -399,4 +399,26 @@ class SignerTest extends AbstractTestCase
         $tx = $txs->get();
         $this->assertEquals($expectSpend, $tx->getHex());
     }
+
+    public function testDontSignInput()
+    {
+        $expectSpend = '020000000113aaf49280ba92bddfcbdc30d6c7501c2575e4a80f539236df233f9218a2c8400000000000ffffffff0100f2052a010000001976a914cd29cc97826c37281ac61301e4d5ed374770585688ac00000000';
+        $value = 50 * 100000000;
+
+        $txid = "40c8a218923f23df3692530fa8e475251c50c7d630dccbdfbd92ba8092f4aa13";
+        $vout = 0;
+        $network = NetworkFactory::bitcoinTestnet();
+
+        $dest = AddressFactory::fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
+
+        $txb = (new TxBuilder())
+            ->version(2)
+            ->input($txid, $vout)
+            ->output($value, $dest);
+
+        $txs = new Signer($txb->get());
+
+        $tx = $txs->get();
+        $this->assertEquals($expectSpend, $tx->getHex());
+    }
 }
