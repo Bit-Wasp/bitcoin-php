@@ -40,6 +40,8 @@
   "require-dev": {
     "ext-json": "*",
     "phpunit/phpunit": "^5.4.0",
-    "squizlabs/php_codesniffer": "^2.0.0"
+    "squizlabs/php_codesniffer": "^2.0.0",
+    "nbobtc/bitcoind-php": "^2.0.0",
+    "bitwasp/testing-php": "^0.1.1"
   }
 }
