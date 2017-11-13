@@ -109,7 +109,7 @@ class Base58
         $data = $hex->slice(0, -4);
         $csVerify = $hex->slice(-4);
 
-        if (self::checksum($data)->getBinary() !== $csVerify->getBinary()) {
+        if (!hash_equals(self::checksum($data)->getBinary(), $csVerify->getBinary())) {
             throw new Base58ChecksumFailure('Failed to verify checksum');
         }
 
