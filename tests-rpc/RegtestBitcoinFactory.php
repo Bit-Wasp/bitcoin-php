@@ -34,6 +34,10 @@ class RegtestBitcoinFactory
     public function __construct() {
         $this->testsDirPath = $this->envOrDefault("BITCOIND_TEST_DIR", "/tmp");
         $this->bitcoindPath = $this->envOrDefault("BITCOIND_PATH");
+        if (null === $this->bitcoindPath) {
+            throw new \RuntimeException("Missing BITCOIND_PATH variable");
+        }
+
         $this->network = NetworkFactory::bitcoinTestnet();
         $this->credential = new RpcCredential("127.0.0.1", 18332, "rpcuser", "rpcpass");
     }
@@ -54,9 +58,9 @@ class RegtestBitcoinFactory
         return $dir;
     }
 
-    public function startBitcoind() {
+    public function startBitcoind($options = []) {
         $testDir = $this->createRandomTestDir();
-        $rpcServer = new RpcServer($this->bitcoindPath, $testDir, $this->network, $this->credential);
+        $rpcServer = new RpcServer($this->bitcoindPath, $testDir, $this->network, $this->credential, $options);
         $rpcServer->start();
         $this->server[] = $rpcServer;
         return $rpcServer;

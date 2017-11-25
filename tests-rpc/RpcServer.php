@@ -4,11 +4,21 @@ namespace BitWasp\Bitcoin\RpcTest;
 
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
+use BitWasp\Bitcoin\Transaction\OutPoint;
+use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Bitcoin\Transaction\TransactionOutput;
+use BitWasp\Bitcoin\Utxo\Utxo;
+use BitWasp\Buffertools\Buffer;
 use Nbobtc\Command\Command;
 use Nbobtc\Http\Client;
 
 class RpcServer
 {
+    const ERROR_STARTUP = -28;
+    const ERROR_TX_MEMPOOL_CONFLICT = -26;
+
     /**
      * @var string
      */
@@ -35,18 +45,33 @@ class RpcServer
     private $client;
 
     /**
+     * @var bool
+     */
+    private $softforks = false;
+
+    private $defaultOptions = [
+        "daemon" => 1,
+        "server" => 1,
+        "regtest" => 1,
+    ];
+
+    private $options = [];
+
+    /**
      * RpcServer constructor.
      * @param $bitcoind
      * @param $dataDir
      * @param NetworkInterface $network
      * @param RpcCredential $credential
+     * @param array $options
      */
-    public function __construct($bitcoind, $dataDir, NetworkInterface $network, RpcCredential $credential)
+    public function __construct($bitcoind, $dataDir, NetworkInterface $network, RpcCredential $credential, array $options = [])
     {
         $this->bitcoind = $bitcoind;
         $this->dataDir = $dataDir;
         $this->network = $network;
         $this->credential = $credential;
+        $this->options = array_merge($options, $this->defaultOptions);
     }
 
     /**
@@ -74,9 +99,20 @@ class RpcServer
         if (!$fd) {
             throw new \RuntimeException("Failed to open bitcoin.conf for writing");
         }
-        if (!fwrite($fd, $rpcCredential->getConfig())) {
+
+        $config = array_merge(
+            $this->options,
+            $rpcCredential->getConfigArray()
+        );
+
+        $iniConfig = implode("\n", array_map(function ($value, $key) {
+            return "{$key}={$value}";
+        }, $config, array_keys($config)));
+
+        if (!fwrite($fd, $iniConfig)) {
             throw new \RuntimeException("Failed to write to bitcoin.conf");
         }
+
         fclose($fd);
     }
 
@@ -109,7 +145,7 @@ class RpcServer
                 if ($result['error'] === null) {
                     $connected = true;
                 } else {
-                    if ($result['error']['code'] !== -28) {
+                    if ($result['error']['code'] !== self::ERROR_STARTUP) {
                         throw new \RuntimeException("Unexpected error code during startup");
                     }
 
@@ -130,6 +166,62 @@ class RpcServer
         $client = new \Nbobtc\Http\Client($this->credential->getDsn());
         $client->withDriver(new CurlDriver());
         return $client;
+    }
+
+    private function activateSoftforks()
+    {
+        if ($this->softforks) {
+            return;
+        }
+
+        $chainInfo = $this->makeRpcRequest('getblockchaininfo');
+        $bestHeight = $chainInfo['result']['blocks'];
+
+        while($bestHeight < 150 || $chainInfo['result']['bip9_softforks']['segwit']['status'] !== 'active') {
+            // ought to finish in 1!
+            $this->makeRpcRequest("generate", [435]);
+            $chainInfo = $this->makeRpcRequest('getblockchaininfo');
+            $bestHeight = $chainInfo['result']['blocks'];
+        }
+
+        $this->softforks = true;
+    }
+
+    /**
+     * @param int $value
+     * @param ScriptInterface $script
+     * @return Utxo
+     */
+    public function fundOutput($value, $script)
+    {
+        $this->activateSoftforks();
+
+        $builder = new TxBuilder();
+        $builder->output($value, $script);
+        $hex = $builder->get()->getHex();
+
+        $result = $this->makeRpcRequest('fundrawtransaction', [$hex, ['feeRate'=>0.0001]]);
+        $unsigned = $result['result']['hex'];
+        $result = $this->makeRpcRequest('signrawtransaction', [$unsigned]);
+        $signedHex = $result['result']['hex'];
+        $signed = TransactionFactory::fromHex($signedHex);
+
+        $outIdx = -1;
+        foreach ($signed->getOutputs() as $i => $output) {
+            if ($output->getScript()->equals($script)) {
+                $outIdx = $i;
+            }
+        }
+
+        if ($outIdx === -1) {
+            throw new \RuntimeException("Sanity check failed, should have found the output we funded");
+        }
+
+        $result = $this->makeRpcRequest('sendrawtransaction', [$signedHex]);
+        $txid = $result['result'];
+        $this->makeRpcRequest("generate", [1]);
+
+        return new Utxo(new OutPoint(Buffer::hex($txid), $outIdx), new TransactionOutput($value, $script));
     }
 
     /**
@@ -166,7 +258,6 @@ class RpcServer
             } while($this->isRunning());
 
             $this->recursiveDelete($this->dataDir);
-
         }
     }
 

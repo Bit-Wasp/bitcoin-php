@@ -58,11 +58,16 @@ EOF;
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getConfig()
+    public function getConfigArray()
     {
-        return sprintf(self::CONFIG_TEMPLATE, $this->username, $this->password, $this->port);
+        return [
+            "rpcuser" => $this->username,
+            "rpcpassword" => $this->password,
+            "rpcport" => $this->port,
+            "rpcallowip" => "127.0.0.1",
+        ];
     }
 
     /**
