@@ -261,6 +261,6 @@ class ScriptTest extends AbstractTestCase
         $this->assertEquals(0, $p2sh->countP2shSigOps(ScriptFactory::sequence([$script->getBuffer()])));
 
         $p2wsh = ScriptFactory::scriptPubKey()->witnessScriptHash(Hash::sha256($script->getBuffer()));
-        $this->assertEquals(0, $p2wsh->countWitnessSigOps(new Script(), new ScriptWitness([$script->getBuffer()]), 0 | Interpreter::VERIFY_WITNESS));
+        $this->assertEquals(0, $p2wsh->countWitnessSigOps(new Script(), new ScriptWitness($script->getBuffer()), 0 | Interpreter::VERIFY_WITNESS));
     }
 }

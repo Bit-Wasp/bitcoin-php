@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -37,7 +39,7 @@ class PrivateKeyTest extends AbstractTestCase
     public function testCreatePrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
         $dec = $ecAdapter->getMath()->hexDec('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141');
-        PrivateKeyFactory::fromInt($dec, $ecAdapter);
+        PrivateKeyFactory::fromInt($dec, false, $ecAdapter);
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
@@ -30,12 +31,8 @@ class CompactSignature extends Signature implements CompactSignatureInterface
      * @param int $recid
      * @param bool $compressed
      */
-    public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, $recid, $compressed)
+    public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, int $recid, bool $compressed)
     {
-        if (!is_bool($compressed)) {
-            throw new \InvalidArgumentException('CompactSignature: $compressed must be a boolean');
-        }
-
         $this->ecAdapter = $adapter;
         $this->recid = $recid;
         $this->compressed = $compressed;
@@ -45,7 +42,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     /**
      * @return Signature
      */
-    public function convert()
+    public function convert(): Signature
     {
         return new Signature($this->ecAdapter, $this->getR(), $this->getS());
     }
@@ -53,7 +50,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     /**
      * @return int
      */
-    public function getRecoveryId()
+    public function getRecoveryId(): int
     {
         return $this->recid;
     }
@@ -61,7 +58,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     /**
      * @return bool
      */
-    public function isCompressed()
+    public function isCompressed(): bool
     {
         return $this->compressed;
     }
@@ -69,7 +66,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     /**
      * @return int
      */
-    public function getFlags()
+    public function getFlags(): int
     {
         return $this->getRecoveryId() + 27 + ($this->isCompressed() ? 4 : 0);
     }

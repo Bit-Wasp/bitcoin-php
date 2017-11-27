@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -18,7 +20,7 @@ class HierarchicalKeyFactory
      * @param EcAdapterInterface $ecAdapter
      * @return Base58ExtendedKeySerializer
      */
-    public static function getSerializer(EcAdapterInterface $ecAdapter)
+    public static function getSerializer(EcAdapterInterface $ecAdapter): Base58ExtendedKeySerializer
     {
         $extSerializer = new Base58ExtendedKeySerializer(new ExtendedKeySerializer($ecAdapter));
         return $extSerializer;
@@ -28,7 +30,7 @@ class HierarchicalKeyFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return HierarchicalKey
      */
-    public static function generateMasterKey(EcAdapterInterface $ecAdapter = null)
+    public static function generateMasterKey(EcAdapterInterface $ecAdapter = null): HierarchicalKey
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $buffer = PrivateKeyFactory::create(true, $ecAdapter);
@@ -40,7 +42,7 @@ class HierarchicalKeyFactory
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey
      */
-    public static function fromEntropy(BufferInterface $entropy, EcAdapterInterface $ecAdapter = null)
+    public static function fromEntropy(BufferInterface $entropy, EcAdapterInterface $ecAdapter = null): HierarchicalKey
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $seed = Hash::hmac('sha512', $entropy, new Buffer('Bitcoin seed', null, $ecAdapter->getMath()));
@@ -54,7 +56,7 @@ class HierarchicalKeyFactory
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKey
      */
-    public static function fromExtended($extendedKey, NetworkInterface $network = null, EcAdapterInterface $ecAdapter = null)
+    public static function fromExtended($extendedKey, NetworkInterface $network = null, EcAdapterInterface $ecAdapter = null): HierarchicalKey
     {
         $extSerializer = self::getSerializer($ecAdapter ?: Bitcoin::getEcAdapter());
         return $extSerializer->parse($network ?: Bitcoin::getNetwork(), $extendedKey);

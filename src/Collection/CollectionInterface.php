@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Collection;
 
 interface CollectionInterface extends \Iterator, \ArrayAccess, \Countable
@@ -7,7 +9,7 @@ interface CollectionInterface extends \Iterator, \ArrayAccess, \Countable
     /**
      * @return array
      */
-    public function all();
+    public function all(): array;
 
     /**
      * @return mixed
@@ -24,10 +26,10 @@ interface CollectionInterface extends \Iterator, \ArrayAccess, \Countable
      * @param int $length
      * @return self
      */
-    public function slice($start, $length);
+    public function slice(int $start, int $length);
 
     /**
      * @return bool
      */
-    public function isNull();
+    public function isNull(): bool;
 }

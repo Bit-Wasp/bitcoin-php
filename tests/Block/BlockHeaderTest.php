@@ -21,9 +21,9 @@ class BlockHeaderTest extends AbstractTestCase
         $version = 2;
         $prevBlock = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141', 32);
         $merkleRoot = Buffer::hex('4242424241414141414141414141414141414141414141414141414141414141', 32);
-        $time ='191230123';
+        $time = 191230123;
         $bits = 0x1d00ffff;
-        $nonce = '666';
+        $nonce = 666;
 
         $header = new BlockHeader(
             $version,
@@ -46,7 +46,7 @@ class BlockHeaderTest extends AbstractTestCase
         $result = BlockHeaderFactory::fromHex($this->getGenesisHex());
 
         $this->assertInstanceOf(BlockHeader::class, $result);
-        $this->assertSame('1', $result->getVersion());
+        $this->assertSame(1, $result->getVersion());
 
         $this->assertInstanceOf(Buffer::class, $result->getPrevBlock());
         $this->assertSame('0000000000000000000000000000000000000000000000000000000000000000', $result->getPrevBlock()->getHex());

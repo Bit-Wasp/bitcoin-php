@@ -160,15 +160,6 @@ class CompactIntegerTest extends AbstractTestCase
         $this->assertEquals($eOverflow, $overflow);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testFNegative()
-    {
-        $math = new Math();
-        $math->encodeCompact(gmp_init(1), 'wrong type');
-    }
-
     public function testOverflow()
     {
         $math = new Math();

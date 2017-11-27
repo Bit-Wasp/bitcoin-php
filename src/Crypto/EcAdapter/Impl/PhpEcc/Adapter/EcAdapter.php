@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -44,7 +46,7 @@ class EcAdapter implements EcAdapterInterface
     /**
      * @return Math
      */
-    public function getMath()
+    public function getMath(): Math
     {
         return $this->math;
     }
@@ -60,9 +62,9 @@ class EcAdapter implements EcAdapterInterface
     /**
      * @param \GMP $scalar
      * @param bool|false $compressed
-     * @return PrivateKey
+     * @return PrivateKeyInterface
      */
-    public function getPrivateKey(\GMP $scalar, $compressed = false)
+    public function getPrivateKey(\GMP $scalar, bool $compressed = false): PrivateKeyInterface
     {
         return new PrivateKey($this, $scalar, $compressed);
     }
@@ -72,7 +74,7 @@ class EcAdapter implements EcAdapterInterface
      * @param bool|false $compressed
      * @return PublicKey
      */
-    public function getPublicKey(PointInterface $point, $compressed = false)
+    public function getPublicKey(PointInterface $point, bool $compressed = false)
     {
         return new PublicKey($this, $point, $compressed);
     }
@@ -106,7 +108,7 @@ class EcAdapter implements EcAdapterInterface
      * @param SignatureInterface $signature
      * @return bool
      */
-    public function verify(BufferInterface $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature)
+    public function verify(BufferInterface $messageHash, PublicKeyInterface $publicKey, SignatureInterface $signature): bool
     {
         /** @var PublicKey $publicKey */
         /** @var Signature $signature */
@@ -119,7 +121,7 @@ class EcAdapter implements EcAdapterInterface
      * @param RbgInterface|null $rbg
      * @return Signature
      */
-    private function doSign(BufferInterface $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null)
+    private function doSign(BufferInterface $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null): Signature
     {
         $rbg = $rbg ?: new Rfc6979($this, $privateKey, $messageHash);
         $randomK = gmp_init($rbg->bytes(32)->getHex(), 16);
@@ -144,7 +146,7 @@ class EcAdapter implements EcAdapterInterface
      * @return SignatureInterface
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function sign(BufferInterface $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    public function sign(BufferInterface $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null): SignatureInterface
     {
         /** @var PrivateKey $privateKey */
         return $this->doSign($messageHash, $privateKey, $rbg);
@@ -153,10 +155,10 @@ class EcAdapter implements EcAdapterInterface
     /**
      * @param BufferInterface $messageHash
      * @param CompactSignatureInterface $signature
-     * @return PublicKey
+     * @return PublicKeyInterface
      * @throws \Exception
      */
-    public function recover(BufferInterface $messageHash, CompactSignatureInterface $signature)
+    public function recover(BufferInterface $messageHash, CompactSignatureInterface $signature): PublicKeyInterface
     {
         $math = $this->getMath();
         $G = $this->getGenerator();
@@ -248,7 +250,7 @@ class EcAdapter implements EcAdapterInterface
      * @return CompactSignature
      * @throws \Exception
      */
-    private function doSignCompact(BufferInterface $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null)
+    private function doSignCompact(BufferInterface $messageHash, PrivateKey $privateKey, RbgInterface $rbg = null): CompactSignature
     {
         $sign = $this->sign($messageHash, $privateKey, $rbg);
 
@@ -267,9 +269,9 @@ class EcAdapter implements EcAdapterInterface
      * @param PrivateKeyInterface $privateKey
      * @param BufferInterface $messageHash
      * @param RbgInterface $rbg
-     * @return CompactSignature
+     * @return CompactSignatureInterface
      */
-    public function signCompact(BufferInterface $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null)
+    public function signCompact(BufferInterface $messageHash, PrivateKeyInterface $privateKey, RbgInterface $rbg = null): CompactSignatureInterface
     {
         /** @var PrivateKey $privateKey */
         return $this->doSignCompact($messageHash, $privateKey, $rbg);
@@ -279,7 +281,7 @@ class EcAdapter implements EcAdapterInterface
      * @param BufferInterface $privateKey
      * @return bool
      */
-    public function validatePrivateKey(BufferInterface $privateKey)
+    public function validatePrivateKey(BufferInterface $privateKey): bool
     {
         $math = $this->math;
         $scalar = $privateKey->getGmp();
@@ -291,7 +293,7 @@ class EcAdapter implements EcAdapterInterface
      * @param bool $half
      * @return bool
      */
-    public function validateSignatureElement(\GMP $element, $half = false)
+    public function validateSignatureElement(\GMP $element, bool $half = false): bool
     {
         $math = $this->getMath();
         $against = $this->getGenerator()->getOrder();
@@ -307,7 +309,7 @@ class EcAdapter implements EcAdapterInterface
      * @return PublicKeyInterface
      * @throws \Exception
      */
-    public function publicKeyFromBuffer(BufferInterface $publicKey)
+    public function publicKeyFromBuffer(BufferInterface $publicKey): PublicKeyInterface
     {
         $prefix = $publicKey->slice(0, 1)->getBinary();
         $size = $publicKey->getSize();

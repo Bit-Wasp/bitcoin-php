@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -7,6 +9,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key\PrivateKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
@@ -48,7 +51,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
      * @param bool|false $compressed
      * @throws \Exception
      */
-    public function __construct(EcAdapter $adapter, \GMP $secret, $compressed = false)
+    public function __construct(EcAdapter $adapter, \GMP $secret, bool $compressed = false)
     {
         $buffer = Buffer::int(gmp_strval($secret, 10), 32, $adapter->getMath());
         if (!$adapter->validatePrivateKey($buffer)) {
@@ -70,21 +73,21 @@ class PrivateKey extends Key implements PrivateKeyInterface
      * @param RbgInterface|null $rbgInterface
      * @return Signature
      */
-    public function sign(BufferInterface $msg32, RbgInterface $rbgInterface = null)
+    public function sign(BufferInterface $msg32, RbgInterface $rbgInterface = null): Signature
     {
         return $this->ecAdapter->sign($msg32, $this, $rbgInterface);
     }
 
     /**
-     * @return bool|false
+     * @return bool
      */
-    public function isCompressed()
+    public function isCompressed(): bool
     {
         return $this->compressed;
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
     public function getSecret()
     {
@@ -94,7 +97,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * @return string
      */
-    public function getSecretBinary()
+    public function getSecretBinary(): string
     {
         return $this->secretBin;
     }
@@ -120,9 +123,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     /**
      * @param \GMP $tweak
-     * @return PrivateKey
+     * @return KeyInterface
      */
-    public function tweakAdd(\GMP $tweak)
+    public function tweakAdd(\GMP $tweak): KeyInterface
     {
         $adapter = $this->ecAdapter;
         $math = $adapter->getMath();
@@ -145,9 +148,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     /**
      * @param \GMP $tweak
-     * @return PrivateKey
+     * @return KeyInterface
      */
-    public function tweakMul(\GMP $tweak)
+    public function tweakMul(\GMP $tweak): KeyInterface
     {
         $privateKey = $this->getBinary();
         $math = $this->ecAdapter->getMath();
@@ -171,7 +174,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
      * @param NetworkInterface $network
      * @return string
      */
-    public function toWif(NetworkInterface $network = null)
+    public function toWif(NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
         $wifSerializer = new WifPrivateKeySerializer($this->ecAdapter, new PrivateKeySerializer($this->ecAdapter));

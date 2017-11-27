@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\Random;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -33,7 +35,7 @@ class Rfc6979 implements RbgInterface
         EcAdapterInterface $ecAdapter,
         PrivateKeyInterface $privateKey,
         BufferInterface $messageHash,
-        $algo = 'sha256'
+        string $algo = 'sha256'
     ) {
         $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), gmp_init($privateKey->getInt(), 10));
         $this->ecAdapter = $ecAdapter;
@@ -42,9 +44,9 @@ class Rfc6979 implements RbgInterface
 
     /**
      * @param int $bytes
-     * @return Buffer
+     * @return BufferInterface
      */
-    public function bytes($bytes)
+    public function bytes(int $bytes): BufferInterface
     {
         $integer = $this->hmac->generate($this->ecAdapter->getGenerator()->getOrder());
         return Buffer::int(gmp_strval($integer, 10), $bytes, $this->ecAdapter->getMath());

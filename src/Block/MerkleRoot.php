@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
@@ -43,7 +45,7 @@ class MerkleRoot
      * @return BufferInterface
      * @throws MerkleTreeEmpty
      */
-    public function calculateHash(callable $hashFunction = null)
+    public function calculateHash(callable $hashFunction = null): BufferInterface
     {
         if ($this->lastHash instanceof BufferInterface) {
             return $this->lastHash;

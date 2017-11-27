@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
@@ -10,80 +12,80 @@ interface ParamsInterface
     /**
      * @return BlockHeaderInterface
      */
-    public function getGenesisBlockHeader();
+    public function getGenesisBlockHeader(): BlockHeaderInterface;
 
     /**
      * @return BlockInterface
      */
-    public function getGenesisBlock();
+    public function getGenesisBlock(): BlockInterface;
 
     /**
      * @return int
      */
-    public function maxBlockSizeBytes();
+    public function maxBlockSizeBytes(): int;
 
     /**
      * @return int
      */
-    public function subsidyHalvingInterval();
+    public function subsidyHalvingInterval(): int;
 
     /**
      * @return int
      */
-    public function coinbaseMaturityAge();
+    public function coinbaseMaturityAge(): int;
 
     /**
      * @return int
      */
-    public function maxMoney();
+    public function maxMoney(): int;
 
     /**
      * @return int
      */
-    public function powTargetTimespan();
+    public function powTargetTimespan(): int;
 
     /**
      * @return int
      */
-    public function powTargetSpacing();
+    public function powTargetSpacing(): int;
 
     /**
      * @return int
      */
-    public function powRetargetInterval();
+    public function powRetargetInterval(): int;
 
     /**
      * @return int|string
      */
-    public function powTargetLimit();
+    public function powTargetLimit(): string;
 
     /**
      * @return int
      */
-    public function powBitsLimit();
+    public function powBitsLimit(): int;
 
     /**
      * @return int
      */
-    public function majorityEnforceBlockUpgrade();
+    public function majorityEnforceBlockUpgrade(): int;
 
     /**
      * @return int
      */
-    public function majorityWindow();
+    public function majorityWindow(): int;
 
     /**
      * @return int
      */
-    public function p2shActivateTime();
+    public function p2shActivateTime(): int;
 
     /**
-     * @return int|string
+     * @return int
      */
-    public function getMaxBlockSigOps();
+    public function getMaxBlockSigOps(): int;
 
     /**
-     * @return int|string
+     * @return int
      */
-    public function getMaxTxSigOps();
+    public function getMaxTxSigOps(): int;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -15,7 +17,7 @@ class BlockFactory
      * @param Math $math
      * @return BlockInterface
      */
-    public static function fromHex($string, Math $math = null)
+    public static function fromHex($string, Math $math = null): BlockInterface
     {
         return (new BlockSerializer(
             $math ?: Bitcoin::getMath(),

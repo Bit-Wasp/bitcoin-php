@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -51,7 +52,7 @@ class CompactSignatureTest extends AbstractTestCase
         $compact = $signed->getCompactSignature();
 
         $this->assertEquals(65, $compact->getBuffer()->getSize());
-        $this->assertTrue($msgSigner->verify($signed, $pubKey->getAddress()));
+        $this->assertTrue($msgSigner->verify($signed, new PayToPubKeyHashAddress($pubKey->getPubKeyHash())));
 
         /** @var CompactSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter);

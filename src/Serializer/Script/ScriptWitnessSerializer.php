@@ -39,7 +39,7 @@ class ScriptWitnessSerializer
             $entries[] = $this->varstring->read($parser);
         }
 
-        return new ScriptWitness($entries);
+        return new ScriptWitness(...$entries);
     }
 
     /**

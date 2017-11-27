@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 /**
@@ -17,7 +19,7 @@ class HierarchicalKeySequence
      * @param int $sequence
      * @return bool
      */
-    public function isHardened($sequence)
+    public function isHardened(int $sequence): bool
     {
         return ($sequence >> 31) === 1;
     }
@@ -26,7 +28,7 @@ class HierarchicalKeySequence
      * @param int $sequence
      * @return int
      */
-    public function getHardened($sequence)
+    public function getHardened(int $sequence): int
     {
         if ($this->isHardened($sequence)) {
             throw new \LogicException('Sequence is already for a hardened key');
@@ -35,24 +37,29 @@ class HierarchicalKeySequence
         $flag = 1 << 31;
         $hardened = $sequence | $flag;
 
-        return $hardened;
+        return (int) $hardened;
     }
 
     /**
      * Convert a human readable path node (eg, "0", "0'", or "0h") into the correct sequence (0, 0x80000000, 0x80000000)
      *
-     * @param $node
-     * @return int|string
+     * @param string $node
+     * @return int
      */
-    public function fromNode($node)
+    public function fromNode(string $node): int
     {
+        if (strlen($node) < 1) {
+            throw new \RuntimeException("Invalid node in sequence - empty value");
+        }
+
+        $last = substr(strtolower($node), -1);
         $hardened = false;
-        if (in_array(substr(strtolower($node), -1), array('h', "'"), true) === true) {
-            $intEnd = strlen($node) - 1;
-            $node = substr($node, 0, $intEnd);
+        if ($last === "h" || $last === "'") {
+            $node = substr($node, 0, -1);
             $hardened = true;
         }
 
+        $node = (int) $node;
         if ($hardened) {
             $node = $this->getHardened($node);
         }
@@ -66,23 +73,23 @@ class HierarchicalKeySequence
      * @param int $sequence
      * @return string
      */
-    public function getNode($sequence)
+    public function getNode(int $sequence): string
     {
         if ($this->isHardened($sequence)) {
             $sequence = $sequence - self::START_HARDENED;
             $sequence = (string) $sequence . 'h';
         }
 
-        return $sequence;
+        return (string) $sequence;
     }
 
     /**
      * Decodes a human-readable path, into an array of integers (sequences)
      *
      * @param string $path
-     * @return array
+     * @return int[]
      */
-    public function decodePath($path)
+    public function decodePath(string $path): array
     {
         if ($path === '') {
             throw new \InvalidArgumentException('Invalid path passed to decodePath()');
@@ -110,7 +117,7 @@ class HierarchicalKeySequence
 
         $path = [];
         foreach ($list as $sequence) {
-            $path[] = $this->getNode($sequence);
+            $path[] = $this->getNode((int) $sequence);
         }
 
         return implode('/', $path);

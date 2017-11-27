@@ -177,7 +177,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
                 continue;
             }
 
-            $scriptWitness = new ScriptWitness($witnessStack);
+            $scriptWitness = new ScriptWitness(...$witnessStack);
             $scriptSigString = $test[$pos++];
             $scriptSig = $this->calcScriptFromString($mapOpNames, $scriptSigString);
 

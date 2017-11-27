@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Collection;
+
+use BitWasp\Buffertools\BufferInterface;
 
 abstract class StaticCollection implements CollectionInterface
 {
@@ -17,7 +21,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->set;
     }
@@ -27,7 +31,7 @@ abstract class StaticCollection implements CollectionInterface
      * @param int $length
      * @return self
      */
-    public function slice($start, $length)
+    public function slice(int $start, int $length)
     {
         $end = count($this->set);
         if ($start > $end || $length > $end) {
@@ -35,21 +39,21 @@ abstract class StaticCollection implements CollectionInterface
         }
 
         $sliced = array_slice($this->set, $start, $length);
-        return new static($sliced);
+        return new static(...$sliced);
     }
 
     /**
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->set);
     }
 
     /**
-     * @return mixed
+     * @return BufferInterface
      */
-    public function bottom()
+    public function bottom(): BufferInterface
     {
         if (count($this->set) === 0) {
             throw new \RuntimeException('No bottom for empty collection');
@@ -59,9 +63,9 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @return mixed
+     * @return BufferInterface
      */
-    public function top()
+    public function top(): BufferInterface
     {
         if (count($this->set) === 0) {
             throw new \RuntimeException('No top for empty collection');
@@ -73,7 +77,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return bool
      */
-    public function isNull()
+    public function isNull(): bool
     {
         return count($this->set) === 0;
     }
@@ -87,9 +91,9 @@ abstract class StaticCollection implements CollectionInterface
     }
 
     /**
-     * @return mixed
+     * @return BufferInterface
      */
-    public function current()
+    public function current(): BufferInterface
     {
         return $this->set[$this->position];
     }
@@ -97,7 +101,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -113,7 +117,7 @@ abstract class StaticCollection implements CollectionInterface
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->set[$this->position]);
     }

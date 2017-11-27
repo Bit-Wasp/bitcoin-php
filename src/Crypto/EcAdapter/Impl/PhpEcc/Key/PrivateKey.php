@@ -1,12 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PrivateKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -14,6 +18,7 @@ use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Crypto\EcDH\EcDH;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 
 class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto\Key\PrivateKeyInterface
 {
@@ -43,7 +48,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
      * @param bool $compressed
      * @throws InvalidPrivateKey
      */
-    public function __construct(EcAdapter $ecAdapter, \GMP $int, $compressed = false)
+    public function __construct(EcAdapter $ecAdapter, \GMP $int, bool $compressed = false)
     {
         if (false === $ecAdapter->validatePrivateKey(Buffer::int(gmp_strval($int, 10), 32, $ecAdapter->getMath()))) {
             throw new InvalidPrivateKey('Invalid private key - must be less than curve order.');
@@ -61,7 +66,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     /**
      * @return \Mdanter\Ecc\Primitives\GeneratorPoint
      */
-    public function getPoint()
+    public function getPoint(): GeneratorPoint
     {
         return $this->ecAdapter->getGenerator();
     }
@@ -69,7 +74,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     /**
      * @return \GMP
      */
-    public function getSecret()
+    public function getSecret(): \GMP
     {
         return $this->secretMultiplier;
     }
@@ -89,18 +94,18 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     /**
      * @param BufferInterface $msg32
      * @param RbgInterface|null $rbg
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface
+     * @return SignatureInterface
      */
-    public function sign(BufferInterface $msg32, RbgInterface $rbg = null)
+    public function sign(BufferInterface $msg32, RbgInterface $rbg = null): SignatureInterface
     {
         return $this->ecAdapter->sign($msg32, $this, $rbg);
     }
 
     /**
      * @param \GMP $tweak
-     * @return PrivateKeyInterface
+     * @return KeyInterface
      */
-    public function tweakAdd(\GMP $tweak)
+    public function tweakAdd(\GMP $tweak): KeyInterface
     {
         $adapter = $this->ecAdapter;
         $modMath = $adapter->getMath()->getModularArithmetic($adapter->getGenerator()->getOrder());
@@ -109,9 +114,9 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
 
     /**
      * @param \GMP $tweak
-     * @return PrivateKeyInterface
+     * @return KeyInterface
      */
-    public function tweakMul(\GMP $tweak)
+    public function tweakMul(\GMP $tweak): KeyInterface
     {
         $adapter = $this->ecAdapter;
         $modMath = $adapter->getMath()->getModularArithmetic($adapter->getGenerator()->getOrder());
@@ -121,7 +126,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     /**
      * {@inheritDoc}
      */
-    public function isCompressed()
+    public function isCompressed(): bool
     {
         return $this->compressed;
     }
@@ -131,7 +136,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
      *
      * @return PublicKey
      */
-    public function getPublicKey()
+    public function getPublicKey(): PublicKey
     {
         if (null === $this->publicKey) {
             $adapter = $this->ecAdapter;
@@ -145,7 +150,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
      * @param NetworkInterface $network
      * @return string
      */
-    public function toWif(NetworkInterface $network = null)
+    public function toWif(NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
         $serializer = new WifPrivateKeySerializer(

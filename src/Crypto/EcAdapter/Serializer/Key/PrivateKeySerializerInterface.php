@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -11,11 +13,11 @@ interface PrivateKeySerializerInterface
      * @param PrivateKeyInterface $privateKey
      * @return BufferInterface
      */
-    public function serialize(PrivateKeyInterface $privateKey);
+    public function serialize(PrivateKeyInterface $privateKey): BufferInterface;
 
     /**
      * @param string|BufferInterface $data
      * @return PrivateKeyInterface
      */
-    public function parse($data);
+    public function parse($data): PrivateKeyInterface;
 }

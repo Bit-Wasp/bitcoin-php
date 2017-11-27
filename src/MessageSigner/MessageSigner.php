@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\MessageSigner;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
@@ -32,16 +34,16 @@ class MessageSigner
      * @return BufferInterface
      * @throws \Exception
      */
-    private function calculateBody($message)
+    private function calculateBody(string $message)
     {
         return new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message, null, $this->ecAdapter->getMath());
     }
 
     /**
      * @param string $message
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function calculateMessageHash($message)
+    public function calculateMessageHash(string $message): BufferInterface
     {
         return Hash::sha256d($this->calculateBody($message));
     }
@@ -51,7 +53,7 @@ class MessageSigner
      * @param PayToPubKeyHashAddress $address
      * @return bool
      */
-    public function verify(SignedMessage $signedMessage, PayToPubKeyHashAddress $address)
+    public function verify(SignedMessage $signedMessage, PayToPubKeyHashAddress $address): bool
     {
         $hash = $this->calculateMessageHash($signedMessage->getMessage());
 
@@ -60,7 +62,7 @@ class MessageSigner
             $signedMessage->getCompactSignature()
         );
 
-        return $publicKey->getAddress()->getHash()->equals($address->getHash());
+        return $publicKey->getPubKeyHash()->equals($address->getHash());
     }
 
     /**
@@ -68,7 +70,7 @@ class MessageSigner
      * @param PrivateKeyInterface $privateKey
      * @return SignedMessage
      */
-    public function sign($message, PrivateKeyInterface $privateKey)
+    public function sign(string $message, PrivateKeyInterface $privateKey): SignedMessage
     {
         $hash = $this->calculateMessageHash($message);
 

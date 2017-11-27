@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
@@ -13,14 +15,14 @@ interface KeyInterface extends SerializableInterface
      *
      * @return bool
      */
-    public function isCompressed();
+    public function isCompressed(): bool;
 
     /**
      * Return a boolean indicating whether the key is private.
      *
      * @return bool
      */
-    public function isPrivate();
+    public function isPrivate(): bool;
 
     /**
      * Return the hash of the public key.
@@ -28,19 +30,19 @@ interface KeyInterface extends SerializableInterface
      * @param PublicKeySerializerInterface|null $serializer
      * @return BufferInterface
      */
-    public function getPubKeyHash(PublicKeySerializerInterface $serializer = null);
+    public function getPubKeyHash(PublicKeySerializerInterface $serializer = null): BufferInterface;
 
     /**
      * @param \GMP $offset
      * @return KeyInterface
      */
-    public function tweakAdd(\GMP $offset);
+    public function tweakAdd(\GMP $offset): KeyInterface;
 
     /**
      * @param \GMP $offset
      * @return KeyInterface
      */
-    public function tweakMul(\GMP $offset);
+    public function tweakMul(\GMP $offset): KeyInterface;
 
     /**
      * @return \BitWasp\Buffertools\BufferInterface

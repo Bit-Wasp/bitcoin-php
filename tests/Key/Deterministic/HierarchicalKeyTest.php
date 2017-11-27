@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -48,8 +51,9 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif($this->network));
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif());
-        $this->assertSame($vectors->address, $key->getPrivateKey()->getAddress()->getAddress($this->network));
-        $this->assertSame($vectors->address, $key->getPrivateKey()->getAddress()->getAddress());
+
+        $this->assertSame($vectors->address, (new PayToPubKeyHashAddress($key->getPublicKey()->getPubKeyHash()))->getAddress($this->network));
+        $this->assertSame($vectors->address, (new PayToPubKeyHashAddress($key->getPublicKey()->getPubKeyHash()))->getAddress());
 
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey(), 'correct xprv');
@@ -255,7 +259,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
         $key = HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
-        $this->assertSame($key->getDepth(), '0');
+        $this->assertSame($key->getDepth(), 0);
     }
 
     /**
@@ -266,7 +270,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame($key->getDepth(), '2');
+        $this->assertSame($key->getDepth(), 2);
     }/**/
 
     /**
@@ -292,7 +296,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame($this->safeMath()->hexDec('615914f3'), $key->getFingerprint());
+        $this->assertSame(0x615914f3, $key->getFingerprint());
     }/**/
 
     /**
@@ -303,7 +307,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame($this->safeMath()->hexDec('a282920f'), $key->getChildFingerprint());
+        $this->assertSame(0xa282920f, $key->getChildFingerprint());
     }/**/
 
     /**
@@ -350,7 +354,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $k = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
         $key = HierarchicalKeyFactory::fromExtended($k, $this->network, $ecAdapter);
-        $key->deriveChild('2147483648');
+        $key->deriveChild(2147483648);
     }
 
     public function getInvalidSequences()
@@ -358,7 +362,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         return [
             [-1],
             [pow(2, 32)],
-            [pow(2, 64)],
+            [pow(2, 62)],
         ];
     }
 

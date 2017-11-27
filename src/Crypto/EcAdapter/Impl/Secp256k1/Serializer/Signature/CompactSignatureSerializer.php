@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
@@ -37,14 +39,14 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new \RuntimeException('Secp256k1 serialize compact failure');
         }
 
-        return new Buffer(chr((int)$signature->getFlags()) . $sig_t, 65, $this->ecAdapter->getMath());
+        return new Buffer(chr($signature->getFlags()) . $sig_t, 65, $this->ecAdapter->getMath());
     }
 
     /**
      * @param CompactSignatureInterface $signature
      * @return BufferInterface
      */
-    public function serialize(CompactSignatureInterface $signature)
+    public function serialize(CompactSignatureInterface $signature): BufferInterface
     {
         /** @var CompactSignature $signature */
         return $this->doSerialize($signature);
@@ -52,9 +54,9 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 
     /**
      * @param string|BufferInterface $data
-     * @return CompactSignature
+     * @return CompactSignatureInterface
      */
-    public function parse($data)
+    public function parse($data): CompactSignatureInterface
     {
         $math = $this->ecAdapter->getMath();
         $buffer = (new Parser($data, $math))->getBuffer();

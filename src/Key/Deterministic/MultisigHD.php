@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
+use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class MultisigHD
@@ -45,7 +49,7 @@ class MultisigHD
      * @param HierarchicalKeySequence $sequences
      * @param bool $sort
      */
-    public function __construct($m, $path, array $keys, HierarchicalKeySequence $sequences, $sort = false)
+    public function __construct(int $m, string $path, array $keys, HierarchicalKeySequence $sequences, bool $sort = false)
     {
         if (count($keys) < 1) {
             throw new \RuntimeException('Must have at least one HierarchicalKey for Multisig HD Script');
@@ -86,7 +90,7 @@ class MultisigHD
     /**
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
@@ -97,7 +101,7 @@ class MultisigHD
      *
      * @return HierarchicalKey[]
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         return $this->keys;
     }
@@ -107,21 +111,21 @@ class MultisigHD
      *
      * @return P2shScript
      */
-    public function getRedeemScript()
+    public function getRedeemScript(): P2shScript
     {
         return $this->redeemScript;
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Script\ScriptInterface
+     * @return ScriptInterface
      */
-    public function getScriptPubKey()
+    public function getScriptPubKey(): ScriptInterface
     {
         return $this->redeemScript->getOutputScript();
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
+     * @return ScriptHashAddress
      */
     public function getAddress()
     {
@@ -134,7 +138,7 @@ class MultisigHD
      * @param int|string $sequence
      * @return MultisigHD
      */
-    public function deriveChild($sequence)
+    public function deriveChild(int $sequence): MultisigHD
     {
         $keys = array_map(
             function (HierarchicalKey $hk) use ($sequence) {
@@ -160,13 +164,13 @@ class MultisigHD
      * @param array|\stdClass|\Traversable $list
      * @return MultisigHD
      */
-    public function deriveFromList($list)
+    public function deriveFromList($list): MultisigHD
     {
         HierarchicalKeySequence::validateListType($list);
 
         $account = $this;
         foreach ($list as $sequence) {
-            $account = $account->deriveChild($sequence);
+            $account = $account->deriveChild((int) $sequence);
         }
 
         return $account;
@@ -178,7 +182,7 @@ class MultisigHD
      * @param string $path
      * @return MultisigHD
      */
-    public function derivePath($path)
+    public function derivePath($path): MultisigHD
     {
         return $this->deriveFromList($this->sequences->decodePath($path));
     }

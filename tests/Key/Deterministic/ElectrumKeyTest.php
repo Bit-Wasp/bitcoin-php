@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\ElectrumKey;
@@ -67,10 +68,12 @@ class ElectrumKeyTest extends AbstractTestCase
         foreach ($eAddrList as $vector) {
             list ($sequence, $eAddr) = $vector;
             $childPriv = $keyPriv->deriveChild($sequence);
-            $this->assertEquals($eAddr, $childPriv->getAddress()->getAddress());
+            $keyHash = $childPriv->getPubKeyHash();
+            $this->assertEquals($eAddr, (new PayToPubKeyHashAddress($keyHash))->getAddress());
 
             $childPub = $keyPub->deriveChild($sequence);
-            $this->assertEquals($eAddr, $childPub->getAddress()->getAddress());
+            $keyHash = $childPub->getPubKeyHash();
+            $this->assertEquals($eAddr, (new PayToPubKeyHashAddress($keyHash))->getAddress());
         }
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -18,7 +20,7 @@ abstract class Key extends Serializable implements KeyInterface
     /**
      * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this instanceof PrivateKeyInterface;
     }
@@ -27,7 +29,7 @@ abstract class Key extends Serializable implements KeyInterface
      * @param PublicKeySerializerInterface|null $serializer
      * @return \BitWasp\Buffertools\BufferInterface
      */
-    public function getPubKeyHash(PublicKeySerializerInterface $serializer = null)
+    public function getPubKeyHash(PublicKeySerializerInterface $serializer = null): BufferInterface
     {
         if ($this instanceof PrivateKeyInterface) {
             $publicKey = $this->getPublicKey();
@@ -40,13 +42,5 @@ abstract class Key extends Serializable implements KeyInterface
         }
 
         return $this->pubKeyHash;
-    }
-
-    /**
-     * @return \BitWasp\Bitcoin\Address\PayToPubKeyHashAddress
-     */
-    public function getAddress()
-    {
-        return AddressFactory::p2pkh($this);
     }
 }
