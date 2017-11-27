@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Bloom\BloomFilter;
@@ -16,31 +18,31 @@ interface BlockInterface extends SerializableInterface
      *
      * @return BlockHeaderInterface
      */
-    public function getHeader();
+    public function getHeader(): BlockHeaderInterface;
 
     /**
      * Calculate the merkle root of the transactions in the block.
      *
      * @return BufferInterface
      */
-    public function getMerkleRoot();
+    public function getMerkleRoot(): BufferInterface;
 
     /**
      * Return the block's transactions.
      *
      * @return TransactionInterface[]
      */
-    public function getTransactions();
+    public function getTransactions(): array;
 
     /**
      * @param int $i
      * @return TransactionInterface
      */
-    public function getTransaction($i);
+    public function getTransaction($i): TransactionInterface;
 
     /**
      * @param BloomFilter $filter
      * @return FilteredBlock
      */
-    public function filter(BloomFilter $filter);
+    public function filter(BloomFilter $filter): FilteredBlock;
 }

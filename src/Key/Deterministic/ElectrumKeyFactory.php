@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -36,7 +38,7 @@ class ElectrumKeyFactory
      * @param EcAdapterInterface $ecAdapter
      * @return ElectrumKey
      */
-    public static function generateMasterKey(BufferInterface $seed, EcAdapterInterface $ecAdapter = null)
+    public static function generateMasterKey(BufferInterface $seed, EcAdapterInterface $ecAdapter = null): ElectrumKey
     {
         // Really weird, did electrum actually hash hex string seeds?
         $binary = $oldseed = $seed->getHex();
@@ -65,7 +67,7 @@ class ElectrumKeyFactory
      * @param EcAdapterInterface $ecAdapter
      * @return ElectrumKey
      */
-    public static function fromMnemonic($mnemonic, ElectrumWordListInterface $wordList = null, EcAdapterInterface $ecAdapter = null)
+    public static function fromMnemonic(string $mnemonic, ElectrumWordListInterface $wordList = null, EcAdapterInterface $ecAdapter = null): ElectrumKey
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $mnemonicConverter = MnemonicFactory::electrum($wordList, $ecAdapter);
@@ -81,7 +83,7 @@ class ElectrumKeyFactory
      * @param EcAdapterInterface $ecAdapter
      * @return ElectrumKey
      */
-    public static function fromKey(KeyInterface $key, EcAdapterInterface $ecAdapter = null)
+    public static function fromKey(KeyInterface $key, EcAdapterInterface $ecAdapter = null): ElectrumKey
     {
         return new ElectrumKey(
             $ecAdapter ?: Bitcoin::getEcAdapter(),

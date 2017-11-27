@@ -11,7 +11,7 @@ interface ScriptWitnessInterface extends CollectionInterface, SerializableInterf
     /**
      * @return BufferInterface[]
      */
-    public function all();
+    public function all(): array;
 
     /**
      * @param ScriptWitnessInterface $witness

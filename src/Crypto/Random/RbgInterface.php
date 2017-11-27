@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\Random;
+
+use BitWasp\Buffertools\BufferInterface;
 
 interface RbgInterface
 {
@@ -8,7 +12,7 @@ interface RbgInterface
      * Return $numBytes bytes deterministically derived from a seed
      *
      * @param int $numNumBytes
-     * @return \BitWasp\Buffertools\Buffer
+     * @return BufferInterface
      */
-    public function bytes($numNumBytes);
+    public function bytes(int $numNumBytes): BufferInterface;
 }

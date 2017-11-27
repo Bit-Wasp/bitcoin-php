@@ -43,6 +43,10 @@ class TransactionSignatureSerializer
         $math = $adapter->getMath();
         $buffer = (new Parser($string, $math))->getBuffer()->getBinary();
 
+        if (strlen($buffer) < 1) {
+            throw new \RuntimeException("Empty signature");
+        }
+
         return new TransactionSignature(
             $adapter,
             $this->sigSerializer->parse(new Buffer(substr($buffer, 0, -1), null, $math)),

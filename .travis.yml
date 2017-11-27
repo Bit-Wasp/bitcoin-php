@@ -2,11 +2,10 @@
 language: php
 
 php:
-  - hhvm
-  - 5.6
   - 7.0
   - 7.1
   - 7.2
+  - nightly
 
 env:
   - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.15.0"

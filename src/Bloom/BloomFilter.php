@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Bloom;
 
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -66,7 +68,7 @@ class BloomFilter extends Serializable
      * @param int $nTweak
      * @param int $flags
      */
-    public function __construct(Math $math, array $vFilter, $numHashFuncs, $nTweak, $flags)
+    public function __construct(Math $math, array $vFilter, int $numHashFuncs, int $nTweak, int $flags)
     {
         $this->math = $math;
         $this->vFilter = $vFilter;
@@ -80,7 +82,7 @@ class BloomFilter extends Serializable
      * @param int $size
      * @return array
      */
-    public static function emptyFilter($size)
+    public static function emptyFilter(int $size): array
     {
         return str_split(str_pad('', $size, '0'), 1);
     }
@@ -96,7 +98,7 @@ class BloomFilter extends Serializable
      * @param int $flags
      * @return BloomFilter
      */
-    public static function create(Math $math, $nElements, $nFpRate, $nTweak, $flags)
+    public static function create(Math $math, int $nElements, float $nFpRate, int $nTweak, int $flags): BloomFilter
     {
         $size = self::idealSize($nElements, $nFpRate);
 
@@ -112,7 +114,7 @@ class BloomFilter extends Serializable
     /**
      * @return bool
      */
-    public function isUpdateNone()
+    public function isUpdateNone(): bool
     {
         return (($this->flags & self::UPDATE_MASK) === self::UPDATE_NONE);
     }
@@ -120,7 +122,7 @@ class BloomFilter extends Serializable
     /**
      * @return bool
      */
-    public function isUpdateAll()
+    public function isUpdateAll(): bool
     {
         return (($this->flags & self::UPDATE_MASK) === self::UPDATE_ALL);
     }
@@ -128,7 +130,7 @@ class BloomFilter extends Serializable
     /**
      * @return bool
      */
-    public function isUpdatePubKeyOnly()
+    public function isUpdatePubKeyOnly(): bool
     {
         return (($this->flags & self::UPDATE_MASK) === self::UPDATE_P2PUBKEY_ONLY);
     }
@@ -136,7 +138,7 @@ class BloomFilter extends Serializable
     /**
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return $this->empty;
     }
@@ -144,7 +146,7 @@ class BloomFilter extends Serializable
     /**
      * @return bool
      */
-    public function isFull()
+    public function isFull(): bool
     {
         return $this->full;
     }
@@ -152,7 +154,7 @@ class BloomFilter extends Serializable
     /**
      * @return array
      */
-    public function getData()
+    public function getData(): array
     {
         return $this->vFilter;
     }
@@ -160,7 +162,7 @@ class BloomFilter extends Serializable
     /**
      * @return int
      */
-    public function getNumHashFuncs()
+    public function getNumHashFuncs(): int
     {
         return $this->numHashFuncs;
     }
@@ -168,7 +170,7 @@ class BloomFilter extends Serializable
     /**
      * @return int
      */
-    public function getTweak()
+    public function getTweak(): int
     {
         return $this->nTweak;
     }
@@ -176,7 +178,7 @@ class BloomFilter extends Serializable
     /**
      * @return int
      */
-    public function getFlags()
+    public function getFlags(): int
     {
         return $this->flags;
     }
@@ -186,7 +188,7 @@ class BloomFilter extends Serializable
      * @param float $fpRate
      * @return int
      */
-    public static function idealSize($nElements, $fpRate)
+    public static function idealSize(int $nElements, float $fpRate): int
     {
         return (int) floor(
             bcdiv(
@@ -194,19 +196,19 @@ class BloomFilter extends Serializable
                     bcmul(
                         bcmul(
                             bcdiv(
-                                -1,
-                                self::LN2SQUARED
+                                '-1',
+                                (string) self::LN2SQUARED
                             ),
-                            $nElements
+                            (string) $nElements
                         ),
-                        log($fpRate)
+                        (string) log($fpRate)
                     ),
                     bcmul(
-                        self::MAX_FILTER_SIZE,
-                        8
+                        (string) self::MAX_FILTER_SIZE,
+                        '8'
                     )
                 ),
-                8
+                '8'
             )
         );
     }
@@ -216,23 +218,23 @@ class BloomFilter extends Serializable
      * @param int $nElements
      * @return int
      */
-    public static function idealNumHashFuncs($filterSize, $nElements)
+    public static function idealNumHashFuncs(int $filterSize, int $nElements)
     {
         return (int) floor(
             min(
                 bcmul(
                     bcdiv(
                         bcmul(
-                            $filterSize,
-                            8
+                            (string) $filterSize,
+                            '8'
                         ),
-                        $nElements
+                        (string) $nElements
                     ),
-                    self::LN2
+                    (string) self::LN2
                 ),
                 bcmul(
-                    self::MAX_FILTER_SIZE,
-                    8
+                    (string) self::MAX_FILTER_SIZE,
+                    '8'
                 )
             )
         );
@@ -243,7 +245,7 @@ class BloomFilter extends Serializable
      * @param BufferInterface $data
      * @return string
      */
-    public function hash($nHashNum, BufferInterface $data)
+    public function hash(int $nHashNum, BufferInterface $data): string
     {
         $hash = Hash::murmur3($data, ($nHashNum * self::TWEAK_START + $this->nTweak) & 0xffffffff)->getInt();
         $hash = gmp_init($hash, 10);
@@ -274,7 +276,7 @@ class BloomFilter extends Serializable
      * @param OutPointInterface $outPoint
      * @return BloomFilter
      */
-    public function insertOutPoint(OutPointInterface $outPoint)
+    public function insertOutPoint(OutPointInterface $outPoint): BloomFilter
     {
         return $this->insertData($outPoint->getBuffer());
     }
@@ -283,7 +285,7 @@ class BloomFilter extends Serializable
      * @param BufferInterface $data
      * @return bool
      */
-    public function containsData(BufferInterface $data)
+    public function containsData(BufferInterface $data): bool
     {
         if ($this->isFull()) {
             return true;
@@ -308,7 +310,7 @@ class BloomFilter extends Serializable
      * @param OutPointInterface $outPoint
      * @return bool
      */
-    public function containsOutPoint(OutPointInterface $outPoint)
+    public function containsOutPoint(OutPointInterface $outPoint): bool
     {
         return $this->containsData($outPoint->getBuffer());
     }
@@ -316,7 +318,7 @@ class BloomFilter extends Serializable
     /**
      * @return bool
      */
-    public function hasAcceptableSize()
+    public function hasAcceptableSize(): bool
     {
         return count($this->vFilter) <= self::MAX_FILTER_SIZE && $this->numHashFuncs <= self::MAX_HASH_FUNCS;
     }
@@ -325,7 +327,7 @@ class BloomFilter extends Serializable
      * @param TransactionInterface $tx
      * @return bool
      */
-    public function isRelevantAndUpdate(TransactionInterface $tx)
+    public function isRelevantAndUpdate(TransactionInterface $tx): bool
     {
         $this->updateEmptyFull();
         $found = false;

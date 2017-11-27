@@ -233,7 +233,7 @@ class InputSigner implements InputSignerInterface
 
         $scriptSig = $this->tx->getInput($this->nInput)->getScript();
         $witnesses = $this->tx->getWitnesses();
-        $witness = array_key_exists($this->nInput, $witnesses) ? $witnesses[$this->nInput] : new ScriptWitness([]);
+        $witness = array_key_exists($this->nInput, $witnesses) ? $witnesses[$this->nInput] : new ScriptWitness();
 
         $fqs = FullyQualifiedScript::fromTxData($this->txOut->getScript(), $scriptSig, $witness, $this->signData);
         if (!$this->allowComplexScripts) {
@@ -1052,7 +1052,7 @@ class InputSigner implements InputSignerInterface
                 if ($i === $this->nInput) {
                     $witness[] = $sig->getScriptWitness();
                 } else {
-                    $witness[] = new ScriptWitness([]);
+                    $witness[] = new ScriptWitness();
                 }
             }
 
@@ -1103,7 +1103,7 @@ class InputSigner implements InputSignerInterface
      *
      * @return SigValues
      */
-    public function serializeSignatures()
+    public function serializeSignatures(): SigValues
     {
         return $this->fqs->encodeStack($this->serializeSteps());
     }

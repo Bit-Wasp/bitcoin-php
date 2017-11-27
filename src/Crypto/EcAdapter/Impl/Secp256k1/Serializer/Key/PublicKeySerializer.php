@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
@@ -37,7 +39,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
             $this->ecAdapter->getContext(),
             $serialized,
             $publicKey->getResource(),
-            $isCompressed
+            (int) $isCompressed
         )) {
             throw new \RuntimeException('Secp256k1: Failed to serialize public key');
         }
@@ -53,7 +55,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      * @param PublicKeyInterface $publicKey
      * @return BufferInterface
      */
-    public function serialize(PublicKeyInterface $publicKey)
+    public function serialize(PublicKeyInterface $publicKey): BufferInterface
     {
         /** @var PublicKey $publicKey */
         return $this->doSerialize($publicKey);
@@ -61,9 +63,9 @@ class PublicKeySerializer implements PublicKeySerializerInterface
 
     /**
      * @param \BitWasp\Buffertools\BufferInterface|string $data
-     * @return PublicKey
+     * @return PublicKeyInterface
      */
-    public function parse($data)
+    public function parse($data): PublicKeyInterface
     {
         $buffer = (new Parser($data))->getBuffer();
         $binary = $buffer->getBinary();

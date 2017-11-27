@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -32,7 +34,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     /**
      * @return EcAdapterInterface
      */
-    public function getEcAdapter()
+    public function getEcAdapter(): EcAdapterInterface
     {
         return $this->ecAdapter;
     }
@@ -40,7 +42,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     /**
      * @return Template
      */
-    private function getInnerTemplate()
+    private function getInnerTemplate(): Template
     {
         return (new TemplateFactory())
             ->uint8()
@@ -53,7 +55,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     /**
      * @return Template
      */
-    private function getOuterTemplate()
+    private function getOuterTemplate(): Template
     {
         return (new TemplateFactory())
             ->uint8()
@@ -65,7 +67,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      * @param SignatureInterface $signature
      * @return BufferInterface
      */
-    public function serialize(SignatureInterface $signature)
+    public function serialize(SignatureInterface $signature): BufferInterface
     {
         $math = $this->ecAdapter->getMath();
 
@@ -101,7 +103,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      * @return Signature
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): Signature
     {
         try {
             list (, $inner) = $this->getOuterTemplate()->parse($parser);
@@ -124,7 +126,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      * @return Signature
      * @throws ParserOutOfRange
      */
-    public function parse($string)
+    public function parse($string): Signature
     {
         $parser = new Parser($string);
         $signature = $this->fromParser($parser);

@@ -55,11 +55,11 @@ class InputSignerTest extends AbstractTestCase
         foreach ($fixtures as $fixture) {
             $txb = new TxBuilder();
             if (isset($fixture['inputs'])) {
-                $witnesses = array_fill(0, count($fixture['inputs']), new ScriptWitness([]));
+                $witnesses = array_fill(0, count($fixture['inputs']), new ScriptWitness());
                 foreach ($fixture['inputs'] as $i => $input) {
                     $txb->input(new Buffer('', 32), 0, ScriptFactory::fromHex($input['scriptSig']));
                     if (isset($input['witness'])) {
-                        $witnesses[$i] = new ScriptWitness(array_map([Buffer::class, 'hex'], $input['witness']));
+                        $witnesses[$i] = new ScriptWitness(...array_map([Buffer::class, 'hex'], $input['witness']));
                     }
                 }
                 $txb->witnesses($witnesses);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
@@ -36,7 +38,7 @@ class ProofOfWork
      * @param int $bits
      * @return \GMP
      */
-    public function getTarget($bits)
+    public function getTarget($bits): \GMP
     {
         $negative = false;
         $overflow = false;
@@ -46,7 +48,7 @@ class ProofOfWork
     /**
      * @return \GMP
      */
-    public function getMaxTarget()
+    public function getMaxTarget(): \GMP
     {
         return $this->getTarget($this->params->powBitsLimit());
     }
@@ -55,7 +57,7 @@ class ProofOfWork
      * @param int $bits
      * @return BufferInterface
      */
-    public function getTargetHash($bits)
+    public function getTargetHash(int $bits): BufferInterface
     {
         return Buffer::int(
             gmp_strval($this->getTarget($bits), 10),
@@ -68,7 +70,7 @@ class ProofOfWork
      * @param int $bits
      * @return string
      */
-    public function getDifficulty($bits)
+    public function getDifficulty(int $bits)
     {
         $target = $this->getTarget($bits);
         $lowest = $this->getMaxTarget();
@@ -87,7 +89,7 @@ class ProofOfWork
      * @param int $nBits
      * @return bool
      */
-    public function check(BufferInterface $hash, $nBits)
+    public function check(BufferInterface $hash, int $nBits): bool
     {
         $negative = false;
         $overflow = false;
@@ -109,7 +111,7 @@ class ProofOfWork
      * @return bool
      * @throws \Exception
      */
-    public function checkHeader(BlockHeaderInterface $header)
+    public function checkHeader(BlockHeaderInterface $header): bool
     {
         return $this->check($header->getHash(), $header->getBits());
     }
@@ -118,7 +120,7 @@ class ProofOfWork
      * @param int $bits
      * @return \GMP
      */
-    public function getWork($bits)
+    public function getWork(int $bits): \GMP
     {
         $target = gmp_strval($this->getTarget($bits), 10);
         return gmp_init(bcdiv(self::POW_2_256, $target), 10);

@@ -323,7 +323,7 @@ class FullyQualifiedScript
 
         return new SigValues(
             ScriptFactory::pushAll($scriptSigChunks),
-            new ScriptWitness($witness)
+            new ScriptWitness(...$witness)
         );
     }
 

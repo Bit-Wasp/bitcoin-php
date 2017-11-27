@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
@@ -29,7 +31,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      * @param PublicKey $publicKey
      * @return string
      */
-    public function getPrefix(PublicKey $publicKey)
+    public function getPrefix(PublicKey $publicKey): string
     {
         if (null === $publicKey->getPrefix()) {
             return $publicKey->isCompressed()
@@ -46,7 +48,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      * @param PublicKey $publicKey
      * @return BufferInterface
      */
-    private function doSerialize(PublicKey $publicKey)
+    private function doSerialize(PublicKey $publicKey): BufferInterface
     {
         $math = $this->ecAdapter->getMath();
         $point = $publicKey->getPoint();
@@ -65,7 +67,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      * @param PublicKeyInterface $publicKey
      * @return BufferInterface
      */
-    public function serialize(PublicKeyInterface $publicKey)
+    public function serialize(PublicKeyInterface $publicKey): BufferInterface
     {
         /** @var PublicKey $publicKey */
         return $this->doSerialize($publicKey);
@@ -73,10 +75,10 @@ class PublicKeySerializer implements PublicKeySerializerInterface
 
     /**
      * @param BufferInterface|string $data
-     * @return PublicKey
+     * @return PublicKeyInterface
      * @throws \Exception
      */
-    public function parse($data)
+    public function parse($data): PublicKeyInterface
     {
         $buffer = (new Parser($data))->getBuffer();
         if (!in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED], true)) {

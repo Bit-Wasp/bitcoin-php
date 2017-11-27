@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -38,7 +40,7 @@ class PartialMerkleTree extends Serializable
      * @param array $vHashes
      * @param array $vBits
      */
-    public function __construct($txCount = 0, array $vHashes = [], array $vBits = [])
+    public function __construct(int $txCount = 0, array $vHashes = [], array $vBits = [])
     {
         $this->elementCount = $txCount;
         $this->vHashes = $vHashes;
@@ -53,7 +55,7 @@ class PartialMerkleTree extends Serializable
      * @param array $vMatch
      * @return PartialMerkleTree
      */
-    public static function create($txCount, array $vTxHashes, array $vMatch)
+    public static function create(int $txCount, array $vTxHashes, array $vMatch)
     {
         $tree = new self($txCount);
         $tree->traverseAndBuild($tree->calcTreeHeight(), 0, $vTxHashes, $vMatch);
@@ -118,9 +120,8 @@ class PartialMerkleTree extends Serializable
      * @param \BitWasp\Buffertools\BufferInterface[] $vTxid
      * @return \BitWasp\Buffertools\BufferInterface
      */
-    public function calculateHash($height, $position, array $vTxid)
+    public function calculateHash(int $height, $position, array $vTxid)
     {
-
         if ($height === 0) {
             return $vTxid[$position];
         } else {
@@ -143,7 +144,7 @@ class PartialMerkleTree extends Serializable
      * @param array $vTxid - array of Txid's in the block
      * @param array $vMatch - reference to array to populate
      */
-    public function traverseAndBuild($height, $position, array $vTxid, array &$vMatch)
+    public function traverseAndBuild(int $height, int $position, array $vTxid, array &$vMatch)
     {
         $parent = false;
         for ($p = $position << $height; $p < ($position + 1) << $height && $p < $this->elementCount; $p++) {
@@ -172,7 +173,7 @@ class PartialMerkleTree extends Serializable
      * @param BufferInterface[] $vMatch
      * @return BufferInterface
      */
-    public function traverseAndExtract($height, $position, &$nBitsUsed, &$nHashUsed, &$vMatch)
+    public function traverseAndExtract(int $height, int $position, &$nBitsUsed, &$nHashUsed, &$vMatch): BufferInterface
     {
         if ($nBitsUsed >= count($this->vFlagBits)) {
             $this->fBad = true;
@@ -212,7 +213,7 @@ class PartialMerkleTree extends Serializable
      * @return BufferInterface - this will be the merkle root
      * @throws \Exception
      */
-    public function extractMatches(array &$vMatch)
+    public function extractMatches(array &$vMatch): BufferInterface
     {
         $nTx = $this->getTxCount();
         if (0 === $nTx) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
@@ -32,7 +34,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      * @param PrivateKey $privateKey
      * @return BufferInterface
      */
-    private function doSerialize(PrivateKey $privateKey)
+    private function doSerialize(PrivateKey $privateKey): BufferInterface
     {
         return new Buffer($privateKey->getSecretBinary(), 32, $this->ecAdapter->getMath());
     }
@@ -41,7 +43,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      * @param PrivateKeyInterface $privateKey
      * @return BufferInterface
      */
-    public function serialize(PrivateKeyInterface $privateKey)
+    public function serialize(PrivateKeyInterface $privateKey): BufferInterface
     {
         /** @var PrivateKey $privateKey */
         return $this->doSerialize($privateKey);
@@ -49,19 +51,19 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
 
     /**
      * @param Parser $parser
-     * @return PrivateKey
+     * @return PrivateKeyInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): PrivateKeyInterface
     {
         return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getGmp());
     }
 
     /**
      * @param \BitWasp\Buffertools\BufferInterface|string $data
-     * @return PrivateKey
+     * @return PrivateKeyInterface
      */
-    public function parse($data)
+    public function parse($data): PrivateKeyInterface
     {
         return $this->fromParser(new Parser($data, $this->ecAdapter->getMath()));
     }

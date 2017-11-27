@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -58,7 +60,7 @@ class HierarchicalKey
      * @param KeyInterface $key
      * @throws \Exception
      */
-    public function __construct(EcAdapterInterface $ecAdapter, $depth, $parentFingerprint, $sequence, BufferInterface $chainCode, KeyInterface $key)
+    public function __construct(EcAdapterInterface $ecAdapter, int $depth, int $parentFingerprint, int $sequence, BufferInterface $chainCode, KeyInterface $key)
     {
         if ($depth < 0 || $depth > IntRange::U8_MAX) {
             throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0 - 255] inclusive');
@@ -93,7 +95,7 @@ class HierarchicalKey
      *
      * @return int
      */
-    public function getDepth()
+    public function getDepth(): int
     {
         return $this->depth;
     }
@@ -105,7 +107,7 @@ class HierarchicalKey
      *
      * @return int
      */
-    public function getSequence()
+    public function getSequence(): int
     {
         return $this->sequence;
     }
@@ -113,9 +115,9 @@ class HierarchicalKey
     /**
      * Get the fingerprint of the parent key. For master keys, this is 00000000.
      *
-     * @return string
+     * @return int
      */
-    public function getFingerprint()
+    public function getFingerprint(): int
     {
         if ($this->getDepth() === 0) {
             return 0;
@@ -128,9 +130,10 @@ class HierarchicalKey
      * Return the fingerprint to be used for child keys.
      * @return int
      */
-    public function getChildFingerprint()
+    public function getChildFingerprint(): int
     {
-        return $this->getPublicKey()->getPubKeyHash()->slice(0, 4)->getInt();
+        $pubKeyHash = $this->getPublicKey()->getPubKeyHash();
+        return (int) $pubKeyHash->slice(0, 4)->getInt();
     }
 
     /**
@@ -237,7 +240,7 @@ class HierarchicalKey
      * @return HierarchicalKey
      * @throws \Exception
      */
-    public function deriveChild($sequence)
+    public function deriveChild(int $sequence)
     {
         $nextDepth = $this->depth + 1;
         if ($nextDepth > 255) {
@@ -277,7 +280,7 @@ class HierarchicalKey
 
         $key = $this;
         foreach ($list as $sequence) {
-            $key = $key->deriveChild($sequence);
+            $key = $key->deriveChild((int) $sequence);
         }
 
         return $key;
@@ -295,7 +298,6 @@ class HierarchicalKey
         $sequences = new HierarchicalKeySequence();
         return $this->deriveFromList($sequences->decodePath($path));
     }
-
 
     /**
      * Serializes the instance according to whether it wraps a private or public key.

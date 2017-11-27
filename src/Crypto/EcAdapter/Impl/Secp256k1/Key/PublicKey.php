@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key\PublicKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\Buffer;
@@ -53,7 +56,7 @@ class PublicKey extends Key implements PublicKeyInterface
      * @param SignatureInterface $signature
      * @return bool
      */
-    public function verify(BufferInterface $msg32, SignatureInterface $signature)
+    public function verify(BufferInterface $msg32, SignatureInterface $signature): bool
     {
         return $this->ecAdapter->verify($msg32, $this, $signature);
     }
@@ -62,12 +65,12 @@ class PublicKey extends Key implements PublicKeyInterface
      * @param PublicKey $other
      * @return bool
      */
-    private function doEquals(PublicKey $other)
+    private function doEquals(PublicKey $other): bool
     {
         $context = $this->ecAdapter->getContext();
         $pubA = '';
         $pubB = '';
-        if (!(secp256k1_ec_pubkey_serialize($context, $pubA, $this->pubkey_t, $this->compressed) && secp256k1_ec_pubkey_serialize($context, $pubB, $other->pubkey_t, $this->compressed))) {
+        if (!(secp256k1_ec_pubkey_serialize($context, $pubA, $this->pubkey_t, (int) $this->compressed) && secp256k1_ec_pubkey_serialize($context, $pubB, $other->pubkey_t, (int) $this->compressed))) {
             throw new \RuntimeException('Unable to serialize public key during equals');
         }
 
@@ -78,7 +81,7 @@ class PublicKey extends Key implements PublicKeyInterface
      * @param PublicKeyInterface $other
      * @return bool
      */
-    public function equals(PublicKeyInterface $other)
+    public function equals(PublicKeyInterface $other): bool
     {
         /** @var PublicKey $other */
         return $this->doEquals($other);
@@ -87,7 +90,7 @@ class PublicKey extends Key implements PublicKeyInterface
     /**
      * @return bool|false
      */
-    public function isCompressed()
+    public function isCompressed(): bool
     {
         return $this->compressed;
     }
@@ -108,7 +111,7 @@ class PublicKey extends Key implements PublicKeyInterface
     {
         $context = $this->ecAdapter->getContext();
         $serialized = '';
-        if (1 !== secp256k1_ec_pubkey_serialize($context, $serialized, $this->pubkey_t, $this->compressed)) {
+        if (1 !== secp256k1_ec_pubkey_serialize($context, $serialized, $this->pubkey_t, (int) $this->compressed)) {
             throw new \Exception('Secp256k1: pubkey serialize');
         }
 
@@ -123,10 +126,10 @@ class PublicKey extends Key implements PublicKeyInterface
 
     /**
      * @param \GMP $tweak
-     * @return PublicKey
+     * @return KeyInterface
      * @throws \Exception
      */
-    public function tweakAdd(\GMP $tweak)
+    public function tweakAdd(\GMP $tweak): KeyInterface
     {
         $context = $this->ecAdapter->getContext();
         $bin = Buffer::int(gmp_strval($tweak, 10), 32)->getBinary();
@@ -141,10 +144,10 @@ class PublicKey extends Key implements PublicKeyInterface
 
     /**
      * @param \GMP $tweak
-     * @return PublicKey
+     * @return KeyInterface
      * @throws \Exception
      */
-    public function tweakMul(\GMP $tweak)
+    public function tweakMul(\GMP $tweak): KeyInterface
     {
         $context = $this->ecAdapter->getContext();
         $bin = Buffer::int(gmp_strval($tweak, 10), 32)->getBinary();

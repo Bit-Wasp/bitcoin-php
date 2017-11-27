@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Mnemonic\Bip39;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -38,7 +40,7 @@ class Bip39Mnemonic implements MnemonicInterface
      * @return string
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function create($entropySize = 512)
+    public function create($entropySize = 512): string
     {
         $random = new Random();
         $entropy = $random->bytes($entropySize / 8);
@@ -51,7 +53,7 @@ class Bip39Mnemonic implements MnemonicInterface
      * @param integer $CSlen
      * @return string
      */
-    private function calculateChecksum(BufferInterface $entropy, $CSlen)
+    private function calculateChecksum(BufferInterface $entropy, int $CSlen): string
     {
         $entHash = Hash::sha256($entropy);
 
@@ -66,9 +68,9 @@ class Bip39Mnemonic implements MnemonicInterface
 
     /**
      * @param BufferInterface $entropy
-     * @return array
+     * @return string[]
      */
-    public function entropyToWords(BufferInterface $entropy)
+    public function entropyToWords(BufferInterface $entropy): array
     {
         if ($entropy->getSize() === 0) {
             throw new \InvalidArgumentException('Invalid entropy, empty');
@@ -90,8 +92,7 @@ class Bip39Mnemonic implements MnemonicInterface
 
         $result = [];
         foreach (str_split($bits, 11) as $bit) {
-            $idx = $math->baseConvert($bit, 2, 10);
-            $result[] = $this->wordList->getWord($idx);
+            $result[] = $this->wordList->getWord((int) $math->baseConvert($bit, 2, 10));
         }
 
         return $result;
@@ -101,7 +102,7 @@ class Bip39Mnemonic implements MnemonicInterface
      * @param BufferInterface $entropy
      * @return string
      */
-    public function entropyToMnemonic(BufferInterface $entropy)
+    public function entropyToMnemonic(BufferInterface $entropy): string
     {
         return implode(' ', $this->entropyToWords($entropy));
     }
@@ -110,7 +111,7 @@ class Bip39Mnemonic implements MnemonicInterface
      * @param string $mnemonic
      * @return BufferInterface
      */
-    public function mnemonicToEntropy($mnemonic)
+    public function mnemonicToEntropy($mnemonic): BufferInterface
     {
         $math = $this->ecAdapter->getMath();
         $words = explode(' ', $mnemonic);

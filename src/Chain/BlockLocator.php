@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Serializable;
@@ -42,7 +44,7 @@ class BlockLocator extends Serializable
     /**
      * @return BufferInterface[]
      */
-    public function getHashes()
+    public function getHashes(): array
     {
         return $this->hashes;
     }
@@ -50,7 +52,7 @@ class BlockLocator extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getHashStop()
+    public function getHashStop(): BufferInterface
     {
         return $this->hashStop;
     }

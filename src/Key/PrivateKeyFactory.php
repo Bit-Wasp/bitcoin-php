@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -21,7 +23,7 @@ class PrivateKeyFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyInterface
      */
-    public static function create($compressed = false, EcAdapterInterface $ecAdapter = null)
+    public static function create(bool $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         return self::fromHex(self::generateSecret(), $compressed, $ecAdapter);
@@ -52,7 +54,7 @@ class PrivateKeyFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyInterface
      */
-    public static function fromHex($hex, $compressed = false, EcAdapterInterface $ecAdapter = null)
+    public static function fromHex($hex, bool $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
 
@@ -73,7 +75,7 @@ class PrivateKeyFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyInterface
      */
-    public static function fromInt($int, $compressed = false, EcAdapterInterface $ecAdapter = null)
+    public static function fromInt($int, bool $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $secret = Buffer::int($int, 32, $ecAdapter->getMath())->getGmp();
@@ -88,7 +90,7 @@ class PrivateKeyFactory
      * @throws InvalidPrivateKey
      * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
-    public static function fromWif($wif, EcAdapterInterface $ecAdapter = null, NetworkInterface $network = null)
+    public static function fromWif(string $wif, EcAdapterInterface $ecAdapter = null, NetworkInterface $network = null)
     {
         if (null === $ecAdapter) {
             $ecAdapter = Bitcoin::getEcAdapter();

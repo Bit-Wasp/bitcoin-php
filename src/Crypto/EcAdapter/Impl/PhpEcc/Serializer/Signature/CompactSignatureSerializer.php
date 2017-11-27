@@ -9,11 +9,11 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 
 class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 {
-
     /**
      * @var EcAdapter
      */
@@ -30,7 +30,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     /**
      * @return \BitWasp\Buffertools\Template
      */
-    private function getTemplate()
+    private function getTemplate(): Template
     {
         return (new TemplateFactory())
             ->uint8()
@@ -43,7 +43,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @param CompactSignature $signature
      * @return BufferInterface
      */
-    private function doSerialize(CompactSignature $signature)
+    private function doSerialize(CompactSignature $signature): BufferInterface
     {
         return $this->getTemplate()->write([
             $signature->getFlags(),
@@ -56,7 +56,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @param CompactSignatureInterface $signature
      * @return BufferInterface
      */
-    public function serialize(CompactSignatureInterface $signature)
+    public function serialize(CompactSignatureInterface $signature): BufferInterface
     {
         /** @var CompactSignature $signature */
         return $this->doSerialize($signature);
@@ -67,7 +67,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @return CompactSignature
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): CompactSignature
     {
         $math = $this->ecAdapter->getMath();
 
@@ -89,11 +89,11 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     }
 
     /**
-     * @param $string
+     * @param BufferInterface|string $string
      * @return CompactSignature
      * @throws ParserOutOfRange
      */
-    public function parse($string)
+    public function parse($string): CompactSignatureInterface
     {
         return $this->fromParser(new Parser($string, $this->ecAdapter->getMath()));
     }

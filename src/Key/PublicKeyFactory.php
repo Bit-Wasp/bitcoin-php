@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 class PublicKeyFactory
 {
@@ -19,18 +22,17 @@ class PublicKeyFactory
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $hex
-     * @param EcAdapterInterface $ecAdapter
-     * @return PublicKey
-     * @throws \Exception
+     * @param BufferInterface|string $hex
+     * @param EcAdapterInterface|null $ecAdapter
+     * @return PublicKeyInterface
      */
-    public static function fromHex($hex, EcAdapterInterface $ecAdapter = null)
+    public static function fromHex($hex, EcAdapterInterface $ecAdapter = null): PublicKeyInterface
     {
         return self::getSerializer($ecAdapter)->parse($hex);
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $hex
+     * @param BufferInterface|string $hex
      * @param EcAdapterInterface|null $ecAdapter
      * @return bool
      */

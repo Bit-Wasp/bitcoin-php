@@ -10,11 +10,11 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
     public function getSequenceVectors()
     {
         return [
-            ['0', '0'],
-            ['0h', '2147483648'],
-            ["0'", '2147483648'],
-            ['1h', '2147483649'],
-            ['2147483647h', '4294967295'],
+            ['0', 0],
+            ['0h', 2147483648],
+            ["0'", 2147483648],
+            ['1h', 2147483649],
+            ['2147483647h', 4294967295],
         ];
     }
 

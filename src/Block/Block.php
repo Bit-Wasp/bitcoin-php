@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Bloom\BloomFilter;
@@ -9,6 +11,7 @@ use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 class Block extends Serializable implements BlockInterface
 {
@@ -37,20 +40,18 @@ class Block extends Serializable implements BlockInterface
      * @param BlockHeaderInterface $header
      * @param TransactionInterface[] $transactions
      */
-    public function __construct(Math $math, BlockHeaderInterface $header, array $transactions)
+    public function __construct(Math $math, BlockHeaderInterface $header, TransactionInterface ...$transactions)
     {
         $this->math = $math;
         $this->header = $header;
-        $this->transactions = array_map(function (TransactionInterface $tx) {
-            return $tx;
-        }, $transactions);
+        $this->transactions = $transactions;
     }
 
     /**
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getHeader()
      */
-    public function getHeader()
+    public function getHeader(): BlockHeaderInterface
     {
         return $this->header;
     }
@@ -60,7 +61,7 @@ class Block extends Serializable implements BlockInterface
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getMerkleRoot()
      * @throws \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      */
-    public function getMerkleRoot()
+    public function getMerkleRoot(): BufferInterface
     {
         if (null === $this->merkleRoot) {
             $this->merkleRoot = new MerkleRoot($this->math, $this->getTransactions());
@@ -73,16 +74,17 @@ class Block extends Serializable implements BlockInterface
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransactions()
      * @return TransactionInterface[]
      */
-    public function getTransactions()
+    public function getTransactions(): array
     {
         return $this->transactions;
     }
 
     /**
+     * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransaction()
      * @param int $i
-     * @return \BitWasp\Bitcoin\Transaction\TransactionInterface
+     * @return TransactionInterface
      */
-    public function getTransaction($i)
+    public function getTransaction($i): TransactionInterface
     {
         return $this->transactions[$i];
     }
@@ -91,7 +93,7 @@ class Block extends Serializable implements BlockInterface
      * @param BloomFilter $filter
      * @return FilteredBlock
      */
-    public function filter(BloomFilter $filter)
+    public function filter(BloomFilter $filter): FilteredBlock
     {
         $vMatch = [];
         $vHashes = [];

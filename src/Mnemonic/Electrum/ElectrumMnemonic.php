@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Mnemonic\Electrum;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -31,10 +33,10 @@ class ElectrumMnemonic implements MnemonicInterface
 
     /**
      * @param BufferInterface $entropy
-     * @return array
+     * @return string[]
      * @throws \Exception
      */
-    public function entropyToWords(BufferInterface $entropy)
+    public function entropyToWords(BufferInterface $entropy): array
     {
         $math = $this->ecAdapter->getMath();
         $n = gmp_init(count($this->wordList), 10);
@@ -47,9 +49,9 @@ class ElectrumMnemonic implements MnemonicInterface
             $index2 = $math->mod($math->add($math->div($x, $n), $index1), $n);
             $index3 = $math->mod($math->add($math->div($math->div($x, $n), $n), $index2), $n);
 
-            $wordArray[] = $this->wordList->getWord(gmp_strval($index1, 10));
-            $wordArray[] = $this->wordList->getWord(gmp_strval($index2, 10));
-            $wordArray[] = $this->wordList->getWord(gmp_strval($index3, 10));
+            $wordArray[] = $this->wordList->getWord((int) gmp_strval($index1, 10));
+            $wordArray[] = $this->wordList->getWord((int) gmp_strval($index2, 10));
+            $wordArray[] = $this->wordList->getWord((int) gmp_strval($index3, 10));
         }
 
         return $wordArray;
@@ -59,7 +61,7 @@ class ElectrumMnemonic implements MnemonicInterface
      * @param BufferInterface $entropy
      * @return string
      */
-    public function entropyToMnemonic(BufferInterface $entropy)
+    public function entropyToMnemonic(BufferInterface $entropy): string
     {
         return implode(' ', $this->entropyToWords($entropy));
     }
@@ -68,7 +70,7 @@ class ElectrumMnemonic implements MnemonicInterface
      * @param string $mnemonic
      * @return BufferInterface
      */
-    public function mnemonicToEntropy($mnemonic)
+    public function mnemonicToEntropy(string $mnemonic): BufferInterface
     {
         $math = $this->ecAdapter->getMath();
         $wordList = $this->wordList;

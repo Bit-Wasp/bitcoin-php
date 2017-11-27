@@ -217,7 +217,7 @@ class Interpreter implements InterpreterInterface
     {
         static $emptyWitness = null;
         if ($emptyWitness === null) {
-            $emptyWitness = new ScriptWitness([]);
+            $emptyWitness = new ScriptWitness();
         }
 
         $witness = is_null($witness) ? $emptyWitness : $witness;
