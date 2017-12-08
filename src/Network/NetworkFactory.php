@@ -220,4 +220,32 @@ class NetworkFactory
 
         return $network;
     }
+    
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function pivx()
+    {
+        $network = self::create('1e', '0d', 'd4')
+            ->setHDPubByte('022d2533')
+            ->setHDPrivByte('0221312b')
+            ->setNetMagicBytes('e9fdc490');
+
+        return $network;
+    }
+    
+    /**
+     * @return NetworkInterface
+     * @throws \Exception
+     */
+    public static function pivxTestnet()
+    {
+        $network = self::create('1e', '0d', 'd4', true)
+            ->setHDPubByte('022d2533')
+            ->setHDPrivByte('0221312b')
+            ->setNetMagicBytes('e9fdc490');
+
+        return $network;
+    }
 }
