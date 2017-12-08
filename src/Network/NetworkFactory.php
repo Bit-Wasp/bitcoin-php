@@ -227,7 +227,7 @@ class NetworkFactory
      */
     public static function pivx()
     {
-        $network = self::create('1e', '0d', 'd4', true)
+        $network = self::create('1e', '0d', 'd4')
             ->setHDPubByte('022d2533')
             ->setHDPrivByte('0221312b')
             ->setNetMagicBytes('e9fdc490');
