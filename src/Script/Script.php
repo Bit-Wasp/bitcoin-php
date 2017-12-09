@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
+use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Parser\Parser;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
@@ -217,16 +218,31 @@ class Script extends Serializable implements ScriptInterface
     }
 
     /**
+     * @param array|null $ops
      * @return bool
      */
-    public function isPushOnly()
+    public function isPushOnly(array&$ops = null)
     {
-        foreach ($this->getScriptParser()->decode() as $entity) {
+        $decoded = $this->getScriptParser()->decode();
+        $data = [];
+        foreach ($decoded as $entity) {
             if ($entity->getOp() > Opcodes::OP_16) {
                 return false;
             }
-        }
 
+            if ($entity->getOp() === 0) {
+                $data[] = new Buffer();
+                continue;
+            }
+
+            $op = $entity->getOp();
+            if ($op >= Opcodes::OP_1 && $op <= Opcodes::OP_16) {
+                $data[] = Number::int(decodeOpN($op))->getBuffer();
+            } else {
+                $data[] = $entity->getData();
+            }
+        }
+        $ops = $data;
         return true;
     }
 

@@ -41,6 +41,34 @@ class ScriptFactory
     }
 
     /**
+     * Create a script consisting only of push-data operations.
+     * Suitable for a scriptSig.
+     *
+     * @param BufferInterface[] $buffers
+     * @return ScriptInterface
+     */
+    public static function pushAll(array $buffers)
+    {
+        return self::sequence(array_map(function ($buffer) {
+            if (!($buffer instanceof BufferInterface)) {
+                throw new \RuntimeException('Script contained a non-push opcode');
+            }
+
+            $size = $buffer->getSize();
+            if ($size === 0) {
+                return Opcodes::OP_0;
+            }
+
+            $first = ord($buffer->getBinary()[0]);
+            if ($size === 1 && $first >= 1 && $first <= 16) {
+                return \BitWasp\Bitcoin\Script\encodeOpN($first);
+            } else {
+                return $buffer;
+            }
+        }, $buffers));
+    }
+
+    /**
      * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return ScriptInterface
      */

@@ -1381,7 +1381,7 @@
     },
     {
       "exception": {
-        "type": "\\RuntimeException",
+        "type": "\\BitWasp\\Bitcoin\\Exceptions\\ScriptHashMismatch",
         "message": "Redeem script fails to solve pay-to-script-hash"
       },
       "txOut": {
@@ -1400,7 +1400,7 @@
     {
       "description": "Unsupported P2SH scripts are rejected",
       "exception": {
-        "type": "\\RuntimeException",
+        "type": "\\BitWasp\\Bitcoin\\Exceptions\\UnsupportedScript",
         "message": "Unsupported pay-to-script-hash script"
       },
       "txOut": {
@@ -1419,7 +1419,7 @@
     {
       "description": "Unsupported P2WSH scripts are rejected",
       "exception": {
-        "type": "\\RuntimeException",
+        "type": "\\BitWasp\\Bitcoin\\Exceptions\\UnsupportedScript",
         "message": "Unsupported witness-script-hash script"
       },
       "txOut": {
@@ -1438,8 +1438,8 @@
     {
       "description": "Unsupported P2SH|P2WSH scripts are rejected",
       "exception": {
-        "type": "\\RuntimeException",
-        "message": "Witness script fails to solve witness-script-hash"
+        "type": "\\BitWasp\\Bitcoin\\Exceptions\\ScriptHashMismatch",
+        "message": "Witness script does not match witness program in redeemScript"
       },
       "txOut": {
         "value": "1",

@@ -29,9 +29,13 @@ interface ScriptInterface extends SerializableInterface
     public function getOpcodes();
 
     /**
+     * Returns boolean indicating whether script
+     * was push only. If true, $ops is populated
+     * with the contained buffers
+     * @param array $ops
      * @return bool
      */
-    public function isPushOnly();
+    public function isPushOnly(array &$ops = null);
 
     /**
      * @param WitnessProgram|null $witness

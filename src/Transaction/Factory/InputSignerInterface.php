@@ -5,6 +5,7 @@ namespace BitWasp\Bitcoin\Transaction\Factory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
+use BitWasp\Bitcoin\Script\FullyQualifiedScript;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Buffertools\BufferInterface;
@@ -55,49 +56,15 @@ interface InputSignerInterface
     public function getPublicKeys();
 
     /**
-     * OutputData for the script to be signed (will be
-     * equal to getScriptPubKey, or getRedeemScript, or
-     * getWitnessScript.
-     *
-     * @return OutputData
-     */
-    public function getSignScript();
-
-    /**
      * OutputData for the txOut script.
      *
-     * @return OutputData
+     * @return FullyQualifiedScript
      */
-    public function getScriptPubKey();
+    public function getInputScripts();
 
     /**
-     * Returns OutputData for the P2SH redeemScript.
-     *
-     * @return OutputData
+     * @return mixed
      */
-    public function getRedeemScript();
-
-    /**
-     * Returns OutputData for the P2WSH witnessScript.
-     *
-     * @return OutputData
-     */
-    public function getWitnessScript();
-
-    /**
-     * Returns whether the scriptPubKey is P2SH.
-     *
-     * @return bool
-     */
-    public function isP2SH();
-
-    /**
-     * Returns whether the scriptPubKey or redeemScript is P2WSH.
-     *
-     * @return bool
-     */
-    public function isP2WSH();
-
     public function getSteps();
 
     /**
