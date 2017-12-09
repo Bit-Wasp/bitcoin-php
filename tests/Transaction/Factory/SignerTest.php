@@ -151,31 +151,35 @@ class SignerTest extends AbstractTestCase
             $this->assertFalse($inSigner->isFullySigned());
             $this->assertFalse($inSigner->verify());
 
-            $this->assertEquals($signData->hasRedeemScript(), $inSigner->isP2SH());
-            $this->assertEquals($signData->hasWitnessScript(), $inSigner->isP2WSH());
+            $inputScripts = $inSigner->getInputScripts();
+            $this->assertEquals($signData->hasRedeemScript(), $inputScripts->isP2SH());
+            $this->assertEquals($signData->hasWitnessScript(), $inputScripts->isP2WSH());
 
             // in default mode, signScript is always set and always canSign(),
             // implicitly meaning it can never contain a script-hash type
-            $this->assertTrue($inSigner->getSignScript() instanceof OutputData);
-            $this->assertTrue($inSigner->getSignScript()->canSign());
-            $this->assertNotEquals(ScriptType::P2SH, $inSigner->getSignScript());
-            $this->assertNotEquals(ScriptType::P2WSH, $inSigner->getSignScript());
+            $signScript = $inputScripts->signScript();
+            $this->assertTrue($signScript instanceof OutputData);
+            $this->assertTrue($signScript->canSign());
+            $this->assertNotEquals(ScriptType::P2SH, $signScript->getType());
+            $this->assertNotEquals(ScriptType::P2WSH, $signScript->getType());
 
+            $scriptPubKey = $inputScripts->scriptPubKey();
             // Check some of the script-hash constraints
             if ($signData->hasRedeemScript()) {
-                $this->assertEquals(ScriptType::P2SH, $inSigner->getScriptPubKey()->getType());
+                $this->assertEquals(ScriptType::P2SH, $scriptPubKey->getType());
+                $redeemScript = $inputScripts->redeemScript();
                 // hash in spk matches hash160(rs)
-                $this->assertTrue($inSigner->getRedeemScript()->getScript()->getScriptHash()->equals($inSigner->getScriptPubKey()->getSolution()));
+                $this->assertTrue($redeemScript->getScript()->getScriptHash()->equals($scriptPubKey->getSolution()));
 
                 if ($signData->hasWitnessScript()) {
-                    $this->assertEquals(ScriptType::P2WSH, $inSigner->getRedeemScript()->getType());
+                    $this->assertEquals(ScriptType::P2WSH, $redeemScript->getType());
                     // redeem script solution is the witness script hash
-                    $this->assertTrue($inSigner->getWitnessScript()->getScript()->getWitnessScriptHash()->equals($inSigner->getRedeemScript()->getSolution()));
+                    $this->assertTrue($inputScripts->witnessScript()->getScript()->getWitnessScriptHash()->equals($redeemScript->getSolution()));
                 }
             } else if ($signData->hasWitnessScript()) {
-                $this->assertEquals(ScriptType::P2WSH, $inSigner->getScriptPubKey()->getType());
+                $this->assertEquals(ScriptType::P2WSH, $scriptPubKey->getType());
                 // spk solution is the witness script hash
-                $this->assertTrue($inSigner->getWitnessScript()->getScript()->getWitnessScriptHash()->equals($inSigner->getScriptPubKey()->getSolution()));
+                $this->assertTrue($inputScripts->witnessScript()->getScript()->getWitnessScriptHash()->equals($scriptPubKey->getSolution()));
             }
 
             foreach ($signSteps as $keyAndHashType) {
@@ -205,6 +209,7 @@ class SignerTest extends AbstractTestCase
         }
 
         $recovered = new Signer($signed);
+
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {
             $origSigner = $signer->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
             $inSigner = $recovered->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);

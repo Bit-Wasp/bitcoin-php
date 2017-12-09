@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Script\WitnessScript;
 
 class SignData
 {
@@ -32,6 +33,9 @@ class SignData
      */
     public function p2sh(ScriptInterface $redeemScript)
     {
+        if ($redeemScript instanceof WitnessScript) {
+            throw new \InvalidArgumentException("Cannot pass WitnessScript as a redeemScript");
+        }
         $this->redeemScript = $redeemScript;
         return $this;
     }
