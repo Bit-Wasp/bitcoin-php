@@ -2,220 +2,240 @@
 
 namespace BitWasp\Bitcoin\Network;
 
+use BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter;
+use BitWasp\Bitcoin\Exceptions\MissingBase58Prefix;
+use BitWasp\Bitcoin\Exceptions\MissingBech32Prefix;
+use BitWasp\Bitcoin\Exceptions\MissingBip32Prefix;
+use BitWasp\Bitcoin\Exceptions\MissingNetworkParameter;
+
 class Network implements NetworkInterface
 {
-    /**
-     * @var string
-     */
-    private $addressByte;
+    const BECH32_PREFIX_SEGWIT = "segwit";
+
+    const BASE58_ADDRESS_P2PKH = "p2pkh";
+    const BASE58_ADDRESS_P2SH = "p2sh";
+    const BASE58_WIF = "wif";
+    const BIP32_PREFIX_XPUB = "xpub";
+    const BIP32_PREFIX_XPRV = "xprv";
 
     /**
-     * @var string
+     * @var array map of base58 address type to byte
      */
-    private $privByte;
+    protected $base58PrefixMap = [];
 
     /**
-     * @var string
+     * @var array map of bech32 address type to HRP
      */
-    private $p2shByte;
+    protected $bech32PrefixMap = [];
 
     /**
-     * @var bool
+     * @var array map of bip32 type to bytes
      */
-    private $testnet;
+    protected $bip32PrefixMap = [];
 
     /**
-     * @var null|string
+     * @var array map of bip32 key type to script type
      */
-    private $xpubByte;
+    protected $bip32ScriptTypeMap = [];
 
     /**
-     * @var null|string
+     * @var string - message prefix for bitcoin signed messages
      */
-    private $xprivByte;
+    protected $signedMessagePrefix;
 
     /**
-     * @var string
+     * @var string - 4 bytes for p2p magic
      */
-    private $netMagicBytes;
+    protected $p2pMagic;
 
     /**
-     * @var null|string
+     * @param string $field - name of field being validated
+     * @param mixed $value - we check this value
+     * @param int $length - length we require
+     * @throws InvalidNetworkParameter
      */
-    private $segwitAddrPrefix;
-
-    /**
-     * Load basic data, throw exception if it's not provided
-     *
-     * @param string $addressByte
-     * @param string $p2shByte
-     * @param string $privByte
-     * @param bool $testnet
-     * @throws \Exception
-     */
-    public function __construct($addressByte, $p2shByte, $privByte, $testnet = false)
+    private function validateHexString($field, $value, $length)
     {
-        if (!(ctype_xdigit($addressByte) && strlen($addressByte) === 2)) {
-            throw new \InvalidArgumentException('address byte must be 1 hexadecimal byte');
+        if (!is_string($value) || strlen($value) !== 2 * $length) {
+            throw new InvalidNetworkParameter("{$field} must be a {$length} byte hex string");
         }
 
-        if (!(ctype_xdigit($p2shByte) && strlen($p2shByte) === 2)) {
-            throw new \InvalidArgumentException('p2sh byte must be 1 hexadecimal byte');
+        if (!ctype_xdigit($value)) {
+            throw new InvalidNetworkParameter("{$field} prefix must be a valid hex string");
+        }
+    }
+
+    /**
+     * Network constructor.
+     * @throws InvalidNetworkParameter
+     */
+    public function __construct()
+    {
+        if (null !== $this->p2pMagic) {
+            $this->validateHexString("P2P magic", $this->p2pMagic, 4);
         }
 
-        if (!(ctype_xdigit($privByte) && strlen($privByte) === 2)) {
-            throw new \InvalidArgumentException('priv byte must be 1 hexadecimal byte');
+        foreach ($this->base58PrefixMap as $type => $byte) {
+            $this->validateHexString("{$type} base58 prefix", $byte, 1);
         }
 
-        if (!is_bool($testnet)) {
-            throw new \InvalidArgumentException('Testnet parameter must be a boolean');
+        foreach ($this->bip32PrefixMap as $type => $bytes) {
+            $this->validateHexString("{$type} bip32 prefix", $bytes, 4);
         }
 
-        $this->addressByte = $addressByte;
-        $this->p2shByte = $p2shByte;
-        $this->privByte = $privByte;
-        $this->testnet = $testnet;
+        if (count($this->bip32ScriptTypeMap) !== count($this->bip32PrefixMap)) {
+            throw new InvalidNetworkParameter("BIP32 prefixes not configured correctly");
+        }
     }
 
     /**
-     * @inheritdoc
+     * @param string $prefixType
+     * @return bool
      */
-    public function isTestnet()
+    protected function hasBase58Prefix($prefixType)
     {
-        return $this->testnet;
+        return array_key_exists($prefixType, $this->base58PrefixMap);
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getAddressByte()
-    {
-        return $this->addressByte;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getPrivByte()
-    {
-        return $this->privByte;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getP2shByte()
-    {
-        return $this->p2shByte;
-    }
-
-    /**
-     * Get version bytes for XPUB key
-     *
+     * @param string $prefixType
      * @return string
-     * @throws \Exception
+     * @throws MissingBase58Prefix
      */
-    public function getHDPubByte()
+    protected function getBase58Prefix($prefixType)
     {
-        if ($this->xpubByte === null) {
-            throw new \Exception('No HD xpub byte was set');
+        if (!$this->hasBase58Prefix($prefixType)) {
+            throw new MissingBase58Prefix();
         }
-
-        return $this->xpubByte;
+        return $this->base58PrefixMap[$prefixType];
     }
 
     /**
-     * Set version bytes for XPUB key
-     *
-     * @param string $bytes
-     * @return $this
+     * @param string $prefixType
+     * @return bool
      */
-    public function setHDPubByte($bytes)
+    protected function hasBech32Prefix($prefixType)
     {
-        if (strlen($bytes) === 8 && ctype_xdigit($bytes) === true) {
-            $this->xpubByte = $bytes;
-        }
-
-        return $this;
+        return array_key_exists($prefixType, $this->bech32PrefixMap);
     }
 
     /**
-     * Get version bytes for XPRIV key
-     *
+     * @param string $prefixType
      * @return string
-     * @throws \Exception
+     * @throws MissingBech32Prefix
      */
-    public function getHDPrivByte()
+    protected function getBech32Prefix($prefixType)
     {
-        if ($this->xprivByte === null) {
-            throw new \Exception('No HD xpriv byte was set');
+        if (!$this->hasBech32Prefix($prefixType)) {
+            throw new MissingBech32Prefix();
         }
-
-        return $this->xprivByte;
+        return $this->bech32PrefixMap[$prefixType];
     }
 
     /**
-     * Set version bytes for XPRIV key
-     *
-     * @param string $bytes
-     * @return $this
+     * @param string $prefixType
+     * @return bool
      */
-    public function setHDPrivByte($bytes)
+    protected function hasBip32Prefix($prefixType)
     {
-        if (strlen($bytes) === 8 && ctype_xdigit($bytes) === true) {
-            $this->xprivByte = $bytes;
-        }
-
-        return $this;
+        return array_key_exists($prefixType, $this->bip32PrefixMap);
     }
 
     /**
-     * @param string $bytes
-     * @return $this
+     * @param $prefixType
+     * @return mixed
+     * @throws MissingBip32Prefix
      */
-    public function setNetMagicBytes($bytes)
+    protected function getBip32Prefix($prefixType)
     {
-        $this->netMagicBytes = $bytes;
-        return $this;
+        if (!$this->hasBip32Prefix($prefixType)) {
+            throw new MissingBip32Prefix();
+        }
+        return $this->bip32PrefixMap[$prefixType];
     }
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws MissingNetworkParameter
+     * @see NetworkInterface::getSignedMessageMagic
+     */
+    public function getSignedMessageMagic()
+    {
+        if (null === $this->signedMessagePrefix) {
+            throw new MissingNetworkParameter("Missing magic string for signed message");
+        }
+        return $this->signedMessagePrefix;
+    }
+
+    /**
+     * @return string
+     * @throws MissingNetworkParameter
+     * @see NetworkInterface::getNetMagicBytes()
      */
     public function getNetMagicBytes()
     {
-        if ($this->netMagicBytes === null) {
-            throw new \Exception('No network magic bytes were set');
+        if (null === $this->p2pMagic) {
+            throw new MissingNetworkParameter("Missing network magic bytes");
         }
-
-        return $this->netMagicBytes;
+        return $this->p2pMagic;
     }
 
     /**
-     * @param string $hrp
-     * @return $this
+     * @return string
+     * @throws MissingBase58Prefix
      */
-    public function setSegwitBech32Prefix($hrp)
+    public function getPrivByte()
     {
-        if ($hrp !== strtoupper($hrp) && $hrp !== strtolower($hrp)) {
-            throw new \RuntimeException("Bech32 prefix for segwit address contains mixed case characters");
-        }
-
-        $this->segwitAddrPrefix = $hrp;
-        return $this;
+        return $this->getBase58Prefix(self::BASE58_WIF);
     }
 
     /**
-     * @return bool
-     * @throws \Exception
+     * @return string
+     * @throws MissingBase58Prefix
+     * @see NetworkInterface::getAddressByte()
+     */
+    public function getAddressByte()
+    {
+        return $this->getBase58Prefix(self::BASE58_ADDRESS_P2PKH);
+    }
+
+    /**
+     * @return string
+     * @throws MissingBase58Prefix
+     * @see NetworkInterface::getP2shByte()
+     */
+    public function getP2shByte()
+    {
+        return $this->getBase58Prefix(self::BASE58_ADDRESS_P2SH);
+    }
+
+    /**
+     * @return mixed|string
+     * @throws MissingBip32Prefix
+     * @see NetworkInterface::getHDPubByte()
+     */
+    public function getHDPubByte()
+    {
+        return $this->getBip32Prefix(self::BIP32_PREFIX_XPUB);
+    }
+
+    /**
+     * @return mixed|string
+     * @throws MissingBip32Prefix
+     * @see NetworkInterface::getHDPrivByte()
+     */
+    public function getHDPrivByte()
+    {
+        return $this->getBip32Prefix(self::BIP32_PREFIX_XPRV);
+    }
+
+    /**
+     * @return string
+     * @throws MissingBech32Prefix
+     * @see NetworkInterface::getSegwitBech32Prefix()
      */
     public function getSegwitBech32Prefix()
     {
-        if ($this->segwitAddrPrefix === null) {
-            throw new \Exception("No bech32 prefix for segwit addresses set");
-        }
-
-        return $this->segwitAddrPrefix;
+        return $this->getBech32Prefix(self::BECH32_PREFIX_SEGWIT);
     }
 }

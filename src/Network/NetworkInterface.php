@@ -11,6 +11,19 @@ interface NetworkInterface
      */
     public function getAddressByte();
 
+    /**
+     * Return the string that binds address signed messages to
+     * this network
+     *
+     * @return string
+     */
+    public function getSignedMessageMagic();
+
+    /**
+     * Returns the segwit bech32 prefix
+     *
+     * @return string
+     */
     public function getSegwitBech32Prefix();
 
     /**
@@ -26,13 +39,6 @@ interface NetworkInterface
      * @return string
      */
     public function getPrivByte();
-
-    /**
-     * Check if the network is testnet
-     *
-     * @return bool
-     */
-    public function isTestnet();
 
     /**
      * Return the HD public bytes for this network
