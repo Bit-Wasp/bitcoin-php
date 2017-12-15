@@ -7,7 +7,6 @@ use BitWasp\Bitcoin\Chain\ParamsInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use Mdanter\Ecc\EccFactory;
@@ -109,7 +108,7 @@ class Bitcoin
     }
 
     /**
-     * @return Network
+     * @return NetworkInterface
      */
     public static function getNetwork()
     {
