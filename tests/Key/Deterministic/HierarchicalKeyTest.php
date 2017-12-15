@@ -10,8 +10,9 @@ use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Network\Network;
+use BitWasp\Bitcoin\Network\BitcoinNetwork;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Network\Networks\BitcoinTestnet;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -21,7 +22,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 {
 
     /**
-     * @var Network
+     * @var BitcoinNetwork
      */
     protected $network;
 
@@ -196,26 +197,13 @@ class HierarchicalKeyTest extends AbstractTestCase
     }
 
     /**
-     * This tests that a network always must have the HD priv/pub bytes
-     * @expectedException \Exception
-     */
-    public function testCreateWithInvalidNetworkHDBytes()
-    {
-        $network = new Network('ff', 'ff', 'ff');
-        $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
-        HierarchicalKeyFactory::fromExtended($key, $network);
-    }
-
-    /**
      * This tests if the key being decoded has bytes which match the network.
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage  HD key magic bytes do not match network magic bytes
      */
     public function testCreateWithInvalidNetwork()
     {
-        $network = NetworkFactory::create('ff', 'ff', 'ff')
-            ->setHDPrivByte('ffffffff')
-            ->setHDPubByte('ffffffff');
+        $network = new BitcoinTestnet();
 
         $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
         HierarchicalKeyFactory::fromExtended($key, $network);
