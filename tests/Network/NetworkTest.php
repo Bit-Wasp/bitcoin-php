@@ -215,8 +215,8 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals(NetworkFactory::dash()->getP2shByte(), '10');
         $this->assertEquals(NetworkFactory::dash()->getPrivByte(), 'cc');
         $this->assertEquals(NetworkFactory::dash()->isTestnet(), false);
-        $this->assertEquals(NetworkFactory::dash()->getHDPrivByte(), '02fe52cc');
-        $this->assertEquals(NetworkFactory::dash()->getHDPubByte(), '02fe52f8');
+        $this->assertEquals(NetworkFactory::dash()->getHDPrivByte(), '0488ade4');
+        $this->assertEquals(NetworkFactory::dash()->getHDPubByte(), '0488b21e');
         $this->assertEquals(NetworkFactory::dash()->getNetMagicBytes(), 'bd6b0cbf');
         $this->assertEquals('7X7VPCbTMLvUSjhMo3vdqKb8eNrccxgkJ1', $p2sh->getAddress(NetworkFactory::dash()));
         $this->assertEquals('XbKZStn8KGzRUsSr5wiq18A3VUyD7pdKXX', $p2pk->getAddress(NetworkFactory::dash()));
@@ -226,8 +226,8 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals(NetworkFactory::dashTestnet()->getP2shByte(), '13');
         $this->assertEquals(NetworkFactory::dashTestnet()->getPrivByte(), 'ef');
         $this->assertEquals(NetworkFactory::dashTestnet()->isTestnet(), true);
-        $this->assertEquals(NetworkFactory::dashTestnet()->getHDPrivByte(), '3a805837');
-        $this->assertEquals(NetworkFactory::dashTestnet()->getHDPubByte(), '3a8061a0');
+        $this->assertEquals(NetworkFactory::dashTestnet()->getHDPrivByte(), '04358394');
+        $this->assertEquals(NetworkFactory::dashTestnet()->getHDPubByte(), '043587CF');
         $this->assertEquals(NetworkFactory::dashTestnet()->getNetMagicBytes(), 'ffcae2ce');
         $this->assertEquals('8j8JLXVKUtK6u37csJvbHhQVXtdSmwYhAb', $p2sh->getAddress(NetworkFactory::dashTestnet()));
         $this->assertEquals('xwcZUjZH3eBd1BEJdNhuZ2Jc9GCduoV5cV', $p2pk->getAddress(NetworkFactory::dashTestnet()));
