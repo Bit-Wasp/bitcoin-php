@@ -199,8 +199,8 @@ class NetworkFactory
     public static function dash()
     {
         $network = self::create('4c', '10', 'cc')
-            ->setHDPubByte('02fe52f8')
-            ->setHDPrivByte('02fe52cc')
+            ->setHDPubByte('0488b21e')
+            ->setHDPrivByte('0488ade4')
             ->setNetMagicBytes('bd6b0cbf');
 
         return $network;
@@ -214,8 +214,8 @@ class NetworkFactory
     public static function dashTestnet()
     {
         $network = self::create('8b', '13', 'ef', true)
-            ->setHDPubByte('3a8061a0')
-            ->setHDPrivByte('3a805837')
+            ->setHDPubByte('043587CF')
+            ->setHDPrivByte('04358394')
             ->setNetMagicBytes('ffcae2ce');
 
         return $network;
