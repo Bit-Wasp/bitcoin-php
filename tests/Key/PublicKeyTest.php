@@ -107,10 +107,13 @@ class PublicKeyTest extends AbstractTestCase
         $results = [];
 
         foreach ($json->test as $test) {
-            $results[] = [
-                $test->key,
-                $test->hash
-            ];
+            foreach ($this->getEcAdapters() as $ecAdapterFixture) {
+                $results[] = [
+                    $ecAdapterFixture[0],
+                    $test->key,
+                    $test->hash
+                ];
+            }
         }
         
         return $results;
@@ -121,11 +124,11 @@ class PublicKeyTest extends AbstractTestCase
      * @param string $eKey - hex public key
      * @param string $eHash - hex sha256ripemd160 of public key
      */
-    public function testPubKeyHash($eKey, $eHash)
+    public function testPubKeyHash(EcAdapterInterface $ecAdapter, $eKey, $eHash)
     {
         $this->assertSame(
             $eHash,
-            PublicKeyFactory::fromHex($eKey)
+            PublicKeyFactory::fromHex($eKey, $ecAdapter)
                 ->getPubKeyHash()
                 ->getHex()
         );

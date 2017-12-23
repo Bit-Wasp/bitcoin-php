@@ -9,7 +9,8 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 
 require __DIR__ . "/../vendor/autoload.php";
 
-function toAddress(HierarchicalKey $key, $purpose) {
+function toAddress(HierarchicalKey $key, $purpose)
+{
     switch ($purpose) {
         case 44:
             $script = ScriptFactory::scriptPubKey()->p2pkh($key->getPublicKey()->getPubKeyHash());

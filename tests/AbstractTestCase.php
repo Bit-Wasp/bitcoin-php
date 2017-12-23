@@ -127,10 +127,10 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $math = new Math;
         $generator = EccFactory::getSecgCurves()->generator256k1();
         $adapters = [];
-
-        $adapters[] = [(extension_loaded('secp256k1')
-            ? EcAdapterFactory::getSecp256k1($math, $generator)
-            : EcAdapterFactory::getPhpEcc($math, $generator))];
+        $adapters[] = [EcAdapterFactory::getPhpEcc($math, $generator)];
+        if (extension_loaded('secp256k1')) {
+            $adapters[] = [EcAdapterFactory::getSecp256k1($math, $generator)];
+        }
 
         return $adapters;
     }

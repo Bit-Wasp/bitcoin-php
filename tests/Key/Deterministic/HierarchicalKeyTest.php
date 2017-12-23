@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -131,32 +130,38 @@ class HierarchicalKeyTest extends AbstractTestCase
         }
     }
 
-    public function testDerivePath()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     * @throws \Exception
+     */
+    public function testDerivePath(EcAdapterInterface $ecAdapter)
     {
+        $network = NetworkFactory::bitcoin();
         $entropy = Buffer::hex("000102030405060708090a0b0c0d0e0f");
-        $masterKey = HierarchicalKeyFactory::fromEntropy($entropy);
-        $this->assertEquals("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi", $masterKey->toExtendedKey());
+        $masterKey = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
+        $this->assertEquals("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi", $masterKey->toExtendedKey($network));
 
         $firstChildKey = $masterKey->derivePath("0");
-        $this->assertEquals("xprv9uHRZZhbkedL37eZEnyrNsQPFZYRAvjy5rt6M1nbEkLSo378x1CQQLo2xxBvREwiK6kqf7GRNvsNEchwibzXaV6i5GcsgyjBeRguXhKsi4R", $firstChildKey->toExtendedKey());
+        $this->assertEquals("xprv9uHRZZhbkedL37eZEnyrNsQPFZYRAvjy5rt6M1nbEkLSo378x1CQQLo2xxBvREwiK6kqf7GRNvsNEchwibzXaV6i5GcsgyjBeRguXhKsi4R", $firstChildKey->toExtendedKey($network));
 
         $bip44ChildKey = $masterKey->derivePath("44'/0'/0'/0/0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey());
+        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in 2 steps
         $bip44ChildKey = $masterKey->derivePath("44'/0'");
         $bip44ChildKey = $bip44ChildKey->derivePath("0'/0/0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey());
+        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in 2 steps
         $bip44ChildKey = $masterKey->derivePath("44'/0'/0'");
         $bip44ChildKey = $bip44ChildKey->derivePath("0/0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey());
+        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in 2 steps
         $bip44ChildKey = $masterKey->derivePath("44'/0'/0'/0");
         $bip44ChildKey = $bip44ChildKey->derivePath("0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey());
+        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
 
         // get the "m/44'/0'/0'/0/0" derivation, in single steps
         $bip44ChildKey = $masterKey->derivePath("44'");
@@ -164,7 +169,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $bip44ChildKey = $bip44ChildKey->derivePath("0'");
         $bip44ChildKey = $bip44ChildKey->derivePath("0");
         $bip44ChildKey = $bip44ChildKey->derivePath("0");
-        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey());
+        $this->assertEquals("xprvA4A9CuBXhdBtCaLxwrw64Jaran4n1rgzeS5mjH47Ds8V67uZS8tTkG8jV3BZi83QqYXPcN4v8EjK2Aof4YcEeqLt688mV57gF4j6QZWdP9U", $bip44ChildKey->toExtendedKey($network));
     }
 
     /**

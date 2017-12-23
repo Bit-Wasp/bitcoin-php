@@ -39,8 +39,6 @@ class UriTest extends AbstractTestCase
         $this->assertEquals('bitcoin:'.$string."?amount=1", $uri->uri());
     }
 
-
-
     public function testLabel()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';

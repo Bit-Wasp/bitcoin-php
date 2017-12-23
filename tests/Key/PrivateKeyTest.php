@@ -149,10 +149,11 @@ class PrivateKeyTest extends AbstractTestCase
     }
 
     /**
+     * @dataProvider getEcAdapters
      * @expectedException \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
-    public function testInvalidWif()
+    public function testInvalidWif(EcAdapterInterface $ecAdapter)
     {
-        PrivateKeyFactory::fromWif('5akdgashdgkjads');
+        PrivateKeyFactory::fromWif('5akdgashdgkjads', $ecAdapter);
     }
 }

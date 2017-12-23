@@ -5,8 +5,11 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
@@ -208,8 +211,7 @@ class SignerTest extends AbstractTestCase
             $this->assertEquals($optExtra['hex'], $signed->getBaseSerialization()->getHex(), 'transaction matches expected hex');
         }
 
-        $recovered = new Signer($signed);
-
+        $recovered = new Signer($signed, $ecAdapter);
         for ($i = 0, $count = count($utxos); $i < $count; $i++) {
             $origSigner = $signer->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
             $inSigner = $recovered->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
@@ -250,15 +252,20 @@ class SignerTest extends AbstractTestCase
     }
 
     /**
-     * @return ScriptInterface[]
+     * @param EcAdapterInterface $ecAdapter
+     * @return array
+     * @throws \Exception
      */
-    public function getSimpleSpendCases()
+    public function getSimpleSpendCases(EcAdapterInterface $ecAdapter)
     {
-        $publicKey = PublicKeyFactory::fromHex('038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b');
+        $publicKey = PublicKeyFactory::fromHex('038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b', $ecAdapter);
+        $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, false, $ecAdapter);
+        $pubKeyBuffer = $pubKeySerializer->serialize($publicKey);
+        $pubKeyHash = Hash::sha256ripe160($pubKeyBuffer);
         return [
-            ScriptFactory::scriptPubKey()->p2pk($publicKey),
-            ScriptFactory::scriptPubKey()->p2pkh($publicKey->getPubKeyHash()),
-            ScriptFactory::scriptPubKey()->multisig(1, [$publicKey])
+            ScriptFactory::sequence([$pubKeyBuffer, Opcodes::OP_CHECKSIG]),
+            ScriptFactory::scriptPubKey()->p2pkh($pubKeyHash),
+            ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$pubKeyBuffer])
         ];
     }
 
@@ -267,11 +274,14 @@ class SignerTest extends AbstractTestCase
      */
     public function getSimpleSpendVectors()
     {
-        $ecAdapter = Bitcoin::getEcAdapter();
         $vectors = [];
-        foreach ($this->getSimpleSpendCases() as $script) {
-            $vectors[] = [$ecAdapter, $script];
+        foreach ($this->getEcAdapters() as $adapterFixture) {
+            $ecAdapter = $adapterFixture[0];
+            foreach ($this->getSimpleSpendCases($ecAdapter) as $script) {
+                $vectors[] = [$ecAdapter, $script];
+            }
         }
+
         return $vectors;
     }
 
@@ -291,7 +301,7 @@ class SignerTest extends AbstractTestCase
             ->outputs([new TransactionOutput(4900000000, $script)])
             ->get();
 
-        $privateKey = PrivateKeyFactory::fromInt(1);
+        $privateKey = PrivateKeyFactory::fromInt(1, false, $ecAdapter);
         $txOut = new TransactionOutput(5000000000, $script);
         $signer = new Signer($tx, $ecAdapter);
         $signer->input(0, $txOut)->sign($privateKey, SigHash::ALL);
