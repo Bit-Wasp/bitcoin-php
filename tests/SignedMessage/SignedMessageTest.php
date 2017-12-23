@@ -56,10 +56,10 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Message must begin with -----BEGIN BITCOIN SIGNED MESSAGE-----
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
-    public function testInvalidMessage1()
+    public function testInvalidMessage1(EcAdapterInterface $ecAdapter)
     {
         $invalid = '-----BEGIN SIGNED MESSAGE-----
 hi
@@ -68,16 +68,20 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         -----END BITCOIN SIGNED MESSAGE-----';
 
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $this->safeEcAdapter())
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
         );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Message must begin with -----BEGIN BITCOIN SIGNED MESSAGE-----");
+
         $serializer->parse($invalid);
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Message must end with -----END BITCOIN SIGNED MESSAGE-----
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
-    public function testInvalidMessage2()
+    public function testInvalidMessage2(EcAdapterInterface $ecAdapter)
     {
         $invalid = '-----BEGIN BITCOIN SIGNED MESSAGE-----
 hi
@@ -86,16 +90,20 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         ';
 
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $this->safeEcAdapter())
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
         );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Message must end with -----END BITCOIN SIGNED MESSAGE-----");
+
         $serializer->parse($invalid);
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unable to find start of signature
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
      */
-    public function testInvalidMessage3()
+    public function testInvalidMessage3(EcAdapterInterface $ecAdapter)
     {
         $invalid = '-----BEGIN BITCOIN SIGNED MESSAGE-----
 hi
@@ -104,8 +112,12 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         -----END BITCOIN SIGNED MESSAGE-----';
 
         $serializer = new SignedMessageSerializer(
-            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $this->safeEcAdapter())
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
         );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unable to find start of signature");
+
         $serializer->parse($invalid);
     }
 }

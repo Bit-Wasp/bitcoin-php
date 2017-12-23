@@ -17,21 +17,23 @@ class WifPrivateKeySerializerTest extends AbstractBip39Case
     /**
      * @param EcAdapterInterface $ecAdapter
      * @dataProvider getEcAdapters
-     * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidPrivateKey
-     * @expectedExceptionMessage Private key should be always be 32 or 33 bytes (depending on if it's compressed)
      */
     public function testSerializer(EcAdapterInterface $ecAdapter)
     {
         $network = NetworkFactory::bitcoin();
 
         $hexSerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
-        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $hexSerializer);
+        $wifSerializer = new WifPrivateKeySerializer($ecAdapter, $hexSerializer);
 
-        $valid = PrivateKeyFactory::create();
+        $valid = PrivateKeyFactory::create(false, $ecAdapter);
         $this->assertEquals($valid, $wifSerializer->parse($wifSerializer->serialize($network, $valid), $network));
 
         $invalid = Buffer::hex('8041414141414141414141414141414141');
         $b58 = Base58::encodeCheck($invalid);
+
+        $this->expectException(\BitWasp\Bitcoin\Exceptions\InvalidPrivateKey::class);
+        $this->expectExceptionMessage("Private key should be always be 32 or 33 bytes (depending on if it's compressed)");
+
         $wifSerializer->parse($b58);
     }
 }
