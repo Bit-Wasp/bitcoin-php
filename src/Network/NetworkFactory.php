@@ -214,7 +214,7 @@ class NetworkFactory
     public static function dashTestnet()
     {
         $network = self::create('8b', '13', 'ef', true)
-            ->setHDPubByte('043587CF')
+            ->setHDPubByte('043587cf')
             ->setHDPrivByte('04358394')
             ->setNetMagicBytes('ffcae2ce');
 
