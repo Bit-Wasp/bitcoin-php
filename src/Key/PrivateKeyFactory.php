@@ -83,16 +83,19 @@ class PrivateKeyFactory
     /**
      * @param string $wif
      * @param EcAdapterInterface|null $ecAdapter
-     * @param NetworkInterface $network
-     * @return \BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface
+     * @param NetworkInterface|null $network
+     * @return PrivateKeyInterface
      * @throws InvalidPrivateKey
+     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public static function fromWif($wif, EcAdapterInterface $ecAdapter = null, NetworkInterface $network = null)
     {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $network = $network ?: Bitcoin::getNetwork();
+        if (null === $ecAdapter) {
+            $ecAdapter = Bitcoin::getEcAdapter();
+        }
+
         $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
-        $wifSerializer = new WifPrivateKeySerializer($ecAdapter->getMath(), $serializer);
+        $wifSerializer = new WifPrivateKeySerializer($ecAdapter, $serializer);
 
         return $wifSerializer->parse($wif, $network);
     }

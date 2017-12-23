@@ -174,7 +174,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     public function toWif(NetworkInterface $network = null)
     {
         $network = $network ?: Bitcoin::getNetwork();
-        $wifSerializer = new WifPrivateKeySerializer($this->ecAdapter->getMath(), new PrivateKeySerializer($this->ecAdapter));
+        $wifSerializer = new WifPrivateKeySerializer($this->ecAdapter, new PrivateKeySerializer($this->ecAdapter));
         return $wifSerializer->serialize($network, $this);
     }
 

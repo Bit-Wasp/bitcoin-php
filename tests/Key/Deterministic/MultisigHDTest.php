@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;
 use BitWasp\Bitcoin\Key\Deterministic\MultisigHD;
@@ -57,10 +58,24 @@ class MultisigHDTest extends AbstractTestCase
         $this->assertEquals($keys, $hd->getKeys(), 'keys should match input when not sorting');
     }
 
-    public function testGetRedeemScript()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testGetRedeemScript(EcAdapterInterface $ecAdapter)
     {
-        $keys[0] = HierarchicalKeyFactory::fromExtended('xpub661MyMwAqRbcGG5afwSiBJ37bLbnzj9VuCdKzcQgihyuRYbiA1PnhuzWzMg2H9xT7JMHWGowEfx93cxzL7KUsX9Q2hrG2ayhKf93x1uXUsV');
-        $keys[1] = HierarchicalKeyFactory::fromExtended('xpub661MyMwAqRbcG2X4GYsMkLw3Rputa3aG865sQUG1mK6B4UGCyGLePHejDxiSYqWGBDUzUagLqzHq8cemTYYjHop8DRtkfqt6TAxMEznufcz');
+        $keys[0] = HierarchicalKeyFactory::fromExtended(
+            'xpub661MyMwAqRbcGG5afwSiBJ37bLbnzj9VuCdKzcQgihyuRYbiA1PnhuzWzMg2H9xT7JMHWGowEfx93cxzL7KUsX9Q2hrG2ayhKf93x1uXUsV',
+            null,
+            $ecAdapter
+        );
+
+        $keys[1] = HierarchicalKeyFactory::fromExtended(
+            'xpub661MyMwAqRbcG2X4GYsMkLw3Rputa3aG865sQUG1mK6B4UGCyGLePHejDxiSYqWGBDUzUagLqzHq8cemTYYjHop8DRtkfqt6TAxMEznufcz',
+            null,
+            $ecAdapter
+        );
+
         $sequences = new HierarchicalKeySequence();
         $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
         $script = $hd->getRedeemScript();
@@ -71,14 +86,19 @@ class MultisigHDTest extends AbstractTestCase
         $this->assertEquals($expected, $script->getHex());
     }
 
-    public function testDeriveChild()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     * @throws \Exception
+     */
+    public function testDeriveChild(EcAdapterInterface $ecAdapter)
     {
         $hd = new MultisigHD(
             2,
             'm',
             [
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('01')),
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'))
+                HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'), $ecAdapter),
+                HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'), $ecAdapter)
             ],
             new HierarchicalKeySequence(),
             true
@@ -95,14 +115,19 @@ class MultisigHDTest extends AbstractTestCase
         $this->assertEquals('3GX7j2puUbkyMiWu3YYYEczJQ1ZPS9vdam', $address->getAddress());
     }
 
-    public function testDerivePath()
+    /**
+     * @throws \Exception
+     * @param EcAdapterInterface $ecAdapter
+     * @dataProvider getEcAdapters
+     */
+    public function testDerivePath(EcAdapterInterface $ecAdapter)
     {
         $hd = new MultisigHD(
             2,
             'm',
             [
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('01')),
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'))
+                HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'), $ecAdapter),
+                HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'), $ecAdapter)
             ],
             new HierarchicalKeySequence(),
             true

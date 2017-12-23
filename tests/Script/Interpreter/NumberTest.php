@@ -8,7 +8,9 @@ use BitWasp\Buffertools\Buffer;
 
 class NumberTest extends AbstractTestCase
 {
-
+    /**
+     * @return array
+     */
     public function getVectors()
     {
         return [
@@ -28,6 +30,7 @@ class NumberTest extends AbstractTestCase
 
     /**
      * @param int|string $int
+     * @param int $expectedSize
      * @param string $expectedHex
      * @dataProvider getVectors
      */
@@ -40,7 +43,9 @@ class NumberTest extends AbstractTestCase
     }
 
     /**
+     * @throws \Exception
      * @param int|string $int
+     * @param int $expectedSize
      * @param string $expectedHex
      * @dataProvider getVectors
      */

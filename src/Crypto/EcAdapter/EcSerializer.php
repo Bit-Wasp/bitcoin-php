@@ -110,17 +110,20 @@ class EcSerializer
      */
     public static function getSerializer($interface, $useCache = true, EcAdapterInterface $adapter = null)
     {
-        $adapter = $adapter ?: Bitcoin::getEcAdapter();
+        if (null === $adapter) {
+            $adapter = Bitcoin::getEcAdapter();
+        }
 
-        if (isset(self::$cache[$interface])) {
-            return self::$cache[$interface];
+        $key = get_class($adapter) . ":" . $interface;
+        if (array_key_exists($key, self::$cache)) {
+            return self::$cache[$key];
         }
 
         $classPath = self::getAdapterImplPath($adapter) . self::getImplRelPath($interface);
         $class = new $classPath($adapter);
 
         if ($useCache && self::$useCache) {
-            self::$cache[$interface] = $class;
+            self::$cache[$key] = $class;
         }
 
         return $class;

@@ -18,7 +18,7 @@ tools:
         excluded_dirs: [vendor, build, tests]
     external_code_coverage:
         timeout: 4100
-        runs: 2
+        runs: 1
 
 changetracking:
     bug_patterns: ["\bfix(?:es|ed)?\b"]

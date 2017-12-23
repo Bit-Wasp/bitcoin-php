@@ -127,18 +127,9 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
         $math = new Math;
         $generator = EccFactory::getSecgCurves()->generator256k1();
         $adapters = [];
-
-        if (getenv('TRAVIS_PHP_VERSION')) {
-            if (getenv('EXT_SECP256K1') == '0') {
-                $adapters[] = [EcAdapterFactory::getPhpEcc($math, $generator)];
-            } else {
-                $adapters[] = [EcAdapterFactory::getSecp256k1($math, $generator)];
-            }
-        } else {
-            // Env var was set, just pass secp256k1
-            $adapters[] = [(extension_loaded('secp256k1')
-                ? EcAdapterFactory::getSecp256k1($math, $generator)
-                : EcAdapterFactory::getPhpEcc($math, $generator))];
+        $adapters[] = [EcAdapterFactory::getPhpEcc($math, $generator)];
+        if (extension_loaded('secp256k1')) {
+            $adapters[] = [EcAdapterFactory::getSecp256k1($math, $generator)];
         }
 
         return $adapters;

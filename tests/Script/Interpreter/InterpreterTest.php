@@ -44,7 +44,7 @@ class InterpreterTest extends AbstractTestCase
     public function testScript($flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result, $tx)
     {
         $ec = Bitcoin::getEcAdapter();
-        $i = new Interpreter($ec, $tx);
+        $i = new Interpreter($ec);
 
         $stack = new Stack();
         $checker = new Checker($ec, new Transaction(), 0, 0);
@@ -58,7 +58,7 @@ class InterpreterTest extends AbstractTestCase
     {
         $ec = Bitcoin::getEcAdapter();
         $f = 0;
-        $i = new Interpreter($ec, new Transaction);
+        $i = new Interpreter($ec);
         $script = ScriptFactory::create()->op('OP_RETURN')->getScript();
 
         $this->assertFalse($i->verify($script, new Script, $f, new Checker($ec, new Transaction(), 0, 0)));
@@ -80,7 +80,7 @@ class InterpreterTest extends AbstractTestCase
         $f = 0;
         $ec = Bitcoin::getEcAdapter();
 
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction);
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $empty = new Script();
         $this->assertFalse($i->verify($empty, $empty, $f, new Checker($ec, new Transaction(), 0, 0)));
     }
@@ -93,7 +93,7 @@ class InterpreterTest extends AbstractTestCase
         $ec = Bitcoin::getEcAdapter();
 
         $f = 0;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction);
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $this->assertFalse($i->verify($true, $false, $f, new Checker($ec, new Transaction(), 0, 0)));
     }
 
@@ -106,7 +106,7 @@ class InterpreterTest extends AbstractTestCase
         $scriptSig = new Script();
 
         $f = InterpreterInterface::VERIFY_P2SH;
-        $i = new Interpreter(Bitcoin::getEcAdapter(), new Transaction);
+        $i = new Interpreter(Bitcoin::getEcAdapter());
         $this->assertFalse($i->verify($scriptSig, $output, $f, new Checker($ec, new Transaction(), 0, 0)));
     }
 
@@ -118,7 +118,7 @@ class InterpreterTest extends AbstractTestCase
         $scriptSig = ScriptFactory::create()->op('OP_0')->push($p2sh->getBuffer())->getScript();
 
         $f = InterpreterInterface::VERIFY_P2SH;
-        $i = new Interpreter($ec, new Transaction);
+        $i = new Interpreter($ec);
         $this->assertFalse($i->verify($scriptSig, $scriptPubKey, $f, new Checker($ec, new Transaction(), 0, 0)));
     }
 
@@ -130,7 +130,7 @@ class InterpreterTest extends AbstractTestCase
         $scriptPubKey = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($p2sh->getBuffer()));
 
         $f = InterpreterInterface::VERIFY_P2SH;
-        $i = new Interpreter($ec, new Transaction);
+        $i = new Interpreter($ec);
         $this->assertFalse($i->verify($scriptSig, $scriptPubKey, $f, new Checker($ec, new Transaction(), 0, 0)));
     }
 
