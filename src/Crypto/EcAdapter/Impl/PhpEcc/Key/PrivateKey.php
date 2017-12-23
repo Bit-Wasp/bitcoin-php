@@ -149,7 +149,7 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     {
         $network = $network ?: Bitcoin::getNetwork();
         $serializer = new WifPrivateKeySerializer(
-            $this->ecAdapter->getMath(),
+            $this->ecAdapter,
             new PrivateKeySerializer($this->ecAdapter)
         );
 

@@ -91,9 +91,6 @@ before_script:
 
 script:
   - if [ "$PHPUNIT" = "true" ]; then make phpunit-ci; fi
-  - if [ "$PHPUNIT_EXT" = "true" ]; then EXT_PHP=" -dextension=secp256k1.so " make phpunit-ci; fi
-  - if [ "$PHPUNIT_EXT" = "true" ]; then EXT_PHP=" -dextension=bitcoinconsensus.so " make phpunit-ci; fi
-  - if [ "$PHPUNIT_EXT" = "true" ]; then EXT_PHP=" -dextension=bitcoinconsensus.so -dextension=secp256k1.so " make phpunit-ci; fi
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
   - if [ "$RPC_TEST" = "true" ]; then export BITCOIND_PATH="$HOME/bitcoin/bitcoin-$BITCOIN_VERSION/bin/bitcoind"; fi
