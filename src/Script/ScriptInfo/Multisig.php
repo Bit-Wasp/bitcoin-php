@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -48,7 +50,7 @@ class Multisig
      * @param bool $allowVerify
      * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct($requiredSigs, array $keys, $opcode, $allowVerify = false, PublicKeySerializerInterface $pubKeySerializer = null)
+    public function __construct(int $requiredSigs, array $keys, int $opcode, $allowVerify = false, PublicKeySerializerInterface $pubKeySerializer = null)
     {
         if ($opcode === Opcodes::OP_CHECKMULTISIG) {
             $verify = false;
@@ -126,7 +128,8 @@ class Multisig
      * @param bool $allowVerify
      * @return Multisig
      */
-    public static function fromScript(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null, $allowVerify = false)
+    public static function fromScript(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null, bool
+    $allowVerify = false)
     {
         return static::fromDecodedScript($script->getScriptParser()->decode(), $pubKeySerializer, $allowVerify);
     }
@@ -134,7 +137,7 @@ class Multisig
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return ScriptType::MULTISIG;
     }
@@ -142,7 +145,7 @@ class Multisig
     /**
      * @return int
      */
-    public function getRequiredSigCount()
+    public function getRequiredSigCount(): int
     {
         return $this->m;
     }
@@ -150,7 +153,7 @@ class Multisig
     /**
      * @return int
      */
-    public function getKeyCount()
+    public function getKeyCount(): int
     {
         return $this->n;
     }
@@ -158,7 +161,7 @@ class Multisig
     /**
      * @return bool
      */
-    public function isChecksigVerify()
+    public function isChecksigVerify(): bool
     {
         return $this->verify;
     }
@@ -167,7 +170,7 @@ class Multisig
      * @param PublicKeyInterface $publicKey
      * @return bool
      */
-    public function checkInvolvesKey(PublicKeyInterface $publicKey)
+    public function checkInvolvesKey(PublicKeyInterface $publicKey): bool
     {
         $buffer = $this->pubKeySerializer->serialize($publicKey);
         foreach ($this->keyBuffers as $key) {
@@ -182,7 +185,7 @@ class Multisig
     /**
      * @return array|BufferInterface[]
      */
-    public function getKeyBuffers()
+    public function getKeyBuffers(): array
     {
         return $this->keyBuffers;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Factory\ScriptInfo;
 
 use BitWasp\Bitcoin\Locktime;
@@ -20,7 +22,7 @@ class CheckSequenceVerify
      * CheckLocktimeVerify constructor.
      * @param int $relativeTimeLock
      */
-    public function __construct($relativeTimeLock)
+    public function __construct(int $relativeTimeLock)
     {
         if ($relativeTimeLock < 0) {
             throw new \RuntimeException("relative locktime cannot be negative");
@@ -38,7 +40,7 @@ class CheckSequenceVerify
      * @param bool $fMinimal
      * @return static
      */
-    public static function fromDecodedScript(array $chunks, $fMinimal = false)
+    public static function fromDecodedScript(array $chunks, $fMinimal = false): self
     {
         if (count($chunks) !== 3) {
             throw new \RuntimeException("Invalid number of items for CSV");
@@ -58,14 +60,14 @@ class CheckSequenceVerify
 
         $numLockTime = Number::buffer($chunks[0]->getData(), $fMinimal, 5);
 
-        return new static($numLockTime->getInt());
+        return new static((int) $numLockTime->getInt());
     }
 
     /**
      * @param ScriptInterface $script
      * @return CheckSequenceVerify
      */
-    public static function fromScript(ScriptInterface $script)
+    public static function fromScript(ScriptInterface $script): self
     {
         return static::fromDecodedScript($script->getScriptParser()->decode());
     }
@@ -73,7 +75,7 @@ class CheckSequenceVerify
     /**
      * @return int
      */
-    public function getRelativeLockTime()
+    public function getRelativeLockTime(): int
     {
         return $this->relativeTimeLock;
     }
@@ -81,7 +83,7 @@ class CheckSequenceVerify
     /**
      * @return bool
      */
-    public function isRelativeToBlock()
+    public function isRelativeToBlock(): bool
     {
         if ($this->isDisabled()) {
             throw new \RuntimeException("This opcode seems to be disabled");
@@ -91,10 +93,10 @@ class CheckSequenceVerify
     }
 
     /**
-     * @return int
+     * @return bool
      */
-    public function isDisabled()
+    public function isDisabled(): bool
     {
-        return $this->relativeTimeLock & TransactionInput::SEQUENCE_LOCKTIME_DISABLE_FLAG;
+        return ($this->relativeTimeLock & TransactionInput::SEQUENCE_LOCKTIME_DISABLE_FLAG) != 0;
     }
 }

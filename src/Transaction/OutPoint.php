@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Serializable;
@@ -7,7 +9,6 @@ use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Bitcoin\Util\IntRange;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class OutPoint extends Serializable implements OutPointInterface
 {
@@ -26,7 +27,7 @@ class OutPoint extends Serializable implements OutPointInterface
      * @param BufferInterface $hashPrevOutput
      * @param int $nPrevOutput
      */
-    public function __construct(BufferInterface $hashPrevOutput, $nPrevOutput)
+    public function __construct(BufferInterface $hashPrevOutput, int $nPrevOutput)
     {
         if ($hashPrevOutput->getSize() !== 32) {
             throw new \InvalidArgumentException('OutPoint: hashPrevOut must be a 32-byte Buffer');
@@ -43,7 +44,7 @@ class OutPoint extends Serializable implements OutPointInterface
     /**
      * @return static
      */
-    public static function makeCoinbase()
+    public static function makeCoinbase(): self
     {
         return new static(new Buffer("", 32), 0xffffffff);
     }
@@ -51,7 +52,7 @@ class OutPoint extends Serializable implements OutPointInterface
     /**
      * @return BufferInterface
      */
-    public function getTxId()
+    public function getTxId(): BufferInterface
     {
         return $this->hashPrevOutput;
     }
@@ -59,16 +60,16 @@ class OutPoint extends Serializable implements OutPointInterface
     /**
      * @return int
      */
-    public function getVout()
+    public function getVout(): int
     {
         return $this->nPrevOutput;
     }
 
     /**
      * @param OutPointInterface $outPoint
-     * @return int
+     * @return bool
      */
-    public function equals(OutPointInterface $outPoint)
+    public function equals(OutPointInterface $outPoint): bool
     {
         $txid = strcmp($this->getTxId()->getBinary(), $outPoint->getTxId()->getBinary());
         if ($txid !== 0) {
@@ -81,7 +82,7 @@ class OutPoint extends Serializable implements OutPointInterface
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new OutPointSerializer())->serialize($this);
     }

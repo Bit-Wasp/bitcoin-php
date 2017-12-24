@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails;
@@ -50,7 +52,7 @@ class RequestSignerTest extends Bip70Test
      * @param string $certPath
      * @dataProvider getSignerVectors
      */
-    public function testSigner($method, $keyPath, $certPath)
+    public function testSigner(string $method, $keyPath, $certPath)
     {
         $details = new PaymentDetails();
         $details->setTime(time());

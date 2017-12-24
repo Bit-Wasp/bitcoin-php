@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -25,7 +27,7 @@ class CltvTest extends AbstractTestCase
      * @param int $sequence
      * @return TransactionInterface
      */
-    public function txFixture($locktime, $sequence)
+    public function txFixture(int $locktime, int $sequence)
     {
         return (new TxBuilder())
             ->input('abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234', 0, null, $sequence)
@@ -75,7 +77,7 @@ class CltvTest extends AbstractTestCase
      * @param null|string $exceptionMsg
      * @dataProvider getCltvCases
      */
-    public function testCltv($locktime, TransactionInterface $unsigned, $exception = null, $exceptionMsg = null)
+    public function testCltv(int $locktime, TransactionInterface $unsigned, $exception = null, $exceptionMsg = null)
     {
         /** @var PrivateKeyInterface[] $keys */
         $key = PrivateKeyFactory::fromHex("4200000042000000420000004200000042000000420000004200000042000000", true);

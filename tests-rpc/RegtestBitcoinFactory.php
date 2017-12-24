@@ -1,7 +1,8 @@
 <?php
 
-namespace BitWasp\Bitcoin\RpcTest;
+declare(strict_types=1);
 
+namespace BitWasp\Bitcoin\RpcTest;
 
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -31,7 +32,18 @@ class RegtestBitcoinFactory
      */
     private $server = [];
 
-    public function __construct() {
+    /**
+     * @var \BitWasp\Bitcoin\Network\NetworkInterface
+     */
+    private $network;
+
+    /**
+     * @var RpcCredential
+     */
+    private $credential;
+
+    public function __construct()
+    {
         $this->testsDirPath = $this->envOrDefault("BITCOIND_TEST_DIR", "/tmp");
         $this->bitcoindPath = $this->envOrDefault("BITCOIND_PATH");
         if (null === $this->bitcoindPath) {
@@ -39,10 +51,16 @@ class RegtestBitcoinFactory
         }
 
         $this->network = NetworkFactory::bitcoinTestnet();
-        $this->credential = new RpcCredential("127.0.0.1", 18332, "rpcuser", "rpcpass");
+        $this->credential = new RpcCredential("127.0.0.1", 18332, "rpcuser", "rpcpass", false);
     }
 
-    private function envOrDefault($var, $default = null) {
+    /**
+     * @param string $var
+     * @param string|null $default
+     * @return string
+     */
+    private function envOrDefault(string $var, string $default = null): string
+    {
         $value = getenv($var);
         if (in_array($value, [null, false, ""])) {
             $value = $default;
@@ -50,7 +68,12 @@ class RegtestBitcoinFactory
         return $value;
     }
 
-    protected function createRandomTestDir() {
+    /**
+     * @return string
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
+     */
+    protected function createRandomTestDir(): string
+    {
         $this->testDir[] = $dir = $this->testsDirPath . "/" . (new Random())->bytes(5)->getHex();
         if (!mkdir($dir)) {
             throw new \RuntimeException("Failed to create test dir!");
@@ -58,7 +81,13 @@ class RegtestBitcoinFactory
         return $dir;
     }
 
-    public function startBitcoind($options = []) {
+    /**
+     * @param array $options
+     * @return RpcServer
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
+     */
+    public function startBitcoind($options = []): RpcServer
+    {
         $testDir = $this->createRandomTestDir();
         $rpcServer = new RpcServer($this->bitcoindPath, $testDir, $this->network, $this->credential, $options);
         $rpcServer->start();
@@ -66,7 +95,11 @@ class RegtestBitcoinFactory
         return $rpcServer;
     }
 
-    protected function cleanup() {
+    /**
+     *
+     */
+    protected function cleanup()
+    {
         $servers = 0;
         $dirs = 0;
         foreach ($this->server as $server) {

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
-function decodeOpN($op)
+function decodeOpN(int $op): int
 {
     if ($op === Opcodes::OP_0) {
         return 0;
@@ -15,7 +17,7 @@ function decodeOpN($op)
     return (int) $op - (Opcodes::OP_1 - 1);
 }
 
-function encodeOpN($op)
+function encodeOpN(int $op): int
 {
     if ($op === 0) {
         return Opcodes::OP_0;

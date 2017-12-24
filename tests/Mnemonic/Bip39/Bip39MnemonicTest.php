@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Bip39;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -17,7 +19,7 @@ class Bip39MnemonicTest extends AbstractBip39Case
      * @param $eMnemonic
      * @param BufferInterface $eSeed
      */
-    public function testEntropyToMnemonic(Bip39Mnemonic $bip39, BufferInterface $entropy, $eMnemonic, BufferInterface $eSeed)
+    public function testEntropyToMnemonic(Bip39Mnemonic $bip39, BufferInterface $entropy, string $eMnemonic, BufferInterface $eSeed)
     {
         $mnemonic = $bip39->entropyToMnemonic($entropy);
         $this->assertEquals($eMnemonic, $mnemonic);
@@ -30,7 +32,7 @@ class Bip39MnemonicTest extends AbstractBip39Case
      * @param $mnemonic
      * @param BufferInterface $eSeed
      */
-    public function testMnemonicToEntropy(Bip39Mnemonic $bip39, BufferInterface $eEntropy, $mnemonic, BufferInterface $eSeed)
+    public function testMnemonicToEntropy(Bip39Mnemonic $bip39, BufferInterface $eEntropy, string $mnemonic, BufferInterface $eSeed)
     {
         $entropy = $bip39->mnemonicToEntropy($mnemonic);
         $this->assertEquals($eEntropy->getBinary(), $entropy->getBinary());

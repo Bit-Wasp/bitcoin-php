@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
@@ -63,7 +65,7 @@ class RequestBuilder
      * @param string $memo
      * @return $this
      */
-    public function setMemo($memo)
+    public function setMemo(string $memo)
     {
         $this->memo = $memo;
         return $this;
@@ -73,7 +75,7 @@ class RequestBuilder
      * @param string $network
      * @return $this
      */
-    public function setNetwork($network)
+    public function setNetwork(string $network)
     {
         $this->network = $network;
         return $this;
@@ -105,10 +107,10 @@ class RequestBuilder
 
     /**
      * @param AddressInterface $address
-     * @param $value
+     * @param int $value
      * @return $this
      */
-    public function addAddressPayment(AddressInterface $address, $value)
+    public function addAddressPayment(AddressInterface $address, int $value)
     {
         $script = ScriptFactory::scriptPubKey()->payToAddress($address);
         $output = new TransactionOutput($value, $script);
@@ -119,7 +121,7 @@ class RequestBuilder
      * @param int $time
      * @return RequestBuilder
      */
-    public function setTime($time)
+    public function setTime(int $time)
     {
         $this->time = $time;
         return $this;
@@ -129,7 +131,7 @@ class RequestBuilder
      * @param int $expires
      * @return RequestBuilder
      */
-    public function setExpires($expires)
+    public function setExpires(int $expires)
     {
         $this->expires = $expires;
         return $this;
@@ -139,7 +141,7 @@ class RequestBuilder
      * @param string $payment_url
      * @return RequestBuilder
      */
-    public function setPaymentUrl($payment_url)
+    public function setPaymentUrl(string $payment_url)
     {
         $this->payment_url = $payment_url;
         return $this;
@@ -149,7 +151,7 @@ class RequestBuilder
      * @param string $merchant_data
      * @return RequestBuilder
      */
-    public function setMerchantData($merchant_data)
+    public function setMerchantData(string $merchant_data)
     {
         $this->merchant_data = $merchant_data;
         return $this;
@@ -168,7 +170,7 @@ class RequestBuilder
     /**
      * @return PaymentDetails
      */
-    public function getPaymentDetails()
+    public function getPaymentDetails(): PaymentDetails
     {
         if (is_null($this->time)) {
             throw new \RuntimeException('Time not set on PaymentDetails');
@@ -212,7 +214,7 @@ class RequestBuilder
     /**
      * @return PaymentRequest
      */
-    public function getPaymentRequest()
+    public function getPaymentRequest(): PaymentRequest
     {
         // Serialize the payment details, and apply a signature based on instance of PaymentRequestSigner
         $request = new PaymentRequest();

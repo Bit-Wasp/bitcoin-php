@@ -1,27 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 
 interface OutPointSerializerInterface
 {
     /**
      * @param OutPointInterface $outpoint
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(OutPointInterface $outpoint);
+    public function serialize(OutPointInterface $outpoint): BufferInterface;
 
     /**
      * @param Parser $parser
      * @return OutPointInterface
      */
-    public function fromParser(Parser $parser);
+    public function fromParser(Parser $parser): OutPointInterface;
 
     /**
      * @param string|\BitWasp\Buffertools\BufferInterface $data
      * @return OutPointInterface
      */
-    public function parse($data);
+    public function parse($data): OutPointInterface;
 }

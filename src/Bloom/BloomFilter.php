@@ -405,7 +405,7 @@ class BloomFilter extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new BloomFilterSerializer())->serialize($this);
     }

@@ -9,21 +9,23 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Buffertools\BufferInterface;
 
 class BlockFactory
 {
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $string
+     * @param BufferInterface|string $string
      * @param Math $math
      * @return BlockInterface
      */
     public static function fromHex($string, Math $math = null): BlockInterface
     {
-        return (new BlockSerializer(
+        $serializer = new BlockSerializer(
             $math ?: Bitcoin::getMath(),
             new BlockHeaderSerializer(),
             new TransactionSerializer()
-        ))
-            ->parse($string);
+        );
+
+        return $serializer->parse($string);
     }
 }

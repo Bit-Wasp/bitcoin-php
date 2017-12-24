@@ -51,7 +51,7 @@ class FilteredBlock extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new FilteredBlockSerializer(new BlockHeaderSerializer(), new PartialMerkleTreeSerializer()))->serialize($this);
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Path;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;

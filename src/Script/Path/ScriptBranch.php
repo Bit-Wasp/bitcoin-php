@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Path;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -37,7 +39,7 @@ class ScriptBranch
     /**
      * @return array|\bool[]
      */
-    public function getPath()
+    public function getPath(): array
     {
         return $this->branch;
     }
@@ -45,7 +47,7 @@ class ScriptBranch
     /**
      * @return array|\array[]
      */
-    public function getScriptSections()
+    public function getScriptSections(): array
     {
         return $this->scriptSections;
     }
@@ -53,7 +55,7 @@ class ScriptBranch
     /**
      * @return array
      */
-    public function getOps()
+    public function getOps(): array
     {
         $sequence = [];
         foreach ($this->getScriptSections() as $segment) {

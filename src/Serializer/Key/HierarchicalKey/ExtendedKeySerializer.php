@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
@@ -77,9 +78,9 @@ class ExtendedKeySerializer
     /**
      * @param NetworkInterface $network
      * @param HierarchicalKey $key
-     * @return Buffer
+     * @return BufferInterface
      */
-    public function serialize(NetworkInterface $network, HierarchicalKey $key)
+    public function serialize(NetworkInterface $network, HierarchicalKey $key): BufferInterface
     {
         $this->checkNetwork($network);
 
@@ -103,16 +104,16 @@ class ExtendedKeySerializer
      * @return HierarchicalKey
      * @throws ParserOutOfRange
      */
-    public function fromParser(NetworkInterface $network, Parser $parser)
+    public function fromParser(NetworkInterface $network, Parser $parser): HierarchicalKey
     {
         $this->checkNetwork($network);
 
         try {
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = [
                 $this->bytestring4->read($parser),
-                $this->uint8->read($parser),
-                $this->uint32->read($parser),
-                $this->uint32->read($parser),
+                (int) $this->uint8->read($parser),
+                (int) $this->uint32->read($parser),
+                (int) $this->uint32->read($parser),
                 $this->bytestring32->read($parser),
                 $this->bytestring33->read($parser),
             ];
@@ -138,7 +139,7 @@ class ExtendedKeySerializer
      * @param BufferInterface $buffer
      * @return HierarchicalKey
      */
-    public function parse(NetworkInterface $network, BufferInterface $buffer)
+    public function parse(NetworkInterface $network, BufferInterface $buffer): HierarchicalKey
     {
         return $this->fromParser($network, new Parser($buffer));
     }

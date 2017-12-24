@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Script\Script;
@@ -49,21 +51,22 @@ class TransactionTest extends AbstractTestCase
      */
     public function testSetVersionException()
     {
-        new Transaction('4294967999');
+        new Transaction(4294967999);
     }
 
     public function testGetLockTime()
     {
         // Default
         $tx = new Transaction();
-        $this->assertEquals('0', $tx->getLockTime());
+        $this->assertEquals(0, $tx->getLockTime());
     }
 
     public function testSetLockTime()
     {
-        $tx = new Transaction(1, [], [], [], '1093');
+        $lockTime = 1093;
+        $tx = new Transaction(1, [], [], [], $lockTime);
 
-        $this->assertSame('1093', $tx->getLockTime());
+        $this->assertEquals($lockTime, $tx->getLockTime());
     }
 
     /**
@@ -71,7 +74,7 @@ class TransactionTest extends AbstractTestCase
      */
     public function testSetLockTimeException()
     {
-        new Transaction(1, [], [], [], '4294967297');
+        new Transaction(1, [], [], [], 4294967297);
     }
 
     /**

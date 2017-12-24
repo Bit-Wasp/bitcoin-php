@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
@@ -31,7 +33,7 @@ class TransactionSerializerTest extends AbstractTestCase
      * @param string $tx
      * @dataProvider getTransactionSerializationFixtures
      */
-    public function testTransactionSerializer($flags, $tx)
+    public function testTransactionSerializer(int $flags, string $tx)
     {
         $serializer = new TransactionSerializer();
         $parsed = $serializer->parse($tx);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Math;
 
 use BitWasp\Bitcoin\Math\Math;
@@ -149,7 +151,7 @@ class CompactIntegerTest extends AbstractTestCase
      * @param bool $eOverflow
      * @dataProvider getTestVectors
      */
-    public function testCases(Math $math, \GMP $int, \GMP $eInt, $eNegative, $eOverflow)
+    public function testCases(Math $math, \GMP $int, \GMP $eInt, bool $eNegative, bool $eOverflow)
     {
         $negative = false;
         $overflow = false;

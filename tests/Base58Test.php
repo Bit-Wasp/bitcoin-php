@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Base58;
@@ -28,7 +30,7 @@ class Base58Test extends AbstractTestCase
      * @param Buffer $bs
      * @param string $base58
      */
-    public function testEncodeDecode(Buffer $bs, $base58)
+    public function testEncodeDecode(Buffer $bs, string $base58)
     {
         $encoded = Base58::encode($bs);
         $this->assertEquals($base58, $encoded);
@@ -56,7 +58,7 @@ class Base58Test extends AbstractTestCase
      * @param Buffer $bs
      * @param string $base58
      */
-    public function testEncodeDecodeCheck(Buffer $bs, $base58)
+    public function testEncodeDecodeCheck(Buffer $bs, string $base58)
     {
         $encoded = Base58::encodeCheck($bs);
         $this->assertTrue($bs->equals(Base58::decodeCheck($encoded)));

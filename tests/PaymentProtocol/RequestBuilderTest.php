@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -18,7 +20,7 @@ class RequestBuilderTest extends Bip70Test
         $memo = '';
         $time = time();
         $network = '';
-        $expires = '';
+        $expires = $time+600;
         $payment_url = '';
         $merchant_data = '';
 

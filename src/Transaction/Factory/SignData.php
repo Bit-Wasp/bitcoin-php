@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -43,7 +45,7 @@ class SignData
     /**
      * @return bool
      */
-    public function hasRedeemScript()
+    public function hasRedeemScript(): bool
     {
         return $this->redeemScript instanceof ScriptInterface;
     }
@@ -51,7 +53,7 @@ class SignData
     /**
      * @return ScriptInterface
      */
-    public function getRedeemScript()
+    public function getRedeemScript(): ScriptInterface
     {
         if (null === $this->redeemScript) {
             throw new \RuntimeException('Redeem script requested but not set');
@@ -73,7 +75,7 @@ class SignData
     /**
      * @return bool
      */
-    public function hasWitnessScript()
+    public function hasWitnessScript(): bool
     {
         return $this->witnessScript instanceof ScriptInterface;
     }
@@ -81,7 +83,7 @@ class SignData
     /**
      * @return ScriptInterface
      */
-    public function getWitnessScript()
+    public function getWitnessScript(): ScriptInterface
     {
         if (null === $this->witnessScript) {
             throw new \RuntimeException('Witness script requested but not set');
@@ -94,7 +96,7 @@ class SignData
      * @param int $flags
      * @return $this
      */
-    public function signaturePolicy($flags)
+    public function signaturePolicy(int $flags)
     {
         $this->signaturePolicy = $flags;
         return $this;
@@ -103,7 +105,7 @@ class SignData
     /**
      * @return bool
      */
-    public function hasSignaturePolicy()
+    public function hasSignaturePolicy(): bool
     {
         return $this->signaturePolicy !== null;
     }
@@ -111,7 +113,7 @@ class SignData
     /**
      * @return int
      */
-    public function getSignaturePolicy()
+    public function getSignaturePolicy(): int
     {
         if (null === $this->signaturePolicy) {
             throw new \RuntimeException('Signature policy requested but not set');
@@ -138,7 +140,7 @@ class SignData
     /**
      * @return bool
      */
-    public function hasLogicalPath()
+    public function hasLogicalPath(): bool
     {
         return is_array($this->logicalPath);
     }
@@ -146,7 +148,7 @@ class SignData
     /**
      * @return bool[]
      */
-    public function getLogicalPath()
+    public function getLogicalPath(): array
     {
         if (null === $this->logicalPath) {
             throw new \RuntimeException("Logical path requested but not set");

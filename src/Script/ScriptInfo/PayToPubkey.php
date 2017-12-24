@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -32,7 +34,7 @@ class PayToPubkey
      * @param BufferInterface $publicKey
      * @param bool $allowVerify
      */
-    public function __construct($opcode, BufferInterface $publicKey, $allowVerify = false)
+    public function __construct(int $opcode, BufferInterface $publicKey, bool $allowVerify = false)
     {
         if ($opcode === Opcodes::OP_CHECKSIG) {
             $verify = false;
@@ -52,7 +54,7 @@ class PayToPubkey
      * @param bool $allowVerify
      * @return static
      */
-    public static function fromDecodedScript(array $chunks, $allowVerify = false)
+    public static function fromDecodedScript(array $chunks, bool $allowVerify = false): PayToPubkey
     {
         if (count($chunks) !== 2 || !$chunks[0]->isPush() || $chunks[1]->isPush()) {
             throw new \InvalidArgumentException('Malformed pay-to-pubkey script');
@@ -66,12 +68,15 @@ class PayToPubkey
      * @param bool $allowVerify
      * @return PayToPubkey
      */
-    public static function fromScript(ScriptInterface $script, $allowVerify = false)
+    public static function fromScript(ScriptInterface $script, bool $allowVerify = false): PayToPubkey
     {
         return static::fromDecodedScript($script->getScriptParser()->decode(), $allowVerify);
     }
 
-    public function getType()
+    /**
+     * @return string
+     */
+    public function getType(): string
     {
         return ScriptType::P2PK;
     }
@@ -79,7 +84,7 @@ class PayToPubkey
     /**
      * @return int
      */
-    public function getRequiredSigCount()
+    public function getRequiredSigCount(): int
     {
         return 1;
     }
@@ -87,12 +92,15 @@ class PayToPubkey
     /**
      * @return int
      */
-    public function getKeyCount()
+    public function getKeyCount(): int
     {
         return 1;
     }
 
-    public function isChecksigVerify()
+    /**
+     * @return bool
+     */
+    public function isChecksigVerify(): bool
     {
         return $this->verify;
     }
@@ -101,7 +109,7 @@ class PayToPubkey
      * @param PublicKeyInterface $publicKey
      * @return bool
      */
-    public function checkInvolvesKey(PublicKeyInterface $publicKey)
+    public function checkInvolvesKey(PublicKeyInterface $publicKey): bool
     {
         return $publicKey->getBuffer()->equals($this->publicKey);
     }
@@ -109,7 +117,7 @@ class PayToPubkey
     /**
      * @return BufferInterface
      */
-    public function getKeyBuffer()
+    public function getKeyBuffer(): BufferInterface
     {
         return $this->publicKey;
     }

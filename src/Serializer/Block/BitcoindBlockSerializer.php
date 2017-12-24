@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use BitWasp\Buffertools\Parser;
 
@@ -45,9 +48,9 @@ class BitcoindBlockSerializer
 
     /**
      * @param BlockInterface $block
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(BlockInterface $block)
+    public function serialize(BlockInterface $block): BufferInterface
     {
         $buffer = $this->blockSerializer->serialize($block);
         $size = $buffer->getSize();
@@ -79,7 +82,7 @@ class BitcoindBlockSerializer
      * @param \BitWasp\Buffertools\BufferInterface|string $data
      * @return BlockInterface
      */
-    public function parse($data)
+    public function parse($data): BlockInterface
     {
         return $this->fromParser(new Parser($data));
     }

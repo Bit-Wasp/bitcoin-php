@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Classifier;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -28,7 +30,7 @@ class OutputData
      * @param ScriptInterface $script
      * @param mixed $solution
      */
-    public function __construct($type, ScriptInterface $script, $solution)
+    public function __construct(string $type, ScriptInterface $script, $solution)
     {
         $this->type = $type;
         $this->script = $script;
@@ -38,7 +40,7 @@ class OutputData
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -46,7 +48,7 @@ class OutputData
     /**
      * @return ScriptInterface
      */
-    public function getScript()
+    public function getScript(): ScriptInterface
     {
         return $this->script;
     }
@@ -62,7 +64,7 @@ class OutputData
     /**
      * @return bool
      */
-    public function canSign()
+    public function canSign(): bool
     {
         return in_array($this->type, [ScriptType::MULTISIG, ScriptType::P2PK, ScriptType::P2PKH]);
     }

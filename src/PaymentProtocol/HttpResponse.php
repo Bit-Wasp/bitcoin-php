@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
 use BitWasp\Bitcoin\Crypto\Random\Random;
@@ -11,11 +13,12 @@ use Symfony\Component\HttpFoundation\Response;
 class HttpResponse
 {
     /**
-     * @param $data
-     * @param $contentType
+     * @param string $data
+     * @param string $contentType
      * @return Response
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function raw($data, $contentType)
+    public function raw(string $data, string $contentType): Response
     {
         $random = new Random();
         $filename = "r" . $random->bytes(12)->getHex() . "." . $contentType;
@@ -36,7 +39,7 @@ class HttpResponse
      * @param PaymentRequest $request
      * @return Response
      */
-    public function paymentRequest(PaymentRequest $request)
+    public function paymentRequest(PaymentRequest $request): Response
     {
         return $this->raw($request->serialize(), 'paymentrequest');
     }
@@ -45,7 +48,7 @@ class HttpResponse
      * @param Payment $payment
      * @return Response
      */
-    public function payment(Payment $payment)
+    public function payment(Payment $payment): Response
     {
         return $this->raw($payment->serialize(), 'payment');
     }
@@ -54,7 +57,7 @@ class HttpResponse
      * @param PaymentACK $ack
      * @return Response
      */
-    public function paymentAck(PaymentACK $ack)
+    public function paymentAck(PaymentACK $ack): Response
     {
         return $this->raw($ack->serialize(), 'paymentack');
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
 use BitWasp\Bitcoin\PaymentProtocol\HttpResponse;
@@ -30,11 +32,11 @@ class HttpResponseTest extends Bip70Test
 
     /**
      * @dataProvider getVectors
-     * @param $method
-     * @param $appType
+     * @param string $method
+     * @param string $appType
      * @param Payment|PaymentRequest|PaymentACK $message
      */
-    public function testAll($method, $appType, $message)
+    public function testAll(string $method, string $appType, $message)
     {
         $http = new HttpResponse();
         $response = call_user_func_array([$http, $method], [$message]);

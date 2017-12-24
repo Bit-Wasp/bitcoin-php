@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @author Joshua Estes
  * @copyright 2012-2015 Joshua Estes

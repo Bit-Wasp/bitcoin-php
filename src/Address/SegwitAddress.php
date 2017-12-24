@@ -41,7 +41,7 @@ class SegwitAddress extends Address implements Bech32AddressInterface
     /**
      * @return WitnessProgram
      */
-    public function getWitnessProgram()
+    public function getWitnessProgram(): WitnessProgram
     {
         return $this->witnessProgram;
     }

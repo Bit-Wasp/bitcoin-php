@@ -26,7 +26,7 @@ class AddressFactory
      * @param KeyInterface $key
      * @return PayToPubKeyHashAddress
      */
-    public static function p2pkh(KeyInterface $key)
+    public static function p2pkh(KeyInterface $key): PayToPubKeyHashAddress
     {
         return new PayToPubKeyHashAddress($key->getPubKeyHash());
     }
@@ -37,7 +37,7 @@ class AddressFactory
      * @param ScriptInterface $p2shScript
      * @return ScriptHashAddress
      */
-    public static function p2sh(ScriptInterface $p2shScript)
+    public static function p2sh(ScriptInterface $p2shScript): ScriptHashAddress
     {
         return new ScriptHashAddress($p2shScript->getScriptHash());
     }
@@ -84,7 +84,7 @@ class AddressFactory
      * @param string $address
      * @param NetworkInterface $network
      * @return AddressInterface
-     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     * @throws \InvalidArgumentException
      */
     public static function fromString(string $address, NetworkInterface $network = null): AddressInterface
     {
@@ -116,7 +116,6 @@ class AddressFactory
      * @param string $address
      * @param NetworkInterface $network
      * @return bool
-     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public static function isValidAddress(string $address, NetworkInterface $network = null): bool
     {

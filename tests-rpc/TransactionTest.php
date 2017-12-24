@@ -1,7 +1,8 @@
 <?php
 
-namespace BitWasp\Bitcoin\RpcTest;
+declare(strict_types=1);
 
+namespace BitWasp\Bitcoin\RpcTest;
 
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -39,7 +40,7 @@ class TransactionTest extends AbstractTestCase
      * Produces scripts for signing
      * @return array
      */
-    public function getScriptVectors()
+    public function getScriptVectors(): array
     {
         return $this->jsonDataFile('signer_fixtures.json')['valid'];
     }
@@ -48,7 +49,7 @@ class TransactionTest extends AbstractTestCase
      * Produces ALL vectors
      * @return array
      */
-    public function getVectors()
+    public function getVectors(): array
     {
         $vectors = [];
         foreach ($this->getScriptVectors() as $fixture) {
@@ -65,7 +66,7 @@ class TransactionTest extends AbstractTestCase
      * @param array $fixture
      * @return array
      */
-    public function stripTestData(array $fixture)
+    public function stripTestData(array $fixture): array
     {
         foreach (['hex'] as $key) {
             if (array_key_exists($key, $fixture)) {
@@ -85,12 +86,12 @@ class TransactionTest extends AbstractTestCase
      * @param int $value
      * @return Utxo
      */
-    public function fundOutput(RpcServer $server, ScriptInterface $script, $value = 100000000)
+    public function fundOutput(RpcServer $server, ScriptInterface $script, $value = 100000000): Utxo
     {
         $chainInfo = $server->makeRpcRequest('getblockchaininfo');
         $bestHeight = $chainInfo['result']['blocks'];
 
-        while($bestHeight < 150 || $chainInfo['result']['bip9_softforks']['segwit']['status'] !== 'active') {
+        while ($bestHeight < 150 || $chainInfo['result']['bip9_softforks']['segwit']['status'] !== 'active') {
             // ought to finish in 1!
             $server->makeRpcRequest("generate", [435]);
             $chainInfo = $server->makeRpcRequest('getblockchaininfo');
@@ -128,12 +129,13 @@ class TransactionTest extends AbstractTestCase
      * @param array $fixture
      * @dataProvider getVectors
      */
-    public function testCases($fixture)
+    public function testCases(array $fixture)
     {
         $bitcoind = $this->rpcFactory->startBitcoind();
         $this->assertTrue($bitcoind->isRunning());
 
-        $defaultPolicy = Interpreter::VERIFY_NONE | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY;;
+        $defaultPolicy = Interpreter::VERIFY_NONE | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY;
+        ;
         $txBuilder = new TxBuilder();
         if (array_key_exists('version', $fixture['raw'])) {
             $txBuilder->version((int) $fixture['raw']['version']);
@@ -141,8 +143,9 @@ class TransactionTest extends AbstractTestCase
 
         $totalOut = 12345;
         foreach ($fixture['raw']['outs'] as $output) {
-            $txBuilder->output($output['value'], ScriptFactory::fromHex($output['script']));
-            $totalOut += $output['value'];
+            $value = (int) $output['value'];
+            $txBuilder->output($value, ScriptFactory::fromHex($output['script']));
+            $totalOut += $value;
         }
 
         /**

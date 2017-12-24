@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -41,7 +43,7 @@ class InputSignerTest extends AbstractTestCase
      */
     private function decodeTxOut(array $txOutArr)
     {
-        return new TransactionOutput($txOutArr['value'], ScriptFactory::fromHex($txOutArr['script']));
+        return new TransactionOutput((int) $txOutArr['value'], ScriptFactory::fromHex($txOutArr['script']));
     }
 
     /**

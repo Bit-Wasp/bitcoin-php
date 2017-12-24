@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -32,7 +34,7 @@ class P2shScriptTest extends AbstractTestCase
      * @param string $exceptionMsg
      * @dataProvider getCannotNestVectors
      */
-    public function testCannotNestWitnessScripts(ScriptInterface $testScript, $exceptionMsg)
+    public function testCannotNestWitnessScripts(ScriptInterface $testScript, string $exceptionMsg)
     {
         $this->expectException(P2shScriptException::class);
         $this->expectExceptionMessage($exceptionMsg);

@@ -33,7 +33,7 @@ class NativeConsensus implements ConsensusInterface
      * @param int $amount
      * @return bool
      */
-    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $flags, $nInputToSign, $amount)
+    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, int $flags, int $nInputToSign, int $amount): bool
     {
         $inputs = $tx->getInputs();
         $interpreter = new Interpreter($this->adapter);

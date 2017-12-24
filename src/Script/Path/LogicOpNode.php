@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Path;
 
 class LogicOpNode
@@ -57,7 +59,7 @@ class LogicOpNode
     /**
      * @return bool
      */
-    public function isRoot()
+    public function isRoot(): bool
     {
         return $this->parent == null;
     }
@@ -65,7 +67,7 @@ class LogicOpNode
     /**
      * @return bool
      */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return count($this->children) > 0;
     }
@@ -101,7 +103,7 @@ class LogicOpNode
     /**
      * @return array
      */
-    public function split()
+    public function split(): array
     {
         if (count($this->children) > 0) {
             throw new \RuntimeException("Sanity check - don't split twice");

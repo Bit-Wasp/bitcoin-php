@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Bloom;
 
 use BitWasp\Bitcoin\Amount;
@@ -324,7 +326,7 @@ class BloomFilterTest extends AbstractTestCase
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
 
         $filter = BloomFilter::create($math, 10, 0.000001, 0, BloomFilter::UPDATE_ALL);
-        $filter->insertOutPoint(new OutPoint(Buffer::hex('41c1d247b5f6ef9952cd711beba91ba216982fb6ba58f3bdaab65e7341414141'), '0'));
+        $filter->insertOutPoint(new OutPoint(Buffer::hex('41c1d247b5f6ef9952cd711beba91ba216982fb6ba58f3bdaab65e7341414141'), 0));
         $this->assertFalse($filter->isRelevantAndUpdate($tx));
     }
 

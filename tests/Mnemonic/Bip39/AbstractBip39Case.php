@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Bip39;
 
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39Mnemonic;

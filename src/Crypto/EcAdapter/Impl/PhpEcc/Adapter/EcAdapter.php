@@ -84,7 +84,7 @@ class EcAdapter implements EcAdapterInterface
      * @param \GMP $s
      * @return Signature
      */
-    public function getSignature(\GMP $r, \GMP $s)
+    public function getSignature(\GMP $r, \GMP $s): SignatureInterface
     {
         return new Signature($this, $r, $s);
     }
@@ -226,7 +226,7 @@ class EcAdapter implements EcAdapterInterface
      * @return int
      * @throws \Exception
      */
-    public function calcPubKeyRecoveryParam(\GMP $r, \GMP $s, BufferInterface $messageHash, PublicKey $publicKey)
+    public function calcPubKeyRecoveryParam(\GMP $r, \GMP $s, BufferInterface $messageHash, PublicKey $publicKey): int
     {
         $Q = $publicKey->getPoint();
         for ($i = 0; $i < 4; $i++) {

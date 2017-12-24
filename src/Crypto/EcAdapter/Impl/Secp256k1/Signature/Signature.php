@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Signature\DerSignatureSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Buffertools\BufferInterface;
 
 class Signature extends Serializable implements SignatureInterface
 {
@@ -100,9 +101,9 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new DerSignatureSerializer($this->ecAdapter))->serialize($this);
     }

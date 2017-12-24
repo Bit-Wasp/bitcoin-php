@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
@@ -27,7 +29,7 @@ class CompactSignatureTest extends AbstractTestCase
 
         for ($i = 0; $i < 2; $i++) {
             $priv = PrivateKeyFactory::create(false)->getHex();
-            $message = $i;
+            $message = "Message $i";
 
             foreach ($this->getEcAdapters() as $adapter) {
                 $vectors[] = [$adapter[0], PrivateKeyFactory::fromHex($priv, true, $adapter[0]), $message];
@@ -44,7 +46,7 @@ class CompactSignatureTest extends AbstractTestCase
      * @param PrivateKeyInterface $private
      * @param string $message
      */
-    public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKeyInterface $private, $message)
+    public function testCompactSignature(EcAdapterInterface $ecAdapter, PrivateKeyInterface $private, string $message)
     {
         $pubKey = $private->getPublicKey();
         $msgSigner = new MessageSigner($ecAdapter);

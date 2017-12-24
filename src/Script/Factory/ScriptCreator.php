@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Factory;
 
 use BitWasp\Bitcoin\Math\Math;
@@ -78,7 +80,7 @@ class ScriptCreator
      * @param string $name
      * @return $this
      */
-    public function op($name)
+    public function op(string $name)
     {
         $code = $this->opcodes->getOpByName($name);
         $this->script .= chr($code);
@@ -88,7 +90,7 @@ class ScriptCreator
     /**
      * Push data into the stack.
      *
-     * @param $data
+     * @param BufferInterface $data
      * @return $this
      * @throws \Exception
      */
@@ -121,7 +123,7 @@ class ScriptCreator
      * @param int $n
      * @return $this
      */
-    public function int($n)
+    public function int(int $n)
     {
         if ($n === 0) {
             $this->script .= chr(Opcodes::OP_0);
@@ -157,7 +159,7 @@ class ScriptCreator
     /**
      * @return ScriptInterface
      */
-    public function getScript()
+    public function getScript(): ScriptInterface
     {
         return new Script(new Buffer($this->script, null, $this->math), $this->opcodes);
     }

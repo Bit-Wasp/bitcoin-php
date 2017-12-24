@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
 abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Countable
@@ -12,7 +14,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     /**
      * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->set->toArray();
     }
@@ -20,7 +22,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     /**
      * @return bool
      */
-    public function isNull()
+    public function isNull(): bool
     {
         return count($this->set) === 0;
     }
@@ -28,7 +30,7 @@ abstract class AbstractCollectionMutator implements \Iterator, \ArrayAccess, \Co
     /**
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->set->count();
     }

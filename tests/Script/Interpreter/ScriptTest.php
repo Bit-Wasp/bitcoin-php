@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -45,8 +47,17 @@ class ScriptTest extends ScriptCheckTestBase
      * @param int $amount
      * @dataProvider prepareInterpreterTests
      */
-    public function testScript(EcAdapterInterface $ecAdapter, Interpreter $interpreter, $flags, $expectedResult, ScriptWitnessInterface $scriptWitness, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $amount, $strTest)
-    {
+    public function testScript(
+        EcAdapterInterface $ecAdapter,
+        Interpreter $interpreter,
+        int $flags,
+        bool $expectedResult,
+        ScriptWitnessInterface $scriptWitness,
+        ScriptInterface $scriptSig,
+        ScriptInterface $scriptPubKey,
+        int $amount,
+        string $strTest
+    ) {
         $create = $this->buildCreditingTransaction($scriptPubKey, $amount);
         $tx = $this->buildSpendTransaction($create, $scriptSig, $scriptWitness);
         $check = $interpreter->verify($scriptSig, $scriptPubKey, $flags, new Checker($ecAdapter, $tx, 0, $amount), $scriptWitness);

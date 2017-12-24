@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -23,7 +25,7 @@ class Base58
      * @return string
      * @throws \Exception
      */
-    public static function encode(BufferInterface $buffer)
+    public static function encode(BufferInterface $buffer): string
     {
         $size = $buffer->getSize();
         if ($buffer->getBinary() === '') {
@@ -55,10 +57,10 @@ class Base58
     /**
      * Decode a base58 string
      * @param string $base58
-     * @return Buffer
+     * @return BufferInterface
      * @throws Base58InvalidCharacter
      */
-    public static function decode($base58)
+    public static function decode(string $base58): BufferInterface
     {
         $math = Bitcoin::getMath();
         if ($base58 === '') {
@@ -91,7 +93,7 @@ class Base58
      * @param BufferInterface $data
      * @return BufferInterface
      */
-    public static function checksum(BufferInterface $data)
+    public static function checksum(BufferInterface $data): BufferInterface
     {
         return Hash::sha256d($data)->slice(0, 4);
     }
@@ -103,11 +105,16 @@ class Base58
      * @return BufferInterface
      * @throws Base58ChecksumFailure
      */
-    public static function decodeCheck($base58)
+    public static function decodeCheck(string $base58): BufferInterface
     {
-        $hex = self::decode($base58);
-        $data = $hex->slice(0, -4);
-        $csVerify = $hex->slice(-4);
+        $decoded = self::decode($base58);
+        $checksumLength = 4;
+        if ($decoded->getSize() < $checksumLength) {
+            throw new Base58ChecksumFailure("Missing base58 checksum");
+        }
+
+        $data = $decoded->slice(0, -$checksumLength);
+        $csVerify = $decoded->slice(-$checksumLength);
 
         if (!hash_equals(self::checksum($data)->getBinary(), $csVerify->getBinary())) {
             throw new Base58ChecksumFailure('Failed to verify checksum');
@@ -123,7 +130,7 @@ class Base58
      * @return string
      * @throws \Exception
      */
-    public static function encodeCheck(BufferInterface $data)
+    public static function encodeCheck(BufferInterface $data): string
     {
         return self::encode(Buffertools::concat($data, self::checksum($data)));
     }

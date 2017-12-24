@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -254,7 +256,7 @@ class ScriptTest extends AbstractTestCase
     public function testBadScriptZeroSigOps()
     {
         $script = new Script(new Buffer("\x41"));
-        $this->assertEquals(0, $script->countSigOps($script));
+        $this->assertEquals(0, $script->countSigOps());
         $this->assertEquals(0, $script->countP2shSigops(new Script));
 
         $p2sh = ScriptFactory::scriptPubKey()->payToScriptHash($script->getScriptHash());

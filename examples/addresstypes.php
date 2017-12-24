@@ -19,7 +19,8 @@ echo " * p2pkh address: {$p2pkh->getAddress()}\n";
 
 $p2wpkhWP = WitnessProgram::v0($publicKey->getPubKeyHash());
 $p2wpkh = new SegwitAddress($p2wpkhWP);
-echo " * v0 key hash address: {$p2wpkh->getAddress()}\n";
+$address = $p2wpkh->getAddress();
+echo " * v0 key hash address: {$address}\n";
 
 #### Script hash types
 

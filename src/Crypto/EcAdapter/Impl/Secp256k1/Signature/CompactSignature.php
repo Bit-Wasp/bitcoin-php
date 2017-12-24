@@ -113,7 +113,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new CompactSignatureSerializer($this->ecAdapter))->serialize($this);
     }

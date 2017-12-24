@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
@@ -24,7 +26,7 @@ class InputCollectionMutator extends AbstractCollectionMutator
     /**
      * @return InputMutator
      */
-    public function current()
+    public function current(): InputMutator
     {
         return $this->set->current();
     }
@@ -33,7 +35,7 @@ class InputCollectionMutator extends AbstractCollectionMutator
      * @param int $offset
      * @return InputMutator
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): InputMutator
     {
         if (!$this->set->offsetExists($offset)) {
             throw new \OutOfRangeException('Input does not exist');
@@ -45,7 +47,7 @@ class InputCollectionMutator extends AbstractCollectionMutator
     /**
      * @return TransactionInputInterface[]
      */
-    public function done()
+    public function done(): array
     {
         $set = [];
         foreach ($this->set as $mutator) {
@@ -60,7 +62,7 @@ class InputCollectionMutator extends AbstractCollectionMutator
      * @param int $length
      * @return $this
      */
-    public function slice($start, $length)
+    public function slice(int $start, int $length)
     {
         $end = $this->set->getSize();
         if ($start > $end || $length > $end) {
@@ -98,7 +100,7 @@ class InputCollectionMutator extends AbstractCollectionMutator
      * @param TransactionInputInterface $input
      * @return $this
      */
-    public function set($i, TransactionInputInterface $input)
+    public function set(int $i, TransactionInputInterface $input)
     {
         $this->set[$i] = new InputMutator($input);
         return $this;

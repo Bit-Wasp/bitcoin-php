@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
@@ -36,7 +38,7 @@ class TxMutator
     /**
      * @return InputCollectionMutator
      */
-    public function inputsMutator()
+    public function inputsMutator(): InputCollectionMutator
     {
         if (null === $this->inputsMutator) {
             $this->inputsMutator = new InputCollectionMutator($this->transaction->getInputs());
@@ -48,7 +50,7 @@ class TxMutator
     /**
      * @return OutputCollectionMutator
      */
-    public function outputsMutator()
+    public function outputsMutator(): OutputCollectionMutator
     {
         if (null === $this->outputsMutator) {
             $this->outputsMutator = new OutputCollectionMutator($this->transaction->getOutputs());
@@ -60,7 +62,7 @@ class TxMutator
     /**
      * @return TransactionInterface
      */
-    public function done()
+    public function done(): TransactionInterface
     {
         if (null !== $this->inputsMutator) {
             $this->inputs($this->inputsMutator->done());
@@ -94,7 +96,7 @@ class TxMutator
      * @param int $nVersion
      * @return $this
      */
-    public function version($nVersion)
+    public function version(int $nVersion)
     {
         return $this->replace(array('version' => $nVersion));
     }
@@ -130,7 +132,7 @@ class TxMutator
      * @param int $locktime
      * @return $this
      */
-    public function locktime($locktime)
+    public function locktime(int $locktime)
     {
         return $this->replace(array('nLockTime' => $locktime));
     }

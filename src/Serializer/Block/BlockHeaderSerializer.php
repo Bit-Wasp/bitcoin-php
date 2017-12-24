@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 
@@ -34,7 +35,7 @@ class BlockHeaderSerializer
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $string
+     * @param BufferInterface|string $string
      * @return BlockHeader
      * @throws ParserOutOfRange
      */
@@ -45,10 +46,10 @@ class BlockHeaderSerializer
 
     /**
      * @param Parser $parser
-     * @return BlockHeader
+     * @return BlockHeaderInterface
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): BlockHeaderInterface
     {
         try {
             return new BlockHeader(
@@ -66,9 +67,9 @@ class BlockHeaderSerializer
 
     /**
      * @param BlockHeaderInterface $header
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(BlockHeaderInterface $header)
+    public function serialize(BlockHeaderInterface $header): BufferInterface
     {
         return new Buffer(
             $this->int32le->write($header->getVersion()) .

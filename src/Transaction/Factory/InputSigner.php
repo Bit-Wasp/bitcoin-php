@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -260,9 +262,9 @@ class InputSigner implements InputSignerInterface
      * @param bool $setting
      * @return $this
      */
-    public function padUnsignedMultisigs($setting)
+    public function padUnsignedMultisigs(bool $setting)
     {
-        $this->padUnsignedMultisigs = (bool) $setting;
+        $this->padUnsignedMultisigs = $setting;
         return $this;
     }
 
@@ -270,9 +272,9 @@ class InputSigner implements InputSignerInterface
      * @param bool $setting
      * @return $this
      */
-    public function tolerateInvalidPublicKey($setting)
+    public function tolerateInvalidPublicKey(bool $setting)
     {
-        $this->tolerateInvalidPublicKey = (bool) $setting;
+        $this->tolerateInvalidPublicKey = $setting;
         return $this;
     }
 
@@ -280,9 +282,9 @@ class InputSigner implements InputSignerInterface
      * @param bool $setting
      * @return $this
      */
-    public function redeemBitcoinCash($setting)
+    public function redeemBitcoinCash(bool $setting)
     {
-        $this->redeemBitcoinCash = (bool) $setting;
+        $this->redeemBitcoinCash = $setting;
         return $this;
     }
 
@@ -290,9 +292,9 @@ class InputSigner implements InputSignerInterface
      * @param bool $setting
      * @return $this
      */
-    public function allowComplexScripts($setting)
+    public function allowComplexScripts(bool $setting)
     {
-        $this->allowComplexScripts = (bool) $setting;
+        $this->allowComplexScripts = $setting;
         return $this;
     }
 
@@ -322,7 +324,7 @@ class InputSigner implements InputSignerInterface
      * @return \SplObjectStorage
      * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      */
-    private function sortMultisigs(ScriptInterface $script, array $signatures, array $publicKeys, $sigVersion)
+    private function sortMultisigs(ScriptInterface $script, array $signatures, array $publicKeys, int $sigVersion): \SplObjectStorage
     {
         $sigCount = count($signatures);
         $keyCount = count($publicKeys);
@@ -437,7 +439,7 @@ class InputSigner implements InputSignerInterface
      * @param bool[] $pathData
      * @return Conditional
      */
-    public function extractConditionalOp(Operation $operation, Stack $mainStack, array &$pathData)
+    public function extractConditionalOp(Operation $operation, Stack $mainStack, array &$pathData): Conditional
     {
         $opValue = null;
 
@@ -476,7 +478,7 @@ class InputSigner implements InputSignerInterface
      * @param int $idx
      * @return Checksig|Conditional
      */
-    public function step($idx)
+    public function step(int $idx)
     {
         if (!array_key_exists($idx, $this->steps)) {
             throw new \RuntimeException("Out of range index for input sign step");
@@ -845,7 +847,7 @@ class InputSigner implements InputSignerInterface
      * @param int $sigHashType
      * @return BufferInterface
      */
-    public function getSigHash($sigHashType)
+    public function getSigHash(int $sigHashType): BufferInterface
     {
         return $this->calculateSigHashUnsafe($this->fqs->signScript()->getScript(), $sigHashType, $this->fqs->sigVersion());
     }
@@ -859,7 +861,7 @@ class InputSigner implements InputSignerInterface
      * @param int $sigVersion
      * @return TransactionSignatureInterface
      */
-    private function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, $sigHashType, $sigVersion)
+    private function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, int $sigHashType, int $sigVersion)
     {
         $hash = $this->calculateSigHashUnsafe($scriptCode, $sigHashType, $sigVersion);
         $ecSignature = $this->ecAdapter->sign($hash, $key, new Rfc6979($this->ecAdapter, $key, $hash, 'sha256'));
@@ -871,7 +873,7 @@ class InputSigner implements InputSignerInterface
      *
      * @return bool
      */
-    public function isFullySigned()
+    public function isFullySigned(): bool
     {
         foreach ($this->steps as $step) {
             if ($step instanceof Conditional) {
@@ -893,7 +895,7 @@ class InputSigner implements InputSignerInterface
      *
      * @return int
      */
-    public function getRequiredSigs()
+    public function getRequiredSigs(): int
     {
         $count = 0;
         foreach ($this->steps as $step) {
@@ -910,7 +912,7 @@ class InputSigner implements InputSignerInterface
      *
      * @return TransactionSignatureInterface[]
      */
-    public function getSignatures()
+    public function getSignatures(): array
     {
         return $this->steps[0]->getSignatures();
     }
@@ -921,7 +923,7 @@ class InputSigner implements InputSignerInterface
      *
      * @return PublicKeyInterface[]
      */
-    public function getPublicKeys()
+    public function getPublicKeys(): array
     {
         return $this->steps[0]->getKeys();
     }
@@ -932,7 +934,7 @@ class InputSigner implements InputSignerInterface
      *
      * @return FullyQualifiedScript
      */
-    public function getInputScripts()
+    public function getInputScripts(): FullyQualifiedScript
     {
         return $this->fqs;
     }
@@ -943,7 +945,7 @@ class InputSigner implements InputSignerInterface
      * @param int $sigHashType
      * @return $this
      */
-    public function signStep($stepIdx, PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
+    public function signStep(int $stepIdx, PrivateKeyInterface $privateKey, int $sigHashType = SigHash::ALL)
     {
         if (!array_key_exists($stepIdx, $this->steps)) {
             throw new \RuntimeException("Unknown step index");
@@ -1016,7 +1018,7 @@ class InputSigner implements InputSignerInterface
      * @param int $sigHashType
      * @return $this
      */
-    public function sign(PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
+    public function sign(PrivateKeyInterface $privateKey, int $sigHashType = SigHash::ALL)
     {
         return $this->signStep(0, $privateKey, $sigHashType);
     }
@@ -1027,7 +1029,7 @@ class InputSigner implements InputSignerInterface
      * @param int $flags
      * @return bool
      */
-    public function verify($flags = null)
+    public function verify(int $flags = null): bool
     {
         $consensus = ScriptFactory::consensus();
 
@@ -1065,7 +1067,7 @@ class InputSigner implements InputSignerInterface
     /**
      * @return Stack
      */
-    private function serializeSteps()
+    private function serializeSteps(): Stack
     {
         $results = [];
         for ($i = 0, $n = count($this->steps); $i < $n; $i++) {
@@ -1108,6 +1110,9 @@ class InputSigner implements InputSignerInterface
         return $this->fqs->encodeStack($this->serializeSteps());
     }
 
+    /**
+     * @return Checksig[]|Conditional[]|mixed
+     */
     public function getSteps()
     {
         return $this->steps;

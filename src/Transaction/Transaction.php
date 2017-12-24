@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -58,11 +60,11 @@ class Transaction extends Serializable implements TransactionInterface
      * @param int $nLockTime
      */
     public function __construct(
-        $nVersion = TransactionInterface::DEFAULT_VERSION,
+        int $nVersion = TransactionInterface::DEFAULT_VERSION,
         array $vin = [],
         array $vout = [],
         array $vwit = [],
-        $nLockTime = 0
+        int $nLockTime = 0
     ) {
         if ($nVersion < IntRange::I32_MIN || $nVersion > IntRange::I32_MAX) {
             throw new \InvalidArgumentException('Transaction version is outside valid range');
@@ -89,7 +91,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return BufferInterface
      */
-    public function getTxHash()
+    public function getTxHash(): BufferInterface
     {
         if (null === $this->hash) {
             $this->hash = Hash::sha256d($this->getBaseSerialization());
@@ -100,7 +102,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return BufferInterface
      */
-    public function getTxId()
+    public function getTxId(): BufferInterface
     {
         return $this->getTxHash()->flip();
     }
@@ -108,7 +110,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return BufferInterface
      */
-    public function getWitnessTxId()
+    public function getWitnessTxId(): BufferInterface
     {
         if (null === $this->wtxid) {
             $this->wtxid = Hash::sha256d($this->getBuffer())->flip();
@@ -120,7 +122,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return int
      */
-    public function getVersion()
+    public function getVersion(): int
     {
         return $this->version;
     }
@@ -130,7 +132,7 @@ class Transaction extends Serializable implements TransactionInterface
      *
      * @return TransactionInputInterface[]
      */
-    public function getInputs()
+    public function getInputs(): array
     {
         return $this->inputs;
     }
@@ -139,7 +141,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param int $index
      * @return TransactionInputInterface
      */
-    public function getInput($index)
+    public function getInput(int $index): TransactionInputInterface
     {
         if (!isset($this->inputs[$index])) {
             throw new \RuntimeException('No input at this index');
@@ -152,7 +154,7 @@ class Transaction extends Serializable implements TransactionInterface
      *
      * @return TransactionOutputInterface[]
      */
-    public function getOutputs()
+    public function getOutputs(): array
     {
         return $this->outputs;
     }
@@ -161,7 +163,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param int $vout
      * @return TransactionOutputInterface
      */
-    public function getOutput($vout)
+    public function getOutput(int $vout): TransactionOutputInterface
     {
         if (!isset($this->outputs[$vout])) {
             throw new \RuntimeException('No output at this index');
@@ -172,7 +174,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return bool
      */
-    public function hasWitness()
+    public function hasWitness(): bool
     {
         for ($l = count($this->inputs), $i = 0; $i < $l; $i++) {
             if (isset($this->witness[$i]) && count($this->witness[$i]) > 0) {
@@ -186,7 +188,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return ScriptWitnessInterface[]
      */
-    public function getWitnesses()
+    public function getWitnesses(): array
     {
         return $this->witness;
     }
@@ -195,7 +197,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param int $index
      * @return ScriptWitnessInterface
      */
-    public function getWitness($index)
+    public function getWitness(int $index): ScriptWitnessInterface
     {
         if (!isset($this->witness[$index])) {
             throw new \RuntimeException('No witness at this index');
@@ -207,7 +209,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param int $vout
      * @return OutPointInterface
      */
-    public function makeOutpoint($vout)
+    public function makeOutpoint(int $vout): OutPointInterface
     {
         $this->getOutput($vout);
         return new OutPoint($this->getTxId(), $vout);
@@ -217,7 +219,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param int $vout
      * @return Utxo
      */
-    public function makeUtxo($vout)
+    public function makeUtxo(int $vout): Utxo
     {
         return new Utxo(new OutPoint($this->getTxId(), $vout), $this->getOutput($vout));
     }
@@ -227,13 +229,13 @@ class Transaction extends Serializable implements TransactionInterface
      *
      * @return int
      */
-    public function getLockTime()
+    public function getLockTime(): int
     {
         return $this->lockTime;
     }
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getValueOut()
     {
@@ -249,7 +251,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return bool
      */
-    public function isCoinbase()
+    public function isCoinbase(): bool
     {
         return count($this->inputs) === 1 && $this->getInput(0)->isCoinBase();
     }
@@ -258,7 +260,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param TransactionInterface $tx
      * @return bool
      */
-    public function equals(TransactionInterface $tx)
+    public function equals(TransactionInterface $tx): bool
     {
         $version = gmp_cmp($this->version, $tx->getVersion());
         if ($version !== 0) {
@@ -299,7 +301,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new TransactionSerializer())->serialize($this);
     }
@@ -307,7 +309,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return BufferInterface
      */
-    public function getBaseSerialization()
+    public function getBaseSerialization(): BufferInterface
     {
         return (new TransactionSerializer())->serialize($this, TransactionSerializer::NO_WITNESS);
     }
@@ -315,7 +317,7 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return BufferInterface
      */
-    public function getWitnessSerialization()
+    public function getWitnessSerialization(): BufferInterface
     {
         if (!$this->hasWitness()) {
             throw new \RuntimeException('Cannot get witness serialization for transaction without witnesses');
@@ -330,7 +332,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @see TransactionInterface::getWitnessSerialization()
      * @deprecated
      */
-    public function getWitnessBuffer()
+    public function getWitnessBuffer(): BufferInterface
     {
         return $this->getWitnessSerialization();
     }

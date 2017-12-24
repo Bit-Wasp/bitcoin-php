@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Collection\StaticBufferCollection;
 use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
+use BitWasp\Buffertools\BufferInterface;
 
 class ScriptWitness extends StaticBufferCollection implements ScriptWitnessInterface
 {
@@ -11,7 +14,7 @@ class ScriptWitness extends StaticBufferCollection implements ScriptWitnessInter
      * @param ScriptWitnessInterface $witness
      * @return bool
      */
-    public function equals(ScriptWitnessInterface $witness)
+    public function equals(ScriptWitnessInterface $witness): bool
     {
         $nStack = count($this);
         if ($nStack !== count($witness)) {
@@ -30,7 +33,7 @@ class ScriptWitness extends StaticBufferCollection implements ScriptWitnessInter
     /**
      * @return \BitWasp\Buffertools\BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new ScriptWitnessSerializer())->serialize($this);
     }

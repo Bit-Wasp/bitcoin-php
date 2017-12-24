@@ -184,7 +184,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new PrivateKeySerializer($this->ecAdapter))->serialize($this);
     }

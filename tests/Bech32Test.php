@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\SegwitBech32;
@@ -127,7 +129,7 @@ class Bech32Test extends AbstractTestCase
      * @param BufferInterface $program
      * @return \BitWasp\Bitcoin\Script\ScriptInterface
      */
-    public function makeSegwitScript($version, BufferInterface $program)
+    public function makeSegwitScript(int $version, BufferInterface $program)
     {
         return ScriptFactory::sequence([encodeOpN($version), $program]);
     }
@@ -138,7 +140,7 @@ class Bech32Test extends AbstractTestCase
      * @param string $scriptHex
      * @dataProvider getBip173Fixtures
      */
-    public function test173Fixtures(NetworkInterface $network, $bech32, $scriptHex)
+    public function test173Fixtures(NetworkInterface $network, string $bech32, string $scriptHex)
     {
         $wp = SegwitBech32::decode($bech32, $network);
         $this->assertEquals($scriptHex, $wp->getScript()->getHex());
@@ -148,7 +150,7 @@ class Bech32Test extends AbstractTestCase
      * @param string $test
      * @dataProvider getValidChecksumFixtures
      */
-    public function testValidChecksum($test)
+    public function testValidChecksum(string $test)
     {
         Bech32::decode($test);
 
@@ -171,7 +173,7 @@ class Bech32Test extends AbstractTestCase
      * @param string $hexScript
      * @dataProvider getAddressVectors
      */
-    public function testValidAddress(NetworkInterface $network, $bech32, $hexScript)
+    public function testValidAddress(NetworkInterface $network, string $bech32, string $hexScript)
     {
         $wp = SegwitBech32::decode($bech32, $network);
         $this->assertEquals($hexScript, $wp->getScript()->getHex());
@@ -184,7 +186,7 @@ class Bech32Test extends AbstractTestCase
      * @param string $bech32
      * @dataProvider getInvalidAddressFixtures
      */
-    public function testInvalidAddress($bech32)
+    public function testInvalidAddress(string $bech32)
     {
         try {
             SegwitBech32::decode($bech32, NetworkFactory::bitcoin());
@@ -229,10 +231,11 @@ class Bech32Test extends AbstractTestCase
      * @param string $bech32
      * @dataProvider getFailedDecodeFixtures
      */
-    public function testDecodeFails($bech32, $exceptionMsg)
+    public function testDecodeFails(string $bech32, string $exceptionMsg)
     {
         $this->expectException(Bech32Exception::class);
         $this->expectExceptionMessage($exceptionMsg);
+
         Bech32::decode($bech32);
     }
 

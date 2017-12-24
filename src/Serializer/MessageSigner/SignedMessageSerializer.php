@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\MessageSigner;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
@@ -32,7 +34,7 @@ class SignedMessageSerializer
      * @param SignedMessage $signedMessage
      * @return BufferInterface
      */
-    public function serialize(SignedMessage $signedMessage)
+    public function serialize(SignedMessage $signedMessage): BufferInterface
     {
         $content = self::HEADER . PHP_EOL
             . $signedMessage->getMessage() . PHP_EOL
@@ -47,7 +49,7 @@ class SignedMessageSerializer
      * @param string $content
      * @return SignedMessage
      */
-    public function parse($content)
+    public function parse(string $content): SignedMessage
     {
         if (0 !== strpos($content, self::HEADER)) {
             throw new \RuntimeException('Message must begin with ' . self::HEADER);

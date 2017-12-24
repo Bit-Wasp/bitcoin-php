@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Address;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -82,7 +84,7 @@ class AddressTest extends AbstractTestCase
      * @param $address
      * @throws \Exception
      */
-    public function testAddress($type, NetworkInterface $network, $data, $address)
+    public function testAddress(string $type, NetworkInterface $network, $data, string $address)
     {
         if ($type === 'pubkeyhash') {
             $pubKey = PublicKeyFactory::fromHex($data);

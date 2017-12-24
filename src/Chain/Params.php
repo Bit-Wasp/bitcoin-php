@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
 use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Buffertools\Buffer;
@@ -121,18 +122,13 @@ class Params implements ParamsInterface
             ->push($timestamp)
             ->getScript();
 
-        $outputScript = ScriptFactory::create()
-            ->push($publicKey)
-            ->op('OP_CHECKSIG')
-            ->getScript();
-
         return new Block(
             $this->math,
             $this->getGenesisBlockHeader(),
             (new TxBuilder)
-                ->version('1')
+                ->version(1)
                 ->input(new Buffer('', 32), 0xffffffff, $inputScript)
-                ->output(5000000000, $outputScript)
+                ->output(5000000000, ScriptFactory::sequence([$publicKey, Opcodes::OP_CHECKSIG]))
                 ->locktime(0)
                 ->get()
         );

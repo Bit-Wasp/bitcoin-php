@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Buffertools\BufferInterface;
@@ -28,7 +30,7 @@ class WitnessProgram
      * @param int $version
      * @param BufferInterface $program
      */
-    public function __construct($version, BufferInterface $program)
+    public function __construct(int $version, BufferInterface $program)
     {
         if ($this->version < 0 || $this->version > 16) {
             throw new \RuntimeException("Invalid witness program version");
@@ -46,7 +48,7 @@ class WitnessProgram
      * @param BufferInterface $program
      * @return WitnessProgram
      */
-    public static function v0(BufferInterface $program)
+    public static function v0(BufferInterface $program): self
     {
         if ($program->getSize() === 20) {
             return new self(self::V0, $program);
@@ -60,7 +62,7 @@ class WitnessProgram
     /**
      * @return int
      */
-    public function getVersion()
+    public function getVersion(): int
     {
         return $this->version;
     }
@@ -68,7 +70,7 @@ class WitnessProgram
     /**
      * @return BufferInterface
      */
-    public function getProgram()
+    public function getProgram(): BufferInterface
     {
         return $this->program;
     }
@@ -76,7 +78,7 @@ class WitnessProgram
     /**
      * @return ScriptInterface
      */
-    public function getScript()
+    public function getScript(): ScriptInterface
     {
         if (null === $this->outputScript) {
             $this->outputScript = ScriptFactory::sequence([encodeOpN($this->version), $this->program]);

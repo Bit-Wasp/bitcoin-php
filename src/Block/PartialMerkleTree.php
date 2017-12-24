@@ -68,7 +68,7 @@ class PartialMerkleTree extends Serializable
      * @param int $height
      * @return int
      */
-    public function calcTreeWidth($height)
+    public function calcTreeWidth(int $height)
     {
         return ($this->elementCount + (1 << $height) - 1) >> $height;
     }
@@ -78,7 +78,7 @@ class PartialMerkleTree extends Serializable
      *
      * @return int
      */
-    public function calcTreeHeight()
+    public function calcTreeHeight(): int
     {
         $height = 0;
         while ($this->calcTreeWidth($height) > 1) {
@@ -91,7 +91,7 @@ class PartialMerkleTree extends Serializable
     /**
      * @return int
      */
-    public function getTxCount()
+    public function getTxCount(): int
     {
         return $this->elementCount;
     }
@@ -99,7 +99,7 @@ class PartialMerkleTree extends Serializable
     /**
      * @return BufferInterface[]
      */
-    public function getHashes()
+    public function getHashes(): array
     {
         return $this->vHashes;
     }
@@ -107,7 +107,7 @@ class PartialMerkleTree extends Serializable
     /**
      * @return array
      */
-    public function getFlagBits()
+    public function getFlagBits(): array
     {
         return $this->vFlagBits;
     }
@@ -120,7 +120,7 @@ class PartialMerkleTree extends Serializable
      * @param \BitWasp\Buffertools\BufferInterface[] $vTxid
      * @return \BitWasp\Buffertools\BufferInterface
      */
-    public function calculateHash(int $height, $position, array $vTxid)
+    public function calculateHash(int $height, $position, array $vTxid): BufferInterface
     {
         if ($height === 0) {
             return $vTxid[$position];
@@ -255,7 +255,7 @@ class PartialMerkleTree extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new PartialMerkleTreeSerializer())->serialize($this);
     }

@@ -1,7 +1,8 @@
 <?php
 
-namespace BitWasp\Bitcoin\RpcTest;
+declare(strict_types=1);
 
+namespace BitWasp\Bitcoin\RpcTest;
 
 class RpcCredential
 {
@@ -48,7 +49,7 @@ EOF;
      * @param string $pass
      * @param bool $isHttps
      */
-    public function __construct($host, $port, $user, $pass, $isHttps = false)
+    public function __construct(string $host, int $port, string $user, string $pass, bool $isHttps)
     {
         $this->host = $host;
         $this->username = $user;
@@ -60,7 +61,7 @@ EOF;
     /**
      * @return array
      */
-    public function getConfigArray()
+    public function getConfigArray(): array
     {
         return [
             "rpcuser" => $this->username,
@@ -73,7 +74,7 @@ EOF;
     /**
      * @return string
      */
-    public function getDsn()
+    public function getDsn(): string
     {
         $prefix = "http" . ($this->isHttps ? "s" : "");
         return "$prefix://{$this->username}:{$this->password}@{$this->host}:{$this->port}";
@@ -82,7 +83,7 @@ EOF;
     /**
      * @return string
      */
-    public function getHost()
+    public function getHost(): string
     {
         return $this->host;
     }
@@ -90,7 +91,7 @@ EOF;
     /**
      * @return int
      */
-    public function getPort()
+    public function getPort(): int
     {
         return $this->port;
     }
@@ -98,7 +99,7 @@ EOF;
     /**
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -106,7 +107,7 @@ EOF;
     /**
      * @return string
      */
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -114,9 +115,8 @@ EOF;
     /**
      * @return bool
      */
-    public function isHttps()
+    public function isHttps(): bool
     {
         return $this->isHttps;
     }
-
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\RpcTest;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -32,7 +34,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @return array
      */
-    public function jsonDataFile($name)
+    public function jsonDataFile(string $name): array
     {
         $contents = $this->dataFile($name);
         $decoded = json_decode($contents, true);
@@ -47,7 +49,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @param string $filename
      * @return string
      */
-    public function dataFile($filename)
+    public function dataFile(string $filename): string
     {
         $contents = file_get_contents($this->dataPath($filename));
         if (false === $contents) {
@@ -60,16 +62,15 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @param string $file
      * @return string
      */
-    public function dataPath($file)
+    public function dataPath(string $file): string
     {
         return __DIR__ . '/../tests/Data/' . $file;
     }
 
-
     /**
      * @return array
      */
-    public function calcMapScriptFlags()
+    public function calcMapScriptFlags(): array
     {
         if (null === $this->scriptFlagNames) {
             $this->scriptFlagNames = [
@@ -99,7 +100,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
      * @param string $string
      * @return int
      */
-    public function getScriptFlagsFromString($string)
+    public function getScriptFlagsFromString(string $string): int
     {
         $mapFlagNames = $this->calcMapScriptFlags();
         if (strlen($string) === 0) {
@@ -118,5 +119,4 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
         return $flags;
     }
-
 }

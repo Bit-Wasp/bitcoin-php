@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Electrum\WordList;
 
 use BitWasp\Bitcoin\Mnemonic\Electrum\Wordlist\EnglishWordList;

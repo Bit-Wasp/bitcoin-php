@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -156,7 +158,7 @@ class Number extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return $this->serialize();
     }

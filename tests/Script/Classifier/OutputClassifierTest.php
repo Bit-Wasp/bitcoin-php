@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script\Classifier;
 
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -143,7 +145,7 @@ class OutputClassifierTest extends AbstractTestCase
      * @param $eSolution
      * @param $classification
      */
-    public function testCases(OutputClassifier $classifier, ScriptInterface $script, $eSolution, $classification)
+    public function testCases(OutputClassifier $classifier, ScriptInterface $script, $eSolution, string $classification)
     {
         $factory = ScriptFactory::scriptPubKey();
         $solution = '';

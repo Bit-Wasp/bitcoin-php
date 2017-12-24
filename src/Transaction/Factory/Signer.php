@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -78,12 +80,8 @@ class Signer
      * @param bool $setting
      * @return $this
      */
-    public function redeemBitcoinCash($setting)
+    public function redeemBitcoinCash(bool $setting)
     {
-        if (!is_bool($setting)) {
-            throw new \InvalidArgumentException("Boolean value expected");
-        }
-
         $this->redeemBitcoinCash = $setting;
         return $this;
     }
@@ -92,12 +90,8 @@ class Signer
      * @param bool $setting
      * @return $this
      */
-    public function padUnsignedMultisigs($setting)
+    public function padUnsignedMultisigs(bool $setting)
     {
-        if (!is_bool($setting)) {
-            throw new \InvalidArgumentException("Boolean value expected");
-        }
-
         $this->padUnsignedMultisigs = $setting;
         return $this;
     }
@@ -106,12 +100,8 @@ class Signer
      * @param bool $setting
      * @return $this
      */
-    public function tolerateInvalidPublicKey($setting)
+    public function tolerateInvalidPublicKey(bool $setting)
     {
-        if (!is_bool($setting)) {
-            throw new \InvalidArgumentException("Boolean value expected");
-        }
-
         $this->tolerateInvalidPublicKey = $setting;
         return $this;
     }
@@ -120,14 +110,9 @@ class Signer
      * @param bool $setting
      * @return $this
      */
-    public function allowComplexScripts($setting)
+    public function allowComplexScripts(bool $setting)
     {
-        if (!is_bool($setting)) {
-            throw new \InvalidArgumentException("Boolean value expected");
-        }
-
         $this->allowComplexScripts = $setting;
-
         return $this;
     }
 
@@ -139,13 +124,12 @@ class Signer
      * @param int $sigHashType
      * @return $this
      */
-    public function sign($nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, $sigHashType = SigHash::ALL)
+    public function sign(int $nIn, PrivateKeyInterface $key, TransactionOutputInterface $txOut, SignData $signData = null, int $sigHashType = SigHash::ALL)
     {
         $input = $this->input($nIn, $txOut, $signData);
         foreach ($input->getSteps() as $idx => $step) {
             $input->sign($key, $sigHashType);
         }
-
 
         return $this;
     }
@@ -156,7 +140,7 @@ class Signer
      * @param SignData|null $signData
      * @return InputSignerInterface
      */
-    public function input($nIn, TransactionOutputInterface $txOut, SignData $signData = null)
+    public function input(int $nIn, TransactionOutputInterface $txOut, SignData $signData = null): InputSignerInterface
     {
         if (null === $signData) {
             $signData = new SignData();
@@ -179,7 +163,7 @@ class Signer
     /**
      * @return TransactionInterface
      */
-    public function get()
+    public function get(): TransactionInterface
     {
         $mutable = TransactionFactory::mutate($this->tx);
         $witnesses = [];
@@ -195,7 +179,6 @@ class Signer
             $mutable->witness($witnesses);
         }
 
-        $new = $mutable->done();
-        return $new;
+        return $mutable->done();
     }
 }

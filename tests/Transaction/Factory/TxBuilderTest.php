@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -31,7 +33,7 @@ class TxBuilderTest extends AbstractTestCase
     {
         // Input
         $hashPrevOut = Buffer::hex('0000000000000000000000000000000000000000000000000000000000000000', 32);
-        $nPrevOut = '0';
+        $nPrevOut = 0;
         $inputScript = new Script(new Buffer('abc'));
         $sequence = 10101;
         // Output

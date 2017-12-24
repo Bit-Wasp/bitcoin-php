@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Exceptions\WitnessScriptException;
@@ -29,7 +31,7 @@ class WitnessScriptTest extends AbstractTestCase
      * @param string $exceptionMsg
      * @dataProvider getCannotNestVectors
      */
-    public function testCannotNestWitnessScripts(ScriptInterface $testScript, $exceptionMsg)
+    public function testCannotNestWitnessScripts(ScriptInterface $testScript, string $exceptionMsg)
     {
         $this->expectException(WitnessScriptException::class);
         $this->expectExceptionMessage($exceptionMsg);

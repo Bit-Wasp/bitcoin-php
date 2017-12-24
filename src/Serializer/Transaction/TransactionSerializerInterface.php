@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -12,18 +14,18 @@ interface TransactionSerializerInterface
      * @param Parser $parser
      * @return TransactionInterface
      */
-    public function fromParser(Parser $parser);
+    public function fromParser(Parser $parser): TransactionInterface;
 
     /**
      * @param string|BufferInterface $data
      * @return TransactionInterface
      */
-    public function parse($data);
+    public function parse($data): TransactionInterface;
 
     /**
      * @param TransactionInterface $transaction
      * @param int $optFlags
      * @return BufferInterface
      */
-    public function serialize(TransactionInterface $transaction, $optFlags = 0);
+    public function serialize(TransactionInterface $transaction, $optFlags = 0): BufferInterface;
 }

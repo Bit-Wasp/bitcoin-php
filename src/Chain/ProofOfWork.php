@@ -70,7 +70,7 @@ class ProofOfWork
      * @param int $bits
      * @return string
      */
-    public function getDifficulty(int $bits)
+    public function getDifficulty(int $bits): string
     {
         $target = $this->getTarget($bits);
         $lowest = $this->getMaxTarget();

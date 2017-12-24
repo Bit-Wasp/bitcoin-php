@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Crypto\Random;
 
 use BitWasp\Bitcoin\Crypto\Random\Random;

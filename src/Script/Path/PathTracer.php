@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Path;
 
 use BitWasp\Bitcoin\Script\Parser\Operation;
@@ -70,7 +72,7 @@ class PathTracer
     /**
      * @return array
      */
-    public function done()
+    public function done(): array
     {
         if ($this->done) {
             return $this->segments;

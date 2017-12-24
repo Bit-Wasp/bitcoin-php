@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest as PaymentRequestBuf;
@@ -37,7 +39,7 @@ class RequestSigner
      * @param string $certFile
      * @throws \Exception
      */
-    public function __construct($type = null, $keyFile = '', $certFile = '')
+    public function __construct(string $type = null, string $keyFile = '', string $certFile = '')
     {
         if ($type === null) {
             $type = self::NONE;
@@ -68,7 +70,7 @@ class RequestSigner
      * @param string $certFile
      * @return RequestSigner
      */
-    public static function sha1($keyFile, $certFile)
+    public static function sha1(string $keyFile, string $certFile)
     {
         return new self(self::SHA1, $keyFile, $certFile);
     }
@@ -78,7 +80,7 @@ class RequestSigner
      * @param string $certFile
      * @return RequestSigner
      */
-    public static function sha256($keyFile, $certFile)
+    public static function sha256(string $keyFile, string $certFile)
     {
         return new self(self::SHA256, $keyFile, $certFile);
     }
@@ -86,7 +88,7 @@ class RequestSigner
     /**
      * @return bool
      */
-    public function supportsSha256()
+    public function supportsSha256(): bool
     {
         return defined('OPENSSL_ALGO_SHA256');
     }
@@ -96,7 +98,7 @@ class RequestSigner
      * @param string $certFile - path to certificate chain file
      * @throws \Exception
      */
-    private function initialize($keyFile, $certFile)
+    private function initialize(string $keyFile, string $certFile)
     {
         if (false === file_exists($keyFile)) {
             throw new \InvalidArgumentException('Private key file does not exist');
@@ -135,7 +137,7 @@ class RequestSigner
      * @return string
      * @throws \Exception
      */
-    private function signData($data)
+    private function signData(string $data): string
     {
         if ($this->type === self::NONE) {
             throw new \RuntimeException('signData called when Signer is not configured for signatures');
@@ -157,7 +159,7 @@ class RequestSigner
      * @return PaymentRequestBuf
      * @throws \Exception
      */
-    public function sign(PaymentRequestBuf $request)
+    public function sign(PaymentRequestBuf $request): PaymentRequestBuf
     {
         $request->setPkiType($this->type);
         $request->setSignature('');
@@ -176,7 +178,7 @@ class RequestSigner
      * @param PaymentRequestBuf $request
      * @return bool
      */
-    public function verify(PaymentRequestBuf $request)
+    public function verify(PaymentRequestBuf $request): bool
     {
         $type = $request->getPkiType();
         if ($type === self::NONE) {
@@ -209,7 +211,7 @@ class RequestSigner
      * @param array $certificate
      * @return bool
      */
-    private function isRoot($certificate)
+    private function isRoot(array $certificate): bool
     {
         return $certificate['issuer'] === $certificate['subject'];
     }
@@ -220,7 +222,7 @@ class RequestSigner
      * @param $leafCertificate
      * @return false|string
      */
-    private function fetchCertificateParent($leafCertificate)
+    private function fetchCertificateParent(array $leafCertificate)
     {
         $pattern = '/CA Issuers - URI:(\\S*)/';
         $matches = array();
@@ -242,7 +244,7 @@ class RequestSigner
     /**
      * Parses a PEM or DER certificate
      * @param string $certData
-     * @return array
+     * @return array|false
      */
     private function parseCertificate($certData)
     {
@@ -259,10 +261,10 @@ class RequestSigner
     }
 
     /**
-     * @param $certData
-     * @return array
+     * @param string $certData
+     * @return string
      */
-    private function der2pem($certData)
+    private function der2pem(string $certData): string
     {
         $begin = '-----BEGIN CERTIFICATE-----';
         $end = '-----END CERTIFICATE-----';
@@ -278,7 +280,7 @@ class RequestSigner
      * @param string $pem_data - pem certificate data
      * @return string
      */
-    private function pem2der($pem_data)
+    private function pem2der(string $pem_data): string
     {
         $begin = 'CERTIFICATE-----';
         $end = '-----END';

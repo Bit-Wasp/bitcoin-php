@@ -15,5 +15,5 @@ interface ConsensusInterface
      * @param integer $amount
      * @return bool
      */
-    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, $flags, $nInputToSign, $amount);
+    public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, int $flags, int $nInputToSign, int $amount): bool;
 }

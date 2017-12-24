@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Chain;
 
 use BitWasp\Bitcoin\Block\BlockHeader;
@@ -23,7 +25,7 @@ class ProofOfWorkTest extends AbstractTestCase
         $results = [];
         foreach ($data as $c => $record) {
             list ($height, $hash, $version, $prev, $merkle, $time, $bits, $nonce) = $record;
-            $header = new BlockHeader($version, Buffer::hex($prev, 32), Buffer::hex($merkle, 32), $time, Buffer::hex($bits)->getInt(), $nonce);
+            $header = new BlockHeader($version, Buffer::hex($prev, 32), Buffer::hex($merkle, 32), (int) $time, (int) Buffer::hex($bits)->getInt(), (int) $nonce);
             $results[] = [$pow, $height, $hash, $header];
         }
 
@@ -39,7 +41,7 @@ class ProofOfWorkTest extends AbstractTestCase
         $math = $this->safeMath();
         $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
-        $bits = '1';
+        $bits = 1;
         $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
     }
 
@@ -52,7 +54,7 @@ class ProofOfWorkTest extends AbstractTestCase
         $math = new Math();
         $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
-        $bits = $math->hexDec('181287ba');
+        $bits = 0x181287ba;
         $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
     }
 

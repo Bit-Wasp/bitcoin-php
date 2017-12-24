@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\BlockInterface;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 
@@ -13,18 +16,18 @@ interface BlockSerializerInterface
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser);
+    public function fromParser(Parser $parser): BlockInterface;
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $string
+     * @param BufferInterface|string $string
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string);
+    public function parse($string): BlockInterface;
 
     /**
      * @param BlockInterface $block
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(BlockInterface $block);
+    public function serialize(BlockInterface $block): BufferInterface;
 }
