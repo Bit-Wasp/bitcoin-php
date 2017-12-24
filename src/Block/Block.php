@@ -84,8 +84,12 @@ class Block extends Serializable implements BlockInterface
      * @param int $i
      * @return TransactionInterface
      */
-    public function getTransaction($i): TransactionInterface
+    public function getTransaction(int $i): TransactionInterface
     {
+        if (!array_key_exists($i, $this->transactions)) {
+            throw new \InvalidArgumentException("No transaction in the block with this index");
+        }
+
         return $this->transactions[$i];
     }
 
@@ -112,7 +116,7 @@ class Block extends Serializable implements BlockInterface
      * {@inheritdoc}
      * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new BlockSerializer($this->math, new BlockHeaderSerializer(), new TransactionSerializer()))->serialize($this);
     }

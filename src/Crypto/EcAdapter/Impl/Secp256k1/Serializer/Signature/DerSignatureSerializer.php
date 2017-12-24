@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
@@ -39,9 +40,9 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
 
     /**
      * @param Signature $signature
-     * @return Buffer
+     * @return BufferInterface
      */
-    private function doSerialize(Signature $signature)
+    private function doSerialize(Signature $signature): BufferInterface
     {
         $signatureOut = '';
         if (!secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $signatureOut, $signature->getResource())) {
@@ -53,9 +54,9 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
 
     /**
      * @param SignatureInterface $signature
-     * @return Buffer
+     * @return BufferInterface
      */
-    public function serialize(SignatureInterface $signature)
+    public function serialize(SignatureInterface $signature): BufferInterface
     {
         /** @var Signature $signature */
         return $this->doSerialize($signature);
@@ -89,7 +90,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      * @param string $data
      * @return SignatureInterface
      */
-    public function parse($data)
+    public function parse($data): SignatureInterface
     {
         $buffer = (new Parser($data))->getBuffer();
         $binary = $buffer->getBinary();

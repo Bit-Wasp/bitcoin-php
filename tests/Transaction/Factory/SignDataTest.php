@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -26,10 +28,10 @@ class SignDataTest extends AbstractTestCase
     /**
      * @param ScriptInterface|null $rs
      * @param ScriptInterface|null $ws
-     * @param null $flags
+     * @param int|null $flags
      * @dataProvider getVectors
      */
-    public function testCase(ScriptInterface $rs = null, ScriptInterface $ws = null, $flags = null)
+    public function testCase(ScriptInterface $rs = null, ScriptInterface $ws = null, int $flags = null)
     {
         $signData = new SignData();
         $this->assertFalse($signData->hasRedeemScript());

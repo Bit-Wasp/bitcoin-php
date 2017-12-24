@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -25,8 +27,7 @@ class InterpreterTest extends AbstractTestCase
             $flags,
             new Script(new Buffer()),
             ScriptFactory::create()->push(Buffer::hex($this->dataFile("10010bytes.hex")))->getScript(),
-            false,
-            new Transaction
+            false
         ];
 
         return $vectors;
@@ -38,10 +39,9 @@ class InterpreterTest extends AbstractTestCase
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param $result
-     * @param $tx
      * @dataProvider getScripts
      */
-    public function testScript($flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $result, $tx)
+    public function testScript(int $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, bool $result)
     {
         $ec = Bitcoin::getEcAdapter();
         $i = new Interpreter($ec);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Path;
 
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
@@ -23,7 +25,7 @@ class BranchInterpreter
      * @param ScriptInterface $script
      * @return ParsedScript
      */
-    public function getScriptTree(ScriptInterface $script)
+    public function getScriptTree(ScriptInterface $script): ParsedScript
     {
         $ast = $this->getAstForLogicalOps($script);
         $scriptPaths = $ast->flags();
@@ -45,7 +47,7 @@ class BranchInterpreter
      * @param ScriptInterface $script
      * @return LogicOpNode
      */
-    public function getAstForLogicalOps(ScriptInterface $script)
+    public function getAstForLogicalOps(ScriptInterface $script): LogicOpNode
     {
         $root = new LogicOpNode(null);
         $current = $root;
@@ -86,7 +88,7 @@ class BranchInterpreter
      * @param bool[] $path
      * @return ScriptBranch
      */
-    public function getBranchForPath(ScriptInterface $script, array $path)
+    public function getBranchForPath(ScriptInterface $script, array $path): ScriptBranch
     {
         // parses the opcodes which were actually run
         $segments = $this->evaluateUsingStack($script, $path);
@@ -99,7 +101,7 @@ class BranchInterpreter
      * @param bool $value
      * @return bool
      */
-    private function checkExec(Stack $vfStack, $value)
+    private function checkExec(Stack $vfStack, bool $value): bool
     {
         $ret = 0;
         foreach ($vfStack as $item) {
@@ -108,7 +110,7 @@ class BranchInterpreter
             }
         }
 
-        return $ret;
+        return (bool) $ret;
     }
 
     /**
@@ -116,7 +118,7 @@ class BranchInterpreter
      * @param int[] $logicalPath
      * @return array - array of Operation[] representing script segments
      */
-    public function evaluateUsingStack(ScriptInterface $script, array $logicalPath)
+    public function evaluateUsingStack(ScriptInterface $script, array $logicalPath): array
     {
         $mainStack = new Stack();
         foreach (array_reverse($logicalPath) as $setting) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -35,9 +37,9 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
      */
     public function testParsesMessage(EcAdapterInterface $ecAdapter)
     {
-        list ($message, $address, $content, $network) = $this->sampleMessage();
+        list ($message, $addressString, $content, $network) = $this->sampleMessage();
         /** @var PayToPubKeyHashAddress $address */
-        $address = AddressFactory::fromString($address, $network);
+        $address = AddressFactory::fromString($addressString, $network);
         $serializer = new SignedMessageSerializer(
             EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
         );

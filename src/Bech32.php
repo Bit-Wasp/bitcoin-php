@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Exceptions\Bech32Exception;
@@ -35,7 +37,7 @@ class Bech32
      * @param int $numValues
      * @return int
      */
-    public static function polyMod(array $values, $numValues)
+    public static function polyMod(array $values, int $numValues): int
     {
         $chk = 1;
         for ($i = 0; $i < $numValues; $i++) {
@@ -55,9 +57,9 @@ class Bech32
      * Expands the human readable part into a character array for checksumming.
      * @param string $hrp
      * @param int $hrpLen
-     * @return array
+     * @return int[]
      */
-    public static function hrpExpand($hrp, $hrpLen)
+    public static function hrpExpand(string $hrp, int $hrpLen): array
     {
         $expand1 = [];
         $expand2 = [];
@@ -78,10 +80,10 @@ class Bech32
      * @param int $fromBits - word (bit count) size of provided data
      * @param int $toBits - requested word size (bit count)
      * @param bool $pad - whether to pad (only when encoding)
-     * @return array
+     * @return int[]
      * @throws Bech32Exception
      */
-    public static function convertBits(array $data, $inLen, $fromBits, $toBits, $pad = true)
+    public static function convertBits(array $data, int $inLen, int $fromBits, int $toBits, bool $pad = true): array
     {
         $acc = 0;
         $bits = 0;
@@ -118,9 +120,9 @@ class Bech32
     /**
      * @param string $hrp
      * @param int[] $convertedDataChars
-     * @return array
+     * @return int[]
      */
-    public static function createChecksum($hrp, array $convertedDataChars)
+    public static function createChecksum(string $hrp, array $convertedDataChars): array
     {
         $values = array_merge(self::hrpExpand($hrp, strlen($hrp)), $convertedDataChars);
         $polyMod = self::polyMod(array_merge($values, [0, 0, 0, 0, 0, 0]), count($values) + 6) ^ 1;
@@ -139,7 +141,7 @@ class Bech32
      * @param int[] $convertedDataChars
      * @return bool
      */
-    public static function verifyChecksum($hrp, array $convertedDataChars)
+    public static function verifyChecksum(string $hrp, array $convertedDataChars): bool
     {
         $expandHrp = self::hrpExpand($hrp, strlen($hrp));
         $r = array_merge($expandHrp, $convertedDataChars);
@@ -152,7 +154,7 @@ class Bech32
      * @param array $combinedDataChars
      * @return string
      */
-    public static function encode($hrp, array $combinedDataChars)
+    public static function encode(string $hrp, array $combinedDataChars): string
     {
         $checksum = self::createChecksum($hrp, $combinedDataChars);
         $characters = array_merge($combinedDataChars, $checksum);
@@ -174,7 +176,7 @@ class Bech32
      * @return array - returns [$hrp, $dataChars]
      * @throws Bech32Exception
      */
-    public static function decode($sBech)
+    public static function decode(string $sBech): array
     {
         $length = strlen($sBech);
         if ($length > 90) {

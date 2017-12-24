@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Exceptions\MissingScriptException;
@@ -212,7 +214,7 @@ class FullyQualifiedScript
      * Was the FQS's scriptPubKey P2SH?
      * @return bool
      */
-    public function isP2SH()
+    public function isP2SH(): bool
     {
         return $this->rsData instanceof OutputData;
     }
@@ -221,7 +223,7 @@ class FullyQualifiedScript
      * Was the FQS's scriptPubKey, or redeemScript, P2WSH?
      * @return bool
      */
-    public function isP2WSH()
+    public function isP2WSH(): bool
     {
         return $this->wsData instanceof OutputData;
     }
@@ -230,7 +232,7 @@ class FullyQualifiedScript
      * Returns the scriptPubKey.
      * @return OutputData
      */
-    public function scriptPubKey()
+    public function scriptPubKey(): OutputData
     {
         return $this->spkData;
     }
@@ -243,7 +245,7 @@ class FullyQualifiedScript
      *
      * @return OutputData
      */
-    public function signScript()
+    public function signScript(): OutputData
     {
         return $this->signData;
     }
@@ -253,7 +255,7 @@ class FullyQualifiedScript
      * Defaults to V0, unless script was segwit.
      * @return int
      */
-    public function sigVersion()
+    public function sigVersion(): int
     {
         return $this->sigVersion;
     }
@@ -264,7 +266,7 @@ class FullyQualifiedScript
      * @return OutputData
      * @throws \RuntimeException
      */
-    public function redeemScript()
+    public function redeemScript(): OutputData
     {
         if (null === $this->rsData) {
             throw new \RuntimeException("No redeemScript for this script!");
@@ -279,7 +281,7 @@ class FullyQualifiedScript
      * @return OutputData
      * @throws \RuntimeException
      */
-    public function witnessScript()
+    public function witnessScript(): OutputData
     {
         if (null === $this->wsData) {
             throw new \RuntimeException("No witnessScript for this script!");
@@ -296,7 +298,7 @@ class FullyQualifiedScript
      * @param Stack $stack
      * @return SigValues
      */
-    public function encodeStack(Stack $stack)
+    public function encodeStack(Stack $stack): SigValues
     {
         $scriptSigChunks = $stack->all();
         $witness = [];
@@ -332,7 +334,7 @@ class FullyQualifiedScript
      * @param ScriptWitnessInterface $witness
      * @return Stack
      */
-    public function extractStack(ScriptInterface $scriptSig, ScriptWitnessInterface $witness)
+    public function extractStack(ScriptInterface $scriptSig, ScriptWitnessInterface $witness): Stack
     {
         $sigChunks = [];
         if (!$scriptSig->isPushOnly($sigChunks)) {

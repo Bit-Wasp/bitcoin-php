@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -24,9 +26,10 @@ class CsvTest extends AbstractTestCase
     /**
      * @param int $locktime
      * @param int $sequence
+     * @param int $version
      * @return TransactionInterface
      */
-    public function txFixture($locktime, $sequence, $version = 2)
+    public function txFixture(int $locktime, int $sequence, int $version = 2)
     {
         return (new TxBuilder())
             ->version($version)
@@ -82,7 +85,7 @@ class CsvTest extends AbstractTestCase
      * @param null|string $exceptionMsg
      * @dataProvider getCltvCases
      */
-    public function testCsv($verifySequence, TransactionInterface $unsigned, $exception = null, $exceptionMsg = null)
+    public function testCsv(int $verifySequence, TransactionInterface $unsigned, string $exception = null, string $exceptionMsg = null)
     {
         /** @var PrivateKeyInterface[] $keys */
         $key = PrivateKeyFactory::fromHex("4200000042000000420000004200000042000000420000004200000042000000", true);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -66,7 +68,7 @@ class Interpreter implements InterpreterInterface
      * @param BufferInterface $value
      * @return bool
      */
-    public function castToBool(BufferInterface $value)
+    public function castToBool(BufferInterface $value): bool
     {
         $val = $value->getBinary();
         for ($i = 0, $size = strlen($val); $i < $size; $i++) {
@@ -85,7 +87,7 @@ class Interpreter implements InterpreterInterface
      * @param BufferInterface $signature
      * @return bool
      */
-    public function isValidSignatureEncoding(BufferInterface $signature)
+    public function isValidSignatureEncoding(BufferInterface $signature): bool
     {
         try {
             TransactionSignature::isDERSignature($signature);
@@ -103,7 +105,7 @@ class Interpreter implements InterpreterInterface
      * @return bool
      * @throws \Exception
      */
-    public function checkMinimalPush($opCode, BufferInterface $pushData)
+    public function checkMinimalPush($opCode, BufferInterface $pushData): bool
     {
         $pushSize = $pushData->getSize();
         $binary = $pushData->getBinary();
@@ -133,7 +135,7 @@ class Interpreter implements InterpreterInterface
      * @param int $count
      * @return $this
      */
-    private function checkOpcodeCount($count)
+    private function checkOpcodeCount(int $count)
     {
         if ($count > 201) {
             throw new \RuntimeException('Error: Script op code count');
@@ -149,7 +151,7 @@ class Interpreter implements InterpreterInterface
      * @param Checker $checker
      * @return bool
      */
-    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, $flags, Checker $checker)
+    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, Checker $checker): bool
     {
         $witnessCount = count($scriptWitness);
 
@@ -213,7 +215,7 @@ class Interpreter implements InterpreterInterface
      * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitnessInterface $witness = null)
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, int $flags, Checker $checker, ScriptWitnessInterface $witness = null): bool
     {
         static $emptyWitness = null;
         if ($emptyWitness === null) {
@@ -341,7 +343,7 @@ class Interpreter implements InterpreterInterface
      * @param bool $value
      * @return bool
      */
-    public function checkExec(Stack $vfStack, $value)
+    public function checkExec(Stack $vfStack, $value): bool
     {
         $ret = 0;
         foreach ($vfStack as $item) {
@@ -350,7 +352,7 @@ class Interpreter implements InterpreterInterface
             }
         }
 
-        return $ret;
+        return (bool) $ret;
     }
 
     /**
@@ -361,7 +363,7 @@ class Interpreter implements InterpreterInterface
      * @param Checker $checker
      * @return bool
      */
-    public function evaluate(ScriptInterface $script, Stack $mainStack, $sigVersion, $flags, Checker $checker)
+    public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, Checker $checker): bool
     {
         $hashStartPos = 0;
         $opCount = 0;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Network\Networks;
 
 use BitWasp\Bitcoin\Network\Networks\DogecoinTestnet;

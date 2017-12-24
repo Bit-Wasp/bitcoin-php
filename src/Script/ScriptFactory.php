@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
+use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
@@ -24,7 +27,7 @@ class ScriptFactory
      * @param BufferInterface|string $string
      * @return ScriptInterface
      */
-    public static function fromHex($string)
+    public static function fromHex($string): ScriptInterface
     {
         return self::create($string instanceof BufferInterface ? $string : Buffer::hex($string))->getScript();
     }
@@ -35,7 +38,7 @@ class ScriptFactory
      * @param Math|null $math
      * @return ScriptCreator
      */
-    public static function create(BufferInterface $buffer = null, Opcodes $opcodes = null, Math $math = null)
+    public static function create(BufferInterface $buffer = null, Opcodes $opcodes = null, Math $math = null): ScriptCreator
     {
         return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes ?: new Opcodes(), $buffer);
     }
@@ -47,7 +50,7 @@ class ScriptFactory
      * @param BufferInterface[] $buffers
      * @return ScriptInterface
      */
-    public static function pushAll(array $buffers)
+    public static function pushAll(array $buffers): ScriptInterface
     {
         return self::sequence(array_map(function ($buffer) {
             if (!($buffer instanceof BufferInterface)) {
@@ -72,7 +75,7 @@ class ScriptFactory
      * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return ScriptInterface
      */
-    public static function sequence(array $sequence)
+    public static function sequence(array $sequence): ScriptInterface
     {
         return self::create()->sequence($sequence)->getScript();
     }
@@ -81,7 +84,7 @@ class ScriptFactory
      * @param Operation[] $operations
      * @return ScriptInterface
      */
-    public static function fromOperations(array $operations)
+    public static function fromOperations(array $operations): ScriptInterface
     {
         $sequence = [];
         foreach ($operations as $operation) {
@@ -98,7 +101,7 @@ class ScriptFactory
     /**
      * @return OutputScriptFactory
      */
-    public static function scriptPubKey()
+    public static function scriptPubKey(): OutputScriptFactory
     {
         if (self::$outputScriptFactory === null) {
             self::$outputScriptFactory = new OutputScriptFactory();
@@ -111,7 +114,7 @@ class ScriptFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return NativeConsensus
      */
-    public static function getNativeConsensus(EcAdapterInterface $ecAdapter = null)
+    public static function getNativeConsensus(EcAdapterInterface $ecAdapter = null): NativeConsensus
     {
         return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter());
     }
@@ -119,16 +122,16 @@ class ScriptFactory
     /**
      * @return BitcoinConsensus
      */
-    public static function getBitcoinConsensus()
+    public static function getBitcoinConsensus(): BitcoinConsensus
     {
         return new BitcoinConsensus();
     }
 
     /**
      * @param EcAdapterInterface|null $ecAdapter
-     * @return \BitWasp\Bitcoin\Script\Consensus\ConsensusInterface
+     * @return ConsensusInterface
      */
-    public static function consensus(EcAdapterInterface $ecAdapter = null)
+    public static function consensus(EcAdapterInterface $ecAdapter = null): ConsensusInterface
     {
         if (extension_loaded('bitcoinconsensus')) {
             return self::getBitcoinConsensus();

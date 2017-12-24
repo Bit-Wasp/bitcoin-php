@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Parser;
 
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -40,7 +42,7 @@ class Operation
      * @param BufferInterface $pushData
      * @param int $pushDataSize
      */
-    public function __construct($opCode, BufferInterface $pushData, $pushDataSize = 0)
+    public function __construct(int $opCode, BufferInterface $pushData, int $pushDataSize = 0)
     {
         $this->push = $opCode >= 0 && $opCode <= Opcodes::OP_PUSHDATA4;
         $this->opCode = $opCode;
@@ -49,7 +51,7 @@ class Operation
     }
 
     /**
-     * @return string
+     * @return BufferInterface|int
      */
     public function encode()
     {
@@ -63,7 +65,7 @@ class Operation
     /**
      * @return bool
      */
-    public function isPush()
+    public function isPush(): bool
     {
         return $this->push;
     }
@@ -71,7 +73,7 @@ class Operation
     /**
      * @return bool
      */
-    public function isLogical()
+    public function isLogical(): bool
     {
         return !$this->isPush() && in_array($this->opCode, self::$logical);
     }
@@ -80,7 +82,7 @@ class Operation
     /**
      * @return int
      */
-    public function getOp()
+    public function getOp(): int
     {
         return $this->opCode;
     }
@@ -88,7 +90,7 @@ class Operation
     /**
      * @return BufferInterface
      */
-    public function getData()
+    public function getData(): BufferInterface
     {
         return $this->pushData;
     }
@@ -96,7 +98,7 @@ class Operation
     /**
      * @return int
      */
-    public function getDataSize()
+    public function getDataSize(): int
     {
         if (!$this->push) {
             throw new \RuntimeException("Op wasn't a push operation");

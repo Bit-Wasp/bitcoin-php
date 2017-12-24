@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -51,7 +53,7 @@ class ComplexSignerTest extends AbstractTestCase
      * @param $idx
      * @return PrivateKeyInterface
      */
-    protected function getKeyFromStore($idx)
+    protected function getKeyFromStore(int $idx)
     {
         if (!array_key_exists($idx, $this->privateKeys)) {
             throw new \RuntimeException("Key at {$idx} is missing");

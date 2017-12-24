@@ -1,7 +1,8 @@
 <?php
 
-namespace BitWasp\Bitcoin\RpcTest;
+declare(strict_types=1);
 
+namespace BitWasp\Bitcoin\RpcTest;
 
 class ServerTest extends AbstractTestCase
 {
@@ -37,7 +38,8 @@ class ServerTest extends AbstractTestCase
         $server->destroy();
     }
 
-    public function testStartStop() {
+    public function testStartStop()
+    {
         $bitcoind = $this->rpcFactory->startBitcoind();
 
         // First bitcoind, generate block

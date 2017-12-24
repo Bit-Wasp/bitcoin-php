@@ -1,7 +1,8 @@
 <?php
 
-namespace BitWasp\Bitcoin\RpcTest;
+declare(strict_types=1);
 
+namespace BitWasp\Bitcoin\RpcTest;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
@@ -65,7 +66,7 @@ class RpcServer
      * @param RpcCredential $credential
      * @param array $options
      */
-    public function __construct($bitcoind, $dataDir, NetworkInterface $network, RpcCredential $credential, array $options = [])
+    public function __construct(string $bitcoind, string $dataDir, NetworkInterface $network, RpcCredential $credential, array $options = [])
     {
         $this->bitcoind = $bitcoind;
         $this->dataDir = $dataDir;
@@ -77,7 +78,7 @@ class RpcServer
     /**
      * @return string
      */
-    private function getPidFile()
+    private function getPidFile(): string
     {
         return "{$this->dataDir}/regtest/bitcoind.pid";
     }
@@ -85,9 +86,14 @@ class RpcServer
     /**
      * @return string
      */
-    private function getConfigFile()
+    private function getConfigFile(): string
     {
         return "{$this->dataDir}/bitcoin.conf";
+    }
+
+    private function secondsToMicro(float $seconds): int
+    {
+        return (int) $seconds * 1000000;
     }
 
     /**
@@ -149,11 +155,12 @@ class RpcServer
                         throw new \RuntimeException("Unexpected error code during startup");
                     }
 
-                    sleep(0.2);
+                    // 0.2 seconds sleep
+                    usleep($this->secondsToMicro(0.02));
                 }
-
             } catch (\Exception $e) {
-                sleep(0.2);
+                // 0.2 seconds sleep
+                usleep($this->secondsToMicro(0.02));
             }
 
             if (microtime(true) > $start + $limit) {
@@ -162,8 +169,12 @@ class RpcServer
         } while (!$connected);
     }
 
-    private function getClient() {
-        $client = new \Nbobtc\Http\Client($this->credential->getDsn());
+    /**
+     * @return Client
+     */
+    private function getClient(): Client
+    {
+        $client = new Client($this->credential->getDsn());
         $client->withDriver(new CurlDriver());
         return $client;
     }
@@ -177,7 +188,7 @@ class RpcServer
         $chainInfo = $this->makeRpcRequest('getblockchaininfo');
         $bestHeight = $chainInfo['result']['blocks'];
 
-        while($bestHeight < 150 || $chainInfo['result']['bip9_softforks']['segwit']['status'] !== 'active') {
+        while ($bestHeight < 150 || $chainInfo['result']['bip9_softforks']['segwit']['status'] !== 'active') {
             // ought to finish in 1!
             $this->makeRpcRequest("generate", [435]);
             $chainInfo = $this->makeRpcRequest('getblockchaininfo');
@@ -192,7 +203,7 @@ class RpcServer
      * @param ScriptInterface $script
      * @return Utxo
      */
-    public function fundOutput($value, $script)
+    public function fundOutput(int $value, ScriptInterface $script)
     {
         $this->activateSoftforks();
 
@@ -227,16 +238,15 @@ class RpcServer
     /**
      * @param string $src
      */
-    private function recursiveDelete($src)
+    private function recursiveDelete(string $src)
     {
         $dir = opendir($src);
-        while(false !== ( $file = readdir($dir)) ) {
+        while (false !== ( $file = readdir($dir))) {
             if (( $file != '.' ) && ( $file != '..' )) {
                 $full = $src . '/' . $file;
-                if ( is_dir($full) ) {
+                if (is_dir($full)) {
                     $this->recursiveDelete($full);
-                }
-                else {
+                } else {
                     unlink($full);
                 }
             }
@@ -254,8 +264,8 @@ class RpcServer
             $this->request("stop");
 
             do {
-                sleep(0.2);
-            } while($this->isRunning());
+                usleep($this->secondsToMicro(0.02));
+            } while ($this->isRunning());
 
             $this->recursiveDelete($this->dataDir);
         }
@@ -264,7 +274,7 @@ class RpcServer
     /**
      * @return bool
      */
-    public function isRunning()
+    public function isRunning(): bool
     {
         return file_exists($this->getPidFile());
     }
@@ -272,7 +282,7 @@ class RpcServer
     /**
      * @return Client
      */
-    public function makeClient()
+    public function makeClient(): Client
     {
         if (!$this->isRunning()) {
             throw new \RuntimeException("No client, server not running");
@@ -288,9 +298,9 @@ class RpcServer
     /**
      * @param string $method
      * @param array $params
-     * @return mixed
+     * @return array
      */
-    public function request($method, array $params = [])
+    public function request(string $method, array $params = []): array
     {
         $unsorted = $this->makeClient()->sendCommand(new Command($method, $params));
         $jsonResult = $unsorted->getBody()->getContents();
@@ -304,11 +314,10 @@ class RpcServer
     /**
      * @param string $method
      * @param array $params
-     * @return mixed
+     * @return array
      */
-    public function makeRpcRequest($method, $params = [])
+    public function makeRpcRequest(string $method, array $params = []): array
     {
         return $this->request($method, $params);
     }
-
 }

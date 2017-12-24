@@ -38,7 +38,7 @@ interface BlockInterface extends SerializableInterface
      * @param int $i
      * @return TransactionInterface
      */
-    public function getTransaction($i): TransactionInterface;
+    public function getTransaction(int $i): TransactionInterface;
 
     /**
      * @param BloomFilter $filter

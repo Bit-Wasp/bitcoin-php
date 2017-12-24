@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Bip69;
 
 use BitWasp\Bitcoin\Script\Script;
@@ -30,7 +32,7 @@ class Bip69Test extends AbstractTestCase
      * @param $expectedCheck
      * @param $txHex
      */
-    public function testCheck(Bip69 $bip69, $expectedCheck, $txHex)
+    public function testCheck(Bip69 $bip69, bool $expectedCheck, string $txHex)
     {
         $tx = TransactionFactory::fromHex($txHex);
         $this->assertEquals($expectedCheck, $bip69->check($tx));

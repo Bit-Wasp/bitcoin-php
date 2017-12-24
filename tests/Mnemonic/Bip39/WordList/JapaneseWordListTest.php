@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Mnemonic\Bip39\WordList;
 
 use BitWasp\Bitcoin\Tests\AbstractTestCase;

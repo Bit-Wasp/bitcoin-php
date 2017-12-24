@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
 use BitWasp\Bitcoin\Math\Math;
@@ -30,7 +32,7 @@ class PaymentVerifier
      * @param Payment $payment
      * @return TransactionInterface[]
      */
-    public function getTransactions(Payment $payment)
+    public function getTransactions(Payment $payment): array
     {
         return array_map(
             function ($binTx) {
@@ -45,7 +47,7 @@ class PaymentVerifier
      * @param TransactionInterface[] $collection
      * @return bool
      */
-    public function checkTransactions(PaymentRequest $request, array $collection)
+    public function checkTransactions(PaymentRequest $request, array $collection): bool
     {
         // Add up cumulative amounts for each destination
         $scriptAmount = [];
@@ -98,7 +100,7 @@ class PaymentVerifier
      * @param PaymentRequest $request
      * @return bool
      */
-    public function checkPayment(PaymentRequest $request, Payment $payment)
+    public function checkPayment(PaymentRequest $request, Payment $payment): bool
     {
         $transactions = $this->getTransactions($payment);
         return $this->checkTransactions($request, $transactions);

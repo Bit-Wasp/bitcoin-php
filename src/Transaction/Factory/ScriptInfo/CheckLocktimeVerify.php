@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Factory\ScriptInfo;
 
 use BitWasp\Bitcoin\Locktime;
@@ -24,7 +26,7 @@ class CheckLocktimeVerify
      * CheckLocktimeVerify constructor.
      * @param int $nLockTime
      */
-    public function __construct($nLockTime)
+    public function __construct(int $nLockTime)
     {
         if ($nLockTime < 0) {
             throw new \RuntimeException("locktime cannot be negative");
@@ -43,7 +45,7 @@ class CheckLocktimeVerify
      * @param bool $fMinimal
      * @return static
      */
-    public static function fromDecodedScript(array $chunks, $fMinimal = false)
+    public static function fromDecodedScript(array $chunks, bool $fMinimal = false): self
     {
         if (count($chunks) !== 3) {
             throw new \RuntimeException("Invalid number of items for CLTV");
@@ -63,14 +65,14 @@ class CheckLocktimeVerify
 
         $numLockTime = Number::buffer($chunks[0]->getData(), $fMinimal, 5);
 
-        return new static($numLockTime->getInt());
+        return new static((int) $numLockTime->getInt());
     }
 
     /**
      * @param ScriptInterface $script
      * @return CheckLocktimeVerify
      */
-    public static function fromScript(ScriptInterface $script)
+    public static function fromScript(ScriptInterface $script): self
     {
         return static::fromDecodedScript($script->getScriptParser()->decode());
     }
@@ -78,7 +80,7 @@ class CheckLocktimeVerify
     /**
      * @return int
      */
-    public function getLocktime()
+    public function getLocktime(): int
     {
         return $this->nLockTime;
     }
@@ -86,7 +88,7 @@ class CheckLocktimeVerify
     /**
      * @return bool
      */
-    public function isLockedToBlock()
+    public function isLockedToBlock(): bool
     {
         return $this->toBlock;
     }

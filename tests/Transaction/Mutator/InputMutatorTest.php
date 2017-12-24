@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Mutator;
 
 use BitWasp\Bitcoin\Script\Script;

@@ -162,9 +162,9 @@ class PrivateKey extends Key implements PrivateKeyInterface, \Mdanter\Ecc\Crypto
     }
 
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new PrivateKeySerializer($this->ecAdapter))->serialize($this);
     }

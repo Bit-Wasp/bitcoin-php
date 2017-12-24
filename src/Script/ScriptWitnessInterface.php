@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Collection\CollectionInterface;
@@ -17,5 +19,5 @@ interface ScriptWitnessInterface extends CollectionInterface, SerializableInterf
      * @param ScriptWitnessInterface $witness
      * @return bool
      */
-    public function equals(ScriptWitnessInterface $witness);
+    public function equals(ScriptWitnessInterface $witness): bool;
 }

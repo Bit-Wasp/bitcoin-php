@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class Conditional
 {
@@ -26,7 +29,7 @@ class Conditional
      * Conditional constructor.
      * @param int $opcode
      */
-    public function __construct($opcode)
+    public function __construct(int $opcode)
     {
         if ($opcode !== Opcodes::OP_IF && $opcode !== Opcodes::OP_NOTIF) {
             throw new \RuntimeException("Opcode for conditional is only IF / NOTIF");
@@ -38,7 +41,7 @@ class Conditional
     /**
      * @return int
      */
-    public function getOp()
+    public function getOp(): int
     {
         return $this->opcode;
     }
@@ -46,19 +49,15 @@ class Conditional
     /**
      * @param bool $value
      */
-    public function setValue($value)
+    public function setValue(bool $value)
     {
-        if (!is_bool($value)) {
-            throw new \RuntimeException("Invalid value for conditional");
-        }
-
         $this->value = $value;
     }
 
     /**
      * @return bool
      */
-    public function hasValue()
+    public function hasValue(): bool
     {
         return null !== $this->value;
     }
@@ -66,7 +65,7 @@ class Conditional
     /**
      * @return bool
      */
-    public function getValue()
+    public function getValue(): bool
     {
         if (null === $this->value) {
             throw new \RuntimeException("Value not set on conditional");
@@ -84,9 +83,9 @@ class Conditional
     }
 
     /**
-     * @return array
+     * @return BufferInterface[]
      */
-    public function serialize()
+    public function serialize(): array
     {
         if ($this->hasValue() && null === $this->providedBy) {
             return [$this->value ? new Buffer("\x01") : new Buffer()];

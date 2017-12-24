@@ -45,7 +45,7 @@ interface KeyInterface extends SerializableInterface
     public function tweakMul(\GMP $offset): KeyInterface;
 
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function getBuffer();
+    public function getBuffer(): BufferInterface;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
@@ -14,7 +16,7 @@ class BitcoinConsensusTest extends AbstractTestCase
     {
         if (extension_loaded('bitcoinconsensus')) {
             $flags = 1 | 3 | 2 | 65;
-            $check = $flags == ($flags&BITCOINCONSENSUS_VERIFY_ALL);
+            $check = $flags == ($flags & BITCOINCONSENSUS_VERIFY_ALL);
             $this->assertFalse($check);
 
             $c = new BitcoinConsensus();

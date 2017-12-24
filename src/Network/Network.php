@@ -52,11 +52,11 @@ class Network implements NetworkInterface
 
     /**
      * @param string $field - name of field being validated
-     * @param mixed $value - we check this value
+     * @param string $value - we check this value
      * @param int $length - length we require
      * @throws InvalidNetworkParameter
      */
-    private function validateHexString($field, $value, $length)
+    private function validateHexString(string $field, string $value, int $length)
     {
         if (!is_string($value) || strlen($value) !== 2 * $length) {
             throw new InvalidNetworkParameter("{$field} must be a {$length} byte hex string");

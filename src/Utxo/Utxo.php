@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Utxo;
 
 use BitWasp\Bitcoin\Transaction\OutPoint;
@@ -31,7 +33,7 @@ class Utxo implements UtxoInterface
     /**
      * @return OutPoint
      */
-    public function getOutPoint()
+    public function getOutPoint(): OutPointInterface
     {
         return $this->outPoint;
     }
@@ -39,7 +41,7 @@ class Utxo implements UtxoInterface
     /**
      * @return TransactionOutputInterface
      */
-    public function getOutput()
+    public function getOutput(): TransactionOutputInterface
     {
         return $this->prevOut;
     }

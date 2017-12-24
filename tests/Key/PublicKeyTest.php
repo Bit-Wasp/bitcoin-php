@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -33,7 +35,7 @@ class PublicKeyTest extends AbstractTestCase
      * @param string $eCompressed
      * @param string $eUncompressed
      */
-    public function testFromHex(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
+    public function testFromHex(EcAdapterInterface $ecAdapter, string $eCompressed, string $eUncompressed)
     {
         $publicKey = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
 
@@ -48,7 +50,7 @@ class PublicKeyTest extends AbstractTestCase
      * @param $eCompressed
      * @param $eUncompressed
      */
-    public function testFromHexUncompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
+    public function testFromHexUncompressed(EcAdapterInterface $ecAdapter, string $eCompressed, string $eUncompressed)
     {
         $publicKey = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
         $this->assertSame($eUncompressed, $publicKey->getBuffer()->getHex());
@@ -124,7 +126,7 @@ class PublicKeyTest extends AbstractTestCase
      * @param string $eKey - hex public key
      * @param string $eHash - hex sha256ripemd160 of public key
      */
-    public function testPubKeyHash(EcAdapterInterface $ecAdapter, $eKey, $eHash)
+    public function testPubKeyHash(EcAdapterInterface $ecAdapter, string $eKey, string $eHash)
     {
         $this->assertSame(
             $eHash,
@@ -136,11 +138,11 @@ class PublicKeyTest extends AbstractTestCase
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param $eCompressed
-     * @param $eUncompressed
+     * @param string $eCompressed
+     * @param string $eUncompressed
      * @dataProvider getPublicVectors
      */
-    public function testIsNotCompressed(EcAdapterInterface $ecAdapter, $eCompressed, $eUncompressed)
+    public function testIsNotCompressed(EcAdapterInterface $ecAdapter, string $eCompressed, string $eUncompressed)
     {
         $pub = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
         $this->assertTrue($pub->isCompressed());

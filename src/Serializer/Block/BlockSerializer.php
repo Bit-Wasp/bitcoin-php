@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
@@ -7,6 +9,7 @@ use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializerInterface;
 use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 
@@ -50,7 +53,7 @@ class BlockSerializer implements BlockSerializerInterface
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): BlockInterface
     {
         try {
             $header = $this->headerSerializer->fromParser($parser);
@@ -66,20 +69,20 @@ class BlockSerializer implements BlockSerializerInterface
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $string
+     * @param BufferInterface|string $string
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string)
+    public function parse($string): BlockInterface
     {
         return $this->fromParser(new Parser($string));
     }
 
     /**
      * @param BlockInterface $block
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(BlockInterface $block)
+    public function serialize(BlockInterface $block): BufferInterface
     {
         $parser = new Parser($this->headerSerializer->serialize($block->getHeader()));
         $parser->appendBinary($this->varint->write(count($block->getTransactions())));

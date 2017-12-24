@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;
@@ -10,7 +12,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterfac
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\Buffertools;
@@ -42,7 +43,7 @@ class WifPrivateKeySerializer
      * @param PrivateKeyInterface $privateKey
      * @return string
      */
-    public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey)
+    public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey): string
     {
         $math = $this->ecAdapter->getMath();
         $serialized = Buffertools::concat(
@@ -67,7 +68,7 @@ class WifPrivateKeySerializer
      * @throws Base58ChecksumFailure
      * @throws InvalidPrivateKey
      */
-    public function parse($wif, NetworkInterface $network = null)
+    public function parse(string $wif, NetworkInterface $network = null): PrivateKeyInterface
     {
         $network = $network ?: Bitcoin::getNetwork();
         $data = Base58::decodeCheck($wif);

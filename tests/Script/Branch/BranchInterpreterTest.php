@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script\Branch;
 
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -182,7 +184,7 @@ class BranchInterpreterTest extends AbstractTestCase
      * @param string $string
      * @return ScriptInterface
      */
-    public function calcScriptFromString($mapOpNames, $string)
+    public function calcScriptFromString(array $mapOpNames, string $string)
     {
         $builder = ScriptFactory::create();
         $split = explode(" ", $string);
@@ -193,7 +195,7 @@ class BranchInterpreterTest extends AbstractTestCase
 
             if (strlen($item) == '') {
             } else if (preg_match("/^[0-9]*$/", $item) || substr($item, 0, 1) === "-" && preg_match("/^[0-9]*$/", substr($item, 1))) {
-                $builder->int($item);
+                $builder->int((int) $item);
             } else if (substr($item, 0, 2) === "0x") {
                 $scriptConcat = new Script(Buffer::hex(substr($item, 2)));
                 $builder->concat($scriptConcat);

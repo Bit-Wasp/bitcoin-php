@@ -162,7 +162,7 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      * {@inheritdoc}
      * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new BlockHeaderSerializer())->serialize($this);
     }

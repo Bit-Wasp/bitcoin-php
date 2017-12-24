@@ -60,7 +60,7 @@ class BlockLocator extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new BlockLocatorSerializer())->serialize($this);
     }

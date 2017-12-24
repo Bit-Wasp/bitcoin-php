@@ -2,6 +2,7 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
+use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -27,6 +28,7 @@ $amountAfterFee = $amount - $fee;
 
 // Two users independently create private keys.
 $pk1 = PrivateKeyFactory::fromHex($privHex1);
+$addr1 = AddressFactory::p2pkh($pk1->getPublicKey());
 $pk2 = PrivateKeyFactory::fromHex($privHex2);
 
 $outpoint = new OutPoint(Buffer::hex($txid), $vout);
@@ -36,7 +38,7 @@ $txOut = new TransactionOutput($amount, $redeemScript->getOutputScript());
 // One party (pk1) wants to spend funds. He creates a transaction spending the funding tx to his address.
 $spendTx = TransactionFactory::build()
     ->spendOutPoint($outpoint)
-    ->payToAddress($amountAfterFee, $pk1->getAddress())
+    ->payToAddress($amountAfterFee, $addr1)
     ->get();
 
 echo "Unsigned transaction: " . $spendTx->getHex() . PHP_EOL;

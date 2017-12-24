@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\ScriptInfo;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -24,11 +26,11 @@ class PayToPubkeyHash
 
     /**
      * PayToPubkeyHash constructor.
-     * @param $opcode
+     * @param int $opcode
      * @param BufferInterface $hash160
      * @param bool $allowVerify
      */
-    public function __construct($opcode, BufferInterface $hash160, $allowVerify = false)
+    public function __construct(int $opcode, BufferInterface $hash160, bool $allowVerify = false)
     {
         if ($hash160->getSize() !== 20) {
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
@@ -52,7 +54,7 @@ class PayToPubkeyHash
      * @param bool $allowVerify
      * @return static
      */
-    public static function fromDecodedScript(array $chunks, $allowVerify = false)
+    public static function fromDecodedScript(array $chunks, bool $allowVerify = false)
     {
         if (count($chunks) !== 5) {
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
@@ -73,12 +75,15 @@ class PayToPubkeyHash
      * @param bool $allowVerify
      * @return PayToPubkeyHash
      */
-    public static function fromScript(ScriptInterface $script, $allowVerify = false)
+    public static function fromScript(ScriptInterface $script, bool $allowVerify = false)
     {
         return self::fromDecodedScript($script->getScriptParser()->decode(), $allowVerify);
     }
 
-    public function getType()
+    /**
+     * @return string
+     */
+    public function getType(): string
     {
         return ScriptType::P2PK;
     }
@@ -86,7 +91,7 @@ class PayToPubkeyHash
     /**
      * @return int
      */
-    public function getRequiredSigCount()
+    public function getRequiredSigCount(): int
     {
         return 1;
     }
@@ -94,7 +99,7 @@ class PayToPubkeyHash
     /**
      * @return int
      */
-    public function getKeyCount()
+    public function getKeyCount(): int
     {
         return 1;
     }
@@ -102,7 +107,7 @@ class PayToPubkeyHash
     /**
      * @return bool
      */
-    public function isChecksigVerify()
+    public function isChecksigVerify(): bool
     {
         return $this->verify;
     }
@@ -111,7 +116,7 @@ class PayToPubkeyHash
      * @param PublicKeyInterface $publicKey
      * @return bool
      */
-    public function checkInvolvesKey(PublicKeyInterface $publicKey)
+    public function checkInvolvesKey(PublicKeyInterface $publicKey): bool
     {
         return $publicKey->getPubKeyHash()->equals($this->hash);
     }
@@ -119,7 +124,7 @@ class PayToPubkeyHash
     /**
      * @return BufferInterface
      */
-    public function getPubKeyHash()
+    public function getPubKeyHash(): BufferInterface
     {
         return $this->hash;
     }

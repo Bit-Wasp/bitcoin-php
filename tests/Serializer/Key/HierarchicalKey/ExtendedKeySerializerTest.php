@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -8,7 +10,7 @@ use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 
-class HexExtendedKeySerializerTest extends AbstractTestCase
+class ExtendedKeySerializerTest extends AbstractTestCase
 {
     /**
      * @dataProvider getEcAdapters

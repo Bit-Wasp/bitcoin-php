@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 class Opcodes implements \ArrayAccess
@@ -281,9 +283,9 @@ class Opcodes implements \ArrayAccess
     }
 
     /**
-     * @param integer $op
+     * @param int $op
      */
-    private function opExists($op)
+    private function opExists(int $op)
     {
         if (!array_key_exists($op, self::$names)) {
             throw new \RuntimeException("Opcode not found");
@@ -293,7 +295,7 @@ class Opcodes implements \ArrayAccess
     /**
      * @param string $name
      */
-    private function opNameExists($name)
+    private function opNameExists(string $name)
     {
         if (!array_key_exists($name, $this->known)) {
             throw new \RuntimeException("Opcode by that name not found");
@@ -304,7 +306,7 @@ class Opcodes implements \ArrayAccess
      * @param int $op
      * @return string
      */
-    public function getOp($op)
+    public function getOp(int $op): string
     {
         $this->opExists($op);
         return self::$names[$op];
@@ -314,7 +316,7 @@ class Opcodes implements \ArrayAccess
      * @param string $name
      * @return int
      */
-    public function getOpByName($name)
+    public function getOpByName(string $name): int
     {
         $this->opNameExists($name);
         return $this->known[$name];
@@ -324,7 +326,7 @@ class Opcodes implements \ArrayAccess
      * @param int $opcode
      * @return string
      */
-    public function offsetGet($opcode)
+    public function offsetGet($opcode): string
     {
         return $this->getOp($opcode);
     }
@@ -333,20 +335,23 @@ class Opcodes implements \ArrayAccess
      * @param int $opcode
      * @return bool
      */
-    public function offsetExists($opcode)
+    public function offsetExists($opcode): bool
     {
         return array_key_exists($opcode, self::$names);
     }
 
+    /**
+     * @throws \RuntimeException
+     */
     private function errorNoWrite()
     {
         throw new \RuntimeException('Cannot write to Opcodes');
     }
 
     /**
-     * @param int $opcode
+     * @param int $pos
      */
-    public function offsetUnset($opcode)
+    public function offsetUnset($pos)
     {
         $this->errorNoWrite();
     }
@@ -355,7 +360,7 @@ class Opcodes implements \ArrayAccess
      * @param int $opcode
      * @param mixed $value
      */
-    public function offsetSet($opcode, $value)
+    public function offsetSet($pos, $value)
     {
         $this->errorNoWrite();
     }

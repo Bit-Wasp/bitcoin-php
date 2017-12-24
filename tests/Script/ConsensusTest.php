@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script;
 
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
@@ -72,10 +74,19 @@ class ConsensusFactoryTest extends ScriptCheckTestBase
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param int $amount
+     * @param string $strTest
      * @dataProvider prepareConsensusTests
      */
-    public function testScript(ConsensusInterface $consensus, $flags, $expectedResult, ScriptWitnessInterface $scriptWitness, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $amount, $strTest)
-    {
+    public function testScript(
+        ConsensusInterface $consensus,
+        int $flags,
+        bool $expectedResult,
+        ScriptWitnessInterface $scriptWitness,
+        ScriptInterface $scriptSig,
+        ScriptInterface $scriptPubKey,
+        int $amount,
+        string $strTest
+    ) {
         $create = $this->buildCreditingTransaction($scriptPubKey, $amount);
         $tx = $this->buildSpendTransaction($create, $scriptSig, $scriptWitness);
         $check = $consensus->verify($tx, $scriptPubKey, $flags, 0, $amount);

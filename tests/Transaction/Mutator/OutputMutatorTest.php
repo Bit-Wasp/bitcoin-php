@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Mutator;
 
 use BitWasp\Bitcoin\Script\Script;
@@ -25,19 +27,5 @@ class OutputMutatorTest extends AbstractTestCase
 
         $this->assertEquals($newValue, $newOutput->getValue());
         $this->assertEquals($newScript, $newOutput->getScript());
-    }
-
-    public function testSetsNull()
-    {
-        $value = 50;
-        $script = new Script();
-        $output = new TransactionOutput($value, $script);
-        $modifier = new OutputMutator($output);
-        $newOutput = $modifier
-            ->null()
-            ->done();
-
-        $this->assertEquals('18446744073709551615', $newOutput->getValue());
-        $this->assertEquals($script, $newOutput->getScript());
     }
 }

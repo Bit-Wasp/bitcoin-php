@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Utxo;
 
 use BitWasp\Bitcoin\Script\Script;
@@ -11,20 +13,18 @@ use BitWasp\Buffertools\Buffer;
 
 class UtxoTest extends AbstractTestCase
 {
-    public function getOutput()
+    public function testUtxo()
     {
-        return new TransactionOutput(
+        $output = new TransactionOutput(
             50,
             new Script()
         );
-    }
 
-    public function testUtxo()
-    {
-        $txid = Buffer::hex('3a182308716d461ad310f43a83d407f9e930e728f918fb5ed9f43679a8fdc1d8', 32);
-        $vout = '0';
-        $output = $this->getOutput();
-        $outpoint = new OutPoint($txid, $vout);
+        $outpoint = new OutPoint(
+            Buffer::hex('3a182308716d461ad310f43a83d407f9e930e728f918fb5ed9f43679a8fdc1d8', 32),
+            0
+        );
+
         $utxo = new Utxo($outpoint, $output);
         $this->assertSame($outpoint, $utxo->getOutPoint());
         $this->assertSame($output, $utxo->getOutput());

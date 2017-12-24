@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -22,8 +24,11 @@ class Hasher extends SigHash
      * @return BufferInterface
      * @throws \Exception
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHash::ALL)
-    {
+    public function calculate(
+        ScriptInterface $txOutScript,
+        int $inputToSign,
+        int $sighashType = SigHash::ALL
+    ): BufferInterface {
         $math = Bitcoin::getMath();
         if ($inputToSign >= count($this->tx->getInputs())) {
             return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
 use BitWasp\Bitcoin\Crypto\Random\Random;
@@ -90,9 +92,10 @@ class PaymentVerifierTest extends Bip70Test
      * @param Math $math
      * @param Payment $payment
      * @param PaymentRequest $request
+     * @param string $message
      * @dataProvider createVectors
      */
-    public function testVerifier(Math $math, Payment $payment, PaymentRequest $request, $message)
+    public function testVerifier(Math $math, Payment $payment, PaymentRequest $request, string $message)
     {
         $verifier = new PaymentVerifier($math);
         $transactions = $verifier->getTransactions($payment);
@@ -146,9 +149,10 @@ class PaymentVerifierTest extends Bip70Test
      * @param Math $math
      * @param Payment $payment
      * @param PaymentRequest $request
+     * @param string $message
      * @dataProvider createInvalidVectors
      */
-    public function testInvalidPayment(Math $math, Payment $payment, PaymentRequest $request, $message)
+    public function testInvalidPayment(Math $math, Payment $payment, PaymentRequest $request, string $message)
     {
         $verifier = new PaymentVerifier($math);
         $transactions = $verifier->getTransactions($payment);

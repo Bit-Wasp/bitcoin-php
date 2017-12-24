@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script\Interpreter;
 
 use BitWasp\Bitcoin\Script\Interpreter\Number;
@@ -34,7 +36,7 @@ class NumberTest extends AbstractTestCase
      * @param string $expectedHex
      * @dataProvider getVectors
      */
-    public function testInts($int, $expectedSize, $expectedHex)
+    public function testInts(int $int, int $expectedSize, string $expectedHex)
     {
         $number = Number::int($int);
         $buffer = $number->getBuffer();
@@ -49,7 +51,7 @@ class NumberTest extends AbstractTestCase
      * @param string $expectedHex
      * @dataProvider getVectors
      */
-    public function testVector($int, $expectedSize, $expectedHex)
+    public function testVector(int $int, int $expectedSize, string $expectedHex)
     {
         $buffer = Buffer::hex($expectedHex);
         $number = Number::buffer($buffer, false);

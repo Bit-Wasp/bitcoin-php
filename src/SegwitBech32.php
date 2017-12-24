@@ -14,11 +14,14 @@ class SegwitBech32
      * address.
      *
      * @param WitnessProgram $witnessProgram
-     * @param NetworkInterface $network
+     * @param NetworkInterface|null $network
      * @return string
+     * @throws Bech32Exception
      */
-    public static function encode(WitnessProgram $witnessProgram, NetworkInterface $network = null)
-    {
+    public static function encode(
+        WitnessProgram $witnessProgram,
+        NetworkInterface $network = null
+    ): string {
         // do this first, why bother encoding if the network doesn't support it..
         $network = $network ?: Bitcoin::getNetwork();
         $hrp = $network->getSegwitBech32Prefix();
@@ -39,8 +42,10 @@ class SegwitBech32
      * @return WitnessProgram
      * @throws Bech32Exception
      */
-    public static function decode($bech32, NetworkInterface $network = null)
-    {
+    public static function decode(
+        string $bech32,
+        NetworkInterface $network = null
+    ): WitnessProgram {
         $network = $network ?: Bitcoin::getNetwork();
         $hrp = $network->getSegwitBech32Prefix();
 

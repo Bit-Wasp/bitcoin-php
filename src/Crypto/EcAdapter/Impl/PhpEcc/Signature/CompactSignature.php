@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature\CompactSignatureSerializer;
+use BitWasp\Buffertools\BufferInterface;
 
 class CompactSignature extends Signature implements CompactSignatureInterface
 {
@@ -72,9 +73,9 @@ class CompactSignature extends Signature implements CompactSignatureInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new CompactSignatureSerializer($this->ecAdapter))->serialize($this);
     }

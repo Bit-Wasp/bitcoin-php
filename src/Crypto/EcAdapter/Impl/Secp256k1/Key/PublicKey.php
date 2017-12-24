@@ -163,7 +163,7 @@ class PublicKey extends Key implements PublicKeyInterface
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new PublicKeySerializer($this->ecAdapter))->serialize($this);
     }

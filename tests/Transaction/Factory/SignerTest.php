@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressFactory;
@@ -69,10 +71,10 @@ class SignerTest extends AbstractTestCase
             foreach ($inputs as $input) {
                 $hash = Buffer::hex($input['hash']);
                 $txid = $hash->flip();
-                $outpoint = new OutPoint($txid, $input['index']);
-                $txOut = new TransactionOutput($input['value'], ScriptFactory::fromHex($input['scriptPubKey']));
+                $outpoint = new OutPoint($txid, (int) $input['index']);
+                $txOut = new TransactionOutput((int) $input['value'], ScriptFactory::fromHex($input['scriptPubKey']));
 
-                $txb->spendOutPoint($outpoint, null, $input['sequence']);
+                $txb->spendOutPoint($outpoint, null, (int) $input['sequence']);
                 $keys[] = array_map(function ($array) use ($ecAdapter) {
                     return [PrivateKeyFactory::fromWif($array['key'], $ecAdapter, NetworkFactory::bitcoinTestnet()), $array['sigHashType']];
                 }, $input['keys']);
@@ -92,9 +94,9 @@ class SignerTest extends AbstractTestCase
 
             $outs = [];
             foreach ($outputs as $output) {
-                $out = new TransactionOutput($output['value'], ScriptFactory::fromHex($output['script']));
+                $out = new TransactionOutput((int) $output['value'], ScriptFactory::fromHex($output['script']));
                 $outs[] = $out;
-                $txb->output($output['value'], ScriptFactory::fromHex($output['script']));
+                $txb->output($out->getValue(), $out->getScript());
             }
 
             $optExtra = [];
@@ -129,7 +131,7 @@ class SignerTest extends AbstractTestCase
      * @param int $value
      * @return Utxo
      */
-    public function createCredit(ScriptInterface $scriptPubKey, $value)
+    public function createCredit(ScriptInterface $scriptPubKey, int $value): Utxo
     {
         return new Utxo(new OutPoint(new Buffer(random_bytes(32)), 0), new TransactionOutput($value, $scriptPubKey));
     }
@@ -362,7 +364,7 @@ class SignerTest extends AbstractTestCase
     }
 
     /**
-     * @param null $tolerateBadKey
+     * @param null|bool $tolerateBadKey
      */
     protected function doTestSignerInvalidKeyInteraction($tolerateBadKey = null)
     {
@@ -380,7 +382,7 @@ class SignerTest extends AbstractTestCase
             ->get();
 
         $signer = new Signer($tx);
-        if ($tolerateBadKey != null) {
+        if (is_bool($tolerateBadKey)) {
             $signer->tolerateInvalidPublicKey($tolerateBadKey);
         }
 

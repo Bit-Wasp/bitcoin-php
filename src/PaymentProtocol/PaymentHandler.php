@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\PaymentProtocol;
 
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Payment;
@@ -12,7 +14,7 @@ class PaymentHandler
      * @param string $memo
      * @return PaymentACK
      */
-    public function getPaymentAck(Payment $payment, $memo = null)
+    public function getPaymentAck(Payment $payment, string $memo = null): PaymentACK
     {
         $ack = new PaymentACK();
         $ack->setPayment($payment);

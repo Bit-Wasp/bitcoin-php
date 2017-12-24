@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
 use BitWasp\Bitcoin\Script\Script;
@@ -15,8 +17,8 @@ class TransactionOutputTest extends AbstractTestCase
 
     public function testGetValueDefault()
     {
-        $out = new TransactionOutput('1', new Script());
-        $this->assertSame('1', $out->getValue());
+        $out = new TransactionOutput(1, new Script());
+        $this->assertSame(1, $out->getValue());
 
         $out = new TransactionOutput(10901, new Script());
         $this->assertSame(10901, $out->getValue());

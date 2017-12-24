@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Exceptions\P2shScriptException;
+use BitWasp\Buffertools\BufferInterface;
 
 class P2shScript extends Script
 {
@@ -46,7 +49,7 @@ class P2shScript extends Script
     /**
      * @throws P2shScriptException
      */
-    public function getWitnessScriptHash()
+    public function getWitnessScriptHash(): BufferInterface
     {
         throw new P2shScriptException("Cannot compute witness-script-hash for a P2shScript");
     }
@@ -54,15 +57,15 @@ class P2shScript extends Script
     /**
      * @return ScriptInterface
      */
-    public function getOutputScript()
+    public function getOutputScript(): ScriptInterface
     {
         return $this->outputScript;
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Address\ScriptHashAddress
+     * @return ScriptHashAddress
      */
-    public function getAddress()
+    public function getAddress(): ScriptHashAddress
     {
         return $this->address;
     }

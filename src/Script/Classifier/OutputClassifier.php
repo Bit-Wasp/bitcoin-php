@@ -115,7 +115,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isPayToPublicKey(ScriptInterface $script)
+    public function isPayToPublicKey(ScriptInterface $script): bool
     {
         try {
             return $this->decodeP2PK($script->getScriptParser()->decode()) !== false;
@@ -164,7 +164,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isPayToPublicKeyHash(ScriptInterface $script)
+    public function isPayToPublicKeyHash(ScriptInterface $script): bool
     {
         try {
             return $this->decodeP2PKH($script->getScriptParser()->decode()) !== false;
@@ -177,7 +177,7 @@ class OutputClassifier
 
     /**
      * @param array $decoded
-     * @return bool
+     * @return bool|BufferInterface
      */
     private function decodeP2SH(array $decoded)
     {
@@ -207,7 +207,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isPayToScriptHash(ScriptInterface $script)
+    public function isPayToScriptHash(ScriptInterface $script): bool
     {
         try {
             return $this->decodeP2SH($script->getScriptParser()->decode()) !== false;
@@ -259,7 +259,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isMultisig(ScriptInterface $script)
+    public function isMultisig(ScriptInterface $script): bool
     {
         try {
             return $this->decodeMultisig($script->getScriptParser()->decode()) !== false;
@@ -299,45 +299,6 @@ class OutputClassifier
     }
 
     /**
-     * @param ScriptInterface $script
-     * @param int $limit
-     * @param array $decoded
-     * @return BufferInterface|false
-     */
-    private function decodeWithLimit(ScriptInterface $script, $limit, array $decoded)
-    {
-        if (($data = $this->decodeWitnessNoLimit($script, $decoded))) {
-            if ($data->getSize() !== $limit) {
-                return false;
-            }
-
-            return $data;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @param Operation[] $decoded
-     * @return BufferInterface|false
-     */
-    private function decodeP2WKH(ScriptInterface $script, array $decoded)
-    {
-        return $this->decodeWithLimit($script, 20, $decoded);
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @param Operation[] $decoded
-     * @return BufferInterface|false
-     */
-    private function decodeP2WSH(ScriptInterface $script, array $decoded)
-    {
-        return $this->decodeWithLimit($script, 32, $decoded);
-    }
-
-    /**
      * @param Operation[] $decoded
      * @return BufferInterface|false
      */
@@ -373,7 +334,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isWitness(ScriptInterface $script)
+    public function isWitness(ScriptInterface $script): bool
     {
         try {
             return $this->decodeWitnessNoLimit($script, $script->getScriptParser()->decode())!== false;
@@ -405,7 +366,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isNullData(ScriptInterface $script)
+    public function isNullData(ScriptInterface $script): bool
     {
         try {
             return $this->decodeNullData($script->getScriptParser()->decode()) !== false;
@@ -443,7 +404,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return bool
      */
-    public function isWitnessCoinbaseCommitment(ScriptInterface $script)
+    public function isWitnessCoinbaseCommitment(ScriptInterface $script): bool
     {
         try {
             return $this->decodeWitnessCoinbaseCommitment($script->getScriptParser()->decode()) !== false;
@@ -458,7 +419,7 @@ class OutputClassifier
      * @param null $solution
      * @return string
      */
-    private function classifyDecoded(array $decoded, &$solution = null)
+    private function classifyDecoded(array $decoded, &$solution = null): string
     {
         $type = ScriptType::NONSTANDARD;
 
@@ -496,7 +457,7 @@ class OutputClassifier
      * @param mixed $solution
      * @return string
      */
-    public function classify(ScriptInterface $script, &$solution = null)
+    public function classify(ScriptInterface $script, &$solution = null): string
     {
         $decoded = $script->getScriptParser()->decode();
 
@@ -509,7 +470,7 @@ class OutputClassifier
      * @param ScriptInterface $script
      * @return OutputData
      */
-    public function decode(ScriptInterface $script)
+    public function decode(ScriptInterface $script): OutputData
     {
         $solution = null;
         $type = $this->classify($script, $solution);
@@ -518,9 +479,10 @@ class OutputClassifier
 
     /**
      * @param ScriptInterface $script
+     * @param bool $allowNonstandard
      * @return OutputData[]
      */
-    public function decodeSequence(ScriptInterface $script, $allowNonstandard = false)
+    public function decodeSequence(ScriptInterface $script, bool $allowNonstandard = false): array
     {
         $decoded = $script->getScriptParser()->decode();
 

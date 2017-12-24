@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -49,6 +51,7 @@ class Checksig
      * @var PublicKeyInterface[]|null[]
      */
     protected $publicKeys = [];
+
     /**
      * Checksig constructor.
      * @param Multisig|PayToPubkeyHash|PayToPubkey $info
@@ -93,11 +96,8 @@ class Checksig
      * @param bool $setting
      * @return $this
      */
-    public function setRequired($setting)
+    public function setRequired(bool $setting)
     {
-        if (!is_bool($setting)) {
-            throw new \RuntimeException("Invalid input to setRequired");
-        }
         $this->required = $setting;
         return $this;
     }
@@ -109,7 +109,7 @@ class Checksig
      *
      * @return bool
      */
-    public function isRequired()
+    public function isRequired(): bool
     {
         return $this->required;
     }
@@ -132,7 +132,7 @@ class Checksig
      *
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->scriptType;
     }
@@ -154,7 +154,7 @@ class Checksig
     /**
      * @return int
      */
-    public function getRequiredSigs()
+    public function getRequiredSigs(): int
     {
         return $this->requiredSigs;
     }
@@ -162,7 +162,7 @@ class Checksig
     /**
      * @return bool
      */
-    public function isFullySigned()
+    public function isFullySigned(): bool
     {
         if ($this->required) {
             return $this->requiredSigs === count($this->signatures);
@@ -175,7 +175,7 @@ class Checksig
      * @param int $idx
      * @return bool
      */
-    public function hasSignature($idx)
+    public function hasSignature(int $idx): bool
     {
         if ($idx > $this->requiredSigs) {
             throw new \RuntimeException("Out of range signature queried");
@@ -189,7 +189,7 @@ class Checksig
      * @param TransactionSignatureInterface $signature
      * @return $this
      */
-    public function setSignature($idx, TransactionSignatureInterface $signature)
+    public function setSignature(int $idx, TransactionSignatureInterface $signature)
     {
         if ($idx < 0 || $idx > $this->keyCount) {
             throw new \RuntimeException("Out of range signature for operation");
@@ -203,7 +203,7 @@ class Checksig
      * @param int $idx
      * @return TransactionSignatureInterface|null
      */
-    public function getSignature($idx)
+    public function getSignature(int $idx)
     {
         if (!$this->hasSignature($idx)) {
             return null;
@@ -215,7 +215,7 @@ class Checksig
     /**
      * @return array
      */
-    public function getSignatures()
+    public function getSignatures(): array
     {
         return $this->signatures;
     }
@@ -224,7 +224,7 @@ class Checksig
      * @param int $idx
      * @return bool
      */
-    public function hasKey($idx)
+    public function hasKey(int $idx): bool
     {
         return array_key_exists($idx, $this->publicKeys);
     }
@@ -233,7 +233,7 @@ class Checksig
      * @param int $idx
      * @return PublicKeyInterface|null
      */
-    public function getKey($idx)
+    public function getKey(int $idx)
     {
         if (!$this->hasKey($idx)) {
             return null;
@@ -247,7 +247,7 @@ class Checksig
      * @param PublicKeyInterface|null $key
      * @return $this
      */
-    public function setKey($idx, $key)
+    public function setKey(int $idx, PublicKeyInterface $key = null)
     {
         if ($idx < 0 || $idx > $this->keyCount) {
             throw new \RuntimeException("Out of range index for public key");
@@ -260,7 +260,7 @@ class Checksig
     /**
      * @return PublicKeyInterface[]
      */
-    public function getKeys()
+    public function getKeys(): array
     {
         return $this->publicKeys;
     }
@@ -268,7 +268,7 @@ class Checksig
     /**
      * @return bool
      */
-    public function isVerify()
+    public function isVerify(): bool
     {
         return $this->info->isChecksigVerify();
     }
@@ -276,10 +276,12 @@ class Checksig
     /**
      * @param TransactionSignatureSerializer $txSigSerializer
      * @param PublicKeySerializerInterface $pubKeySerializer
-     * @return array
+     * @return BufferInterface[]
      */
-    public function serialize(TransactionSignatureSerializer $txSigSerializer, PublicKeySerializerInterface $pubKeySerializer)
-    {
+    public function serialize(
+        TransactionSignatureSerializer $txSigSerializer,
+        PublicKeySerializerInterface $pubKeySerializer
+    ): array {
         $outputType = $this->getType();
         $result = [];
 

@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -26,7 +28,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
      * @param int $amount
      * @return Transaction
      */
-    public function buildCreditingTransaction(ScriptInterface $scriptPubKey, $amount = 0)
+    public function buildCreditingTransaction(ScriptInterface $scriptPubKey, int $amount = 0)
     {
         return new Transaction(
             1,
@@ -49,10 +51,13 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
      * @param TransactionInterface $tx
      * @param ScriptInterface $scriptSig
      * @param ScriptWitnessInterface|null $scriptWitness
-     * @return Transaction
+     * @return TransactionInterface
      */
-    public function buildSpendTransaction(TransactionInterface $tx, ScriptInterface $scriptSig, ScriptWitnessInterface $scriptWitness = null)
-    {
+    public function buildSpendTransaction(
+        TransactionInterface $tx,
+        ScriptInterface $scriptSig,
+        ScriptWitnessInterface $scriptWitness = null
+    ): TransactionInterface {
         return new Transaction(
             1,
             [
@@ -72,9 +77,9 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
 
     /**
      * @param string $data
-     * @return Script|ScriptInterface
+     * @return ScriptInterface
      */
-    public function parseTestScript($data)
+    public function parseTestScript($data): ScriptInterface
     {
         if (is_array($data)) {
             return ScriptFactory::sequence($data);
@@ -89,7 +94,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
      * @param Opcodes $opcodes
      * @return array
      */
-    public function calcMapOpNames(Opcodes $opcodes)
+    public function calcMapOpNames(Opcodes $opcodes): array
     {
         $mapOpNames = [];
         for ($op = 0; $op <= Opcodes::OP_NOP10; $op++) {
@@ -114,7 +119,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
      * @param string $string
      * @return ScriptInterface
      */
-    public function calcScriptFromString($mapOpNames, $string)
+    public function calcScriptFromString(array $mapOpNames, string $string): ScriptInterface
     {
         $builder = ScriptFactory::create();
         $split = explode(" ", $string);
@@ -125,7 +130,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
 
             if (strlen($item) == '') {
             } else if (preg_match("/^[0-9]*$/", $item) || substr($item, 0, 1) === "-" && preg_match("/^[0-9]*$/", substr($item, 1))) {
-                $builder->int($item);
+                $builder->int((int) $item);
             } else if (substr($item, 0, 2) === "0x") {
                 $scriptConcat = new Script(Buffer::hex(substr($item, 2)));
                 $builder->concat($scriptConcat);
@@ -145,7 +150,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
     /**
      * @return array
      */
-    public function prepareTestData()
+    public function prepareTestData(): array
     {
         $opcodes = new Opcodes();
         $mapOpNames = $this->calcMapOpNames($opcodes);
@@ -164,8 +169,8 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
                 }
 
                 $amt = number_format($test[$pos][$i], 8, '.', '');
-                $sat = bcmul($amt, 10**8);
-                $amount = $sat;
+                $sat = bcmul($amt, (string) Amount::COIN);
+                $amount = (int) $sat;
                 $pos++;
             }
 
@@ -197,7 +202,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
      * @param array $ecAdapterFixtures - array<array<EcAdapterInterface>>
      * @return array - array<array<ConsensusInterface,EcAdapterInterface>>
      */
-    public function getConsensusAdapters(array $ecAdapterFixtures)
+    public function getConsensusAdapters(array $ecAdapterFixtures): array
     {
         $adapters = [];
         foreach ($ecAdapterFixtures as $ecAdapterFixture) {

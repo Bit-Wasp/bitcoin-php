@@ -1,7 +1,8 @@
 <?php
 
-namespace BitWasp\Bitcoin\RpcTest;
+declare(strict_types=1);
 
+namespace BitWasp\Bitcoin\RpcTest;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -31,7 +32,8 @@ class RbfTransactionTest extends AbstractTestCase
         $this->rpcFactory = $rpcFactory;
     }
 
-    private function assertSendRawTransaction($result) {
+    private function assertSendRawTransaction($result)
+    {
         $this->assertInternalType('array', $result);
         $this->assertArrayHasKey('error', $result);
         $this->assertEquals(null, $result['error']);
@@ -135,7 +137,6 @@ class RbfTransactionTest extends AbstractTestCase
         $this->assertSendRawTransaction($result);
 
         $bitcoind->destroy();
-
     }
 
     public function testCannotReplaceIfNotOptin()
@@ -179,7 +180,6 @@ class RbfTransactionTest extends AbstractTestCase
         $this->assertBitcoindError(RpcServer::ERROR_TX_MEMPOOL_CONFLICT, $result);
 
         $bitcoind->destroy();
-
     }
 
     public function testCanReplaceIfOptin()

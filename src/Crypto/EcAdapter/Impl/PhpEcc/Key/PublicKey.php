@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
+use Mdanter\Ecc\Primitives\CurveFpInterface;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\Key\PublicKeyInterface
@@ -65,7 +66,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     /**
      * @return \Mdanter\Ecc\Primitives\CurveFpInterface
      */
-    public function getCurve()
+    public function getCurve(): CurveFpInterface
     {
         return $this->ecAdapter->getGenerator()->getCurve();
     }
@@ -179,7 +180,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new PublicKeySerializer($this->ecAdapter))->serialize($this);
     }

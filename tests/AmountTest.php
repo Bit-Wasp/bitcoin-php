@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Amount;
@@ -13,8 +15,8 @@ class AmountTest extends AbstractTestCase
             ['1', Amount::COIN],
             ['1.12345678', 112345678],
             ['21000000', 2100000000000000],
-            ['0', '0'],
-            ['0.0', '0']
+            ['0', 0],
+            ['0.0', 0]
         ];
     }
 
@@ -23,7 +25,7 @@ class AmountTest extends AbstractTestCase
      * @param $satoshis
      * @dataProvider getVectors
      */
-    public function testAmount($btc, $satoshis)
+    public function testAmount(string $btc, int $satoshis)
     {
         $amount = new Amount();
         $this->assertEquals($btc, $amount->toBtc($satoshis));

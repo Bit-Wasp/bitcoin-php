@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Script\Branch;
 
 use BitWasp\Bitcoin\Script\Parser\Operation;

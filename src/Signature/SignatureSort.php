@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -28,7 +30,7 @@ class SignatureSort implements SignatureSortInterface
      * @param BufferInterface $messageHash
      * @return \SplObjectStorage
      */
-    public function link(array $signatures, array $publicKeys, BufferInterface $messageHash)
+    public function link(array $signatures, array $publicKeys, BufferInterface $messageHash): \SplObjectStorage
     {
         $sigCount = count($signatures);
         $storage = new \SplObjectStorage();

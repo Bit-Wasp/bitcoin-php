@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
 use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
@@ -58,9 +60,9 @@ class TransactionSerializer implements TransactionSerializerInterface
      * @param Parser $parser
      * @return TransactionInterface
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): TransactionInterface
     {
-        $version = $this->int32le->read($parser);
+        $version = (int) $this->int32le->read($parser);
 
         $vin = [];
         $vinCount = $this->varint->read($parser);
@@ -103,7 +105,7 @@ class TransactionSerializer implements TransactionSerializerInterface
             throw new \RuntimeException('Flags byte was 0');
         }
 
-        $lockTime = $this->uint32le->read($parser);
+        $lockTime = (int) $this->uint32le->read($parser);
 
         return new Transaction($version, $vin, $vout, $vwit, $lockTime);
     }
@@ -112,7 +114,7 @@ class TransactionSerializer implements TransactionSerializerInterface
      * @param string|BufferInterface $data
      * @return TransactionInterface
      */
-    public function parse($data)
+    public function parse($data): TransactionInterface
     {
         return $this->fromParser(new Parser($data));
     }
@@ -122,7 +124,7 @@ class TransactionSerializer implements TransactionSerializerInterface
      * @param int $opt
      * @return BufferInterface
      */
-    public function serialize(TransactionInterface $transaction, $opt = 0)
+    public function serialize(TransactionInterface $transaction, $opt = 0): BufferInterface
     {
         $parser = new Parser();
         $parser->appendBinary($this->int32le->write($transaction->getVersion()));

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -33,7 +35,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      * @param SignatureInterface $signature
      * @param $hashType
      */
-    public function __construct(EcAdapterInterface $ecAdapter, SignatureInterface $signature, $hashType)
+    public function __construct(EcAdapterInterface $ecAdapter, SignatureInterface $signature, int $hashType)
     {
         $this->ecAdapter = $ecAdapter;
         $this->signature = $signature;
@@ -43,15 +45,15 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     /**
      * @return SignatureInterface
      */
-    public function getSignature()
+    public function getSignature(): SignatureInterface
     {
         return $this->signature;
     }
 
     /**
-     * @return int|string
+     * @return int
      */
-    public function getHashType()
+    public function getHashType(): int
     {
         return $this->hashType;
     }
@@ -60,7 +62,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      * @param TransactionSignatureInterface $other
      * @return bool
      */
-    public function equals(TransactionSignatureInterface $other)
+    public function equals(TransactionSignatureInterface $other): bool
     {
         return $this->signature->equals($other->getSignature())
             && $this->hashType === $other->getHashType();
@@ -71,7 +73,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
      * @return bool
      * @throws SignatureNotCanonical
      */
-    public static function isDERSignature(BufferInterface $sig)
+    public static function isDERSignature(BufferInterface $sig): bool
     {
         $checkVal = function ($fieldName, $start, $length, $binaryString) {
             if ($length === 0) {
@@ -130,7 +132,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         $txSigSerializer = new TransactionSignatureSerializer(
             EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $this->ecAdapter)

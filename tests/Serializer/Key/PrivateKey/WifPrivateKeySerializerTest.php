@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Tests\Serializer\Key\PrivateKey;
 
 use BitWasp\Bitcoin\Base58;

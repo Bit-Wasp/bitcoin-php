@@ -1,5 +1,6 @@
 <?php
 
+use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 
@@ -21,4 +22,6 @@ echo " - Dec: " . gmp_strval($privateKey->getSecret(), 10) . "\n";
 echo "Public Key\n";
 echo " - Hex: " . $publicKey->getHex() . "\n";
 echo " - Hash: " . $publicKey->getPubKeyHash()->getHex() . "\n";
-echo " - Address: " . $publicKey->getAddress()->getAddress() . "\n";
+
+$address = AddressFactory::p2pkh($publicKey);
+echo " - Address: " . $address->getAddress() . "\n";
