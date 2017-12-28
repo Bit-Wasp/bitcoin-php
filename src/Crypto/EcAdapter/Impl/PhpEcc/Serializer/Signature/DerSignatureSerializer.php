@@ -64,12 +64,11 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param SignatureInterface $signature
+     * @param SignatureInterface|\Mdanter\Ecc\Crypto\Signature\Signature $signature
      * @return BufferInterface
      */
     public function serialize(SignatureInterface $signature): BufferInterface
     {
-        /** @var \Mdanter\Ecc\Crypto\Signature\Signature|$signature $math */
         $math = $this->ecAdapter->getMath();
 
         // Ensure that the R and S hex's are of even length

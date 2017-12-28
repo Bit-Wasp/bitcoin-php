@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Address\AddressInterface;
@@ -16,12 +18,12 @@ class Uri
     private $address;
 
     /**
-     * @var null|int
+     * @var null|float
      */
     private $amount;
 
     /**
-     * @var
+     * @var string|null
      */
     private $label;
 

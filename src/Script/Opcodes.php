@@ -357,7 +357,7 @@ class Opcodes implements \ArrayAccess
     }
 
     /**
-     * @param int $opcode
+     * @param int $pos
      * @param mixed $value
      */
     public function offsetSet($pos, $value)
