@@ -11,7 +11,9 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
+use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Primitives\CurveFpInterface;
+use Mdanter\Ecc\Primitives\GeneratorPoint;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\Key\PublicKeyInterface
@@ -56,9 +58,9 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     }
 
     /**
-     * @return \Mdanter\Ecc\Primitives\GeneratorPoint
+     * @return GeneratorPoint
      */
-    public function getGenerator()
+    public function getGenerator(): GeneratorPoint
     {
         return $this->ecAdapter->getGenerator();
     }
@@ -94,7 +96,10 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
      */
     public function verify(BufferInterface $msg32, SignatureInterface $signature): bool
     {
-        return $this->ecAdapter->verify($msg32, $this, $signature);
+        /** @var SignatureInterface|\Mdanter\Ecc\Crypto\Signature\Signature $signature */
+        $hash = gmp_init($msg32->getHex(), 16);
+        $signer = new Signer($this->ecAdapter->getMath());
+        return $signer->verify($this, $signature, $hash);
     }
 
     /**
@@ -105,7 +110,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     {
         $offset = $this->ecAdapter->getGenerator()->mul($tweak);
         $newPoint = $this->point->add($offset);
-        return $this->ecAdapter->getPublicKey($newPoint, $this->compressed);
+        return new PublicKey($this->ecAdapter, $newPoint, $this->compressed);
     }
 
     /**
@@ -115,7 +120,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     public function tweakMul(\GMP $tweak): KeyInterface
     {
         $point = $this->point->mul($tweak);
-        return $this->ecAdapter->getPublicKey($point, $this->compressed);
+        return new PublicKey($this->ecAdapter, $point, $this->compressed);
     }
 
     /**

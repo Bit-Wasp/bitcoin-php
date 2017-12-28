@@ -13,7 +13,7 @@ use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Network\BitcoinNetwork;
+use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\Networks\BitcoinTestnet;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -25,7 +25,7 @@ class HierarchicalKeyTest extends AbstractTestCase
 {
 
     /**
-     * @var BitcoinNetwork
+     * @var Network
      */
     protected $network;
 
@@ -424,18 +424,11 @@ class HierarchicalKeyTest extends AbstractTestCase
         $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface')
             ->setMethods([
                 'getMath',
-                'getAdapterName',
                 'getGenerator',
                 'publicKeyFromBuffer',
-                'recoverYfromX',
                 'validateSignatureElement',
-                'associateSigs',
-                'sign',
-                'verify',
                 'getPrivateKey',
-                'halfOrder',
-                'checkInt',
-                'signCompact',
+                'getOrder',
                 'recover',
                 'validatePrivateKey'
             ])
@@ -458,12 +451,12 @@ class HierarchicalKeyTest extends AbstractTestCase
                 }
             );
 
-
         $privMockBuilder = $this->getMockBuilder('BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface')
             ->setMethods([
                 'getSecret',
                 'getPublicKey',
                 'sign',
+                'signCompact',
                 'toWif',
 
                 // Key Interface

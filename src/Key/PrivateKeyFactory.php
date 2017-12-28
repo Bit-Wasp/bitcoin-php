@@ -78,7 +78,7 @@ class PrivateKeyFactory
     public static function fromInt($int, bool $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $secret = Buffer::int($int, 32, $ecAdapter->getMath())->getGmp();
+        $secret = Buffer::int($int, 32)->getGmp();
         return $ecAdapter->getPrivateKey($secret, $compressed);
     }
 

@@ -82,9 +82,9 @@ class ElectrumKey
      * @param bool $change
      * @return \GMP
      */
-    public function getSequenceOffset($sequence, $change = false): \GMP
+    public function getSequenceOffset(int $sequence, bool $change = false): \GMP
     {
-        $seed = new Buffer(sprintf("%s:%s:%s", $sequence, $change ? '1' : '0', $this->getMPK()->getBinary()), null, $this->ecAdapter->getMath());
+        $seed = new Buffer(sprintf("%s:%d:%s", $sequence, $change ? 1 : 0, $this->getMPK()->getBinary()));
         return Hash::sha256d($seed)->getGmp();
     }
 
@@ -93,7 +93,7 @@ class ElectrumKey
      * @param bool $change
      * @return KeyInterface
      */
-    public function deriveChild($sequence, $change = false): KeyInterface
+    public function deriveChild(int $sequence, bool $change = false): KeyInterface
     {
         $key = is_null($this->masterPrivate) ? $this->masterPublic : $this->masterPrivate;
         return $key->tweakAdd($this->getSequenceOffset($sequence, $change));

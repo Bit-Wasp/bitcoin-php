@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\BufferInterface;
 
-class Signature extends Serializable implements SignatureInterface
+class Signature extends Serializable implements SignatureInterface, \Mdanter\Ecc\Crypto\Signature\SignatureInterface
 {
     /**
      * @var \GMP
@@ -43,7 +43,7 @@ class Signature extends Serializable implements SignatureInterface
      * @inheritdoc
      * @see SignatureInterface::getR()
      */
-    public function getR()
+    public function getR(): \GMP
     {
         return $this->r;
     }
@@ -52,7 +52,7 @@ class Signature extends Serializable implements SignatureInterface
      * @inheritdoc
      * @see SignatureInterface::getS()
      */
-    public function getS()
+    public function getS(): \GMP
     {
         return $this->s;
     }

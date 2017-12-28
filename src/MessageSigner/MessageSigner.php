@@ -36,7 +36,7 @@ class MessageSigner
      */
     private function calculateBody(string $message)
     {
-        return new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message, null, $this->ecAdapter->getMath());
+        return new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message, null);
     }
 
     /**
@@ -76,9 +76,8 @@ class MessageSigner
 
         return new SignedMessage(
             $message,
-            $this->ecAdapter->signCompact(
+            $privateKey->signCompact(
                 $hash,
-                $privateKey,
                 new Rfc6979(
                     $this->ecAdapter,
                     $privateKey,

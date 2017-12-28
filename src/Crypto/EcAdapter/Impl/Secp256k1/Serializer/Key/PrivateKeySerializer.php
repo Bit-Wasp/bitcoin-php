@@ -36,7 +36,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      */
     private function doSerialize(PrivateKey $privateKey): BufferInterface
     {
-        return new Buffer($privateKey->getSecretBinary(), 32, $this->ecAdapter->getMath());
+        return new Buffer($privateKey->getSecretBinary(), 32);
     }
 
     /**
@@ -65,6 +65,6 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      */
     public function parse($data): PrivateKeyInterface
     {
-        return $this->fromParser(new Parser($data, $this->ecAdapter->getMath()));
+        return $this->fromParser(new Parser($data));
     }
 }

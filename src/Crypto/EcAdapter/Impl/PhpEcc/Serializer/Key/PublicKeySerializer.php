@@ -54,13 +54,13 @@ class PublicKeySerializer implements PublicKeySerializerInterface
         $point = $publicKey->getPoint();
 
         $length = 33;
-        $data = $this->getPrefix($publicKey) . Buffer::int(gmp_strval($point->getX(), 10), 32, $math)->getBinary();
+        $data = $this->getPrefix($publicKey) . Buffer::int(gmp_strval($point->getX(), 10), 32)->getBinary();
         if (!$publicKey->isCompressed()) {
             $length = 65;
-            $data .= Buffer::int(gmp_strval($point->getY(), 10), 32, $math)->getBinary();
+            $data .= Buffer::int(gmp_strval($point->getY(), 10), 32)->getBinary();
         }
 
-        return new Buffer($data, $length, $math);
+        return new Buffer($data, $length);
     }
 
     /**

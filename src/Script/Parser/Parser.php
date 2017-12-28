@@ -70,7 +70,7 @@ class Parser implements \Iterator
         $this->data = $buffer->getBinary();
         $this->end = $buffer->getSize();
         $this->script = $script;
-        $this->empty = new Buffer('', 0, $math);
+        $this->empty = new Buffer('', 0);
     }
 
     /**
@@ -130,7 +130,7 @@ class Parser implements \Iterator
             }
 
             if ($dataSize > 0) {
-                $pushData = new Buffer(substr($this->data, $this->position, $dataSize), $dataSize, $this->math);
+                $pushData = new Buffer(substr($this->data, $this->position, $dataSize), $dataSize);
             }
 
             $this->position += $dataSize;

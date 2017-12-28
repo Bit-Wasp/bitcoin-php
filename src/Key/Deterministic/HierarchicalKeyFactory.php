@@ -45,7 +45,7 @@ class HierarchicalKeyFactory
     public static function fromEntropy(BufferInterface $entropy, EcAdapterInterface $ecAdapter = null): HierarchicalKey
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $seed = Hash::hmac('sha512', $entropy, new Buffer('Bitcoin seed', null, $ecAdapter->getMath()));
+        $seed = Hash::hmac('sha512', $entropy, new Buffer('Bitcoin seed'));
         $privateKey = PrivateKeyFactory::fromHex($seed->slice(0, 32), true, $ecAdapter);
         return new HierarchicalKey($ecAdapter, 0, 0, 0, $seed->slice(32, 32), $privateKey);
     }

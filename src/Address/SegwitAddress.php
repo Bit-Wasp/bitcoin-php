@@ -47,7 +47,7 @@ class SegwitAddress extends Address implements Bech32AddressInterface
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Script\ScriptInterface
+     * @return ScriptInterface
      */
     public function getScriptPubKey(): ScriptInterface
     {

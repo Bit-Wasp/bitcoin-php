@@ -91,9 +91,9 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
             0x30,
             $this->getInnerTemplate()->write([
                 0x02,
-                new Buffer($rBin, null, $math),
+                new Buffer($rBin, null),
                 0x02,
-                new Buffer($sBin, null, $math)
+                new Buffer($sBin, null)
             ])
         ]);
     }

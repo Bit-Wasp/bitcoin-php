@@ -29,14 +29,13 @@ class Hasher extends SigHash
         int $inputToSign,
         int $sighashType = SigHash::ALL
     ): BufferInterface {
-        $math = Bitcoin::getMath();
         if ($inputToSign >= count($this->tx->getInputs())) {
-            return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
+            return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
         }
 
         if (($sighashType & 0x1f) == SigHash::SINGLE) {
             if ($inputToSign >= count($this->tx->getOutputs())) {
-                return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32, $math);
+                return Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
             }
         }
 

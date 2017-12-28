@@ -62,10 +62,10 @@ class Math extends GmpMath
         $size = $this->rightShift($compact, 24);
         $word = $this->bitwiseAnd($compact, gmp_init(0x007fffff, 10));
         if ($this->cmp($size, gmp_init(3)) <= 0) {
-            $positions = $this->toString($this->mul(gmp_init(8, 10), $this->sub(gmp_init(3, 10), $size)));
+            $positions = (int) $this->toString($this->mul(gmp_init(8, 10), $this->sub(gmp_init(3, 10), $size)));
             $word = $this->rightShift($word, $positions);
         } else {
-            $positions = $this->toString($this->mul(gmp_init(8, 10), $this->sub($size, gmp_init(3, 10))));
+            $positions = (int) $this->toString($this->mul(gmp_init(8, 10), $this->sub($size, gmp_init(3, 10))));
             $word = $this->leftShift($word, $positions);
         }
 

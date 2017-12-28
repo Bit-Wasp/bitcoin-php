@@ -59,11 +59,7 @@ class ProofOfWork
      */
     public function getTargetHash(int $bits): BufferInterface
     {
-        return Buffer::int(
-            gmp_strval($this->getTarget($bits), 10),
-            32,
-            $this->math
-        );
+        return Buffer::int(gmp_strval($this->getTarget($bits), 10), 32);
     }
 
     /**

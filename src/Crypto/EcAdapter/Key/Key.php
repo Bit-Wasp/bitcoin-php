@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
