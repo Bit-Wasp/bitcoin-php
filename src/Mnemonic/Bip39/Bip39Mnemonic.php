@@ -111,7 +111,6 @@ class Bip39Mnemonic implements MnemonicInterface
      */
     public function mnemonicToEntropy(string $mnemonic): BufferInterface
     {
-        $math = $this->ecAdapter->getMath();
         $words = explode(' ', $mnemonic);
 
         if (count($words) % 3 !== 0) {

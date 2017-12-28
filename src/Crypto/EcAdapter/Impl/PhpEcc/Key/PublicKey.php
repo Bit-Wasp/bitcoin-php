@@ -91,12 +91,11 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
 
     /**
      * @param BufferInterface $msg32
-     * @param SignatureInterface $signature
+     * @param SignatureInterface|\Mdanter\Ecc\Crypto\Signature\Signature $signature
      * @return bool
      */
     public function verify(BufferInterface $msg32, SignatureInterface $signature): bool
     {
-        /** @var SignatureInterface|\Mdanter\Ecc\Crypto\Signature\Signature $signature */
         $hash = gmp_init($msg32->getHex(), 16);
         $signer = new Signer($this->ecAdapter->getMath());
         return $signer->verify($this, $signature, $hash);

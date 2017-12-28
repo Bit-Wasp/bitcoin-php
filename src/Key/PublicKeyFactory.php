@@ -35,19 +35,4 @@ class PublicKeyFactory
             ->parse($buffer)
         ;
     }
-
-    /**
-     * @param BufferInterface|string $hex
-     * @param EcAdapterInterface|null $ecAdapter
-     * @return bool
-     */
-    public static function validateHex($hex, EcAdapterInterface $ecAdapter = null)
-    {
-        try {
-            self::fromHex($hex, $ecAdapter);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
 }

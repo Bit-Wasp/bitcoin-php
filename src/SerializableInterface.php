@@ -9,7 +9,7 @@ use BitWasp\Buffertools\BufferInterface;
 interface SerializableInterface extends \BitWasp\Buffertools\SerializableInterface
 {
     /**
-     * @return /home/tk/git/bitcoin-php/src/SerializableInterface.php
+     * @return BufferInterface
      */
     public function getBuffer(): BufferInterface;
 

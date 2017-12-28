@@ -28,11 +28,9 @@ class Base58
     public static function encode(BufferInterface $buffer): string
     {
         $size = $buffer->getSize();
-        if ($buffer->getBinary() === '') {
+        if ($size === 0) {
             return '';
         }
-
-        $math = Bitcoin::getMath();
 
         $orig = $buffer->getBinary();
         $decimal = $buffer->getGmp();
@@ -40,13 +38,15 @@ class Base58
         $return = '';
         $zero = gmp_init(0);
         $_58 = gmp_init(58);
-        while ($math->cmp($decimal, $zero) > 0) {
-            list($decimal, $rem) = $math->divQr($decimal, $_58);
+        while (gmp_cmp($decimal, $zero) > 0) {
+            $div = gmp_div($decimal, $_58);
+            $rem = gmp_sub($decimal, gmp_mul($div, $_58));
             $return .= self::$base58chars[(int) gmp_strval($rem, 10)];
+            $decimal = $div;
         }
         $return = strrev($return);
 
-        //leading zeros
+        // Leading zeros
         for ($i = 0; $i < $size && $orig[$i] === "\x00"; $i++) {
             $return = '1' . $return;
         }
@@ -62,9 +62,8 @@ class Base58
      */
     public static function decode(string $base58): BufferInterface
     {
-        $math = Bitcoin::getMath();
         if ($base58 === '') {
-            return new Buffer('', 0, $math);
+            return new Buffer('', 0);
         }
 
         $original = $base58;
@@ -76,10 +75,10 @@ class Base58
             if ($loc === false) {
                 throw new Base58InvalidCharacter('Found character that is not allowed in base58: ' . $base58[$i]);
             }
-            $return = $math->add($math->mul($return, $_58), gmp_init($loc, 10));
+            $return = gmp_add(gmp_mul($return, $_58), gmp_init($loc, 10));
         }
 
-        $binary = $math->cmp($return, gmp_init(0)) === 0 ? '' : Buffer::int(gmp_strval($return, 10))->getBinary();
+        $binary = gmp_cmp($return, gmp_init(0)) === 0 ? '' : Buffer::int(gmp_strval($return, 10))->getBinary();
         for ($i = 0; $i < $length && $original[$i] === '1'; $i++) {
             $binary = "\x00" . $binary;
         }
@@ -88,10 +87,9 @@ class Base58
     }
 
     /**
-     * Calculate a checksum for the given data
-     *
      * @param BufferInterface $data
      * @return BufferInterface
+     * @throws \Exception
      */
     public static function checksum(BufferInterface $data): BufferInterface
     {
@@ -100,10 +98,11 @@ class Base58
 
     /**
      * Decode a base58 checksum string and validate checksum
-     *
      * @param string $base58
      * @return BufferInterface
      * @throws Base58ChecksumFailure
+     * @throws Base58InvalidCharacter
+     * @throws \Exception
      */
     public static function decodeCheck(string $base58): BufferInterface
     {
