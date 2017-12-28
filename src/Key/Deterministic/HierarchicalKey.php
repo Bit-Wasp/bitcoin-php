@@ -212,7 +212,7 @@ class HierarchicalKey
      * @return BufferInterface
      * @throws \Exception
      */
-    public function getHmacSeed($sequence)
+    public function getHmacSeed(int $sequence)
     {
         if ($sequence < 0 || $sequence > IntRange::U32_MAX) {
             throw new \InvalidArgumentException("Sequence is outside valid range, must be >= 0 && <= (2^31)-1");
@@ -223,14 +223,12 @@ class HierarchicalKey
                 throw new \Exception("Can't derive a hardened key without the private key");
             }
 
-            $buffer = Buffertools::concat(new Buffer("\x00"), $this->getPrivateKey()->getBuffer());
+            $data = "\x00{$this->getPrivateKey()->getBinary()}";
         } else {
-            $buffer = $this->getPublicKey()->getBuffer();
+            $data = $this->getPublicKey()->getBinary();
         }
 
-        return (new Parser($buffer))
-            ->writeBytes(4, Buffer::int($sequence, 4))
-            ->getBuffer();
+        return new Buffer($data . pack("N", $sequence));
     }
 
     /**
