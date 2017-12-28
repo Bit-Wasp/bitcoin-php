@@ -27,5 +27,5 @@ interface TransactionSerializerInterface
      * @param int $optFlags
      * @return BufferInterface
      */
-    public function serialize(TransactionInterface $transaction, $optFlags = 0): BufferInterface;
+    public function serialize(TransactionInterface $transaction, int $optFlags = 0): BufferInterface;
 }
