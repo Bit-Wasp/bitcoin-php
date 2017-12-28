@@ -124,7 +124,7 @@ class TransactionSerializer implements TransactionSerializerInterface
      * @param int $opt
      * @return BufferInterface
      */
-    public function serialize(TransactionInterface $transaction, $opt = 0): BufferInterface
+    public function serialize(TransactionInterface $transaction, int $opt = 0): BufferInterface
     {
         $parser = new Parser();
         $parser->appendBinary($this->int32le->write($transaction->getVersion()));
