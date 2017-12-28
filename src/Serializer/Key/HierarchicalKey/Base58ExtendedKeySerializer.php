@@ -27,6 +27,7 @@ class Base58ExtendedKeySerializer
      * @param NetworkInterface $network
      * @param HierarchicalKey $key
      * @return string
+     * @throws \Exception
      */
     public function serialize(NetworkInterface $network, HierarchicalKey $key): string
     {
@@ -37,6 +38,8 @@ class Base58ExtendedKeySerializer
      * @param NetworkInterface $network
      * @param string $base58
      * @return HierarchicalKey
+     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function parse(NetworkInterface $network, string $base58): HierarchicalKey
     {

@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
 
 class TransactionSignatureSerializer
 {
@@ -36,22 +35,22 @@ class TransactionSignatureSerializer
     }
 
     /**
-     * @param string|BufferInterface $string
+     * @param BufferInterface $buffer
      * @return TransactionSignatureInterface
+     * @throws \Exception
      */
-    public function parse($string): TransactionSignatureInterface
+    public function parse(BufferInterface $buffer): TransactionSignatureInterface
     {
         $adapter = $this->sigSerializer->getEcAdapter();
-        $buffer = (new Parser($string))->getBuffer()->getBinary();
 
-        if (strlen($buffer) < 1) {
+        if ($buffer->getSize() < 1) {
             throw new \RuntimeException("Empty signature");
         }
 
         return new TransactionSignature(
             $adapter,
-            $this->sigSerializer->parse(new Buffer(substr($buffer, 0, -1))),
-            unpack('C', substr($buffer, -1))[1]
+            $this->sigSerializer->parse($buffer->slice(0, -1)),
+            (int) $buffer->slice(-1)->getInt()
         );
     }
 }

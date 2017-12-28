@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Block;
 
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Buffertools\Buffer;
 
 class BlockHeaderSerializerTest extends AbstractTestCase
 {
@@ -15,6 +16,6 @@ class BlockHeaderSerializerTest extends AbstractTestCase
     public function testInvalidParse()
     {
         $serializer = new BlockHeaderSerializer;
-        $serializer->parse('');
+        $serializer->parse(new Buffer());
     }
 }

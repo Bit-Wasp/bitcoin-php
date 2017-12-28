@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
 
 class PublicKeySerializer implements PublicKeySerializerInterface
 {
@@ -50,7 +49,6 @@ class PublicKeySerializer implements PublicKeySerializerInterface
      */
     private function doSerialize(PublicKey $publicKey): BufferInterface
     {
-        $math = $this->ecAdapter->getMath();
         $point = $publicKey->getPoint();
 
         $length = 33;
@@ -74,13 +72,12 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param BufferInterface|string $data
+     * @param BufferInterface $buffer
      * @return PublicKeyInterface
      * @throws \Exception
      */
-    public function parse($data): PublicKeyInterface
+    public function parse(BufferInterface $buffer): PublicKeyInterface
     {
-        $buffer = (new Parser($data))->getBuffer();
         if (!in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED], true)) {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }

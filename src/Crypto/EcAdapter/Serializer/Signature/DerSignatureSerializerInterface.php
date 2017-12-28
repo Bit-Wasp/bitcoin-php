@@ -22,8 +22,8 @@ interface DerSignatureSerializerInterface
     public function serialize(SignatureInterface $signature): BufferInterface;
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $derSignature
      * @return SignatureInterface
      */
-    public function parse($data): SignatureInterface;
+    public function parse(BufferInterface $derSignature): SignatureInterface;
 }

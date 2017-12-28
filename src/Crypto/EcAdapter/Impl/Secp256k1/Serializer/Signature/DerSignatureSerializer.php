@@ -87,13 +87,13 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param string $data
+     * @param BufferInterface $derSignature
      * @return SignatureInterface
      */
-    public function parse($data): SignatureInterface
+    public function parse(BufferInterface $derSignature): SignatureInterface
     {
-        $buffer = (new Parser($data))->getBuffer();
-        $binary = $buffer->getBinary();
+        $derSignature = (new Parser($derSignature))->getBuffer();
+        $binary = $derSignature->getBinary();
 
         $sig_t = '';
         /** @var resource $sig_t */
@@ -102,7 +102,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         }
 
         // Unfortunately, we need to use the Parser here to get r and s :/
-        list (, $inner) = $this->getOuterTemplate()->parse(new Parser($buffer));
+        list (, $inner) = $this->getOuterTemplate()->parse(new Parser($derSignature));
         list (, $r, , $s) = $this->getInnerTemplate()->parse(new Parser($inner));
         /** @var Buffer $r */
         /** @var Buffer $s */

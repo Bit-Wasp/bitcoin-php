@@ -111,10 +111,10 @@ class TransactionSerializer implements TransactionSerializerInterface
     }
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $data
      * @return TransactionInterface
      */
-    public function parse($data): TransactionInterface
+    public function parse(BufferInterface $data): TransactionInterface
     {
         return $this->fromParser(new Parser($data));
     }

@@ -65,6 +65,7 @@ class BitcoindBlockSerializer
      * @param Parser $parser
      * @return BlockInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws \Exception
      */
     public function fromParser(Parser $parser)
     {
@@ -81,10 +82,10 @@ class BitcoindBlockSerializer
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $data
+     * @param BufferInterface $data
      * @return BlockInterface
      */
-    public function parse($data): BlockInterface
+    public function parse(BufferInterface $data): BlockInterface
     {
         return $this->fromParser(new Parser($data));
     }

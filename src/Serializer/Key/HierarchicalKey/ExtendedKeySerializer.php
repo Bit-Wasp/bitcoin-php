@@ -63,27 +63,12 @@ class ExtendedKeySerializer
 
     /**
      * @param NetworkInterface $network
-     * @throws \Exception
-     */
-    private function checkNetwork(NetworkInterface $network)
-    {
-        try {
-            $network->getHDPrivByte();
-            $network->getHDPubByte();
-        } catch (\Exception $e) {
-            throw new \Exception('Network not configured for HD wallets');
-        }
-    }
-
-    /**
-     * @param NetworkInterface $network
      * @param HierarchicalKey $key
      * @return BufferInterface
+     * @throws \Exception
      */
     public function serialize(NetworkInterface $network, HierarchicalKey $key): BufferInterface
     {
-        $this->checkNetwork($network);
-
         list ($prefix, $data) = $key->isPrivate()
             ? [$network->getHDPrivByte(), new Buffer("\x00". $key->getPrivateKey()->getBinary(), 33)]
             : [$network->getHDPubByte(), $key->getPublicKey()->getBuffer()];
@@ -106,8 +91,6 @@ class ExtendedKeySerializer
      */
     public function fromParser(NetworkInterface $network, Parser $parser): HierarchicalKey
     {
-        $this->checkNetwork($network);
-
         try {
             list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = [
                 $this->bytestring4->read($parser),
@@ -128,8 +111,8 @@ class ExtendedKeySerializer
         }
 
         $key = ($network->getHDPrivByte() === $bytes)
-            ? PrivateKeyFactory::fromHex($keyData->slice(1), true, $this->ecAdapter)
-            : PublicKeyFactory::fromHex($keyData, $this->ecAdapter);
+            ? PrivateKeyFactory::fromBuffer($keyData->slice(1), true, $this->ecAdapter)
+            : PublicKeyFactory::fromBuffer($keyData, $this->ecAdapter);
 
         return new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
     }
@@ -138,6 +121,7 @@ class ExtendedKeySerializer
      * @param NetworkInterface $network
      * @param BufferInterface $buffer
      * @return HierarchicalKey
+     * @throws ParserOutOfRange
      */
     public function parse(NetworkInterface $network, BufferInterface $buffer): HierarchicalKey
     {

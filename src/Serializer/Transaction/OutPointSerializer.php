@@ -32,6 +32,7 @@ class OutPointSerializer implements OutPointSerializerInterface
     /**
      * @param OutPointInterface $outpoint
      * @return BufferInterface
+     * @throws \Exception
      */
     public function serialize(OutPointInterface $outpoint): BufferInterface
     {
@@ -44,6 +45,7 @@ class OutPointSerializer implements OutPointSerializerInterface
     /**
      * @param Parser $parser
      * @return OutPointInterface
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
     public function fromParser(Parser $parser): OutPointInterface
     {
@@ -54,10 +56,11 @@ class OutPointSerializer implements OutPointSerializerInterface
     }
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $data
      * @return OutPointInterface
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function parse($data): OutPointInterface
+    public function parse(BufferInterface $data): OutPointInterface
     {
         return $this->fromParser(new Parser($data));
     }

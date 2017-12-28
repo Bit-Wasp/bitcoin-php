@@ -16,8 +16,8 @@ interface PrivateKeySerializerInterface
     public function serialize(PrivateKeyInterface $privateKey): BufferInterface;
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $data
      * @return PrivateKeyInterface
      */
-    public function parse($data): PrivateKeyInterface;
+    public function parse(BufferInterface $data): PrivateKeyInterface;
 }

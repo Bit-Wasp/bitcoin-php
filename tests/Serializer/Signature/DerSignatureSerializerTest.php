@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Buffertools\Buffer;
 
 class DerSignatureSerializerTest extends AbstractTestCase
 {
@@ -20,6 +21,6 @@ class DerSignatureSerializerTest extends AbstractTestCase
     {
         /** @var DerSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $adapter);
-        $serializer->parse('');
+        $serializer->parse(new Buffer());
     }
 }

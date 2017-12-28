@@ -30,10 +30,10 @@ class BlockLocatorTest extends AbstractTestCase
         $locator = new BlockLocator([$hash1, $hash2], $hashStop);
 
         $serializer = new BlockLocatorSerializer();
-        $binary = $serializer->serialize($locator);
-        $this->assertEquals($binary->getBinary(), $locator->getBinary());
+        $buffer = $serializer->serialize($locator);
+        $this->assertEquals($buffer->getBinary(), $locator->getBinary());
 
-        $parsed = $serializer->parse($binary);
+        $parsed = $serializer->parse($buffer);
         $this->assertEquals($locator, $parsed);
     }
 }

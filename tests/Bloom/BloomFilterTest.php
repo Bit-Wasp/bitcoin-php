@@ -16,32 +16,35 @@ use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\Transaction;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 
 class BloomFilterTest extends AbstractTestCase
 {
     /**
-     * @param string $hex
+     * @param BufferInterface $hex
      * @return BloomFilter
      */
-    private function parseFilter($hex)
+    private function parseFilter(BufferInterface $hex)
     {
         return (new BloomFilterSerializer)->parse($hex);
     }
 
     /**
      * @return BloomFilter
+     * @throws \Exception
      */
     private function getEmptyFilterVector()
     {
-        return $this->parseFilter('2200000000000000000000000000000000000000000000000000000000000000000000120000000000000001');
+        return $this->parseFilter(Buffer::hex('2200000000000000000000000000000000000000000000000000000000000000000000120000000000000001'));
     }
 
     /**
      * @return BloomFilter
+     * @throws \Exception
      */
     private function getFullFilterVector()
     {
-        return $this->parseFilter('22FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF120000000000000001');
+        return $this->parseFilter(Buffer::hex('22FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF120000000000000001'));
     }
 
     /**

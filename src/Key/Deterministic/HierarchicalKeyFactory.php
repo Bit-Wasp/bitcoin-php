@@ -29,6 +29,8 @@ class HierarchicalKeyFactory
     /**
      * @param EcAdapterInterface|null $ecAdapter
      * @return HierarchicalKey
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
+     * @throws \Exception
      */
     public static function generateMasterKey(EcAdapterInterface $ecAdapter = null): HierarchicalKey
     {
@@ -39,14 +41,15 @@ class HierarchicalKeyFactory
 
     /**
      * @param BufferInterface $entropy
-     * @param EcAdapterInterface $ecAdapter
+     * @param EcAdapterInterface|null $ecAdapter
      * @return HierarchicalKey
+     * @throws \Exception
      */
     public static function fromEntropy(BufferInterface $entropy, EcAdapterInterface $ecAdapter = null): HierarchicalKey
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $seed = Hash::hmac('sha512', $entropy, new Buffer('Bitcoin seed'));
-        $privateKey = PrivateKeyFactory::fromHex($seed->slice(0, 32), true, $ecAdapter);
+        $privateKey = PrivateKeyFactory::fromBuffer($seed->slice(0, 32), true, $ecAdapter);
         return new HierarchicalKey($ecAdapter, 0, 0, 0, $seed->slice(32, 32), $privateKey);
     }
 

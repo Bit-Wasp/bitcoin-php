@@ -102,7 +102,6 @@ class OutputClassifierTest extends AbstractTestCase
 
         $hash = Hash::sha256(new Buffer('string'));
         $this->assertTrue($classifier->isWitness(ScriptFactory::sequence([Opcodes::OP_0, $hash])));
-        ;
     }
 
     public function testIsNullData()
@@ -174,7 +173,7 @@ class OutputClassifierTest extends AbstractTestCase
 
         if ($type === ScriptType::P2PK) {
             $this->assertTrue($classifier->isPayToPublicKey($script));
-            $this->assertEquals($script, $factory->p2pk(PublicKeyFactory::fromHex($solution)));
+            $this->assertEquals($script, $factory->p2pk(PublicKeyFactory::fromBuffer($solution)));
         } else {
             $this->assertFalse($classifier->isPayToPublicKey($script));
         }
@@ -189,7 +188,7 @@ class OutputClassifierTest extends AbstractTestCase
         if ($type === ScriptType::MULTISIG) {
             $this->assertTrue($classifier->isMultisig($script));
             $count = Multisig::fromScript($script)->getRequiredSigCount();
-            $this->assertEquals($script, $factory->multisig($count, array_map([PublicKeyFactory::class, 'fromHex'], $solution), false));
+            $this->assertEquals($script, $factory->multisig($count, array_map([PublicKeyFactory::class, 'fromBuffer'], $solution), false));
         } else {
             $this->assertFalse($classifier->isMultisig($script));
         }

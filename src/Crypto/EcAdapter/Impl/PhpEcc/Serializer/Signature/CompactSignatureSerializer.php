@@ -89,11 +89,11 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     }
 
     /**
-     * @param BufferInterface|string $string
-     * @return CompactSignature
+     * @param BufferInterface $string
+     * @return CompactSignatureInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string): CompactSignatureInterface
+    public function parse(BufferInterface $string): CompactSignatureInterface
     {
         return $this->fromParser(new Parser($string));
     }

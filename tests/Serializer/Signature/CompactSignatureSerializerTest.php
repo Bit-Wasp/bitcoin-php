@@ -22,7 +22,7 @@ class CompactSignatureSerializerTest extends AbstractTestCase
     {
         /** @var CompactSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter);
-        $serializer->parse('');
+        $serializer->parse(new Buffer());
     }
 
     /**

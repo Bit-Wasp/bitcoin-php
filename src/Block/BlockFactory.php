@@ -9,16 +9,30 @@ use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class BlockFactory
 {
     /**
-     * @param BufferInterface|string $string
-     * @param Math $math
+     * @param string $string
+     * @param Math|null $math
      * @return BlockInterface
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws \Exception
      */
-    public static function fromHex($string, Math $math = null): BlockInterface
+    public static function fromHex(string $string, Math $math = null): BlockInterface
+    {
+        return self::fromBuffer(Buffer::hex($string), $math);
+    }
+
+    /**
+     * @param BufferInterface $buffer
+     * @param Math|null $math
+     * @return BlockInterface
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     */
+    public static function fromBuffer(BufferInterface $buffer, Math $math = null): BlockInterface
     {
         $serializer = new BlockSerializer(
             $math ?: Bitcoin::getMath(),
@@ -26,6 +40,6 @@ class BlockFactory
             new TransactionSerializer()
         );
 
-        return $serializer->parse($string);
+        return $serializer->parse($buffer);
     }
 }
