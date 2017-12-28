@@ -36,6 +36,6 @@ abstract class SigHash implements SigHashInterface
     abstract public function calculate(
         ScriptInterface $txOutScript,
         int $inputToSign,
-        int $sighashType = SigHash::ALL
+        int $sighashType = self::ALL
     ): BufferInterface;
 }
