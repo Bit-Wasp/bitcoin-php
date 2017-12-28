@@ -92,7 +92,6 @@ class PartialMerkleTreeSerializer
      */
     private function bitsToBuffers(array $bits): array
     {
-        $math = Bitcoin::getMath();
         $vBuffers = str_split(str_pad('', (int)((count($bits)+7)/8), '0', STR_PAD_LEFT));
         $nBits = count($bits);
 
@@ -102,7 +101,7 @@ class PartialMerkleTreeSerializer
         }
 
         foreach ($vBuffers as &$value) {
-            $value = Buffer::int($value, null, $math);
+            $value = Buffer::int($value);
         }
         unset($value);
 

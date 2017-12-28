@@ -51,7 +51,7 @@ class ElectrumKeyFactory
 
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         // Convert binary data to hex.
-        $str = new Buffer($binary, 32, $ecAdapter->getMath());
+        $str = new Buffer($binary, 32);
 
         return self::fromSecretExponent(
             $str->getInt(),

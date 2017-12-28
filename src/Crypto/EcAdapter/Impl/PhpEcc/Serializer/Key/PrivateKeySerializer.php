@@ -32,7 +32,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      */
     public function serialize(PrivateKeyInterface $privateKey): BufferInterface
     {
-        return Buffer::int(gmp_strval($privateKey->getSecret(), 10), 32, $this->ecAdapter->getMath());
+        return Buffer::int(gmp_strval($privateKey->getSecret(), 10), 32);
     }
 
     /**

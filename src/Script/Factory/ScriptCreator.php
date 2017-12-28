@@ -161,6 +161,6 @@ class ScriptCreator
      */
     public function getScript(): ScriptInterface
     {
-        return new Script(new Buffer($this->script, null, $this->math), $this->opcodes);
+        return new Script(new Buffer($this->script), $this->opcodes);
     }
 }

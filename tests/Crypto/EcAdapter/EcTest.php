@@ -7,6 +7,7 @@ namespace BitWasp\Bitcoin\Tests\Crypto\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEcc;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -35,7 +36,7 @@ class EcTest extends AbstractTestCase
     {
         $math = $ec->getMath();
         $key = $private->getSecret();
-        return $math->mod($math->add($key, $add), $ec->getGenerator()->getOrder());
+        return $math->mod($math->add($key, $add), $ec->getOrder());
     }
 
     /**
@@ -48,7 +49,7 @@ class EcTest extends AbstractTestCase
     {
         $math = $ec->getMath();
         $key = $private->getSecret();
-        return $math->mod($math->mul($key, $add), $ec->getGenerator()->getOrder());
+        return $math->mod($math->mul($key, $add), $ec->getOrder());
     }
 
     /**
@@ -129,8 +130,8 @@ class EcTest extends AbstractTestCase
         $private = $this->getFirstPrivateKey($ec);
         $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
 
-        $signature = $ec->sign($messageHash, $private);
-        $this->assertTrue($ec->verify($messageHash, $private->getPublicKey(), $signature));
+        $signature = $private->sign($messageHash);
+        $this->assertTrue($private->getPublicKey()->verify($messageHash, $signature));
     }
 
     /**
@@ -142,7 +143,7 @@ class EcTest extends AbstractTestCase
         $private = $this->getFirstPrivateKey($ec);
         $messageHash = Buffer::hex('0100000000000000000000000000000000000000000000000000000000000000', 32);
 
-        $compact = $ec->signCompact($messageHash, $private);
+        $compact = $private->signCompact($messageHash);
         $publicKey = $ec->recover($messageHash, $compact);
         $this->assertEquals($private->isCompressed(), $publicKey->isCompressed());
         $this->assertEquals($private->getPublicKey()->getBinary(), $publicKey->getBinary());

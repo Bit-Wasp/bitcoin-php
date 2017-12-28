@@ -82,8 +82,6 @@ class Bip39Mnemonic implements MnemonicInterface
             throw new \InvalidArgumentException('Invalid entropy, must be multitude of 4 bytes');
         }
 
-        $math = $this->ecAdapter->getMath();
-
         $ENT = $entropy->getSize() * 8;
         $CS = $ENT / 32;
 
@@ -92,7 +90,7 @@ class Bip39Mnemonic implements MnemonicInterface
 
         $result = [];
         foreach (str_split($bits, 11) as $bit) {
-            $result[] = $this->wordList->getWord((int) $math->baseConvert($bit, 2, 10));
+            $result[] = $this->wordList->getWord((int) gmp_strval(gmp_init($bit, 2), 10));
         }
 
         return $result;
@@ -123,7 +121,7 @@ class Bip39Mnemonic implements MnemonicInterface
         $bits = array();
         foreach ($words as $word) {
             $idx = $this->wordList->getIndex($word);
-            $bits[] = str_pad($math->baseConvert($idx, 10, 2), 11, '0', STR_PAD_LEFT);
+            $bits[] = str_pad(gmp_strval(gmp_init($idx, 10), 2), 11, '0', STR_PAD_LEFT);
         }
 
         $bits = implode('', $bits);
@@ -144,10 +142,10 @@ class Bip39Mnemonic implements MnemonicInterface
         for ($i = 0; $i < $ENT; $i += $bitsInChar) {
             // Extract 8 bits at a time, convert to hex, pad, and convert to binary.
             $eBits = substr($entBits, $i, $bitsInChar);
-            $binary .= pack("H*", (str_pad($math->baseConvert($eBits, 2, 16), 2, '0', STR_PAD_LEFT)));
+            $binary .= pack("H*", (str_pad(gmp_strval(gmp_init($eBits, 2), 16), 2, '0', STR_PAD_LEFT)));
         }
 
-        $entropy = new Buffer($binary, null, $math);
+        $entropy = new Buffer($binary);
         if ($csBits !== $this->calculateChecksum($entropy, $CS)) {
             throw new \InvalidArgumentException('Checksum does not match');
         }

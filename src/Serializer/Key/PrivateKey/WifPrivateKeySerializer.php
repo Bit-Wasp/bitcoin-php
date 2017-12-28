@@ -47,14 +47,14 @@ class WifPrivateKeySerializer
     {
         $math = $this->ecAdapter->getMath();
         $serialized = Buffertools::concat(
-            Buffer::hex($network->getPrivByte(), 1, $math),
+            Buffer::hex($network->getPrivByte(), 1),
             $this->keySerializer->serialize($privateKey)
         );
 
         if ($privateKey->isCompressed()) {
             $serialized = Buffertools::concat(
                 $serialized,
-                new Buffer("\x01", 1, $math)
+                new Buffer("\x01", 1)
             );
         }
 

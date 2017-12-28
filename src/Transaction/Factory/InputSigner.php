@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
-use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Exceptions\UnsupportedScript;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
@@ -864,8 +863,7 @@ class InputSigner implements InputSignerInterface
     private function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, int $sigHashType, int $sigVersion)
     {
         $hash = $this->calculateSigHashUnsafe($scriptCode, $sigHashType, $sigVersion);
-        $ecSignature = $this->ecAdapter->sign($hash, $key, new Rfc6979($this->ecAdapter, $key, $hash, 'sha256'));
-        return new TransactionSignature($this->ecAdapter, $ecSignature, $sigHashType);
+        return new TransactionSignature($this->ecAdapter, $key->sign($hash), $sigHashType);
     }
 
     /**

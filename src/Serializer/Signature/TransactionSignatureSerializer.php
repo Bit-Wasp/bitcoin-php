@@ -42,8 +42,7 @@ class TransactionSignatureSerializer
     public function parse($string): TransactionSignatureInterface
     {
         $adapter = $this->sigSerializer->getEcAdapter();
-        $math = $adapter->getMath();
-        $buffer = (new Parser($string, $math))->getBuffer()->getBinary();
+        $buffer = (new Parser($string))->getBuffer()->getBinary();
 
         if (strlen($buffer) < 1) {
             throw new \RuntimeException("Empty signature");
@@ -51,7 +50,7 @@ class TransactionSignatureSerializer
 
         return new TransactionSignature(
             $adapter,
-            $this->sigSerializer->parse(new Buffer(substr($buffer, 0, -1), null, $math)),
+            $this->sigSerializer->parse(new Buffer(substr($buffer, 0, -1))),
             unpack('C', substr($buffer, -1))[1]
         );
     }

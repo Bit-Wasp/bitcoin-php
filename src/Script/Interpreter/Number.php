@@ -152,7 +152,7 @@ class Number extends Serializable
             $s .= chr($i);
         }
 
-        return new Buffer($s, null, $this->math);
+        return new Buffer($s);
     }
 
     /**

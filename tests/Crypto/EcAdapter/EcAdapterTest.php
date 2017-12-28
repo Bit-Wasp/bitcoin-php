@@ -115,11 +115,11 @@ class EcAdapterTest extends AbstractTestCase
         $math = $ecAdapter->getMath();
         foreach ($json->test as $c => $test) {
             $privateKey = PrivateKeyFactory ::fromHex($test->privKey, false, $ecAdapter);
-            $message = new Buffer($test->message, null, $math);
+            $message = new Buffer($test->message, null);
             $messageHash = Hash::sha256($message);
 
             $k = new Rfc6979($ecAdapter, $privateKey, $messageHash);
-            $sig = $ecAdapter->sign($messageHash, $privateKey, $k);
+            $sig = $privateKey->sign($messageHash, $k);
 
             // K must be correct (from privatekey and message hash)
             $this->assertEquals(strtolower($test->expectedK), $k->bytes(32)->getHex());
@@ -129,7 +129,7 @@ class EcAdapterTest extends AbstractTestCase
             $sHex = $math->decHex(gmp_strval($sig->getS(), 10));
             $this->assertSame($test->expectedRSLow, $rHex . $sHex);
 
-            $this->assertTrue($ecAdapter->verify($messageHash, $privateKey->getPublicKey(), $sig));
+            $this->assertTrue($privateKey->getPublicKey()->verify($messageHash, $sig));
         }
     }
 
@@ -143,9 +143,9 @@ class EcAdapterTest extends AbstractTestCase
         $pk = $ecAdapter->getPrivateKey(gmp_init('4141414141414141414141414141414141414141414141414141414141414141'), false);
 
         $hash = $random->bytes(32);
-        $sig = $ecAdapter->sign($hash, $pk, new Random());
+        $sig = $pk->sign($hash, new Random());
 
         $this->assertInstanceOf(SignatureInterface::class, $sig);
-        $this->assertTrue($ecAdapter->verify($hash, $pk->getPublicKey(), $sig));
+        $this->assertTrue($pk->getPublicKey()->verify($hash, $sig));
     }
 }

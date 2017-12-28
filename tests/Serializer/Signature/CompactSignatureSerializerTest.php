@@ -11,7 +11,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 
-class CompactSignatureTest extends AbstractTestCase
+class CompactSignatureSerializerTest extends AbstractTestCase
 {
     /**
      * @dataProvider getEcAdapters
@@ -39,7 +39,7 @@ class CompactSignatureTest extends AbstractTestCase
         $math = $ecAdapter->getMath();
         for ($c = 1; $c < 5; $c++) {
             $t = $c + 27;
-            $test = Buffer::hex($math->decHex($t) . $r . $s);
+            $test = Buffer::hex($math->decHex((string) $t) . $r . $s);
             $parsed = $serializer->parse($test);
             $this->assertInstanceOf(CompactSignatureInterface::class, $parsed);
         }

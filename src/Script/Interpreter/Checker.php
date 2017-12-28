@@ -220,7 +220,7 @@ class Checker
             $hash = $hasher->calculate($script, $this->nInput, $sigHashType);
             $this->sigHashCache[$cacheCheck] = $hash->getBinary();
         } else {
-            $hash = new Buffer($this->sigHashCache[$cacheCheck], 32, $this->adapter->getMath());
+            $hash = new Buffer($this->sigHashCache[$cacheCheck], 32);
         }
 
         return $hash;
@@ -248,7 +248,7 @@ class Checker
                 $publicKey = $this->pubKeySerializer->parse($keyBuf);
 
                 $hash = $this->getSigHash($script, $txSignature->getHashType(), $sigVersion);
-                $result = $this->sigCache[$cacheCheck] = $this->adapter->verify($hash, $publicKey, $txSignature->getSignature());
+                $result = $this->sigCache[$cacheCheck] = $publicKey->verify($hash, $txSignature->getSignature());
             } else {
                 $result = $this->sigCache[$cacheCheck];
             }

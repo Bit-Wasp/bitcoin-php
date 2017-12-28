@@ -36,7 +36,7 @@ class SignatureSort implements SignatureSortInterface
         $storage = new \SplObjectStorage();
         foreach ($signatures as $signature) {
             foreach ($publicKeys as $key) {
-                if ($this->ecAdapter->verify($messageHash, $key, $signature)) {
+                if ($key->verify($messageHash, $signature)) {
                     $storage->attach($key, $signature);
                     if (count($storage) === $sigCount) {
                         break 2;

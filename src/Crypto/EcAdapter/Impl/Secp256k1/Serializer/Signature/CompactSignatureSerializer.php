@@ -39,7 +39,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new \RuntimeException('Secp256k1 serialize compact failure');
         }
 
-        return new Buffer(chr($signature->getFlags()) . $sig_t, 65, $this->ecAdapter->getMath());
+        return new Buffer(chr($signature->getFlags()) . $sig_t, 65);
     }
 
     /**
@@ -58,8 +58,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      */
     public function parse($data): CompactSignatureInterface
     {
-        $math = $this->ecAdapter->getMath();
-        $buffer = (new Parser($data, $math))->getBuffer();
+        $buffer = (new Parser($data))->getBuffer();
 
         if ($buffer->getSize() !== 65) {
             throw new \RuntimeException('Compact Sig must be 65 bytes');
@@ -73,7 +72,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
             throw new \RuntimeException('Invalid signature type');
         }
 
-        $isCompressed = $math->cmp($math->bitwiseAnd(gmp_init($recoveryFlags), gmp_init(4)), gmp_init(0)) !== 0;
+        $isCompressed = ($recoveryFlags & 4) !== 0;
         $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
 
         $sig_t = '';

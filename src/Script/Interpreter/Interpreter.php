@@ -58,8 +58,8 @@ class Interpreter implements InterpreterInterface
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->math = $ecAdapter->getMath();
-        $this->vchFalse = new Buffer("", 0, $this->math);
-        $this->vchTrue = new Buffer("\x01", 1, $this->math);
+        $this->vchFalse = new Buffer("", 0);
+        $this->vchTrue = new Buffer("\x01", 1);
     }
 
     /**

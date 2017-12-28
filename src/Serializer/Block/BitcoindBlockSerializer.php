@@ -68,9 +68,11 @@ class BitcoindBlockSerializer
      */
     public function fromParser(Parser $parser)
     {
-        /** @var Buffer $bytes */
-        /** @var int|string $blockSize */
-        list ($bytes, $blockSize) = [$this->magic->read($parser), $this->size->read($parser)];
+        /**
+         * @var Buffer $bytes
+         * @var int $blockSize
+         */
+        list ($bytes, $blockSize) = [$this->magic->read($parser), (int) $this->size->read($parser)];
         if ($bytes->getHex() !== $this->network->getNetMagicBytes()) {
             throw new \RuntimeException('Block version bytes did not match network');
         }

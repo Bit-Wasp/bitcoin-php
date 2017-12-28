@@ -45,7 +45,7 @@ class BitcoinCashChecker extends Checker
             $hash = $hasher->calculate($script, $this->nInput, $sigHashType);
             $this->sigHashCache[$cacheCheck] = $hash->getBinary();
         } else {
-            $hash = new Buffer($this->sigHashCache[$cacheCheck], 32, $this->adapter->getMath());
+            $hash = new Buffer($this->sigHashCache[$cacheCheck], 32);
         }
 
         return $hash;

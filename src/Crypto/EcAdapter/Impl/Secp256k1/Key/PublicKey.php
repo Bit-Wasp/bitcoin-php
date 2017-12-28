@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key\PublicKeySerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -35,7 +36,7 @@ class PublicKey extends Key implements PublicKeyInterface
      * @param resource $secp256k1_pubkey_t
      * @param bool|false $compressed
      */
-    public function __construct(EcAdapter $ecAdapter, $secp256k1_pubkey_t, $compressed = false)
+    public function __construct(EcAdapter $ecAdapter, $secp256k1_pubkey_t, bool $compressed = false)
     {
         if (!is_resource($secp256k1_pubkey_t) ||
             !get_resource_type($secp256k1_pubkey_t) === SECP256K1_TYPE_PUBKEY) {
@@ -58,7 +59,8 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function verify(BufferInterface $msg32, SignatureInterface $signature): bool
     {
-        return $this->ecAdapter->verify($msg32, $this, $signature);
+        /** @var Signature $signature */
+        return (bool) secp256k1_ecdsa_verify($this->ecAdapter->getContext(), $signature->getResource(), $msg32->getBinary(), $this->pubkey_t);
     }
 
     /**

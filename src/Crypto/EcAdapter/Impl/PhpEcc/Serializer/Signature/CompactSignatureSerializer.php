@@ -95,6 +95,6 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      */
     public function parse($string): CompactSignatureInterface
     {
-        return $this->fromParser(new Parser($string, $this->ecAdapter->getMath()));
+        return $this->fromParser(new Parser($string));
     }
 }
