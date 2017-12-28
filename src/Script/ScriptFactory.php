@@ -24,12 +24,24 @@ class ScriptFactory
     private static $outputScriptFactory = null;
 
     /**
-     * @param BufferInterface|string $string
+     * @param string $string
+     * @return ScriptInterface
+     * @throws \Exception
+     */
+    public static function fromHex(string $string): ScriptInterface
+    {
+        return self::fromBuffer(Buffer::hex($string));
+    }
+
+    /**
+     * @param BufferInterface $buffer
+     * @param Opcodes|null $opcodes
+     * @param Math|null $math
      * @return ScriptInterface
      */
-    public static function fromHex($string): ScriptInterface
+    public static function fromBuffer(BufferInterface $buffer, Opcodes $opcodes = null, Math $math = null): ScriptInterface
     {
-        return self::create($string instanceof BufferInterface ? $string : Buffer::hex($string))->getScript();
+        return self::create($buffer, $opcodes, $math)->getScript();
     }
 
     /**

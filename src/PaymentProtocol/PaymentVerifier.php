@@ -36,7 +36,7 @@ class PaymentVerifier
     {
         return array_map(
             function ($binTx) {
-                return TransactionFactory::fromHex(new Buffer($binTx));
+                return TransactionFactory::fromBuffer(new Buffer($binTx));
             },
             $payment->getTransactionsList()
         );

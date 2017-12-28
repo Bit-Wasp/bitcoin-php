@@ -16,8 +16,8 @@ interface CompactSignatureSerializerInterface
     public function serialize(CompactSignatureInterface $signature): BufferInterface;
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $data
      * @return CompactSignatureInterface
      */
-    public function parse($data): CompactSignatureInterface;
+    public function parse(BufferInterface $data): CompactSignatureInterface;
 }

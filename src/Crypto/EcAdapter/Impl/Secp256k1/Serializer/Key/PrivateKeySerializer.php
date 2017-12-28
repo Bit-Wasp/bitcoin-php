@@ -52,7 +52,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     /**
      * @param Parser $parser
      * @return PrivateKeyInterface
-     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws \Exception
      */
     public function fromParser(Parser $parser): PrivateKeyInterface
     {
@@ -60,10 +60,11 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $data
+     * @param BufferInterface $data
      * @return PrivateKeyInterface
+     * @throws \Exception
      */
-    public function parse($data): PrivateKeyInterface
+    public function parse(BufferInterface $data): PrivateKeyInterface
     {
         return $this->fromParser(new Parser($data));
     }

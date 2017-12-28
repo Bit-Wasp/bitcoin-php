@@ -61,12 +61,11 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $data
+     * @param BufferInterface $buffer
      * @return PublicKeyInterface
      */
-    public function parse($data): PublicKeyInterface
+    public function parse(BufferInterface $buffer): PublicKeyInterface
     {
-        $buffer = (new Parser($data))->getBuffer();
         $binary = $buffer->getBinary();
         $pubkey_t = '';
         /** @var resource $pubkey_t */

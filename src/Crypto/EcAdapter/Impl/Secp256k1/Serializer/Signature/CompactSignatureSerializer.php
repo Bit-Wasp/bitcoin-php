@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerial
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
 
 class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 {
@@ -53,13 +52,12 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     }
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $buffer
      * @return CompactSignatureInterface
+     * @throws \Exception
      */
-    public function parse($data): CompactSignatureInterface
+    public function parse(BufferInterface $buffer): CompactSignatureInterface
     {
-        $buffer = (new Parser($data))->getBuffer();
-
         if ($buffer->getSize() !== 65) {
             throw new \RuntimeException('Compact Sig must be 65 bytes');
         }

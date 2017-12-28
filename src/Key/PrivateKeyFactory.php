@@ -22,21 +22,21 @@ class PrivateKeyFactory
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyInterface
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public static function create(bool $compressed = false, EcAdapterInterface $ecAdapter = null)
+    public static function create(bool $compressed = false, EcAdapterInterface $ecAdapter = null): PrivateKeyInterface
     {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        return self::fromHex(self::generateSecret(), $compressed, $ecAdapter);
+        return self::fromBuffer(self::generateSecret(), $compressed, $ecAdapter);
     }
 
     /**
      * Generate a buffer containing a valid key
      *
      * @param EcAdapterInterface|null $ecAdapter
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public static function generateSecret(EcAdapterInterface $ecAdapter = null)
+    public static function generateSecret(EcAdapterInterface $ecAdapter = null): BufferInterface
     {
         $random = new Random();
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
@@ -49,19 +49,31 @@ class PrivateKeyFactory
     }
 
     /**
-     * @param BufferInterface|string $hex
+     * @param string $hex
      * @param bool $compressed
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyInterface
+     * @throws \Exception
      */
-    public static function fromHex($hex, bool $compressed = false, EcAdapterInterface $ecAdapter = null)
+    public static function fromHex(string $hex, bool $compressed = false, EcAdapterInterface $ecAdapter = null): PrivateKeyInterface
+    {
+        return self::fromBuffer(Buffer::hex($hex), $compressed, $ecAdapter);
+    }
+
+    /**
+     * @param BufferInterface $buffer
+     * @param bool $compressed
+     * @param EcAdapterInterface $ecAdapter
+     * @return PrivateKeyInterface
+     */
+    public static function fromBuffer(BufferInterface $buffer, bool $compressed, EcAdapterInterface $ecAdapter = null): PrivateKeyInterface
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
 
         /** @var PrivateKeySerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
 
-        $parsed = $serializer->parse($hex);
+        $parsed = $serializer->parse($buffer);
         if ($compressed) {
             $parsed = $ecAdapter->getPrivateKey($parsed->getSecret(), $compressed);
         }

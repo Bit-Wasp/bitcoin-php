@@ -14,7 +14,6 @@ use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\Buffertools;
 
 class WifPrivateKeySerializer
 {
@@ -42,23 +41,17 @@ class WifPrivateKeySerializer
      * @param NetworkInterface $network
      * @param PrivateKeyInterface $privateKey
      * @return string
+     * @throws \Exception
      */
     public function serialize(NetworkInterface $network, PrivateKeyInterface $privateKey): string
     {
-        $math = $this->ecAdapter->getMath();
-        $serialized = Buffertools::concat(
-            Buffer::hex($network->getPrivByte(), 1),
-            $this->keySerializer->serialize($privateKey)
-        );
-
+        $prefix = pack("H*", $network->getPrivByte());
+        $ending = "";
         if ($privateKey->isCompressed()) {
-            $serialized = Buffertools::concat(
-                $serialized,
-                new Buffer("\x01", 1)
-            );
+            $ending = "\x01";
         }
 
-        return Base58::encodeCheck($serialized);
+        return Base58::encodeCheck(new Buffer("{$prefix}{$this->keySerializer->serialize($privateKey)->getBinary()}{$ending}"));
     }
 
     /**
@@ -67,6 +60,7 @@ class WifPrivateKeySerializer
      * @return PrivateKeyInterface
      * @throws Base58ChecksumFailure
      * @throws InvalidPrivateKey
+     * @throws \Exception
      */
     public function parse(string $wif, NetworkInterface $network = null): PrivateKeyInterface
     {

@@ -23,8 +23,8 @@ interface OutPointSerializerInterface
     public function fromParser(Parser $parser): OutPointInterface;
 
     /**
-     * @param string|\BitWasp\Buffertools\BufferInterface $data
+     * @param BufferInterface $data
      * @return OutPointInterface
      */
-    public function parse($data): OutPointInterface;
+    public function parse(BufferInterface $data): OutPointInterface;
 }

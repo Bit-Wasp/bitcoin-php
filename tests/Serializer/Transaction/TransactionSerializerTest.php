@@ -7,6 +7,7 @@ namespace BitWasp\Bitcoin\Tests\Serializer\Transaction;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
+use BitWasp\Buffertools\Buffer;
 
 class TransactionSerializerTest extends AbstractTestCase
 {
@@ -36,7 +37,7 @@ class TransactionSerializerTest extends AbstractTestCase
     public function testTransactionSerializer(int $flags, string $tx)
     {
         $serializer = new TransactionSerializer();
-        $parsed = $serializer->parse($tx);
+        $parsed = $serializer->parse(Buffer::hex($tx));
     
         $serialized = $serializer->serialize($parsed);
         $this->assertEquals($tx, $serialized->getHex());

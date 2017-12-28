@@ -46,10 +46,10 @@ class BlockLocatorSerializer
     }
 
     /**
-     * @param BufferInterface|string $data
+     * @param BufferInterface $data
      * @return BlockLocator
      */
-    public function parse($data): BlockLocator
+    public function parse(BufferInterface $data): BlockLocator
     {
         return $this->fromParser(new Parser($data));
     }
@@ -57,6 +57,7 @@ class BlockLocatorSerializer
     /**
      * @param BlockLocator $blockLocator
      * @return BufferInterface
+     * @throws \Exception
      */
     public function serialize(BlockLocator $blockLocator): BufferInterface
     {

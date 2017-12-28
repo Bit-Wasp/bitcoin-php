@@ -17,10 +17,10 @@ interface TransactionSerializerInterface
     public function fromParser(Parser $parser): TransactionInterface;
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $data
      * @return TransactionInterface
      */
-    public function parse($data): TransactionInterface;
+    public function parse(BufferInterface $data): TransactionInterface;
 
     /**
      * @param TransactionInterface $transaction

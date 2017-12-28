@@ -69,11 +69,12 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
      */
     public function serialize(SignatureInterface $signature): BufferInterface
     {
+        /** @var \Mdanter\Ecc\Crypto\Signature\Signature|$signature $math */
         $math = $this->ecAdapter->getMath();
 
         // Ensure that the R and S hex's are of even length
-        $rBin = pack('H*', $math->decHex($math->toString($signature->getR())));
-        $sBin = pack('H*', $math->decHex($math->toString($signature->getS())));
+        $rBin = $math->intToString($signature->getR());
+        $sBin = $math->intToString($signature->getS());
 
         // Pad R and S if their highest bit is flipped, ie,
         // they are negative.
@@ -122,14 +123,12 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param BufferInterface|$string
+     * @param BufferInterface $derSignature
      * @return SignatureInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string): SignatureInterface
+    public function parse(BufferInterface $derSignature): SignatureInterface
     {
-        $parser = new Parser($string);
-        $signature = $this->fromParser($parser);
-        return $signature;
+        return $this->fromParser(new Parser($derSignature));
     }
 }

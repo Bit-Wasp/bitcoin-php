@@ -21,10 +21,10 @@ class OutpointSerializerTest extends AbstractTestCase
         $this->assertEquals($serialized, $outpoint->getBuffer()->getBinary());
 
         $serializer = new OutPointSerializer();
-        $serializerOutput = $serializer->serialize($outpoint);
-        $this->assertEquals($serialized, $serializerOutput->getBinary());
+        $serializedOutput = $serializer->serialize($outpoint);
+        $this->assertEquals($serialized, $serializedOutput->getBinary());
 
-        $parsed = $serializer->parse($serializerOutput);
+        $parsed = $serializer->parse($serializedOutput);
         $this->assertTrue($parsed->equals($outpoint));
     }
 }

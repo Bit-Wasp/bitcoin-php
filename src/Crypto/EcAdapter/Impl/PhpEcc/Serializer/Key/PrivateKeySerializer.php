@@ -38,6 +38,7 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     /**
      * @param Parser $parser
      * @return PrivateKeyInterface
+     * @throws \Exception
      */
     public function fromParser(Parser $parser): PrivateKeyInterface
     {
@@ -45,11 +46,11 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
     }
 
     /**
-     * @param BufferInterface|string $string
+     * @param BufferInterface $buffer
      * @return PrivateKeyInterface
      */
-    public function parse($string): PrivateKeyInterface
+    public function parse(BufferInterface $buffer): PrivateKeyInterface
     {
-        return $this->fromParser(new Parser($string));
+        return $this->fromParser(new Parser($buffer));
     }
 }

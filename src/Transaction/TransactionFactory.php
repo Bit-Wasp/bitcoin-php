@@ -7,6 +7,7 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Transaction\Factory\TxBuilder;
 use BitWasp\Bitcoin\Transaction\Mutator\TxMutator;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class TransactionFactory
@@ -29,11 +30,21 @@ class TransactionFactory
     }
 
     /**
-     * @param BufferInterface|string $string
+     * @param string $hex
+     * @return TransactionInterface
+     * @throws \Exception
+     */
+    public static function fromHex(string $hex): TransactionInterface
+    {
+        return self::fromBuffer(Buffer::hex($hex));
+    }
+
+    /**
+     * @param BufferInterface $buffer
      * @return TransactionInterface
      */
-    public static function fromHex($string): TransactionInterface
+    public static function fromBuffer(BufferInterface $buffer): TransactionInterface
     {
-        return (new TransactionSerializer())->parse($string);
+        return (new TransactionSerializer())->parse($buffer);
     }
 }

@@ -19,11 +19,11 @@ interface BlockSerializerInterface
     public function fromParser(Parser $parser): BlockInterface;
 
     /**
-     * @param BufferInterface|string $string
+     * @param BufferInterface $buffer
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string): BlockInterface;
+    public function parse(BufferInterface $buffer): BlockInterface;
 
     /**
      * @param BlockInterface $block

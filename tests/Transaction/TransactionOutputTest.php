@@ -55,9 +55,9 @@ class TransactionOutputTest extends AbstractTestCase
 
     public function testSerialize()
     {
-        $buffer = 'cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac';
+        $buffer = Buffer::hex('cac10000000000001976a9140eff868646ece0af8bc979093585e80297112f1f88ac');
         $s = new TransactionOutputSerializer();
         $out = $s->parse($buffer);
-        $this->assertEquals($buffer, $out->getBuffer()->getHex());
+        $this->assertTrue($buffer->equals($out->getBuffer()));
     }
 }

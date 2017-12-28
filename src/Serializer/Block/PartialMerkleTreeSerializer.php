@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Serializer\Block;
 
-use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Block\PartialMerkleTree;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -78,12 +77,12 @@ class PartialMerkleTreeSerializer
     }
 
     /**
-     * @param BufferInterface|string $data
+     * @param BufferInterface $buffer
      * @return PartialMerkleTree
      */
-    public function parse($data): PartialMerkleTree
+    public function parse(BufferInterface $buffer): PartialMerkleTree
     {
-        return $this->fromParser(new Parser($data));
+        return $this->fromParser(new Parser($buffer));
     }
 
     /**

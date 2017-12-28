@@ -45,10 +45,10 @@ class FilteredBlockSerializer
     }
 
     /**
-     * @param BufferInterface|string $data
+     * @param BufferInterface $data
      * @return FilteredBlock
      */
-    public function parse($data): FilteredBlock
+    public function parse(BufferInterface $data): FilteredBlock
     {
         return $this->fromParser(new Parser($data));
     }

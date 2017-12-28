@@ -79,10 +79,10 @@ class BloomFilterSerializer
     }
 
     /**
-     * @param string|BufferInterface $data
+     * @param BufferInterface $data
      * @return BloomFilter
      */
-    public function parse($data): BloomFilter
+    public function parse(BufferInterface $data): BloomFilter
     {
         return $this->fromParser(new Parser($data));
     }

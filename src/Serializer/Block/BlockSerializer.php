@@ -69,13 +69,13 @@ class BlockSerializer implements BlockSerializerInterface
     }
 
     /**
-     * @param BufferInterface|string $string
+     * @param BufferInterface $buffer
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string): BlockInterface
+    public function parse(BufferInterface $buffer): BlockInterface
     {
-        return $this->fromParser(new Parser($string));
+        return $this->fromParser(new Parser($buffer));
     }
 
     /**

@@ -19,5 +19,5 @@ interface PublicKeySerializerInterface
      * @param string|BufferInterface $data
      * @return PublicKeyInterface
      */
-    public function parse($data): PublicKeyInterface;
+    public function parse(BufferInterface $data): PublicKeyInterface;
 }

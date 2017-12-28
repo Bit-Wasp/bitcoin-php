@@ -55,10 +55,11 @@ class TransactionInputSerializer
 
     /**
      * @param Parser $parser
-     * @return TransactionInput
+     * @return TransactionInputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws \Exception
      */
-    public function fromParser(Parser $parser): TransactionInput
+    public function fromParser(Parser $parser): TransactionInputInterface
     {
         return new TransactionInput(
             $this->outpointSerializer->fromParser($parser),
@@ -68,11 +69,12 @@ class TransactionInputSerializer
     }
 
     /**
-     * @param BufferInterface|string $string
+     * @param BufferInterface $string
      * @return TransactionInput
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws \Exception
      */
-    public function parse($string): TransactionInput
+    public function parse(BufferInterface $string): TransactionInput
     {
         return $this->fromParser(new Parser($string));
     }
