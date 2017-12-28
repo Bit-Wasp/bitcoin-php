@@ -180,8 +180,8 @@ class FullyQualifiedScript
      */
     public static function fromTxData(
         ScriptInterface $scriptPubKey,
-        ScriptInterface $scriptSig = null,
-        ScriptWitnessInterface $witness = null,
+        ScriptInterface $scriptSig,
+        ScriptWitnessInterface $witness,
         SignData $signData = null,
         OutputClassifier $classifier = null
     ) {
