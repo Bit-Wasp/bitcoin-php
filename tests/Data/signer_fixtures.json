@@ -1458,7 +1458,7 @@
     {
       "description": "P2PKH: detects a bad signature",
       "exception": {
-        "type": "\\RuntimeException",
+        "type": "\\BitWasp\\Bitcoin\\Exceptions\\SignerException",
         "message": "Existing signatures are invalid!"
       },
       "txOut": {
@@ -1476,7 +1476,7 @@
     {
       "description": "P2PK: detects a bad signature",
       "exception": {
-        "type": "\\RuntimeException",
+        "type": "\\BitWasp\\Bitcoin\\Exceptions\\SignerException",
         "message": "Existing signatures are invalid!"
       },
       "txOut": {
@@ -1494,7 +1494,7 @@
     {
       "description": "Multisig: detects a bad signature",
       "exception": {
-        "type": "\\RuntimeException",
+        "type": "\\BitWasp\\Bitcoin\\Exceptions\\SignerException",
         "message": "Existing signatures are invalid!"
       },
       "txOut": {

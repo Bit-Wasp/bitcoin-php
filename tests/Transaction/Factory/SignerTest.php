@@ -14,6 +14,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Exceptions\SignerException;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -310,10 +311,6 @@ class SignerTest extends AbstractTestCase
         $signer->input(0, $txOut)->sign($privateKey, SigHash::ALL);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid sigHashType requested
-     */
     public function testRejectsInvalidSigHashType()
     {
         $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
@@ -323,7 +320,11 @@ class SignerTest extends AbstractTestCase
             ->outputs([new TransactionOutput(4900000000, new Script)])
             ->get(), Bitcoin::getEcAdapter());
 
-        $signer->input(0, $txOut)->getSigHash(20);
+        $input = $signer->input(0, $txOut);
+        $this->expectException(SignerException::class);
+        $this->expectExceptionMessage("Invalid sigHashType requested");
+
+        $input->getSigHash(20);
     }
 
     public function testDiscouragesInvalidKeysInScripts()
@@ -416,7 +417,7 @@ class SignerTest extends AbstractTestCase
             ->output($value, $dest);
 
         $txs = new Signer($txb->get());
-        $txs->redeemBitcoinCash(true);
+        $txs->redeemBitcoinCash();
 
         $hashType = SigHash::BITCOINCASH | SigHash::ALL;
 
@@ -625,7 +626,7 @@ class SignerTest extends AbstractTestCase
                 $exception = $e;
             }
 
-            $this->assertInstanceOf(\RuntimeException::class, $exception);
+            $this->assertInstanceOf(SignerException::class, $exception);
             $this->assertEquals("Padding is forbidden for a fully signed multisig script", $exception->getMessage());
         }
     }
@@ -696,7 +697,7 @@ class SignerTest extends AbstractTestCase
                 $exception = $e;
             }
 
-            $this->assertInstanceOf(\RuntimeException::class, $exception);
+            $this->assertInstanceOf(SignerException::class, $exception);
             $this->assertEquals("Padding is forbidden for a fully signed multisig script", $exception->getMessage());
         }
     }

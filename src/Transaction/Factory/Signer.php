@@ -10,7 +10,11 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
+use BitWasp\Bitcoin\Exceptions\SignerException;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
+use BitWasp\Bitcoin\Transaction\Factory\Checker\BitcoinCashCheckerCreator;
+use BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreator;
+use BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreatorBase;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
@@ -46,17 +50,17 @@ class Signer
     /**
      * @var bool
      */
-    private $redeemBitcoinCash = false;
-
-    /**
-     * @var bool
-     */
     private $padUnsignedMultisigs = false;
 
     /**
      * @var bool
      */
     private $allowComplexScripts = false;
+
+    /**
+     * @var CheckerCreator
+     */
+    private $checkerCreator;
 
     /**
      * @var InputSignerInterface[]
@@ -74,16 +78,32 @@ class Signer
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->sigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $this->ecAdapter));
         $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $this->ecAdapter);
+        $this->checkerCreator = new CheckerCreator($this->ecAdapter, $this->sigSerializer, $this->pubKeySerializer);
     }
 
     /**
-     * @param bool $setting
      * @return $this
+     * @throws SignerException
      */
-    public function redeemBitcoinCash(bool $setting)
+    public function redeemBitcoinCash()
     {
-        $this->redeemBitcoinCash = $setting;
+        $this->setCheckerCreator(new BitcoinCashCheckerCreator($this->ecAdapter, $this->sigSerializer, $this->pubKeySerializer));
         return $this;
+    }
+
+    /**
+     * @param CheckerCreatorBase $checker
+     * @return $this
+     * @throws SignerException
+     */
+    public function setCheckerCreator(CheckerCreatorBase $checker)
+    {
+        if (empty($this->signatureCreator)) {
+            $this->checkerCreator = $checker;
+            return $this;
+        } else {
+            throw new SignerException("Cannot change CheckerCreator after inputs have been parsed");
+        }
     }
 
     /**
@@ -147,12 +167,12 @@ class Signer
         }
 
         if (!isset($this->signatureCreator[$nIn])) {
-            $input = (new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData, $this->sigSerializer, $this->pubKeySerializer))
-                ->padUnsignedMultisigs($this->padUnsignedMultisigs)
-                ->tolerateInvalidPublicKey($this->tolerateInvalidPublicKey)
-                ->redeemBitcoinCash($this->redeemBitcoinCash)
-                ->allowComplexScripts($this->allowComplexScripts)
-                ->extract();
+            $checker = $this->checkerCreator->create($this->tx, $nIn, $txOut);
+            $input = new InputSigner($this->ecAdapter, $this->tx, $nIn, $txOut, $signData, $checker, $this->sigSerializer, $this->pubKeySerializer);
+            $input->padUnsignedMultisigs($this->padUnsignedMultisigs);
+            $input->tolerateInvalidPublicKey($this->tolerateInvalidPublicKey);
+            $input->allowComplexScripts($this->allowComplexScripts);
+            $input->extract();
 
             $this->signatureCreator[$nIn] = $input;
         }
