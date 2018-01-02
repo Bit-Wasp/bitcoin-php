@@ -11,8 +11,13 @@ use BitWasp\Bitcoin\Transaction\SignatureHash\V1Hasher;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
-class BitcoinCashChecker extends Checker
+class BitcoinCashChecker extends CheckerBase
 {
+    /**
+     * @var array
+     */
+    protected $sigHashCache = [];
+
     /**
      * @var int
      */
@@ -24,7 +29,7 @@ class BitcoinCashChecker extends Checker
      * @param int $sigVersion
      * @return BufferInterface
      */
-    public function getSigHash(ScriptInterface $script, int $sigHashType, int $sigVersion)
+    public function getSigHash(ScriptInterface $script, int $sigHashType, int $sigVersion): BufferInterface
     {
         if ($sigVersion !== 0) {
             throw new \RuntimeException("SigVersion must be 0");
@@ -35,11 +40,7 @@ class BitcoinCashChecker extends Checker
             if ($sigHashType & SigHash::BITCOINCASH) {
                 $hasher = new V1Hasher($this->transaction, $this->amount);
             } else {
-                if ($this->hasherV0) {
-                    $hasher = $this->hasherV0;
-                } else {
-                    $hasher = $this->hasherV0 = new Hasher($this->transaction);
-                }
+                $hasher = new Hasher($this->transaction);
             }
 
             $hash = $hasher->calculate($script, $this->nInput, $sigHashType);
