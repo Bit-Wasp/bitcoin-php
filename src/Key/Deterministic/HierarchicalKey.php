@@ -16,8 +16,6 @@ use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Util\IntRange;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
 
 class HierarchicalKey
 {
@@ -176,13 +174,11 @@ class HierarchicalKey
     /**
      * @return HierarchicalKey
      */
-    public function toPublic()
+    public function withoutPrivateKey(): HierarchicalKey
     {
-        if ($this->isPrivate()) {
-            $this->key = $this->getPrivateKey()->getPublicKey();
-        }
-
-        return $this;
+        $clone = clone $this;
+        $clone->key = $clone->getPublicKey();
+        return $clone;
     }
 
     /**
@@ -333,9 +329,11 @@ class HierarchicalKey
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedPublicKey(NetworkInterface $network = null)
+    public function toExtendedPublicKey(NetworkInterface $network = null): string
     {
-        $clone = clone($this);
-        return $clone->toPublic()->toExtendedKey($network);
+        return $this
+            ->withoutPrivateKey()
+            ->toExtendedKey($network)
+        ;
     }
 }
