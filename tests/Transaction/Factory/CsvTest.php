@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -31,10 +32,11 @@ class CsvTest extends AbstractTestCase
      */
     public function txFixture(int $locktime, int $sequence, int $version = 2)
     {
+        $addrCreator = new AddressCreator();
         return (new TxBuilder())
             ->version($version)
             ->input('abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234', 0, null, $sequence)
-            ->output(90000000, AddressFactory::fromString("1BQLNJtMDKmMZ4PyqVFfRuBNvoGhjigBKF")->getScriptPubKey())
+            ->output(90000000, $addrCreator->fromString("1BQLNJtMDKmMZ4PyqVFfRuBNvoGhjigBKF")->getScriptPubKey())
             ->locktime($locktime)
             ->get()
             ;

@@ -2,6 +2,7 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
@@ -12,6 +13,7 @@ use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\MessageSigner\SignedMessageSerializer;
 
 Bitcoin::setNetwork(NetworkFactory::bitcoinTestnet());
+$addrCreator = new AddressCreator();
 
 $address = 'n2Z2DFCxG6vktyX1MFkKAQPQFsrmniGKj5';
 
@@ -22,7 +24,7 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
 -----END BITCOIN SIGNED MESSAGE-----';
 
 /** @var PayToPubKeyHashAddress $address */
-$address = AddressFactory::fromString($address);
+$address = $addrCreator->fromString($address);
 
 /** @var CompactSignatureSerializerInterface $compactSigSerializer */
 $compactSigSerializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class);

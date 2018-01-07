@@ -2,9 +2,12 @@
 
 require __DIR__ . "/../../vendor/autoload.php";
 
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\PaymentProtocol\RequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\RequestSigner;
+
+$addrCreator = new AddressCreator();
 
 $time = time();
 $amount = 10000;
@@ -18,7 +21,7 @@ $signer = new RequestSigner('x509+sha256', '../tests/ssl/server.key', '../tests/
 $builder = new RequestBuilder($signer, 'main', time());
 
 // PaymentRequests contain outputs that the wallet will fulfill
-$address = AddressFactory::fromString($destination);
+$address = $addrCreator->fromString($destination);
 $builder->addAddressPayment($address, $amount);
 $builder->setPaymentUrl($paymentUrl);
 
