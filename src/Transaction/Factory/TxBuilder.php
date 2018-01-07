@@ -265,7 +265,7 @@ class TxBuilder
         // Create Script from address, then create an output.
         $this->output(
             $value,
-            ScriptFactory::scriptPubKey()->payToAddress($address)
+            $address->getScriptPubKey()
         );
 
         return $this;
