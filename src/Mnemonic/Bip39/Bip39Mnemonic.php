@@ -68,7 +68,7 @@ class Bip39Mnemonic implements MnemonicInterface
 
     /**
      * @param BufferInterface $entropy
-     * @return string[]
+     * @return string[] - array of words from the word list
      */
     public function entropyToWords(BufferInterface $entropy): array
     {
@@ -113,6 +113,7 @@ class Bip39Mnemonic implements MnemonicInterface
     {
         $words = explode(' ', $mnemonic);
 
+        // Mnemonic sizes are multiples of 3 words
         if (count($words) % 3 !== 0) {
             throw new \InvalidArgumentException('Invalid mnemonic');
         }
@@ -130,11 +131,12 @@ class Bip39Mnemonic implements MnemonicInterface
             throw new \InvalidArgumentException('Invalid mnemonic, too long');
         }
 
+        // Every 32 bits of ENT adds a 1 CS bit.
         $CS = strlen($bits) / 33;
         $ENT = strlen($bits) - $CS;
 
-        $csBits = substr($bits, -1 * $CS);
-        $entBits = substr($bits, 0, -1 * $CS);
+        // Checksum bits
+        $csBits = substr($bits, $ENT, $CS);
 
         // Split $ENT bits into 8 bit words to be packed
         assert($ENT % 8 === 0);

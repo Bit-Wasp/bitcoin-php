@@ -41,7 +41,7 @@ class EnglishWordList extends WordList implements Bip39WordListInterface
             $this->wordsFlipped = array_flip($this->getWords());
         }
 
-        if (!isset($this->wordsFlipped[$word])) {
+        if (!array_key_exists($word, $this->wordsFlipped)) {
             throw new \InvalidArgumentException(__CLASS__ . ' does not contain word ' . $word);
         }
 
