@@ -147,12 +147,7 @@ class Number extends Serializable
             $result[count($result) - 1] |= 0x80;
         }
 
-        $s = '';
-        foreach ($result as $i) {
-            $s .= chr($i);
-        }
-
-        return new Buffer($s);
+        return new Buffer(pack("C*", ...$result));
     }
 
     /**
