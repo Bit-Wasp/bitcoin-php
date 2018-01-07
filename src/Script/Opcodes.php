@@ -86,8 +86,8 @@ class Opcodes implements \ArrayAccess
     const OP_MUL = 149;
     const OP_DIV = 150;
     const OP_MOD = 151;
-    const OP_LSHIFT = 152;
-    const OP_RSHIFT = 153;
+    const OP_LSHIFT = 152; /* Disabled */
+    const OP_RSHIFT = 153; /* Disabled */
     const OP_BOOLAND = 154;
     const OP_BOOLOR = 155;
     const OP_NUMEQUAL = 156;
@@ -220,8 +220,8 @@ class Opcodes implements \ArrayAccess
         self::OP_MUL => 'OP_MUL',
         self::OP_DIV => 'OP_DIV',
         self::OP_MOD => 'OP_MOD',
-        self::OP_LSHIFT => 'OP_LSHIFT',
-        self::OP_RSHIFT => 'OP_RSHIFT',
+        self::OP_LSHIFT => 'OP_LSHIFT', /* Disabled */
+        self::OP_RSHIFT => 'OP_RSHIFT', /* Disabled */
         self::OP_BOOLAND => 'OP_BOOLAND',
         self::OP_BOOLOR => 'OP_BOOLOR',
         self::OP_NUMEQUAL => 'OP_NUMEQUAL',
