@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Address\SegwitAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -20,10 +21,10 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Address\AddressCreator;
 
 class AddressTest extends AbstractTestCase
 {
-
     public function getNetwork($network)
     {
         switch ($network) {
@@ -140,20 +141,22 @@ class AddressTest extends AbstractTestCase
 
         // check ourselves a bit, do we get the test fixture when
         // we pass our addresses output script?
-        $addrAgain = AddressFactory::fromOutputScript($fromString->getScriptPubKey());
+        $addressReader = new AddressCreator();
+        $addrAgain = $addressReader->fromOutputScript($fromString->getScriptPubKey());
         $this->assertEquals($addrAgain->getAddress($network), $fromString->getAddress($network));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAddressFailswithBytes()
     {
         $add = 'LPjNgqp43ATwzMTJPM2SFoEYeyJV6pq6By';
         $this->assertFalse(AddressFactory::isValidAddress($add));
 
         $network = Bitcoin::getNetwork();
-        AddressFactory::fromString($add, $network);
+        $addressReader = new AddressCreator();
+
+        $this->expectException(UnrecognizedAddressException::class);
+
+        $addressReader->fromString($add, $network);
     }
 
     public function testFromOutputScriptSuccess()
@@ -164,10 +167,12 @@ class AddressTest extends AbstractTestCase
         $pubkeyHash = $outputScriptFactory->payToPubKeyHash($publicKey->getPubKeyHash());
         $scriptHash = $outputScriptFactory->payToScriptHash(Hash::sha256ripe160($outputScriptFactory->multisig(1, [$publicKey])->getBuffer()));
 
-        $p2pkhAddress = AddressFactory::fromOutputScript($pubkeyHash);
+        $addressCreator = new AddressCreator();
+
+        $p2pkhAddress = $addressCreator->fromOutputScript($pubkeyHash);
         $this->assertInstanceOf(PayToPubKeyHashAddress::class, $p2pkhAddress);
 
-        $scriptAddress = AddressFactory::fromOutputScript($scriptHash);
+        $scriptAddress = $addressCreator->fromOutputScript($scriptHash);
         $this->assertInstanceOf(ScriptHashAddress::class, $scriptAddress);
     }
 
@@ -178,7 +183,8 @@ class AddressTest extends AbstractTestCase
     public function testFromOutputScript()
     {
         $unknownScript = ScriptFactory::create()->op('OP_0')->op('OP_1')->getScript();
-        AddressFactory::fromOutputScript($unknownScript);
+        $addressCreator = new AddressCreator();
+        $addressCreator->fromOutputScript($unknownScript);
     }
 
     public function testAssociatedAddress()

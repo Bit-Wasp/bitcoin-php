@@ -8,7 +8,7 @@ use BitWasp\Buffertools\BufferInterface;
 
 /**
  * Abstract Class Address
- * Used to store a hash, and a base58 encoded address
+ * Used to store a hash
  */
 abstract class Address implements AddressInterface
 {

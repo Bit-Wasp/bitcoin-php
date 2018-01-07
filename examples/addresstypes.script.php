@@ -1,6 +1,7 @@
 <?php
 
 use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -16,7 +17,8 @@ $script = ScriptFactory::scriptPubKey()->p2pkh($pubKeyHash);
 
 ### Key hash types
 echo "key hash types\n";
-$p2pkh = AddressFactory::fromOutputScript($script);
+$addrReader = new AddressCreator();
+$p2pkh = $addrReader->fromOutputScript($script);
 echo " * p2pkh address: {$p2pkh->getAddress()}\n";
 
 #### Script hash types

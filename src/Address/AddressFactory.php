@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Address;
 
-use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Script\WitnessProgram;
-use BitWasp\Bitcoin\Script\WitnessScript;
-use BitWasp\Bitcoin\SegwitBech32;
-use BitWasp\Buffertools\BufferInterface;
 
 class AddressFactory
 {
@@ -53,63 +48,25 @@ class AddressFactory
 
     /**
      * @param ScriptInterface $outputScript
-     * @return AddressInterface
+     * @return Address
      */
-    public static function fromOutputScript(ScriptInterface $outputScript): AddressInterface
+    public static function fromOutputScript(ScriptInterface $outputScript): Address
     {
-        if ($outputScript instanceof P2shScript || $outputScript instanceof WitnessScript) {
-            throw new \RuntimeException("P2shScript & WitnessScript's are not accepted by fromOutputScript");
-        }
-
-        $wp = null;
-        if ($outputScript->isWitness($wp)) {
-            /** @var WitnessProgram $wp */
-            return new SegwitAddress($wp);
-        }
-
-        $decode = (new OutputClassifier())->decode($outputScript);
-        switch ($decode->getType()) {
-            case ScriptType::P2PKH:
-                /** @var BufferInterface $solution */
-                return new PayToPubKeyHashAddress($decode->getSolution());
-            case ScriptType::P2SH:
-                /** @var BufferInterface $solution */
-                return new ScriptHashAddress($decode->getSolution());
-            default:
-                throw new \RuntimeException('Script type is not associated with an address');
-        }
+        $reader = new AddressCreator();
+        return $reader->fromOutputScript($outputScript);
     }
 
     /**
      * @param string $address
-     * @param NetworkInterface $network
-     * @return AddressInterface
-     * @throws \InvalidArgumentException
+     * @param NetworkInterface|null $network
+     * @return Address
+     * @throws \BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException
      */
-    public static function fromString(string $address, NetworkInterface $network = null): AddressInterface
+    public static function fromString(string $address, NetworkInterface $network = null): Address
     {
         $network = $network ?: Bitcoin::getNetwork();
-
-        try {
-            $data = Base58::decodeCheck($address);
-            $prefixByte = $data->slice(0, 1)->getHex();
-
-            if ($prefixByte === $network->getP2shByte()) {
-                return new ScriptHashAddress($data->slice(1));
-            } else if ($prefixByte === $network->getAddressByte()) {
-                return new PayToPubKeyHashAddress($data->slice(1));
-            }
-        } catch (\Exception $e) {
-            // continue on for Bech32
-        }
-
-        try {
-            return new SegwitAddress(SegwitBech32::decode($address, $network));
-        } catch (\Exception $e) {
-            // continue on
-        }
-
-        throw new \InvalidArgumentException("Address not recognized");
+        $reader = new AddressCreator();
+        return $reader->fromString($address, $network);
     }
 
     /**
