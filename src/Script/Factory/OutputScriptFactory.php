@@ -122,7 +122,7 @@ class OutputScriptFactory
      */
     public function multisig(int $m, array $keys = [], $sort = true): ScriptInterface
     {
-        return self::multisigKeyBuffers($m, array_map(function (PublicKeyInterface $key) {
+        return self::multisigKeyBuffers($m, array_map(function (PublicKeyInterface $key): BufferInterface {
             return $key->getBuffer();
         }, $keys), $sort);
     }
@@ -162,7 +162,7 @@ class OutputScriptFactory
             $new->push($key);
         }
 
-        return $new->int($n)->op('OP_CHECKMULTISIG')->getScript();
+        return $new->int($n)->opcode(Opcodes::OP_CHECKMULTISIG)->getScript();
     }
 
     /**

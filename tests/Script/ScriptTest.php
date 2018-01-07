@@ -157,12 +157,13 @@ class ScriptTest extends AbstractTestCase
     public function testGetScriptHash()
     {
         $script = $script = ScriptFactory::create()
-            ->op('OP_2')
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->op('OP_3')
-            ->op('OP_CHECKMULTISIG')
+            ->opcode(Opcodes::OP_2)
+            ->data(
+                Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+                Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+                Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb')
+            )
+            ->opcode(Opcodes::OP_3, Opcodes::OP_CHECKMULTISIG)
             ->getScript();
 
         $rs = new Script(Buffer::hex('522102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb2102cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb53ae'));
@@ -189,12 +190,12 @@ class ScriptTest extends AbstractTestCase
     public function getPushOnlyVectors()
     {
         return [
-            [ScriptFactory::create()->push(new Buffer())->push(new Buffer())->op('OP_0')->getScript(), true],
-            [ScriptFactory::create()->op('OP_1')->getScript(), true],
-            [ScriptFactory::create()->op('OP_0')->getScript(), true],
-            [ScriptFactory::create()->op('OP_16')->op('OP_RESERVED')->getScript(), true],
-            [ScriptFactory::create()->op('OP_16')->op('OP_RESERVED')->getScript(), true],
-            [ScriptFactory::create()->op('OP_NOP')->getScript(), false],
+            [ScriptFactory::create()->data(new Buffer(), new Buffer())->opcode(Opcodes::OP_0)->getScript(), true],
+            [ScriptFactory::create()->opcode(Opcodes::OP_1)->getScript(), true],
+            [ScriptFactory::create()->opcode(Opcodes::OP_0)->getScript(), true],
+            [ScriptFactory::create()->opcode(Opcodes::OP_16, Opcodes::OP_RESERVED)->getScript(), true],
+            [ScriptFactory::create()->opcode(Opcodes::OP_16, Opcodes::OP_RESERVED)->getScript(), true],
+            [ScriptFactory::create()->opcode(Opcodes::OP_NOP)->getScript(), false],
 
         ];
     }
