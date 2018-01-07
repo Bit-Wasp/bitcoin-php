@@ -1,6 +1,6 @@
 <?php
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 
@@ -23,5 +23,5 @@ echo "Public Key\n";
 echo " - Hex: " . $publicKey->getHex() . "\n";
 echo " - Hash: " . $publicKey->getPubKeyHash()->getHex() . "\n";
 
-$address = AddressFactory::p2pkh($publicKey);
+$address = new PayToPubKeyHashAddress($publicKey->getPubKeyHash());
 echo " - Address: " . $address->getAddress() . "\n";

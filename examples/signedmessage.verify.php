@@ -3,7 +3,6 @@
 require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\AddressCreator;
-use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;

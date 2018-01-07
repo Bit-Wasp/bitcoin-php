@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
-use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Script;
@@ -136,7 +136,7 @@ class TxBuilderTest extends AbstractTestCase
     {
         $key = PrivateKeyFactory::create(false);
         $script = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
-        $scriptAddress = AddressFactory::p2sh($script);
+        $scriptAddress = new ScriptHashAddress($script->getScriptHash());
         return [
             [new PayToPubKeyHashAddress($key->getPubKeyHash())],
             [$scriptAddress],
@@ -151,8 +151,7 @@ class TxBuilderTest extends AbstractTestCase
     {
         $expectedScript = ScriptFactory::scriptPubKey()->payToAddress($address);
 
-        $ecAdapter = $this->safeEcAdapter();
-        $builder = new TxBuilder($ecAdapter);
+        $builder = new TxBuilder();
         $builder->payToAddress(50, $address);
 
         $this->assertEquals($expectedScript, $builder->get()->getOutput(0)->getScript());
