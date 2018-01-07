@@ -1,6 +1,6 @@
 <?php
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\Base58AddressInterface;
 use BitWasp\Bitcoin\Address\SegwitAddress;
 
@@ -12,7 +12,8 @@ require __DIR__ . "/../vendor/autoload.php";
 //$addressString = "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej";
 $addressString = "3BbDtxBSjgfTRxaBUgR2JACWRukLKtZdiQ";
 
-$address = AddressFactory::fromString($addressString);
+$addrCreator = new AddressCreator();
+$address = $addrCreator->fromString($addressString);
 
 if ($address instanceof Base58AddressInterface) {
     echo "Base58 Hash160: " . $address->getHash()->getHex().PHP_EOL;

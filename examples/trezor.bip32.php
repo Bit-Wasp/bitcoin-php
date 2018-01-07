@@ -20,7 +20,6 @@ function getScriptPubKey(HierarchicalKey $key, $purpose)
         default:
             throw new \InvalidArgumentException("Invalid purpose");
     }
-
 }
 
 $mnemonic = "rain enhance term seminar upper must gun uniform huge brown fresh gun warrior mesh tag";
@@ -61,4 +60,3 @@ $script0 = getScriptPubKey($xpub->derivePath("0/0"), $purpose);
 $script1 = getScriptPubKey($xpub->derivePath("0/1"), $purpose);
 echo "0/0: ".$addressCreator->fromOutputScript($script0)->getAddress().PHP_EOL;
 echo "0/1: ".$addressCreator->fromOutputScript($script1)->getAddress().PHP_EOL;
-

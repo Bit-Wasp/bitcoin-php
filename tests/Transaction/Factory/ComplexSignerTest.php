@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -435,9 +436,10 @@ class ComplexSignerTest extends AbstractTestCase
 
     public function complexTestProvider()
     {
+        $addrCreator = new AddressCreator();
         $spend = (new TxBuilder())
             ->spendOutPoint(new OutPoint(new Buffer('abcd', 32), 0))
-            ->payToAddress(10000000, AddressFactory::fromString('1BQLNJtMDKmMZ4PyqVFfRuBNvoGhjigBKF'))
+            ->payToAddress(10000000, $addrCreator->fromString('1BQLNJtMDKmMZ4PyqVFfRuBNvoGhjigBKF'))
             ->get();
 
         $fixtures = [];

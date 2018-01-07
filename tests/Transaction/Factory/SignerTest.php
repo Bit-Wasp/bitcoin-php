@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
@@ -408,7 +409,8 @@ class SignerTest extends AbstractTestCase
         $keyPair = PrivateKeyFactory::fromWif($wif, null, $network);
 
         $spk = ScriptFactory::scriptPubKey()->payToPubKey($keyPair->getPublicKey());
-        $dest = AddressFactory::fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
+        $addrCreator = new AddressCreator();
+        $dest = $addrCreator->fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
 
         $txb = (new TxBuilder())
             ->version(2)
@@ -436,7 +438,8 @@ class SignerTest extends AbstractTestCase
         $vout = 0;
         $network = NetworkFactory::bitcoinTestnet();
 
-        $dest = AddressFactory::fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
+        $addrCreator = new AddressCreator();
+        $dest = $addrCreator->fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
 
         $txb = (new TxBuilder())
             ->version(2)
@@ -473,9 +476,10 @@ class SignerTest extends AbstractTestCase
         $p2wshSignData = (new SignData())
             ->p2wsh($p2wsh);
 
+        $addrCreator = new AddressCreator();
         $unsigned = (new TxBuilder())
             ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
-            ->payToAddress($value, AddressFactory::fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
+            ->payToAddress($value, $addrCreator->fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
             ->get();
 
         $experimentsPart = [
@@ -577,9 +581,10 @@ class SignerTest extends AbstractTestCase
         $value = 40000;
         $txOut = new TransactionOutput($value, $addr->getScriptPubKey());
 
+        $addrCreator = new AddressCreator();
         $unsigned = (new TxBuilder())
             ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
-            ->payToAddress($value, AddressFactory::fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
+            ->payToAddress($value, $addrCreator->fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
             ->get();
 
         $signData = (new SignData())
@@ -647,9 +652,10 @@ class SignerTest extends AbstractTestCase
         $value = 40000;
         $txOut = new TransactionOutput($value, $p2wsh->getOutputScript());
 
+        $addrCreator = new AddressCreator();
         $unsigned = (new TxBuilder())
             ->input('5077666f78045cb3482f64ee5d203366363af71436c1bb6db8b49c428a53f00d', 0)
-            ->payToAddress($value, AddressFactory::fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
+            ->payToAddress($value, $addrCreator->fromString('3EppTrJXEgNHgHoSRQdQaVQV4VS7Tg7aSs'))
             ->get();
 
         $signData = (new SignData())

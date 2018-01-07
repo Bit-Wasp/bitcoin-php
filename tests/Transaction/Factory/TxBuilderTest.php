@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
@@ -84,7 +85,8 @@ class TxBuilderTest extends AbstractTestCase
     public function testPayToAddress()
     {
         $addressStr = '1KnHL81THzfp7tfFqHYWwo4GnY1L2rt4pk';
-        $address = AddressFactory::fromString($addressStr);
+        $addrCreator = new AddressCreator();
+        $address = $addrCreator->fromString($addressStr);
         $value = 50;
 
         $builder = new TxBuilder();
