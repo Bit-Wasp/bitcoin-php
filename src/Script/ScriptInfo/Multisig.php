@@ -128,8 +128,7 @@ class Multisig
      * @param bool $allowVerify
      * @return Multisig
      */
-    public static function fromScript(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null, bool
-    $allowVerify = false)
+    public static function fromScript(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null, bool $allowVerify = false)
     {
         return static::fromDecodedScript($script->getScriptParser()->decode(), $pubKeySerializer, $allowVerify);
     }
