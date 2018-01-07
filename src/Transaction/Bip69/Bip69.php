@@ -25,7 +25,7 @@ class Bip69
     /**
      * @param TransactionInputInterface $vin1
      * @param TransactionInputInterface $vin2
-     * @return bool
+     * @return int
      */
     public function compareInputs(TransactionInputInterface $vin1, TransactionInputInterface $vin2): int
     {
