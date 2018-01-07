@@ -8,8 +8,8 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class MessageSigner
@@ -28,49 +28,55 @@ class MessageSigner
     }
 
     /**
-     * @param string $message
-     * @return BufferInterface
-     * @throws \Exception
-     */
-    private function calculateBody($message)
-    {
-        return new Buffer("\x18Bitcoin Signed Message:\n" . Buffertools::numToVarInt(strlen($message))->getBinary() . $message, null, $this->ecAdapter->getMath());
-    }
-
-    /**
+     * @param NetworkInterface $network
      * @param string $message
      * @return \BitWasp\Buffertools\BufferInterface
      */
-    public function calculateMessageHash($message)
+    private function calculateBody(NetworkInterface $network, $message)
     {
-        return Hash::sha256d($this->calculateBody($message));
+        return new Buffer(sprintf(
+            "\x18%s:\n%s%s",
+            $network->getSignedMessageMagic(),
+            Buffertools::numToVarInt(strlen($message))->getBinary(),
+            $message
+        ));
+    }
+
+    /**
+     * @param NetworkInterface $network
+     * @param string $message
+     * @return \BitWasp\Buffertools\BufferInterface
+     */
+    public function calculateMessageHash(NetworkInterface $network, $message)
+    {
+        return Hash::sha256d($this->calculateBody($network, $message));
     }
 
     /**
      * @param SignedMessage $signedMessage
      * @param PayToPubKeyHashAddress $address
+     * @param NetworkInterface|null $network
      * @return bool
      */
-    public function verify(SignedMessage $signedMessage, PayToPubKeyHashAddress $address)
+    public function verify(SignedMessage $signedMessage, PayToPubKeyHashAddress $address, NetworkInterface $network = null)
     {
-        $hash = $this->calculateMessageHash($signedMessage->getMessage());
+        $network = $network ?: Bitcoin::getNetwork();
+        $hash = $this->calculateMessageHash($network, $signedMessage->getMessage());
+        $publicKey = $this->ecAdapter->recover($hash, $signedMessage->getCompactSignature());
 
-        $publicKey = $this->ecAdapter->recover(
-            $hash,
-            $signedMessage->getCompactSignature()
-        );
-
-        return $publicKey->getAddress()->getHash()->equals($address->getHash());
+        return hash_equals($publicKey->getAddress()->getHash()->getBinary(), $address->getHash()->getBinary());
     }
 
     /**
      * @param string $message
      * @param PrivateKeyInterface $privateKey
+     * @param NetworkInterface|null $network
      * @return SignedMessage
      */
-    public function sign($message, PrivateKeyInterface $privateKey)
+    public function sign($message, PrivateKeyInterface $privateKey, NetworkInterface $network = null)
     {
-        $hash = $this->calculateMessageHash($message);
+        $network = $network ?: Bitcoin::getNetwork();
+        $hash = $this->calculateMessageHash($network, $message);
 
         return new SignedMessage(
             $message,
