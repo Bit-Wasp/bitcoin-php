@@ -39,7 +39,7 @@ class Bip39SeedGenerator
         return Hash::pbkdf2(
             'sha512',
             $this->normalize($mnemonic),
-            $this->normalize("mnemonic" . $passphrase),
+            $this->normalize("mnemonic{$passphrase}"),
             2048,
             64
         );
