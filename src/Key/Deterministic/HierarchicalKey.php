@@ -140,7 +140,7 @@ class HierarchicalKey
      *
      * @return BufferInterface
      */
-    public function getChainCode()
+    public function getChainCode(): BufferInterface
     {
         return $this->chainCode;
     }
@@ -148,7 +148,7 @@ class HierarchicalKey
     /**
      * @return PrivateKeyInterface
      */
-    public function getPrivateKey()
+    public function getPrivateKey(): PrivateKeyInterface
     {
         if ($this->key->isPrivate()) {
             return $this->key;
@@ -162,7 +162,7 @@ class HierarchicalKey
      *
      * @return PublicKeyInterface
      */
-    public function getPublicKey()
+    public function getPublicKey(): PublicKeyInterface
     {
         if ($this->isPrivate()) {
             return $this->getPrivateKey()->getPublicKey();
@@ -186,7 +186,7 @@ class HierarchicalKey
      *
      * @return bool
      */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this->key->isPrivate();
     }
@@ -196,7 +196,7 @@ class HierarchicalKey
      *
      * @return bool
      */
-    public function isHardened()
+    public function isHardened(): bool
     {
         return ($this->sequence >> 31) === 1;
     }
@@ -208,7 +208,7 @@ class HierarchicalKey
      * @return BufferInterface
      * @throws \Exception
      */
-    public function getHmacSeed(int $sequence)
+    public function getHmacSeed(int $sequence): BufferInterface
     {
         if ($sequence < 0 || $sequence > IntRange::U32_MAX) {
             throw new \InvalidArgumentException("Sequence is outside valid range, must be >= 0 && <= (2^31)-1");
@@ -234,7 +234,7 @@ class HierarchicalKey
      * @return HierarchicalKey
      * @throws \Exception
      */
-    public function deriveChild(int $sequence)
+    public function deriveChild(int $sequence): HierarchicalKey
     {
         $nextDepth = $this->depth + 1;
         if ($nextDepth > 255) {
@@ -266,7 +266,7 @@ class HierarchicalKey
      * @param array|\stdClass|\Traversable $list
      * @return HierarchicalKey
      */
-    public function deriveFromList($list)
+    public function deriveFromList($list): HierarchicalKey
     {
         if (!is_array($list) && !$list instanceof \Traversable && !$list instanceof \stdClass) {
             throw new \InvalidArgumentException('List must be an array or \Traversable');
@@ -287,7 +287,7 @@ class HierarchicalKey
      * @return HierarchicalKey
      * @throws \Exception
      */
-    public function derivePath($path)
+    public function derivePath(string $path): HierarchicalKey
     {
         $sequences = new HierarchicalKeySequence();
         return $this->deriveFromList($sequences->decodePath($path));
@@ -298,7 +298,7 @@ class HierarchicalKey
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedKey(NetworkInterface $network = null)
+    public function toExtendedKey(NetworkInterface $network = null): string
     {
         $network = $network ?: Bitcoin::getNetwork();
 
@@ -314,7 +314,7 @@ class HierarchicalKey
      * @param NetworkInterface $network
      * @return string
      */
-    public function toExtendedPrivateKey(NetworkInterface $network = null)
+    public function toExtendedPrivateKey(NetworkInterface $network = null): string
     {
         if (!$this->isPrivate()) {
             throw new \LogicException('Cannot create extended private key from public');

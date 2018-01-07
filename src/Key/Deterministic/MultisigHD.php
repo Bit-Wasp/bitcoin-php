@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 
 class MultisigHD
@@ -80,9 +81,9 @@ class MultisigHD
      * @param HierarchicalKey[] $keys
      * @return HierarchicalKey[]
      */
-    private function sortHierarchicalKeys(array $keys)
+    private function sortHierarchicalKeys(array $keys): array
     {
-        return Buffertools::sort($keys, function (HierarchicalKey $key) {
+        return Buffertools::sort($keys, function (HierarchicalKey $key): BufferInterface {
             return $key->getPublicKey()->getBuffer();
         });
     }
@@ -127,7 +128,7 @@ class MultisigHD
     /**
      * @return ScriptHashAddress
      */
-    public function getAddress()
+    public function getAddress(): ScriptHashAddress
     {
         return $this->redeemScript->getAddress();
     }
