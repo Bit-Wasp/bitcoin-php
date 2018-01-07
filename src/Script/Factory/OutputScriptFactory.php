@@ -149,7 +149,7 @@ class OutputScriptFactory
             $new->push($key);
         }
 
-        return $new->int($n)->op('OP_CHECKMULTISIG')->getScript();
+        return $new->int($n)->opcode(Opcodes::OP_CHECKMULTISIG)->getScript();
     }
 
     /**

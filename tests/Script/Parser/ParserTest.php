@@ -88,7 +88,7 @@ class ParserTest extends AbstractTestCase
     public function testParse()
     {
         $buf = Buffer::hex('0f9947c2b0fdd82ef3153232ee23d5c0bed84a02');
-        $script = ScriptFactory::create()->op('OP_HASH160')->push($buf)->op('OP_EQUAL')->getScript();
+        $script = ScriptFactory::create()->opcode(Opcodes::OP_HASH160)->push($buf)->opcode(Opcodes::OP_EQUAL)->getScript();
         $parse = $script->getScriptParser()->decode();
         $this->assertFalse($parse[0]->isPush());
         $this->assertSame($parse[0]->getOp(), Opcodes::OP_HASH160);
@@ -102,7 +102,7 @@ class ParserTest extends AbstractTestCase
 
     public function testParseNullByte()
     {
-        $script = ScriptFactory::create()->op('OP_0')->getScript();
+        $script = ScriptFactory::create()->opcode(Opcodes::OP_0)->getScript();
         $parse = $script->getScriptParser()->decode();
         $data = $parse[0];
         $this->assertEquals(Opcodes::OP_0, $data->getOp());
@@ -199,7 +199,7 @@ class ParserTest extends AbstractTestCase
     public function testDataSize()
     {
         $buffer = new Buffer('', 40);
-        $script = ScriptFactory::create()->push($buffer)->op('OP_HASH160')->getScript();
+        $script = ScriptFactory::create()->push($buffer)->opcode(Opcodes::OP_HASH160)->getScript();
         $parsed = $script->getScriptParser();
 
         for ($i = 0; $i < 1; $i++) {

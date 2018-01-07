@@ -79,14 +79,13 @@ class OutputScriptFactoryTest extends AbstractTestCase
 
     public function testClassifyMultisig()
     {
-        $script = ScriptFactory::create()
-            ->op('OP_2')
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->op('OP_3')
-            ->op('OP_CHECKMULTISIG')
-            ->getScript();
+        $keyBufs = [
+            Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+            Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+            Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+        ];
+
+        $script = ScriptFactory::scriptPubKey()->multisigKeyBuffers(2, $keyBufs);
 
         $classifier = new OutputClassifier();
         $this->assertEquals(ScriptType::MULTISIG, $classifier->classify($script));
@@ -95,14 +94,13 @@ class OutputScriptFactoryTest extends AbstractTestCase
     public function testPayToScriptHash()
     {
         // Script::payToScriptHash should produce a ScriptHash type script, from a different script
-        $script = ScriptFactory::create()
-            ->op('OP_2')
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->push(Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'))
-            ->op('OP_3')
-            ->op('OP_CHECKMULTISIG')
-            ->getScript();
+        $keyBufs = [
+            Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+            Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+            Buffer::hex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb'),
+        ];
+
+        $script = ScriptFactory::scriptPubKey()->multisigKeyBuffers(2, $keyBufs);
 
         $scriptHash = ScriptFactory::scriptPubKey()->payToScriptHash(Hash::sha256ripe160($script->getBuffer()));
         $parsed = $scriptHash->getScriptParser()->decode();
@@ -120,7 +118,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $hash = Hash::sha256d(new Buffer($witnessMerkleRoot->getBinary() . $reservedVal->getBinary()));
 
         $expected = ScriptFactory::create()
-            ->op('OP_RETURN')
+            ->opcode(Opcodes::OP_RETURN)
             ->push(new Buffer("\xaa\x21\xa9\xed" . $hash->getBinary()))
             ->getScript();
 

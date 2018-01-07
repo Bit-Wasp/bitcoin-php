@@ -15,6 +15,7 @@ use BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -180,7 +181,7 @@ class AddressTest extends AbstractTestCase
      */
     public function testFromOutputScript()
     {
-        $unknownScript = ScriptFactory::create()->op('OP_0')->op('OP_1')->getScript();
+        $unknownScript = ScriptFactory::create()->opcode(Opcodes::OP_0, Opcodes::OP_1)->getScript();
         $addressCreator = new AddressCreator();
         $addressCreator->fromOutputScript($unknownScript);
     }
