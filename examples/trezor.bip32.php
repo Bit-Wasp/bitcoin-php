@@ -1,6 +1,6 @@
 <?php
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
@@ -9,20 +9,18 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 
 require __DIR__ . "/../vendor/autoload.php";
 
-function toAddress(HierarchicalKey $key, $purpose)
+function getScriptPubKey(HierarchicalKey $key, $purpose)
 {
     switch ($purpose) {
         case 44:
-            $script = ScriptFactory::scriptPubKey()->p2pkh($key->getPublicKey()->getPubKeyHash());
-            break;
+            return ScriptFactory::scriptPubKey()->p2pkh($key->getPublicKey()->getPubKeyHash());
         case 49:
             $rs = new P2shScript(ScriptFactory::scriptPubKey()->p2wkh($key->getPublicKey()->getPubKeyHash()));
-            $script = $rs->getOutputScript();
-            break;
+            return $rs->getOutputScript();
         default:
             throw new \InvalidArgumentException("Invalid purpose");
     }
-    return AddressFactory::fromOutputScript($script);
+
 }
 
 $mnemonic = "rain enhance term seminar upper must gun uniform huge brown fresh gun warrior mesh tag";
@@ -58,6 +56,9 @@ echo "initialize from xpub (M/{$purpose}'/0'/0'): \n";
 
 $xpub = HierarchicalKeyFactory::fromExtended($purposePub);
 
+$addressCreator = new AddressCreator();
+$script0 = getScriptPubKey($xpub->derivePath("0/0"), $purpose);
+$script1 = getScriptPubKey($xpub->derivePath("0/1"), $purpose);
+echo "0/0: ".$addressCreator->fromOutputScript($script0)->getAddress().PHP_EOL;
+echo "0/1: ".$addressCreator->fromOutputScript($script1)->getAddress().PHP_EOL;
 
-echo "0/0: ".toAddress($xpub->derivePath("0/0"), $purpose)->getAddress().PHP_EOL;
-echo "0/1: ".toAddress($xpub->derivePath("0/1"), $purpose)->getAddress().PHP_EOL;

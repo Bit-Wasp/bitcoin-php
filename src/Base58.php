@@ -23,7 +23,6 @@ class Base58
      *
      * @param BufferInterface $buffer
      * @return string
-     * @throws \Exception
      */
     public static function encode(BufferInterface $buffer): string
     {
@@ -89,7 +88,6 @@ class Base58
     /**
      * @param BufferInterface $data
      * @return BufferInterface
-     * @throws \Exception
      */
     public static function checksum(BufferInterface $data): BufferInterface
     {
@@ -127,7 +125,6 @@ class Base58
      *
      * @param BufferInterface $data
      * @return string
-     * @throws \Exception
      */
     public static function encodeCheck(BufferInterface $data): string
     {
