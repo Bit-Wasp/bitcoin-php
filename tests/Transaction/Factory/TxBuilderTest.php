@@ -94,7 +94,8 @@ class TxBuilderTest extends AbstractTestCase
         $tx = $builder->get();
 
         $output = $tx->getOutput(0);
-        $this->assertEquals(ScriptFactory::scriptPubKey()->payToAddress($address)->getBinary(), $output->getScript()->getBinary());
+        $script = $address->getScriptPubKey();
+        $this->assertEquals($script->getBinary(), $output->getScript()->getBinary());
         $this->assertEquals($value, $output->getValue());
     }
 
@@ -149,7 +150,7 @@ class TxBuilderTest extends AbstractTestCase
      */
     public function testPayToAddress2(AddressInterface $address)
     {
-        $expectedScript = ScriptFactory::scriptPubKey()->payToAddress($address);
+        $expectedScript = $address->getScriptPubKey();
 
         $builder = new TxBuilder();
         $builder->payToAddress(50, $address);

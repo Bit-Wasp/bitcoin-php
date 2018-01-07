@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\Output;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentDetails;
 use BitWasp\Bitcoin\PaymentProtocol\Protobufs\PaymentRequest;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
@@ -112,7 +111,7 @@ class RequestBuilder
      */
     public function addAddressPayment(AddressInterface $address, int $value)
     {
-        $script = ScriptFactory::scriptPubKey()->payToAddress($address);
+        $script = $address->getScriptPubKey();
         $output = new TransactionOutput($value, $script);
         return $this->addOutput($output);
     }

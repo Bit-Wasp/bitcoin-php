@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Script\Factory;
 
-use BitWasp\Bitcoin\Address\AddressInterface;
-use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -17,17 +15,6 @@ use BitWasp\Buffertools\Buffertools;
 
 class OutputScriptFactory
 {
-    /**
-     * @param AddressInterface $address
-     * @return ScriptInterface
-     */
-    public function payToAddress(AddressInterface $address): ScriptInterface
-    {
-        return $address instanceof ScriptHashAddress
-            ? ScriptFactory::sequence([Opcodes::OP_HASH160, $address->getHash(), Opcodes::OP_EQUAL])
-            : ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $address->getHash(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
-    }
-
     /**
      * @param PublicKeyInterface $publicKey
      * @return ScriptInterface
@@ -120,9 +107,9 @@ class OutputScriptFactory
      * @param bool|true $sort
      * @return ScriptInterface
      */
-    public function multisig(int $m, array $keys = [], $sort = true): ScriptInterface
+    public function multisig(int $m, array $keys = [], bool $sort = true): ScriptInterface
     {
-        return self::multisigKeyBuffers($m, array_map(function (PublicKeyInterface $key) {
+        return self::multisigKeyBuffers($m, array_map(function (PublicKeyInterface $key): BufferInterface {
             return $key->getBuffer();
         }, $keys), $sort);
     }
@@ -130,10 +117,10 @@ class OutputScriptFactory
     /**
      * @param int $m
      * @param BufferInterface[] $keys
-     * @param bool|true $sort
+     * @param bool $sort
      * @return ScriptInterface
      */
-    public function multisigKeyBuffers(int $m, array $keys = [], $sort = true): ScriptInterface
+    public function multisigKeyBuffers(int $m, array $keys = [], bool $sort = true): ScriptInterface
     {
         $n = count($keys);
         if ($m < 0) {
@@ -155,7 +142,7 @@ class OutputScriptFactory
         $new = ScriptFactory::create();
         $new->int($m);
         foreach ($keys as $key) {
-            if ($key->getSize() != PublicKey::LENGTH_COMPRESSED && $key->getSize() != PublicKey::LENGTH_UNCOMPRESSED) {
+            if ($key->getSize() !== PublicKey::LENGTH_COMPRESSED && $key->getSize() !== PublicKey::LENGTH_UNCOMPRESSED) {
                 throw new \RuntimeException("Invalid length for public key buffer");
             }
 

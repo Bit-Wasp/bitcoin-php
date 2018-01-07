@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Script\Factory;
 
-use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
-use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
@@ -22,31 +20,6 @@ use Mdanter\Ecc\Primitives\Point;
 
 class OutputScriptFactoryTest extends AbstractTestCase
 {
-    public function testPayToAddress()
-    {
-        $publicKey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $p2pkh = new PayToPubKeyHashAddress($publicKey->getPubKeyHash());
-        $p2pkhScript = ScriptFactory::scriptPubKey()->payToAddress($p2pkh);
-        $parsedScript = $p2pkhScript->getScriptParser()->decode();
-
-        $classifier = new OutputClassifier();
-        $this->assertEquals(Opcodes::OP_DUP, $parsedScript[0]->getOp());
-        $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[1]->getOp());
-        $this->assertTrue($p2pkh->getHash()->equals($parsedScript[2]->getData()));
-        $this->assertEquals(Opcodes::OP_EQUALVERIFY, $parsedScript[3]->getOp());
-        $this->assertEquals(Opcodes::OP_CHECKSIG, $parsedScript[4]->getOp());
-        $this->assertEquals(ScriptType::P2PKH, $classifier->classify($p2pkhScript));
-
-        $multisig = ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]);
-        $p2sh = new ScriptHashAddress($multisig->getScriptHash());
-        $p2shScript = ScriptFactory::scriptPubKey()->payToAddress($p2sh);
-        $parsedScript = $p2shScript->getScriptParser()->decode();
-        $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[0]->getOp());
-        $this->assertTrue($p2sh->getHash()->equals($parsedScript[1]->getData()));
-        $this->assertEquals(Opcodes::OP_EQUAL, $parsedScript[2]->getOp());
-        $this->assertEquals(ScriptType::P2SH, $classifier->classify($p2shScript));
-    }
-
     public function testPayToPubKey()
     {
         $x = gmp_init('61365198687444549113797742543489768233362236615628880309411002867851217134145', 10);
