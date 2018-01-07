@@ -3,7 +3,6 @@
 require __DIR__ . "/../../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\AddressCreator;
-use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\PaymentProtocol\RequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\RequestSigner;
 

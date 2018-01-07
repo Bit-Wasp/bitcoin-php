@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Address;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
 use BitWasp\Bitcoin\Address\Base58AddressInterface;
 use BitWasp\Bitcoin\Address\Bech32AddressInterface;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
@@ -19,6 +18,7 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
+use BitWasp\Bitcoin\Tests\Script\ScriptInfo\PaytoPubkeyTest;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Bitcoin\Address\AddressCreator;
 
@@ -88,7 +88,7 @@ class AddressTest extends AbstractTestCase
     {
         if ($type === 'pubkeyhash') {
             $pubKey = PublicKeyFactory::fromHex($data);
-            $obj = AddressFactory::p2pkh($pubKey);
+            $obj = new PayToPubKeyHashAddress($pubKey->getPubKeyHash());
             $this->assertInstanceOf(PayToPubKeyHashAddress::class, $obj);
 
             $pubKeyHash = $pubKey->getPubKeyHash();
@@ -97,7 +97,7 @@ class AddressTest extends AbstractTestCase
             $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
         } else if ($type === 'script') {
             $redeemScript = ScriptFactory::fromHex($data);
-            $obj = AddressFactory::p2sh($redeemScript);
+            $obj = new ScriptHashAddress($redeemScript->getScriptHash());
             $this->assertInstanceOf(ScriptHashAddress::class, $obj);
 
             $scriptHash = $redeemScript->getScriptHash() ;
@@ -110,7 +110,7 @@ class AddressTest extends AbstractTestCase
             $this->assertTrue($script->isWitness($witnessProgram));
 
             /** @var WitnessProgram $witnessProgram */
-            $obj = AddressFactory::fromWitnessProgram($witnessProgram);
+            $obj = new SegwitAddress($witnessProgram);
             $this->assertInstanceOf(SegwitAddress::class, $obj);
         } else {
             throw new \Exception('Unknown address type');

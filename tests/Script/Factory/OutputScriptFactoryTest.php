@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Script\Factory;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
@@ -24,7 +25,7 @@ class OutputScriptFactoryTest extends AbstractTestCase
     public function testPayToAddress()
     {
         $publicKey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $p2pkh = AddressFactory::p2pkh($publicKey);
+        $p2pkh = new PayToPubKeyHashAddress($publicKey->getPubKeyHash());
         $p2pkhScript = ScriptFactory::scriptPubKey()->payToAddress($p2pkh);
         $parsedScript = $p2pkhScript->getScriptParser()->decode();
 
@@ -36,7 +37,8 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals(Opcodes::OP_CHECKSIG, $parsedScript[4]->getOp());
         $this->assertEquals(ScriptType::P2PKH, $classifier->classify($p2pkhScript));
 
-        $p2sh = AddressFactory::p2sh(ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]));
+        $multisig = ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]);
+        $p2sh = new ScriptHashAddress($multisig->getScriptHash());
         $p2shScript = ScriptFactory::scriptPubKey()->payToAddress($p2sh);
         $parsedScript = $p2shScript->getScriptParser()->decode();
         $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[0]->getOp());

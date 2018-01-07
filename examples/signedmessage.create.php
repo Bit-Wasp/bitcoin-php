@@ -2,7 +2,7 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
@@ -14,5 +14,5 @@ $message = 'hi';
 
 $signer = new MessageSigner($ec);
 $signed = $signer->sign($message, $privateKey);
-$address = AddressFactory::p2pkh($privateKey->getPublicKey());
+$address = new PayToPubKeyHashAddress($privateKey->getPublicKey()->getPubKeyHash());
 echo sprintf("Signed by %s\n%s\n", $address->getAddress(), $signed->getBuffer()->getBinary());

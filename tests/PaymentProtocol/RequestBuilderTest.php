@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\PaymentProtocol;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\PaymentProtocol\RequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\RequestSigner;
@@ -57,7 +57,7 @@ class RequestBuilderTest extends Bip70Test
         $builder =  new RequestBuilder();
         $builder->setTime(1);
         $pubkey = PublicKeyFactory::fromHex('0496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858ee');
-        $address = AddressFactory::p2pkh($pubkey);
+        $address = new PayToPubKeyHashAddress($pubkey->getPubKeyHash());
         $script = ScriptFactory::scriptPubKey()->payToAddress($address);
 
         $builder->addAddressPayment($address, 50);
