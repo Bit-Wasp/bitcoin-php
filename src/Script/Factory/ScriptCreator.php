@@ -9,7 +9,6 @@ use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -133,16 +132,6 @@ class ScriptCreator
             $this->push(Number::int($n)->getBuffer());
         }
 
-        return $this;
-    }
-
-    /**
-     * @param Serializable $object
-     * @return $this
-     */
-    public function pushSerializable(Serializable $object)
-    {
-        $this->push($object->getBuffer());
         return $this;
     }
 
