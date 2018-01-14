@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Crypto;
 
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use lastguest\Murmur;
 
 class Hash
 {
@@ -112,7 +113,7 @@ class Hash
      */
     public static function murmur3(BufferInterface $data, int $seed): BufferInterface
     {
-        return new Buffer(pack('N', murmurhash3_int($data->getBinary(), (int)$seed)), 4);
+        return new Buffer(pack('N', Murmur::hash3_int($data->getBinary(), $seed)), 4);
     }
 
     /**
