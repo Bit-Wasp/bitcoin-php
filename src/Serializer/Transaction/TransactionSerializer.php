@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\Transaction;
@@ -51,9 +52,23 @@ class TransactionSerializer implements TransactionSerializerInterface
         $this->uint32le = Types::uint32le();
         $this->varint = Types::varint();
 
-        $this->inputSerializer = $inputSerializer ?: new TransactionInputSerializer(new OutPointSerializer());
-        $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer;
-        $this->witnessSerializer = $witnessSerializer ?: new ScriptWitnessSerializer();
+        if ($inputSerializer === null || $outputSerializer === null) {
+            $opcodes = new Opcodes();
+            if (!$inputSerializer) {
+                $inputSerializer = new TransactionInputSerializer(new OutPointSerializer(), $opcodes);
+            }
+            if (!$outputSerializer) {
+                $outputSerializer = new TransactionOutputSerializer($opcodes);
+            }
+        }
+
+        if (!$witnessSerializer) {
+            $witnessSerializer = new ScriptWitnessSerializer();
+        }
+
+        $this->inputSerializer = $inputSerializer;
+        $this->outputSerializer = $outputSerializer;
+        $this->witnessSerializer = $witnessSerializer;
     }
 
     /**
