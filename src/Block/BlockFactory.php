@@ -6,8 +6,13 @@ namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
+use BitWasp\Bitcoin\Serializer\Script\ScriptWitnessSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -34,10 +39,15 @@ class BlockFactory
      */
     public static function fromBuffer(BufferInterface $buffer, Math $math = null): BlockInterface
     {
+        $opcodes = new Opcodes();
         $serializer = new BlockSerializer(
             $math ?: Bitcoin::getMath(),
             new BlockHeaderSerializer(),
-            new TransactionSerializer()
+            new TransactionSerializer(
+                new TransactionInputSerializer(new OutPointSerializer(), $opcodes),
+                new TransactionOutputSerializer($opcodes),
+                new ScriptWitnessSerializer()
+            )
         );
 
         return $serializer->parse($buffer);
