@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
@@ -28,14 +29,21 @@ class TransactionInputSerializer
     private $uint32le;
 
     /**
+     * @var Opcodes
+     */
+    private $opcodes;
+
+    /**
      * TransactionInputSerializer constructor.
      * @param OutPointSerializerInterface $outPointSerializer
+     * @param Opcodes|null $opcodes
      */
-    public function __construct(OutPointSerializerInterface $outPointSerializer)
+    public function __construct(OutPointSerializerInterface $outPointSerializer, Opcodes $opcodes = null)
     {
         $this->outpointSerializer = $outPointSerializer;
         $this->varstring = Types::varstring();
         $this->uint32le = Types::uint32le();
+        $this->opcodes = $opcodes ?: new Opcodes();
     }
 
     /**
@@ -60,7 +68,7 @@ class TransactionInputSerializer
     {
         return new TransactionInput(
             $this->outpointSerializer->fromParser($parser),
-            new Script($this->varstring->read($parser)),
+            new Script($this->varstring->read($parser), $this->opcodes),
             $this->uint32le->read($parser)
         );
     }
