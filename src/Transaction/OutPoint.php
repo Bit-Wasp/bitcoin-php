@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Transaction;
 
+use BitWasp\Bitcoin\Exceptions\InvalidHashLengthException;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Bitcoin\Util\IntRange;
@@ -26,11 +27,12 @@ class OutPoint extends Serializable implements OutPointInterface
      * OutPoint constructor.
      * @param BufferInterface $hashPrevOutput
      * @param int $nPrevOutput
+     * @throws InvalidHashLengthException
      */
     public function __construct(BufferInterface $hashPrevOutput, int $nPrevOutput)
     {
         if ($hashPrevOutput->getSize() !== 32) {
-            throw new \InvalidArgumentException('OutPoint: hashPrevOut must be a 32-byte Buffer');
+            throw new InvalidHashLengthException('OutPoint: hashPrevOut must be a 32-byte Buffer');
         }
 
         if ($nPrevOutput < 0 || $nPrevOutput > IntRange::U32_MAX) {

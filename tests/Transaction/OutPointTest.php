@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Transaction;
 
+use BitWasp\Bitcoin\Exceptions\InvalidHashLengthException;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Buffertools\Buffer;
@@ -11,11 +12,14 @@ use BitWasp\Buffertools\Buffer;
 class OutPointTest extends AbstractTestCase
 {
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidHashLengthException
      * @expectedExceptionMessage OutPoint: hashPrevOut must be a 32-byte Buffer
      */
     public function testInvalidHashSize()
     {
+        $this->expectException(InvalidHashLengthException::class);
+        $this->expectExceptionMessage("OutPoint: hashPrevOut must be a 32-byte Buffer");
+
         new OutPoint(new Buffer('', 8), 1);
     }
 
