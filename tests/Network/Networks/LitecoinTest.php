@@ -13,7 +13,7 @@ class LitecoinTest extends AbstractTestCase
     {
         $network = new Litecoin();
         $this->assertEquals('30', $network->getAddressByte());
-        $this->assertEquals('05', $network->getP2shByte());
+        $this->assertEquals('32', $network->getP2shByte());
         $this->assertEquals('b0', $network->getPrivByte());
         $this->assertEquals('019d9cfe', $network->getHDPrivByte());
         $this->assertEquals('019da462', $network->getHDPubByte());

@@ -23,7 +23,7 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals('2Mwx4ckFK9pLBeknxCZt17tajwBEQXxNaWV', $p2sh->getAddress(NetworkFactory::bitcoinTestnet()));
         $this->assertEquals('mg9fuhDDAbD673KswdNyyWgaX8zDxJT8QY', $p2pk->getAddress(NetworkFactory::bitcoinTestnet()));
 
-        $this->assertEquals('36PrZ1KHYMpqSyAQXSG8VwbUiq2EogxLo2', $p2sh->getAddress(NetworkFactory::litecoin()));
+        $this->assertEquals('MCbzrtjFVUgGFUSJdKFUKaqt3Xcgpi6Csx', $p2sh->getAddress(NetworkFactory::litecoin()));
         $this->assertEquals('LKrfsrS4SE1tajYRQCPuRcY1sMkoFf1BN3', $p2pk->getAddress(NetworkFactory::litecoin()));
 
         $this->assertEquals('EMrk83fMRQoNM74qDBb45TDWLxEehWXA7u', $p2sh->getAddress(NetworkFactory::viacoin()));
