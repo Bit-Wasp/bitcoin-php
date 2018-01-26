@@ -86,6 +86,8 @@ class MerkleRootTest extends AbstractTestCase
     {
         $transactions = $this->getTransactionCollection($txArray);
         $merkle = new MerkleRoot($math, $transactions);
-        $this->assertEquals($eMerkleRoot, $merkle->calculateHash());
+        $this->assertEquals($eMerkleRoot->getHex(), $merkle->calculateHash()->getHex());
+
+        $this->assertTrue($eMerkleRoot->equals($merkle->calculateHash()));
     }
 }
