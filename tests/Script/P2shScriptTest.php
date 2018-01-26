@@ -58,7 +58,7 @@ class P2shScriptTest extends AbstractTestCase
         $this->assertTrue($p2shScript->getOutputScript()->equals($expectedP2sh));
 
         $addressCreator = new AddressCreator();
-        $expectedAddress = $addressCreator->fromScript($script)->getAddress();
+        $expectedAddress = $addressCreator->fromRedeemScript($script)->getAddress();
         $this->assertEquals($expectedAddress, $p2shScript->getAddress()->getAddress());
     }
 

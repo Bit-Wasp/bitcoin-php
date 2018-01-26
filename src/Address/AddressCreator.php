@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException;
+use BitWasp\Bitcoin\Exceptions\UnrecognizedScriptForAddressException;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\P2shScript;
@@ -59,7 +60,8 @@ class AddressCreator extends BaseAddressCreator
 
     /**
      * @param ScriptInterface $outputScript
-     * @return Address
+     * @return Address|PayToPubKeyHashAddress|ScriptHashAddress|SegwitAddress
+     * @throws UnrecognizedScriptForAddressException
      */
     public function fromOutputScript(ScriptInterface $outputScript)
     {
@@ -82,7 +84,7 @@ class AddressCreator extends BaseAddressCreator
                 /** @var BufferInterface $solution */
                 return new ScriptHashAddress($decode->getSolution());
             default:
-                throw new UnrecognizedAddressException('Script type is not associated with an address');
+                throw new UnrecognizedScriptForAddressException('Script type is not associated with an address');
         }
     }
 
@@ -104,7 +106,7 @@ class AddressCreator extends BaseAddressCreator
             return $bech32Address;
         }
 
-        throw new UnrecognizedAddressException();
+        throw new UnrecognizedAddressException("Address not understood");
     }
 
     /**
@@ -113,7 +115,7 @@ class AddressCreator extends BaseAddressCreator
      * @param KeyInterface $key
      * @return PayToPubKeyHashAddress
      */
-    public static function fromKey(KeyInterface $key)
+    public function fromKey(KeyInterface $key)
     {
         return new PayToPubKeyHashAddress($key->getPubKeyHash());
     }
@@ -124,16 +126,20 @@ class AddressCreator extends BaseAddressCreator
      * @param ScriptInterface $p2shScript
      * @return ScriptHashAddress
      */
-    public static function fromScript(ScriptInterface $p2shScript)
+    public function fromRedeemScript(ScriptInterface $p2shScript)
     {
-        return new ScriptHashAddress($p2shScript->getScriptHash());
+        if ($p2shScript instanceof WitnessScript) {
+            throw new \LogicException("Cannot create a P2SH address directly for a WitnessScript");
+        } else {
+            return new ScriptHashAddress($p2shScript->getScriptHash());
+        }
     }
 
     /**
      * @param WitnessProgram $wp
      * @return SegwitAddress
      */
-    public static function fromWitnessProgram(WitnessProgram $wp)
+    public function fromWitnessProgram(WitnessProgram $wp)
     {
         return new SegwitAddress($wp);
     }

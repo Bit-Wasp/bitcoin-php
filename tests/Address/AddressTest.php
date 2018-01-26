@@ -85,7 +85,7 @@ class AddressTest extends AbstractTestCase
             $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
         } else if ($type === 'script') {
             $p2shScript = ScriptFactory::fromHex($data);
-            $obj = $addressCreator->fromScript($p2shScript);
+            $obj = $addressCreator->fromRedeemScript($p2shScript);
             $script = ScriptFactory::scriptPubKey()->payToScriptHash($obj->getHash());
         } else if ($type === 'witness') {
             $script = ScriptFactory::fromHex($data);
@@ -115,18 +115,6 @@ class AddressTest extends AbstractTestCase
         $this->assertTrue($script->equals($toScript));
     }
 
-    /**
-     * @expectedException \BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException
-     */
-    public function testAddressFailswithBytes()
-    {
-        $add = 'LPjNgqp43ATwzMTJPM2SFoEYeyJV6pq6By';
-
-        $network = Bitcoin::getNetwork();
-        $addressCreator = new AddressCreator();
-        $addressCreator->fromString($add, $network);
-    }
-
     public function testFromOutputScriptSuccess()
     {
         $outputScriptFactory = ScriptFactory::scriptPubKey();
@@ -141,16 +129,5 @@ class AddressTest extends AbstractTestCase
 
         $scriptAddress = $addressCreator->fromOutputScript($scriptHash);
         $this->assertInstanceOf(ScriptHashAddress::class, $scriptAddress);
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Script type is not associated with an address
-     */
-    public function testFromOutputScript()
-    {
-        $unknownScript = ScriptFactory::create()->op('OP_0')->op('OP_1')->getScript();
-        $addressCreator = new AddressCreator();
-        $addressCreator->fromOutputScript($unknownScript);
     }
 }
