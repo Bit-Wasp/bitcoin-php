@@ -156,14 +156,14 @@ class NetworkTest extends AbstractTestCase
         $this->assertEquals('mg9fuhDDAbD673KswdNyyWgaX8zDxJT8QY', $p2pk->getAddress(NetworkFactory::bitcoinTestnet()));
 
         $this->assertEquals(NetworkFactory::litecoin()->getAddressByte(), '30');
-        $this->assertEquals(NetworkFactory::litecoin()->getP2shByte(), '05');
+        $this->assertEquals(NetworkFactory::litecoin()->getP2shByte(), '32');
         $this->assertEquals(NetworkFactory::litecoin()->getPrivByte(), 'b0');
         $this->assertEquals(NetworkFactory::litecoin()->isTestnet(), false);
         $this->assertEquals(NetworkFactory::litecoin()->getHDPrivByte(), '019d9cfe');
         $this->assertEquals(NetworkFactory::litecoin()->getHDPubByte(), '019da462');
         $this->assertEquals(NetworkFactory::litecoin()->getNetMagicBytes(), 'dbb6c0fb');
 
-        $this->assertEquals('36PrZ1KHYMpqSyAQXSG8VwbUiq2EogxLo2', $p2sh->getAddress(NetworkFactory::litecoin()));
+        $this->assertEquals('MCbzrtjFVUgGFUSJdKFUKaqt3Xcgpi6Csx', $p2sh->getAddress(NetworkFactory::litecoin()));
         $this->assertEquals('LKrfsrS4SE1tajYRQCPuRcY1sMkoFf1BN3', $p2pk->getAddress(NetworkFactory::litecoin()));
 
         $this->assertEquals(NetworkFactory::viacoin()->getAddressByte(), '47');
