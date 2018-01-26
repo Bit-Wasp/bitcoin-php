@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\SignedMessage;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
@@ -37,7 +37,8 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
     {
         list ($message, $address, $content, $network) = $this->sampleMessage();
         /** @var PayToPubKeyHashAddress $address */
-        $address = AddressFactory::fromString($address, $network);
+        $addressCreator = new AddressCreator();
+        $address = $addressCreator->fromString($address, $network);
         $serializer = new SignedMessageSerializer(
             EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
         );

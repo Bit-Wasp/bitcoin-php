@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Uri;
 
@@ -11,7 +11,8 @@ class UriTest extends AbstractTestCase
     public function testDefault()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $address = AddressFactory::fromString($string);
+        $addressCreator = new AddressCreator();
+        $address = $addressCreator->fromString($string);
         $uri = new Uri($address);
         $this->assertEquals('bitcoin:'.$string, $uri->uri());
     }
@@ -19,7 +20,8 @@ class UriTest extends AbstractTestCase
     public function testAmount()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $address = AddressFactory::fromString($string);
+        $addressCreator = new AddressCreator();
+        $address = $addressCreator->fromString($string);
         $uri = new Uri($address);
 
         $amount = new Amount();
@@ -31,7 +33,8 @@ class UriTest extends AbstractTestCase
     public function testAmountBtc()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $address = AddressFactory::fromString($string);
+        $addressCreator = new AddressCreator();
+        $address = $addressCreator->fromString($string);
         $uri = new Uri($address);
 
         $uri->setAmountBtc(1);
@@ -44,7 +47,8 @@ class UriTest extends AbstractTestCase
     public function testLabel()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $address = AddressFactory::fromString($string);
+        $addressCreator = new AddressCreator();
+        $address = $addressCreator->fromString($string);
         $uri = new Uri($address);
         $uri->setLabel('this is the label');
 
@@ -54,7 +58,8 @@ class UriTest extends AbstractTestCase
     public function testMessage()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $address = AddressFactory::fromString($string);
+        $addressCreator = new AddressCreator();
+        $address = $addressCreator->fromString($string);
         $uri = new Uri($address);
         $uri->setMessage('this is the label');
 
@@ -64,7 +69,8 @@ class UriTest extends AbstractTestCase
     public function testRequestUrl()
     {
         $string = '1FeDtFhARLxjKUPPkQqEBL78tisenc9znS';
-        $address = AddressFactory::fromString($string);
+        $addressCreator = new AddressCreator();
+        $address = $addressCreator->fromString($string);
         $uri = new Uri($address);
         $uri->setRequestUrl('https://example.com/request');
 

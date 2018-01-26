@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -380,7 +380,8 @@ class SignerTest extends AbstractTestCase
         $keyPair = PrivateKeyFactory::fromWif($wif, null, $network);
 
         $spk = ScriptFactory::scriptPubKey()->payToPubKey($keyPair->getPublicKey());
-        $dest = AddressFactory::fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
+        $addressCreator = new AddressCreator();
+        $dest = $addressCreator->fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
 
         $txb = (new TxBuilder())
             ->version(2)
@@ -409,7 +410,8 @@ class SignerTest extends AbstractTestCase
         $vout = 0;
         $network = NetworkFactory::bitcoinTestnet();
 
-        $dest = AddressFactory::fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
+        $addressCreator = new AddressCreator();
+        $dest = $addressCreator->fromString('mzDktdwPcWwqg8aZkPotx6aYi4mKvDD7ay', $network)->getScriptPubKey();
 
         $txb = (new TxBuilder())
             ->version(2)

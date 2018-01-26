@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Serializable;
@@ -47,6 +47,6 @@ abstract class Key extends Serializable implements KeyInterface
      */
     public function getAddress()
     {
-        return AddressFactory::fromKey($this);
+        return new PayToPubKeyHashAddress($this->getPubKeyHash());
     }
 }

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Exceptions\P2shScriptException;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -10,7 +10,6 @@ use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -58,7 +57,8 @@ class P2shScriptTest extends AbstractTestCase
         $expectedP2sh = ScriptFactory::scriptPubKey()->p2sh($script->getScriptHash());
         $this->assertTrue($p2shScript->getOutputScript()->equals($expectedP2sh));
 
-        $expectedAddress = AddressFactory::fromScript($script)->getAddress();
+        $addressCreator = new AddressCreator();
+        $expectedAddress = $addressCreator->fromScript($script)->getAddress();
         $this->assertEquals($expectedAddress, $p2shScript->getAddress()->getAddress());
     }
 
