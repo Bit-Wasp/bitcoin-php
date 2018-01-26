@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Exceptions\InvalidHashLengthException;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Buffertools\BufferInterface;
@@ -55,11 +56,11 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     public function __construct(int $version, BufferInterface $prevBlock, BufferInterface $merkleRoot, int $timestamp, int $bits, int $nonce)
     {
         if ($prevBlock->getSize() !== 32) {
-            throw new \InvalidArgumentException('BlockHeader prevBlock must be a 32-byte Buffer');
+            throw new InvalidHashLengthException('BlockHeader prevBlock must be a 32-byte Buffer');
         }
 
         if ($merkleRoot->getSize() !== 32) {
-            throw new \InvalidArgumentException('BlockHeader merkleRoot must be a 32-byte Buffer');
+            throw new InvalidHashLengthException('BlockHeader merkleRoot must be a 32-byte Buffer');
         }
 
         $this->version = $version;
