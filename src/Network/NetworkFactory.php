@@ -84,7 +84,7 @@ class NetworkFactory
      */
     public static function litecoin()
     {
-        $network = self::create('30', '05', 'b0')
+        $network = self::create('30', '32', 'b0')
             ->setHDPubByte('019da462')
             ->setHDPrivByte('019d9cfe')
             ->setNetMagicBytes('dbb6c0fb');
