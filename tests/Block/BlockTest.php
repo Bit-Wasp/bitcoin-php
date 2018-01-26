@@ -72,6 +72,19 @@ class BlockTest extends AbstractTestCase
         $this->assertEquals($tx->getTxId(), $block->getMerkleRoot());
     }
 
+    public function testMissingTxIndex()
+    {
+        $hex = '010000000462442ea8de9ee6cc2dd7d76dfc4523910eb2e3bd4b202d376910de700f63bf4b000000008b48304502207db5ea602fe2e9f8e70bfc68b7f468d68910d2ff4ac50294fc80109e254f317f022100a68a66f23406fdfd93025c28ffef4e79260283335ce39a4e8d0b52c5ee41913b014104f8de51f3b278225c0fe74a856ea2481e9ad4c9385fc10cefadaa4357ecd2c4d29904902d10e376546500c127f65d0de35b6215d49dd1ef6c67e6cdd5e781ef22ffffffff10aa2a8f9211ab71ffc9df03d52450d89a9de648fdfd75c0d20e4dcb1be29cfd020000008b483045022100d088af937bd457903391023c468bdbb9dc46681c3c83ab7b101c26a41524a0e20220369597fa4737aa4408469fec831b5ce53caee8e9fec81282376c6f592be354fb01410445e476b3ea4559019c9f44dc41c103090473ce448f421f0000f2d630a62bb96af64f0fde21c84e4c5a679c43cb7b74e520dad662abfbedc86cc27cc03036c2b0ffffffff067b1e03bd8edc0496b41af958fead9d57489fa12d23f4b341ded9b78d8cb114000000008b483045022009538bca3258eb4175faa7121dca68b51d95f2ed7d24278f03e2d88077d92815022100b8706672c585e8607e18d235e69548cd28736adfa9ce4f8f5f3baffc5aad091b01410445e476b3ea4559019c9f44dc41c103090473ce448f421f0000f2d630a62bb96af64f0fde21c84e4c5a679c43cb7b74e520dad662abfbedc86cc27cc03036c2b0ffffffff7f6d4bbb8f0d9b8bcad2e431c270aac63aa9caaa880dbd1688e39b6ac0d45ff4020000008b48304502203da091fed8fc71b3c859ee1dfe9c3d0e64915502af057357effa1ae4d1e0dbbf02210090fd964dfe7286b1ab0af3e8d6686c7826039eb0b46bac9803af367f080f38e401410445e476b3ea4559019c9f44dc41c103090473ce448f421f0000f2d630a62bb96af64f0fde21c84e4c5a679c43cb7b74e520dad662abfbedc86cc27cc03036c2b0ffffffff0200b79ba7000000001976a914b5ac94f60f833b1e2dab9bc5f7895687bd750e8688acb0720200000000001976a9141b16cf7372a97b42533605e14616b6338caba8e888ac00000000';
+        $tx = TransactionFactory::fromHex($hex);
+        $header = new BlockHeader(1, Buffer::hex('00000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), Buffer::hex('12345678aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 1, 1, 1);
+        $block = new Block(new Math(), $header, $tx);
+
+        $this->assertTrue($tx->equals($block->getTransaction(0)));
+        $this->expectExceptionMessage("No transaction in the block with this index");
+
+        $block->getTransaction(1);
+    }
+
     public function testFromParser()
     {
         $txHex = '01000000'.
