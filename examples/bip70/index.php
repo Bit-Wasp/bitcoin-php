@@ -2,7 +2,7 @@
 
 require __DIR__ . "/../../vendor/autoload.php";
 
-use BitWasp\Bitcoin\Address\AddressFactory;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\PaymentProtocol\RequestBuilder;
 use BitWasp\Bitcoin\PaymentProtocol\RequestSigner;
 
@@ -18,7 +18,8 @@ $signer = new RequestSigner('x509+sha256', '../tests/ssl/server.key', '../tests/
 $builder = new RequestBuilder($signer, 'main', time());
 
 // PaymentRequests contain outputs that the wallet will fulfill
-$address = AddressFactory::fromString($destination);
+$addressCreator = new AddressCreator();
+$address = $addressCreator->fromString($destination);
 $builder->addAddressPayment($address, $amount);
 $builder->setPaymentUrl($paymentUrl);
 
@@ -32,7 +33,7 @@ fclose($fd);
 
 // Create a url + display a QR
 $encodedUrl = urlencode($fetchUrl);
-$uri = "bitcoin:$address?r=$encodedUrl&amount=0.00010000";
+$uri = "bitcoin:{$destination}?r=$encodedUrl&amount=0.00010000";
 $qr = urlencode($uri);
 
 echo "<a href='$uri'>Pay<img src='https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=$qr'></a>";
