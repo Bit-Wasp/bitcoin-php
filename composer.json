@@ -32,7 +32,7 @@
     "composer/semver": "^1.4.0",
     "lastguest/murmurhash": "v2.0.0",
     "rgooding/protobuf-php": "v0.0.1",
-    "symfony/http-foundation": "^2.7|^3.0",
+    "symfony/http-foundation": "^2.7|^3.0|^4.0",
     "mdanter/ecc": "^0.5.0",
     "bitwasp/buffertools": "^0.5.0",
     "bitwasp/secp256k1-php": "^0.1.2"
