@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin;
 
-use BitWasp\Bitcoin\Exceptions\Bech32Exception;
+use \BitWasp\Bech32\Exception\Bech32Exception;
 
 class Bech32
 {
@@ -109,7 +109,7 @@ class Bech32
                 $ret[] = ($acc << $toBits - $bits) & $maxv;
             }
         } else if ($bits >= $fromBits || ((($acc << ($toBits - $bits))) & $maxv)) {
-            throw new Bech32Exception('Invalid data');
+            throw new \BitWasp\Bech32\Exception\Bech32Exception('Invalid data');
         }
 
         return $ret;
@@ -176,61 +176,6 @@ class Bech32
      */
     public static function decode($sBech)
     {
-        $length = strlen($sBech);
-        if ($length > 90) {
-            throw new Bech32Exception('Bech32 string cannot exceed 90 characters in length');
-        }
-
-        $chars = array_values(unpack('C*', $sBech));
-
-        $haveUpper = false;
-        $haveLower = false;
-        $positionOne = -1;
-
-        for ($i = 0; $i < $length; $i++) {
-            $x = $chars[$i];
-            if ($x < 33 || $x > 126) {
-                throw new Bech32Exception('Out of range character in bech32 string');
-            }
-
-            if ($x >= 0x61 && $x <= 0x7a) {
-                $haveLower = true;
-            }
-
-            if ($x >= 0x41 && $x <= 0x5a) {
-                $haveUpper = true;
-                $x = $chars[$i] = $x + 0x20;
-            }
-
-            // find location of last '1' character
-            if ($x === 0x31) {
-                $positionOne = $i;
-            }
-        }
-
-        if ($haveUpper && $haveLower) {
-            throw new Bech32Exception('Data contains mixture of higher/lower case characters');
-        }
-
-        if ($positionOne < 1 || ($positionOne + 7) > $length) {
-            throw new Bech32Exception('Invalid location for `1` character');
-        }
-
-        $hrp = [];
-        for ($i = 0; $i < $positionOne; $i++) {
-            $hrp[$i] = chr($chars[$i]);
-        }
-
-        $hrp = implode('', $hrp);
-        $data = [];
-        for ($i = $positionOne + 1; $i < $length; $i++) {
-            $data[] = ($chars[$i] & 0x80) ? -1 : self::$charsetKey[$chars[$i]];
-        }
-
-        if (!self::verifyChecksum($hrp, $data)) {
-            throw new Bech32Exception('Invalid bech32 checksum');
-        }
-
-        return [$hrp, array_slice($data, 0, -6)];
+        return \BitWasp\Bech32\decode($sBech);
     }
 }

@@ -35,7 +35,8 @@
     "symfony/http-foundation": "^2.7|^3.0|^4.0",
     "mdanter/ecc": "^0.4.0",
     "bitwasp/buffertools": "^0.4.0",
-    "bitwasp/secp256k1-php": "^0.1.2"
+    "bitwasp/secp256k1-php": "^0.1.2",
+    "bitwasp/bech32": "^0.0.1"
   },
   "require-dev": {
     "ext-json": "*",
