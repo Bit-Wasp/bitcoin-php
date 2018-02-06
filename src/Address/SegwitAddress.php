@@ -62,6 +62,6 @@ class SegwitAddress extends Address implements Bech32AddressInterface
     {
         $network = $network ?: Bitcoin::getNetwork();
 
-        return SegwitBech32::encode($this->witnessProgram, $network);
+        return \BitWasp\Bech32\encodeSegwit($network->getSegwitBech32Prefix(), $this->witnessProgram->getVersion(), $this->witnessProgram->getProgram()->getBinary());
     }
 }
