@@ -45,24 +45,24 @@ install:
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ]; then
-            git clone https://github.com/bitcoin/secp256k1.git &&
+            git clone https://github.com/bitcoin-core/secp256k1.git &&
             cd secp256k1 &&
             ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-experimental &&
-            make && sudo make install && cd ..;
+            make && ./tests && sudo make install && cd ..;
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ] && [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
             git clone -b v0.0 https://github.com/Bit-Wasp/secp256k1-php &&
-            cd secp256k1-php/secp256k1 &&
+            cd secp256k1-php && composer install && cd secp256k1 &&
             phpize && ./configure &&
-            make && sudo make install && cd ../..;
+            make && sudo make install && php -dextension=secp256k1.so ../vendor/bin/phpunit -c ../phpunit.xml && cd ../..;
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ] && [ "$TRAVIS_PHP_VERSION" != "5.6" ]; then
             git clone -b v0.1.2 https://github.com/Bit-Wasp/secp256k1-php &&
-            cd secp256k1-php/secp256k1 &&
+            cd secp256k1-php && composer install && cd secp256k1 &&
             phpize && ./configure &&
-            make && sudo make install && cd ../..;
+            make && sudo make install && php -dextension=secp256k1.so ../vendor/bin/phpunit -c ../phpunit.xml && cd ../..;
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ]; then
