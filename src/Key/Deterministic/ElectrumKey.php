@@ -96,6 +96,18 @@ class ElectrumKey
     public function deriveChild(int $sequence, bool $change = false): KeyInterface
     {
         $key = is_null($this->masterPrivate) ? $this->masterPublic : $this->masterPrivate;
-        return $key->tweakAdd($this->getSequenceOffset($sequence, $change));
+        $offset = $this->getSequenceOffset($sequence, $change);
+        if ($this->masterPrivate) {
+            echo "derive sequence {$sequence} " . ($change ? "external":"internal") . PHP_EOL;
+            echo "sequenceOffset: " . gmp_strval($offset, 10) . PHP_EOL;
+            echo " + privKey    : " . $this->getMasterPrivateKey()->getHex().PHP_EOL;
+            $child = $key->tweakAdd($offset);
+            echo "     equals   : " . $child->getHex() . PHP_EOL;
+            echo "    pubkey    : " . $child->getPublicKey()->getHex() . PHP_EOL;
+        } else {
+            $child = $key->tweakAdd($offset);
+        }
+
+        return $child;
     }
 }

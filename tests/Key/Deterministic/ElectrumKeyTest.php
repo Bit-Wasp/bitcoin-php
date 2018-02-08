@@ -71,6 +71,18 @@ class ElectrumKeyTest extends AbstractTestCase
             list ($sequence, $eAddr) = $vector;
             $childPriv = $keyPriv->deriveChild($sequence);
             $keyHash = $childPriv->getPubKeyHash();
+
+            if ($eAddr != (new PayToPubKeyHashAddress($keyHash))->getAddress()) {
+                var_dump($mnemonic);
+                var_dump($eSecExp);
+                var_dump($eMPK);
+                var_dump($vector);
+                echo "$eAddr != expected\n";
+                echo (new PayToPubKeyHashAddress($keyHash))->getAddress() . PHP_EOL;
+                echo "childPriv: {$childPriv->getHex()}\n";
+                echo "childPrivKeyHash: {$keyHash->getHex()}\n";
+            }
+
             $this->assertEquals($eAddr, (new PayToPubKeyHashAddress($keyHash))->getAddress());
 
             $childPub = $keyPub->deriveChild($sequence);

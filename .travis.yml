@@ -87,6 +87,7 @@ script:
       elif [ "$PHPUNIT" = "true" ]; then
           make phpunit-ci;
       fi
+
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
   - if [ "$RPC_TEST" = "true" ]; then export BITCOIND_PATH="$HOME/bitcoin/bitcoin-$BITCOIN_VERSION/bin/bitcoind"; fi
