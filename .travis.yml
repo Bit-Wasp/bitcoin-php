@@ -60,7 +60,7 @@ install:
     - |
         if [ "$PHPUNIT_EXT" = "true" ] && [ "$TRAVIS_PHP_VERSION" != "5.6" ]; then
             git clone https://github.com/Bit-Wasp/secp256k1-php && cd secp256k1-php &&
-            git checkout 55dae0e0cd6c5028eadbfb76c7436d022887d044 && cd secp256k1 &&
+            git checkout 1335d166f26f67b1ba4781a7ae4434f58756d98b && cd secp256k1 &&
             phpize && ./configure &&
             make && sudo make install && cd ../..;
         fi
@@ -81,11 +81,12 @@ before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
 
 script:
+  - travis/run_secp256k1_tests.sh || exit 1
   - |
       if [ "$PHPUNIT_EXT" = "true" ]; then
-          EXT_PHP='-dextension="secp256k1.so" -dextension="bitcoinconsensus.so"' make phpunit-ci;
+          EXT_PHP='-dextension="secp256k1.so" -dextension="bitcoinconsensus.so"' make phpunit-ci || travis_terminate 1;
       elif [ "$PHPUNIT" = "true" ]; then
-          make phpunit-ci;
+          make phpunit-ci || travis_terminate 1;
       fi
 
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
