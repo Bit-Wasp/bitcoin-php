@@ -60,7 +60,7 @@ install:
     - |
         if [ "$PHPUNIT_EXT" = "true" ] && [ "$TRAVIS_PHP_VERSION" != "5.6" ]; then
             git clone https://github.com/Bit-Wasp/secp256k1-php && cd secp256k1-php &&
-            git checkout 1335d166f26f67b1ba4781a7ae4434f58756d98b && cd secp256k1 &&
+            git checkout 60678a95beccd3e093d7fc3c9f36cad46ec0ddd1 && cd secp256k1 &&
             phpize && ./configure &&
             make && sudo make install && cd ../..;
         fi
