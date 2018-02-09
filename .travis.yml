@@ -81,16 +81,11 @@ before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
 
 script:
-  - |
-      if [ "$PHPUNIT_EXT" = "true" ]; then
-          EXT_PHP='-dextension="secp256k1.so" -dextension="bitcoinconsensus.so"' make phpunit-ci;
-      elif [ "$PHPUNIT" = "true" ]; then
-          make phpunit-ci;
-      fi
+  - travis/run_secp256k1_tests.sh || exit 1
+  - travis/run_phpunit_tests.sh || exit 1
+  - travis/run_rpc_tests.sh || exit 1
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
-  - if [ "$RPC_TEST" = "true" ]; then export BITCOIND_PATH="$HOME/bitcoin/bitcoin-$BITCOIN_VERSION/bin/bitcoind"; fi
-  - if [ "$RPC_TEST" = "true" ]; then vendor/bin/phpunit --debug -c phpunit.rpc.xml; fi
 
 after_script:
   - if [ "${COVERAGE}" = "true" ]; then make scrutinizer; fi
