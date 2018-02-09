@@ -59,8 +59,8 @@ install:
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ] && [ "$TRAVIS_PHP_VERSION" != "5.6" ]; then
-            git clone -b v0.1.2 https://github.com/Bit-Wasp/secp256k1-php &&
-            cd secp256k1-php/secp256k1 &&
+            git clone https://github.com/Bit-Wasp/secp256k1-php && cd secp256k1-php &&
+            git checkout 60678a95beccd3e093d7fc3c9f36cad46ec0ddd1 && cd secp256k1 &&
             phpize && ./configure &&
             make && sudo make install && cd ../..;
         fi
@@ -81,12 +81,14 @@ before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
 
 script:
+  - travis/run_secp256k1_tests.sh || exit 1
   - |
       if [ "$PHPUNIT_EXT" = "true" ]; then
-          EXT_PHP='-dextension="secp256k1.so" -dextension="bitcoinconsensus.so"' make phpunit-ci;
+          EXT_PHP='-dextension="secp256k1.so" -dextension="bitcoinconsensus.so"' make phpunit-ci || travis_terminate 1;
       elif [ "$PHPUNIT" = "true" ]; then
-          make phpunit-ci;
+          make phpunit-ci || travis_terminate 1;
       fi
+
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
   - if [ "$RPC_TEST" = "true" ]; then export BITCOIND_PATH="$HOME/bitcoin/bitcoin-$BITCOIN_VERSION/bin/bitcoind"; fi

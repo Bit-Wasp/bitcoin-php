@@ -181,8 +181,13 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $adapter = $this->ecAdapter;
         $math = $adapter->getMath();
         $context = $adapter->getContext();
+
         $privateKey = $this->getBinary(); // mod by reference
+        echo "      privateKey = " . unpack("H*", $privateKey)[1] . PHP_EOL;
+
         $tweak = Buffer::int($math->toString($tweak), 32)->getBinary();
+        echo "      tweak = " . unpack("H*", $tweak)[1] . PHP_EOL;
+
         $ret = \secp256k1_ec_privkey_tweak_add(
             $context,
             $privateKey,
@@ -193,7 +198,9 @@ class PrivateKey extends Key implements PrivateKeyInterface
             throw new \RuntimeException('Secp256k1 privkey tweak add: failed');
         }
 
-        $secret = new Buffer($privateKey);
+        echo "      privateKey.tweaked = " . unpack("H*", $privateKey)[1] . PHP_EOL;
+        echo "      [originValue = " . unpack("H*", $this->getBinary())[1] . "]" . PHP_EOL;
+        $secret = new Buffer($privateKey, 32);
         return $adapter->getPrivateKey($secret->getGmp(), $this->compressed);
     }
 
