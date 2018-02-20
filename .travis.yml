@@ -7,14 +7,10 @@ php:
   - 7.0
   - 7.1
   - 7.2
+  - nightly
 
 env:
-  - PHPUNIT=true
-  - PHPUNIT=true COVERAGE=true
-  - PHPUNIT=true EXT_SECP256K1=true
-  - PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.13.0
-  - PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
-  - PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
+  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2
 
 dist: trusty
 sudo: required
@@ -22,34 +18,19 @@ sudo: required
 matrix:
   exclude:
       # dont want coverage on all runs, will include runs with just PHPUNIT
-    - php: 5.6
-      env: PHPUNIT=true COVERAGE=true
-    - php: hhvm
-      env: PHPUNIT=true COVERAGE=true
-    - php: 7.1
-      env: PHPUNIT=true COVERAGE=true
-    - php: 7.0
-      env: PHPUNIT=true
-
       # hhvm doesn't support our extensions
     - php: hhvm
-      env: PHPUNIT=true EXT_SECP256K1=true
-    - php: hhvm
-      env: PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.13.0
-    - php: hhvm
-      env: PHPUNIT=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
-    - php: hhvm
-      env: PHPUNIT=true EXT_SECP256K1=true EXT_CONSENSUS=true BITCOIN_VERSION=0.14.2
-
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2
+    - php: 7.0
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2
   include:
       # add tests without coverage
       # add extra test runs for php7: secp256k1+coverage, codestyle, examples
+    - php: hhvm
+      env: PHPUNIT=true
+
     - php: 7.0
-      env: PHPUNIT=true COVERAGE=true EXT_SECP256K1=true
-    - php: 7.0
-      env: CODE_STYLE=true
-    - php: 7.0
-      env: EXAMPLES=true
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2 COVERAGE=true CODE_STYLE=true EXAMPLES=true
 
 install:
     - |
@@ -92,10 +73,15 @@ install:
     - composer update
 
 before_script:
-  - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
+  - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
 
 script:
-  - if [ "$PHPUNIT" = "true" ]; then make phpunit-ci; fi
+  - |
+      if [ "$PHPUNIT_EXT" = "true" ]; then
+          EXT_PHP='-dextension="secp256k1.so" -dextension="bitcoinconsensus.so"' make phpunit-ci;
+      elif [ "$PHPUNIT" = "true" ]; then
+          make phpunit-ci;
+      fi
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
 
