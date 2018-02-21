@@ -93,7 +93,7 @@ interface InterpreterInterface
      * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, Checker $checker, ScriptWitnessInterface $witness = null);
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, $flags, CheckerBase $checker, ScriptWitnessInterface $witness = null);
 
     /**
      * @param ScriptInterface $script
@@ -103,5 +103,5 @@ interface InterpreterInterface
      * @param Checker $checker
      * @return bool
      */
-    public function evaluate(ScriptInterface $script, Stack $stack, $sigVersion, $flags, Checker $checker);
+    public function evaluate(ScriptInterface $script, Stack $stack, $sigVersion, $flags, CheckerBase $checker);
 }
