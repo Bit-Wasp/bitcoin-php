@@ -4,7 +4,6 @@ namespace BitWasp\Bitcoin\Address;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException;
 use BitWasp\Bitcoin\Exceptions\UnrecognizedScriptForAddressException;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -107,40 +106,5 @@ class AddressCreator extends BaseAddressCreator
         }
 
         throw new UnrecognizedAddressException("Address not understood");
-    }
-
-    /**
-     * Returns a pay-to-pubkey-hash address for the given public key
-     *
-     * @param KeyInterface $key
-     * @return PayToPubKeyHashAddress
-     */
-    public function fromKey(KeyInterface $key)
-    {
-        return new PayToPubKeyHashAddress($key->getPubKeyHash());
-    }
-
-    /**
-     * Takes the $p2shScript and generates the scriptHash address.
-     *
-     * @param ScriptInterface $p2shScript
-     * @return ScriptHashAddress
-     */
-    public function fromRedeemScript(ScriptInterface $p2shScript)
-    {
-        if ($p2shScript instanceof WitnessScript) {
-            throw new \LogicException("Cannot create a P2SH address directly for a WitnessScript");
-        } else {
-            return new ScriptHashAddress($p2shScript->getScriptHash());
-        }
-    }
-
-    /**
-     * @param WitnessProgram $wp
-     * @return SegwitAddress
-     */
-    public function fromWitnessProgram(WitnessProgram $wp)
-    {
-        return new SegwitAddress($wp);
     }
 }

@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptType;
@@ -34,8 +35,9 @@ class OutputScriptFactoryTest extends AbstractTestCase
         $this->assertEquals(Opcodes::OP_CHECKSIG, $parsedScript[4]->getOp());
         $this->assertEquals(ScriptType::P2PKH, $classifier->classify($p2pkhScript));
 
-        $addressCreator = new AddressCreator();
-        $p2sh = $addressCreator->fromRedeemScript(ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]));
+        $p2shScript = new P2shScript(ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]));
+        $p2sh = $p2shScript->getAddress();
+
         $p2shScript = ScriptFactory::scriptPubKey()->payToAddress($p2sh);
         $parsedScript = $p2shScript->getScriptParser()->decode();
         $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[0]->getOp());

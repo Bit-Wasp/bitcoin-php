@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Locktime;
+use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -131,9 +132,8 @@ class TxBuilderTest extends AbstractTestCase
     public function getAddresses()
     {
         $key = PrivateKeyFactory::create(false);
-        $script = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
-        $addressCreator = new AddressCreator();
-        $scriptAddress = $addressCreator->fromRedeemScript($script);
+        $script = new P2shScript(ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]));
+        $scriptAddress = $script->getAddress();
         return [
             [$key->getAddress()],
             [$scriptAddress],

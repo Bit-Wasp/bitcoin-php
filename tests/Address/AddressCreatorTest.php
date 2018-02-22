@@ -12,27 +12,11 @@ use BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Buffertools\Buffer;
 
 class AddressCreatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testFromWitnessProgram()
-    {
-        $hash = new Buffer('', 20);
-        $wp = WitnessProgram::V0($hash);
-
-        $addressCreator = new AddressCreator();
-        $address = $addressCreator->fromWitnessProgram($wp);
-
-        $this->assertInstanceOf(SegwitAddress::class, $address);
-
-        $wp2 = $address->getWitnessProgram();
-        $this->assertEquals($wp->getVersion(), $wp2->getVersion());
-        $this->assertTrue($wp->getScript()->equals($wp2->getScript()));
-    }
-
     public function testFromP2PKHOutputScript()
     {
         $keyHash = Hash::sha256ripe160(Buffer::hex("0328a8ed32daa433fdff209e9a413bb1ef43ecc67306d332a916533100418a7569"));
@@ -89,58 +73,6 @@ class AddressCreatorTest extends \PHPUnit_Framework_TestCase
         $address = $addressCreator->fromOutputScript($p2wsh);
 
         $this->assertInstanceOf(SegwitAddress::class, $address);
-    }
-
-    public function testFromKey()
-    {
-        $key = PublicKeyFactory::fromHex("0328a8ed32daa433fdff209e9a413bb1ef43ecc67306d332a916533100418a7569");
-
-        $addressCreator = new AddressCreator();
-        $address = $addressCreator->fromKey($key);
-
-        $this->assertInstanceOf(PayToPubKeyHashAddress::class, $address);
-
-        $this->assertTrue($key->getPubKeyHash()->equals($address->getHash()));
-    }
-
-    public function testFromRedeemScript()
-    {
-        $key = Buffer::hex("0328a8ed32daa433fdff209e9a413bb1ef43ecc67306d332a916533100418a7569");
-        $redeemScript = ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$key]);
-
-        $addressCreator = new AddressCreator();
-        $address = $addressCreator->fromRedeemScript($redeemScript);
-
-        $this->assertInstanceOf(ScriptHashAddress::class, $address);
-
-        $this->assertTrue($redeemScript->getScriptHash()->equals($address->getHash()));
-    }
-
-    public function testFromRedeemScriptRejectsWitnessScripts()
-    {
-        $key = Buffer::hex("0328a8ed32daa433fdff209e9a413bb1ef43ecc67306d332a916533100418a7569");
-        $redeemScript = ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$key]);
-        $redeemScript = new WitnessScript($redeemScript);
-
-        $addressCreator = new AddressCreator();
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage("Cannot create a P2SH address directly for a WitnessScript");
-
-        $addressCreator->fromRedeemScript($redeemScript);
-    }
-
-    public function testFromAddress()
-    {
-        $key = Buffer::hex("0328a8ed32daa433fdff209e9a413bb1ef43ecc67306d332a916533100418a7569");
-        $redeemScript = ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$key]);
-
-        $addressCreator = new AddressCreator();
-        $address = $addressCreator->fromRedeemScript($redeemScript);
-
-        $this->assertInstanceOf(ScriptHashAddress::class, $address);
-
-        $this->assertTrue($redeemScript->getScriptHash()->equals($address->getHash()));
     }
 
     /**
