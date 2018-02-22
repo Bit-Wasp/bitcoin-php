@@ -9,10 +9,10 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
+use BitWasp\Bitcoin\Exceptions\SignerException;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
-use BitWasp\Bitcoin\Script\Interpreter\BitcoinCashChecker;
-use BitWasp\Bitcoin\Script\Interpreter\Checker;
+use BitWasp\Bitcoin\Script\Interpreter\CheckerBase;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Stack;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -86,11 +86,6 @@ class InputSigner implements InputSignerInterface
     private $tolerateInvalidPublicKey = false;
 
     /**
-     * @var bool
-     */
-    private $redeemBitcoinCash = false;
-
-    /**
      * @var SignData
      */
     private $signData;
@@ -146,7 +141,7 @@ class InputSigner implements InputSignerInterface
     private $interpreter;
 
     /**
-     * @var Checker
+     * @var CheckerBase
      */
     private $signatureChecker;
 
@@ -174,19 +169,22 @@ class InputSigner implements InputSignerInterface
      * @param int $nInput
      * @param TransactionOutputInterface $txOut
      * @param SignData $signData
+     * @param CheckerBase $checker
      * @param TransactionSignatureSerializer|null $sigSerializer
      * @param PublicKeySerializerInterface|null $pubKeySerializer
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
+    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $tx, $nInput, TransactionOutputInterface $txOut, SignData $signData, CheckerBase $checker, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
     {
         $this->ecAdapter = $ecAdapter;
         $this->tx = $tx;
         $this->nInput = $nInput;
         $this->txOut = $txOut;
         $this->signData = $signData;
+        $defaultFlags = Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY | Interpreter::VERIFY_WITNESS;
+        $this->flags = $this->signData->hasSignaturePolicy() ? $this->signData->getSignaturePolicy() : $defaultFlags;
         $this->publicKeys = [];
         $this->signatures = [];
-
+        $this->signatureChecker = $checker;
         $this->txSigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter));
         $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
         $this->interpreter = new Interpreter($this->ecAdapter);
@@ -197,25 +195,6 @@ class InputSigner implements InputSignerInterface
      */
     public function extract()
     {
-        $defaultFlags = Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_CHECKLOCKTIMEVERIFY | Interpreter::VERIFY_CHECKSEQUENCEVERIFY | Interpreter::VERIFY_WITNESS;
-        $checker = new Checker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
-
-        if ($this->redeemBitcoinCash) {
-            // unset VERIFY_WITNESS default
-            $defaultFlags = $defaultFlags & (~Interpreter::VERIFY_WITNESS);
-
-            if ($this->signData->hasSignaturePolicy()) {
-                if ($this->signData->getSignaturePolicy() & Interpreter::VERIFY_WITNESS) {
-                    throw new \RuntimeException("VERIFY_WITNESS is not possible for bitcoin cash");
-                }
-            }
-
-            $checker = new BitcoinCashChecker($this->ecAdapter, $this->tx, $this->nInput, $this->txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
-        }
-
-        $this->flags = $this->signData->hasSignaturePolicy() ? $this->signData->getSignaturePolicy() : $defaultFlags;
-        $this->signatureChecker = $checker;
-
         $witnesses = $this->tx->getWitnesses();
         $witness = array_key_exists($this->nInput, $witnesses) ? $witnesses[$this->nInput]->all() : [];
 
@@ -234,16 +213,6 @@ class InputSigner implements InputSignerInterface
     public function tolerateInvalidPublicKey($setting)
     {
         $this->tolerateInvalidPublicKey = (bool) $setting;
-        return $this;
-    }
-
-    /**
-     * @param bool $setting
-     * @return $this
-     */
-    public function redeemBitcoinCash($setting)
-    {
-        $this->redeemBitcoinCash = (bool) $setting;
         return $this;
     }
 
@@ -274,6 +243,7 @@ class InputSigner implements InputSignerInterface
      * @param BufferInterface[] $publicKeys
      * @param int $sigVersion
      * @return \SplObjectStorage
+     * @throws \BitWasp\Bitcoin\Exceptions\ScriptRuntimeException
      */
     private function sortMultisigs(ScriptInterface $script, array $signatures, array $publicKeys, $sigVersion)
     {
@@ -397,6 +367,8 @@ class InputSigner implements InputSignerInterface
      * @param array $stack
      * @param int $sigVersion
      * @return string
+     * @throws SignerException
+     * @throws \Exception
      */
     public function extractFromValues(OutputData $outputData, array $stack, $sigVersion)
     {
@@ -407,7 +379,7 @@ class InputSigner implements InputSignerInterface
             $this->requiredSigs = 1;
             if ($size === 2) {
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
+                    throw new SignerException('Existing signatures are invalid!');
                 }
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
                 $this->publicKeys = [$this->parseStepPublicKey($stack[1])];
@@ -416,7 +388,7 @@ class InputSigner implements InputSignerInterface
             $this->requiredSigs = 1;
             if ($size === 1) {
                 if (!$this->evaluateSolution($outputData->getScript(), $stack, $sigVersion)) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
+                    throw new SignerException('Existing signatures are invalid!');
                 }
                 $this->signatures = [$this->txSigSerializer->parse($stack[0])];
             }
@@ -439,14 +411,14 @@ class InputSigner implements InputSignerInterface
 
                 // If we seem to have all signatures but fail evaluation, abort
                 if ($sigBufCount === $this->requiredSigs && !$check) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
+                    throw new SignerException('Existing signatures are invalid!');
                 }
 
                 $keyToSigMap = $this->sortMultiSigs($outputData->getScript(), $sigBufs, $keyBuffers, $sigVersion);
 
                 // Here we learn if any signatures were invalid, it won't be in the map.
                 if ($sigBufCount !== count($keyToSigMap)) {
-                    throw new \RuntimeException('Existing signatures are invalid!');
+                    throw new SignerException('Existing signatures are invalid!');
                 }
 
                 foreach ($keyBuffers as $idx => $key) {
@@ -531,6 +503,7 @@ class InputSigner implements InputSignerInterface
      * @param ScriptInterface $scriptSig
      * @param BufferInterface[] $witness
      * @return $this
+     * @throws SignerException
      */
     private function solve(SignData $signData, ScriptInterface $scriptPubKey, ScriptInterface $scriptSig, array $witness)
     {
@@ -594,14 +567,15 @@ class InputSigner implements InputSignerInterface
      * Pure function to produce a signature hash for a given $scriptCode, $sigHashType, $sigVersion.
      *
      * @param ScriptInterface $scriptCode
-     * @param int $sigHashType
-     * @param int $sigVersion
+     * @param $sigHashType
+     * @param $sigVersion
      * @return BufferInterface
+     * @throws SignerException
      */
     public function calculateSigHashUnsafe(ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
         if (!$this->signatureChecker->isDefinedHashtype($sigHashType)) {
-            throw new \RuntimeException('Invalid sigHashType requested');
+            throw new SignerException('Invalid sigHashType requested');
         }
 
         return $this->signatureChecker->getSigHash($scriptCode, $sigHashType, $sigVersion);
@@ -612,6 +586,7 @@ class InputSigner implements InputSignerInterface
      *
      * @param int $sigHashType
      * @return BufferInterface
+     * @throws SignerException
      */
     public function getSigHash($sigHashType)
     {
@@ -626,6 +601,7 @@ class InputSigner implements InputSignerInterface
      * @param int $sigHashType
      * @param int $sigVersion
      * @return TransactionSignatureInterface
+     * @throws SignerException
      */
     private function calculateSignature(PrivateKeyInterface $key, ScriptInterface $scriptCode, $sigHashType, $sigVersion)
     {
@@ -766,6 +742,7 @@ class InputSigner implements InputSignerInterface
      * @param PrivateKeyInterface $privateKey
      * @param int $sigHashType
      * @return $this
+     * @throws SignerException
      */
     public function sign(PrivateKeyInterface $privateKey, $sigHashType = SigHash::ALL)
     {

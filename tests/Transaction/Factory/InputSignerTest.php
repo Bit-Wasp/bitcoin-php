@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Script\Interpreter\Checker;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -84,8 +85,10 @@ class InputSignerTest extends AbstractTestCase
      */
     public function testInvalidSolveSignData($description, EcAdapterInterface $ecAdapter, TransactionInterface $tx, TransactionOutput $txOut, SignData $signData, $exception, $exceptionMsg)
     {
+        $checker = new Checker($ecAdapter, $tx, 0, $txOut->getValue());
+
         try {
-            (new InputSigner($ecAdapter, $tx, 0, $txOut, $signData))
+            (new InputSigner($ecAdapter, $tx, 0, $txOut, $signData, $checker))
                 ->extract();
         } catch (\Exception $caught) {
             $this->assertInstanceOf($exception, $caught);
