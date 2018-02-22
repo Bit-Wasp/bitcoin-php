@@ -57,8 +57,7 @@ class P2shScriptTest extends AbstractTestCase
         $expectedP2sh = ScriptFactory::scriptPubKey()->p2sh($script->getScriptHash());
         $this->assertTrue($p2shScript->getOutputScript()->equals($expectedP2sh));
 
-        $addressCreator = new AddressCreator();
-        $expectedAddress = $addressCreator->fromRedeemScript($script)->getAddress();
+        $expectedAddress = (new ScriptHashAddress($script->getScriptHash()))->getAddress();
         $this->assertEquals($expectedAddress, $p2shScript->getAddress()->getAddress());
     }
 

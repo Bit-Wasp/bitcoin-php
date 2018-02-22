@@ -13,6 +13,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
+use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -84,8 +85,8 @@ class AddressTest extends AbstractTestCase
             $obj = PublicKeyFactory::fromHex($data)->getAddress();
             $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
         } else if ($type === 'script') {
-            $p2shScript = ScriptFactory::fromHex($data);
-            $obj = $addressCreator->fromRedeemScript($p2shScript);
+            $p2shScript = new P2shScript(ScriptFactory::fromHex($data));
+            $obj = $p2shScript->getAddress();
             $script = ScriptFactory::scriptPubKey()->payToScriptHash($obj->getHash());
         } else if ($type === 'witness') {
             $script = ScriptFactory::fromHex($data);
