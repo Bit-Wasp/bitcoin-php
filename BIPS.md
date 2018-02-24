@@ -17,8 +17,6 @@ Some BIPs are specific to the network layer - for these see [Bitcoin P2P](https:
   - [BIP 66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki) - Strict DER Signatures
   - [BIP 67](https://github.com/bitcoin/bips/blob/master/bip-0067.mediawiki) - Deterministic P2SH multi-signature addresses
   - [BIP 69](https://github.com/bitcoin/bips/blob/master/bip-0069.mediawiki) - Lexicographical Indexing of Transaction Inputs and Outputs
-  - [BIP 70](https://github.com/bitcoin/bips/blob/master/bip-0070.mediawiki) - Payment Protocol
-  - [BIP 72](https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki) - Payment protocol URIs
   - [BIP 112](https://github.com/bitcoin/bips/blob/master/bip-0112.mediawiki) - OP_CHECKSEQUENCEVERIFY
   - [BIP 141](https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki) - Segregated Witness (Consensus layer)
   - [BIP 143](https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki) - Transaction Signature Verification for Version 0 Witness Program
