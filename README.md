@@ -1,5 +1,5 @@
   
-## Bitcoin
+Bitcoin
 =======
 
 [![Build Status](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/build-status/master)
@@ -36,3 +36,12 @@ You can install this library via Composer: `composer require bitwasp/bitcoin`
  - Easy serialization to binary representation of most classes
  - SIGHASH types when creating transactions
 
+# Other projects  
+
+ - [buffertools-php](https://github.com/Bit-Wasp/buffertools-php) - Toolkit for working with binary data in PHP
+ - [ext-secp256k1](https://github.com/Bit-Wasp/secp256k1-php) - PHP bindings to libsecp256k1
+ - [ext-bitcoinconsensus](https://github.com/Bit-Wasp/bitcoinconsensus-php) - PHP bindings to libbitcoinconsensus
+ - [bitcoin-p2p-php](https://github.com/Bit-Wasp/bitcoin-p2p-php) - PHP implementation of bitcoin P2P messaging using reactphp
+ - [stratum-php](https://github.com/Bit-Wasp/stratum-php) - PHP implementation of the stratum protocol using reactphp
+ - [electrum-discovery-php](https://github.com/Bit-Wasp/electrum-discovery-php)- Electrum server discovery (over IRC) using reactphp 
+ - [node-php](https://github.com/Bit-Wasp/node-php) - A toy project (really just for fun) a full node using bitcoin-p2p-php
