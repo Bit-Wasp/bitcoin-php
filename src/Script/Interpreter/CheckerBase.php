@@ -37,7 +37,7 @@ abstract class CheckerBase
     protected $nInput;
 
     /**
-     * @var int|string
+     * @var int
      */
     protected $amount;
 
