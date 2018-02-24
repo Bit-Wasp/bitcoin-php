@@ -31,8 +31,6 @@
     "pleonasm/merkle-tree": "1.0.0",
     "composer/semver": "^1.4.0",
     "lastguest/murmurhash": "v1.3.0",
-    "rgooding/protobuf-php": "v0.0.1",
-    "symfony/http-foundation": "^2.7|^3.0",
     "mdanter/ecc": "^0.4.0",
     "bitwasp/buffertools": "^0.4.0",
     "bitwasp/secp256k1-php": "^0.1.2"
