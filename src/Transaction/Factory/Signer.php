@@ -45,11 +45,6 @@ class Signer
     private $tolerateInvalidPublicKey = false;
 
     /**
-     * @var bool
-     */
-    private $redeemBitcoinCash = false;
-
-    /**
      * @var InputSignerInterface[]
      */
     private $signatureCreator = [];
@@ -85,7 +80,7 @@ class Signer
             return $this;
         }
 
-        throw new SignerException("Cannot change CheckreCreator after inputs have been parsed");
+        throw new SignerException("Cannot change CheckerCreator after inputs have been parsed");
     }
 
     /**
