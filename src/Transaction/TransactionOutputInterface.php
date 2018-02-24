@@ -10,7 +10,7 @@ interface TransactionOutputInterface extends SerializableInterface
     /**
      * Get the value of this output
      *
-     * @return int|string
+     * @return int
      */
     public function getValue();
 
