@@ -6,80 +6,29 @@
 
 ### OutPoint
  OutPoints wrap a Buffer of the transaction ID, and the vout index that is to be spent. 
-```php
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Transaction\OutPoint;
 
-$txid = Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1');
-$vout = 0;
-$outpoint = new OutPoint($txid, $vout);
-```
+[Creating an outpoint](../examples/doc/tx/001_create_outpoint.php)
  
 ### TransactionInput
  TransactionInputs consist of an OutPoint, the scriptSig, and a sequence number. 
  The $script has a default value of null, where an empty script will be used.  
  The $sequence has a default value of TransactionInput::SEQUENCE_FINAL (0xffffffff)
  
-```php
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
+The [TransactionInput](../src/Transaction/TransactionInput.php) class derives it's methods from [TransactionInputInterface](../src/Transaction/TransactionInputInterface.php)
 
-$txid = Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1');
-$vout = 0;
-$outpoint = new OutPoint($txid, $vout);
-
-$sequence = TransactionInput::SEQUENCE_FINAL;
-$script = new Script();
-$input = new TransactionInput($outpoint, $script, $sequence);
-```
-
-The TransactionInput class derives it's methods from TransactionInputInterface:
-[../src/Transaction/TransactionInputInterface.php]
+[Creating a TransactionInput](../examples/doc/tx/002_create_txin.php)
 
 ### TransactionOutput
-```php
-use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
+The [TransactionOutput](../src/Transaction/TransactionOutput.php) class derives it's methods from [TransactionOutputInterface](../src/Transaction/TransactionOutputInterface.php)
 
-$value = 100000000; /* amounts are satoshis */
-$script = new Script();
-$output = new TransactionOutput($value, $script);
-```
-
-The TransactionOutput class derives it's methods from TransactionOutputInterface:
-[../src/Transaction/TransactionOutputInterface.php]
+[Creating a TransactionOutput](../examples/doc/tx/003_create_txout.php)
 
 ### Transaction
-```php
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Bitcoin\Transaction\Transaction;
-use BitWasp\Bitcoin\Transaction\TransactionInput;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
+The [Transaction](../src/Transaction/Transaction.php) class derives it's methods from [TransactionInterface](../src/Transaction/TransactionInterface.php)
 
-$txid = Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1');
-$vout = 0;
-$outpoint = new OutPoint($txid, $vout);
-$input = new TransactionInput($outpoint, new Script());
-
-$value = 100000000; /* amounts are satoshis */
-$scriptPubKey = new Script();
-$output = new TransactionOutput($value, $scriptPubKey);
-
-$transaction = new Transaction(
-    1, /* version */
-    [$input], /* vTxIn */
-    [$output], /* vTxOut */
-    [], /* vWit */
-    0 /* locktime */
-);
-```
+[Creating a Transaction](../examples/doc/tx/004_create_tx.php)
 
 ## Transaction Builder
-
  The library has a simplified interface for creating transactions. The TransactionBuilder
  is used to create unsigned transactions, or simply to create a transaction from an API response. 
  
@@ -101,24 +50,7 @@ $transaction = new Transaction(
  Witness data can be added using:
   `TxBuilder::witnesses()` - providing an array of `ScriptWitnessInterface` 
   
-```php
-use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Script\Script;
-use BitWasp\Bitcoin\Locktime;
-
-$math = Bitcoin::getMath();
-$lockTime = new Locktime($math);
-$scriptPubKey = new Script();
-
-$transaction = TransactionFactory::build()
-    ->version(1)
-    ->input('abcdb7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1eabcd', 0)
-    ->output(1500000, $scriptPubKey)
-    ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
-    ->lockToBlockHeight($lockTime, 400000)
-    ->get();
-```
+[Creating a Transaction using TxBuilder](../examples/doc/tx/006_create_tx_txbuilder.php)
  
 ## Transaction Signer
 
@@ -147,136 +79,16 @@ $transaction = TransactionFactory::build()
   - Re-serializing the scriptSig and scriptWitness fields
  
 ### Simple output script: pay to pubkey hash
-```php
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Transaction\Factory\Signer;
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-
-$privateKey = PrivateKeyFactory::fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
-
-// Utxo is: outpoint.txid, outpoint.vout, txout.scriptPubKey, txout.amount
-$outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1'), 0);
-$outputScript = ScriptFactory::scriptPubKey()->payToPubKeyHash($privateKey->getPubKeyHash());
-$amount = 1501000;
-$txOut = new TransactionOutput($amount, $outputScript);
-
-$transaction = TransactionFactory::build()
-    ->spendOutPoint($outpoint)
-    ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
-    ->get();
-
-$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-$signed = (new Signer($transaction, $ec))
-    ->sign(0, $privateKey, $txOut)
-    ->get();
-```
+[Spending a public key hash output](../examples/doc/tx/007_sign_p2pkh_tx.php)
 
 ### P2SH: 1 of 2 multisig
-```php
-$privateKey = PrivateKeyFactory::fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
-$privateKey2 = PrivateKeyFactory::create();
+[Spending a 1-of-2 multisignature (P2SH) output](../examples/doc/tx/008_sign_p2sh_1of2_multisig_tx.php)
 
-// Utxo is: outpoint.txid, outpoint.vout, txout.scriptPubKey, txout.amount
-$outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1'), 0);
+### Witness V0 ScriptHash: 2 of 2 multisig
+[Spending a 2-of-2 multisignature (P2WSH) output](../examples/doc/tx/009_sign_p2wsh_2of2_multisig_tx.php)
 
-$redeemScript = ScriptFactory::p2sh()->multisig(1, [$privateKey->getPublicKey(), $privateKey2->getPublicKey()]);
-$outputScript = $redeemScript->getOutputScript();
-
-$amount = 1501000;
-$txOut = new TransactionOutput($amount, $outputScript);
-
-$transaction = TransactionFactory::build()
-    ->spendOutPoint($outpoint)
-    ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
-    ->get();
-
-$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-$signed = (new Signer($transaction, $ec))
-    ->sign(0, $privateKey, $txOut, $redeemScript)
-    ->get();
-```
-
-### Witness V0 ScriptHash: 1 of 2 multisig
-```php
-use BitWasp\Bitcoin\Transaction\Factory\Signer;
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Script\WitnessProgram;
-
-$privateKey = PrivateKeyFactory::fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
-$privateKey2 = PrivateKeyFactory::create();
-
-// Utxo is: outpoint.txid, outpoint.vout, txout.scriptPubKey, txout.amount
-$outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1'), 0);
-
-$witnessScript = ScriptFactory::scriptPubKey()->multisig(1, [$privateKey->getPublicKey(), $privateKey2->getPublicKey()]);
-$witnessProgram = new WitnessProgram(0, Hash::sha256($witnessScript->getBuffer()));
-$outputScript = $witnessProgram->getScript();
-
-$amount = 1501000;
-$txOut = new TransactionOutput($amount, $outputScript);
-
-$transaction = TransactionFactory::build()
-    ->spendOutPoint($outpoint)
-    ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
-    ->get();
-
-$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-$signed = (new Signer($transaction, $ec))
-    ->sign(0, $privateKey, $txOut, null, $witnessScript)
-    ->get();
-
-echo "Get non-witness transaction " . $signed->getBuffer()->getHex() . PHP_EOL . PHP_EOL;
-echo "Get witness bearing transaction: " . $signed->getWitnessBuffer()->getHex() . PHP_EOL;
-```
-
-
-### P2SH | Witness V0 Script Hash: 1 of 2 multisig
-```php
-
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-
-$privateKey = PrivateKeyFactory::fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
-$privateKey2 = PrivateKeyFactory::fromHex('1a0733d2c0cde1ec521bee36f16775eb3e5e368431484eeb02afe72499c5865f');
-
-$outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1'), 0);
-$multisig = ScriptFactory::scriptPubKey()->multisig(1, [$privateKey->getPublicKey(), $privateKey2->getPublicKey()], false);
-$witnessProgram = new \BitWasp\Bitcoin\Script\WitnessProgram(0, \BitWasp\Bitcoin\Crypto\Hash::sha256($multisig->getBuffer()));
-$p2shOutScript = ScriptFactory::scriptPubKey()->payToScriptHash($witnessProgram->getScript());
-
-
-$amount = 1501000;
-$txOut = new TransactionOutput($amount, $p2shOutScript);
-
-$transaction = TransactionFactory::build()
-    ->spendOutPoint($outpoint)
-    ->payToAddress(1500000, \BitWasp\Bitcoin\Address\AddressFactory::fromString('1DUzqgG31FvNubNL6N1FVdzPbKYWZG2Mb6'))
-    ->get();
-
-$ec = \BitWasp\Bitcoin\Bitcoin::getEcAdapter();
-$signed = (new \BitWasp\Bitcoin\Transaction\Factory\Signer($transaction, $ec))
-    ->sign(0, $privateKey, $txOut, $witnessProgram->getScript(), $multisig)
-    ->get();
-
-echo "Witness bearing transaction " . $signed->getWitnessBuffer()->getHex() . PHP_EOL. PHP_EOL;
-echo "Non-witness transaction " . $signed->getBuffer()->getHex() . PHP_EOL;
-
-```
-
+### P2SH V0 Witness Script Hash: 2 of 3 multisig
+[Spending a 2-of-3 multisignature (P2SH P2WSH) output](../examples/doc/tx/010_sign_p2sh_p2wsh_2of3_multisig_tx.php)
 
 ## Checking Signatures
 
@@ -287,28 +99,6 @@ will always return the most suitable.
 
 The example below validates a transaction produced in the `P2SH | Witness V0 Script Hash: 1 of 2 multisig` example.
 
-### Checking a P2SH | witness v0 script hash: 1 of 2 multisig
-```php
+### Checking a P2SH|P2WSH 2 of 3 multisig
 
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Transaction\OutPoint;
-use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Transaction\TransactionOutput;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-
-$outpoint = new OutPoint(Buffer::hex('87f7b7639d132e9817f58d3fe3f9f65ff317dc780107a6c10cba5ce2ad1e4ea1'), 0);
-$multisig = ScriptFactory::fromHex('5141047695c66e05a2b57dac3cbd84ff9d65f35d110cf0c5229811a952fe94f039480c8d10942adfd39d2597ba394380b05e78034cf1a385a388cb38fad8a45cf180b34104edfd1a26415f325d999bc17373a6f91072c88883d5cf045087bac80dd8c2ce2adfd154dadc1b8996941e2f0f0adc5837b2acc94915547e33814d785a18e81a7652ae');
-$witnessProgram = new \BitWasp\Bitcoin\Script\WitnessProgram(0, \BitWasp\Bitcoin\Crypto\Hash::sha256($multisig->getBuffer()));
-$p2shOutScript = ScriptFactory::scriptPubKey()->payToScriptHash($witnessProgram->getScript());
-
-$amount = 1501000;
-$txOut = new TransactionOutput($amount, $p2shOutScript);
-
-$parsed = TransactionFactory::fromHex('01000000000101a14e1eade25cba0cc1a6070178dc17f35ff6f9e33f8df517982e139d63b7f78700000000232200205aa8b7caaf9b2bfa6d9f9fb3bc6da6aa37fe66b56647962f5375d448796e7b18ffffffff0160e31600000000001976a91488ed05abdbc1f46d1e6b3f482cae3965e9679d5888ac030047304402205c2aed1832621e4cfb023789b9ed43e7787479590652f4422e8d3e1f9643e98f022070fddab960b5e30b6b70ba9c6c31263e4d7303eb4046bd816da08cc574fd817801875141047695c66e05a2b57dac3cbd84ff9d65f35d110cf0c5229811a952fe94f039480c8d10942adfd39d2597ba394380b05e78034cf1a385a388cb38fad8a45cf180b34104edfd1a26415f325d999bc17373a6f91072c88883d5cf045087bac80dd8c2ce2adfd154dadc1b8996941e2f0f0adc5837b2acc94915547e33814d785a18e81a7652ae00000000');
-$consensus = ScriptFactory::consensus();
-$r = $parsed->validator()->checkSignature($consensus, 0, $txOut);
-var_dump($r);
-
-```
-
-
+[Verifying the signature on a fully signed transaction input](../examples/doc/tx/011_verify_p2sh_p2wsh_2of3_multisig_tx.php)

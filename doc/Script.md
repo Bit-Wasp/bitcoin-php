@@ -56,7 +56,6 @@ There are currently two ways of verifying bitcoin scripts:
   
  It returns a boolean value indicating whether execution was successful.
  
-
 ### Verifying Scripts
 
 A great way to learn the scripting engine is to explore cases that don't involve ECDSA.   
@@ -71,28 +70,9 @@ The ScriptPubKey looks like: 1 OP_ADD 2 OP_EQUAL (hex: 51935287)
 OP_ADD removes the top values from the stack and pushes the result of addition. 
 OP_EQUAL compares two strings and pushes a `true` value to the stack. 
 
-The solution to this is a push of `1`. 
+The solution to this is a single data-push of `1`.
 
-```php
-use BitWasp\Bitcoin\Script\ScriptFactory;
-use BitWasp\Bitcoin\Transaction\TransactionFactory;
-use BitWasp\Bitcoin\Script\Opcodes;
-use \BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
-
-// Replace this part with other examples
-$flags = I::VERIFY_NONE;
-$scriptSig = ScriptFactory::sequence([Buffer::int(1)]);
-$scriptPubKey = ScriptFactory::sequence([Opcodes::OP_1, Opcodes::OP_ADD, Opcodes::OP_2, Opcodes::OP_EQUAL]);
-
-$tx = TransactionFactory::build()
-    ->input(str_pad('', 64, '0'), 0, $scriptSig)
-    ->get();
-
-$consensus = ScriptFactory::consensus();
-
-echo $consensus->verify($tx, $scriptPubKey, 0, 0) ? "yes\n" : "no\n";
-```
+[Evaluating 1 + 1 = 2 script](../examples/doc/script/001_run_simple_custom_script.php)
 
 We can change the scripts to explore more of bitcoin's language. 
 
@@ -107,12 +87,4 @@ scripts might fail, or skip a key validation step.
 Another interesting example are hash-locked contracts. A scriptPubKey can lock funds, requiring the preimage 
 of the hash to be provided.
 
-```php
-$preimage = new Buffer('auauly4lraslidfhalsdfalsdfa');
-$hash = Hash::sha256($preimage);
-
-$flags = I::VERIFY_NONE;
-$scriptSig = ScriptFactory::sequence([$preimage]);
-$scriptPubKey = ScriptFactory::sequence([Opcodes::OP_SHA256, $hash, Opcodes::OP_EQUAL]);
-```
-
+[Evaluating script preimage](../examples/doc/script/002_run_simple_hashlock_script.php)
