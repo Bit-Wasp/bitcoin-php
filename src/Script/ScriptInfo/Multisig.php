@@ -40,7 +40,7 @@ class Multisig
     public function __construct(ScriptInterface $script, PublicKeySerializerInterface $pubKeySerializer = null)
     {
         if (null === $pubKeySerializer) {
-            $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, false, Bitcoin::getEcAdapter());
+            $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, Bitcoin::getEcAdapter());
         }
 
         $parse = $script->getScriptParser()->decode();
