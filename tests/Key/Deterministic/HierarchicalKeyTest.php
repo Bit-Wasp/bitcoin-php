@@ -10,6 +10,8 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
+use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkScriptDataFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
@@ -79,6 +81,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         new HierarchicalKey(
             Bitcoin::getEcAdapter(),
+            new P2pkhScriptDataFactory(),
             1,
             1,
             1,
@@ -508,7 +511,15 @@ class HierarchicalKeyTest extends AbstractTestCase
 
         /** @var EcAdapterInterface $mock */
         /** @var PrivateKeyInterface $mockPriv */
-        $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($mock, 0, 0, 0, new Buffer('00', 32), $mockPriv);
+        $key = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey(
+            $mock,
+            new P2pkScriptDataFactory(),
+            0,
+            0,
+            0,
+            new Buffer('00', 32),
+            $mockPriv
+        );
 
         $this->assertEquals(0, $this->HK_run_count);
         $expected = 1;
