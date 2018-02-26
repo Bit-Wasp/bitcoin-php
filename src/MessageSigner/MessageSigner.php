@@ -63,8 +63,8 @@ class MessageSigner
         $network = $network ?: Bitcoin::getNetwork();
         $hash = $this->calculateMessageHash($network, $signedMessage->getMessage());
         $publicKey = $this->ecAdapter->recover($hash, $signedMessage->getCompactSignature());
-
-        return hash_equals($publicKey->getAddress()->getHash()->getBinary(), $address->getHash()->getBinary());
+        $pubKeyAddress = new PayToPubKeyHashAddress($publicKey->getPubKeyHash());
+        return hash_equals($pubKeyAddress->getHash()->getBinary(), $address->getHash()->getBinary());
     }
 
     /**
