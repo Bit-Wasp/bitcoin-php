@@ -2,8 +2,6 @@
 
 namespace BitWasp\Bitcoin\Script\Factory;
 
-use BitWasp\Bitcoin\Address\AddressInterface;
-use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -15,17 +13,6 @@ use BitWasp\Buffertools\Buffertools;
 
 class OutputScriptFactory
 {
-    /**
-     * @param AddressInterface $address
-     * @return ScriptInterface
-     */
-    public function payToAddress(AddressInterface $address)
-    {
-        return $address instanceof ScriptHashAddress
-            ? ScriptFactory::sequence([Opcodes::OP_HASH160, $address->getHash(), Opcodes::OP_EQUAL])
-            : ScriptFactory::sequence([Opcodes::OP_DUP, Opcodes::OP_HASH160, $address->getHash(), Opcodes::OP_EQUALVERIFY, Opcodes::OP_CHECKSIG]);
-    }
-
     /**
      * @param PublicKeyInterface $publicKey
      * @return ScriptInterface
