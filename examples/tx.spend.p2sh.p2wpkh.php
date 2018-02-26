@@ -2,6 +2,7 @@
 
 require __DIR__ . "/../vendor/autoload.php";
 
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
@@ -23,10 +24,12 @@ $p2shScript = new P2shScript($redeemScript);
 $outpoint = new OutPoint(Buffer::hex('23d6640c3f3383ffc8233fbd830ee49162c720389bbba1c313a43b06a235ae13', 32), 0);
 $txOut = new TransactionOutput(95590000, $p2shScript->getOutputScript());
 
+$dest = new PayToPubKeyHashAddress($key->getPubKeyHash());
+
 // Move UTXO to a pub-key-hash address
 $tx = (new TxBuilder())
     ->spendOutPoint($outpoint)
-    ->payToAddress(94550000, $key->getPublicKey()->getAddress())
+    ->payToAddress(94550000, $dest)
     ->get();
 
 // Sign transaction
