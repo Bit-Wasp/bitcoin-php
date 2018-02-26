@@ -22,7 +22,7 @@ class HierarchicalKey
     /**
      * @var EcAdapterInterface
      */
-    private $ecAdapter;
+    protected $ecAdapter;
 
     /**
      * @var int
@@ -231,6 +231,26 @@ class HierarchicalKey
     }
 
     /**
+     * @param $nextDepth
+     * @param $sequence
+     * @param BufferInterface $chainCode
+     * @param KeyInterface $key
+     * @return HierarchicalKey
+     * @throws \Exception
+     */
+    protected function childKey($nextDepth, $sequence, BufferInterface $chainCode, KeyInterface $key)
+    {
+        return new HierarchicalKey(
+            $this->ecAdapter,
+            $nextDepth,
+            $this->getChildFingerprint(),
+            $sequence,
+            $chainCode,
+            $key
+        );
+    }
+
+    /**
      * Derive a child key
      *
      * @param int $sequence
@@ -255,14 +275,7 @@ class HierarchicalKey
         $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
         $key = $key->tweakAdd($offset->getGmp());
 
-        return new HierarchicalKey(
-            $this->ecAdapter,
-            $nextDepth,
-            $this->getChildFingerprint(),
-            $sequence,
-            $chain,
-            $key
-        );
+        return $this->childKey($nextDepth, $sequence, $chain, $key);
     }
 
     /**
@@ -295,7 +308,6 @@ class HierarchicalKey
         $sequences = new HierarchicalKeySequence();
         return $this->deriveFromList($sequences->decodePath($path));
     }
-
 
     /**
      * Serializes the instance according to whether it wraps a private or public key.
