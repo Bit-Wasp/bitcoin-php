@@ -18,7 +18,7 @@ class HexExtendedKeySerializerTest extends AbstractTestCase
     public function testInvalidKey(EcAdapterInterface $adapter)
     {
         $network = NetworkFactory::bitcoinTestnet();
-        $serializer = new ExtendedKeySerializer($adapter, $network);
+        $serializer = new ExtendedKeySerializer($adapter);
         $serializer->parse($network, new Buffer());
     }
 }
