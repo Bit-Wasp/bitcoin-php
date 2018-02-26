@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
+use BitWasp\Bitcoin\Address\BaseAddressCreator;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Key\KeyToScript\ScriptAndSignData;
+use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\Base58ExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\ExtendedKeySerializer;
@@ -22,7 +25,7 @@ class HierarchicalKey
     /**
      * @var EcAdapterInterface
      */
-    private $ecAdapter;
+    protected $ecAdapter;
 
     /**
      * @var int
@@ -45,20 +48,30 @@ class HierarchicalKey
     private $chainCode;
 
     /**
-     * @var PublicKeyInterface|PrivateKeyInterface
+     * @var KeyInterface
      */
     private $key;
 
     /**
+     * @var ScriptDataFactory
+     */
+    private $scriptDataFactory;
+
+    /**
+     * @var ScriptAndSignData|null
+     */
+    private $scriptAndSignData;
+
+    /**
      * @param EcAdapterInterface $ecAdapter
+     * @param ScriptDataFactory $scriptDataFactory
      * @param int $depth
      * @param int $parentFingerprint
      * @param int $sequence
      * @param BufferInterface $chainCode
      * @param KeyInterface $key
-     * @throws \Exception
      */
-    public function __construct(EcAdapterInterface $ecAdapter, int $depth, int $parentFingerprint, int $sequence, BufferInterface $chainCode, KeyInterface $key)
+    public function __construct(EcAdapterInterface $ecAdapter, ScriptDataFactory $scriptDataFactory, int $depth, int $parentFingerprint, int $sequence, BufferInterface $chainCode, KeyInterface $key)
     {
         if ($depth < 0 || $depth > IntRange::U8_MAX) {
             throw new \InvalidArgumentException('Invalid depth for BIP32 key, must be in range [0 - 255] inclusive');
@@ -86,6 +99,7 @@ class HierarchicalKey
         $this->parentFingerprint = $parentFingerprint;
         $this->chainCode = $chainCode;
         $this->key = $key;
+        $this->scriptDataFactory = $scriptDataFactory;
     }
 
     /**
@@ -151,7 +165,9 @@ class HierarchicalKey
     public function getPrivateKey(): PrivateKeyInterface
     {
         if ($this->key->isPrivate()) {
-            return $this->key;
+            /** @var PrivateKeyInterface $key */
+            $key = $this->key;
+            return $key;
         }
 
         throw new \RuntimeException('Unable to get private key, not known');
@@ -167,7 +183,9 @@ class HierarchicalKey
         if ($this->isPrivate()) {
             return $this->getPrivateKey()->getPublicKey();
         } else {
-            return $this->key;
+            /** @var PublicKeyInterface $key */
+            $key = $this->key;
+            return $key;
         }
     }
 
@@ -179,6 +197,46 @@ class HierarchicalKey
         $clone = clone $this;
         $clone->key = $clone->getPublicKey();
         return $clone;
+    }
+
+    /**
+     * @param ScriptDataFactory $factory
+     * @return HierarchicalKey
+     */
+    public function withScriptFactory(ScriptDataFactory $factory)
+    {
+        $clone = clone $this;
+        $clone->scriptDataFactory = $factory;
+        return $clone;
+    }
+
+    /**
+     * @return ScriptDataFactory
+     */
+    public function getScriptDataFactory()
+    {
+        return $this->scriptDataFactory;
+    }
+
+    /**
+     * @return \BitWasp\Bitcoin\Key\KeyToScript\ScriptAndSignData
+     */
+    public function getScriptAndSignData()
+    {
+        if (null === $this->scriptAndSignData) {
+            $this->scriptAndSignData = $this->scriptDataFactory->convertKey($this->key);
+        }
+
+        return $this->scriptAndSignData;
+    }
+
+    /**
+     * @param BaseAddressCreator $addressCreator
+     * @return \BitWasp\Bitcoin\Address\Address
+     */
+    public function getAddress(BaseAddressCreator $addressCreator)
+    {
+        return $this->getScriptAndSignData()->getAddress($addressCreator);
     }
 
     /**
@@ -254,6 +312,7 @@ class HierarchicalKey
 
         return new HierarchicalKey(
             $this->ecAdapter,
+            $this->scriptDataFactory,
             $nextDepth,
             $this->getChildFingerprint(),
             $sequence,
@@ -265,6 +324,7 @@ class HierarchicalKey
     /**
      * @param array|\stdClass|\Traversable $list
      * @return HierarchicalKey
+     * @throws \Exception
      */
     public function deriveFromList($list): HierarchicalKey
     {
@@ -331,9 +391,6 @@ class HierarchicalKey
      */
     public function toExtendedPublicKey(NetworkInterface $network = null): string
     {
-        return $this
-            ->withoutPrivateKey()
-            ->toExtendedKey($network)
-        ;
+        return $this->withoutPrivateKey()->toExtendedKey($network);
     }
 }

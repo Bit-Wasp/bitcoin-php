@@ -76,7 +76,7 @@ class Multisig
         }
 
         if (null === $pubKeySerializer) {
-            $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, false, Bitcoin::getEcAdapter());
+            $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, Bitcoin::getEcAdapter());
         }
 
         $this->verify = $verify;

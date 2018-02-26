@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
@@ -23,63 +24,71 @@ class ExtendedKeySerializer
     private $ecAdapter;
 
     /**
-     * @var \BitWasp\Buffertools\Types\ByteString
+     * @var RawExtendedKeySerializer
      */
-    private $bytestring4;
+    private $rawSerializer;
 
     /**
-     * @var \BitWasp\Buffertools\Types\Uint8
+     * @var P2pkhScriptDataFactory
      */
-    private $uint8;
+    private $defaultScriptFactory;
 
     /**
-     * @var \BitWasp\Buffertools\Types\Uint32
+     * @var GlobalPrefixConfig
      */
-    private $uint32;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\ByteString
-     */
-    private $bytestring32;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\ByteString
-     */
-    private $bytestring33;
+    private $prefixConfig;
 
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @throws \Exception
+     * @param GlobalPrefixConfig|null $config
      */
-    public function __construct(EcAdapterInterface $ecAdapter)
+    public function __construct(EcAdapterInterface $ecAdapter, GlobalPrefixConfig $config = null)
     {
         $this->ecAdapter = $ecAdapter;
-        $this->bytestring4 = Types::bytestring(4);
-        $this->uint8 = Types::uint8();
-        $this->uint32 = Types::uint32();
-        $this->bytestring32 = Types::bytestring(32);
-        $this->bytestring33 = Types::bytestring(33);
+        $this->rawSerializer = new RawExtendedKeySerializer($ecAdapter);
+        $this->defaultScriptFactory = new P2pkhScriptDataFactory();
+        $this->prefixConfig = $config;
     }
 
     /**
      * @param NetworkInterface $network
      * @param HierarchicalKey $key
      * @return BufferInterface
-     * @throws \Exception
      */
     public function serialize(NetworkInterface $network, HierarchicalKey $key): BufferInterface
     {
-        list ($prefix, $data) = $key->isPrivate()
-            ? [$network->getHDPrivByte(), new Buffer("\x00". $key->getPrivateKey()->getBinary(), 33)]
-            : [$network->getHDPubByte(), $key->getPublicKey()->getBuffer()];
+        if (null === $this->prefixConfig) {
+            if ($key->getScriptDataFactory()->getScriptType() !== $this->defaultScriptFactory->getScriptType()) {
+                throw new \InvalidArgumentException("Cannot serialize non-P2PKH HierarchicalKeys without a GlobalPrefixConfig");
+            }
+            $privatePrefix = $network->getHDPrivByte();
+            $publicPrefix = $network->getHDPubByte();
+        } else {
+            $scriptConfig = $this->prefixConfig
+                ->getNetworkConfig($network)
+                ->getConfigForScriptType($key->getScriptDataFactory()->getScriptType())
+            ;
+            $privatePrefix = $scriptConfig->getPrivatePrefix();
+            $publicPrefix = $scriptConfig->getPublicPrefix();
+        }
 
-        return new Buffer(
-            pack("H*", $prefix) .
-            $this->uint8->write($key->getDepth()) .
-            $this->uint32->write($key->getFingerprint()) .
-            $this->uint32->write($key->getSequence()) .
-            $this->bytestring32->write($key->getChainCode()) .
-            $this->bytestring33->write($data)
+        if ($key->isPrivate()) {
+            $prefix = $privatePrefix;
+            $keyData = new Buffer("\x00{$key->getPrivateKey()->getBinary()}");
+        } else {
+            $prefix = $publicPrefix;
+            $keyData = $key->getPublicKey()->getBuffer();
+        }
+
+        return $this->rawSerializer->serialize(
+            new RawKeyParams(
+                $prefix,
+                $key->getDepth(),
+                $key->getFingerprint(),
+                $key->getSequence(),
+                $key->getChainCode(),
+                $keyData
+            )
         );
     }
 
@@ -91,30 +100,38 @@ class ExtendedKeySerializer
      */
     public function fromParser(NetworkInterface $network, Parser $parser): HierarchicalKey
     {
-        try {
-            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = [
-                $this->bytestring4->read($parser),
-                (int) $this->uint8->read($parser),
-                (int) $this->uint32->read($parser),
-                (int) $this->uint32->read($parser),
-                $this->bytestring32->read($parser),
-                $this->bytestring33->read($parser),
-            ];
+        $params = $this->rawSerializer->fromParser($parser);
 
-            $bytes = $bytes->getHex();
-        } catch (ParserOutOfRange $e) {
-            throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
+        if (null === $this->prefixConfig) {
+            if (!($params->getPrefix() === $network->getHDPubByte() || $params->getPrefix() === $network->getHDPrivByte())) {
+                throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
+            }
+            $privatePrefix = $network->getHDPrivByte();
+            $scriptFactory = $this->defaultScriptFactory;
+        } else {
+            $scriptConfig = $this->prefixConfig
+                ->getNetworkConfig($network)
+                ->getConfigForPrefix($params->getPrefix())
+            ;
+            $privatePrefix = $scriptConfig->getPrivatePrefix();
+            $scriptFactory = $scriptConfig->getScriptDataFactory();
         }
 
-        if ($bytes !== $network->getHDPubByte() && $bytes !== $network->getHDPrivByte()) {
-            throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
+        if ($params->getPrefix() === $privatePrefix) {
+            $key = PrivateKeyFactory::fromBuffer($params->getKeyData()->slice(1), true, $this->ecAdapter);
+        } else {
+            $key = PublicKeyFactory::fromBuffer($params->getKeyData(), $this->ecAdapter);
         }
 
-        $key = ($network->getHDPrivByte() === $bytes)
-            ? PrivateKeyFactory::fromBuffer($keyData->slice(1), true, $this->ecAdapter)
-            : PublicKeyFactory::fromBuffer($keyData, $this->ecAdapter);
-
-        return new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
+        return new HierarchicalKey(
+            $this->ecAdapter,
+            $scriptFactory,
+            $params->getDepth(),
+            $params->getParentFingerprint(),
+            $params->getSequence(),
+            $params->getChainCode(),
+            $key
+        );
     }
 
     /**
