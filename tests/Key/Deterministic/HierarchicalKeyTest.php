@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -48,8 +49,10 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif($this->network));
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif());
-        $this->assertSame($vectors->address, $key->getPrivateKey()->getAddress()->getAddress($this->network));
-        $this->assertSame($vectors->address, $key->getPrivateKey()->getAddress()->getAddress());
+
+        $addr = new PayToPubKeyHashAddress($key->getPrivateKey()->getPubKeyHash());
+        $this->assertSame($vectors->address, $addr->getAddress($this->network));
+        $this->assertSame($vectors->address, $addr->getAddress());
 
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey(), 'correct xprv');

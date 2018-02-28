@@ -3,6 +3,7 @@
 namespace BitWasp\Bitcoin\Tests\Script\Factory;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
@@ -10,7 +11,6 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
-use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptType;
@@ -20,32 +20,6 @@ use Mdanter\Ecc\Primitives\Point;
 
 class OutputScriptFactoryTest extends AbstractTestCase
 {
-    public function testPayToAddress()
-    {
-        $publicKey = PublicKeyFactory::fromHex('02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb');
-        $p2pkh = $publicKey->getAddress();
-        $p2pkhScript = ScriptFactory::scriptPubKey()->payToAddress($p2pkh);
-        $parsedScript = $p2pkhScript->getScriptParser()->decode();
-
-        $classifier = new OutputClassifier();
-        $this->assertEquals(Opcodes::OP_DUP, $parsedScript[0]->getOp());
-        $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[1]->getOp());
-        $this->assertTrue($p2pkh->getHash()->equals($parsedScript[2]->getData()));
-        $this->assertEquals(Opcodes::OP_EQUALVERIFY, $parsedScript[3]->getOp());
-        $this->assertEquals(Opcodes::OP_CHECKSIG, $parsedScript[4]->getOp());
-        $this->assertEquals(ScriptType::P2PKH, $classifier->classify($p2pkhScript));
-
-        $p2shScript = new P2shScript(ScriptFactory::scriptPubKey()->multisig(1, [$publicKey]));
-        $p2sh = $p2shScript->getAddress();
-
-        $p2shScript = ScriptFactory::scriptPubKey()->payToAddress($p2sh);
-        $parsedScript = $p2shScript->getScriptParser()->decode();
-        $this->assertEquals(Opcodes::OP_HASH160, $parsedScript[0]->getOp());
-        $this->assertTrue($p2sh->getHash()->equals($parsedScript[1]->getData()));
-        $this->assertEquals(Opcodes::OP_EQUAL, $parsedScript[2]->getOp());
-        $this->assertEquals(ScriptType::P2SH, $classifier->classify($p2shScript));
-    }
-
     public function testPayToPubKey()
     {
         $x = gmp_init('61365198687444549113797742543489768233362236615628880309411002867851217134145', 10);

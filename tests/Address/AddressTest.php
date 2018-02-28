@@ -82,12 +82,12 @@ class AddressTest extends AbstractTestCase
     {
         $addressCreator = new AddressCreator();
         if ($type === 'pubkeyhash') {
-            $obj = PublicKeyFactory::fromHex($data)->getAddress();
-            $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($obj->getHash());
+            $script = ScriptFactory::scriptPubKey()->payToPubKeyHash(PublicKeyFactory::fromHex($data)->getPubKeyHash());
+            $obj = $addressCreator->fromOutputScript($script);
         } else if ($type === 'script') {
             $p2shScript = new P2shScript(ScriptFactory::fromHex($data));
-            $obj = $p2shScript->getAddress();
-            $script = ScriptFactory::scriptPubKey()->payToScriptHash($obj->getHash());
+            $script = $p2shScript->getOutputScript();
+            $obj = $addressCreator->fromOutputScript($script);
         } else if ($type === 'witness') {
             $script = ScriptFactory::fromHex($data);
             $witnessProgram = null;

@@ -3,12 +3,12 @@
 namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Exceptions\SignerException;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
@@ -359,7 +359,7 @@ class SignerTest extends AbstractTestCase
 
         $txOut = new TransactionOutput(123123, $script);
 
-        $dest = $myKey->getPublicKey()->getAddress();
+        $dest = new PayToPubKeyHashAddress($myKey->getPublicKey()->getPubKeyHash());
 
         $tx = (new TxBuilder())
             ->input("abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234", 0)

@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressInterface;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\P2shScript;
@@ -79,22 +80,6 @@ class TxBuilderTest extends AbstractTestCase
         $this->assertEquals(0, $input->getOutPoint()->getVout());
     }
 
-    public function testPayToAddress()
-    {
-        $addressStr = '1KnHL81THzfp7tfFqHYWwo4GnY1L2rt4pk';
-        $addressCreator = new AddressCreator();
-        $address = $addressCreator->fromString($addressStr);
-        $value = 50;
-
-        $builder = new TxBuilder();
-        $builder->payToAddress($value, $address);
-        $tx = $builder->get();
-
-        $output = $tx->getOutput(0);
-        $this->assertEquals(ScriptFactory::scriptPubKey()->payToAddress($address)->getBinary(), $output->getScript()->getBinary());
-        $this->assertEquals($value, $output->getValue());
-    }
-
     public function testSetMethods()
     {
         $version = 10;
@@ -132,10 +117,11 @@ class TxBuilderTest extends AbstractTestCase
     public function getAddresses()
     {
         $key = PrivateKeyFactory::create(false);
+
         $script = new P2shScript(ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]));
         $scriptAddress = $script->getAddress();
         return [
-            [$key->getAddress()],
+            [new PayToPubKeyHashAddress($key->getPubKeyHash())],
             [$scriptAddress],
         ];
     }
@@ -146,7 +132,7 @@ class TxBuilderTest extends AbstractTestCase
      */
     public function testPayToAddress2(AddressInterface $address)
     {
-        $expectedScript = ScriptFactory::scriptPubKey()->payToAddress($address);
+        $expectedScript = $address->getScriptPubKey();
 
         $builder = new TxBuilder();
         $builder->payToAddress(50, $address);
