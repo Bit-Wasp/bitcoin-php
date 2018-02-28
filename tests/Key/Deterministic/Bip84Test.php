@@ -6,6 +6,7 @@ use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Key\Deterministic\ScriptedHierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2wpkhScriptDataFactory;
+use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\Base58ScriptedExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\ExtendedKeyWithScriptSerializer;
@@ -14,7 +15,7 @@ use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\NetworkHdKeyPrefixCon
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\NetworkScriptPrefix;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class ScriptedHierarchicalKeyTest extends AbstractTestCase
+class Bip84Test extends AbstractTestCase
 {
     public function testBip84()
     {
@@ -32,9 +33,12 @@ class ScriptedHierarchicalKeyTest extends AbstractTestCase
             new ExtendedKeyWithScriptSerializer($adapter, $globalConfig)
         );
 
+        $bip39 = new Bip39SeedGenerator();
+        $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
+
         $addrFactory = new AddressCreator();
         $rootzprv = "zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5";
-        $rootPriv = ScriptedHierarchicalKeyFactory::fromExtended($rootzprv, $globalConfig);
+        $rootPriv = ScriptedHierarchicalKeyFactory::fromEntropy($ent, $p2wpkhScriptDataFactory);
         $this->assertEquals($rootzprv, $ser->serialize($btc, $rootPriv));
 
         $rootzpub = "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF";
