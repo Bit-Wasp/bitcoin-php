@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: tk
- * Date: 2/25/18
- * Time: 3:32 PM
- */
 
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
@@ -12,18 +6,50 @@ use BitWasp\Buffertools\BufferInterface;
 
 class RawKeyParams
 {
+    /**
+     * @var string
+     */
     private $prefix;
+
+    /**
+     * @var int
+     */
     private $depth;
-    private $fingerprint;
+
+    /**
+     * @var int
+     */
+    private $parentFpr;
+
+    /**
+     * @var int
+     */
     private $sequence;
+
+    /**
+     * @var BufferInterface
+     */
     private $chainCode;
+
+    /**
+     * @var BufferInterface
+     */
     private $keyData;
 
-    public function __construct($prefix, $depth, $fingerprint, $sequence, BufferInterface $chainCode, BufferInterface $keyData)
+    /**
+     * RawKeyParams constructor.
+     * @param string $prefix
+     * @param int $depth
+     * @param int $parentFingerprint
+     * @param int $sequence
+     * @param BufferInterface $chainCode
+     * @param BufferInterface $keyData
+     */
+    public function __construct($prefix, $depth, $parentFingerprint, $sequence, BufferInterface $chainCode, BufferInterface $keyData)
     {
         $this->prefix = $prefix;
         $this->depth = $depth;
-        $this->fingerprint = $fingerprint;
+        $this->parentFpr = $parentFingerprint;
         $this->sequence = $sequence;
         $this->chainCode = $chainCode;
         $this->keyData = $keyData;
@@ -48,9 +74,9 @@ class RawKeyParams
     /**
      * @return int
      */
-    public function getFingerprint()
+    public function getParentFingerprint()
     {
-        return $this->fingerprint;
+        return $this->parentFpr;
     }
 
     /**

@@ -4,6 +4,7 @@
 namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyScriptDecorator;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -30,16 +31,16 @@ class ExtendedKeyWithScriptSerializer
     private $rawSerializer;
 
     /**
-     * @var GlobalHdKeyPrefixConfig
+     * @var GlobalPrefixConfig
      */
     private $config;
 
     /**
      * ExtendedKeyWithScriptSerializer constructor.
      * @param EcAdapterInterface $ecAdapter
-     * @param GlobalHdKeyPrefixConfig $hdPrefixConfig
+     * @param GlobalPrefixConfig $hdPrefixConfig
      */
-    public function __construct(EcAdapterInterface $ecAdapter, GlobalHdKeyPrefixConfig $hdPrefixConfig)
+    public function __construct(EcAdapterInterface $ecAdapter, GlobalPrefixConfig $hdPrefixConfig)
     {
         $this->ecAdapter = $ecAdapter;
         $this->rawSerializer = new RawExtendedKeySerializer($ecAdapter);
@@ -55,7 +56,7 @@ class ExtendedKeyWithScriptSerializer
     public function serialize(NetworkInterface $network, HierarchicalKeyScriptDecorator $key)
     {
         $scriptConfig = $this->config
-            ->getNetworkHdPrefixConfig($network)
+            ->getNetworkConfig($network)
             ->getConfigForScriptType($key->getScriptDataFactory()->getScriptType())
         ;
 
@@ -89,7 +90,7 @@ class ExtendedKeyWithScriptSerializer
     {
         $params = $this->rawSerializer->fromParser($parser);
         $scriptConfig = $this->config
-            ->getNetworkHdPrefixConfig($network)
+            ->getNetworkConfig($network)
             ->getConfigForPrefix($params->getPrefix())
         ;
 
@@ -106,7 +107,7 @@ class ExtendedKeyWithScriptSerializer
             new HierarchicalKey(
                 $this->ecAdapter,
                 $params->getDepth(),
-                $params->getFingerprint(),
+                $params->getParentFingerprint(),
                 $params->getSequence(),
                 $params->getChainCode(),
                 $key

@@ -2,6 +2,7 @@
 
 namespace BitWasp\Bitcoin\Key\KeyToScript\Decorator;
 
+use BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\KeyToScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 
@@ -23,13 +24,14 @@ abstract class ScriptHashDecorator extends ScriptDataFactory
     protected $decorateType;
 
     /**
-     * P2shScriptDecorator constructor.
+     * ScriptHashDecorator constructor.
      * @param KeyToScriptDataFactory $scriptDataFactory
+     * @throws DisallowedScriptDataFactoryException
      */
     public function __construct(KeyToScriptDataFactory $scriptDataFactory)
     {
         if (!in_array($scriptDataFactory->getScriptType(), $this->allowedScriptTypes, true)) {
-            throw new \InvalidArgumentException("Unsupported key-to-script factory for this script-hash type.");
+            throw new DisallowedScriptDataFactoryException("Unsupported key-to-script factory for this script-hash type.");
         }
         $this->scriptDataFactory = $scriptDataFactory;
     }

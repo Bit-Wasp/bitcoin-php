@@ -1,26 +1,30 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
+namespace BitWasp\Bitcoin\Key\Deterministic\HdPrefix;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
-class GlobalHdKeyPrefixConfig
+class GlobalPrefixConfig
 {
     /**
-     * @var NetworkHdKeyPrefixConfig[]
+     * @var NetworkConfig[]
      */
     private $networkConfigs = [];
 
     /**
      * ScriptPrefixConfig constructor.
-     * @param NetworkHdKeyPrefixConfig[] $config
+     * @param NetworkConfig[] $config
      */
     public function __construct(array $config)
     {
         foreach ($config as $networkPrefixConfig) {
+            if (!($networkPrefixConfig instanceof NetworkConfig)) {
+                throw new \InvalidArgumentException("expecting array of NetworkPrefixConfig");
+            }
+
             $networkClass = get_class($networkPrefixConfig->getNetwork());
-            if (!array_key_exists($networkClass, $this->networkConfigs)) {
-                $this->networkConfigs[$networkClass] = [];
+            if (array_key_exists($networkClass, $this->networkConfigs)) {
+                throw new \InvalidArgumentException("multiple configs for network");
             }
 
             $this->networkConfigs[$networkClass] = $networkPrefixConfig;
@@ -29,9 +33,9 @@ class GlobalHdKeyPrefixConfig
 
     /**
      * @param NetworkInterface $network
-     * @return NetworkHdKeyPrefixConfig
+     * @return NetworkConfig
      */
-    public function getNetworkHdPrefixConfig(NetworkInterface $network)
+    public function getNetworkConfig(NetworkInterface $network)
     {
         $class = get_class($network);
         if (!array_key_exists($class, $this->networkConfigs)) {

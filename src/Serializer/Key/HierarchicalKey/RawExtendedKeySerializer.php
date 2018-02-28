@@ -65,7 +65,7 @@ class RawExtendedKeySerializer
         return new Buffer(
             pack("H*", $keyParams->getPrefix()) .
             $this->uint8->write($keyParams->getDepth()) .
-            $this->uint32->write($keyParams->getFingerprint()) .
+            $this->uint32->write($keyParams->getParentFingerprint()) .
             $this->uint32->write($keyParams->getSequence()) .
             $this->bytestring32->write($keyParams->getChainCode()) .
             $this->bytestring33->write($keyParams->getKeyData())

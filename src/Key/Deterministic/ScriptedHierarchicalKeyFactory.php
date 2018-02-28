@@ -8,17 +8,17 @@ use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\Base58ScriptedExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\ExtendedKeyWithScriptSerializer;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\GlobalHdKeyPrefixConfig;
+use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Buffertools\BufferInterface;
 
 class ScriptedHierarchicalKeyFactory
 {
     /**
      * @param EcAdapterInterface $ecAdapter
-     * @param GlobalHdKeyPrefixConfig $hdPrefixConfig
+     * @param GlobalPrefixConfig $hdPrefixConfig
      * @return Base58ScriptedExtendedKeySerializer
      */
-    public static function getSerializer(EcAdapterInterface $ecAdapter, GlobalHdKeyPrefixConfig $hdPrefixConfig)
+    public static function getSerializer(EcAdapterInterface $ecAdapter, GlobalPrefixConfig $hdPrefixConfig)
     {
         return new Base58ScriptedExtendedKeySerializer(
             new ExtendedKeyWithScriptSerializer($ecAdapter, $hdPrefixConfig)
@@ -56,12 +56,12 @@ class ScriptedHierarchicalKeyFactory
 
     /**
      * @param string $extendedKey
-     * @param GlobalHdKeyPrefixConfig $config
+     * @param GlobalPrefixConfig $config
      * @param NetworkInterface $network
      * @param EcAdapterInterface $ecAdapter
      * @return HierarchicalKeyScriptDecorator
      */
-    public static function fromExtended($extendedKey, GlobalHdKeyPrefixConfig $config, NetworkInterface $network = null, EcAdapterInterface $ecAdapter = null)
+    public static function fromExtended($extendedKey, GlobalPrefixConfig $config, NetworkInterface $network = null, EcAdapterInterface $ecAdapter = null)
     {
         $extSerializer = self::getSerializer($ecAdapter ?: Bitcoin::getEcAdapter(), $config);
         return $extSerializer->parse($network ?: Bitcoin::getNetwork(), $extendedKey);

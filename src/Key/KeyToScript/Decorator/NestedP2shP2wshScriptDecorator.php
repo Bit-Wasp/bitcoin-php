@@ -22,7 +22,7 @@ class NestedP2shP2wshScriptDecorator extends ScriptHashDecorator
     /**
      * @var string
      */
-    protected $decorateType = "p2sh|p2wsh";
+    protected $decorateType = "scripthash|witness_v0_scripthash";
 
     /**
      * @param KeyInterface $key

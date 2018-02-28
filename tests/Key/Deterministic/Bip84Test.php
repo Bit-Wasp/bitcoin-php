@@ -3,32 +3,37 @@
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
-use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\ScriptedHierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2wpkhScriptDataFactory;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\Base58ScriptedExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\ExtendedKeyWithScriptSerializer;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\GlobalHdKeyPrefixConfig;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\NetworkHdKeyPrefixConfig;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\NetworkScriptPrefix;
+use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
+use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
+use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\ScriptPrefix;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class Bip84Test extends AbstractTestCase
 {
-    public function testBip84()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $adapter
+     * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
+     * @throws \Exception
+     */
+    public function testBip84(EcAdapterInterface $adapter)
     {
-        $adapter = Bitcoin::getEcAdapter();
         $btc = NetworkFactory::bitcoin();
 
         $p2wpkhScriptDataFactory = new P2wpkhScriptDataFactory();
 
-        $btcConfig = new NetworkHdKeyPrefixConfig($btc, [
-            new NetworkScriptPrefix($p2wpkhScriptDataFactory, "04b2430c", "04b24746"),
+        $btcConfig = new NetworkConfig($btc, [
+            new ScriptPrefix($p2wpkhScriptDataFactory, "04b2430c", "04b24746"),
         ]);
 
-        $globalConfig = new GlobalHdKeyPrefixConfig([$btcConfig]);
+        $globalConfig = new GlobalPrefixConfig([$btcConfig]);
         $ser = new Base58ScriptedExtendedKeySerializer(
             new ExtendedKeyWithScriptSerializer($adapter, $globalConfig)
         );
@@ -37,22 +42,30 @@ class Bip84Test extends AbstractTestCase
         $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
 
         $addrFactory = new AddressCreator();
-        $rootzprv = "zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5";
-        $rootPriv = ScriptedHierarchicalKeyFactory::fromEntropy($ent, $p2wpkhScriptDataFactory);
-        $this->assertEquals($rootzprv, $ser->serialize($btc, $rootPriv));
 
-        $rootzpub = "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF";
+        $rootPriv = ScriptedHierarchicalKeyFactory::fromEntropy($ent, $p2wpkhScriptDataFactory);
+        $this->assertEquals(
+            "zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5",
+            $ser->serialize($btc, $rootPriv)
+        );
 
         $rootPub = $rootPriv->withoutPrivateKey();
-        $this->assertEquals($rootzpub, $ser->serialize($btc, $rootPub));
+        $this->assertEquals(
+            "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF",
+            $ser->serialize($btc, $rootPub)
+        );
 
-        $xpriv = "zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE";
         $xprivKey = $rootPriv->derivePath("84'/0'/0'");
-        $this->assertEquals($xpriv, $ser->serialize($btc, $xprivKey));
+        $this->assertEquals(
+            "zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE",
+            $ser->serialize($btc, $xprivKey)
+        );
 
-        $xpub = "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs";
         $xpubKey = $xprivKey->withoutPrivateKey();
-        $this->assertEquals($xpub, $ser->serialize($btc, $xpubKey));
+        $this->assertEquals(
+            "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs",
+            $ser->serialize($btc, $xpubKey)
+        );
 
         $account0_0_prv = $xprivKey->derivePath("0/0");
         $this->assertEquals(

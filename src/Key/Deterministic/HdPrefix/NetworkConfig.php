@@ -1,11 +1,11 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
+namespace BitWasp\Bitcoin\Key\Deterministic\HdPrefix;
 
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
-class NetworkHdKeyPrefixConfig
+class NetworkConfig
 {
     /**
      * @var Network
@@ -13,25 +13,25 @@ class NetworkHdKeyPrefixConfig
     private $network;
 
     /**
-     * @var NetworkScriptPrefix[]
+     * @var ScriptPrefix[]
      */
     private $scriptPrefixMap = [];
 
     /**
-     * @var NetworkScriptPrefix[]
+     * @var ScriptPrefix[]
      */
     private $scriptTypeMap = [];
 
     /**
      * NetworkHdKeyPrefixConfig constructor.
      * @param NetworkInterface $network
-     * @param NetworkScriptPrefix[] $prefixConfigList
+     * @param ScriptPrefix[] $prefixConfigList
      */
     public function __construct(NetworkInterface $network, array $prefixConfigList)
     {
         foreach ($prefixConfigList as $config) {
-            if (!($config instanceof NetworkScriptPrefix)) {
-                throw new \InvalidArgumentException();
+            if (!($config instanceof ScriptPrefix)) {
+                throw new \InvalidArgumentException("expecting array of NetworkPrefixConfig");
             }
             $this->setupConfig($config);
         }
@@ -40,9 +40,9 @@ class NetworkHdKeyPrefixConfig
     }
 
     /**
-     * @param NetworkScriptPrefix $config
+     * @param ScriptPrefix $config
      */
-    private function setupConfig(NetworkScriptPrefix $config)
+    private function setupConfig(ScriptPrefix $config)
     {
         $this->checkForOverwriting($config);
 
@@ -52,9 +52,9 @@ class NetworkHdKeyPrefixConfig
     }
 
     /**
-     * @param NetworkScriptPrefix $config
+     * @param ScriptPrefix $config
      */
-    private function checkForOverwriting(NetworkScriptPrefix $config)
+    private function checkForOverwriting(ScriptPrefix $config)
     {
         if (array_key_exists($config->getPublicPrefix(), $this->scriptPrefixMap)) {
             $this->rejectConflictPrefix($config, $config->getPublicPrefix());
@@ -70,10 +70,10 @@ class NetworkHdKeyPrefixConfig
     }
 
     /**
-     * @param NetworkScriptPrefix $config
+     * @param ScriptPrefix $config
      * @param string $prefix
      */
-    private function rejectConflictPrefix(NetworkScriptPrefix $config, $prefix)
+    private function rejectConflictPrefix(ScriptPrefix $config, $prefix)
     {
         $conflict = $this->scriptPrefixMap[$prefix];
         throw new \RuntimeException(sprintf(
@@ -85,12 +85,12 @@ class NetworkHdKeyPrefixConfig
     }
 
     /**
-     * @param NetworkScriptPrefix $config
+     * @param ScriptPrefix $config
      */
-    private function rejectConflictScriptType(NetworkScriptPrefix $config)
+    private function rejectConflictScriptType(ScriptPrefix $config)
     {
         throw new \RuntimeException(sprintf(
-            "The script type %s conflicts with another",
+            "The script type %s has a conflict",
             $config->getScriptDataFactory()->getScriptType()
         ));
     }
@@ -104,16 +104,8 @@ class NetworkHdKeyPrefixConfig
     }
 
     /**
-     * @return NetworkScriptPrefix[]
-     */
-    public function getPrefixList()
-    {
-        return $this->scriptPrefixMap;
-    }
-
-    /**
      * @param string $prefix
-     * @return NetworkScriptPrefix
+     * @return ScriptPrefix
      */
     public function getConfigForPrefix($prefix)
     {
@@ -126,7 +118,7 @@ class NetworkHdKeyPrefixConfig
 
     /**
      * @param string $scriptType
-     * @return NetworkScriptPrefix
+     * @return ScriptPrefix
      */
     public function getConfigForScriptType($scriptType)
     {

@@ -1,10 +1,11 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
+namespace BitWasp\Bitcoin\Key\Deterministic\HdPrefix;
 
+use BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 
-class NetworkScriptPrefix
+class ScriptPrefix
 {
     /**
      * @var string
@@ -29,6 +30,22 @@ class NetworkScriptPrefix
      */
     public function __construct(ScriptDataFactory $scriptDataFactory, $privatePrefix, $publicPrefix)
     {
+        if (strlen($privatePrefix) !== 8) {
+            throw new InvalidNetworkParameter("Invalid HD private prefix: wrong length");
+        }
+
+        if (!ctype_xdigit($privatePrefix)) {
+            throw new InvalidNetworkParameter("Invalid HD private prefix: expecting hex");
+        }
+
+        if (strlen($publicPrefix) !== 8) {
+            throw new InvalidNetworkParameter("Invalid HD public prefix: wrong length");
+        }
+
+        if (!ctype_xdigit($publicPrefix)) {
+            throw new InvalidNetworkParameter("Invalid HD public prefix: expecting hex");
+        }
+
         $this->scriptDataFactory = $scriptDataFactory;
         $this->publicPrefix = $publicPrefix;
         $this->privatePrefix = $privatePrefix;

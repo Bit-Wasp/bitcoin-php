@@ -82,7 +82,7 @@ class ExtendedKeySerializer
         return new HierarchicalKey(
             $this->ecAdapter,
             $params->getDepth(),
-            $params->getFingerprint(),
+            $params->getParentFingerprint(),
             $params->getSequence(),
             $params->getChainCode(),
             $key
