@@ -4,8 +4,9 @@ namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Serializer\Key\HierarchicalKey\BasicKeyAdapter;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
@@ -24,11 +25,6 @@ class ExtendedKeySerializer
     private $rawSerializer;
 
     /**
-     * @var BasicKeyAdapter
-     */
-    private $basicKey;
-
-    /**
      * @param EcAdapterInterface $ecAdapter
      * @throws \Exception
      */
@@ -36,18 +32,32 @@ class ExtendedKeySerializer
     {
         $this->ecAdapter = $ecAdapter;
         $this->rawSerializer = new RawExtendedKeySerializer($ecAdapter);
-        $this->basicKey = new BasicKeyAdapter();
     }
 
     /**
      * @param NetworkInterface $network
      * @param HierarchicalKey $key
-     * @return Buffer
+     * @return BufferInterface
      */
     public function serialize(NetworkInterface $network, HierarchicalKey $key)
     {
+        if ($key->isPrivate()) {
+            $prefix = $network->getHDPrivByte();
+            $keyData = new Buffer("\x00" . $key->getPrivateKey()->getBinary());
+        } else {
+            $prefix = $network->getHDPubByte();
+            $keyData = $key->getPublicKey()->getBuffer();
+        }
+
         return $this->rawSerializer->serialize(
-            $this->basicKey->getParams($network, $key)
+            new RawKeyParams(
+                $prefix,
+                $key->getDepth(),
+                $key->getFingerprint(),
+                $key->getSequence(),
+                $key->getChainCode(),
+                $keyData
+            )
         );
     }
 
@@ -59,9 +69,23 @@ class ExtendedKeySerializer
      */
     public function fromParser(NetworkInterface $network, Parser $parser)
     {
-        return $this->basicKey->getKey(
-            $network,
-            $this->rawSerializer->fromParser($parser)
+        $params = $this->rawSerializer->fromParser($parser);
+
+        if ($params->getPrefix() === $network->getHDPubByte()) {
+            $key = PublicKeyFactory::fromHex($params->getKeyData(), $this->ecAdapter);
+        } else if ($params->getPrefix() === $network->getHDPrivByte()) {
+            $key = PrivateKeyFactory::fromHex($params->getKeyData()->slice(1), true, $this->ecAdapter);
+        } else {
+            throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
+        }
+
+        return new HierarchicalKey(
+            $this->ecAdapter,
+            $params->getDepth(),
+            $params->getFingerprint(),
+            $params->getSequence(),
+            $params->getChainCode(),
+            $key
         );
     }
 

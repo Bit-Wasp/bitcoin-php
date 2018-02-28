@@ -2,15 +2,15 @@
 
 namespace BitWasp\Bitcoin\Key\KeyToScript;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 
 interface ScriptDataFactoryInterface
 {
     /**
-     * @param Key $key
+     * @param KeyInterface $key
      * @return ScriptAndSignData
      */
-    public function convertKey(Key $key);
+    public function convertKey(KeyInterface $key);
 
     /**
      * @return string

@@ -4,6 +4,7 @@ namespace BitWasp\Bitcoin\Key\KeyToScript\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
@@ -37,10 +38,10 @@ abstract class KeyToScriptDataFactory implements ScriptDataFactoryInterface
     abstract protected function convertKeyToScriptData(PublicKeyInterface $publicKey);
 
     /**
-     * @param Key $key
+     * @param KeyInterface $key
      * @return ScriptAndSignData
      */
-    public function convertKey(Key $key)
+    public function convertKey(KeyInterface $key)
     {
         if ($key->isPrivate()) {
             /** @var PrivateKeyInterface $key */

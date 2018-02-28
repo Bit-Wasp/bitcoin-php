@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Key\KeyToScript\Decorator;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptAndSignData;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptType;
@@ -25,11 +25,11 @@ class P2shScriptDecorator extends ScriptHashDecorator
     protected $decorateType = ScriptType::P2SH;
 
     /**
-     * @param Key $key
+     * @param KeyInterface $key
      * @return ScriptAndSignData
      * @throws \BitWasp\Bitcoin\Exceptions\P2shScriptException
      */
-    public function convertKey(Key $key)
+    public function convertKey(KeyInterface $key)
     {
         $redeemScript = new P2shScript($this->scriptDataFactory->convertKey($key)->getScriptPubKey());
         return new ScriptAndSignData(

@@ -38,8 +38,8 @@ class ScriptedHierarchicalKeyTest extends AbstractTestCase
         $this->assertEquals($rootzprv, $ser->serialize($btc, $rootPriv));
 
         $rootzpub = "zpub6jftahH18ngZxLmXaKw3GSZzZsszmt9WqedkyZdezFtWRFBZqsQH5hyUmb4pCEeZGmVfQuP5bedXTB8is6fTv19U1GQRyQUKQGUTzyHACMF";
-        $rootPub = clone $rootPriv;
-        $rootPub->toPublic();
+
+        $rootPub = $rootPriv->withoutPrivateKey();
         $this->assertEquals($rootzpub, $ser->serialize($btc, $rootPub));
 
         $xpriv = "zprvAdG4iTXWBoARxkkzNpNh8r6Qag3irQB8PzEMkAFeTRXxHpbF9z4QgEvBRmfvqWvGp42t42nvgGpNgYSJA9iefm1yYNZKEm7z6qUWCroSQnE";
@@ -47,17 +47,17 @@ class ScriptedHierarchicalKeyTest extends AbstractTestCase
         $this->assertEquals($xpriv, $ser->serialize($btc, $xprivKey));
 
         $xpub = "zpub6rFR7y4Q2AijBEqTUquhVz398htDFrtymD9xYYfG1m4wAcvPhXNfE3EfH1r1ADqtfSdVCToUG868RvUUkgDKf31mGDtKsAYz2oz2AGutZYs";
-        $xpubKey = (clone $xprivKey)->toPublic();
+        $xpubKey = $xprivKey->withoutPrivateKey();
         $this->assertEquals($xpub, $ser->serialize($btc, $xpubKey));
 
         $account0_0_prv = $xprivKey->derivePath("0/0");
         $this->assertEquals(
             "KyZpNDKnfs94vbrwhJneDi77V6jF64PWPF8x5cdJb8ifgg2DUc9d",
-            $account0_0_prv->getPrivateKey()->toWif()
+            $account0_0_prv->getHdKey()->getPrivateKey()->toWif()
         );
         $this->assertEquals(
             "0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c",
-            $account0_0_prv->getPublicKey()->getHex()
+            $account0_0_prv->getHdKey()->getPublicKey()->getHex()
         );
         $this->assertEquals(
             "bc1qcr8te4kr609gcawutmrza0j4xv80jy8z306fyu",
@@ -67,11 +67,11 @@ class ScriptedHierarchicalKeyTest extends AbstractTestCase
         $account0_1_prv = $xprivKey->derivePath("0/1");
         $this->assertEquals(
             "Kxpf5b8p3qX56DKEe5NqWbNUP9MnqoRFzZwHRtsFqhzuvUJsYZCy",
-            $account0_1_prv->getPrivateKey()->toWif()
+            $account0_1_prv->getHdKey()->getPrivateKey()->toWif()
         );
         $this->assertEquals(
             "03e775fd51f0dfb8cd865d9ff1cca2a158cf651fe997fdc9fee9c1d3b5e995ea77",
-            $account0_1_prv->getPublicKey()->getHex()
+            $account0_1_prv->getHdKey()->getPublicKey()->getHex()
         );
         $this->assertEquals(
             "bc1qnjg0jd8228aq7egyzacy8cys3knf9xvrerkf9g",
@@ -81,16 +81,15 @@ class ScriptedHierarchicalKeyTest extends AbstractTestCase
         $account1_0_prv = $xprivKey->derivePath("1/0");
         $this->assertEquals(
             "KxuoxufJL5csa1Wieb2kp29VNdn92Us8CoaUG3aGtPtcF3AzeXvF",
-            $account1_0_prv->getPrivateKey()->toWif()
+            $account1_0_prv->getHdKey()->getPrivateKey()->toWif()
         );
         $this->assertEquals(
             "03025324888e429ab8e3dbaf1f7802648b9cd01e9b418485c5fa4c1b9b5700e1a6",
-            $account1_0_prv->getPublicKey()->getHex()
+            $account1_0_prv->getHdKey()->getPublicKey()->getHex()
         );
         $this->assertEquals(
             "bc1q8c6fshw2dlwun7ekn9qwf37cu2rn755upcp6el",
             $account1_0_prv->getAddress($addrFactory)->getAddress()
         );
-
     }
 }

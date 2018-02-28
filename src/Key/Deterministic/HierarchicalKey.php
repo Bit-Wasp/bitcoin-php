@@ -173,13 +173,11 @@ class HierarchicalKey
     /**
      * @return HierarchicalKey
      */
-    public function toPublic()
+    public function withoutPrivateKey()
     {
-        if ($this->isPrivate()) {
-            $this->key = $this->getPrivateKey()->getPublicKey();
-        }
-
-        return $this;
+        $clone = clone $this;
+        $clone->key = $clone->getPublicKey();
+        return $clone;
     }
 
     /**
@@ -347,7 +345,6 @@ class HierarchicalKey
      */
     public function toExtendedPublicKey(NetworkInterface $network = null)
     {
-        $clone = clone($this);
-        return $clone->toPublic()->toExtendedKey($network);
+        return $this->withoutPrivateKey()->toExtendedKey($network);
     }
 }

@@ -3,8 +3,7 @@
 namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
 
 use BitWasp\Bitcoin\Base58;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
-use BitWasp\Bitcoin\Key\Deterministic\ScriptedHierarchicalKey;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyScriptDecorator;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
 class Base58ScriptedExtendedKeySerializer
@@ -24,10 +23,10 @@ class Base58ScriptedExtendedKeySerializer
 
     /**
      * @param NetworkInterface $network
-     * @param HierarchicalKey $key
+     * @param HierarchicalKeyScriptDecorator $key
      * @return string
      */
-    public function serialize(NetworkInterface $network, ScriptedHierarchicalKey $key)
+    public function serialize(NetworkInterface $network, HierarchicalKeyScriptDecorator $key)
     {
         return Base58::encodeCheck($this->serializer->serialize($network, $key));
     }
@@ -35,7 +34,7 @@ class Base58ScriptedExtendedKeySerializer
     /**
      * @param NetworkInterface $network
      * @param string $base58
-     * @return ScriptedHierarchicalKey
+     * @return HierarchicalKeyScriptDecorator
      */
     public function parse(NetworkInterface $network, $base58)
     {

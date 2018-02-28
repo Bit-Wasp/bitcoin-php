@@ -49,7 +49,6 @@ class NetworkHdKeyPrefixConfig
         $this->scriptPrefixMap[$config->getPrivatePrefix()] = $config;
         $this->scriptPrefixMap[$config->getPublicPrefix()] = $config;
         $this->scriptTypeMap[$config->getScriptDataFactory()->getScriptType()] = $config;
-        echo "registered {$config->getScriptDataFactory()->getScriptType()}\n";
     }
 
     /**
@@ -63,6 +62,10 @@ class NetworkHdKeyPrefixConfig
 
         if (array_key_exists($config->getPrivatePrefix(), $this->scriptPrefixMap)) {
             $this->rejectConflictPrefix($config, $config->getPrivatePrefix());
+        }
+
+        if (array_key_exists($config->getScriptDataFactory()->getScriptType(), $this->scriptTypeMap)) {
+            $this->rejectConflictScriptType($config);
         }
     }
 
@@ -78,6 +81,17 @@ class NetworkHdKeyPrefixConfig
             $config->getScriptDataFactory()->getScriptType(),
             $prefix === $config->getPublicPrefix() ? "public" : "private",
             $conflict->getScriptDataFactory()->getScriptType()
+        ));
+    }
+
+    /**
+     * @param NetworkScriptPrefix $config
+     */
+    private function rejectConflictScriptType(NetworkScriptPrefix $config)
+    {
+        throw new \RuntimeException(sprintf(
+            "The script type %s conflicts with another",
+            $config->getScriptDataFactory()->getScriptType()
         ));
     }
 
