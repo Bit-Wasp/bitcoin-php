@@ -4,7 +4,7 @@ namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactoryInterface;
+use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\Base58ScriptedExtendedKeySerializer;
 use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\ExtendedKeyWithScriptSerializer;
@@ -26,12 +26,12 @@ class ScriptedHierarchicalKeyFactory
     }
 
     /**
-     * @param ScriptDataFactoryInterface $scriptDataFactory
+     * @param ScriptDataFactory $scriptDataFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return HierarchicalKeyScriptDecorator
      * @throws \Exception
      */
-    public static function generateMasterKey(ScriptDataFactoryInterface $scriptDataFactory, EcAdapterInterface $ecAdapter = null)
+    public static function generateMasterKey(ScriptDataFactory $scriptDataFactory, EcAdapterInterface $ecAdapter = null)
     {
         return new HierarchicalKeyScriptDecorator(
             $scriptDataFactory,
@@ -41,12 +41,12 @@ class ScriptedHierarchicalKeyFactory
 
     /**
      * @param BufferInterface $entropy
-     * @param ScriptDataFactoryInterface $scriptDataFactory
+     * @param ScriptDataFactory $scriptDataFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return HierarchicalKeyScriptDecorator
      * @throws \Exception
      */
-    public static function fromEntropy(BufferInterface $entropy, ScriptDataFactoryInterface $scriptDataFactory, EcAdapterInterface $ecAdapter = null)
+    public static function fromEntropy(BufferInterface $entropy, ScriptDataFactory $scriptDataFactory, EcAdapterInterface $ecAdapter = null)
     {
         return new HierarchicalKeyScriptDecorator(
             $scriptDataFactory,

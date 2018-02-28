@@ -4,12 +4,12 @@ namespace BitWasp\Bitcoin\Key\Deterministic;
 
 use BitWasp\Bitcoin\Address\BaseAddressCreator;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptAndSignData;
-use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactoryInterface;
+use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 
 class HierarchicalKeyScriptDecorator
 {
     /**
-     * @var ScriptDataFactoryInterface
+     * @var ScriptDataFactory
      */
     private $scriptFactory;
 
@@ -25,10 +25,10 @@ class HierarchicalKeyScriptDecorator
 
     /**
      * HierarchicalKeyScriptDecorator constructor.
-     * @param ScriptDataFactoryInterface $scriptFactory
+     * @param ScriptDataFactory $scriptFactory
      * @param HierarchicalKey $hdKey
      */
-    public function __construct(ScriptDataFactoryInterface $scriptFactory, HierarchicalKey $hdKey)
+    public function __construct(ScriptDataFactory $scriptFactory, HierarchicalKey $hdKey)
     {
         $this->scriptFactory = $scriptFactory;
         $this->hdKey = $hdKey;
@@ -43,7 +43,7 @@ class HierarchicalKeyScriptDecorator
     }
 
     /**
-     * @return ScriptDataFactoryInterface
+     * @return ScriptDataFactory
      */
     public function getScriptDataFactory()
     {

@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
 
-use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactoryInterface;
+use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 
 class NetworkScriptPrefix
 {
@@ -17,17 +17,17 @@ class NetworkScriptPrefix
     private $publicPrefix;
 
     /**
-     * @var ScriptDataFactoryInterface
+     * @var ScriptDataFactory
      */
     private $scriptDataFactory;
 
     /**
      * ScriptPrefixConfig constructor.
-     * @param ScriptDataFactoryInterface $scriptDataFactory
+     * @param ScriptDataFactory $scriptDataFactory
      * @param string $privatePrefix
      * @param string $publicPrefix
      */
-    public function __construct(ScriptDataFactoryInterface $scriptDataFactory, $privatePrefix, $publicPrefix)
+    public function __construct(ScriptDataFactory $scriptDataFactory, $privatePrefix, $publicPrefix)
     {
         $this->scriptDataFactory = $scriptDataFactory;
         $this->publicPrefix = $publicPrefix;
@@ -51,7 +51,7 @@ class NetworkScriptPrefix
     }
 
     /**
-     * @return ScriptDataFactoryInterface
+     * @return ScriptDataFactory
      */
     public function getScriptDataFactory()
     {

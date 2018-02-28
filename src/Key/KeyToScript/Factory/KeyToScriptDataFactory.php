@@ -3,15 +3,14 @@
 namespace BitWasp\Bitcoin\Key\KeyToScript\Factory;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptAndSignData;
-use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactoryInterface;
+use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 
-abstract class KeyToScriptDataFactory implements ScriptDataFactoryInterface
+abstract class KeyToScriptDataFactory extends ScriptDataFactory
 {
     /**
      * @var PublicKeySerializerInterface

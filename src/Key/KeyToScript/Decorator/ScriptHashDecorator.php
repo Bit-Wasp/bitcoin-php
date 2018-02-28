@@ -3,9 +3,9 @@
 namespace BitWasp\Bitcoin\Key\KeyToScript\Decorator;
 
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\KeyToScriptDataFactory;
-use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactoryInterface;
+use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 
-abstract class ScriptHashDecorator implements ScriptDataFactoryInterface
+abstract class ScriptHashDecorator extends ScriptDataFactory
 {
     /**
      * @var KeyToScriptDataFactory
