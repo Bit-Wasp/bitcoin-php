@@ -1,22 +1,22 @@
 <?php
 
-namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
+namespace BitWasp\Bitcoin\Serializer\Key\ScriptDecoratedHierarchicalKey;
 
 use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyScriptDecorator;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 
-class Base58ScriptedExtendedKeySerializer
+class Base58ExtendedKeySerializer
 {
     /**
-     * @var ExtendedKeyWithScriptSerializer
+     * @var ExtendedKeySerializer
      */
     private $serializer;
 
     /**
-     * @param ExtendedKeyWithScriptSerializer $hdSerializer
+     * @param ExtendedKeySerializer $hdSerializer
      */
-    public function __construct(ExtendedKeyWithScriptSerializer $hdSerializer)
+    public function __construct(ExtendedKeySerializer $hdSerializer)
     {
         $this->serializer = $hdSerializer;
     }

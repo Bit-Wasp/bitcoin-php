@@ -6,22 +6,22 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\Base58ScriptedExtendedKeySerializer;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\ExtendedKeyWithScriptSerializer;
+use BitWasp\Bitcoin\Serializer\Key\ScriptDecoratedHierarchicalKey\Base58ExtendedKeySerializer;
+use BitWasp\Bitcoin\Serializer\Key\ScriptDecoratedHierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Buffertools\BufferInterface;
 
-class ScriptedHierarchicalKeyFactory
+class ScriptDecoratedHierarchicalKeyFactory
 {
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param GlobalPrefixConfig $hdPrefixConfig
-     * @return Base58ScriptedExtendedKeySerializer
+     * @return Base58ExtendedKeySerializer
      */
     public static function getSerializer(EcAdapterInterface $ecAdapter, GlobalPrefixConfig $hdPrefixConfig)
     {
-        return new Base58ScriptedExtendedKeySerializer(
-            new ExtendedKeyWithScriptSerializer($ecAdapter, $hdPrefixConfig)
+        return new Base58ExtendedKeySerializer(
+            new ExtendedKeySerializer($ecAdapter, $hdPrefixConfig)
         );
     }
 

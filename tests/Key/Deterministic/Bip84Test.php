@@ -4,12 +4,12 @@ namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\Deterministic\ScriptedHierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Deterministic\ScriptDecoratedHierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2wpkhScriptDataFactory;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\Base58ScriptedExtendedKeySerializer;
-use BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey\ExtendedKeyWithScriptSerializer;
+use BitWasp\Bitcoin\Serializer\Key\ScriptDecoratedHierarchicalKey\Base58ExtendedKeySerializer;
+use BitWasp\Bitcoin\Serializer\Key\ScriptDecoratedHierarchicalKey\ExtendedKeySerializer;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\ScriptPrefix;
@@ -34,8 +34,8 @@ class Bip84Test extends AbstractTestCase
         ]);
 
         $globalConfig = new GlobalPrefixConfig([$btcConfig]);
-        $ser = new Base58ScriptedExtendedKeySerializer(
-            new ExtendedKeyWithScriptSerializer($adapter, $globalConfig)
+        $ser = new Base58ExtendedKeySerializer(
+            new ExtendedKeySerializer($adapter, $globalConfig)
         );
 
         $bip39 = new Bip39SeedGenerator();
@@ -43,7 +43,7 @@ class Bip84Test extends AbstractTestCase
 
         $addrFactory = new AddressCreator();
 
-        $rootPriv = ScriptedHierarchicalKeyFactory::fromEntropy($ent, $p2wpkhScriptDataFactory);
+        $rootPriv = ScriptDecoratedHierarchicalKeyFactory::fromEntropy($ent, $p2wpkhScriptDataFactory);
         $this->assertEquals(
             "zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5",
             $ser->serialize($btc, $rootPriv)

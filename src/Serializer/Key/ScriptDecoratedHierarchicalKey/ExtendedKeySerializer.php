@@ -1,7 +1,7 @@
 <?php
 
 
-namespace BitWasp\Bitcoin\Serializer\Key\ScriptedHierarchicalKey;
+namespace BitWasp\Bitcoin\Serializer\Key\ScriptDecoratedHierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
@@ -17,7 +17,7 @@ use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 use BitWasp\Buffertools\Parser;
 
-class ExtendedKeyWithScriptSerializer
+class ExtendedKeySerializer
 {
 
     /**
@@ -94,12 +94,10 @@ class ExtendedKeyWithScriptSerializer
             ->getConfigForPrefix($params->getPrefix())
         ;
 
-        if ($params->getPrefix() === $scriptConfig->getPublicPrefix()) {
-            $key = PublicKeyFactory::fromHex($params->getKeyData(), $this->ecAdapter);
-        } else if ($params->getPrefix() === $scriptConfig->getPrivatePrefix()) {
+        if ($params->getPrefix() === $scriptConfig->getPrivatePrefix()) {
             $key = PrivateKeyFactory::fromHex($params->getKeyData()->slice(1), true, $this->ecAdapter);
         } else {
-            throw new \InvalidArgumentException('Invalid prefix for extended key');
+            $key = PublicKeyFactory::fromHex($params->getKeyData(), $this->ecAdapter);
         }
 
         return new HierarchicalKeyScriptDecorator(
