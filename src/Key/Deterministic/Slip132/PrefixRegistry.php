@@ -22,6 +22,7 @@ class PrefixRegistry
             if (count($prefixes) !== 2) {
                 throw new \InvalidArgumentException("Expecting two BIP32 prefixes");
             }
+            // private, public
             if (strlen($prefixes[0]) !== 8 || !ctype_xdigit($prefixes[0])) {
                 throw new \InvalidArgumentException("Invalid private prefix");
             }
