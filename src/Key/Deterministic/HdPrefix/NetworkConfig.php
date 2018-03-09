@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key\Deterministic\HdPrefix;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Key\KeyToScript\Decorator;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;

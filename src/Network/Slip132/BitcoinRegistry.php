@@ -13,6 +13,7 @@ class BitcoinRegistry extends PrefixRegistry
     {
         $map = [];
         foreach ([
+                     // private, public
                      [["0488ade4", "0488b21e"], /* xpub */ [ScriptType::P2PKH]],
                      [["0488ade4", "0488b21e"], /* xpub */ [ScriptType::P2SH, ScriptType::P2PKH]],
                      [["049d7878", "049d7cb2"], /* ypub */ [ScriptType::P2SH, ScriptType::P2WKH]],
