@@ -206,6 +206,7 @@ class HierarchicalKey
     {
         $clone = clone $this;
         $clone->scriptDataFactory = $factory;
+        $clone->scriptAndSignData = null; // we cache, don't forget to clear
         return $clone;
     }
 
