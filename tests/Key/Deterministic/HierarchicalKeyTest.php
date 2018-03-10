@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
-use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shP2wshScriptDecorator;
+use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shScriptDecorator;
+use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkScriptDataFactory;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
@@ -17,6 +20,7 @@ use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
+use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Network\Networks\BitcoinTestnet;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -54,8 +58,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif($this->network));
         $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif());
 
-        $this->assertSame($vectors->address, (new PayToPubKeyHashAddress($key->getPublicKey()->getPubKeyHash()))->getAddress($this->network));
-        $this->assertSame($vectors->address, (new PayToPubKeyHashAddress($key->getPublicKey()->getPubKeyHash()))->getAddress());
+        $this->assertSame($vectors->address, $key->getAddress(new AddressCreator())->getAddress($this->network));
 
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
         $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey(), 'correct xprv');
@@ -528,5 +531,28 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertEquals(2, $child->getSequence());
         $this->assertEquals(2, $this->HK_run_count);
         $this->assertEquals(gmp_strval($math->add($k, gmp_init(1)), 10), gmp_strval($child->getPrivateKey()->getSecret(), 10));
+    }
+
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     * @throws \Exception
+     */
+    public function testExposesScriptDataFactory(EcAdapterInterface $ecAdapter)
+    {
+        $factories = [
+            new P2pkScriptDataFactory(),
+            new P2shScriptDecorator(new P2pkScriptDataFactory()),
+            new P2wshScriptDecorator(new P2pkScriptDataFactory()),
+            new P2shP2wshScriptDecorator(new P2pkScriptDataFactory()),
+        ];
+
+        $priv = PrivateKeyFactory::fromHex('0100000001000000010000000100000001000000010000000100000001000000', true, $ecAdapter);
+        $chain = new Buffer('00', 32);
+        foreach ($factories as $factory) {
+            $hd = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($ecAdapter, $factory, 0, 0, 0, $chain, $priv);
+
+            $this->assertSame($factory, $hd->getScriptDataFactory());
+        }
     }
 }
