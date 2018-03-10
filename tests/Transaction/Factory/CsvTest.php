@@ -6,7 +6,7 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
@@ -89,7 +89,8 @@ class CsvTest extends AbstractTestCase
     public function testCsv(int $verifySequence, TransactionInterface $unsigned, string $exception = null, string $exceptionMsg = null)
     {
         /** @var PrivateKeyInterface[] $keys */
-        $key = PrivateKeyFactory::fromHex("4200000042000000420000004200000042000000420000004200000042000000", true);
+        $factory = new PrivateKeyFactory(true);
+        $key = $factory->fromHex("4200000042000000420000004200000042000000420000004200000042000000");
 
         $s = ScriptFactory::sequence([
             Number::int($verifySequence)->getBuffer(), Opcodes::OP_CHECKSEQUENCEVERIFY, Opcodes::OP_DROP,

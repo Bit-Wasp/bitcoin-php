@@ -8,6 +8,9 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -39,11 +42,24 @@ class ExtendedKeySerializer
     private $prefixConfig;
 
     /**
+     * @var PrivateKeySerializerInterface
+     */
+    private $privateKeySerializer;
+
+    /**
+     * @var PublicKeySerializerInterface
+     */
+    private $publicKeySerializer;
+
+    /**
      * @param EcAdapterInterface $ecAdapter
      * @param GlobalPrefixConfig|null $config
      */
     public function __construct(EcAdapterInterface $ecAdapter, GlobalPrefixConfig $config = null)
     {
+        $this->privateKeySerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
+        $this->publicKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
+
         $this->ecAdapter = $ecAdapter;
         $this->rawSerializer = new RawExtendedKeySerializer($ecAdapter);
         $this->defaultScriptFactory = new P2pkhScriptDataFactory();

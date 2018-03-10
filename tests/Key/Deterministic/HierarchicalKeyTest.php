@@ -8,19 +8,19 @@ use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shP2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkScriptDataFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
-use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Network\Networks\BitcoinTestnet;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
@@ -72,7 +72,9 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testGenerateNew(EcAdapterInterface $ecAdapter)
     {
-        $key = HierarchicalKeyFactory::generateMasterKey($ecAdapter);
+        $random = new Random();
+        $factory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $factory->generateMasterKey($random);
         $this->assertInstanceOf(HierarchicalKey::class, $key);
     }
 
@@ -82,6 +84,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testFailsWithUncompressed()
     {
+        $privFactory = new PrivateKeyFactory(false);
         new HierarchicalKey(
             Bitcoin::getEcAdapter(),
             new P2pkhScriptDataFactory(),
@@ -89,7 +92,7 @@ class HierarchicalKeyTest extends AbstractTestCase
             1,
             1,
             new Buffer('', 32),
-            PrivateKeyFactory::create(false)
+            $privFactory->generate(new Random())
         );
     }
 
@@ -99,8 +102,9 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testFromEntropy(EcAdapterInterface $ecAdapter)
     {
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $entropy = Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141');
-        $key = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
+        $key = $hdFactory->fromEntropy($entropy);
         $this->assertInstanceOf(HierarchicalKey::class, $key);
     }
 
@@ -132,7 +136,8 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testTestVectors(EcAdapterInterface $ecAdapter, BufferInterface $entropy, $details, $derivs)
     {
-        $key = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromEntropy($entropy);
         $this->compareToPrivVectors($key, $details);
 
         foreach ($derivs as $childDeriv) {
@@ -150,7 +155,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $network = NetworkFactory::bitcoin();
         $entropy = Buffer::hex("000102030405060708090a0b0c0d0e0f");
-        $masterKey = HierarchicalKeyFactory::fromEntropy($entropy, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $masterKey = $hdFactory->fromEntropy($entropy);
         $this->assertEquals("xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi", $masterKey->toExtendedKey($network));
 
         $firstChildKey = $masterKey->derivePath("0");
@@ -190,7 +196,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testCreateHeirarchicalPrivateKey(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
-        $key = HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPrv, $this->network);
 
         $this->assertInstanceOf(HierarchicalKey::class, $key);
         $this->assertSame($key->toExtendedPrivateKey($this->network), $xPrv);
@@ -198,7 +205,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertTrue($key->isPrivate());
 
         $xPub = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $key = $hdFactory->fromExtended($xPub, $this->network);
 
         $this->assertInstanceOf(HierarchicalKey::class, $key);
         $this->assertSame($key->toExtendedPublicKey($this->network), $xPub);
@@ -214,9 +221,9 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testCreateWithInvalidNetwork()
     {
         $network = new BitcoinTestnet();
-
+        $hdFactory = new HierarchicalKeyFactory();
         $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
-        HierarchicalKeyFactory::fromExtended($key, $network);
+        $hdFactory->fromExtended($key, $network);
     }
 
     /**
@@ -225,7 +232,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testCreateWithInvalidLength()
     {
         $key = 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA';
-        HierarchicalKeyFactory::fromExtended($key, $this->network);
+        $hdFactory = new HierarchicalKeyFactory();
+        $hdFactory->fromExtended($key, $this->network);
     }
 
     /**
@@ -237,7 +245,8 @@ class HierarchicalKeyTest extends AbstractTestCase
         $xprv = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
         $xpub = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
 
-        $key = HierarchicalKeyFactory::fromExtended($xprv, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory();
+        $key = $hdFactory->fromExtended($xprv, $this->network);
 
         $this->assertSame($xprv, $key->toExtendedKey($this->network));
         $this->assertSame($xprv, $key->toExtendedPrivateKey($this->network));
@@ -253,7 +262,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetExtendedPrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory();
+        $key = $hdFactory->fromExtended($xPub, $this->network);
         $key->toExtendedPrivateKey($this->network);
     }
 
@@ -264,7 +274,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testMasterKeyDepthIsZero(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
-        $key = HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory();
+        $key = $hdFactory->fromExtended($xPrv, $this->network);
         $this->assertSame($key->getDepth(), 0);
     }
 
@@ -275,7 +286,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetDepth(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory();
+        $key = $hdFactory->fromExtended($xPub, $this->network);
         $this->assertSame($key->getDepth(), 2);
     }/**/
 
@@ -286,11 +298,12 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testIsHardened(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPub, $this->network);
         $this->assertFalse($key->isHardened());
 
         $xPub = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $key = $hdFactory->fromExtended($xPub, $this->network);
         $this->assertTrue($key->isHardened());
     }/**/
 
@@ -301,7 +314,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetFingerprint(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPub, $this->network);
         $this->assertSame(0x615914f3, $key->getFingerprint());
     }/**/
 
@@ -312,7 +326,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetChildFingerprint(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPub, $this->network);
         $this->assertSame(0xa282920f, $key->getChildFingerprint());
     }/**/
 
@@ -323,7 +338,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetPrivateKey(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
-        $key = HierarchicalKeyFactory::fromExtended($xPrv, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPrv, $this->network);
         $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $key->getPrivateKey()->getBuffer()->getHex());
     }/**/
 
@@ -336,7 +352,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testGetPrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPub, $this->network);
         $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $key->getPrivateKey());
     }/**/
 
@@ -346,9 +363,10 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testGetPublicKey(EcAdapterInterface $ecAdapter)
     {
-        $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
-        $xPub = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame('02e399a713db445b33340034ee5f71cd782bd9bc78f6f3352ca640109fe24ca23a', $xPub->getPublicKey()->getBuffer()->getHex());
+        $xpub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
+        $factory = new HierarchicalKeyFactory($ecAdapter);
+        $hd = $factory->fromExtended($xpub);
+        $this->assertSame('02e399a713db445b33340034ee5f71cd782bd9bc78f6f3352ca640109fe24ca23a', $hd->getPublicKey()->getBuffer()->getHex());
     }/**/
 
     /**
@@ -359,7 +377,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     public function testDeriveFailure(EcAdapterInterface $ecAdapter)
     {
         $k = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
-        $key = HierarchicalKeyFactory::fromExtended($k, $this->network, $ecAdapter);
+        $factory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $factory->fromExtended($k, $this->network);
         $key->deriveChild(2147483648);
     }
 
@@ -376,12 +395,13 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @dataProvider getInvalidSequences
      * @param int $sequence
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= (2^31)-1
+     * @expectedExceptionMessage Sequence is outside valid range
      */
     public function testInvalidSequenceGetHmac($sequence)
     {
-        $ecAdapter = Bitcoin::getEcAdapter();
-        $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network, $ecAdapter);
+        $xPrv = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+        $hdFactory = new HierarchicalKeyFactory();
+        $key = $hdFactory->fromExtended($xPrv, $this->network);
         $key->getHmacSeed($sequence);
     }
 
@@ -393,8 +413,8 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testInvalidSequenceDeriveChild($sequence)
     {
-        $ecAdapter = Bitcoin::getEcAdapter();
-        $key = HierarchicalKeyFactory::fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network, $ecAdapter);
+        $factory = new HierarchicalKeyFactory(Bitcoin::getEcAdapter());
+        $key = $factory->fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network);
         $key->deriveChild($sequence);
     }
 
@@ -402,7 +422,8 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $seed = "d13de7bd1e54422d1a3b3b699a27fb460de2849e7e66a005c647e8e4a54075cb";
         $buffer = Buffer::hex($seed);
-        $root = HierarchicalKeyFactory::fromEntropy($buffer);
+        $factory = new HierarchicalKeyFactory();
+        $root = $factory->fromEntropy($buffer);
 
         $this->assertEquals("c23ab32b36ddff49fae350a1bed8ec6b4d9fc252238dd789b7273ba4416054eb", $root->getChainCode()->getHex());
         $this->assertEquals("xpub661MyMwAqRbcGUbHLLJ5n2DzFAt8mmaDxbmbdimh68m8EiXGEQPiJya4BJat5yMzy4e68VSUoLGCu5uvzf8dUoGvwuJsLE6F1cibmWsxFNn", $root->toExtendedPublicKey());
@@ -547,7 +568,8 @@ class HierarchicalKeyTest extends AbstractTestCase
             new P2shP2wshScriptDecorator(new P2pkScriptDataFactory()),
         ];
 
-        $priv = PrivateKeyFactory::fromHex('0100000001000000010000000100000001000000010000000100000001000000', true, $ecAdapter);
+        $pkFactory = new PrivateKeyFactory(true, $ecAdapter);
+        $priv = $pkFactory->fromHex('0100000001000000010000000100000001000000010000000100000001000000');
         $chain = new Buffer('00', 32);
         foreach ($factories as $factory) {
             $hd = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($ecAdapter, $factory, 0, 0, 0, $chain, $priv);

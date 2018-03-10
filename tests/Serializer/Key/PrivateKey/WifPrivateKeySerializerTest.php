@@ -8,7 +8,8 @@ use BitWasp\Bitcoin\Base58;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
 use BitWasp\Bitcoin\Tests\Mnemonic\Bip39\AbstractBip39Case;
@@ -25,9 +26,10 @@ class WifPrivateKeySerializerTest extends AbstractBip39Case
         $network = NetworkFactory::bitcoin();
 
         $hexSerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
-        $wifSerializer = new WifPrivateKeySerializer($ecAdapter, $hexSerializer);
+        $wifSerializer = new WifPrivateKeySerializer($hexSerializer);
 
-        $valid = PrivateKeyFactory::create(false, $ecAdapter);
+        $factory = new PrivateKeyFactory(false, $ecAdapter);
+        $valid = $factory->generate(new Random());
         $this->assertEquals($valid, $wifSerializer->parse($wifSerializer->serialize($network, $valid), $network));
 
         $invalid = Buffer::hex('8041414141414141414141414141414141');

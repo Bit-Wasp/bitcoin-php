@@ -6,13 +6,11 @@ namespace BitWasp\Bitcoin\Key;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Serializer\Key\PrivateKey\WifPrivateKeySerializer;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory as PrivKeyFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -26,7 +24,9 @@ class PrivateKeyFactory
      */
     public static function create(bool $compressed = false, EcAdapterInterface $ecAdapter = null): PrivateKeyInterface
     {
-        return self::fromBuffer(self::generateSecret(), $compressed, $ecAdapter);
+        return (new PrivKeyFactory($compressed, $ecAdapter ?: Bitcoin::getEcAdapter()))
+            ->generate(new Random())
+        ;
     }
 
     /**
@@ -57,7 +57,9 @@ class PrivateKeyFactory
      */
     public static function fromHex(string $hex, bool $compressed = false, EcAdapterInterface $ecAdapter = null): PrivateKeyInterface
     {
-        return self::fromBuffer(Buffer::hex($hex), $compressed, $ecAdapter);
+        return (new PrivKeyFactory($compressed, $ecAdapter ?: Bitcoin::getEcAdapter()))
+            ->fromHex($hex)
+        ;
     }
 
     /**
@@ -68,17 +70,9 @@ class PrivateKeyFactory
      */
     public static function fromBuffer(BufferInterface $buffer, bool $compressed, EcAdapterInterface $ecAdapter = null): PrivateKeyInterface
     {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-
-        /** @var PrivateKeySerializerInterface $serializer */
-        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
-
-        $parsed = $serializer->parse($buffer);
-        if ($compressed) {
-            $parsed = $ecAdapter->getPrivateKey($parsed->getSecret(), $compressed);
-        }
-
-        return $parsed;
+        return (new PrivKeyFactory($compressed, $ecAdapter ?: Bitcoin::getEcAdapter()))
+            ->fromBuffer($buffer)
+        ;
     }
 
     /**
@@ -89,9 +83,9 @@ class PrivateKeyFactory
      */
     public static function fromInt($int, bool $compressed = false, EcAdapterInterface $ecAdapter = null)
     {
-        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $secret = Buffer::int($int, 32)->getGmp();
-        return $ecAdapter->getPrivateKey($secret, $compressed);
+        return (new PrivKeyFactory($compressed, $ecAdapter ?: Bitcoin::getEcAdapter()))
+            ->fromBuffer(Buffer::int($int, 32))
+        ;
     }
 
     /**
@@ -104,13 +98,8 @@ class PrivateKeyFactory
      */
     public static function fromWif(string $wif, EcAdapterInterface $ecAdapter = null, NetworkInterface $network = null)
     {
-        if (null === $ecAdapter) {
-            $ecAdapter = Bitcoin::getEcAdapter();
-        }
-
-        $serializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
-        $wifSerializer = new WifPrivateKeySerializer($ecAdapter, $serializer);
-
-        return $wifSerializer->parse($wif, $network);
+        return (new PrivKeyFactory(true, $ecAdapter ?: Bitcoin::getEcAdapter()))
+            ->fromWif($wif, $network)
+        ;
     }
 }
