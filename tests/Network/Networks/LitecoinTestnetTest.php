@@ -16,6 +16,7 @@ class LitecoinTestnetTest extends AbstractTestCase
         $this->assertEquals('04358394', $network->getHDPrivByte());
         $this->assertEquals('043587cf', $network->getHDPubByte());
         $this->assertEquals('f1c8d2fd', $network->getNetMagicBytes());
+        $this->assertEquals('tltc', $network->getSegwitBech32Prefix());
         $this->assertEquals("Litecoin Signed Message", $network->getSignedMessageMagic());
     }
 }
