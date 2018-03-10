@@ -87,7 +87,9 @@ class NetworkFactory
         $network = self::create('30', '05', 'b0')
             ->setHDPubByte('019da462')
             ->setHDPrivByte('019d9cfe')
-            ->setNetMagicBytes('dbb6c0fb');
+            ->setNetMagicBytes('dbb6c0fb')
+            ->setSegwitBech32Prefix("ltc")
+        ;
 
         return $network;
     }
@@ -101,7 +103,9 @@ class NetworkFactory
         $network = self::create('6f', 'c4', 'ef', true)
             ->setHDPubByte('019da462')
             ->setHDPrivByte('019d9cfe')
-            ->setNetMagicBytes('dcb7c1fc');
+            ->setNetMagicBytes('dcb7c1fc')
+            ->setSegwitBech32Prefix("tltc")
+        ;
 
         return $network;
     }
