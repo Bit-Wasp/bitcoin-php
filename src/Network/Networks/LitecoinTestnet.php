@@ -37,6 +37,14 @@ class LitecoinTestnet extends Network
 
     /**
      * {@inheritdoc}
+     * @see Network::$bech32PrefixMap
+     */
+    protected $bech32PrefixMap = [
+        self::BECH32_PREFIX_SEGWIT => "tltc",
+    ];
+
+    /**
+     * {@inheritdoc}
      * @see Network::$signedMessagePrefix
      */
     protected $signedMessagePrefix = "Litecoin Signed Message";
