@@ -86,6 +86,6 @@ class ElectrumKeyFactory
      */
     public function fromKey(KeyInterface $key): ElectrumKey
     {
-        return new ElectrumKey($this->adapter, $key);
+        return new ElectrumKey($key);
     }
 }

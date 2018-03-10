@@ -49,7 +49,7 @@ class PrivateKeyFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyFactory
      */
-    public static function uncompressed(EcAdapterInterface $ecAdapter = null): self
+    public static function uncompressed(EcAdapterInterface $ecAdapter = null): PrivateKeyFactory
     {
         return new self(false, $ecAdapter);
     }
@@ -58,7 +58,7 @@ class PrivateKeyFactory
      * @param EcAdapterInterface|null $ecAdapter
      * @return PrivateKeyFactory
      */
-    public static function compressed(EcAdapterInterface $ecAdapter = null): self
+    public static function compressed(EcAdapterInterface $ecAdapter = null): PrivateKeyFactory
     {
         return new self(true, $ecAdapter);
     }
