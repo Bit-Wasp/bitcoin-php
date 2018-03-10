@@ -34,6 +34,14 @@ class LitecoinTestnet extends Network
         self::BIP32_PREFIX_XPUB => ScriptType::P2PKH,
         self::BIP32_PREFIX_XPRV => ScriptType::P2PKH,
     ];
+    
+     /**
+     * {@inheritdoc}
+     * @see Network::$bech32PrefixMap
+     */
+    protected $bech32PrefixMap = [
+        self::BECH32_PREFIX_SEGWIT => "tltc",
+    ];
 
     /**
      * {@inheritdoc}
