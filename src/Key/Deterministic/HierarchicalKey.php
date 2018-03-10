@@ -200,18 +200,6 @@ class HierarchicalKey
     }
 
     /**
-     * @param ScriptDataFactory $factory
-     * @return HierarchicalKey
-     */
-    public function withScriptFactory(ScriptDataFactory $factory)
-    {
-        $clone = clone $this;
-        $clone->scriptDataFactory = $factory;
-        $clone->scriptAndSignData = null; // we cache, don't forget to clear
-        return $clone;
-    }
-
-    /**
      * @return ScriptDataFactory
      */
     public function getScriptDataFactory()

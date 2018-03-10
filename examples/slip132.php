@@ -69,4 +69,3 @@ $addrKey = $accountKey->derivePath("0/0");
 $serAddrKey = $serializer->serialize($btc, $addrKey);
 echo "address key {$serAddrKey}\n";
 echo "addr[0] {$addrKey->getAddress($addrCreator)->getAddress($btc)}\n";
-
