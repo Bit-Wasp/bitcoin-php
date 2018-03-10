@@ -15,7 +15,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\SignerException;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
@@ -54,6 +54,7 @@ class SignerTest extends AbstractTestCase
      */
     public function getScriptVectors(EcAdapterInterface $ecAdapter)
     {
+        $privFactory = new PrivateKeyFactory(true, $ecAdapter);
         $results = [];
         foreach ($this->jsonDataFile('signer_fixtures.json')['valid'] as $fixture) {
             $inputs = $fixture['raw']['ins'];
@@ -76,8 +77,8 @@ class SignerTest extends AbstractTestCase
                 $txOut = new TransactionOutput((int) $input['value'], ScriptFactory::fromHex($input['scriptPubKey']));
 
                 $txb->spendOutPoint($outpoint, null, (int) $input['sequence']);
-                $keys[] = array_map(function ($array) use ($ecAdapter) {
-                    return [PrivateKeyFactory::fromWif($array['key'], $ecAdapter, NetworkFactory::bitcoinTestnet()), $array['sigHashType']];
+                $keys[] = array_map(function ($array) use ($ecAdapter, $privFactory) {
+                    return [$privFactory->fromWif($array['key'], NetworkFactory::bitcoinTestnet()), $array['sigHashType']];
                 }, $input['keys']);
                 $utxos[] = new Utxo($outpoint, $txOut);
 
@@ -305,7 +306,9 @@ class SignerTest extends AbstractTestCase
             ->outputs([new TransactionOutput(4900000000, $script)])
             ->get();
 
-        $privateKey = PrivateKeyFactory::fromInt(1, false, $ecAdapter);
+        $factory = new PrivateKeyFactory(false, $ecAdapter);
+        $privateKey = $factory->fromBuffer(Buffer::int(1, 32));
+
         $txOut = new TransactionOutput(5000000000, $script);
         $signer = new Signer($tx, $ecAdapter);
         $signer->input(0, $txOut)->sign($privateKey, SigHash::ALL);
@@ -369,7 +372,8 @@ class SignerTest extends AbstractTestCase
      */
     protected function doTestSignerInvalidKeyInteraction($tolerateBadKey = null)
     {
-        $myKey = PrivateKeyFactory::create();
+        $factory = new PrivateKeyFactory(false);
+        $myKey = $factory->generate(new Random());
         $badKey = Buffer::hex("031234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd");
         $script = ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$myKey->getPublicKey()->getBuffer(), $badKey], false);
 
@@ -396,7 +400,16 @@ class SignerTest extends AbstractTestCase
         }
     }
 
-    public function testBitcoinCash()
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     * @throws SignerException
+     * @throws \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
+     * @throws \BitWasp\Bitcoin\Exceptions\InvalidPrivateKey
+     * @throws \BitWasp\Bitcoin\Exceptions\UnrecognizedAddressException
+     * @throws \Exception
+     */
+    public function testBitcoinCash(EcAdapterInterface $ecAdapter)
     {
         $expectSpend = '020000000113aaf49280ba92bddfcbdc30d6c7501c2575e4a80f539236df233f9218a2c8400000000049483045022100c5874e39da4dd427d35e24792bf31dcd63c25684deec66b426271b4043e21c3002201bfdc0621ad4237e8db05aa6cad69f3d5ab4ae32ebb2048f65b12165da6cc69341ffffffff0100f2052a010000001976a914cd29cc97826c37281ac61301e4d5ed374770585688ac00000000';
         $value = 50 * 100000000;
@@ -406,7 +419,8 @@ class SignerTest extends AbstractTestCase
         $network = NetworkFactory::bitcoinTestnet();
 
         $wif = "cTNwkxh7nVByhc3i7BH6eaBFQ4yVs6WvXBGBoA9xdKiorwcYVACc";
-        $keyPair = PrivateKeyFactory::fromWif($wif, null, $network);
+        $prvFactory = new PrivateKeyFactory(true, $ecAdapter);
+        $keyPair = $prvFactory->fromWif($wif, $network);
 
         $spk = ScriptFactory::scriptPubKey()->payToPubKey($keyPair->getPublicKey());
         $addrCreator = new AddressCreator();
@@ -417,7 +431,7 @@ class SignerTest extends AbstractTestCase
             ->input($txid, $vout)
             ->output($value, $dest);
 
-        $txs = new Signer($txb->get());
+        $txs = new Signer($txb->get(), $ecAdapter);
         $txs->redeemBitcoinCash();
 
         $hashType = SigHash::BITCOINCASH | SigHash::ALL;
@@ -454,10 +468,11 @@ class SignerTest extends AbstractTestCase
 
     public function paddedMultisigsProvider()
     {
+        $privFactory = new PrivateKeyFactory(true);
         $keys = [
-            PrivateKeyFactory::fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
-            PrivateKeyFactory::fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
-            PrivateKeyFactory::fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
+            $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
+            $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
+            $privFactory->fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
         ];
 
         $multisig = ScriptFactory::scriptPubKey()->multisig(2, array_map(function (PrivateKeyInterface $key) {
@@ -565,10 +580,11 @@ class SignerTest extends AbstractTestCase
 
     public function testFullySignedMultisigIsNotPadded()
     {
+        $privFactory = new PrivateKeyFactory(true);
         $keys = [
-            PrivateKeyFactory::fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
-            PrivateKeyFactory::fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
-            PrivateKeyFactory::fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
+            $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
+            $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
+            $privFactory->fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
         ];
 
         $multisig = ScriptFactory::scriptPubKey()->multisig(2, array_map(function (PrivateKeyInterface $key) {
@@ -637,10 +653,11 @@ class SignerTest extends AbstractTestCase
 
     public function testFullySignedWitnessMultisigIsNotPadded()
     {
+        $privFactory = new PrivateKeyFactory(true);
         $keys = [
-            PrivateKeyFactory::fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
-            PrivateKeyFactory::fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
-            PrivateKeyFactory::fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
+            $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
+            $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
+            $privFactory->fromWif('KxuuCULSevY215pnSPtRHka3YH83D9w2MKtwg1y33L6pBzk3tjQ1'),
         ];
 
         $multisig = ScriptFactory::scriptPubKey()->multisig(2, array_map(function (PrivateKeyInterface $key) {

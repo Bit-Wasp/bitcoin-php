@@ -2,7 +2,7 @@
 
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -29,7 +29,8 @@ $seed = $bip39->getSeed($mnemonic);
 
 $purpose = 44;
 
-$root = HierarchicalKeyFactory::fromEntropy($seed);
+$factory = new HierarchicalKeyFactory();
+$root = $factory->fromEntropy($seed);
 echo "Root key (m): " . $root->toExtendedKey() . PHP_EOL;
 echo "Root key (M): " . $root->toExtendedPublicKey() . PHP_EOL;
 
@@ -55,7 +56,7 @@ echo "\n\n -------------- \n\n";
 
 echo "initialize from xpub (M/{$purpose}'/0'/0'): \n";
 
-$xpub = HierarchicalKeyFactory::fromExtended($purposePub);
+$xpub = $factory->fromExtended($purposePub);
 
 $addressCreator = new AddressCreator();
 $script0 = getScriptPubKey($xpub->derivePath("0/0"), $purpose);

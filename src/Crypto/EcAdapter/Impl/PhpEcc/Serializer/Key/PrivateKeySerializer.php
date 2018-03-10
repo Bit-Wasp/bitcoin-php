@@ -37,20 +37,23 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
 
     /**
      * @param Parser $parser
+     * @param bool $compressed
      * @return PrivateKeyInterface
      * @throws \Exception
      */
-    public function fromParser(Parser $parser): PrivateKeyInterface
+    public function fromParser(Parser $parser, bool $compressed): PrivateKeyInterface
     {
-        return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getGmp());
+        return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getGmp(), $compressed);
     }
 
     /**
      * @param BufferInterface $buffer
+     * @param bool $compressed
      * @return PrivateKeyInterface
+     * @throws \Exception
      */
-    public function parse(BufferInterface $buffer): PrivateKeyInterface
+    public function parse(BufferInterface $buffer, bool $compressed): PrivateKeyInterface
     {
-        return $this->fromParser(new Parser($buffer));
+        return $this->fromParser(new Parser($buffer), $compressed);
     }
 }

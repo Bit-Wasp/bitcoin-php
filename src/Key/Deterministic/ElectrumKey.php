@@ -15,11 +15,6 @@ use BitWasp\Buffertools\BufferInterface;
 class ElectrumKey
 {
     /**
-     * @var EcAdapterInterface
-     */
-    private $ecAdapter;
-
-    /**
      * @var null|PrivateKeyInterface
      */
     private $masterPrivate;
@@ -45,8 +40,6 @@ class ElectrumKey
         } elseif ($masterKey instanceof PublicKeyInterface) {
             $this->masterPublic = $masterKey;
         }
-
-        $this->ecAdapter = $ecAdapter;
     }
 
     /**

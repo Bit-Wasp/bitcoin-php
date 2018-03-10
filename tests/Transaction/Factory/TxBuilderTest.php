@@ -8,7 +8,8 @@ use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Address\AddressInterface;
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Locktime;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -135,7 +136,8 @@ class TxBuilderTest extends AbstractTestCase
 
     public function getAddresses()
     {
-        $key = PrivateKeyFactory::create(false);
+        $factory = new PrivateKeyFactory(false);
+        $key = $factory->generate(new Random());
         $script = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
         $scriptAddress = new ScriptHashAddress($script->getScriptHash());
         return [

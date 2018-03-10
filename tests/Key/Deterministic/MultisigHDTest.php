@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;
 use BitWasp\Bitcoin\Key\Deterministic\MultisigHD;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -26,8 +26,9 @@ class MultisigHDTest extends AbstractTestCase
 
     public function testCreateRootWhenAlreadySorted()
     {
-        $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
-        $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
+        $hdFactory = new HierarchicalKeyFactory();
+        $keys[0] = $hdFactory->fromEntropy(Buffer::hex('01'));
+        $keys[1] = $hdFactory->fromEntropy(Buffer::hex('02'));
 
         $sequences = new HierarchicalKeySequence();
 
@@ -39,8 +40,9 @@ class MultisigHDTest extends AbstractTestCase
 
     public function testSortedKeysAsSideEffect()
     {
-        $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
-        $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
+        $hdFactory = new HierarchicalKeyFactory();
+        $keys[0] = $hdFactory->fromEntropy(Buffer::hex('02'));
+        $keys[1] = $hdFactory->fromEntropy(Buffer::hex('01'));
 
         $sequences = new HierarchicalKeySequence();
         $hd = new MultisigHD(2, 'm', $keys, $sequences, true);
@@ -50,8 +52,9 @@ class MultisigHDTest extends AbstractTestCase
 
     public function testNoSideEffectWhenNotSorting()
     {
-        $keys[0] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'));
-        $keys[1] = HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'));
+        $hdFactory = new HierarchicalKeyFactory();
+        $keys[0] = $hdFactory->fromEntropy(Buffer::hex('01'));
+        $keys[1] = $hdFactory->fromEntropy(Buffer::hex('02'));
 
         $sequences = new HierarchicalKeySequence();
 
@@ -66,16 +69,13 @@ class MultisigHDTest extends AbstractTestCase
      */
     public function testGetRedeemScript(EcAdapterInterface $ecAdapter)
     {
-        $keys[0] = HierarchicalKeyFactory::fromExtended(
-            'xpub661MyMwAqRbcGG5afwSiBJ37bLbnzj9VuCdKzcQgihyuRYbiA1PnhuzWzMg2H9xT7JMHWGowEfx93cxzL7KUsX9Q2hrG2ayhKf93x1uXUsV',
-            null,
-            $ecAdapter
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $keys[0] = $hdFactory->fromExtended(
+            'xpub661MyMwAqRbcGG5afwSiBJ37bLbnzj9VuCdKzcQgihyuRYbiA1PnhuzWzMg2H9xT7JMHWGowEfx93cxzL7KUsX9Q2hrG2ayhKf93x1uXUsV'
         );
 
-        $keys[1] = HierarchicalKeyFactory::fromExtended(
-            'xpub661MyMwAqRbcG2X4GYsMkLw3Rputa3aG865sQUG1mK6B4UGCyGLePHejDxiSYqWGBDUzUagLqzHq8cemTYYjHop8DRtkfqt6TAxMEznufcz',
-            null,
-            $ecAdapter
+        $keys[1] = $hdFactory->fromExtended(
+            'xpub661MyMwAqRbcG2X4GYsMkLw3Rputa3aG865sQUG1mK6B4UGCyGLePHejDxiSYqWGBDUzUagLqzHq8cemTYYjHop8DRtkfqt6TAxMEznufcz'
         );
 
         $sequences = new HierarchicalKeySequence();
@@ -95,12 +95,13 @@ class MultisigHDTest extends AbstractTestCase
      */
     public function testDeriveChild(EcAdapterInterface $ecAdapter)
     {
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $hd = new MultisigHD(
             2,
             'm',
             [
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'), $ecAdapter),
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'), $ecAdapter)
+                $hdFactory->fromEntropy(Buffer::hex('01')),
+                $hdFactory->fromEntropy(Buffer::hex('02')),
             ],
             new HierarchicalKeySequence(),
             true
@@ -124,12 +125,14 @@ class MultisigHDTest extends AbstractTestCase
      */
     public function testDerivePath(EcAdapterInterface $ecAdapter)
     {
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+
         $hd = new MultisigHD(
             2,
             'm',
             [
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('01'), $ecAdapter),
-                HierarchicalKeyFactory::fromEntropy(Buffer::hex('02'), $ecAdapter)
+                $hdFactory->fromEntropy(Buffer::hex('01')),
+                $hdFactory->fromEntropy(Buffer::hex('02')),
             ],
             new HierarchicalKeySequence(),
             true
