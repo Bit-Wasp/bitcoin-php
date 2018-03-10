@@ -51,16 +51,6 @@ class Bip49Test extends AbstractTestCase
             "03a1af804ac108a8a51782198c2d034b28bf90c8803f5a53f76276fa69a4eae77f",
             $firstKey->getPrivateKey()->getPublicKey()->getHex()
         );
-
-        $slip132 = new Slip132(new KeyToScriptHelper($adapter));
-        $registry = new BitcoinRegistry();
-        $prefix = $slip132->p2shP2wpkh($registry);
-        $p2shP2wpkhKey = $firstKey->withScriptFactory($prefix->getScriptDataFactory());
-        $address = $p2shP2wpkhKey->getAddress(new AddressCreator());
-        $this->assertEquals(
-            "2Mww8dCYPUpKHofjgcXcBCEGmniw9CoaiD2",
-            $address->getAddress($tbtc)
-        );
     }
 
     /**
