@@ -65,7 +65,7 @@ class ElectrumKeyTest extends AbstractTestCase
         $electrumFactory = new ElectrumKeyFactory($ecAdapter);
         $keyPriv = $electrumFactory->fromMnemonic($mnemonic);
 
-        $keyPub = new ElectrumKey($ecAdapter, $keyPriv->getMasterPublicKey());
+        $keyPub = $keyPriv->withoutPrivateKey();
         $this->assertEquals($eSecExp, $keyPriv->getMasterPrivateKey()->getHex());
         $this->assertEquals($eMPK, $keyPriv->getMPK()->getHex());
 
