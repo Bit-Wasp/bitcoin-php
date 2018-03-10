@@ -138,7 +138,6 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
             new ExtendedKeySerializer($adapter, $config)
         );
 
-        echo $ent->getHex().PHP_EOL;
         $root = HierarchicalKeyFactory::fromEntropy($ent, $adapter, $prefix->getScriptDataFactory());
         $account = $root->derivePath("44'/0'/0'");
 
