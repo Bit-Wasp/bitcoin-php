@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\RpcTest;
 
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -181,10 +181,11 @@ class TransactionTest extends AbstractTestCase
         $txBuilder->locktime(isset($fixture['raw']['locktime']) ? $fixture['raw']['locktime'] : 0);
 
         $signer = new Signer($txBuilder->get());
+        $privFactory = PrivateKeyFactory::compressed();
         foreach ($fixture['raw']['ins'] as $i => $input) {
             $iSigner = $signer->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
             foreach ($input['keys'] as $key) {
-                $priv = PrivateKeyFactory::fromWif($key['key'], null, NetworkFactory::bitcoinTestnet());
+                $priv = $privFactory->fromWif($key['key'], NetworkFactory::bitcoinTestnet());
                 $sigHashType = $key['sigHashType'];
                 $iSigner->sign($priv, $sigHashType);
             }

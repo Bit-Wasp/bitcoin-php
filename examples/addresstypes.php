@@ -3,12 +3,13 @@
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Address\ScriptHashAddress;
 use BitWasp\Bitcoin\Address\SegwitAddress;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 
 require __DIR__ . "/../vendor/autoload.php";
 
-$priv = PrivateKeyFactory::fromWif('L1U6RC3rXfsoAx3dxsU1UcBaBSRrLWjEwUGbZPxWX9dBukN345R1');
+$privFactory = new PrivateKeyFactory(true);
+$priv = $privFactory->fromWif('L1U6RC3rXfsoAx3dxsU1UcBaBSRrLWjEwUGbZPxWX9dBukN345R1');
 $publicKey = $priv->getPublicKey();
 $pubKeyHash = $publicKey->getPubKeyHash();
 

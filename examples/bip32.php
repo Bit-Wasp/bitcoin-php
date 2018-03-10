@@ -2,15 +2,18 @@
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 
 require __DIR__ . "/../vendor/autoload.php";
 
 $math = Bitcoin::getMath();
 $network = Bitcoin::getNetwork();
+$random = new Random();
 
 // By default, this example produces random keys.
-$master = HierarchicalKeyFactory::generateMasterKey();
+$hdFactory = new HierarchicalKeyFactory();
+$master = $hdFactory->generateMasterKey($random);
 
 // To restore from an existing xprv/xpub:
 //$master = HierarchicalKeyFactory::fromExtended("xprv9s21ZrQH143K4Se1mR27QkNkLS9LSarRVFQcopi2mcomwNPDaABdM1gjyow2VgrVGSYReepENPKX2qiH61CbixpYuSg4fFgmrRtk6TufhPU");

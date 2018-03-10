@@ -6,7 +6,7 @@ namespace BitWasp\Bitcoin\Tests\Transaction\Factory;
 
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -42,11 +42,12 @@ class ComplexSignerTest extends AbstractTestCase
 
     protected function initKeyStore()
     {
-        $this->privateKeys[] = PrivateKeyFactory::fromHex("990000009900000099000000990000009900000099000000ff00000099000000", true);
-        $this->privateKeys[] = PrivateKeyFactory::fromHex("98aa0000990000009900000099000000990000009900000099000ff099000000", true);
-        $this->privateKeys[] = PrivateKeyFactory::fromHex("98bb000099000000990ff0009900000099000000990000009900000099000000", true);
-        $this->privateKeys[] = PrivateKeyFactory::fromHex("98cc00009900000099000000990000009900ff00990000009900000099000000", true);
-        $this->privateKeys[] = PrivateKeyFactory::fromHex("98cc0000990ed00099000000990920009900ff009900000099000000990000cc", true);
+        $factory = new PrivateKeyFactory(true);
+        $this->privateKeys[] = $factory->fromHex("990000009900000099000000990000009900000099000000ff00000099000000");
+        $this->privateKeys[] = $factory->fromHex("98aa0000990000009900000099000000990000009900000099000ff099000000");
+        $this->privateKeys[] = $factory->fromHex("98bb000099000000990ff0009900000099000000990000009900000099000000");
+        $this->privateKeys[] = $factory->fromHex("98cc00009900000099000000990000009900ff00990000009900000099000000");
+        $this->privateKeys[] = $factory->fromHex("98cc0000990ed00099000000990920009900ff009900000099000000990000cc");
     }
 
     /**

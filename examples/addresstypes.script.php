@@ -1,14 +1,15 @@
 <?php
 
 use BitWasp\Bitcoin\Address\AddressCreator;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessScript;
 
 require __DIR__ . "/../vendor/autoload.php";
 
-$priv = PrivateKeyFactory::fromWif('L1U6RC3rXfsoAx3dxsU1UcBaBSRrLWjEwUGbZPxWX9dBukN345R1');
+$privFactory = new PrivateKeyFactory(true);
+$priv = $privFactory->fromWif('L1U6RC3rXfsoAx3dxsU1UcBaBSRrLWjEwUGbZPxWX9dBukN345R1');
 $publicKey = $priv->getPublicKey();
 $pubKeyHash = $publicKey->getPubKeyHash();
 
