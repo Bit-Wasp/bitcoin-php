@@ -1,6 +1,5 @@
 <?php
 
-
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -8,7 +7,6 @@ use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
-use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
@@ -22,29 +20,9 @@ class ExtendedKeySerializer
     private $ecAdapter;
 
     /**
-     * @var \BitWasp\Buffertools\Types\ByteString
+     * @var RawExtendedKeySerializer
      */
-    private $bytestring4;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\Uint8
-     */
-    private $uint8;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\Uint32
-     */
-    private $uint32;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\ByteString
-     */
-    private $bytestring32;
-
-    /**
-     * @var \BitWasp\Buffertools\Types\ByteString
-     */
-    private $bytestring33;
+    private $rawSerializer;
 
     /**
      * @param EcAdapterInterface $ecAdapter
@@ -53,47 +31,33 @@ class ExtendedKeySerializer
     public function __construct(EcAdapterInterface $ecAdapter)
     {
         $this->ecAdapter = $ecAdapter;
-        $this->bytestring4 = Types::bytestring(4);
-        $this->uint8 = Types::uint8();
-        $this->uint32 = Types::uint32();
-        $this->bytestring32 = Types::bytestring(32);
-        $this->bytestring33 = Types::bytestring(33);
-    }
-
-    /**
-     * @param NetworkInterface $network
-     * @throws \Exception
-     */
-    private function checkNetwork(NetworkInterface $network)
-    {
-        try {
-            $network->getHDPrivByte();
-            $network->getHDPubByte();
-        } catch (\Exception $e) {
-            throw new \Exception('Network not configured for HD wallets');
-        }
+        $this->rawSerializer = new RawExtendedKeySerializer($ecAdapter);
     }
 
     /**
      * @param NetworkInterface $network
      * @param HierarchicalKey $key
-     * @return Buffer
+     * @return BufferInterface
      */
     public function serialize(NetworkInterface $network, HierarchicalKey $key)
     {
-        $this->checkNetwork($network);
+        if ($key->isPrivate()) {
+            $prefix = $network->getHDPrivByte();
+            $keyData = new Buffer("\x00" . $key->getPrivateKey()->getBinary());
+        } else {
+            $prefix = $network->getHDPubByte();
+            $keyData = $key->getPublicKey()->getBuffer();
+        }
 
-        list ($prefix, $data) = $key->isPrivate()
-            ? [$network->getHDPrivByte(), new Buffer("\x00". $key->getPrivateKey()->getBinary(), 33)]
-            : [$network->getHDPubByte(), $key->getPublicKey()->getBuffer()];
-
-        return new Buffer(
-            pack("H*", $prefix) .
-            $this->uint8->write($key->getDepth()) .
-            $this->uint32->write($key->getFingerprint()) .
-            $this->uint32->write($key->getSequence()) .
-            $this->bytestring32->write($key->getChainCode()) .
-            $this->bytestring33->write($data)
+        return $this->rawSerializer->serialize(
+            new RawKeyParams(
+                $prefix,
+                $key->getDepth(),
+                $key->getFingerprint(),
+                $key->getSequence(),
+                $key->getChainCode(),
+                $keyData
+            )
         );
     }
 
@@ -105,32 +69,24 @@ class ExtendedKeySerializer
      */
     public function fromParser(NetworkInterface $network, Parser $parser)
     {
-        $this->checkNetwork($network);
+        $params = $this->rawSerializer->fromParser($parser);
 
-        try {
-            list ($bytes, $depth, $parentFingerprint, $sequence, $chainCode, $keyData) = [
-                $this->bytestring4->read($parser),
-                $this->uint8->read($parser),
-                $this->uint32->read($parser),
-                $this->uint32->read($parser),
-                $this->bytestring32->read($parser),
-                $this->bytestring33->read($parser),
-            ];
-
-            $bytes = $bytes->getHex();
-        } catch (ParserOutOfRange $e) {
-            throw new ParserOutOfRange('Failed to extract HierarchicalKey from parser');
-        }
-
-        if ($bytes !== $network->getHDPubByte() && $bytes !== $network->getHDPrivByte()) {
+        if ($params->getPrefix() === $network->getHDPubByte()) {
+            $key = PublicKeyFactory::fromHex($params->getKeyData(), $this->ecAdapter);
+        } else if ($params->getPrefix() === $network->getHDPrivByte()) {
+            $key = PrivateKeyFactory::fromHex($params->getKeyData()->slice(1), true, $this->ecAdapter);
+        } else {
             throw new \InvalidArgumentException('HD key magic bytes do not match network magic bytes');
         }
 
-        $key = ($network->getHDPrivByte() === $bytes)
-            ? PrivateKeyFactory::fromHex($keyData->slice(1), true, $this->ecAdapter)
-            : PublicKeyFactory::fromHex($keyData, $this->ecAdapter);
-
-        return new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
+        return new HierarchicalKey(
+            $this->ecAdapter,
+            $params->getDepth(),
+            $params->getParentFingerprint(),
+            $params->getSequence(),
+            $params->getChainCode(),
+            $key
+        );
     }
 
     /**

@@ -47,7 +47,8 @@ echo "M/{$purpose}'/0'/0': ".$purposePriv->toExtendedPublicKey().PHP_EOL;
 echo "Derive (M -> m/{$purpose}'/0'/0'): .... should fail\n";
 
 try {
-    $rootPub = $root->toPublic()->derivePath("{$purpose}'/0'/0'");
+    $rootPub = $root->withoutPrivateKey();
+    $rootPub->derivePath("{$purpose}'/0'/0'");
 } catch (\Exception $e) {
     echo "caught exception, yes this is impossible: " . $e->getMessage().PHP_EOL;
 }
