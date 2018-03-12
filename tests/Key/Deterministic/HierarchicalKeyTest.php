@@ -17,7 +17,7 @@ use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkScriptDataFactory;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Network\Network;
 use BitWasp\Bitcoin\Network\NetworkFactory;
@@ -446,7 +446,8 @@ class HierarchicalKeyTest extends AbstractTestCase
 
 
         $k = $math->sub($generator->getOrder(), gmp_init(1));
-        $startPub = PublicKeyFactory::fromHex('0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798');
+        $pubKeyFactory = new PublicKeyFactory();
+        $startPub = $pubKeyFactory->fromHex('0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798');
 
         $mock = $this->getMockBuilder('\BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface')
             ->setMethods([

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Key\KeyToScript\Factory;
 
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shP2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -21,7 +21,8 @@ class P2pkhScriptDataFactoryTest extends AbstractTestCase
         $this->assertEquals(ScriptType::P2PKH, $factory->getScriptType());
 
         $privKeyHex = "8de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b";
-        $privKey = PrivateKeyFactory::fromHex($privKeyHex);
+        $privKeyFactory = new PrivateKeyFactory(false);
+        $privKey = $privKeyFactory->fromHex($privKeyHex);
         $publicKey = $privKey->getPublicKey();
         $script = $factory->convertKey($publicKey);
         $this->assertEquals(
@@ -48,7 +49,8 @@ class P2pkhScriptDataFactoryTest extends AbstractTestCase
         $this->assertEquals(ScriptType::P2SH . "|" . ScriptType::P2PKH, $factory->getScriptType());
 
         $publicKeyHex = "038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b";
-        $publicKey = PublicKeyFactory::fromHex($publicKeyHex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $publicKey = $pubKeyFactory->fromHex($publicKeyHex);
 
         $script = $factory->convertKey($publicKey);
 
@@ -72,7 +74,8 @@ class P2pkhScriptDataFactoryTest extends AbstractTestCase
         $this->assertEquals(ScriptType::P2WSH . "|" . ScriptType::P2PKH, $factory->getScriptType());
 
         $publicKeyHex = "038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b";
-        $publicKey = PublicKeyFactory::fromHex($publicKeyHex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $publicKey = $pubKeyFactory->fromHex($publicKeyHex);
 
         $script = $factory->convertKey($publicKey);
 
@@ -96,7 +99,8 @@ class P2pkhScriptDataFactoryTest extends AbstractTestCase
         $this->assertEquals(ScriptType::P2SH . "|" . ScriptType::P2WSH . "|" . ScriptType::P2PKH, $factory->getScriptType());
 
         $publicKeyHex = "038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b";
-        $publicKey = PublicKeyFactory::fromHex($publicKeyHex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $publicKey = $pubKeyFactory->fromHex($publicKeyHex);
 
         $script = $factory->convertKey($publicKey);
 

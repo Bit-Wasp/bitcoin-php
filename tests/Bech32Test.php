@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\SegwitBech32;
 use BitWasp\Bitcoin\Bech32;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Exceptions\Bech32Exception;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use function BitWasp\Bitcoin\Script\encodeOpN;
@@ -21,7 +21,8 @@ class Bech32Test extends AbstractTestCase
     public function getBip173Fixtures()
     {
         $publicKeyHex = "0279BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";
-        $publicKey = PublicKeyFactory::fromHex($publicKeyHex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $publicKey = $pubKeyFactory->fromHex($publicKeyHex);
         $publicKeyScript = ScriptFactory::scriptPubKey()->p2pk($publicKey);
         $p2wsh = WitnessProgram::v0($publicKeyScript->getWitnessScriptHash());
         $p2wpkh = WitnessProgram::v0($publicKey->getPubKeyHash());

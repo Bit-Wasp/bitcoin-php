@@ -16,7 +16,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Exceptions\SignerException;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputData;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
@@ -263,7 +263,8 @@ class SignerTest extends AbstractTestCase
      */
     public function getSimpleSpendCases(EcAdapterInterface $ecAdapter)
     {
-        $publicKey = PublicKeyFactory::fromHex('038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b', $ecAdapter);
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
+        $publicKey = $pubKeyFactory->fromHex('038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b');
         $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, false, $ecAdapter);
         $pubKeyBuffer = $pubKeySerializer->serialize($publicKey);
         $pubKeyHash = Hash::sha256ripe160($pubKeyBuffer);

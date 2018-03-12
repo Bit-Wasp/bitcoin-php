@@ -7,7 +7,7 @@ namespace BitWasp\Bitcoin\Tests\Bloom;
 use BitWasp\Bitcoin\Amount;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Serializer\Bloom\BloomFilterSerializer;
@@ -20,6 +20,17 @@ use BitWasp\Buffertools\BufferInterface;
 
 class BloomFilterTest extends AbstractTestCase
 {
+    /**
+     * @var PublicKeyFactory
+     */
+    private $pubKeyFactory;
+
+    public function setUp()
+    {
+        $this->pubKeyFactory = new PublicKeyFactory();
+        parent::setUp();
+    }
+
     /**
      * @param BufferInterface $hex
      * @return BloomFilter
@@ -209,7 +220,7 @@ class BloomFilterTest extends AbstractTestCase
 
     public function testInsertKey()
     {
-        $pub = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $pub = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $math = new Math();
         $flags = BloomFilter::UPDATE_ALL;
         $filter = BloomFilter::create($math, 2, 0.001, 0, $flags);
@@ -223,7 +234,7 @@ class BloomFilterTest extends AbstractTestCase
 
     public function testEmptyFilterNeverMatches()
     {
-        $pubkey = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $spends = $this->getPayToPubkeyTxVector($pubkey);
 
         $filter = $this->getEmptyFilterVector();
@@ -232,7 +243,7 @@ class BloomFilterTest extends AbstractTestCase
 
     public function testFullFilterAlwaysRelevant()
     {
-        $pubkey = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $tx = $this->getPayToPubkeyTxVector($pubkey);
         $filter = $this->getFullFilterVector();
         $this->assertTrue($filter->isRelevantAndUpdate($tx));
@@ -258,7 +269,7 @@ class BloomFilterTest extends AbstractTestCase
     public function testTxMatchesPayToPubkey()
     {
         $math = $this->safeMath();
-        $pubkey = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
 
         $tx = $this->getPayToPubkeyTxVector($pubkey);
 
@@ -270,7 +281,7 @@ class BloomFilterTest extends AbstractTestCase
     public function testTxMatchesPayToMultisig()
     {
         $math = $this->safeMath();
-        $pubkey = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $pubkey = $this->pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
 
         $tx = $this->getPayToMultisigTxVector($pubkey);
 

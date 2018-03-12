@@ -7,7 +7,7 @@ namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
@@ -33,7 +33,6 @@ class Bip84Test extends AbstractTestCase
         $slip132Registry = new Slip132(new KeyToScriptHelper($adapter));
         $registry = new BitcoinRegistry();
         $prefix = $slip132Registry->p2wpkh($registry);
-        $p2wpkhScriptDataFactory = $prefix->getScriptDataFactory();
 
         $globalConfig = new GlobalPrefixConfig([
             new NetworkConfig($btc, [
@@ -50,7 +49,9 @@ class Bip84Test extends AbstractTestCase
 
         $addrFactory = new AddressCreator();
 
-        $rootPriv = HierarchicalKeyFactory::fromEntropy($ent, $adapter, $p2wpkhScriptDataFactory);
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $rootPriv = $hkFactory->fromEntropy($ent, $prefix->getScriptDataFactory());
+
         $this->assertEquals(
             "zprvAWgYBBk7JR8Gjrh4UJQ2uJdG1r3WNRRfURiABBE3RvMXYSrRJL62XuezvGdPvG6GFBZduosCc1YP5wixPox7zhZLfiUm8aunE96BBa4Kei5",
             $ser->serialize($btc, $rootPriv)
@@ -143,7 +144,8 @@ class Bip84Test extends AbstractTestCase
             new ExtendedKeySerializer($adapter, $config)
         );
 
-        $root = HierarchicalKeyFactory::fromEntropy($ent, $adapter, $prefix->getScriptDataFactory());
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $root = $hkFactory->fromEntropy($ent, $prefix->getScriptDataFactory());
         $account = $root->derivePath("84'/0'/0'");
 
         $this->assertEquals(

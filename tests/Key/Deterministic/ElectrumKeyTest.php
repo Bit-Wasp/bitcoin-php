@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\ElectrumKey;
 use BitWasp\Bitcoin\Key\Factory\ElectrumKeyFactory;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ElectrumKeyTest extends AbstractTestCase
@@ -115,7 +115,8 @@ class ElectrumKeyTest extends AbstractTestCase
      */
     public function testFailsWithoutMasterPrivateKey()
     {
-        $key = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $pubKeyFactory = new PublicKeyFactory();
+        $key = $pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $electrumFactory = new ElectrumKeyFactory();
         $e = $electrumFactory->fromKey($key);
         $e->getMasterPrivateKey();

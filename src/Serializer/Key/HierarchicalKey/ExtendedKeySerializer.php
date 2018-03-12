@@ -11,8 +11,6 @@ use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -134,9 +132,9 @@ class ExtendedKeySerializer
         }
 
         if ($params->getPrefix() === $privatePrefix) {
-            $key = PrivateKeyFactory::fromBuffer($params->getKeyData()->slice(1), true, $this->ecAdapter);
+            $key = $this->privateKeySerializer->parse($params->getKeyData()->slice(1), true);
         } else {
-            $key = PublicKeyFactory::fromBuffer($params->getKeyData(), $this->ecAdapter);
+            $key = $this->publicKeySerializer->parse($params->getKeyData());
         }
 
         return new HierarchicalKey(

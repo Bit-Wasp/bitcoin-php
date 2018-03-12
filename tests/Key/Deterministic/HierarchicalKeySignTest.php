@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Tests\Key\Deterministic;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\ScriptPrefix;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -42,7 +43,9 @@ class HierarchicalKeySignTest extends AbstractTestCase
      */
     public function testEndToEnd(EcAdapterInterface $adapter, ScriptPrefix $prefix, $purpose)
     {
-        $key = HierarchicalKeyFactory::generateMasterKey($adapter, $prefix->getScriptDataFactory());
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $random = new Random();
+        $key = $hkFactory->generateMasterKey($random, $prefix->getScriptDataFactory());
         $account = $key->derivePath("{$purpose}'/0'/0'");
         $external = $account->deriveChild(0);
         $key0 = $external->deriveChild(0);

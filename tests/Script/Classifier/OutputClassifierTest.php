@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Tests\Script\Classifier;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
@@ -146,6 +146,7 @@ class OutputClassifierTest extends AbstractTestCase
      */
     public function testCases(OutputClassifier $classifier, ScriptInterface $script, $eSolution, string $classification)
     {
+        $pubKeyFactory = new PublicKeyFactory();
         $factory = ScriptFactory::scriptPubKey();
         $solution = '';
         $type = $classifier->classify($script, $solution);
@@ -173,7 +174,7 @@ class OutputClassifierTest extends AbstractTestCase
 
         if ($type === ScriptType::P2PK) {
             $this->assertTrue($classifier->isPayToPublicKey($script));
-            $this->assertEquals($script, $factory->p2pk(PublicKeyFactory::fromBuffer($solution)));
+            $this->assertEquals($script, $factory->p2pk($pubKeyFactory->fromBuffer($solution)));
         } else {
             $this->assertFalse($classifier->isPayToPublicKey($script));
         }
@@ -188,7 +189,7 @@ class OutputClassifierTest extends AbstractTestCase
         if ($type === ScriptType::MULTISIG) {
             $this->assertTrue($classifier->isMultisig($script));
             $count = Multisig::fromScript($script)->getRequiredSigCount();
-            $this->assertEquals($script, $factory->multisig($count, array_map([PublicKeyFactory::class, 'fromBuffer'], $solution), false));
+            $this->assertEquals($script, $factory->multisig($count, array_map([$pubKeyFactory, 'fromBuffer'], $solution), false));
         } else {
             $this->assertFalse($classifier->isMultisig($script));
         }

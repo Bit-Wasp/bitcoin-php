@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Key\Factory;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -22,8 +23,9 @@ class PublicKeyFactory
      * PublicKeyFactory constructor.
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(EcAdapterInterface $ecAdapter)
+    public function __construct(EcAdapterInterface $ecAdapter = null)
     {
+        $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->serializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
     }
 
