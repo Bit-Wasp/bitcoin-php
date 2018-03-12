@@ -3,7 +3,7 @@
 require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
@@ -15,7 +15,8 @@ use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
 
 // Setup network and private key to segnet
-$key = PrivateKeyFactory::fromHex("4242424242424242424242424242424242424242424242424242424242424242", true);
+$privKeyFactory = PrivateKeyFactory::compressed();
+$key = $privKeyFactory->fromHex("4242424242424242424242424242424242424242424242424242424242424242");
 
 // Spend from a P2WSH P2PKH
 $witnessScript = new WitnessScript(ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash()));

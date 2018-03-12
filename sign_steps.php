@@ -2,22 +2,20 @@
 
 require "vendor/autoload.php";
 
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\Number;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Path\BranchInterpreter;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 
-$alice = PrivateKeyFactory::fromInt(1);
-$bob = PrivateKeyFactory::fromInt(2);
-
+$privFactory = PrivateKeyFactory::compressed();
 $random = new Random();
 
-$alicePriv = \BitWasp\Bitcoin\Key\PrivateKeyFactory::create(true);
+$alicePriv = $privFactory->generate($random);
 $alicePub = $alicePriv->getPublicKey();
 
-$bobPriv = \BitWasp\Bitcoin\Key\PrivateKeyFactory::create(true);
+$bobPriv = $privFactory->generate($random);
 $bobPub = $bobPriv->getPublicKey();
 
 $rhash1 = $random->bytes(20);

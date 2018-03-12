@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 
@@ -96,9 +96,10 @@ class EcAdapterTest extends AbstractTestCase
     public function testIsValidPublicKey(EcAdapterInterface $ecAdapter)
     {
         $json = json_decode($this->dataFile('publickey.compressed.json'));
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
         foreach ($json->test as $test) {
             try {
-                PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
+                $pubKeyFactory->fromHex($test->compressed, $ecAdapter);
                 $valid = true;
             } catch (\Exception $e) {
                 $valid = false;
