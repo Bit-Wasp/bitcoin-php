@@ -34,6 +34,14 @@ class ViacoinTestnet extends Network
     ];
 
     /**
+     * {@inheritdoc}
+     * @see Network::$bech32PrefixMap
+     */
+    protected $bech32PrefixMap = [
+        self::BECH32_PREFIX_SEGWIT => "tvia",
+    ];
+
+    /**
      * @var string - message prefix for bitcoin signed messages
      */
     protected $signedMessagePrefix = "Viacoin Signed Message";

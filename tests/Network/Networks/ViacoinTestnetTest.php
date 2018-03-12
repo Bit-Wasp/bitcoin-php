@@ -18,6 +18,7 @@ class ViacoinTestnetTest extends AbstractTestCase
         $this->assertEquals('04358394', $network->getHDPrivByte());
         $this->assertEquals('043587cf', $network->getHDPubByte());
         $this->assertEquals('92efc5a9', $network->getNetMagicBytes());
+        $this->assertEquals('tvia', $network->getSegwitBech32Prefix());
         $this->assertEquals("Viacoin Signed Message", $network->getSignedMessageMagic());
     }
 }
