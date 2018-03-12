@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Serializer\Key\HierarchicalKey;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\Buffer;
@@ -48,11 +49,24 @@ class ExtendedKeySerializer
     private $bytestring33;
 
     /**
+     * @var PrivateKeySerializerInterface
+     */
+    private $privateKeySerializer;
+
+    /**
+     * @var PublicKeySerializerInterface
+     */
+    private $publicKeySerializer;
+
+    /**
      * @param EcAdapterInterface $ecAdapter
      * @throws \Exception
      */
     public function __construct(EcAdapterInterface $ecAdapter)
     {
+        $this->privateKeySerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
+        $this->publicKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
+
         $this->ecAdapter = $ecAdapter;
         $this->bytestring4 = Types::bytestring(4);
         $this->uint8 = Types::uint8();
@@ -69,9 +83,13 @@ class ExtendedKeySerializer
      */
     public function serialize(NetworkInterface $network, HierarchicalKey $key): BufferInterface
     {
-        list ($prefix, $data) = $key->isPrivate()
-            ? [$network->getHDPrivByte(), new Buffer("\x00". $key->getPrivateKey()->getBinary(), 33)]
-            : [$network->getHDPubByte(), $key->getPublicKey()->getBuffer()];
+        if ($key->isPrivate()) {
+            $prefix = $network->getHDPrivByte();
+            $data = new Buffer("\x00{$this->privateKeySerializer->serialize($key->getPrivateKey())->getBinary()}", 33);
+        } else {
+            $prefix = $network->getHDPubByte();
+            $data = $this->publicKeySerializer->serialize($key->getPublicKey());
+        }
 
         return new Buffer(
             pack("H*", $prefix) .
@@ -111,8 +129,8 @@ class ExtendedKeySerializer
         }
 
         $key = ($network->getHDPrivByte() === $bytes)
-            ? PrivateKeyFactory::fromBuffer($keyData->slice(1), true, $this->ecAdapter)
-            : PublicKeyFactory::fromBuffer($keyData, $this->ecAdapter);
+            ? $this->privateKeySerializer->parse($keyData->slice(1), true)
+            : $this->publicKeySerializer->parse($keyData);
 
         return new HierarchicalKey($this->ecAdapter, $depth, $parentFingerprint, $sequence, $chainCode, $key);
     }

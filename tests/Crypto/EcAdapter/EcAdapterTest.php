@@ -9,8 +9,8 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 
@@ -48,12 +48,14 @@ class EcAdapterTest extends AbstractTestCase
      */
     public function testPrivateToPublic(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
     {
-        $priv = PrivateKeyFactory::fromHex($privHex, false, $ec);
+        $ucFactory = PrivateKeyFactory::uncompressed($ec);
+        $priv = $ucFactory->fromHex($privHex);
         $this->assertSame($priv->getPublicKey()->getHex(), $pubHex);
         $this->assertSame($privHex, $priv->getHex());
 
-        $priv = PrivateKeyFactory::fromHex($privHex, true, $ec);
-        $this->assertSame($priv->getPublicKey()->getHex(), $compressedHex);
+        $cFactory = PrivateKeyFactory::compressed($ec);
+        $priv = $cFactory->fromHex($privHex);
+        $this->assertSame($compressedHex, $priv->getPublicKey()->getHex());
     }
 
     /**
@@ -94,9 +96,10 @@ class EcAdapterTest extends AbstractTestCase
     public function testIsValidPublicKey(EcAdapterInterface $ecAdapter)
     {
         $json = json_decode($this->dataFile('publickey.compressed.json'));
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
         foreach ($json->test as $test) {
             try {
-                PublicKeyFactory::fromHex($test->compressed, $ecAdapter);
+                $pubKeyFactory->fromHex($test->compressed, $ecAdapter);
                 $valid = true;
             } catch (\Exception $e) {
                 $valid = false;
@@ -113,8 +116,9 @@ class EcAdapterTest extends AbstractTestCase
     {
         $json = json_decode($this->dataFile('hmacdrbg.json'));
         $math = $ecAdapter->getMath();
+        $ucFactory = PrivateKeyFactory::uncompressed($ecAdapter);
         foreach ($json->test as $c => $test) {
-            $privateKey = PrivateKeyFactory ::fromHex($test->privKey, false, $ecAdapter);
+            $privateKey = $ucFactory->fromHex($test->privKey);
             $message = new Buffer($test->message, null);
             $messageHash = Hash::sha256($message);
 

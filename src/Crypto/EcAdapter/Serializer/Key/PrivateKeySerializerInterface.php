@@ -17,7 +17,8 @@ interface PrivateKeySerializerInterface
 
     /**
      * @param BufferInterface $data
+     * @param bool $compressed
      * @return PrivateKeyInterface
      */
-    public function parse(BufferInterface $data): PrivateKeyInterface;
+    public function parse(BufferInterface $data, bool $compressed): PrivateKeyInterface;
 }

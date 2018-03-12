@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Key\Deterministic;
 
-use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
@@ -14,11 +13,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class ElectrumKey
 {
-    /**
-     * @var EcAdapterInterface
-     */
-    private $ecAdapter;
-
     /**
      * @var null|PrivateKeyInterface
      */
@@ -30,10 +24,9 @@ class ElectrumKey
     private $masterPublic;
 
     /**
-     * @param EcAdapterInterface $ecAdapter
      * @param KeyInterface $masterKey
      */
-    public function __construct(EcAdapterInterface $ecAdapter, KeyInterface $masterKey)
+    public function __construct(KeyInterface $masterKey)
     {
         if ($masterKey->isCompressed()) {
             throw new \RuntimeException('Electrum keys are not compressed');
@@ -45,8 +38,6 @@ class ElectrumKey
         } elseif ($masterKey instanceof PublicKeyInterface) {
             $this->masterPublic = $masterKey;
         }
-
-        $this->ecAdapter = $ecAdapter;
     }
 
     /**
@@ -97,5 +88,15 @@ class ElectrumKey
     {
         $key = is_null($this->masterPrivate) ? $this->masterPublic : $this->masterPrivate;
         return $key->tweakAdd($this->getSequenceOffset($sequence, $change));
+    }
+
+    /**
+     * @return ElectrumKey
+     */
+    public function withoutPrivateKey(): ElectrumKey
+    {
+        $clone = clone $this;
+        $clone->masterPrivate = null;
+        return $clone;
     }
 }

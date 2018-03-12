@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Script;
 
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -22,8 +22,9 @@ class ScriptFactoryTest extends AbstractTestCase
 
     public function testMultisig()
     {
-        $pk1 = PrivateKeyFactory::fromInt('4');
-        $pk2 = PrivateKeyFactory::fromInt('50000000');
+        $factory = new PrivateKeyFactory(false);
+        $pk1 = $factory->fromHex('9999999999999999999999999999999999999999999999999999999999999999');
+        $pk2 = $factory->fromHex('abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234');
 
         $m = 2;
         $arbitrary = [$pk1->getPublicKey(), $pk2->getPublicKey()];

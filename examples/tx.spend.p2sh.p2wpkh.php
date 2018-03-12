@@ -4,7 +4,7 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface as I;
 use BitWasp\Bitcoin\Script\P2shScript;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -14,7 +14,8 @@ use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
-$key = PrivateKeyFactory::fromHex("4242424242424242424242424242424242424242424242424242424242424242", true);
+$privKeyFactory = PrivateKeyFactory::compressed();
+$key = $privKeyFactory->fromHex("4242424242424242424242424242424242424242424242424242424242424242");
 
 // scriptPubKey is P2SH | P2WPKH
 $redeemScript = ScriptFactory::scriptPubKey()->p2wkh($key->getPubKeyHash());

@@ -3,7 +3,7 @@
 require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeySequence;
 use BitWasp\Bitcoin\Key\Deterministic\MultisigHD;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
@@ -24,13 +24,13 @@ function status(MultisigHD $hd)
 $ec = Bitcoin::getEcAdapter();
 
 $bip39 = (new MnemonicFactory())->bip39();
-$seed = new Bip39SeedGenerator($bip39);
-
+$seed = new Bip39SeedGenerator();
+$hdFactory = new HierarchicalKeyFactory();
 $s = [];
 $k = [];
 for ($i = 0; $i < 3; $i++) {
     $s[$i] = $seed->getSeed($bip39->create());
-    $k[$i] = HierarchicalKeyFactory::fromEntropy($s[$i]);
+    $k[$i] = $hdFactory->fromEntropy($s[$i]);
 }
 
 $sequences = new HierarchicalKeySequence();

@@ -8,9 +8,9 @@ use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\ElectrumKey;
-use BitWasp\Bitcoin\Key\Deterministic\ElectrumKeyFactory;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\ElectrumKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class ElectrumKeyTest extends AbstractTestCase
@@ -62,8 +62,10 @@ class ElectrumKeyTest extends AbstractTestCase
      */
     public function testCKD(EcAdapterInterface $ecAdapter, $mnemonic, $eSecExp, $eMPK, array $eAddrList = array())
     {
-        $keyPriv = ElectrumKeyFactory::fromMnemonic($mnemonic, null, $ecAdapter);
-        $keyPub = new ElectrumKey($ecAdapter, $keyPriv->getMasterPublicKey());
+        $electrumFactory = new ElectrumKeyFactory($ecAdapter);
+        $keyPriv = $electrumFactory->fromMnemonic($mnemonic);
+
+        $keyPub = $keyPriv->withoutPrivateKey();
         $this->assertEquals($eSecExp, $keyPriv->getMasterPrivateKey()->getHex());
         $this->assertEquals($eMPK, $keyPriv->getMPK()->getHex());
 
@@ -85,18 +87,25 @@ class ElectrumKeyTest extends AbstractTestCase
      */
     public function testFromKey()
     {
-        $key = PrivateKeyFactory::create(false);
-        $e = ElectrumKeyFactory::fromKey($key);
+        $random = new Random();
+        $ucFactory = PrivateKeyFactory::uncompressed();
+        $key = $ucFactory->generate($random);
+
+        $electrumFactory = new ElectrumKeyFactory();
+        $e = $electrumFactory->fromKey($key);
         $this->assertInstanceOf(ElectrumKey::class, $e);
 
-        $key = PrivateKeyFactory::create(true);
-        ElectrumKeyFactory::fromKey($key);
+        $cFactory = PrivateKeyFactory::compressed();
+        $key = $cFactory->generate($random);
+        $electrumFactory->fromKey($key);
     }
 
     public function testGenerate()
     {
         $random = new Random();
-        $key = ElectrumKeyFactory::generateMasterKey($random->bytes(32));
+        $bytes = $random->bytes(32);
+        $electrumFactory = new ElectrumKeyFactory();
+        $key = $electrumFactory->getKeyFromSeed($bytes);
         $this->assertInstanceOf(ElectrumKey::class, $key);
     }
 
@@ -106,8 +115,10 @@ class ElectrumKeyTest extends AbstractTestCase
      */
     public function testFailsWithoutMasterPrivateKey()
     {
-        $key = PublicKeyFactory::fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
-        $e = ElectrumKeyFactory::fromKey($key);
+        $pubKeyFactory = new PublicKeyFactory();
+        $key = $pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
+        $electrumFactory = new ElectrumKeyFactory();
+        $e = $electrumFactory->fromKey($key);
         $e->getMasterPrivateKey();
     }
 }

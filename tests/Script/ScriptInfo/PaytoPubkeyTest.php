@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests\Script\ScriptInfo;
 
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -16,7 +17,8 @@ class PaytoPubkeyTest extends AbstractTestCase
 {
     public function testMethods()
     {
-        $priv = PrivateKeyFactory::create();
+        $factory = new PrivateKeyFactory(false);
+        $priv = $factory->generate(new Random());
         $pub = $priv->getPublicKey();
 
         $script = ScriptFactory::sequence([$pub->getBuffer(), Opcodes::OP_CHECKSIG]);
@@ -29,7 +31,7 @@ class PaytoPubkeyTest extends AbstractTestCase
         $this->assertTrue($pub->getBuffer()->equals($info->getKeyBuffer()));
         $this->assertTrue($info->checkInvolvesKey($pub));
 
-        $otherPriv = PrivateKeyFactory::create();
+        $otherPriv = $factory->generate(new Random());
         $otherPub = $otherPriv->getPublicKey();
 
         $this->assertFalse($info->checkInvolvesKey($otherPub));

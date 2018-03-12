@@ -4,7 +4,7 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\Factory\Signer;
 use BitWasp\Bitcoin\Transaction\OutPoint;
@@ -26,10 +26,11 @@ $amount = '161662670';
 $fee = '12345';
 $amountAfterFee = $amount - $fee;
 
+$privKeyFactory = PrivateKeyFactory::uncompressed();
 // Two users independently create private keys.
-$pk1 = PrivateKeyFactory::fromHex($privHex1);
+$pk1 = $privKeyFactory->fromHex($privHex1);
 $addr1 = new PayToPubKeyHashAddress($pk1->getPublicKey()->getPubKeyHash());
-$pk2 = PrivateKeyFactory::fromHex($privHex2);
+$pk2 = $privKeyFactory->fromHex($privHex2);
 
 $outpoint = new OutPoint(Buffer::hex($txid), $vout);
 $redeemScript = new P2shScript(ScriptFactory::fromHex($redeemScriptHex));
