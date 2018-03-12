@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
@@ -47,7 +47,8 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
 
         $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
 
-        $root = HierarchicalKeyFactory::fromEntropy($ent, $adapter, $prefix->getScriptDataFactory());
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $root = $hkFactory->fromEntropy($ent, $prefix->getScriptDataFactory());
 
         $account = $root->derivePath("44'/0'/0'");
 
@@ -86,7 +87,8 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
 
         $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
 
-        $root = HierarchicalKeyFactory::fromEntropy($ent, $adapter);
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $root = $hkFactory->fromEntropy($ent);
 
         $account = $root->derivePath("44'/0'/0'");
 
@@ -139,7 +141,10 @@ class Bip44KeyAndAddressTest extends AbstractTestCase
         $serializer = new Base58ExtendedKeySerializer(
             new ExtendedKeySerializer($adapter, $config)
         );
-        $root = HierarchicalKeyFactory::fromEntropy($ent, $adapter, $prefix->getScriptDataFactory());
+
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $root = $hkFactory->fromEntropy($ent, $prefix->getScriptDataFactory());
+
         $account = $root->derivePath("44'/0'/0'");
 
         $this->assertEquals(

@@ -4,11 +4,14 @@ require __DIR__ . "/../vendor/autoload.php";
 
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Key\PrivateKeyFactory;
+use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 
 $ec = Bitcoin::getEcAdapter();
-$privateKey = PrivateKeyFactory::create(true);
+$random = new Random();
+$compressedKeyFactory = PrivateKeyFactory::compressed();
+$privateKey = $compressedKeyFactory->generate($random);
 
 $message = 'hi';
 

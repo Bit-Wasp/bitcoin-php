@@ -6,7 +6,7 @@ namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
 
@@ -37,7 +37,8 @@ class PublicKeyTest extends AbstractTestCase
      */
     public function testFromHex(EcAdapterInterface $ecAdapter, string $eCompressed, string $eUncompressed)
     {
-        $publicKey = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
+        $publicKey = $pubKeyFactory->fromHex($eCompressed);
 
         $this->assertSame($eCompressed, $publicKey->getBuffer()->getHex());
         $this->assertSame($publicKey->getBuffer()->getHex(), $eCompressed);
@@ -52,7 +53,8 @@ class PublicKeyTest extends AbstractTestCase
      */
     public function testFromHexUncompressed(EcAdapterInterface $ecAdapter, string $eCompressed, string $eUncompressed)
     {
-        $publicKey = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
+        $publicKey = $pubKeyFactory->fromHex($eUncompressed);
         $this->assertSame($eUncompressed, $publicKey->getBuffer()->getHex());
         $this->assertSame($publicKey->getBuffer()->getHex(), $eUncompressed);
         $this->assertFalse($publicKey->isCompressed());
@@ -67,7 +69,8 @@ class PublicKeyTest extends AbstractTestCase
     public function testFromHexInvalidLength(EcAdapterInterface $ecAdapter)
     {
         $hex = '02cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44febaa';
-        PublicKeyFactory::fromHex($hex, $ecAdapter);
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
+        $pubKeyFactory->fromHex($hex);
     }
 
     /**
@@ -76,7 +79,8 @@ class PublicKeyTest extends AbstractTestCase
     public function testFromHexInvalidByte()
     {
         $hex = '01cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
-        PublicKeyFactory::fromHex($hex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $pubKeyFactory->fromHex($hex);
     }
 
     public function testIsCompressedOrUncompressed()
@@ -100,7 +104,8 @@ class PublicKeyTest extends AbstractTestCase
     public function testFromHexInvalidByte2()
     {
         $hex = '04cffc9fcdc2a4e6f5dd91aee9d8d79828c1c93e7a76949a451aab8be6a0c44feb';
-        PublicKeyFactory::fromHex($hex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $pubKeyFactory->fromHex($hex);
     }
 
     public function getPkHashVectors()
@@ -123,14 +128,16 @@ class PublicKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getPkHashVectors
+     * @param EcAdapterInterface $ecAdapter
      * @param string $eKey - hex public key
      * @param string $eHash - hex sha256ripemd160 of public key
      */
     public function testPubKeyHash(EcAdapterInterface $ecAdapter, string $eKey, string $eHash)
     {
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
         $this->assertSame(
             $eHash,
-            PublicKeyFactory::fromHex($eKey, $ecAdapter)
+            $pubKeyFactory->fromHex($eKey)
                 ->getPubKeyHash()
                 ->getHex()
         );
@@ -144,10 +151,11 @@ class PublicKeyTest extends AbstractTestCase
      */
     public function testIsNotCompressed(EcAdapterInterface $ecAdapter, string $eCompressed, string $eUncompressed)
     {
-        $pub = PublicKeyFactory::fromHex($eCompressed, $ecAdapter);
+        $pubKeyFactory = new PublicKeyFactory($ecAdapter);
+        $pub = $pubKeyFactory->fromHex($eCompressed);
         $this->assertTrue($pub->isCompressed());
 
-        $pub = PublicKeyFactory::fromHex($eUncompressed, $ecAdapter);
+        $pub = $pubKeyFactory->fromHex($eUncompressed);
         $this->assertFalse($pub->isCompressed());
     }
 }

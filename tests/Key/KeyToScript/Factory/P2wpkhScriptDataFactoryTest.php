@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shP2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2wpkhScriptDataFactory;
-use BitWasp\Bitcoin\Key\PublicKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\PublicKeyFactory;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
@@ -21,7 +21,8 @@ class P2wpkhScriptDataFactoryTest extends AbstractTestCase
         $this->assertEquals(ScriptType::P2WKH, $factory->getScriptType());
 
         $publicKeyHex = "038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b";
-        $publicKey = PublicKeyFactory::fromHex($publicKeyHex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $publicKey = $pubKeyFactory->fromHex($publicKeyHex);
         $script = $factory->convertKey($publicKey);
         $this->assertEquals(
             "0014851a33a5ef0d4279bd5854949174e2c65b1d4500",
@@ -38,7 +39,8 @@ class P2wpkhScriptDataFactoryTest extends AbstractTestCase
         $this->assertEquals(ScriptType::P2SH . "|" . ScriptType::P2WKH, $factory->getScriptType());
 
         $publicKeyHex = "038de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b";
-        $publicKey = PublicKeyFactory::fromHex($publicKeyHex);
+        $pubKeyFactory = new PublicKeyFactory();
+        $publicKey = $pubKeyFactory->fromHex($publicKeyHex);
 
         $script = $factory->convertKey($publicKey);
 

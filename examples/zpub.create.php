@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
 use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
@@ -35,7 +36,9 @@ $scriptFactory = $prefix->getScriptDataFactory();
 // We just need a ScriptDataFactory. (see the KeyToScript
 // helpers on how to create custom script factories)
 
-$masterKey = HierarchicalKeyFactory::generateMasterKey($adapter, $scriptFactory);
+$random = new Random();
+$hdFactory = new HierarchicalKeyFactory($adapter);
+$masterKey = $hdFactory->generateMasterKey($random, $scriptFactory);
 
 // First nice part, we have access to the SPK/RS/WS
 $scriptAndSignData = $masterKey->getScriptAndSignData();

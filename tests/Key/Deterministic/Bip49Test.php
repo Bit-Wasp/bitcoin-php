@@ -10,7 +10,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\GlobalPrefixConfig;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\NetworkConfig;
 use BitWasp\Bitcoin\Key\Deterministic\Slip132\Slip132;
-use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
 use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
 use BitWasp\Bitcoin\Mnemonic\Bip39\Bip39SeedGenerator;
@@ -29,7 +29,9 @@ class Bip49Test extends AbstractTestCase
 
         $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
 
-        $root = HierarchicalKeyFactory::fromEntropy($ent, $adapter);
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $root = $hkFactory->fromEntropy($ent);
+
         $this->assertEquals(
             "tprv8ZgxMBicQKsPe5YMU9gHen4Ez3ApihUfykaqUorj9t6FDqy3nP6eoXiAo2ssvpAjoLroQxHqr3R5nE3a5dU3DHTjTgJDd7zrbniJr6nrCzd",
             $root->toExtendedPrivateKey($tbtc)
@@ -74,7 +76,8 @@ class Bip49Test extends AbstractTestCase
 
         $ent = $bip39->getSeed("abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about");
 
-        $root = HierarchicalKeyFactory::fromEntropy($ent, $adapter, $prefix->getScriptDataFactory());
+        $hkFactory = new HierarchicalKeyFactory($adapter);
+        $root = $hkFactory->fromEntropy($ent, $prefix->getScriptDataFactory());
 
         $config = new GlobalPrefixConfig([
             new NetworkConfig($btc, [
