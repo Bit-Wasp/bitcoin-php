@@ -34,9 +34,11 @@ class MessageSigner
      */
     private function calculateBody(NetworkInterface $network, $message)
     {
+        $prefix = sprintf("%s:\n", $network->getSignedMessageMagic());
         return new Buffer(sprintf(
-            "\x18%s:\n%s%s",
-            $network->getSignedMessageMagic(),
+            "%s%s%s%s",
+            Buffertools::numToVarInt(strlen($prefix))->getBinary(),
+            $prefix,
             Buffertools::numToVarInt(strlen($message))->getBinary(),
             $message
         ));
