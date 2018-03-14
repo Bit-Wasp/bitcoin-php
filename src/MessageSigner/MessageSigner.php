@@ -33,12 +33,19 @@ class MessageSigner
     /**
      * @param NetworkInterface $network
      * @param string $message
-     * @return Buffer
+     * @return BufferInterface
+     * @throws \Exception
      */
-    private function calculateBody(NetworkInterface $network, string $message)
+    private function calculateBody(NetworkInterface $network, string $message): BufferInterface
     {
-        $varIntBuffer = Buffertools::numToVarInt(strlen($message));
-        return new Buffer("\x18{$network->getSignedMessageMagic()}:\n{$varIntBuffer->getBinary()}{$message}", null);
+        $prefix = sprintf("%s:\n", $network->getSignedMessageMagic());
+        return new Buffer(sprintf(
+            "%s%s%s%s",
+            Buffertools::numToVarInt(strlen($prefix))->getBinary(),
+            $prefix,
+            Buffertools::numToVarInt(strlen($message))->getBinary(),
+            $message
+        ));
     }
 
     /**
