@@ -5,7 +5,6 @@ namespace BitWasp\Bitcoin\Tests;
 use BitWasp\Bitcoin\SegwitBech32;
 use BitWasp\Bitcoin\Bech32;
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Exceptions\Bech32Exception;
 use BitWasp\Bitcoin\Key\PublicKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -206,7 +205,7 @@ class Bech32Test extends AbstractTestCase
     }
 
     /**
-     * @expectedException \BitWasp\Bitcoin\Exceptions\Bech32Exception
+     * @expectedException \BitWasp\Bech32\Exception\Bech32Exception
      * @expectedExceptionMessage Invalid value for convert bits
      */
     public function testInvalidCharValue()
@@ -218,9 +217,8 @@ class Bech32Test extends AbstractTestCase
     {
         return [
             [str_pad("", 91, "A"), "Bech32 string cannot exceed 90 characters in length"],
-            ["\x10", "Out of range character in bech32 string"],
-            ["aB", "Data contains mixture of higher/lower case characters"],
-            ["bcbcbc1bc", "Invalid location for `1` character"],
+            ["aaa", "Bech32 string is too short"],
+            ["bc1QW508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", "Data contains mixture of higher/lower case characters"],
             ["bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t5", "Invalid bech32 checksum"],
         ];
     }
@@ -231,7 +229,7 @@ class Bech32Test extends AbstractTestCase
      */
     public function testDecodeFails($bech32, $exceptionMsg)
     {
-        $this->expectException(Bech32Exception::class);
+        $this->expectException(\BitWasp\Bech32\Exception\Bech32Exception::class);
         $this->expectExceptionMessage($exceptionMsg);
         Bech32::decode($bech32);
     }

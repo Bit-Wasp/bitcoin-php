@@ -2,7 +2,7 @@
 
 namespace BitWasp\Bitcoin;
 
-use BitWasp\Bitcoin\Exceptions\Bech32Exception;
+use BitWasp\Bech32\Exception\Bech32Exception;
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Buffertools\Buffer;
