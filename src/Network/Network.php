@@ -200,6 +200,15 @@ class Network implements NetworkInterface
     {
         return $this->getBase58Prefix(self::BASE58_ADDRESS_P2PKH);
     }
+    /**
+     * @return int
+     * @throws MissingBase58Prefix
+     * @see NetworkInterface::getAddressPrefixLength()
+     */
+    public function getAddressPrefixLength(): int
+    {
+        return strlen($this->getAddressByte()) / 2;
+    }
 
     /**
      * @return string
@@ -209,6 +218,16 @@ class Network implements NetworkInterface
     public function getP2shByte(): string
     {
         return $this->getBase58Prefix(self::BASE58_ADDRESS_P2SH);
+    }
+
+    /**
+     * @return int
+     * @throws MissingBase58Prefix
+     * @see NetworkInterface::getP2shPrefixLength()
+     */
+    public function getP2shPrefixLength(): int
+    {
+        return strlen($this->getP2shByte()) / 2;
     }
 
     /**

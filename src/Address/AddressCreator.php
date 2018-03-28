@@ -28,12 +28,12 @@ class AddressCreator extends BaseAddressCreator
     {
         try {
             $data = Base58::decodeCheck($strAddress);
-            $prefixByte = $data->slice(0, 1)->getHex();
+            $prefixByte = $data->slice(0, $network->getP2shPrefixLength())->getHex();
 
             if ($prefixByte === $network->getP2shByte()) {
                 return new ScriptHashAddress($data->slice(1));
             } else if ($prefixByte === $network->getAddressByte()) {
-                return new PayToPubKeyHashAddress($data->slice(1));
+                return new PayToPubKeyHashAddress($data->slice($network->getAddressPrefixLength()));
             }
         } catch (\Exception $e) {
             // Just return null

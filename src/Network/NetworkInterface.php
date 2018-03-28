@@ -14,6 +14,13 @@ interface NetworkInterface
     public function getAddressByte(): string;
 
     /**
+     * Return a address prefix length in bytes
+     *
+     * @return int
+     */
+    public function getAddressPrefixLength(): int;
+
+    /**
      * Return the string that binds address signed messages to
      * this network
      *
@@ -34,6 +41,13 @@ interface NetworkInterface
      * @return string
      */
     public function getP2shByte(): string;
+
+    /**
+     * Return the p2sh prefix length in bytes for the network
+     *
+     * @return int
+     */
+    public function getP2shPrefixLength(): int;
 
     /**
      * Get the private key byte for the network
