@@ -96,4 +96,12 @@ class NetworkFactory
     {
         return new Networks\DashTestnet();
     }
+
+    /**
+     * @return NetworkInterface
+     */
+    public static function zcash()
+    {
+        return new Networks\Zcash();
+    }
 }
