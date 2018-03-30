@@ -56,10 +56,20 @@ class Network implements NetworkInterface
      * @param int $length - length we require
      * @throws InvalidNetworkParameter
      */
-    private function validateHexString(string $field, string $value, int $length)
+    private function validateHexStringRepresentsBytes(string $field, string $value)
     {
-        if (!is_string($value) || strlen($value) !== 2 * $length) {
-            throw new InvalidNetworkParameter("{$field} must be a {$length} byte hex string");
+        if (!is_string($value)) {
+            throw new InvalidNetworkParameter("{$field} must be a string");
+        }
+
+        $length = strlen($value);
+
+        if ($length == 0) {
+            throw new InvalidNetworkParameter("{$field} must be non-empty string");
+        }
+
+        if ($length % 2 !== 0) {
+            throw new InvalidNetworkParameter("{$field} must have even number of characters (hex representing bytes)");
         }
 
         if (!ctype_xdigit($value)) {
@@ -74,19 +84,19 @@ class Network implements NetworkInterface
     public function __construct()
     {
         if (null !== $this->p2pMagic) {
-            $this->validateHexString("P2P magic", $this->p2pMagic, 4);
+            $this->validateHexStringRepresentsBytes("P2P magic", $this->p2pMagic);
         }
 
         foreach ($this->base58PrefixMap as $type => $byte) {
-            $this->validateHexString("{$type} base58 prefix", $byte, 1);
+            $this->validateHexStringRepresentsBytes("{$type} base58 prefix", $byte);
         }
 
         foreach ($this->bip32PrefixMap as $type => $bytes) {
-            $this->validateHexString("{$type} bip32 prefix", $bytes, 4);
+            $this->validateHexStringRepresentsBytes("{$type} bip32 prefix", $bytes);
         }
 
         if (count($this->bip32ScriptTypeMap) !== count($this->bip32PrefixMap)) {
-            throw new InvalidNetworkParameter("BIP32 prefixes not configured correctly");
+            throw new InvalidNetworkParameter("BIP32 prefixes not configured correctly. Number of items does not match.");
         }
     }
 
