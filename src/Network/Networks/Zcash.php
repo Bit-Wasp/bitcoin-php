@@ -49,13 +49,4 @@ class Zcash extends Network
      */
     // https://github.com/zcash/zcash/blob/master/src/chainparams.cpp#L111-L114
     protected $p2pMagic = "6427e924";
-
-    /**
-     * Network constructor.
-     * @throws InvalidNetworkParameter
-     */
-    public function __construct()
-    {
-        // intentionally skipped validation
-    }
 }
