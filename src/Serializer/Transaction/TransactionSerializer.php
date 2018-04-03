@@ -19,32 +19,32 @@ class TransactionSerializer implements TransactionSerializerInterface
     /**
      * @var \BitWasp\Buffertools\Types\Int32
      */
-    private $int32le;
+    protected $int32le;
 
     /**
      * @var \BitWasp\Buffertools\Types\Uint32
      */
-    private $uint32le;
+    protected $uint32le;
 
     /**
      * @var \BitWasp\Buffertools\Types\VarInt
      */
-    private $varint;
+    protected $varint;
 
     /**
      * @var TransactionInputSerializer
      */
-    private $inputSerializer;
+    protected $inputSerializer;
 
     /**
      * @var TransactionOutputSerializer
      */
-    private $outputSerializer;
+    protected $outputSerializer;
 
     /**
      * @var ScriptWitnessSerializer
      */
-    private $witnessSerializer;
+    protected $witnessSerializer;
 
     public function __construct(TransactionInputSerializer $inputSerializer = null, TransactionOutputSerializer $outputSerializer = null, ScriptWitnessSerializer $witnessSerializer = null)
     {
