@@ -79,7 +79,7 @@ class BitcoinRegistryTest extends AbstractTestCase
         $this->assertEquals("04b2430c", $priv);
     }
 
-    public function testZpubP2shP2wshP2pkh()
+    public function testZpubP2wshP2pkh()
     {
         $registry = new BitcoinRegistry();
         list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2WSH . "|" . ScriptType::P2PKH);
