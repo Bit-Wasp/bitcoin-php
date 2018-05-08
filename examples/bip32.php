@@ -16,7 +16,7 @@ $hdFactory = new HierarchicalKeyFactory();
 $master = $hdFactory->generateMasterKey($random);
 
 // To restore from an existing xprv/xpub:
-//$master = HierarchicalKeyFactory::fromExtended("xprv9s21ZrQH143K4Se1mR27QkNkLS9LSarRVFQcopi2mcomwNPDaABdM1gjyow2VgrVGSYReepENPKX2qiH61CbixpYuSg4fFgmrRtk6TufhPU");
+//$master = $hdFactory->fromExtended("xprv9s21ZrQH143K4Se1mR27QkNkLS9LSarRVFQcopi2mcomwNPDaABdM1gjyow2VgrVGSYReepENPKX2qiH61CbixpYuSg4fFgmrRtk6TufhPU");
 echo "Master key (m)\n";
 echo "   " . $master->toExtendedPrivateKey($network) . "\n";
 ;
