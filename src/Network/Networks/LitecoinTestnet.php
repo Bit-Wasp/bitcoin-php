@@ -13,7 +13,7 @@ class LitecoinTestnet extends Network
      */
     protected $base58PrefixMap = [
         self::BASE58_ADDRESS_P2PKH => "6f",
-        self::BASE58_ADDRESS_P2SH => "c4",
+        self::BASE58_ADDRESS_P2SH => "3a",
         self::BASE58_WIF => "ef",
     ];
 
