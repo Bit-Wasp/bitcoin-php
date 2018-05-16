@@ -19,7 +19,7 @@ class EnglishWordListTest extends AbstractTestCase
      */
     public function testUnknownWord()
     {
-        $wl = new \BitWasp\Bitcoin\Mnemonic\Bip39\Wordlist\EnglishWordlist();
+        $wl = new EnglishWordList();
         $wl->getWord(101010101);
     }
 
@@ -28,7 +28,7 @@ class EnglishWordListTest extends AbstractTestCase
      */
     public function testExceptionOutOfRange()
     {
-        $wl = new EnglishWordlist();
+        $wl = new EnglishWordList();
 
         $word = $wl->getIndex('able');
         $this->assertInternalType('integer', $word);
