@@ -11,7 +11,7 @@ class OpcodesTest extends AbstractTestCase
 {
     public function testGetOpByName()
     {
-        $op = new OpCodes;
+        $op = new Opcodes;
         $expected = 0;
         $lookupOpName = 'OP_0';
         $val = $op->getOpByName('OP_0');
@@ -32,7 +32,7 @@ class OpcodesTest extends AbstractTestCase
 
     public function testGetOp()
     {
-        $op = new OpCodes;
+        $op = new Opcodes;
         // Check getRegisteredOpCode returns the right operation
         $expected = 'OP_0';
         $val = $op->getOp(0);
@@ -46,7 +46,7 @@ class OpcodesTest extends AbstractTestCase
      */
     public function testGetOpCodeException()
     {
-        $op = new OpCodes;
+        $op = new Opcodes;
         $op->getOp(3);
     }
 
