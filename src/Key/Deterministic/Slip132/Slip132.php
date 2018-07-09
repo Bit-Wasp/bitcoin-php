@@ -51,18 +51,6 @@ class Slip132
     }
 
     /**
-     * xpub on bitcoin
-     * @param PrefixRegistry $registry
-     * @return ScriptPrefix
-     * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
-     * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
-     */
-    public function p2shP2pkh(PrefixRegistry $registry): ScriptPrefix
-    {
-        return $this->loadPrefix($registry, $this->helper->getP2shFactory($this->helper->getP2pkhFactory()));
-    }
-
-    /**
      * ypub on bitcoin
      * @param PrefixRegistry $registry
      * @return ScriptPrefix
