@@ -77,6 +77,7 @@ class Slip132
      * @return ScriptPrefix
      * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
+     * @deprecated
      */
     public function p2shP2wshP2pkh(PrefixRegistry $registry)
     {
@@ -100,6 +101,7 @@ class Slip132
      * @return ScriptPrefix
      * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
+     * @deprecated
      */
     public function p2wshP2pkh(PrefixRegistry $registry)
     {
