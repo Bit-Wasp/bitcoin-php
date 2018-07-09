@@ -25,7 +25,7 @@ $bitcoinPrefixes = new BitcoinRegistry();
 
 // What prefixes do we want to encode/decode? Configure those here
 // Separate out this one, want it in a sec
-$YpubPrefix = $slip132->p2shP2wshP2pkh($bitcoinPrefixes);
+$ypubPrefix = $slip132->p2shP2wpkh($bitcoinPrefixes);
 
 // Keys with ALL of these prefixes will be supported.
 // You can chose a subset if desired (for some networks it's
@@ -38,10 +38,8 @@ $config = new GlobalPrefixConfig([
         // prefixes can conflict, so you might need
         // two configs for full support ;)
 
-        $slip132->p2shP2wpkh($bitcoinPrefixes),
-        $YpubPrefix,
+        $ypubPrefix,
         $slip132->p2wpkh($bitcoinPrefixes),
-        $slip132->p2wshP2pkh($bitcoinPrefixes),
     ])
 ]);
 
@@ -55,7 +53,7 @@ $seed = $bip39->getSeed("insect issue net wall milk bulb stamp remind tell fee r
 // don't actually need the config until serialize
 // time
 $hdFactory = new HierarchicalKeyFactory($adapter);
-$p2shP2wshP2pkhKey = $hdFactory->fromEntropy($seed, $YpubPrefix->getScriptDataFactory());
+$p2shP2wshP2pkhKey = $hdFactory->fromEntropy($seed, $ypubPrefix->getScriptDataFactory());
 $serialized = $serializer->serialize($btc, $p2shP2wshP2pkhKey);
 echo "master key {$serialized}\n";
 
