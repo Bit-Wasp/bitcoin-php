@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Key\Deterministic\Slip132;
 
 use BitWasp\Bitcoin\Bitcoin;
+use BitWasp\Bitcoin\Exceptions\NotImplementedException;
 use BitWasp\Bitcoin\Key\Deterministic\HdPrefix\ScriptPrefix;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\KeyToScriptHelper;
@@ -77,12 +78,11 @@ class Slip132
      * Ypub on bitcoin
      * @param PrefixRegistry $registry
      * @return ScriptPrefix
-     * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
-     * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
+     * @throws NotImplementedException
      */
     public function p2shP2wshP2pkh(PrefixRegistry $registry): ScriptPrefix
     {
-        return $this->loadPrefix($registry, $this->helper->getP2shP2wshFactory($this->helper->getP2pkhFactory()));
+        throw new NotImplementedException("Ypub/prv not supported yet");
     }
 
     /**
@@ -100,11 +100,10 @@ class Slip132
      * Zpub on bitcoin
      * @param PrefixRegistry $registry
      * @return ScriptPrefix
-     * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
-     * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
+     * @throws NotImplementedException
      */
     public function p2wshP2pkh(PrefixRegistry $registry): ScriptPrefix
     {
-        return $this->loadPrefix($registry, $this->helper->getP2wshFactory($this->helper->getP2pkhFactory()));
+        throw new NotImplementedException("Zpub/prv not supported yet");
     }
 }
