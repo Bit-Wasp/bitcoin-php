@@ -59,8 +59,11 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function verify(BufferInterface $msg32, SignatureInterface $signature): bool
     {
+        $ctx = $this->ecAdapter->getContext();
+        $normalized = null;
+        secp256k1_ecdsa_signature_normalize($ctx, $normalized, $signature->getResource());
         /** @var Signature $signature */
-        return (bool) secp256k1_ecdsa_verify($this->ecAdapter->getContext(), $signature->getResource(), $msg32->getBinary(), $this->pubkey_t);
+        return (bool) secp256k1_ecdsa_verify($ctx, $normalized, $msg32->getBinary(), $this->pubkey_t);
     }
 
     /**
@@ -121,7 +124,7 @@ class PublicKey extends Key implements PublicKeyInterface
         }
 
         /** @var resource $clone */
-        $clone = '';
+        $clone = null;
         if (1 !== secp256k1_ec_pubkey_parse($context, $clone, $serialized)) {
             throw new \Exception('Secp256k1 pubkey parse');
         }

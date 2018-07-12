@@ -67,12 +67,11 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     public function parse(BufferInterface $buffer): PublicKeyInterface
     {
         $binary = $buffer->getBinary();
-        $pubkey_t = '';
-        /** @var resource $pubkey_t */
+        $pubkey_t = null;
         if (!secp256k1_ec_pubkey_parse($this->ecAdapter->getContext(), $pubkey_t, $binary)) {
             throw new \RuntimeException('Secp256k1 failed to parse public key');
         }
-
+        /** @var resource $pubkey_t */
         return new PublicKey(
             $this->ecAdapter,
             $pubkey_t,

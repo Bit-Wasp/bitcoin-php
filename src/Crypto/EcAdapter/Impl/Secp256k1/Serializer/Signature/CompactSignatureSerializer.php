@@ -33,8 +33,8 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     private function doSerialize(CompactSignature $signature)
     {
         $sig_t = '';
-        $recid = '';
-        if (!secp256k1_ecdsa_recoverable_signature_serialize_compact($this->ecAdapter->getContext(), $signature->getResource(), $sig_t, $recid)) {
+        $recid = 0;
+        if (!secp256k1_ecdsa_recoverable_signature_serialize_compact($this->ecAdapter->getContext(), $sig_t, $recid, $signature->getResource())) {
             throw new \RuntimeException('Secp256k1 serialize compact failure');
         }
 
@@ -73,12 +73,11 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
         $isCompressed = ($recoveryFlags & 4) !== 0;
         $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
 
-        $sig_t = '';
-        /** @var resource $sig_t */
+        $sig_t = null;
         if (!secp256k1_ecdsa_recoverable_signature_parse_compact($this->ecAdapter->getContext(), $sig_t, $sig->getBinary(), $recoveryId)) {
             throw new \RuntimeException('Unable to parse compact signature');
         }
-
+        /** @var resource $sig_t */
         return new CompactSignature($this->ecAdapter, $sig_t, $recoveryId, $isCompressed);
     }
 }
