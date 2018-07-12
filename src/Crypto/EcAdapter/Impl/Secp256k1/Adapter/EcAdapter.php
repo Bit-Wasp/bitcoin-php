@@ -128,7 +128,7 @@ class EcAdapter implements EcAdapterInterface
      */
     private function doRecover(BufferInterface $msg32, CompactSignature $compactSig): PublicKey
     {
-        $publicKey = '';
+        $publicKey = null;
         /** @var resource $publicKey */
         $context = $this->context;
         $sig = $compactSig->getResource();

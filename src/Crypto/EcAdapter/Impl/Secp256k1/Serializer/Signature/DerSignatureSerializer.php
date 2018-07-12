@@ -95,7 +95,7 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
         $derSignature = (new Parser($derSignature))->getBuffer();
         $binary = $derSignature->getBinary();
 
-        $sig_t = '';
+        $sig_t = null;
         /** @var resource $sig_t */
         if (!ecdsa_signature_parse_der_lax($this->ecAdapter->getContext(), $sig_t, $binary)) {
             throw new \RuntimeException('Secp256k1: parse der failure');

@@ -51,8 +51,8 @@ class CompactSignature extends Signature implements CompactSignatureInterface
         }
 
         $ser = '';
-        $recidout = '';
-        secp256k1_ecdsa_recoverable_signature_serialize_compact($ecAdapter->getContext(), $secp256k1_ecdsa_signature_t, $ser, $recidout);
+        $recidout = 0;
+        secp256k1_ecdsa_recoverable_signature_serialize_compact($ecAdapter->getContext(), $ser, $recidout, $secp256k1_ecdsa_signature_t);
         list ($r, $s) = array_map(
             function ($val) use ($math) {
                 return (new Buffer($val))->getGmp();

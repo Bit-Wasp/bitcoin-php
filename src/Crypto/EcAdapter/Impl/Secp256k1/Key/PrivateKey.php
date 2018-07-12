@@ -79,12 +79,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         $context = $this->ecAdapter->getContext();
 
-        /** @var resource $sig_t */
-        $sig_t = '';
+        $sig_t = null;
         if (1 !== secp256k1_ecdsa_sign($context, $sig_t, $msg32->getBinary(), $this->secretBin)) {
             throw new \RuntimeException('Secp256k1: failed to sign');
         }
-
+        /** @var resource $sig_t */
         $derSig = '';
         secp256k1_ecdsa_signature_serialize_der($context, $derSig, $sig_t);
 
@@ -106,14 +105,15 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         $context = $this->ecAdapter->getContext();
         
-        $sig_t = '';
+        $sig_t = null;
         if (1 !== secp256k1_ecdsa_sign_recoverable($context, $sig_t, $msg32->getBinary(), $this->secretBin)) {
             throw new \RuntimeException('Secp256k1: failed to sign');
         }
-
-        $recid = '';
+        /** @var resource $sig_t
+         */
+        $recid = 0;
         $ser = '';
-        if (!secp256k1_ecdsa_recoverable_signature_serialize_compact($context, $sig_t, $ser, $recid)) {
+        if (!secp256k1_ecdsa_recoverable_signature_serialize_compact($context, $ser, $recid, $sig_t)) {
             throw new \RuntimeException('Failed to obtain recid');
         }
 
@@ -160,12 +160,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
     {
         if (null === $this->publicKey) {
             $context = $this->ecAdapter->getContext();
-            $publicKey_t = '';
-            /** @var resource $publicKey_t */
+            $publicKey_t = null;
             if (1 !== secp256k1_ec_pubkey_create($context, $publicKey_t, $this->getBinary())) {
                 throw new \RuntimeException('Failed to create public key');
             }
-
+            /** @var resource $publicKey_t */
             $this->publicKey = new PublicKey($this->ecAdapter, $publicKey_t, $this->compressed);
         }
 
