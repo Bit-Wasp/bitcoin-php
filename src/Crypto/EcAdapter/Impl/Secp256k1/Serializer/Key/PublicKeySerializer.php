@@ -39,7 +39,7 @@ class PublicKeySerializer implements PublicKeySerializerInterface
             $this->ecAdapter->getContext(),
             $serialized,
             $publicKey->getResource(),
-            (int) $isCompressed
+            $isCompressed ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED
         )) {
             throw new \RuntimeException('Secp256k1: Failed to serialize public key');
         }
