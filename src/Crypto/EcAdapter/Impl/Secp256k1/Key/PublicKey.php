@@ -72,7 +72,9 @@ class PublicKey extends Key implements PublicKeyInterface
         $context = $this->ecAdapter->getContext();
         $pubA = '';
         $pubB = '';
-        if (!(secp256k1_ec_pubkey_serialize($context, $pubA, $this->pubkey_t, (int) $this->compressed) && secp256k1_ec_pubkey_serialize($context, $pubB, $other->pubkey_t, (int) $this->compressed))) {
+        $flags = $this->compressed ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED;
+
+        if (!(secp256k1_ec_pubkey_serialize($context, $pubA, $this->pubkey_t, $flags) && secp256k1_ec_pubkey_serialize($context, $pubB, $other->pubkey_t, $flags))) {
             throw new \RuntimeException('Unable to serialize public key during equals');
         }
 
@@ -113,7 +115,8 @@ class PublicKey extends Key implements PublicKeyInterface
     {
         $context = $this->ecAdapter->getContext();
         $serialized = '';
-        if (1 !== secp256k1_ec_pubkey_serialize($context, $serialized, $this->pubkey_t, (int) $this->compressed)) {
+        $flags = $this->compressed ? SECP256K1_EC_COMPRESSED : SECP256K1_EC_UNCOMPRESSED;
+        if (1 !== secp256k1_ec_pubkey_serialize($context, $serialized, $this->pubkey_t, $flags)) {
             throw new \Exception('Secp256k1: pubkey serialize');
         }
 
