@@ -54,7 +54,7 @@ class ConsensusFactoryTest extends ScriptCheckTestBase
                     // versions reject usage of some flags. We skip verification of some
                     // of these, should be a @todo determine how many of these tests are
                     // skipped
-                    if ($flags !== ($flags & BITCOINCONSENSUS_VERIFY_ALL)) {
+                    if ($flags !== ($flags & BITCOINCONSENSUS_SCRIPT_FLAGS_VERIFY_ALL)) {
                         continue;
                     }
                 }
