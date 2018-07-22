@@ -22,7 +22,7 @@ class BitcoinConsensus implements ConsensusInterface
      */
     public function verify(TransactionInterface $tx, ScriptInterface $scriptPubKey, int $flags, int $nInputToSign, int $amount): bool
     {
-        if ($flags !== ($flags & BITCOINCONSENSUS_VERIFY_ALL)) {
+        if ($flags !== ($flags & BITCOINCONSENSUS_SCRIPT_FLAGS_VERIFY_ALL)) {
             throw new BitcoinConsensusException("Invalid flags for bitcoinconsensus");
         }
 

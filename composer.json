@@ -37,6 +37,7 @@
     "ext-json": "*",
     "phpunit/phpunit": "^5.4.0",
     "squizlabs/php_codesniffer": "^2.0.0",
-    "nbobtc/bitcoind-php": "v2.0.2"
+    "nbobtc/bitcoind-php": "v2.0.2",
+    "bitwasp/bitcoinconsensus": "v3.0.0"
   }
 }

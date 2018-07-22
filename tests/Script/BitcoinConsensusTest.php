@@ -16,7 +16,7 @@ class BitcoinConsensusTest extends AbstractTestCase
     {
         if (extension_loaded('bitcoinconsensus')) {
             $flags = 1 | 3 | 2 | 65;
-            $check = $flags == ($flags & BITCOINCONSENSUS_VERIFY_ALL);
+            $check = $flags == ($flags & BITCOINCONSENSUS_SCRIPT_FLAGS_VERIFY_ALL);
             $this->assertFalse($check);
 
             $c = new BitcoinConsensus();
