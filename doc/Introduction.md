@@ -6,8 +6,6 @@
 
 [Transaction](Transaction.md)
 
-[Payment Protocol](Payment%20Protocol.md)
-
 [Serialization](Serialization.md)
 
 [Types](Types.md)
