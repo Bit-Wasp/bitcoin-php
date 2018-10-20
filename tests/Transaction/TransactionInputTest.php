@@ -9,8 +9,9 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Buffertools\Buffer;
+use PHPUnit\Framework\TestCase;
 
-class TransactionInputTest extends \PHPUnit_Framework_TestCase
+class TransactionInputTest extends TestCase
 {
     public function testGetSequence()
     {

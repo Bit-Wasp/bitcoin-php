@@ -6,8 +6,9 @@ namespace BitWasp\Bitcoin\RpcTest;
 
 use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractTestCase extends TestCase
 {
     /**
      * @var array

@@ -10,8 +10,9 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdap
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
 use Mdanter\Ecc\EccFactory;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractTestCase extends TestCase
 {
     /**
      * @var array
