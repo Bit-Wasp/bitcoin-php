@@ -100,8 +100,12 @@ class NetworkFactory
     /**
      * @return NetworkInterface
      */
-    public static function zcash()
+    public static function zcash(): NetworkInterface
     {
         return new Networks\Zcash();
+    }
+    public static function zcashTestnet(): NetworkInterface
+    {
+        return new Networks\ZcashTestnet();
     }
 }
