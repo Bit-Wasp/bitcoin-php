@@ -40,6 +40,14 @@ class NetworkFactory
     {
         return new Networks\Litecoin();
     }
+	
+	/**
+     * @return NetworkInterface
+     */
+	public static function digibyte(): NetworkInterface
+    {
+        return new Networks\DigiByte();
+    }
 
     /**
      * @return Networks\LitecoinTestnet
