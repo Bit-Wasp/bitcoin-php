@@ -3,7 +3,7 @@
 use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Random\Random;
-use BitWasp\Bitcoin\Key\Factory\HierarchicalKeyFactory;
+use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory;
 
 require __DIR__ . "/../vendor/autoload.php";
 
@@ -13,10 +13,10 @@ $random = new Random();
 
 // By default, this example produces random keys.
 $hdFactory = new HierarchicalKeyFactory();
-$master = $hdFactory->generateMasterKey($random);
+//$master = $hdFactory->generateMasterKey($random);  //generates errors
 
 // To restore from an existing xprv/xpub:
-//$master = $hdFactory->fromExtended("xprv9s21ZrQH143K4Se1mR27QkNkLS9LSarRVFQcopi2mcomwNPDaABdM1gjyow2VgrVGSYReepENPKX2qiH61CbixpYuSg4fFgmrRtk6TufhPU");
+$master = $hdFactory->fromExtended("xprv9s21ZrQH143K4Se1mR27QkNkLS9LSarRVFQcopi2mcomwNPDaABdM1gjyow2VgrVGSYReepENPKX2qiH61CbixpYuSg4fFgmrRtk6TufhPU");
 echo "Master key (m)\n";
 echo "   " . $master->toExtendedPrivateKey($network) . "\n";
 ;
