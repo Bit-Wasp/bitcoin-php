@@ -30,8 +30,8 @@ class DigiByte extends Network
      * @see Network::$bip32PrefixMap
      */
     protected $bip32PrefixMap = [
-        self::BIP32_PREFIX_XPUB => "0488B21E",
-        self::BIP32_PREFIX_XPRV => "0488ADE4",
+        self::BIP32_PREFIX_XPUB => "0488b21e",
+        self::BIP32_PREFIX_XPRV => "0488ade4",
     ];
 
     /**
