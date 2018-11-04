@@ -8,7 +8,7 @@ php:
   - nightly
 
 env:
-  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3"
+  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
 
 dist: trusty
 sudo: required
@@ -20,14 +20,14 @@ cache:
 matrix:
   exclude:
     - php: 7.2
-      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3"
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
 
   include:
     # add extra test runs for php7: coverage, codestyle, examples, rpc tests
     - php: 7.2
-      env: PHPUNIT=true BITCOIN_VERSION="0.16.3" PHPUNIT_EXT=true COVERAGE=true CODE_STYLE=true EXAMPLES=true
+      env: COVERAGE=true CODE_STYLE=true EXAMPLES=true PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
     - php: 7.0
-      env: RPC_TEST=true BITCOIN_VERSION="0.16.3"
+      env: RPC_TEST=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
 
 install:
     - |
@@ -48,7 +48,7 @@ install:
     - |
         if [ "$PHPUNIT_EXT" = "true" ]; then
             git clone https://github.com/bitcoin/secp256k1.git &&
-            cd secp256k1 &&
+            cd secp256k1 && git checkout ${SECP256K1_COMMIT} &&
             ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-experimental &&
             make && sudo make install && cd ..;
         fi
