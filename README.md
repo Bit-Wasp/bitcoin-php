@@ -22,19 +22,16 @@ You can install this library via Composer: `composer require bitwasp/bitcoin`
 
 ## Presently supported:
 
- - Bloom filters
- - Blocks, headers, and merkle blocks
+ - Blocks, headers, and merkle blocks and bloom filters
  - P2SH & Segregated witness scripts
  - An adaptable elliptic-curve library, using [[PhpEcc](https://github.com/mdanter/phpecc)] by default, or libsecp256k1 if the bindings are found
  - Support for building, parsing, signing/validating transactions
  - Deterministic signatures (RFC6979)
  - BIP32 and electrum (older type I) deterministic key algorithms
+ - BIP39, and the older electrum seed format.
  - ScriptFactory for common input/output types, parser, interpreter, and classifiers
  - Supports bindings to libbitcoinconsensus
  - Bindings to Stratum (electrum) servers
- - Easy serialization to binary representation of most classes
- - SIGHASH types when creating transactions
- - Payment Protocol (BIP70)
 
 # Other projects
 
