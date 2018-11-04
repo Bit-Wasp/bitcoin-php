@@ -33,6 +33,10 @@
     "bitwasp/secp256k1-php": "^0.2.0",
     "bitwasp/bech32": "^0.0.1"
   },
+  "suggest": {
+    "ext-secp256k1": "The secp256k1 library for fast and safe elliptic curve operations",
+    "ext-bitcoinconsensus": "The bitcoinconsensus library for safest possible script verification"
+  },
   "require-dev": {
     "ext-json": "*",
     "phpunit/phpunit": "^5.4.0",
