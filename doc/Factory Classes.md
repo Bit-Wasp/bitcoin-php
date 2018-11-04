@@ -15,18 +15,7 @@ An example of a globally set dependency is the Network; if not explicitly provid
    `Bitcoin::getNetwork()` - Returns the default, or explicitly set `NetworkInterface`
    
    `Bitcoin::setNetwork(NetworkInterface $network)` - Sets $network as the default network
- 
-### \BitWasp\Bitcoin\Address\AddressFactory:
 
-  `AddressFactory::fromKey(PublicKeyInterface $publicKey)`: Returns an `PayToPubKeyHashAddress` instance for the provided `PublicKeyInterface`
-   
-  `AddressFactory::fromScript(ScriptInterface $p2shScript)`: Returns an `ScriptHashAddress` instance for the provided `ScriptInterface`
-  
-  `AddressFactory::fromOutputScript(ScriptInterface $scriptPubKey)`: Attempts to return an Address instance based on the type of scriptPubKey
-  
-  `AddressFactory::getAssociatedAddress(ScriptInterface $scriptPubKey, [$network])`: Returns a base58 string for a P2PK, or P2PKH script, or P2SH script.
-  
-  `AddressFactory::fromString($string, [$network])`: Tries to return an AddressInterface based off the string, and network.
    
 ### \BitWasp\Bitcoin\Block\BlockFactory
 
