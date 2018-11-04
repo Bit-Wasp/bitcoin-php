@@ -24,7 +24,6 @@
   },
   "require": {
     "php-64bit": ">=7.0",
-    "paragonie/random_compat": "^1.4.0|^2.0.0",
     "pleonasm/merkle-tree": "1.0.0",
     "composer/semver": "^1.4.0",
     "lastguest/murmurhash": "v2.0.0",
