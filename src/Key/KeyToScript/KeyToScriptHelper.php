@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shP2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\KeyToScriptDataFactory;
+use BitWasp\Bitcoin\Key\KeyToScript\Factory\MultisigScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2wpkhScriptDataFactory;
 use BitWasp\Bitcoin\Script\ScriptType;
@@ -56,6 +57,17 @@ class KeyToScriptHelper
             $this->cache[$key] = new P2pkhScriptDataFactory($this->pubKeySer);
         }
         return $this->cache[$key];
+    }
+
+    /**
+     * @param int $m
+     * @param int $n
+     * @param bool $sortKeys
+     * @return MultisigScriptDataFactory
+     */
+    public function getMultisigFactory(int $m, int $n, bool $sortKeys)
+    {
+        return new MultisigScriptDataFactory($m, $n, $sortKeys, $this->pubKeySer);
     }
 
     /**

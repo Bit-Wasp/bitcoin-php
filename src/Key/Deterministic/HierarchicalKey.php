@@ -280,7 +280,7 @@ class HierarchicalKey
      *
      * @param int $sequence
      * @return HierarchicalKey
-     * @throws \Exception
+     * @throws \BitWasp\Bitcoin\Exceptions\InvalidDerivationException
      */
     public function deriveChild(int $sequence): HierarchicalKey
     {
@@ -340,7 +340,23 @@ class HierarchicalKey
     public function derivePath(string $path): HierarchicalKey
     {
         $sequences = new HierarchicalKeySequence();
-        return $this->deriveFromList($sequences->decodePath($path));
+        $parts = $sequences->decodeRelative($path);
+        $numParts = count($parts);
+
+        $key = $this;
+        for ($i = 0; $i < $numParts; $i++) {
+            try {
+                $key = $key->deriveChild((int) $parts[$i]);
+            } catch (InvalidDerivationException $e) {
+                if ($i === $numParts - 1) {
+                    throw new InvalidDerivationException($e->getMessage());
+                } else {
+                    throw new InvalidDerivationException("Invalid derivation for non-terminal index: cannot use this path!");
+                }
+            }
+        }
+
+        return $key;
     }
 
     /**

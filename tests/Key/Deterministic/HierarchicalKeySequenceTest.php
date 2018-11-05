@@ -28,22 +28,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
     public function testGetSequence($node, $eSeq)
     {
         $sequence = new HierarchicalKeySequence();
-        $this->assertEquals($eSeq, $sequence->fromNode($node));
-
-        // canonicalize the sequence - library returns h.
-        $eSeq = str_replace("'", 'h', $node);
-        $this->assertEquals($eSeq, $sequence->getNode($sequence->fromNode($node)));
-    }
-
-    /**
-     * @expectedException \LogicException
-     */
-    public function testHardenedSequenceFailure()
-    {
-        $sequence = new HierarchicalKeySequence();
-
-        // Ensures that requesting a hardened sequence for >= 0x80000000 throws an exception
-        $sequence->getHardened(HierarchicalKeySequence::START_HARDENED);
+        $this->assertEquals([$eSeq], $sequence->decodeRelative($node));
     }
 
     /**
@@ -52,7 +37,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
     public function testDecodePathFailure()
     {
         $sequence = new HierarchicalKeySequence();
-        $sequence->decodePath('');
+        $sequence->decodeRelative('');
     }
 
     public function testDecodePath()
@@ -60,7 +45,7 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
         $sequence = new HierarchicalKeySequence();
 
         $expected = ['2147483648','2147483649','444','2147526030'];
-        $this->assertEquals($expected, $sequence->decodePath("0'/1'/444/42382'"));
+        $this->assertEquals($expected, $sequence->decodeRelative("0'/1'/444/42382'"));
     }
 
     /**
@@ -73,33 +58,6 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
         $sequence = new HierarchicalKeySequence();
 
         // There should only be one, just implode to get the value
-        $this->assertEquals($integer, implode("", $sequence->decodePath($node)));
-    }
-
-    public function getEncodePathVectors()
-    {
-        $array = ['2147483648','2147483649','444','2147526030'];
-        $stdClass = new \stdClass();
-        $stdClass->a = '2147483648';
-        $stdClass->b = '2147483649';
-        $stdClass->c = '444';
-        $stdClass->d  = '2147526030';
-        $traversable = \SplFixedArray::fromArray($array, false);
-
-        return [
-            [$array],
-            [$stdClass],
-            [$traversable]
-        ];
-    }
-
-    /**
-     * @dataProvider getEncodePathVectors
-     */
-    public function testEncodePathVectors($list)
-    {
-        $sequence = new HierarchicalKeySequence();
-
-        $this->assertEquals("0h/1h/444/42382h", $sequence->encodePath($list));
+        $this->assertEquals($integer, implode("", $sequence->decodeRelative($node)));
     }
 }

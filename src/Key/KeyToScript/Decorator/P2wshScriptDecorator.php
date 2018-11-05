@@ -26,13 +26,13 @@ class P2wshScriptDecorator extends ScriptHashDecorator
     protected $decorateType = ScriptType::P2WSH;
 
     /**
-     * @param KeyInterface $key
+     * @param KeyInterface ...$key
      * @return ScriptAndSignData
      * @throws \BitWasp\Bitcoin\Exceptions\WitnessScriptException
      */
-    public function convertKey(KeyInterface $key): ScriptAndSignData
+    public function convertKey(KeyInterface ...$key): ScriptAndSignData
     {
-        $witnessScript = new WitnessScript($this->scriptDataFactory->convertKey($key)->getScriptPubKey());
+        $witnessScript = new WitnessScript($this->scriptDataFactory->convertKey(...$key)->getScriptPubKey());
         return new ScriptAndSignData(
             $witnessScript->getOutputScript(),
             (new SignData())

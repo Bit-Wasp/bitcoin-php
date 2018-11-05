@@ -74,6 +74,21 @@ class Slip132
     }
 
     /**
+     * Ypub on bitcoin
+     * @param int $m
+     * @param int $n
+     * @param bool $sortKeys
+     * @param PrefixRegistry $registry
+     * @return ScriptPrefix
+     * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
+     * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
+     */
+    public function p2shP2wshMultisig(int $m, int $n, bool $sortKeys, PrefixRegistry $registry): ScriptPrefix
+    {
+        return $this->loadPrefix($registry, $this->helper->getP2shP2wshFactory($this->helper->getMultisigFactory($m, $n, $sortKeys)));
+    }
+
+    /**
      * zpub on bitcoin
      * @param PrefixRegistry $registry
      * @return ScriptPrefix
@@ -92,6 +107,17 @@ class Slip132
      */
     public function p2wshP2pkh(PrefixRegistry $registry): ScriptPrefix
     {
+        throw new NotImplementedException("Zpub/prv not supported yet");
+    }
+    /**
+     * Zpub on bitcoin
+     * @param PrefixRegistry $registry
+     * @return ScriptPrefix
+     * @throws NotImplementedException
+     */
+    public function p2wshMultisig(int $m, int $n, bool $sortKeys, PrefixRegistry $registry): ScriptPrefix
+    {
+        return $this->loadPrefix($registry, $this->helper->getP2wshFactory($this->helper->getMultisigFactory($m, $n, $sortKeys)));
         throw new NotImplementedException("Zpub/prv not supported yet");
     }
 }
