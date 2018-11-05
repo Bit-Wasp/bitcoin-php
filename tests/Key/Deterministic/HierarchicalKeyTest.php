@@ -437,13 +437,13 @@ class HierarchicalKeyTest extends AbstractTestCase
     }
 
     /**
-     *
+     * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidDerivationException
+     * @expectedExceptionMessage Derived invalid key for index 1, use next index
      */
     public function testSkipsInvalidKey()
     {
         $math = new Math();
         $generator = EccFactory::getSecgCurves($math)->generator256k1();
-
 
         $k = $math->sub($generator->getOrder(), gmp_init(1));
         $pubKeyFactory = new PublicKeyFactory();
@@ -547,12 +547,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         );
 
         $this->assertEquals(0, $this->HK_run_count);
-        $expected = 1;
-        $child = $key->deriveChild($expected);
-        $this->assertNotEquals($expected, $child->getSequence());
-        $this->assertEquals(2, $child->getSequence());
-        $this->assertEquals(2, $this->HK_run_count);
-        $this->assertEquals(gmp_strval($math->add($k, gmp_init(1)), 10), gmp_strval($child->getPrivateKey()->getSecret(), 10));
+        $key->deriveChild(1);
     }
 
     /**
