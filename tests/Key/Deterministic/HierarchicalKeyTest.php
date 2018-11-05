@@ -430,7 +430,7 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertEquals("xprv9s21ZrQH143K3zWpEJm5QtHFh93eNJrNbNqzqLN5XoE9MvC7gs5TmBFaL2PpaXpDc8FBYVe5EChc73ApjSQ5fWsXS7auHy1MmG6hdpywE1q", $root->toExtendedPrivateKey());
         $this->assertEquals("0000081d1e4bad6731c84450c9a3dbb70e8ba30118d3419f2c74077b7996a078", $root->getPrivateKey()->getHex());
 
-        $child = $root->derivePath("m/44'/0'/0'/0/0'");
+        $child = $root->derivePath("44'/0'/0'/0/0'");
         $this->assertEquals("ca27553aa89617e982e621637d6478f564b32738f8bbe2e48d0a58a8e0f6da40", $child->getChainCode()->getHex());
         $this->assertEquals("xpub6GcBnm7FfDg5ERWACCvtuotN6Tdoc37r3SZ1asBHvCWzPkqWn3MVKPWKzy6GsfmdMUGanR3D12dH1cp5tJauuubwc4FAJDn67SH2uUjwAT1", $child->toExtendedPublicKey());
         $this->assertEquals("xprvA3cqPFaMpr7n1wRh6BPtYfwdYRoKCaPzgDdQnUmgMrz1WxWNEW3EmbBr9ieh9BJAsRGKFPLvotb4p4Aq79jddUVKPVJt7exVzLHcv777JVf", $child->toExtendedPrivateKey());

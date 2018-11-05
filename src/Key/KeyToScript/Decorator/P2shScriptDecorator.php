@@ -27,13 +27,13 @@ class P2shScriptDecorator extends ScriptHashDecorator
     protected $decorateType = ScriptType::P2SH;
 
     /**
-     * @param KeyInterface $key
+     * @param KeyInterface ...$keys
      * @return ScriptAndSignData
      * @throws \BitWasp\Bitcoin\Exceptions\P2shScriptException
      */
-    public function convertKey(KeyInterface $key): ScriptAndSignData
+    public function convertKey(KeyInterface ...$keys): ScriptAndSignData
     {
-        $redeemScript = new P2shScript($this->scriptDataFactory->convertKey($key)->getScriptPubKey());
+        $redeemScript = new P2shScript($this->scriptDataFactory->convertKey(...$keys)->getScriptPubKey());
         return new ScriptAndSignData(
             $redeemScript->getOutputScript(),
             (new SignData())
