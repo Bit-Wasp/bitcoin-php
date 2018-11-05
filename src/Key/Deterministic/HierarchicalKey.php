@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Exceptions\InvalidDerivationException;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptAndSignData;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -292,8 +293,8 @@ class HierarchicalKey
         $offset = $hash->slice(0, 32);
         $chain = $hash->slice(32);
 
-        if (false === $this->ecAdapter->validatePrivateKey($offset)) {
-            return $this->deriveChild($sequence + 1);
+        if (!$this->ecAdapter->validatePrivateKey($offset)) {
+            throw new InvalidDerivationException("Derived invalid key for index {$sequence}, use next index");
         }
 
         $key = $this->isPrivate() ? $this->getPrivateKey() : $this->getPublicKey();
