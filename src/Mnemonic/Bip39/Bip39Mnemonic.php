@@ -23,10 +23,12 @@ class Bip39Mnemonic implements MnemonicInterface
      */
     private $wordList;
 
-    const DEFAULT_ENTROPY_LEN = 256;
+    const MIN_ENTROPY_BYTE_LEN = 16;
+    const MAX_ENTROPY_BYTE_LEN = 32;
+    const DEFAULT_ENTROPY_BYTE_LEN = self::MAX_ENTROPY_BYTE_LEN;
 
     private $validEntropySizes = [
-        128, 160, 192, 224, 256,
+        self::MIN_ENTROPY_BYTE_LEN * 8, 160, 192, 224, self::MAX_ENTROPY_BYTE_LEN * 8,
     ];
 
     /**
@@ -49,7 +51,7 @@ class Bip39Mnemonic implements MnemonicInterface
     public function create(int $entropySize = null): string
     {
         if (null === $entropySize) {
-            $entropySize = self::DEFAULT_ENTROPY_LEN;
+            $entropySize = self::DEFAULT_ENTROPY_BYTE_LEN * 8;
         }
 
         if (!in_array($entropySize, $this->validEntropySizes)) {
