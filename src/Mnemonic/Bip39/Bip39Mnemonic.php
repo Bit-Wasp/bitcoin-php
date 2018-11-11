@@ -23,6 +23,12 @@ class Bip39Mnemonic implements MnemonicInterface
      */
     private $wordList;
 
+    const DEFAULT_ENTROPY_LEN = 256;
+
+    private $validEntropySizes = [
+        128, 160, 192, 224, 256,
+    ];
+
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param Bip39WordListInterface $wordList
@@ -40,8 +46,16 @@ class Bip39Mnemonic implements MnemonicInterface
      * @return string
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function create($entropySize = 512): string
+    public function create(int $entropySize = null): string
     {
+        if (null === $entropySize) {
+            $entropySize = self::DEFAULT_ENTROPY_LEN;
+        }
+
+        if (!in_array($entropySize, $this->validEntropySizes)) {
+            throw new \InvalidArgumentException("Invalid entropy length");
+        }
+
         $random = new Random();
         $entropy = $random->bytes($entropySize / 8);
 
@@ -72,19 +86,12 @@ class Bip39Mnemonic implements MnemonicInterface
      */
     public function entropyToWords(BufferInterface $entropy): array
     {
-        if ($entropy->getSize() === 0) {
-            throw new \InvalidArgumentException('Invalid entropy, empty');
-        }
-        if ($entropy->getSize() > 1024) {
-            throw new \InvalidArgumentException('Invalid entropy, max 1024 bytes');
-        }
-        if ($entropy->getSize() % 4 !== 0) {
-            throw new \InvalidArgumentException('Invalid entropy, must be multitude of 4 bytes');
-        }
-
         $ENT = $entropy->getSize() * 8;
-        $CS = $ENT / 32;
+        if (!in_array($entropy->getSize() * 8, $this->validEntropySizes)) {
+            throw new \InvalidArgumentException("Invalid entropy length");
+        }
 
+        $CS = $ENT / 32;
         $bits = gmp_strval($entropy->getGmp(), 2) . $this->calculateChecksum($entropy, $CS);
         $bits = str_pad($bits, ($ENT + $CS), '0', STR_PAD_LEFT);
 
@@ -126,14 +133,12 @@ class Bip39Mnemonic implements MnemonicInterface
             $bits .= str_pad(decbin($idx), 11, '0', STR_PAD_LEFT);
         }
 
-        // Max entropy is 1024bytes; (1024×8)+((1024×8)÷32) = 8448 bits
-        if (strlen($bits) > 8448) {
-            throw new \InvalidArgumentException('Invalid mnemonic, too long');
-        }
-
         // Every 32 bits of ENT adds a 1 CS bit.
         $CS = strlen($bits) / 33;
         $ENT = strlen($bits) - $CS;
+        if (!in_array($ENT, $this->validEntropySizes)) {
+            throw new \InvalidArgumentException('Invalid mnemonic - entropy size is invalid');
+        }
 
         // Checksum bits
         $csBits = substr($bits, $ENT, $CS);
