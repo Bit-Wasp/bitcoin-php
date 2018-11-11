@@ -299,7 +299,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame($this->safeMath()->hexDec('615914f3'), $key->getFingerprint());
+        $this->assertEquals(0x615914f3, $key->getFingerprint());
     }/**/
 
     /**
@@ -310,7 +310,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $key = HierarchicalKeyFactory::fromExtended($xPub, $this->network, $ecAdapter);
-        $this->assertSame($this->safeMath()->hexDec('a282920f'), $key->getChildFingerprint());
+        $this->assertEquals(0xa282920f, $key->getChildFingerprint());
     }/**/
 
     /**
