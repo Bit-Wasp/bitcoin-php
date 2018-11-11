@@ -72,4 +72,4 @@ $signed = $signer->get();
 echo "txid: {$signed->getTxId()->getHex()}\n";
 echo "raw: {$signed->getHex()}\n";
 echo "ws: {$witnessScript->getHex()}\n";
-echo "input valid? " . ($input->verify(Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS | Interpreter::VERIFY_CLEAN_STACK) ? "true" : "false") . PHP_EOL;
+echo "input valid? " . ($input->verify(Interpreter::VERIFY_DERSIG | Interpreter::VERIFY_P2SH | Interpreter::VERIFY_WITNESS) ? "true" : "false") . PHP_EOL;
