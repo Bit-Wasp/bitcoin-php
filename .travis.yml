@@ -10,7 +10,7 @@ php:
   - nightly
 
 env:
-  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2
+  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.3 SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
 
 dist: trusty
 sudo: required
@@ -20,9 +20,9 @@ matrix:
       # dont want coverage on all runs, will include runs with just PHPUNIT
       # hhvm doesn't support our extensions
     - php: hhvm
-      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.3 SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
     - php: 7.0
-      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.3 SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
   include:
       # add tests without coverage
       # add extra test runs for php7: secp256k1+coverage, codestyle, examples
@@ -30,13 +30,13 @@ matrix:
       env: PHPUNIT=true
 
     - php: 7.0
-      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.2 COVERAGE=true CODE_STYLE=true EXAMPLES=true
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION=0.14.3 COVERAGE=true CODE_STYLE=true EXAMPLES=true SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
 
 install:
     - |
         if [ "$PHPUNIT_EXT" = "true" ]; then
             git clone https://github.com/bitcoin/secp256k1.git &&
-            cd secp256k1 &&
+            cd secp256k1 && git checkout ${SECP256K1_COMMIT} &&
             ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-experimental &&
             make && sudo make install && cd ..;
         fi
