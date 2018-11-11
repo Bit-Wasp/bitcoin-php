@@ -62,7 +62,7 @@ class Bip39MnemonicTest extends AbstractBip39Case
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entropy, must be multitude of 4 bytes
+     * @expectedExceptionMessage Invalid entropy length
      */
     public function testFailsOnEntropyMod4()
     {
@@ -72,7 +72,7 @@ class Bip39MnemonicTest extends AbstractBip39Case
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entropy, max 1024 bytes
+     * @expectedExceptionMessage Invalid entropy length
      */
     public function testFailsOnEntropyTooLong()
     {
@@ -82,7 +82,7 @@ class Bip39MnemonicTest extends AbstractBip39Case
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid mnemonic, too long
+     * @expectedExceptionMessage Invalid mnemonic - entropy size is invalid
      */
     public function testFailsOnMnemonicOfEntropyTooLong()
     {
