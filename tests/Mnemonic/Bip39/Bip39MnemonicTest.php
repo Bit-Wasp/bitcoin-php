@@ -16,7 +16,7 @@ class Bip39MnemonicTest extends AbstractBip39Case
      * @dataProvider getBip39Vectors
      * @param Bip39Mnemonic $bip39
      * @param BufferInterface $entropy
-     * @param $eMnemonic
+     * @param string $eMnemonic
      * @param BufferInterface $eSeed
      */
     public function testEntropyToMnemonic(Bip39Mnemonic $bip39, BufferInterface $entropy, string $eMnemonic, BufferInterface $eSeed)
@@ -29,7 +29,7 @@ class Bip39MnemonicTest extends AbstractBip39Case
      * @dataProvider getBip39Vectors
      * @param Bip39Mnemonic $bip39
      * @param BufferInterface $eEntropy
-     * @param $mnemonic
+     * @param string $mnemonic
      * @param BufferInterface $eSeed
      */
     public function testMnemonicToEntropy(Bip39Mnemonic $bip39, BufferInterface $eEntropy, string $mnemonic, BufferInterface $eSeed)

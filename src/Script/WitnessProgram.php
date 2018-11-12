@@ -21,7 +21,7 @@ class WitnessProgram
     private $program;
 
     /**
-     * @var
+     * @var ScriptInterface|null
      */
     private $outputScript;
 
