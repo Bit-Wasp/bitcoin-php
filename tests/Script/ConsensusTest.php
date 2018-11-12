@@ -11,7 +11,7 @@ use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 
-class ConsensusFactoryTest extends ScriptCheckTestBase
+class ConsensusTest extends ScriptCheckTestBase
 {
     public function testGetNativeConsensus()
     {
