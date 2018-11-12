@@ -21,16 +21,10 @@ class LogicOpNodeTest extends AbstractTestCase
 
     public function testNodeWontSplitTwice()
     {
-        $threw = false;
-        try {
-            $logicNode = new LogicOpNode();
-            $this->assertFalse($logicNode->hasChildren());
-            $logicNode->split();
-        } catch (\Exception $e) {
-            $threw = true;
-        }
+        $logicNode = new LogicOpNode();
+        $this->assertFalse($logicNode->hasChildren());
+        $logicNode->split();
 
-        $this->assertFalse($threw, "control split should not fail");
         $this->assertTrue($logicNode->hasChildren());
 
         $this->expectException(\RuntimeException::class);

@@ -57,32 +57,33 @@ class SignDataTest extends AbstractTestCase
         }
     }
 
-    public function getThrowVectors()
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Witness script requested but not set
+     */
+    public function testThrowsIfUnknownWSRequested()
     {
-        return [
-            ['getWitnessScript', '\\RuntimeException', 'Witness script requested but not set'],
-            ['getRedeemScript', '\\RuntimeException', 'Redeem script requested but not set'],
-            ['getSignaturePolicy', '\\RuntimeException', 'Signature policy requested but not set'],
-        ];
+        $signData = new SignData();
+        $signData->getWitnessScript();
     }
 
     /**
-     * @param $function
-     * @param $expectedException
-     * @param $expectedExceptionMessage
-     * @dataProvider getThrowVectors
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Redeem script requested but not set
      */
-    public function testThrowsIfUnknownDataRequested($function, $expectedException, $expectedExceptionMessage)
+    public function testThrowsIfUnknownRSRequested()
     {
         $signData = new SignData();
-        try {
-            $signData->{$function}();
-        } catch (\Exception $caught) {
-            $this->assertInstanceOf($expectedException, $caught);
-            $this->assertEquals($expectedExceptionMessage, $caught->getMessage());
-            return;
-        }
+        $signData->getRedeemScript();
+    }
 
-        throw new \RuntimeException('Test failed to complete');
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Signature policy requested but not set
+     */
+    public function testThrowsIfUnknownSignaturePolicyRequested()
+    {
+        $signData = new SignData();
+        $signData->getSignaturePolicy();
     }
 }
