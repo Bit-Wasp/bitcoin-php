@@ -203,9 +203,9 @@ class ScriptTest extends AbstractTestCase
     /**
      * @dataProvider getPushOnlyVectors
      * @param ScriptInterface $script
-     * @param $eResult
+     * @param bool $eResult
      */
-    public function testIsPushOnly(ScriptInterface $script, $eResult)
+    public function testIsPushOnly(ScriptInterface $script, bool $eResult)
     {
         $this->assertEquals($eResult, $script->isPushOnly());
     }
