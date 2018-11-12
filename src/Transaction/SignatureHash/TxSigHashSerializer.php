@@ -22,7 +22,7 @@ class TxSigHashSerializer
     private $scriptCode;
 
     /**
-     * @var
+     * @var int
      */
     private $nIn;
 
