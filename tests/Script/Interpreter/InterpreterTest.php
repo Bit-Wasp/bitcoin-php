@@ -39,7 +39,7 @@ class InterpreterTest extends AbstractTestCase
      * @param int $flags
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
-     * @param $result
+     * @param bool $result
      * @dataProvider getScripts
      */
     public function testScript(int $flags, ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, bool $result)
