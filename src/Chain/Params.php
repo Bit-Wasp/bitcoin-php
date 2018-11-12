@@ -191,7 +191,7 @@ class Params implements ParamsInterface
     }
 
     /**
-     * @return int|string
+     * @return string
      */
     public function powTargetLimit(): string
     {
