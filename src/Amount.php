@@ -9,7 +9,7 @@ class Amount
     const COIN = 100000000;
 
     /**
-     * @param int|string $satoshis
+     * @param int $satoshis
      * @return string
      */
     public function toBtc(int $satoshis): string
