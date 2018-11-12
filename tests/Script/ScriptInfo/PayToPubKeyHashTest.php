@@ -12,7 +12,7 @@ use BitWasp\Bitcoin\Script\ScriptInfo\PayToPubkeyHash;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
-class PayToPubkeyHashTest extends AbstractTestCase
+class PayToPubKeyHashTest extends AbstractTestCase
 {
     public function testMethods()
     {
