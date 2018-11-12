@@ -60,7 +60,7 @@ echo "master key {$serialized}\n";
 // This shows how you can parse such a key.
 // Remember the serializer needs the config for this!
 $parsedKey = $serializer->parse($btc, $serialized);
-$accountKey = $parsedKey->derivePath("m/44'/0'/0'"); // Can't really remember the 'purpose' field for this script, assume 44
+$accountKey = $parsedKey->derivePath("44'/0'/0'"); // Can't really remember the 'purpose' field for this script, assume 44
 $serAccKey = $serializer->serialize($btc, $accountKey);
 echo "account key {$serAccKey}\n";
 
