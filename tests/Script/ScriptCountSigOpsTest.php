@@ -93,11 +93,11 @@ class ScriptCountSigOpsTest extends AbstractTestCase
 
     /**
      * @param Script $script
-     * @param $fAccurate
-     * @param $eSigOpCount
+     * @param bool $fAccurate
+     * @param int $eSigOpCount
      * @dataProvider getCountTestVectors
      */
-    public function testSigOpCount(Script $script, $fAccurate, $eSigOpCount)
+    public function testSigOpCount(Script $script, bool $fAccurate, int $eSigOpCount)
     {
         $this->assertEquals($eSigOpCount, $script->countSigOps($fAccurate));
     }
