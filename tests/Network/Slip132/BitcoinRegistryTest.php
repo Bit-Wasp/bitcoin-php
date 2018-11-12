@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BitWasp\Bitcoin\Tests\Key\Deterministic\HdPrefix\Slip132;
+namespace BitWasp\Bitcoin\Tests\Network\Slip132;
 
 use BitWasp\Bitcoin\Network\Networks\Bitcoin;
 use BitWasp\Bitcoin\Network\Slip132\BitcoinRegistry;

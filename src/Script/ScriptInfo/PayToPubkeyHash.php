@@ -25,6 +25,11 @@ class PayToPubkeyHash
     private $verify;
 
     /**
+     * @var int
+     */
+    private $opcode;
+
+    /**
      * PayToPubkeyHash constructor.
      * @param int $opcode
      * @param BufferInterface $hash160
