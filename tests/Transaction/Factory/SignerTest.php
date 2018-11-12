@@ -77,7 +77,7 @@ class SignerTest extends AbstractTestCase
                 $txOut = new TransactionOutput((int) $input['value'], ScriptFactory::fromHex($input['scriptPubKey']));
 
                 $txb->spendOutPoint($outpoint, null, (int) $input['sequence']);
-                $keys[] = array_map(function ($array) use ($ecAdapter, $privFactory) {
+                $keys[] = array_map(function ($array) use ($privFactory) {
                     return [$privFactory->fromWif($array['key'], NetworkFactory::bitcoinTestnet()), $array['sigHashType']];
                 }, $input['keys']);
                 $utxos[] = new Utxo($outpoint, $txOut);
