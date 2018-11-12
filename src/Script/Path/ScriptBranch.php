@@ -14,19 +14,19 @@ class ScriptBranch
     private $fullScript;
 
     /**
-     * @var array|\array[]
+     * @var array
      */
     private $scriptSections;
 
     /**
-     * @var array|\bool[]
+     * @var bool[]
      */
     private $branch;
 
     /**
      * ScriptBranch constructor.
      * @param ScriptInterface $fullScript
-     * @param array $logicalPath
+     * @param bool[] $logicalPath
      * @param array $scriptSections
      */
     public function __construct(ScriptInterface $fullScript, array $logicalPath, array $scriptSections)
@@ -37,7 +37,7 @@ class ScriptBranch
     }
 
     /**
-     * @return array|\bool[]
+     * @return bool[]
      */
     public function getPath(): array
     {
@@ -45,7 +45,7 @@ class ScriptBranch
     }
 
     /**
-     * @return array|\array[]
+     * @return array[]
      */
     public function getScriptSections(): array
     {
