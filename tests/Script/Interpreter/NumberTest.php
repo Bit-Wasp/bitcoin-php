@@ -31,7 +31,7 @@ class NumberTest extends AbstractTestCase
     }
 
     /**
-     * @param int|string $int
+     * @param int $int
      * @param int $expectedSize
      * @param string $expectedHex
      * @dataProvider getVectors
@@ -46,7 +46,7 @@ class NumberTest extends AbstractTestCase
 
     /**
      * @throws \Exception
-     * @param int|string $int
+     * @param int $int
      * @param int $expectedSize
      * @param string $expectedHex
      * @dataProvider getVectors
