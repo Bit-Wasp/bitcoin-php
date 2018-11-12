@@ -41,6 +41,7 @@
     "squizlabs/php_codesniffer": "^2.0.0",
     "nbobtc/bitcoind-php": "v2.0.2",
     "bitwasp/secp256k1-php": "^v0.2.0",
-    "bitwasp/bitcoinconsensus": "v3.0.0"
+    "bitwasp/bitcoinconsensus": "v3.0.0",
+    "phpstan/phpstan": "^0.10.5"
   }
 }
