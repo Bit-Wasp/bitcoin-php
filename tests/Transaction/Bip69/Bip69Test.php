@@ -29,15 +29,15 @@ class Bip69Test extends AbstractTestCase
     /**
      * @dataProvider getVectors
      * @param Bip69 $bip69
-     * @param $expectedCheck
-     * @param $txHex
+     * @param bool $expectedCheck
+     * @param string $txHex
      */
     public function testCheck(Bip69 $bip69, bool $expectedCheck, string $txHex)
     {
         $tx = TransactionFactory::fromHex($txHex);
         $this->assertEquals($expectedCheck, $bip69->check($tx));
 
-        if ($expectedCheck === false) {
+        if (!$expectedCheck) {
             $fixed = $bip69->mutate($tx);
             $this->assertEquals(true, $bip69->check($fixed));
         }
