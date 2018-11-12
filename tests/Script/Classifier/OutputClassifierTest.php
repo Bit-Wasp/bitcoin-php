@@ -141,8 +141,8 @@ class OutputClassifierTest extends AbstractTestCase
      * @dataProvider getVectors
      * @param OutputClassifier $classifier
      * @param ScriptInterface $script
-     * @param $eSolution
-     * @param $classification
+     * @param BufferInterface|BufferInterface[] $eSolution
+     * @param string $classification
      */
     public function testCases(OutputClassifier $classifier, ScriptInterface $script, $eSolution, string $classification)
     {
