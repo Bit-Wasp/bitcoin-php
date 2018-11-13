@@ -172,8 +172,8 @@ class FullyQualifiedScript
      * for final validation.
      *
      * @param ScriptInterface $scriptPubKey
-     * @param ScriptInterface|null $scriptSig
-     * @param ScriptWitnessInterface|null $witness
+     * @param ScriptInterface $scriptSig
+     * @param ScriptWitnessInterface $witness
      * @param SignData|null $signData
      * @param OutputClassifier|null $classifier
      * @return FullyQualifiedScript
