@@ -69,7 +69,7 @@ class BranchInterpreter
                     if (null === $current->getParent()) {
                         throw new \RuntimeException("Unexpected ELSE, current scope had no parent");
                     }
-                    $current = $current->getParent()->getChild(!$current->getValue());
+                    $current = $current->getParent()->getChild((int) !$current->getValue());
                     break;
             }
         }

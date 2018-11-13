@@ -23,10 +23,10 @@ class LogicOpNode
 
     /**
      * MASTNode constructor.
-     * @param self|null $parent
+     * @param LogicOpNode|null $parent
      * @param bool|null $value
      */
-    public function __construct(self $parent = null, $value = null)
+    public function __construct(LogicOpNode $parent = null, bool $value = null)
     {
         $this->parent = $parent;
         $this->value = $value;
@@ -89,12 +89,12 @@ class LogicOpNode
     }
 
     /**
-     * @param $value
+     * @param int $value
      * @return LogicOpNode
      */
-    public function getChild($value)
+    public function getChild(int $value): LogicOpNode
     {
-        if (!isset($this->children[$value])) {
+        if (!array_key_exists($value, $this->children)) {
             throw new \RuntimeException("Child not found");
         }
         return $this->children[$value];
