@@ -80,13 +80,13 @@ class AddressTest extends AbstractTestCase
 
     /**
      * @dataProvider getVectors
-     * @param $type
+     * @param string $type
      * @param NetworkInterface $network
-     * @param $data
-     * @param $address
+     * @param string $data
+     * @param string $address
      * @throws \Exception
      */
-    public function testAddress(string $type, NetworkInterface $network, $data, string $address)
+    public function testAddress(string $type, NetworkInterface $network, string $data, string $address)
     {
         if ($type === 'pubkeyhash') {
             $pubKeyFactory = new PublicKeyFactory();
