@@ -19,7 +19,7 @@ class EcAdapterFactory
     private static $adapter;
 
     /**
-     * @var
+     * @var resource
      */
     private static $context;
 
