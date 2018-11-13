@@ -21,8 +21,8 @@ class AmountTest extends AbstractTestCase
     }
 
     /**
-     * @param $btc
-     * @param $satoshis
+     * @param string $btc
+     * @param int $satoshis
      * @dataProvider getVectors
      */
     public function testAmount(string $btc, int $satoshis)
@@ -36,7 +36,7 @@ class AmountTest extends AbstractTestCase
     {
         $amount = new Amount();
         $value = '1.123456789';
-        $expected = '112345678';
+        $expected = 112345678;
         $this->assertEquals($expected, ($amount->toSatoshis($value)));
     }
 }
