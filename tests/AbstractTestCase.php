@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Tests;
 
+use BitWasp\Bitcoin\Block\Block;
 use BitWasp\Bitcoin\Block\BlockFactory;
+use BitWasp\Bitcoin\Block\BlockInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcAdapterFactory;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter as PhpEccAdapter;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Interpreter\Interpreter;
+use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
 use Mdanter\Ecc\EccFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -105,19 +108,19 @@ abstract class AbstractTestCase extends TestCase
     }
 
     /**
-     * @param $i
-     * @return \BitWasp\Bitcoin\Block\BlockInterface
+     * @param int $i
+     * @return BlockInterface
      */
-    public function getBlock($i)
+    public function getBlock(int $i): BlockInterface
     {
         $blocks = $this->getBlocks();
         return BlockFactory::fromHex($blocks[$i]);
     }
 
     /**
-     * @return \BitWasp\Bitcoin\Block\Block
+     * @return Block
      */
-    public function getGenesisBlock()
+    public function getGenesisBlock(): Block
     {
         return $this->getBlock(0);
     }
@@ -139,7 +142,7 @@ abstract class AbstractTestCase extends TestCase
     }
 
     /**
-     * @param $flagStr
+     * @param string $flagStr
      * @return int
      */
     public function getInterpreterFlags($flagStr)
@@ -147,7 +150,7 @@ abstract class AbstractTestCase extends TestCase
         $array = explode(",", $flagStr);
         $int = 0;
         foreach ($array as $activeFlag) {
-            $f = constant('\BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface::'.$activeFlag);
+            $f = constant(InterpreterInterface::class."::$activeFlag");
             $int |= $f;
         }
 
