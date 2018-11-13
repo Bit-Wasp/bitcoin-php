@@ -71,6 +71,7 @@ install:
             make && sudo make install && cd ../..;
         fi
     - composer update
+    - if [ "${COVERAGE}" = "true" ]; then composer require --dev phpstan/phpstan ^v0.10.0; fi
 
 before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
@@ -79,7 +80,7 @@ script:
   - travis/run_secp256k1_tests.sh || exit 1
   - travis/run_phpunit_tests.sh || exit 1
   - travis/run_rpc_tests.sh || exit 1
-  - if [ "$COVERAGE" = "true" ]; then vendor/bin/phpstan src test -l 1; fi
+  - if [ "$COVERAGE" = "true" ]; then pwd && vendor/bin/phpstan analyse src test -l 1; fi
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
 
