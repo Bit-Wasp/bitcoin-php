@@ -48,8 +48,8 @@ class PublicKeyTest extends AbstractTestCase
     /**
      * @dataProvider getPublicVectors
      * @param EcAdapterInterface $ecAdapter
-     * @param $eCompressed
-     * @param $eUncompressed
+     * @param string $eCompressed
+     * @param string $eUncompressed
      */
     public function testFromHexUncompressed(EcAdapterInterface $ecAdapter, string $eCompressed, string $eUncompressed)
     {
