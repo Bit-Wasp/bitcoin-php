@@ -243,7 +243,7 @@ class Checksig
     }
 
     /**
-     * @param $idx
+     * @param int $idx
      * @param PublicKeyInterface|null $key
      * @return $this
      */
