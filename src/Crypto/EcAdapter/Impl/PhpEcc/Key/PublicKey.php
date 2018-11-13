@@ -91,7 +91,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
 
     /**
      * @param BufferInterface $msg32
-     * @param SignatureInterface|\Mdanter\Ecc\Crypto\Signature\Signature $signature
+     * @param SignatureInterface $signature
      * @return bool
      */
     public function verify(BufferInterface $msg32, SignatureInterface $signature): bool
