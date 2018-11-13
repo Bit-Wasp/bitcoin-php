@@ -26,14 +26,14 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
     private $signature;
 
     /**
-     * @var int|string
+     * @var int
      */
     private $hashType;
 
     /**
      * @param EcAdapterInterface $ecAdapter
      * @param SignatureInterface $signature
-     * @param $hashType
+     * @param int $hashType
      */
     public function __construct(EcAdapterInterface $ecAdapter, SignatureInterface $signature, int $hashType)
     {
