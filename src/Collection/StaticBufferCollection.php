@@ -20,7 +20,7 @@ class StaticBufferCollection extends StaticCollection
 
     /**
      * StaticBufferCollection constructor.
-     * @param BufferInterface[] $values
+     * @param BufferInterface ...$values
      */
     public function __construct(BufferInterface... $values)
     {
