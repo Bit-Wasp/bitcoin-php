@@ -53,7 +53,6 @@ class Network implements NetworkInterface
     /**
      * @param string $field - name of field being validated
      * @param string $value - we check this value
-     * @param int $length - length we require
      * @throws InvalidNetworkParameter
      */
     private function validateHexStringRepresentsBytes(string $field, string $value)
