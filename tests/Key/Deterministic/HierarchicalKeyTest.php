@@ -51,19 +51,19 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * @param HierarchicalKey $key
-     * @param $vectors
+     * @param \stdClass $vector
      */
-    private function compareToPrivVectors(\BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey $key, $vectors)
+    private function compareToPrivVectors(\BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey $key, $vector)
     {
-        $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif($this->network));
-        $this->assertSame($vectors->secret_wif, $key->getPrivateKey()->toWif());
+        $this->assertSame($vector->secret_wif, $key->getPrivateKey()->toWif($this->network));
+        $this->assertSame($vector->secret_wif, $key->getPrivateKey()->toWif());
 
-        $this->assertSame($vectors->address, $key->getAddress(new AddressCreator())->getAddress($this->network));
+        $this->assertSame($vector->address, $key->getAddress(new AddressCreator())->getAddress($this->network));
 
-        $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
-        $this->assertSame($vectors->xprv_b58, $key->toExtendedPrivateKey(), 'correct xprv');
-        $this->assertSame($vectors->xpub_b58, $key->toExtendedPublicKey($this->network), 'correct xpub');
-        $this->assertSame($vectors->xpub_b58, $key->toExtendedPublicKey(), 'correct xpub');
+        $this->assertSame($vector->xprv_b58, $key->toExtendedPrivateKey($this->network), 'correct xprv');
+        $this->assertSame($vector->xprv_b58, $key->toExtendedPrivateKey(), 'correct xprv');
+        $this->assertSame($vector->xpub_b58, $key->toExtendedPublicKey($this->network), 'correct xpub');
+        $this->assertSame($vector->xpub_b58, $key->toExtendedPublicKey(), 'correct xpub');
     }
 
     /**
