@@ -64,8 +64,9 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
     }
 
     /**
-     * @param SignatureInterface|\Mdanter\Ecc\Crypto\Signature\Signature $signature
+     * @param SignatureInterface $signature
      * @return BufferInterface
+     * @throws \Exception
      */
     public function serialize(SignatureInterface $signature): BufferInterface
     {
