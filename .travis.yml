@@ -80,7 +80,7 @@ script:
   - travis/run_secp256k1_tests.sh || exit 1
   - travis/run_phpunit_tests.sh || exit 1
   - travis/run_rpc_tests.sh || exit 1
-  - if [ "$COVERAGE" = "true" ]; then pwd && vendor/bin/phpstan analyse src test -l 1; fi
+  - if [ "$COVERAGE" = "true" ]; then pwd && vendor/bin/phpstan analyse src tests -l 1; fi
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
 
