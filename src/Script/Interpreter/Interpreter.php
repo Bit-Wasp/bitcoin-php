@@ -211,11 +211,11 @@ class Interpreter implements InterpreterInterface
      * @param ScriptInterface $scriptSig
      * @param ScriptInterface $scriptPubKey
      * @param int $flags
-     * @param Checker $checker
+     * @param CheckerBase $checker
      * @param ScriptWitnessInterface|null $witness
      * @return bool
      */
-    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, int $flags, Checker $checker, ScriptWitnessInterface $witness = null): bool
+    public function verify(ScriptInterface $scriptSig, ScriptInterface $scriptPubKey, int $flags, CheckerBase $checker, ScriptWitnessInterface $witness = null): bool
     {
         static $emptyWitness = null;
         if ($emptyWitness === null) {
@@ -360,10 +360,10 @@ class Interpreter implements InterpreterInterface
      * @param Stack $mainStack
      * @param int $sigVersion
      * @param int $flags
-     * @param Checker $checker
+     * @param CheckerBase $checker
      * @return bool
      */
-    public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, Checker $checker): bool
+    public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, CheckerBase $checker): bool
     {
         $hashStartPos = 0;
         $opCount = 0;
