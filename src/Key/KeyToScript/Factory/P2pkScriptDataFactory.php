@@ -21,16 +21,16 @@ class P2pkScriptDataFactory extends KeyToScriptDataFactory
     }
 
     /**
-     * @param PublicKeyInterface $publicKeys
+     * @param PublicKeyInterface $keys
      * @return ScriptAndSignData
      */
-    protected function convertKeyToScriptData(PublicKeyInterface ...$publicKeys): ScriptAndSignData
+    protected function convertKeyToScriptData(PublicKeyInterface ...$keys): ScriptAndSignData
     {
-        if (count($publicKeys) !== 1) {
+        if (count($keys) !== 1) {
             throw new \InvalidArgumentException("Invalid number of keys");
         }
         return new ScriptAndSignData(
-            ScriptFactory::scriptPubKey()->p2pk($publicKeys[0]),
+            ScriptFactory::scriptPubKey()->p2pk($keys[0]),
             new SignData()
         );
     }

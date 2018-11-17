@@ -28,14 +28,14 @@ class P2shP2wshScriptDecorator extends ScriptHashDecorator
     protected $decorateType = "scripthash|witness_v0_scripthash";
 
     /**
-     * @param KeyInterface ...$key
+     * @param KeyInterface ...$keys
      * @return ScriptAndSignData
      * @throws \BitWasp\Bitcoin\Exceptions\P2shScriptException
      * @throws \BitWasp\Bitcoin\Exceptions\WitnessScriptException
      */
-    public function convertKey(KeyInterface ...$key): ScriptAndSignData
+    public function convertKey(KeyInterface ...$keys): ScriptAndSignData
     {
-        $witnessScript = new WitnessScript($this->scriptDataFactory->convertKey(...$key)->getScriptPubKey());
+        $witnessScript = new WitnessScript($this->scriptDataFactory->convertKey(...$keys)->getScriptPubKey());
         $redeemScript = new P2shScript($witnessScript);
         return new ScriptAndSignData(
             $redeemScript->getOutputScript(),

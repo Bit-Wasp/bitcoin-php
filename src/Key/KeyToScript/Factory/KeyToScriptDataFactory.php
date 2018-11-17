@@ -32,10 +32,10 @@ abstract class KeyToScriptDataFactory extends ScriptDataFactory
     }
 
     /**
-     * @param PublicKeyInterface ...$publicKeys
+     * @param PublicKeyInterface ...$keys
      * @return ScriptAndSignData
      */
-    abstract protected function convertKeyToScriptData(PublicKeyInterface... $publicKeys): ScriptAndSignData;
+    abstract protected function convertKeyToScriptData(PublicKeyInterface ...$keys): ScriptAndSignData;
 
     /**
      * @param KeyInterface ...$keys
