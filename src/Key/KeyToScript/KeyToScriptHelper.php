@@ -18,9 +18,8 @@ use BitWasp\Bitcoin\Script\ScriptType;
 
 class KeyToScriptHelper
 {
-
     /**
-     * @var mixed
+     * @var ScriptDataFactory[]
      */
     private $cache = [];
 
@@ -39,18 +38,9 @@ class KeyToScriptHelper
     }
 
     /**
-     * @param array ...$scriptPaths
-     * @return string
-     */
-    private function makeScriptKey(... $scriptPaths)
-    {
-        return implode("|", $scriptPaths);
-    }
-
-    /**
      * @return P2pkhScriptDataFactory
      */
-    public function getP2pkhFactory()
+    public function getP2pkhFactory(): P2pkhScriptDataFactory
     {
         $key = ScriptType::P2PKH;
         if (!array_key_exists($key, $this->cache)) {
@@ -60,20 +50,20 @@ class KeyToScriptHelper
     }
 
     /**
-     * @param int $m
-     * @param int $n
-     * @param bool $sortKeys
+     * @param int $numSignatures
+     * @param int $numKeys
+     * @param bool $sortCosignKeys
      * @return MultisigScriptDataFactory
      */
-    public function getMultisigFactory(int $m, int $n, bool $sortKeys)
+    public function getMultisigFactory(int $numSignatures, int $numKeys, bool $sortCosignKeys): MultisigScriptDataFactory
     {
-        return new MultisigScriptDataFactory($m, $n, $sortKeys, $this->pubKeySer);
+        return new MultisigScriptDataFactory($numSignatures, $numKeys, $sortCosignKeys, $this->pubKeySer);
     }
 
     /**
      * @return P2wpkhScriptDataFactory
      */
-    public function getP2wpkhFactory()
+    public function getP2wpkhFactory(): P2wpkhScriptDataFactory
     {
         $key = ScriptType::P2WKH;
         if (!array_key_exists($key, $this->cache)) {
@@ -84,12 +74,12 @@ class KeyToScriptHelper
 
     /**
      * @param KeyToScriptDataFactory $scriptFactory
-     * @return P2shScriptDecorator
+     * @return ScriptDataFactory
      * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
      */
-    public function getP2shFactory(KeyToScriptDataFactory $scriptFactory)
+    public function getP2shFactory(KeyToScriptDataFactory $scriptFactory): ScriptDataFactory
     {
-        $key = $this->makeScriptKey(ScriptType::P2SH, $scriptFactory->getScriptType());
+        $key = sprintf("%s|%s", ScriptType::P2SH, $scriptFactory->getScriptType());
         if (!array_key_exists($key, $this->cache)) {
             $this->cache[$key] = new P2shScriptDecorator($scriptFactory);
         }
@@ -98,12 +88,12 @@ class KeyToScriptHelper
 
     /**
      * @param KeyToScriptDataFactory $scriptFactory
-     * @return P2wshScriptDecorator
+     * @return ScriptDataFactory
      * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
      */
-    public function getP2wshFactory(KeyToScriptDataFactory $scriptFactory)
+    public function getP2wshFactory(KeyToScriptDataFactory $scriptFactory): ScriptDataFactory
     {
-        $key = $this->makeScriptKey(ScriptType::P2WSH, $scriptFactory->getScriptType());
+        $key = sprintf("%s|%s", ScriptType::P2WSH, $scriptFactory->getScriptType());
         if (!array_key_exists($key, $this->cache)) {
             $this->cache[$key] = new P2wshScriptDecorator($scriptFactory);
         }
@@ -112,12 +102,12 @@ class KeyToScriptHelper
 
     /**
      * @param KeyToScriptDataFactory $scriptFactory
-     * @return P2shP2wshScriptDecorator
+     * @return ScriptDataFactory
      * @throws \BitWasp\Bitcoin\Exceptions\DisallowedScriptDataFactoryException
      */
-    public function getP2shP2wshFactory(KeyToScriptDataFactory $scriptFactory)
+    public function getP2shP2wshFactory(KeyToScriptDataFactory $scriptFactory): ScriptDataFactory
     {
-        $key = $this->makeScriptKey(ScriptType::P2SH, ScriptType::P2WSH, $scriptFactory->getScriptType());
+        $key = sprintf("%s|%s|%s", ScriptType::P2SH, ScriptType::P2WSH, $scriptFactory->getScriptType());
         if (!array_key_exists($key, $this->cache)) {
             $this->cache[$key] = new P2shP2wshScriptDecorator($scriptFactory);
         }
