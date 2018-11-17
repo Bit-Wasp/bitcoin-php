@@ -11,6 +11,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
+use BitWasp\Bitcoin\Key\Deterministic\MultisigHD;
 use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Key\KeyToScript\ScriptDataFactory;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -91,5 +92,15 @@ class HierarchicalKeyFactory
     public function fromExtended(string $extendedKey, NetworkInterface $network = null): HierarchicalKey
     {
         return $this->serializer->parse($network ?: Bitcoin::getNetwork(), $extendedKey);
+    }
+
+    /**
+     * @param ScriptDataFactory $scriptFactory
+     * @param HierarchicalKey ...$keys
+     * @return MultisigHD
+     */
+    public function multisig(ScriptDataFactory $scriptFactory, HierarchicalKey ...$keys): MultisigHD
+    {
+        return new MultisigHD($scriptFactory, ...$keys);
     }
 }

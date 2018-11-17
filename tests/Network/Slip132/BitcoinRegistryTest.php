@@ -35,11 +35,11 @@ class BitcoinRegistryTest extends AbstractTestCase
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
      * @throws \BitWasp\Bitcoin\Exceptions\MissingBip32Prefix
      */
-    public function testXpubP2shP2pkh()
+    public function testXpubP2shMultisig()
     {
         $network = new Bitcoin();
         $registry = new BitcoinRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2SH . "|" . ScriptType::P2PKH);
+        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2SH . "|" . ScriptType::MULTISIG);
 
         $this->assertEquals(
             $network->getHDPubByte(),
@@ -64,7 +64,7 @@ class BitcoinRegistryTest extends AbstractTestCase
     public function testYpubP2shP2wshP2pkh()
     {
         $registry = new BitcoinRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2SH . "|" . ScriptType::P2WSH . "|" . ScriptType::P2PKH);
+        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2SH . "|" . ScriptType::P2WSH . "|" . ScriptType::MULTISIG);
 
         $this->assertEquals("0295b43f", $pub);
         $this->assertEquals("0295b005", $priv);
@@ -82,7 +82,7 @@ class BitcoinRegistryTest extends AbstractTestCase
     public function testZpubP2wshP2pkh()
     {
         $registry = new BitcoinRegistry();
-        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2WSH . "|" . ScriptType::P2PKH);
+        list ($priv, $pub) = $registry->getPrefixes(ScriptType::P2WSH . "|" . ScriptType::MULTISIG);
 
         $this->assertEquals("02aa7ed3", $pub);
         $this->assertEquals("02aa7a99", $priv);
