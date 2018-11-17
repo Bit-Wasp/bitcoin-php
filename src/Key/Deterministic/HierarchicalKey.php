@@ -312,25 +312,6 @@ class HierarchicalKey
     }
 
     /**
-     * @param array|\stdClass|\Traversable $list
-     * @return HierarchicalKey
-     * @throws \Exception
-     */
-    public function deriveFromList($list): HierarchicalKey
-    {
-        if (!is_array($list) && !$list instanceof \Traversable && !$list instanceof \stdClass) {
-            throw new \InvalidArgumentException('List must be an array or \Traversable');
-        }
-
-        $key = $this;
-        foreach ($list as $sequence) {
-            $key = $key->deriveChild((int) $sequence);
-        }
-
-        return $key;
-    }
-
-    /**
      * Decodes a BIP32 path into actual 32bit sequence numbers and derives the child key
      *
      * @param string $path
