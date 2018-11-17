@@ -20,18 +20,17 @@ $btc = NetworkFactory::bitcoin();
 
 $slip132 = new Slip132(new KeyToScriptHelper($adapter));
 $bitcoinPrefixes = new BitcoinRegistry();
-$zpubPrefix = $slip132->p2wpkh($bitcoinPrefixes);
 
 $config = new GlobalPrefixConfig([
-    new NetworkConfig($btc, [
-        $zpubPrefix,
-    ])
+    new NetworkConfig($btc, [$slip132->p2wpkh($bitcoinPrefixes)])
 ]);
 
 $serializer = new Base58ExtendedKeySerializer(
     new ExtendedKeySerializer($adapter, $config)
 );
 
+// The ONLY way to parse these keys is creating a Base58ExtendedKeySerializer with
+// a global config
 $rootKey = $serializer->parse($btc, "zprvAWgYBBk7JR8GiuMByuy3PBgDdCdBk3fBK77VSGEMnWT1gKG7hz5z9Jt1tPCA2itCvzowhWh5yMdGwyLcLmuKmC8RwgPZMcdCfvyVLhmUR2m");
 
 $account0Key = $rootKey->derivePath("84'/0'/0'");

@@ -61,19 +61,6 @@ class Slip132Test extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $adapter
-     * @expectedException \BitWasp\Bitcoin\Exceptions\NotImplementedException
-     * @expectedExceptionMessage Ypub/prv not supported yet
-     */
-    public function testYpubP2shP2wshP2pkh(EcAdapterInterface $adapter)
-    {
-        $slip132 = new Slip132(new KeyToScriptHelper($adapter));
-        $registry = new BitcoinRegistry();
-        $slip132->p2shP2wshP2pkh($registry);
-    }
-
-    /**
-     * @dataProvider getEcAdapters
-     * @param EcAdapterInterface $adapter
      * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
      */
     public function testzpubP2wpkh(EcAdapterInterface $adapter)
@@ -96,13 +83,44 @@ class Slip132Test extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $adapter
-     * @expectedException \BitWasp\Bitcoin\Exceptions\NotImplementedException
-     * @expectedExceptionMessage Zpub/prv not supported yet
+     * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
      */
-    public function testZpubP2shP2wshP2pkh(EcAdapterInterface $adapter)
+    public function testYpubP2wshMultisig(EcAdapterInterface $adapter)
     {
         $slip132 = new Slip132(new KeyToScriptHelper($adapter));
         $registry = new BitcoinRegistry();
-        $slip132->p2wshP2pkh($registry);
+        $prefix = $slip132->p2wshMultisig(1, 1, true, $registry);
+
+        list ($priv, $pub) = $registry->getPrefixes($prefix->getScriptDataFactory()->getScriptType());
+        $this->assertEquals($pub, $prefix->getPublicPrefix());
+        $this->assertEquals($priv, $prefix->getPrivatePrefix());
+
+        $factory = $prefix->getScriptDataFactory();
+        $this->assertEquals(
+            ScriptType::P2WSH . "|" . ScriptType::MULTISIG,
+            $factory->getScriptType()
+        );
+    }
+
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $adapter
+     * @throws \BitWasp\Bitcoin\Exceptions\InvalidNetworkParameter
+     */
+    public function testZpubP2shP2wshMultisig(EcAdapterInterface $adapter)
+    {
+        $slip132 = new Slip132(new KeyToScriptHelper($adapter));
+        $registry = new BitcoinRegistry();
+        $prefix = $slip132->p2shP2wshMultisig(1, 1, true, $registry);
+
+        list ($priv, $pub) = $registry->getPrefixes($prefix->getScriptDataFactory()->getScriptType());
+        $this->assertEquals($pub, $prefix->getPublicPrefix());
+        $this->assertEquals($priv, $prefix->getPrivatePrefix());
+
+        $factory = $prefix->getScriptDataFactory();
+        $this->assertEquals(
+            ScriptType::P2SH . "|" . ScriptType::P2WSH . "|" . ScriptType::MULTISIG,
+            $factory->getScriptType()
+        );
     }
 }

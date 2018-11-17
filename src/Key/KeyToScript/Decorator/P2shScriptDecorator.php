@@ -16,6 +16,7 @@ class P2shScriptDecorator extends ScriptHashDecorator
      * @var array
      */
     protected $allowedScriptTypes = [
+        ScriptType::MULTISIG,
         ScriptType::P2PKH,
         ScriptType::P2PK,
         ScriptType::P2WKH,

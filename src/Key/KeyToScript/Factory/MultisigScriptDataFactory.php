@@ -48,14 +48,19 @@ class MultisigScriptDataFactory extends KeyToScriptDataFactory
      * @param PublicKeyInterface ...$publicKeys
      * @return ScriptAndSignData
      */
-    protected function convertKeyToScriptData(PublicKeyInterface... $publicKeys): ScriptAndSignData
+    protected function convertKeyToScriptData(PublicKeyInterface ...$publicKeys): ScriptAndSignData
     {
         if (count($publicKeys) !== $this->numKeys) {
             throw new \InvalidArgumentException("Incorrect number of keys");
         }
 
+        $keyBuffers = [];
+        for ($i = 0; $i < $this->numKeys; $i++) {
+            $keyBuffers[] = $this->pubKeySerializer->serialize($publicKeys[$i]);
+        }
+
         return new ScriptAndSignData(
-            ScriptFactory::scriptPubKey()->multisig($this->numSigners, $publicKeys, $this->sortKeys),
+            ScriptFactory::scriptPubKey()->multisigKeyBuffers($this->numSigners, $keyBuffers, $this->sortKeys),
             new SignData()
         );
     }
