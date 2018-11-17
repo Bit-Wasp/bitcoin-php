@@ -64,12 +64,12 @@ class ParserTest extends AbstractTestCase
 
     /**
      * @dataProvider getTestPushScripts
-     * @param $script
-     * @param $expectedOp
-     * @param $expectedPushData
-     * @param $result
+     * @param string $script
+     * @param int $expectedOp
+     * @param string $expectedPushData
+     * @param bool $result
      */
-    public function testPush($script, $expectedOp, $expectedPushData, $result)
+    public function testPush(string $script, int $expectedOp, string $expectedPushData, $result)
     {
         $parser = ScriptFactory::fromHex($script)->getScriptParser();
 
