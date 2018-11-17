@@ -9,10 +9,10 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 abstract class ScriptDataFactory
 {
     /**
-     * @param KeyInterface ...$key
+     * @param KeyInterface ...$keys
      * @return ScriptAndSignData
      */
-    abstract public function convertKey(KeyInterface ...$key): ScriptAndSignData;
+    abstract public function convertKey(KeyInterface ...$keys): ScriptAndSignData;
 
     /**
      * @return string

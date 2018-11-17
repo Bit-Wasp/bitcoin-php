@@ -25,11 +25,6 @@ abstract class ScriptHashDecorator extends ScriptDataFactory
      */
     protected $decorateType;
 
-    /**
-     * ScriptHashDecorator constructor.
-     * @param KeyToScriptDataFactory $scriptDataFactory
-     * @throws DisallowedScriptDataFactoryException
-     */
     public function __construct(KeyToScriptDataFactory $scriptDataFactory)
     {
         if (!in_array($scriptDataFactory->getScriptType(), $this->allowedScriptTypes, true)) {
