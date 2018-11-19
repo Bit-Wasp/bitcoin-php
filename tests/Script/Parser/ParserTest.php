@@ -69,7 +69,7 @@ class ParserTest extends AbstractTestCase
      * @param string $expectedPushData
      * @param bool $result
      */
-    public function testPush(string $script, int $expectedOp, string $expectedPushData, $result)
+    public function testPush(string $script, int $expectedOp, $expectedPushData, bool $result)
     {
         $parser = ScriptFactory::fromHex($script)->getScriptParser();
 
