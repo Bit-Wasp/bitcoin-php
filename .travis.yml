@@ -57,7 +57,7 @@ install:
             git clone -b v0.2.0 https://github.com/Bit-Wasp/secp256k1-php &&
             cd secp256k1-php/secp256k1 &&
             phpize && ./configure &&
-            make && sudo make install && cd ../..;
+            make && sudo make install && echo "extension=secp256k1.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini && cd ../..;
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ]; then
@@ -68,19 +68,19 @@ install:
             git clone -b v3.0.0 https://github.com/Bit-Wasp/bitcoinconsensus-php &&
             cd bitcoinconsensus-php/bitcoinconsensus &&
             phpize && ./configure --with-bitcoinconsensus &&
-            make && sudo make install && cd ../..;
+            make && sudo make install && echo "extension=bitcoinconsensus.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini && cd ../..;
         fi
     - composer update
-    - if [ "${COVERAGE}" = "true" ]; then composer require --dev phpstan/phpstan ^v0.10.0; fi
+    - if [ "${COVERAGE}" = "true" ]; then composer require --dev phpstan/phpstan; fi
 
 before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
 
 script:
   - travis/run_secp256k1_tests.sh || exit 1
-  - travis/run_phpunit_tests.sh || exit 1
-  - travis/run_rpc_tests.sh || exit 1
   - if [ "$COVERAGE" = "true" ]; then pwd && vendor/bin/phpstan analyse src tests -l 1; fi
+  - make phpunit-ci || exit 1
+  - travis/run_rpc_tests.sh || exit 1
   - if [ "$CODE_STYLE" = "true" ]; then make phpcs && echo "Code style OK"; fi
   - if [ "$EXAMPLES" = "true" ]; then make test-examples && echo "Examples OK"; fi
 
