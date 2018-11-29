@@ -41,9 +41,9 @@ class EcAdapterTest extends AbstractTestCase
     /**
      * @dataProvider getPrivVectors
      * @param EcAdapterInterface $ec
-     * @param $privHex
-     * @param $pubHex
-     * @param $compressedHex
+     * @param string $privHex
+     * @param string $pubHex
+     * @param string $compressedHex
      * @throws \Exception
      */
     public function testPrivateToPublic(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
@@ -99,7 +99,7 @@ class EcAdapterTest extends AbstractTestCase
         $pubKeyFactory = new PublicKeyFactory($ecAdapter);
         foreach ($json->test as $test) {
             try {
-                $pubKeyFactory->fromHex($test->compressed, $ecAdapter);
+                $pubKeyFactory->fromHex($test->compressed);
                 $valid = true;
             } catch (\Exception $e) {
                 $valid = false;

@@ -39,11 +39,6 @@ class CompactSignature extends Signature implements CompactSignatureInterface
      */
     public function __construct(EcAdapter $ecAdapter, $secp256k1_ecdsa_signature_t, int $recid, bool $compressed)
     {
-        $math = $ecAdapter->getMath();
-        if (!is_bool($compressed)) {
-            throw new \InvalidArgumentException('CompactSignature: compressed must be a boolean');
-        }
-
         if (!is_resource($secp256k1_ecdsa_signature_t)
             || SECP256K1_TYPE_RECOVERABLE_SIG !== get_resource_type($secp256k1_ecdsa_signature_t)
         ) {

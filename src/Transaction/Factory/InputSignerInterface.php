@@ -70,13 +70,12 @@ interface InputSignerInterface
     public function step(int $idx);
 
     /**
-     * @param $idx
+     * @param int $idx
      * @param PrivateKeyInterface $privateKey
      * @param int $sigHashType
      * @return mixed
      */
     public function signStep(int $idx, PrivateKeyInterface $privateKey, int $sigHashType = SigHash::ALL);
-
 
     /**
      * Sign the input using $key and $sigHashTypes

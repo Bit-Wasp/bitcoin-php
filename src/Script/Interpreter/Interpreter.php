@@ -148,10 +148,10 @@ class Interpreter implements InterpreterInterface
      * @param WitnessProgram $witnessProgram
      * @param ScriptWitnessInterface $scriptWitness
      * @param int $flags
-     * @param Checker $checker
+     * @param CheckerBase $checker
      * @return bool
      */
-    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, Checker $checker): bool
+    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, CheckerBase $checker): bool
     {
         $witnessCount = count($scriptWitness);
 

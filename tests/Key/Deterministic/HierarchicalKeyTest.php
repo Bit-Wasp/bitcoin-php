@@ -53,7 +53,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @param HierarchicalKey $key
      * @param \stdClass $vector
      */
-    private function compareToPrivVectors(\BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey $key, $vector)
+    private function compareToPrivVectors(\BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey $key, \stdClass $vector)
     {
         $this->assertSame($vector->secret_wif, $key->getPrivateKey()->toWif($this->network));
         $this->assertSame($vector->secret_wif, $key->getPrivateKey()->toWif());
@@ -131,10 +131,10 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @dataProvider getBip32Vectors
      * @param EcAdapterInterface $ecAdapter
      * @param BufferInterface $entropy
-     * @param $details
-     * @param $derivs
+     * @param \stdClass[] $details
+     * @param array $derivs
      */
-    public function testTestVectors(EcAdapterInterface $ecAdapter, BufferInterface $entropy, $details, $derivs)
+    public function testTestVectors(EcAdapterInterface $ecAdapter, BufferInterface $entropy, \stdClass $details, array $derivs)
     {
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $key = $hdFactory->fromEntropy($entropy);
