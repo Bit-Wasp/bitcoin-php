@@ -44,8 +44,7 @@ abstract class KeyToScriptDataFactory extends ScriptDataFactory
      */
     public function convertKey(KeyInterface $key): ScriptAndSignData
     {
-        if ($key->isPrivate()) {
-            /** @var PrivateKeyInterface $key */
+        if ($key instanceof PrivateKeyInterface) {
             $key = $key->getPublicKey();
         }
         /** @var PublicKeyInterface $key */

@@ -51,7 +51,7 @@ class ComplexSignerTest extends AbstractTestCase
     }
 
     /**
-     * @param $idx
+     * @param int $idx
      * @return PrivateKeyInterface
      */
     protected function getKeyFromStore(int $idx)
