@@ -1,11 +1,42 @@
-filter:
-    excluded_paths: [examples*, vendor/*, build/*, tests/*, tests-rpc/*, stubs/*, src/Payments/Protobufs/*]
+build:
+    nodes:
+        php-scrutinizer-run:
+            project_setup:
+                override: true
+            tests:
+                override: [php-scrutinizer-run]
 
-before_commands:
-    - "composer install --prefer-source --no-dev"
+    environment:
+        mysql: false
+        redis: false
+        postgresql: false
+        php:
+           version: 7.2
+           ini:
+               'zend.assertions': '1'
+               'assert.exception': '1'
+    dependencies:
+        override:
+            -
+                command: 'composer install'
+    tests:
+        override: true
+    project_setup:
+        override: true
+
+filter:
+    paths:
+        - src/*
+    excluded_paths:
+        - examples/*
+        - build/*
+        - tests/*
+        - tests-rpc/*
+        - stubs/*
+        - vendor/*
 
 tools:
-    php_cpd: true
+    php_cpd: false
     php_pdepend: true
     php_analyzer: true
     php_sim: true
@@ -23,3 +54,43 @@ tools:
 changetracking:
     bug_patterns: ["\bfix(?:es|ed)?\b"]
     feature_patterns: ["\badd(?:s|ed)?\b", "\bimplement(?:s|ed)?\b"]
+
+build_failure_conditions:
+    # No new critical issue is introduced (existing ones are tolerated)
+    - 'issues.severity(>= CRITICAL).new.exists'
+
+    # Code Coverage drops below 60%
+    - 'project.metric("scrutinizer.test_coverage", < 0.80)'
+
+    # Code Coverage decreased from previous inspection by more than 1%
+    - 'project.metric_change("scrutinizer.test_coverage", < -0.01)'
+
+checks:
+    php:
+        simplify_boolean_return: true
+        return_doc_comments: true
+        return_doc_comment_if_not_inferrable: true
+        remove_extra_empty_lines: true
+        properties_in_camelcaps: true
+        phpunit_assertions: true
+        parameters_in_camelcaps: true
+        parameter_doc_comments: true
+        param_doc_comment_if_not_inferrable: true
+        overriding_parameter: true
+        no_short_variable_names:
+            minimum: '3'
+        no_short_method_names:
+            minimum: '3'
+        no_long_variable_names:
+            maximum: '20'
+        no_goto: true
+        fix_use_statements:
+            remove_unused: true
+            preserve_multiple: false
+            preserve_blanklines: false
+            order_alphabetically: false
+        fix_line_ending: true
+        check_method_contracts:
+            verify_interface_like_constraints: true
+            verify_documented_constraints: true
+            verify_parent_constraints: true
