@@ -39,7 +39,7 @@ class UriTest extends AbstractTestCase
         $address = $addrCreator->fromString($string);
         $uri = new Uri($address);
 
-        $uri->setAmountBtc(1);
+        $uri->setAmountBtc('1');
 
         $this->assertEquals('bitcoin:'.$string."?amount=1", $uri->uri());
     }
