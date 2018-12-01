@@ -31,7 +31,7 @@ class Utxo implements UtxoInterface
     }
 
     /**
-     * @return OutPoint
+     * @return OutPointInterface
      */
     public function getOutPoint(): OutPointInterface
     {
