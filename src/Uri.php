@@ -18,7 +18,7 @@ class Uri
     private $address;
 
     /**
-     * @var null|float
+     * @var null|string
      */
     private $amount;
 
@@ -62,10 +62,10 @@ class Uri
     }
 
     /**
-     * @param float $value
+     * @param string $value
      * @return $this
      */
-    public function setAmountBtc(float $value)
+    public function setAmountBtc(string $value)
     {
         $this->amount = $value;
         return $this;
