@@ -9,8 +9,8 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Crypto\Key\PrivateKey as MdPrivateKey;
-use Mdanter\Ecc\Random\HmacRandomNumberGenerator;
 use Mdanter\Ecc\Random\RandomGeneratorFactory;
+use Mdanter\Ecc\Random\RandomNumberGeneratorInterface;
 
 class Rfc6979 implements RbgInterface
 {
@@ -21,7 +21,7 @@ class Rfc6979 implements RbgInterface
     private $ecAdapter;
 
     /**
-     * @var HmacRandomNumberGenerator
+     * @var RandomNumberGeneratorInterface
      */
     private $hmac;
 
