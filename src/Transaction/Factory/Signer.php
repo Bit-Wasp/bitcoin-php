@@ -12,7 +12,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Exceptions\SignerException;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
-use BitWasp\Bitcoin\Transaction\Factory\Checker\BitcoinCashCheckerCreator;
 use BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreator;
 use BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreatorBase;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
@@ -79,16 +78,6 @@ class Signer
         $this->sigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $this->ecAdapter));
         $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $this->ecAdapter);
         $this->checkerCreator = new CheckerCreator($this->ecAdapter, $this->sigSerializer, $this->pubKeySerializer);
-    }
-
-    /**
-     * @return $this
-     * @throws SignerException
-     */
-    public function redeemBitcoinCash()
-    {
-        $this->setCheckerCreator(new BitcoinCashCheckerCreator($this->ecAdapter, $this->sigSerializer, $this->pubKeySerializer));
-        return $this;
     }
 
     /**
