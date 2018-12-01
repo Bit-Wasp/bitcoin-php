@@ -21,7 +21,7 @@ class P2pkScriptDataFactory extends KeyToScriptDataFactory
     }
 
     /**
-     * @param PublicKeyInterface $keys
+     * @param PublicKeyInterface ...$keys
      * @return ScriptAndSignData
      */
     protected function convertKeyToScriptData(PublicKeyInterface ...$keys): ScriptAndSignData
