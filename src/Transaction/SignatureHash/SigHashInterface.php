@@ -31,11 +31,6 @@ interface SigHashInterface
     const ANYONECANPAY = 128;
 
     /**
-     * Bitcoin Cash optional sighash flag
-     */
-    const BITCOINCASH = 0x40;
-
-    /**
      * Calculate the hash of the current transaction, when you are looking to
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
      * SIGHASH_ALL, though SIGHASH_SINGLE, SIGHASH_NONE, SIGHASH_ANYONECANPAY
