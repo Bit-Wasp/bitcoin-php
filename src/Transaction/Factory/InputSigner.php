@@ -122,7 +122,7 @@ class InputSigner implements InputSignerInterface
     private $interpreter;
 
     /**
-     * @var Checker
+     * @var CheckerBase
      */
     private $signatureChecker;
 
