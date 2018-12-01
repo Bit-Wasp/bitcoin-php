@@ -198,7 +198,7 @@ class Parser implements \Iterator
     }
 
     /**
-     * @return Operation
+     * @return Operation|null
      */
     public function next()
     {
