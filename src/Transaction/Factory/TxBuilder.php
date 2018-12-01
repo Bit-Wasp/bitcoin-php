@@ -106,11 +106,11 @@ class TxBuilder
     /**
      * @param BufferInterface|string $hashPrevOut - hex or BufferInterface
      * @param int $nPrevOut
-     * @param Script|null $script
+     * @param ScriptInterface $script
      * @param int $nSequence
      * @return $this
      */
-    public function input($hashPrevOut, int $nPrevOut, Script $script = null, int $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
+    public function input($hashPrevOut, int $nPrevOut, ScriptInterface $script = null, int $nSequence = TransactionInputInterface::SEQUENCE_FINAL)
     {
         if ($hashPrevOut instanceof BufferInterface) {
             if ($hashPrevOut->getSize() !== 32) {
