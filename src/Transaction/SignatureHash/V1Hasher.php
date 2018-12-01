@@ -32,7 +32,7 @@ class V1Hasher extends SigHash
     protected $outputSerializer;
 
     /**
-     * @var TransactionOutputSerializer
+     * @var OutPointSerializerInterface
      */
     protected $outpointSerializer;
 
