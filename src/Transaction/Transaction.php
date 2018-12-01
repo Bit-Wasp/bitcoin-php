@@ -237,15 +237,14 @@ class Transaction extends Serializable implements TransactionInterface
     /**
      * @return int
      */
-    public function getValueOut()
+    public function getValueOut(): int
     {
-        $math = Bitcoin::getMath();
-        $value = gmp_init(0);
+        $value = 0;
         foreach ($this->outputs as $output) {
-            $value = $math->add($value, gmp_init($output->getValue()));
+            $value = $value + $output->getValue();
         }
 
-        return gmp_strval($value, 10);
+        return $value;
     }
 
     /**
