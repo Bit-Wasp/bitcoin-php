@@ -58,7 +58,7 @@ class Signer
     private $allowComplexScripts = false;
 
     /**
-     * @var CheckerCreator
+     * @var CheckerCreatorBase
      */
     private $checkerCreator;
 
@@ -98,7 +98,7 @@ class Signer
      */
     public function setCheckerCreator(CheckerCreatorBase $checker)
     {
-        if (empty($this->signatureCreator)) {
+        if (null === $this->signatureCreator) {
             $this->checkerCreator = $checker;
             return $this;
         } else {
