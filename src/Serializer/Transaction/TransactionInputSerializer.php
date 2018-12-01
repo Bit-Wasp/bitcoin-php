@@ -16,7 +16,7 @@ use BitWasp\Buffertools\Parser;
 class TransactionInputSerializer
 {
     /**
-     * @var OutPointSerializer
+     * @var OutPointSerializerInterface
      */
     private $outpointSerializer;
 
@@ -78,11 +78,11 @@ class TransactionInputSerializer
 
     /**
      * @param BufferInterface $string
-     * @return TransactionInput
+     * @return TransactionInputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      * @throws \Exception
      */
-    public function parse(BufferInterface $string): TransactionInput
+    public function parse(BufferInterface $string): TransactionInputInterface
     {
         return $this->fromParser(new Parser($string));
     }
