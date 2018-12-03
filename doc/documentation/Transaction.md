@@ -7,26 +7,26 @@
 ### OutPoint
  OutPoints wrap a Buffer of the transaction ID, and the vout index that is to be spent. 
 
-[Creating an outpoint](../examples/doc/tx/001_create_outpoint.php)
+[Creating an outpoint](../../examples/doc/tx/001_create_outpoint.php)
  
 ### TransactionInput
  TransactionInputs consist of an OutPoint, the scriptSig, and a sequence number. 
  The $script has a default value of null, where an empty script will be used.  
  The $sequence has a default value of TransactionInput::SEQUENCE_FINAL (0xffffffff)
  
-The [TransactionInput](../src/Transaction/TransactionInput.php) class derives it's methods from [TransactionInputInterface](../src/Transaction/TransactionInputInterface.php)
+The [TransactionInput](../../src/Transaction/TransactionInput.php) class derives it's methods from [TransactionInputInterface](../../src/Transaction/TransactionInputInterface.php)
 
-[Creating a TransactionInput](../examples/doc/tx/002_create_txin.php)
+[Creating a TransactionInput](../../examples/doc/tx/002_create_txin.php)
 
 ### TransactionOutput
-The [TransactionOutput](../src/Transaction/TransactionOutput.php) class derives it's methods from [TransactionOutputInterface](../src/Transaction/TransactionOutputInterface.php)
+The [TransactionOutput](../../src/Transaction/TransactionOutput.php) class derives it's methods from [TransactionOutputInterface](../../src/Transaction/TransactionOutputInterface.php)
 
-[Creating a TransactionOutput](../examples/doc/tx/003_create_txout.php)
+[Creating a TransactionOutput](../../examples/doc/tx/003_create_txout.php)
 
 ### Transaction
-The [Transaction](../src/Transaction/Transaction.php) class derives it's methods from [TransactionInterface](../src/Transaction/TransactionInterface.php)
+The [Transaction](../../src/Transaction/Transaction.php) class derives it's methods from [TransactionInterface](../../src/Transaction/TransactionInterface.php)
 
-[Creating a Transaction](../examples/doc/tx/004_create_tx.php)
+[Creating a Transaction](../../examples/doc/tx/004_create_tx.php)
 
 ## Transaction Builder
  The library has a simplified interface for creating transactions. The TransactionBuilder
@@ -50,7 +50,7 @@ The [Transaction](../src/Transaction/Transaction.php) class derives it's methods
  Witness data can be added using:
   `TxBuilder::witnesses()` - providing an array of `ScriptWitnessInterface` 
   
-[Creating a Transaction using TxBuilder](../examples/doc/tx/006_create_tx_txbuilder.php)
+[Creating a Transaction using TxBuilder](../../examples/doc/tx/006_create_tx_txbuilder.php)
  
 ## Transaction Signer
 
@@ -79,16 +79,16 @@ The [Transaction](../src/Transaction/Transaction.php) class derives it's methods
   - Re-serializing the scriptSig and scriptWitness fields
  
 ### Simple output script: pay to pubkey hash
-[Spending a public key hash output](../examples/doc/tx/007_sign_p2pkh_tx.php)
+[Spending a public key hash output](../../examples/doc/tx/007_sign_p2pkh_tx.php)
 
 ### P2SH: 1 of 2 multisig
-[Spending a 1-of-2 multisignature (P2SH) output](../examples/doc/tx/008_sign_p2sh_1of2_multisig_tx.php)
+[Spending a 1-of-2 multisignature (P2SH) output](../../examples/doc/tx/008_sign_p2sh_1of2_multisig_tx.php)
 
 ### Witness V0 ScriptHash: 2 of 2 multisig
-[Spending a 2-of-2 multisignature (P2WSH) output](../examples/doc/tx/009_sign_p2wsh_2of2_multisig_tx.php)
+[Spending a 2-of-2 multisignature (P2WSH) output](../../examples/doc/tx/009_sign_p2wsh_2of2_multisig_tx.php)
 
 ### P2SH V0 Witness Script Hash: 2 of 3 multisig
-[Spending a 2-of-3 multisignature (P2SH P2WSH) output](../examples/doc/tx/010_sign_p2sh_p2wsh_2of3_multisig_tx.php)
+[Spending a 2-of-3 multisignature (P2SH P2WSH) output](../../examples/doc/tx/010_sign_p2sh_p2wsh_2of3_multisig_tx.php)
 
 ## Checking Signatures
 
@@ -101,4 +101,4 @@ The example below validates a transaction produced in the `P2SH | Witness V0 Scr
 
 ### Checking a P2SH|P2WSH 2 of 3 multisig
 
-[Verifying the signature on a fully signed transaction input](../examples/doc/tx/011_verify_p2sh_p2wsh_2of3_multisig_tx.php)
+[Verifying the signature on a fully signed transaction input](../../examples/doc/tx/011_verify_p2sh_p2wsh_2of3_multisig_tx.php)
