@@ -72,7 +72,7 @@ OP_EQUAL compares two strings and pushes a `true` value to the stack.
 
 The solution to this is a single data-push of `1`.
 
-[Evaluating 1 + 1 = 2 script](../examples/doc/script/001_run_simple_custom_script.php)
+[Evaluating 1 + 1 = 2 script](../../examples/doc/script/001_run_simple_custom_script.php)
 
 We can change the scripts to explore more of bitcoin's language. 
 
@@ -87,4 +87,4 @@ scripts might fail, or skip a key validation step.
 Another interesting example are hash-locked contracts. A scriptPubKey can lock funds, requiring the preimage 
 of the hash to be provided.
 
-[Evaluating script preimage](../examples/doc/script/002_run_simple_hashlock_script.php)
+[Evaluating script preimage](../../examples/doc/script/002_run_simple_hashlock_script.php)
