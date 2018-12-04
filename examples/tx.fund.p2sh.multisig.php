@@ -13,7 +13,7 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
 // Lets pretend the coins are owned by this guy
-$privKeyFactory = new PrivateKeyFactory(true);
+$privKeyFactory = new PrivateKeyFactory();
 $originPriv = $privKeyFactory->fromWif("KzBmWku6EuUXbhSym74RXUE7bKWdNanc8vTqxFrMxEstofCWsKgH");
 $originSpk = ScriptFactory::scriptPubKey()->p2pkh($originPriv->getPubKeyHash());
 

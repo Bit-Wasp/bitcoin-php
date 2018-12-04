@@ -35,13 +35,12 @@ class CompactSignatureTest extends AbstractTestCase
 
             foreach ($this->getEcAdapters() as $adapterRow) {
                 $adapter = $adapterRow[0];
-                $compressedFactory = PrivateKeyFactory::compressed($adapter);
-                $uncompressedFactory = PrivateKeyFactory::uncompressed($adapter);
+                $keyFactory = new PrivateKeyFactory($adapter);
 
-                $priv = $uncompressedFactory->generate($random)->getHex();
+                $priv = $keyFactory->generateUncompressed($random)->getHex();
 
-                $vectors[] = [$adapter, $compressedFactory->fromHex($priv), $message];
-                $vectors[] = [$adapter, $uncompressedFactory->fromHex($priv), $message];
+                $vectors[] = [$adapter, $keyFactory->fromHexCompressed($priv), $message];
+                $vectors[] = [$adapter, $keyFactory->fromHexUncompressed($priv), $message];
             }
         }
 

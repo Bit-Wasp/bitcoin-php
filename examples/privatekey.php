@@ -10,8 +10,8 @@ require __DIR__ . "/../vendor/autoload.php";
 $network = Bitcoin::getNetwork();
 
 $random = new Random();
-$compressedKeyFactory = PrivateKeyFactory::compressed();
-$privateKey = $compressedKeyFactory->generate($random);
+$privKeyFactory = new PrivateKeyFactory();
+$privateKey = $privKeyFactory->generateCompressed($random);
 $publicKey = $privateKey->getPublicKey();
 
 echo "Key Info\n";

@@ -16,8 +16,8 @@ class PayToPubKeyHashTest extends AbstractTestCase
 {
     public function testMethods()
     {
-        $factory = new PrivateKeyFactory(false);
-        $priv = $factory->generate(new Random());
+        $factory = new PrivateKeyFactory();
+        $priv = $factory->generateUncompressed(new Random());
         $pub = $priv->getPublicKey();
         $keyHash = $pub->getPubKeyHash();
         $script = ScriptFactory::scriptPubKey()->payToPubKeyHash($keyHash);
@@ -30,7 +30,7 @@ class PayToPubKeyHashTest extends AbstractTestCase
         $this->assertEquals(1, $info->getKeyCount());
         $this->assertTrue($info->checkInvolvesKey($pub));
 
-        $otherpriv = $factory->generate(new Random());
+        $otherpriv = $factory->generateUncompressed(new Random());
         $otherpub = $otherpriv->getPublicKey();
         $this->assertFalse($info->checkInvolvesKey($otherpub));
 

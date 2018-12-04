@@ -103,11 +103,11 @@ class RbfTransactionTest extends AbstractTestCase
         $this->assertTrue($bitcoind->isRunning());
 
         $rng = new Random();
-        $factory = PrivateKeyFactory::compressed();
-        $destKey = $factory->generate($rng);
+        $factory = new PrivateKeyFactory();
+        $destKey = $factory->generateCompressed($rng);
         $destSPK = ScriptFactory::scriptPubKey()->p2wkh($destKey->getPubKeyHash());
 
-        $privateKey = $factory->generate($rng);
+        $privateKey = $factory->generateCompressed($rng);
         $scriptPubKey = ScriptFactory::scriptPubKey()->p2wkh($privateKey->getPubKeyHash());
         $amount = 100000000;
 
@@ -148,11 +148,11 @@ class RbfTransactionTest extends AbstractTestCase
         $this->assertTrue($bitcoind->isRunning());
 
         $random = new Random();
-        $factory = PrivateKeyFactory::compressed();
-        $destKey = $factory->generate($random);
+        $factory = new PrivateKeyFactory();
+        $destKey = $factory->generateCompressed($random);
         $destSPK = ScriptFactory::scriptPubKey()->p2wkh($destKey->getPubKeyHash());
 
-        $privateKey = $factory->generate($random);
+        $privateKey = $factory->generateCompressed($random);
         $scriptPubKey = ScriptFactory::scriptPubKey()->p2wkh($privateKey->getPubKeyHash());
         $amount = 100000000;
 
@@ -193,14 +193,14 @@ class RbfTransactionTest extends AbstractTestCase
         $this->assertTrue($bitcoind->isRunning());
 
         $random = new Random();
-        $factory = PrivateKeyFactory::compressed();
-        $destKey = $factory->generate($random);
+        $factory = new PrivateKeyFactory();
+        $destKey = $factory->generateCompressed($random);
         $destSPK = ScriptFactory::scriptPubKey()->p2wkh($destKey->getPubKeyHash());
 
-        $changeKey = $factory->generate($random);
+        $changeKey = $factory->generateCompressed($random);
         $changeSPK = ScriptFactory::scriptPubKey()->p2wkh($changeKey->getPubKeyHash());
 
-        $privateKey = $factory->generate($random);
+        $privateKey = $factory->generateCompressed($random);
         $scriptPubKey = ScriptFactory::scriptPubKey()->p2wkh($privateKey->getPubKeyHash());
         $amount = 100000000;
 

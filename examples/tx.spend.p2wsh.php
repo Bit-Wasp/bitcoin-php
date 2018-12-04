@@ -15,8 +15,8 @@ use BitWasp\Bitcoin\Script\WitnessScript;
 use BitWasp\Bitcoin\Transaction\Factory\SignData;
 
 // Setup network and private key to segnet
-$privKeyFactory = PrivateKeyFactory::compressed();
-$key = $privKeyFactory->fromHex("4242424242424242424242424242424242424242424242424242424242424242");
+$privKeyFactory = new PrivateKeyFactory();
+$key = $privKeyFactory->fromHexCompressed("4242424242424242424242424242424242424242424242424242424242424242");
 
 // Spend from a P2WSH P2PKH
 $witnessScript = new WitnessScript(ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash()));

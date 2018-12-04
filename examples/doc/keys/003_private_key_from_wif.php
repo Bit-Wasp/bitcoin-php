@@ -8,7 +8,7 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 
-$privKeyFactory = new PrivateKeyFactory(true);
+$privKeyFactory = new PrivateKeyFactory();
 
 $rbg = new Random();
 $privateKey = $privKeyFactory->fromWif("L2uRfwpmG3RTXTy6ZvzTRC4Xtkwi6axoQFopgRsCEpsSc5Qh5uSP");

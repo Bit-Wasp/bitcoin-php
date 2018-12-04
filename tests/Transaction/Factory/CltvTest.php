@@ -81,8 +81,8 @@ class CltvTest extends AbstractTestCase
     public function testCltv(int $locktime, TransactionInterface $unsigned, $exception = null, $exceptionMsg = null)
     {
         /** @var PrivateKeyInterface[] $keys */
-        $factory = new PrivateKeyFactory(true);
-        $key = $factory->fromHex("4200000042000000420000004200000042000000420000004200000042000000");
+        $factory = new PrivateKeyFactory();
+        $key = $factory->fromHexCompressed("4200000042000000420000004200000042000000420000004200000042000000");
 
         $s = ScriptFactory::sequence([
             Number::int($locktime)->getBuffer(), Opcodes::OP_CHECKLOCKTIMEVERIFY, Opcodes::OP_DROP,

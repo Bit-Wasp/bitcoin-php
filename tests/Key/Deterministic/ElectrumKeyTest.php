@@ -88,15 +88,14 @@ class ElectrumKeyTest extends AbstractTestCase
     public function testFromKey()
     {
         $random = new Random();
-        $ucFactory = PrivateKeyFactory::uncompressed();
-        $key = $ucFactory->generate($random);
+        $privKeyFactory = new PrivateKeyFactory();
+        $key = $privKeyFactory->generateUncompressed($random);
 
         $electrumFactory = new ElectrumKeyFactory();
         $e = $electrumFactory->fromKey($key);
         $this->assertInstanceOf(ElectrumKey::class, $e);
 
-        $cFactory = PrivateKeyFactory::compressed();
-        $key = $cFactory->generate($random);
+        $key = $privKeyFactory->generateCompressed($random);
         $electrumFactory->fromKey($key);
     }
 

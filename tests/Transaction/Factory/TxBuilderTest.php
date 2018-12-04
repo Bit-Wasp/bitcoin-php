@@ -136,8 +136,8 @@ class TxBuilderTest extends AbstractTestCase
 
     public function getAddresses()
     {
-        $factory = new PrivateKeyFactory(false);
-        $key = $factory->generate(new Random());
+        $factory = new PrivateKeyFactory();
+        $key = $factory->generateUncompressed(new Random());
         $script = ScriptFactory::scriptPubKey()->multisig(1, [$key->getPublicKey()]);
         $scriptAddress = new ScriptHashAddress($script->getScriptHash());
         return [

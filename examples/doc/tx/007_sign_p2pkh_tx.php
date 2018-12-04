@@ -24,7 +24,7 @@ use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
  * if an inconsistency in user input is detected.
  */
 
-$privKeyFactory = new PrivateKeyFactory(true);
+$privKeyFactory = new PrivateKeyFactory();
 $privateKey = $privKeyFactory->fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
 $txOut = new TransactionOutput(
     1501000,

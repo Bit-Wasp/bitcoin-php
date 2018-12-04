@@ -46,7 +46,7 @@ class HierarchicalKeyFactory
     public function __construct(EcAdapterInterface $ecAdapter = null, Base58ExtendedKeySerializer $serializer = null)
     {
         $this->adapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $this->privFactory = PrivateKeyFactory::compressed($this->adapter);
+        $this->privFactory = new PrivateKeyFactory($this->adapter);
         $this->serializer = $serializer ?: new Base58ExtendedKeySerializer(
             new ExtendedKeySerializer($this->adapter)
         );
@@ -79,7 +79,7 @@ class HierarchicalKeyFactory
         $privSecret = $seed->slice(0, 32);
         $chainCode = $seed->slice(32, 32);
         $scriptFactory = $scriptFactory ?: new P2pkhScriptDataFactory(EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $this->adapter));
-        return new HierarchicalKey($this->adapter, $scriptFactory, 0, 0, 0, $chainCode, $this->privFactory->fromBuffer($privSecret));
+        return new HierarchicalKey($this->adapter, $scriptFactory, 0, 0, 0, $chainCode, $this->privFactory->fromBufferCompressed($privSecret));
     }
 
     /**

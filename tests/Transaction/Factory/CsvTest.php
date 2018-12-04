@@ -89,8 +89,8 @@ class CsvTest extends AbstractTestCase
     public function testCsv(int $verifySequence, TransactionInterface $unsigned, string $exception = null, string $exceptionMsg = null)
     {
         /** @var PrivateKeyInterface[] $keys */
-        $factory = new PrivateKeyFactory(true);
-        $key = $factory->fromHex("4200000042000000420000004200000042000000420000004200000042000000");
+        $factory = new PrivateKeyFactory();
+        $key = $factory->fromHexCompressed("4200000042000000420000004200000042000000420000004200000042000000");
 
         $s = ScriptFactory::sequence([
             Number::int($verifySequence)->getBuffer(), Opcodes::OP_CHECKSEQUENCEVERIFY, Opcodes::OP_DROP,

@@ -28,7 +28,7 @@ require __DIR__ . "/../../../vendor/autoload.php";
  * inside them yet.
  */
 
-$privKeyFactory = new PrivateKeyFactory(true);
+$privKeyFactory = new PrivateKeyFactory();
 $pubKeyFactory = new PublicKeyFactory();
 $privateKey1 = $privKeyFactory->fromWif('5Hwig3iZrm6uxS6Ch1egmJGyC89Q76X5tgVgtbEcLTPTx3aW5Zi');
 

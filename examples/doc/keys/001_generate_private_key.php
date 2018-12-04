@@ -8,11 +8,10 @@ use BitWasp\Bitcoin\Crypto\Random\Random;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 
-$compressed = true;
-$privKeyFactory = new PrivateKeyFactory($compressed);
+$privKeyFactory = new PrivateKeyFactory();
 
 $rbg = new Random();
-$privateKey = $privKeyFactory->generate($rbg);
+$privateKey = $privKeyFactory->generateCompressed($rbg);
 $publicKey = $privateKey->getPublicKey();
 echo "private key wif  {$privateKey->toWif()}\n";
 echo "            hex  {$privateKey->getHex()}\n";

@@ -13,10 +13,11 @@ use BitWasp\Bitcoin\Transaction\TransactionFactory;
 Bitcoin::setNetwork(NetworkFactory::bitcoinTestnet());
 $network = Bitcoin::getNetwork();
 $ecAdapter = Bitcoin::getEcAdapter();
-$addrCreator = new AddressCreator();
-$privFactory = PrivateKeyFactory::uncompressed();
 
-$privateKey = $privFactory->fromHex('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d5');
+$addrCreator = new AddressCreator();
+$privFactory = new PrivateKeyFactory($ecAdapter);
+
+$privateKey = $privFactory->fromHexUncompressed('17a2209250b59f07a25b560aa09cb395a183eb260797c0396b82904f918518d5');
 $address = new PayToPubKeyHashAddress($privateKey->getPublicKey()->getPubKeyHash());
 echo "[Key: " . $privateKey->toWif($network) . " Address " . $address->getAddress($network) . "]\n";
 

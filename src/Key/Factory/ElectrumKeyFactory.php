@@ -32,7 +32,7 @@ class ElectrumKeyFactory
     public function __construct(EcAdapterInterface $ecAdapter = null)
     {
         $this->adapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $this->privateFactory = PrivateKeyFactory::uncompressed($ecAdapter);
+        $this->privateFactory = new PrivateKeyFactory($ecAdapter);
     }
 
     /**
@@ -76,7 +76,7 @@ class ElectrumKeyFactory
      */
     public function fromSecretExponent(BufferInterface $secret): ElectrumKey
     {
-        $masterKey = $this->privateFactory->fromBuffer($secret);
+        $masterKey = $this->privateFactory->fromBufferUncompressed($secret);
         return $this->fromKey($masterKey);
     }
 

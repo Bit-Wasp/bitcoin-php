@@ -26,11 +26,11 @@ $amount = '161662670';
 $fee = '12345';
 $amountAfterFee = $amount - $fee;
 
-$privKeyFactory = PrivateKeyFactory::uncompressed();
+$privKeyFactory = new PrivateKeyFactory();
 // Two users independently create private keys.
-$pk1 = $privKeyFactory->fromHex($privHex1);
+$pk1 = $privKeyFactory->fromHexUncompressed($privHex1);
 $addr1 = new PayToPubKeyHashAddress($pk1->getPublicKey()->getPubKeyHash());
-$pk2 = $privKeyFactory->fromHex($privHex2);
+$pk2 = $privKeyFactory->fromHexUncompressed($privHex2);
 
 $outpoint = new OutPoint(Buffer::hex($txid), $vout);
 $redeemScript = new P2shScript(ScriptFactory::fromHex($redeemScriptHex));

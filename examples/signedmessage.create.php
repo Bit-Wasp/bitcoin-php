@@ -10,8 +10,8 @@ use BitWasp\Bitcoin\MessageSigner\MessageSigner;
 
 $ec = Bitcoin::getEcAdapter();
 $random = new Random();
-$compressedKeyFactory = PrivateKeyFactory::compressed();
-$privateKey = $compressedKeyFactory->generate($random);
+$privKeyFactory = new PrivateKeyFactory($ec);
+$privateKey = $privKeyFactory->generateCompressed($random);
 
 $message = 'hi';
 

@@ -17,8 +17,8 @@ class PaytoPubkeyTest extends AbstractTestCase
 {
     public function testMethods()
     {
-        $factory = new PrivateKeyFactory(false);
-        $priv = $factory->generate(new Random());
+        $factory = new PrivateKeyFactory();
+        $priv = $factory->generateUncompressed(new Random());
         $pub = $priv->getPublicKey();
 
         $script = ScriptFactory::sequence([$pub->getBuffer(), Opcodes::OP_CHECKSIG]);
@@ -31,7 +31,7 @@ class PaytoPubkeyTest extends AbstractTestCase
         $this->assertTrue($pub->getBuffer()->equals($info->getKeyBuffer()));
         $this->assertTrue($info->checkInvolvesKey($pub));
 
-        $otherPriv = $factory->generate(new Random());
+        $otherPriv = $factory->generateUncompressed(new Random());
         $otherPub = $otherPriv->getPublicKey();
 
         $this->assertFalse($info->checkInvolvesKey($otherPub));
