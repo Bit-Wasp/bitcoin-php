@@ -72,8 +72,12 @@ class SignedMessageSerializer
         $sigStart = $sigHeaderPos + strlen(self::SIG_START);
 
         $sig = trim(substr($content, $sigStart, $sigEnd - $sigStart));
-        $sig = new Buffer(base64_decode($sig));
-        $compactSig = $this->csSerializer->parse($sig);
+        $decoded = base64_decode($sig);
+        if (false === $decoded) {
+            throw new \RuntimeException('Invalid base64');
+        }
+
+        $compactSig = $this->csSerializer->parse(new Buffer($decoded));
 
         return new SignedMessage($message, $compactSig);
     }
