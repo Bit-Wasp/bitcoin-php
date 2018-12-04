@@ -13,7 +13,6 @@ use BitWasp\Buffertools\BufferInterface;
 
 class TransactionInput extends Serializable implements TransactionInputInterface
 {
-
     /**
      * @var OutPointInterface
      */
@@ -25,7 +24,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $script;
 
     /**
-     * @var string|int
+     * @var int
      */
     private $sequence;
 
