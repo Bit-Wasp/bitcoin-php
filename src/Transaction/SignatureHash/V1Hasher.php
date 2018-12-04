@@ -127,7 +127,7 @@ class V1Hasher extends SigHash
         int $sighashType = SigHash::ALL
     ): BufferInterface {
 
-        $sighashType = (int) $sighashType;
+        $sighashType = $sighashType;
         $hashPrevOuts = $this->hashPrevOuts($sighashType);
         $hashSequence = $this->hashSequences($sighashType);
         $hashOutputs = $this->hashOutputs($sighashType, $inputToSign);
