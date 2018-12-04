@@ -42,12 +42,12 @@ class ComplexSignerTest extends AbstractTestCase
 
     protected function initKeyStore()
     {
-        $factory = new PrivateKeyFactory(true);
-        $this->privateKeys[] = $factory->fromHex("990000009900000099000000990000009900000099000000ff00000099000000");
-        $this->privateKeys[] = $factory->fromHex("98aa0000990000009900000099000000990000009900000099000ff099000000");
-        $this->privateKeys[] = $factory->fromHex("98bb000099000000990ff0009900000099000000990000009900000099000000");
-        $this->privateKeys[] = $factory->fromHex("98cc00009900000099000000990000009900ff00990000009900000099000000");
-        $this->privateKeys[] = $factory->fromHex("98cc0000990ed00099000000990920009900ff009900000099000000990000cc");
+        $factory = new PrivateKeyFactory();
+        $this->privateKeys[] = $factory->fromHexCompressed("990000009900000099000000990000009900000099000000ff00000099000000");
+        $this->privateKeys[] = $factory->fromHexCompressed("98aa0000990000009900000099000000990000009900000099000ff099000000");
+        $this->privateKeys[] = $factory->fromHexCompressed("98bb000099000000990ff0009900000099000000990000009900000099000000");
+        $this->privateKeys[] = $factory->fromHexCompressed("98cc00009900000099000000990000009900ff00990000009900000099000000");
+        $this->privateKeys[] = $factory->fromHexCompressed("98cc0000990ed00099000000990920009900ff009900000099000000990000cc");
     }
 
     /**

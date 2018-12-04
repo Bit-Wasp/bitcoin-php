@@ -28,8 +28,8 @@ class WifPrivateKeySerializerTest extends AbstractBip39Case
         $hexSerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
         $wifSerializer = new WifPrivateKeySerializer($hexSerializer);
 
-        $factory = new PrivateKeyFactory(false, $ecAdapter);
-        $valid = $factory->generate(new Random());
+        $factory = new PrivateKeyFactory($ecAdapter);
+        $valid = $factory->generateUncompressed(new Random());
         $this->assertEquals($valid, $wifSerializer->parse($wifSerializer->serialize($network, $valid), $network));
 
         $invalid = Buffer::hex('8041414141414141414141414141414141');

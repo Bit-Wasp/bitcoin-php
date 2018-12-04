@@ -14,8 +14,8 @@ use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
-$privKeyFactory = PrivateKeyFactory::compressed();
-$key = $privKeyFactory->fromHex("4242424242424242424242424242424242424242424242424242424242424242");
+$privKeyFactory = new PrivateKeyFactory();
+$key = $privKeyFactory->fromHexCompressed("4242424242424242424242424242424242424242424242424242424242424242");
 
 // scriptPubKey is P2SH | P2WPKH
 $redeemScript = ScriptFactory::scriptPubKey()->p2wkh($key->getPubKeyHash());

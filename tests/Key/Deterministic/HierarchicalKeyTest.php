@@ -84,7 +84,7 @@ class HierarchicalKeyTest extends AbstractTestCase
      */
     public function testFailsWithUncompressed()
     {
-        $privFactory = new PrivateKeyFactory(false);
+        $privFactory = new PrivateKeyFactory();
         new HierarchicalKey(
             Bitcoin::getEcAdapter(),
             new P2pkhScriptDataFactory(),
@@ -92,7 +92,7 @@ class HierarchicalKeyTest extends AbstractTestCase
             1,
             1,
             new Buffer('', 32),
-            $privFactory->generate(new Random())
+            $privFactory->generateUncompressed(new Random())
         );
     }
 
@@ -564,8 +564,8 @@ class HierarchicalKeyTest extends AbstractTestCase
             new P2shP2wshScriptDecorator(new P2pkScriptDataFactory()),
         ];
 
-        $pkFactory = new PrivateKeyFactory(true, $ecAdapter);
-        $priv = $pkFactory->fromHex('0100000001000000010000000100000001000000010000000100000001000000');
+        $pkFactory = new PrivateKeyFactory($ecAdapter);
+        $priv = $pkFactory->fromHexCompressed('0100000001000000010000000100000001000000010000000100000001000000');
         $chain = new Buffer('00', 32);
         foreach ($factories as $factory) {
             $hd = new \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey($ecAdapter, $factory, 0, 0, 0, $chain, $priv);

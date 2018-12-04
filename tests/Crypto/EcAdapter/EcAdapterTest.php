@@ -48,13 +48,13 @@ class EcAdapterTest extends AbstractTestCase
      */
     public function testPrivateToPublic(EcAdapterInterface $ec, $privHex, $pubHex, $compressedHex)
     {
-        $ucFactory = PrivateKeyFactory::uncompressed($ec);
-        $priv = $ucFactory->fromHex($privHex);
+        $ucFactory = new PrivateKeyFactory($ec);
+        $priv = $ucFactory->fromHexUncompressed($privHex);
         $this->assertSame($priv->getPublicKey()->getHex(), $pubHex);
         $this->assertSame($privHex, $priv->getHex());
 
-        $cFactory = PrivateKeyFactory::compressed($ec);
-        $priv = $cFactory->fromHex($privHex);
+        $cFactory = new PrivateKeyFactory($ec);
+        $priv = $cFactory->fromHexCompressed($privHex);
         $this->assertSame($compressedHex, $priv->getPublicKey()->getHex());
     }
 
@@ -116,9 +116,9 @@ class EcAdapterTest extends AbstractTestCase
     {
         $json = json_decode($this->dataFile('hmacdrbg.json'));
         $math = $ecAdapter->getMath();
-        $ucFactory = PrivateKeyFactory::uncompressed($ecAdapter);
+        $privKeyFactory = new PrivateKeyFactory($ecAdapter);
         foreach ($json->test as $c => $test) {
-            $privateKey = $ucFactory->fromHex($test->privKey);
+            $privateKey = $privKeyFactory->fromHexUncompressed($test->privKey);
             $message = new Buffer($test->message, null);
             $messageHash = Hash::sha256($message);
 

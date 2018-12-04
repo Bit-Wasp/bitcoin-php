@@ -2,23 +2,25 @@
 
 use BitWasp\Bitcoin\Address\AddressCreator;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
+use BitWasp\Bitcoin\Key\KeyToScript\Factory\P2pkhScriptDataFactory;
 use BitWasp\Bitcoin\Script\P2shScript;
-use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Bitcoin\Script\WitnessScript;
 
 require __DIR__ . "/../vendor/autoload.php";
 
-$privFactory = PrivateKeyFactory::compressed();
+$addrReader = new AddressCreator();
+$privFactory = new PrivateKeyFactory();
 $priv = $privFactory->fromWif('L1U6RC3rXfsoAx3dxsU1UcBaBSRrLWjEwUGbZPxWX9dBukN345R1');
 $publicKey = $priv->getPublicKey();
-$pubKeyHash = $publicKey->getPubKeyHash();
 
-$script = ScriptFactory::scriptPubKey()->p2pkh($pubKeyHash);
+$helper = new P2pkhScriptDataFactory();
+$scriptData = $helper->convertKey($publicKey);
+$script = $scriptData->getScriptPubKey();
 
 ### Key hash types
 echo "key hash types\n";
-$addrReader = new AddressCreator();
-$p2pkh = $addrReader->fromOutputScript($script);
+
+$p2pkh = $scriptData->getAddress($addrReader);
 echo " * p2pkh address: {$p2pkh->getAddress()}\n";
 
 #### Script hash types

@@ -14,7 +14,7 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
 // Same private keys as tx.fund.p2sh.multisig.php
-$privKeyFactory = new PrivateKeyFactory(true);
+$privKeyFactory = new PrivateKeyFactory();
 $privKey1 = $privKeyFactory->fromWif("L3WyxitKt4DQrhcdTEnyzLWWyurf2fz1iqCdAbuUXaUmSM328JWv");
 $privKey2 = $privKeyFactory->fromWif("L45C3XqWziQVnifEQdzwYmpGG5SPXxFv5Es8bnjE5QXZF5K8bSGh");
 

@@ -13,8 +13,8 @@ use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Buffertools\Buffer;
 
 // Setup network and private key to segnet
-$privKeyFactory = PrivateKeyFactory::compressed();
-$key = $privKeyFactory->fromHex("4242424242424242424242424242424242424242424242424242424242424242");
+$privKeyFactory = new PrivateKeyFactory();
+$key = $privKeyFactory->fromHexCompressed("4242424242424242424242424242424242424242424242424242424242424242");
 
 $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($key->getPubKeyHash());
 

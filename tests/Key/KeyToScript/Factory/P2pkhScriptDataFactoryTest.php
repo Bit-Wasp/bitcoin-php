@@ -21,8 +21,8 @@ class P2pkhScriptDataFactoryTest extends AbstractTestCase
         $this->assertEquals(ScriptType::P2PKH, $factory->getScriptType());
 
         $privKeyHex = "8de63cf582d058a399a176825c045672d5ff8ea25b64d28d4375dcdb14c02b2b";
-        $privKeyFactory = new PrivateKeyFactory(false);
-        $privKey = $privKeyFactory->fromHex($privKeyHex);
+        $privKeyFactory = new PrivateKeyFactory();
+        $privKey = $privKeyFactory->fromHexUncompressed($privKeyHex);
         $publicKey = $privKey->getPublicKey();
         $script = $factory->convertKey($publicKey);
         $this->assertEquals(

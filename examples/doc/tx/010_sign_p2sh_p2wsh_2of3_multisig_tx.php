@@ -27,14 +27,14 @@ require __DIR__ . "/../../../vendor/autoload.php";
  * because the unsigned transaction doesn't have the
  * witnessScript yet.
  */
-$privKeyFactory = new PrivateKeyFactory(true);
+$privKeyFactory = new PrivateKeyFactory();
 $pubKeyFactory = new PublicKeyFactory();
-$privateKey1 = $privKeyFactory->fromHex('7bca8cbb9e0c108445281ade9d8f6b7d8bb18edb0b5ca4dc3aa660362b96f831', true);
+$privateKey1 = $privKeyFactory->fromHexCompressed('7bca8cbb9e0c108445281ade9d8f6b7d8bb18edb0b5ca4dc3aa660362b96f831', true);
 $publicKey1 = $privateKey1->getPublicKey();
 
 $publicKey2 = $pubKeyFactory->fromHex("03fff6dc247b15006cb88ad4d052f303e063ac88e99c3eb98b2d20aa9328943cd9");
 
-$privateKey3 = $privKeyFactory->fromHex("108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c", true);
+$privateKey3 = $privKeyFactory->fromHexCompressed("108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c", true);
 $publicKey3 = $privateKey3->getPublicKey();
 
 // The witnessScript needs to be known when spending

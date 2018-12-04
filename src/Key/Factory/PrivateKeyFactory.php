@@ -18,11 +18,6 @@ use BitWasp\Buffertools\BufferInterface;
 class PrivateKeyFactory
 {
     /**
-     * @var bool
-     */
-    private $compressed;
-
-    /**
      * @var PrivateKeySerializerInterface
      */
     private $privSerializer;
@@ -34,41 +29,23 @@ class PrivateKeyFactory
 
     /**
      * PrivateKeyFactory constructor.
-     * @param bool $compressed
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(bool $compressed, EcAdapterInterface $ecAdapter = null)
+    public function __construct(EcAdapterInterface $ecAdapter = null)
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->privSerializer = EcSerializer::getSerializer(PrivateKeySerializerInterface::class, true, $ecAdapter);
         $this->wifSerializer = new WifPrivateKeySerializer($this->privSerializer);
-        $this->compressed = $compressed;
     }
-
+    
     /**
-     * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKeyFactory
+     * @param Random $random
+     * @return PrivateKeyInterface
+     * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public static function uncompressed(EcAdapterInterface $ecAdapter = null): PrivateKeyFactory
+    public function generateCompressed(Random $random): PrivateKeyInterface
     {
-        return new self(false, $ecAdapter);
-    }
-
-    /**
-     * @param EcAdapterInterface|null $ecAdapter
-     * @return PrivateKeyFactory
-     */
-    public static function compressed(EcAdapterInterface $ecAdapter = null): PrivateKeyFactory
-    {
-        return new self(true, $ecAdapter);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCompressed(): bool
-    {
-        return $this->compressed;
+        return $this->privSerializer->parse($random->bytes(32), true);
     }
 
     /**
@@ -76,11 +53,29 @@ class PrivateKeyFactory
      * @return PrivateKeyInterface
      * @throws \BitWasp\Bitcoin\Exceptions\RandomBytesFailure
      */
-    public function generate(Random $random): PrivateKeyInterface
+    public function generateUncompressed(Random $random): PrivateKeyInterface
     {
-        return $this->fromBuffer(
-            $random->bytes(32)
-        );
+        return $this->privSerializer->parse($random->bytes(32), false);
+    }
+
+    /**
+     * @param BufferInterface $raw
+     * @return PrivateKeyInterface
+     * @throws \Exception
+     */
+    public function fromBufferCompressed(BufferInterface $raw): PrivateKeyInterface
+    {
+        return $this->privSerializer->parse($raw, true);
+    }
+
+    /**
+     * @param BufferInterface $raw
+     * @return PrivateKeyInterface
+     * @throws \Exception
+     */
+    public function fromBufferUncompressed(BufferInterface $raw): PrivateKeyInterface
+    {
+        return $this->privSerializer->parse($raw, false);
     }
 
     /**
@@ -88,21 +83,19 @@ class PrivateKeyFactory
      * @return PrivateKeyInterface
      * @throws \Exception
      */
-    public function fromHex(string $hex): PrivateKeyInterface
+    public function fromHexCompressed(string $hex): PrivateKeyInterface
     {
-        return $this->fromBuffer(Buffer::hex($hex));
+        return $this->fromBufferCompressed(Buffer::hex($hex));
     }
 
     /**
-     * @param BufferInterface $buffer
+     * @param string $hex
      * @return PrivateKeyInterface
+     * @throws \Exception
      */
-    public function fromBuffer(BufferInterface $buffer): PrivateKeyInterface
+    public function fromHexUncompressed(string $hex): PrivateKeyInterface
     {
-        return $this->privSerializer->parse(
-            $buffer,
-            $this->compressed
-        );
+        return $this->fromBufferUncompressed(Buffer::hex($hex));
     }
 
     /**

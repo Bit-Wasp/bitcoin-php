@@ -54,7 +54,7 @@ class SignerTest extends AbstractTestCase
      */
     public function getScriptVectors(EcAdapterInterface $ecAdapter)
     {
-        $privFactory = new PrivateKeyFactory(true, $ecAdapter);
+        $privFactory = new PrivateKeyFactory($ecAdapter);
         $results = [];
         foreach ($this->jsonDataFile('signer_fixtures.json')['valid'] as $fixture) {
             $inputs = $fixture['raw']['ins'];
@@ -307,8 +307,8 @@ class SignerTest extends AbstractTestCase
             ->outputs([new TransactionOutput(4900000000, $script)])
             ->get();
 
-        $factory = new PrivateKeyFactory(false, $ecAdapter);
-        $privateKey = $factory->fromBuffer(Buffer::int(1, 32));
+        $factory = new PrivateKeyFactory($ecAdapter);
+        $privateKey = $factory->fromBufferUncompressed(Buffer::int(1, 32));
 
         $txOut = new TransactionOutput(5000000000, $script);
         $signer = new Signer($tx, $ecAdapter);
@@ -373,8 +373,8 @@ class SignerTest extends AbstractTestCase
      */
     protected function doTestSignerInvalidKeyInteraction($tolerateBadKey = null)
     {
-        $factory = new PrivateKeyFactory(false);
-        $myKey = $factory->generate(new Random());
+        $factory = new PrivateKeyFactory();
+        $myKey = $factory->generateUncompressed(new Random());
         $badKey = Buffer::hex("031234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd");
         $script = ScriptFactory::scriptPubKey()->multisigKeyBuffers(1, [$myKey->getPublicKey()->getBuffer(), $badKey], false);
 
@@ -426,7 +426,7 @@ class SignerTest extends AbstractTestCase
 
     public function paddedMultisigsProvider()
     {
-        $privFactory = new PrivateKeyFactory(true);
+        $privFactory = new PrivateKeyFactory();
         $keys = [
             $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
             $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
@@ -538,7 +538,7 @@ class SignerTest extends AbstractTestCase
 
     public function testFullySignedMultisigIsNotPadded()
     {
-        $privFactory = new PrivateKeyFactory(true);
+        $privFactory = new PrivateKeyFactory();
         $keys = [
             $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
             $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),
@@ -611,7 +611,7 @@ class SignerTest extends AbstractTestCase
 
     public function testFullySignedWitnessMultisigIsNotPadded()
     {
-        $privFactory = new PrivateKeyFactory(true);
+        $privFactory = new PrivateKeyFactory();
         $keys = [
             $privFactory->fromWif('KzzM4K74i3uoUKHZqfBRR44T1zcChzZFMjZkxZZReiTkSPkFv6jY'),
             $privFactory->fromWif('L34yCtA8pZ2pGjdg2sKYJ5BwqW1rQYVNdSPMbRuCUfpJN9XkMqVR'),

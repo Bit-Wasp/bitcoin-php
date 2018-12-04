@@ -26,11 +26,11 @@ require __DIR__ . "/../../../vendor/autoload.php";
  */
 
 
-$privKeyFactory = new PrivateKeyFactory(true);
-$privateKey1 = $privKeyFactory->fromHex('7bca8cbb9e0c108445281ade9d8f6b7d8bb18edb0b5ca4dc3aa660362b96f831', true);
+$privKeyFactory = new PrivateKeyFactory();
+$privateKey1 = $privKeyFactory->fromHexCompressed('7bca8cbb9e0c108445281ade9d8f6b7d8bb18edb0b5ca4dc3aa660362b96f831', true);
 $publicKey1 = $privateKey1->getPublicKey();
 
-$privateKey2 = $privKeyFactory->fromHex("108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c", true);
+$privateKey2 = $privKeyFactory->fromHexCompressed("108445281ade9d8f6b7d8bb1825ca40bedb67bca8cdc3aa6603b9b6f831b9e0c", true);
 $publicKey2 = $privateKey2->getPublicKey();
 
 // The witnessScript needs to be known when spending

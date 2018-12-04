@@ -181,7 +181,7 @@ class TransactionTest extends AbstractTestCase
         $txBuilder->locktime(isset($fixture['raw']['locktime']) ? $fixture['raw']['locktime'] : 0);
 
         $signer = new Signer($txBuilder->get());
-        $privFactory = PrivateKeyFactory::compressed();
+        $privFactory = new PrivateKeyFactory();
         foreach ($fixture['raw']['ins'] as $i => $input) {
             $iSigner = $signer->input($i, $utxos[$i]->getOutput(), $signDatas[$i]);
             foreach ($input['keys'] as $key) {
