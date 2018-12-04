@@ -29,6 +29,9 @@ class P2wpkhScriptDataFactory extends KeyToScriptDataFactory
         if (count($keys) !== 1) {
             throw new \InvalidArgumentException("Invalid number of keys");
         }
+        if (!$keys[0]->isCompressed()) {
+            throw new \InvalidArgumentException("Cannot create P2WPKH address for non-compressed public key");
+        }
         return new ScriptAndSignData(
             ScriptFactory::scriptPubKey()->p2wkh($keys[0]->getPubKeyHash($this->pubKeySerializer)),
             new SignData()
