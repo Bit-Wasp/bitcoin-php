@@ -160,7 +160,7 @@ class Number extends Serializable
     /**
      * @return int
      */
-    public function getInt()
+    public function getInt(): int
     {
         if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MAX)) > 0) {
             return self::MAX;
@@ -168,7 +168,7 @@ class Number extends Serializable
             return self::MIN;
         }
 
-        return $this->number;
+        return (int) $this->number;
     }
 
     /**

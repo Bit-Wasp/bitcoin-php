@@ -65,7 +65,7 @@ class CheckLocktimeVerify
 
         $numLockTime = Number::buffer($chunks[0]->getData(), $fMinimal, 5);
 
-        return new static((int) $numLockTime->getInt());
+        return new static($numLockTime->getInt());
     }
 
     /**
