@@ -66,7 +66,8 @@ class DerSignatureSerializer implements DerSignatureSerializerInterface
             $sBin = "\x00$sBin";
         }
 
-        $inner = sprintf("\x02%s%s\x02%s%s",
+        $inner = sprintf(
+            "\x02%s%s\x02%s%s",
             Buffertools::numToVarIntBin(strlen($rBin)),
             $rBin,
             Buffertools::numToVarIntBin(strlen($sBin)),

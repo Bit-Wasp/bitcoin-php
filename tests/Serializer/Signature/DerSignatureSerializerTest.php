@@ -28,7 +28,8 @@ class DerSignatureSerializerTest extends AbstractTestCase
         $serializer->parse(new Buffer());
     }
 
-    public function testPhpeccIsConsistent() {
+    public function testPhpeccIsConsistent()
+    {
         $r = 1;
         $s = 1;
         $adapter = EcAdapterFactory::getPhpEcc(new Math(), EccFactory::getSecgCurves()->generator256k1());
