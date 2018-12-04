@@ -14,7 +14,7 @@ function decodeOpN(int $op): int
         throw new \RuntimeException("Invalid opcode");
     }
 
-    return (int) $op - (Opcodes::OP_1 - 1);
+    return $op - (Opcodes::OP_1 - 1);
 }
 
 function encodeOpN(int $op): int
@@ -27,5 +27,5 @@ function encodeOpN(int $op): int
         throw new \RuntimeException("Invalid value");
     }
 
-    return (int) Opcodes::OP_1 + $op - 1;
+    return Opcodes::OP_1 + $op - 1;
 }
