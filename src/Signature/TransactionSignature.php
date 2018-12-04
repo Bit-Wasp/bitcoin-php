@@ -68,7 +68,7 @@ class TransactionSignature extends Serializable implements TransactionSignatureI
             && $this->hashType === $other->getHashType();
     }
 
-    private static function verifyElement($fieldName, $start, $length, $binaryString)
+    private static function verifyElement(string $fieldName, int $start, int $length, string $binaryString)
     {
         if ($length === 0) {
             throw new SignatureNotCanonical('Signature ' . $fieldName . ' length is zero');
