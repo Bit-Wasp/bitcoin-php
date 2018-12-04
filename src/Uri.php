@@ -15,7 +15,12 @@ class Uri
     /**
      * @var AddressInterface
      */
-    private $address;
+    private $bip21Address;
+
+    /**
+     * @var AddressInterface|null
+     */
+    private $bip72Address;
 
     /**
      * @var null|string
@@ -53,11 +58,13 @@ class Uri
             if ($address === null) {
                 throw new \InvalidArgumentException('Cannot provide a null address with bip0021');
             }
-        } else if ($convention !== self::BIP0072) {
+            $this->bip21Address = $address;
+        } else if ($convention === self::BIP0072) {
+            $this->bip72Address = $address;
+        } else {
             throw new \InvalidArgumentException("Invalid convention for bitcoin uri");
         }
 
-        $this->address = $address;
         $this->rule = $convention;
     }
 
@@ -119,9 +126,9 @@ class Uri
     public function uri(NetworkInterface $network = null): string
     {
         if ($this->rule === self::BIP0072) {
-            $address = $this->address === null ? '' : $this->address->getAddress($network);
+            $address = $this->bip72Address === null ? '' : $this->bip72Address->getAddress($network);
         } else {
-            $address = $this->address->getAddress($network);
+            $address = $this->bip21Address->getAddress($network);
         }
 
         $url = 'bitcoin:' . $address;
