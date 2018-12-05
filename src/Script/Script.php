@@ -165,7 +165,7 @@ class Script extends Serializable implements ScriptInterface
      */
     public function countWitnessSigOps(ScriptInterface $scriptSig, ScriptWitnessInterface $scriptWitness, int $flags): int
     {
-        if ($flags & InterpreterInterface::VERIFY_WITNESS === 0) {
+        if (($flags & InterpreterInterface::VERIFY_WITNESS) === 0) {
             return 0;
         }
 
@@ -177,10 +177,13 @@ class Script extends Serializable implements ScriptInterface
 
         if ((new OutputClassifier())->isPayToScriptHash($this)) {
             $parsed = $scriptSig->getScriptParser()->decode();
-            $subscript = new Script(end($parsed)->getData());
-            if ($subscript->isWitness($program)) {
-                /** @var WitnessProgram $program */
-                return $this->witnessSigOps($program, $scriptWitness);
+            $count = count($parsed);
+            if ($count > 0) {
+                $subscript = new Script($parsed[$count - 1]->getData());
+                if ($subscript->isWitness($program)) {
+                    /** @var WitnessProgram $program */
+                    return $this->witnessSigOps($program, $scriptWitness);
+                }
             }
         }
 
