@@ -18,11 +18,11 @@ class Amount
     }
 
     /**
-     * @param string $double
+     * @param string $btcAmount
      * @return int
      */
-    public function toSatoshis(string $double): int
+    public function toSatoshis(string $btcAmount): int
     {
-        return (int) bcmul((string) $double, (string) self::COIN, 0);
+        return (int) bcmul($btcAmount, (string) self::COIN, 0);
     }
 }
