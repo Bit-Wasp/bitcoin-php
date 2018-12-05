@@ -327,7 +327,7 @@ class HierarchicalKey
         $key = $this;
         for ($i = 0; $i < $numParts; $i++) {
             try {
-                $key = $key->deriveChild((int) $parts[$i]);
+                $key = $key->deriveChild($parts[$i]);
             } catch (InvalidDerivationException $e) {
                 if ($i === $numParts - 1) {
                     throw new InvalidDerivationException($e->getMessage());
