@@ -92,13 +92,13 @@ class Bip39Mnemonic implements MnemonicInterface
             throw new \InvalidArgumentException("Invalid entropy length");
         }
 
-        $CS = $ENT / 32;
+        $CS = $ENT >> 5; // divide by 32, convinces static analysis result is an integer
         $bits = gmp_strval($entropy->getGmp(), 2) . $this->calculateChecksum($entropy, $CS);
         $bits = str_pad($bits, ($ENT + $CS), '0', STR_PAD_LEFT);
 
         $result = [];
         foreach (str_split($bits, 11) as $bit) {
-            $result[] = $this->wordList->getWord((int) bindec($bit));
+            $result[] = $this->wordList->getWord(bindec($bit));
         }
 
         return $result;
@@ -148,7 +148,7 @@ class Bip39Mnemonic implements MnemonicInterface
         $entArray = str_split(substr($bits, 0, $ENT), 8);
         $chars = [];
         for ($i = 0; $i < $ENT / 8; $i++) {
-            $chars[] = (int) bindec($entArray[$i]);
+            $chars[] = bindec($entArray[$i]);
         }
 
         // Check checksum
