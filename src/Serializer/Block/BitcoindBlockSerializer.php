@@ -53,12 +53,12 @@ class BitcoindBlockSerializer
     public function serialize(BlockInterface $block): BufferInterface
     {
         $buffer = $this->blockSerializer->serialize($block);
-        $size = $buffer->getSize();
-        return new Buffer(
-            Buffertools::flipBytes(pack("H*", $this->network->getNetMagicBytes())) .
-            $this->size->write($size) .
+        return new Buffer(sprintf(
+            "%s%s%s",
+            strrev(pack("H*", $this->network->getNetMagicBytes())),
+            pack("V", $buffer->getSize()),
             $buffer->getBinary()
-        );
+        ));
     }
 
     /**
