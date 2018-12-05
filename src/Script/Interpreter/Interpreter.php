@@ -343,7 +343,7 @@ class Interpreter implements InterpreterInterface
      * @param bool $value
      * @return bool
      */
-    public function checkExec(Stack $vfStack, $value): bool
+    public function checkExec(Stack $vfStack, bool $value): bool
     {
         $ret = 0;
         foreach ($vfStack as $item) {
@@ -783,23 +783,23 @@ class Interpreter implements InterpreterInterface
                             } else if ($opCode === Opcodes::OP_SUB) {
                                 $num = $this->math->sub($num1, $num2);
                             } else if ($opCode === Opcodes::OP_BOOLAND) {
-                                $num = $this->math->cmp($num1, $zero) !== 0 && $this->math->cmp($num2, $zero) !== 0;
+                                $num = (int) ($this->math->cmp($num1, $zero) !== 0 && $this->math->cmp($num2, $zero) !== 0);
                             } else if ($opCode === Opcodes::OP_BOOLOR) {
-                                $num = $this->math->cmp($num1, $zero) !== 0 || $this->math->cmp($num2, $zero) !== 0;
+                                $num = (int) ($this->math->cmp($num1, $zero) !== 0 || $this->math->cmp($num2, $zero) !== 0);
                             } elseif ($opCode === Opcodes::OP_NUMEQUAL) {
-                                $num = $this->math->cmp($num1, $num2) === 0;
+                                $num = (int) ($this->math->cmp($num1, $num2) === 0);
                             } elseif ($opCode === Opcodes::OP_NUMEQUALVERIFY) {
-                                $num = $this->math->cmp($num1, $num2) === 0;
+                                $num = (int) ($this->math->cmp($num1, $num2) === 0);
                             } elseif ($opCode === Opcodes::OP_NUMNOTEQUAL) {
-                                $num = $this->math->cmp($num1, $num2) !== 0;
+                                $num = (int) ($this->math->cmp($num1, $num2) !== 0);
                             } elseif ($opCode === Opcodes::OP_LESSTHAN) {
-                                $num = $this->math->cmp($num1, $num2) < 0;
+                                $num = (int) ($this->math->cmp($num1, $num2) < 0);
                             } elseif ($opCode === Opcodes::OP_GREATERTHAN) {
-                                $num = $this->math->cmp($num1, $num2) > 0;
+                                $num = (int) ($this->math->cmp($num1, $num2) > 0);
                             } elseif ($opCode === Opcodes::OP_LESSTHANOREQUAL) {
-                                $num = $this->math->cmp($num1, $num2) <= 0;
+                                $num = (int) ($this->math->cmp($num1, $num2) <= 0);
                             } elseif ($opCode === Opcodes::OP_GREATERTHANOREQUAL) {
-                                $num = $this->math->cmp($num1, $num2) >= 0;
+                                $num = (int) ($this->math->cmp($num1, $num2) >= 0);
                             } elseif ($opCode === Opcodes::OP_MIN) {
                                 $num = ($this->math->cmp($num1, $num2) <= 0) ? $num1 : $num2;
                             } else {
