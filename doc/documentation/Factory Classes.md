@@ -16,7 +16,6 @@ An example of a globally set dependency is the Network; if not explicitly provid
    
    `Bitcoin::setNetwork(NetworkInterface $network)` - Sets $network as the default network
 
-   
 ### \BitWasp\Bitcoin\Block\BlockFactory
 
   `BlockFactory::fromHex($data)` - Attempts to parse a block from a hex string or Buffer.
@@ -27,28 +26,35 @@ An example of a globally set dependency is the Network; if not explicitly provid
   
 ### \BitWasp\Bitcoin\Key\PrivateKeyFactory
 
-  `PrivateKeyFactory::fromHex($data)` - Parses `PrivateKeyInterface` from hex string or Buffer
-  
-  `PrivateKeyFactory::fromInt($int)` - Creates a `PrivateKeyInterface` using the provided decimal integer.
-  
+Private key factory is an instance, which wraps an EcAdapterInterface (optional constructor arg)
+
+  `PrivateKeyFactory::fromHexCompressed($hexString)` - Parses `PrivateKeyInterface` from hex string
+  `PrivateKeyFactory::fromHexUncompressed($hexString)` - Parses `PrivateKeyInterface` from hex string
+  `PrivateKeyFactory::fromBufferCompressed($data)` - Parses `PrivateKeyInterface` from a Buffer
+  `PrivateKeyFactory::fromBufferUncompressed($data)` - Parses `PrivateKeyInterface` from a Buffer
+  `PrivateKeyFactory::generateCompressed(new Random())` - Generates a new compressed private key using the RNG
+  `PrivateKeyFactory::generateUncompressed(new Random())` - Generates a new uncompressed private key using the RNG   
   `PrivateKeyFactory::fromWif($wif)` - Parses a base58 encoded private key.
-  
-  `PrivateKeyFactory::create([$compressed = false]` - Generates a `PrivateKeyInterface`.
-  
-  `PrivateKeyFactory::generateSecret()` - Generates a Buffer representing a valid private key.
 
 ### \BitWasp\Bitcoin\Key\PublicKeyFactory
+
+Public key factory is an instance, which wraps an EcAdapterInterface (optional constructor arg)
 
   `PublicKeyFactory::fromHex($data)` - Parses `PublicKeyInterface` from hex string or Buffer
   
 ### \BitWasp\Bitcoin\Key\Deterministic\HierarchicalKeyFactory
 
-   `HierarchicalKeyFactory::fromExtended($extendedKey)` - Parses a `HierarchicalKey` from a base58 encoded string
+HierarchicalKeyFactory is an instance. It can be initialized with a special Base58ExtendedKeySerializer
+with knowledge about SLIP132 prefixes to work with zpubs/etc
+
+   `HierarchicalKeyFactory::fromExtended($extendedKey)` - Parses a `HierarchicalKey` from a base58 encoded string. Takes an optional second parameter, the Network object containing bip32 network prefixes. Set this explicitly, or override the default with Bitcoin::setNetwork()
    
-   `HierarchicalKeyFactory::generateMasterKey()` - Creates a new master `HierarchicalKey`
+   `HierarchicalKeyFactory::generateMasterKey($random)` - Creates a new master `HierarchicalKey`. Takes an optional second parameter, the ScriptDataFactory responsible for producing addresses
     
-   `HierarchicalKeyFactory::fromEntropy(Buffer $entropy)` - Creates a master `HierarchicalKey` from provided entropy
+   `HierarchicalKeyFactory::fromEntropy(Buffer $entropy)` - Creates a master `HierarchicalKey` from provided entropy. Takes an optional second parameter, the ScriptDataFactory responsible for producing addresses
    
+   `HierarchicalKeyFactory::multisig($scriptDataFactory, ...$extendedKeys)` - Creates a multisignature HD account from the HD keys
+
 ### \BitWasp\Bitcoin\Script\ScriptFactory
 
    `ScriptFactory::fromHex($data)` - Parses `ScriptInterface` from hex string or Buffer
@@ -84,9 +90,7 @@ An example of a globally set dependency is the Network; if not explicitly provid
    `ScriptCreator::getScript()` - Returns a `ScriptInterface` of the composed script 
    
 ### \BitWasp\Bitcoin\Script\Factory\OutputScriptFactory instance:
-   This class contains methods to safely generate commonly used output scripts.
-   
-   `OutputScriptFactory::payToAddress(AddressInterface $address)` - Returns output script for the provided address
+   This class is intended contains methods to safely generate commonly used output scripts.
    
    `OutputScriptFactory::payToPubKey(PublicKeyInterface $publicKey)` - Returns pay-to-pubkey output script for $publicKey.
      
