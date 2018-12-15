@@ -6,7 +6,6 @@ namespace BitWasp\Bitcoin\Transaction\PSBT;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Transaction\OutPointInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
@@ -31,43 +30,20 @@ class UpdatableInput
         return $this->input;
     }
 
-    private function findOurOutPoint(TransactionInterface $tx, OutPointInterface &$o = null)
+    public function addNonWitnessTx(TransactionInterface $tx)
     {
         $outPoint = $this->psbt->getTransaction()->getInputs()[$this->nIn]->getOutPoint();
         if (!$outPoint->getTxId()->equals($tx->getTxId())) {
             throw new \RuntimeException("Non-witness txid differs from unsigned tx input {$this->nIn}");
         }
-        if ($outPoint->getVout() >= count($this->psbt->getTransaction()->getOutputs())) {
+        if ($outPoint->getVout() > count($tx->getOutputs()) - 1) {
             throw new \RuntimeException("unsigned tx outpoint does not exist in this transaction");
         }
-        $o = $outPoint;
-    }
-
-    public function addNonWitnessTx(TransactionInterface $tx)
-    {
-        if ($this->input->hasNonWitnessTx()) {
-            return;
-        }
-        $this->findOurOutPoint($tx);
         $this->input = $this->input->withNonWitnessTx($tx);
-    }
-
-    public function addWitnessTx(TransactionInterface $tx)
-    {
-        if ($this->input->hasWitnessTxOut()) {
-            return;
-        }
-        /** @var OutPointInterface $outPoint */
-        $outPoint = null;
-        $this->findOurOutPoint($tx, $outPoint);
-        $this->input = $this->input->withWitnessTxOut($tx->getOutput($outPoint->getVout()));
     }
 
     public function addWitnessTxOut(TransactionOutputInterface $txOut)
     {
-        if ($this->input->hasWitnessTxOut()) {
-            return;
-        }
         $this->input = $this->input->withWitnessTxOut($txOut);
     }
 

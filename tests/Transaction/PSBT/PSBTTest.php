@@ -8,7 +8,6 @@ use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\PSBT\PSBT;
-use BitWasp\Bitcoin\Transaction\PSBT\PSBTGlobals;
 use BitWasp\Bitcoin\Transaction\PSBT\PSBTInput;
 use BitWasp\Bitcoin\Transaction\PSBT\PSBTOutput;
 use BitWasp\Bitcoin\Transaction\PSBT\UpdatableInput;
@@ -103,6 +102,16 @@ class PSBTTest extends AbstractTestCase
                 /*$base64=*/ 'cHNidP8BAFUCAAAAASeaIyOl37UfxF8iD6WLD8E+HjNCeSqF1+Ns1jM7XLw5AAAAAAD/////AaBa6gsAAAAAGXapFP/pwAYQl8w7Y28ssEYPpPxCfStFiKwAAAAAAAEBIJVe6gsAAAAAF6kUY0UgD2jRieGtwN8cTRbqjxTA2+uHIgIEsTQcy6doO2r08SOM1ul+cWfVafrEfx5I1HVBhENVvUZGMEMCIAQktY7/qqaU4VWepck7v9SokGQiQFXN8HC2dxRpRC0HAh9cjrD+plFtYLisszrWTt5g6Hhb+zqpS5m9+GFR25qaAQEEIgAgdx/RitRZZm3Unz1WTj28QvTIR3TjYK2haBao7UiNVoEBBUdSIQSxNBzLp2g7avTxI4zW6X5xZ9Vp+sR/HkjUdUGEQ1W9RiED3lXR4drIBeP4pYwfv5uUwC89uq/hJ/78pJlfJvggg71SriIGA7E0HMunaDtq9PEjjNbpfnFn1Wn6xH8eSNR1QYRDVb1GELSmumcAAACAAAAAgAQAAIAiBgPeVdHh2sgF4/iljB+/m5TALz26r+En/vykmV8m+CCDvRC0prpnAAAAgAAAAIAFAACAAAA=',
             ],
 
+            [ // PSBT with duplicate global tx
+                /*$hex=*/ '70736274ff01004501000000013412cdab3412cdab3412cdab3412cdab3412cdab3412cdab3412cdab3412cdab0000000000ffffffff020100000000000000000200000000000000000000000001004501000000013412cdab3412cdab3412cdab3412cdab3412cdab3412cdab3412cdab3412cdab0000000000ffffffff0201000000000000000002000000000000000000000000000000',
+                /*$base64=*/ 'cHNidP8BAEUBAAAAATQSzas0Es2rNBLNqzQSzas0Es2rNBLNqzQSzas0Es2rAAAAAAD/////AgEAAAAAAAAAAAIAAAAAAAAAAAAAAAABAEUBAAAAATQSzas0Es2rNBLNqzQSzas0Es2rNBLNqzQSzas0Es2rAAAAAAD/////AgEAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAA=',
+            ],
+
+            [ // PSBT with duplicate global unknown key
+                /*$hex=*/ '70736274ff023431023635023431023635000000',
+                /*$base64=*/ 'cHNidP8CNDECNjUCNDECNjUAAAA==',
+            ],
+
         ];
     }
 
@@ -148,6 +157,13 @@ class PSBTTest extends AbstractTestCase
             [ // PSBT with unknown types in the inputs.
                 /*$hex=*/ '70736274ff01003f0200000001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000000000ffffffff010000000000000000036a010000000000000a0f0102030405060708090f0102030405060708090a0b0c0d0e0f0000',
                 /*$base64=*/ 'cHNidP8BAD8CAAAAAf//////////////////////////////////////////AAAAAAD/////AQAAAAAAAAAAA2oBAAAAAAAACg8BAgMEBQYHCAkPAQIDBAUGBwgJCgsMDQ4PAAA=',
+            ],
+
+            // my own
+
+            [ // PSBT with a global unknown key
+                /*$hex=*/ '70736274ff01004501000000013412cdab3412cdab3412cdab3412cdab3412cdab3412cdab3412cdab3412cdab0000000000ffffffff0201000000000000000002000000000000000000000000014102363500000000',
+                /*$base64=*/ 'cHNidP8BAEUBAAAAATQSzas0Es2rNBLNqzQSzas0Es2rNBLNqzQSzas0Es2rAAAAAAD/////AgEAAAAAAAAAAAIAAAAAAAAAAAAAAAABQQI2NQAAAAA=',
             ],
         ];
     }
@@ -203,11 +219,91 @@ class PSBTTest extends AbstractTestCase
         $psbt = new PSBT($unsignedTx, $unknowns, $inputs, $outputs);
         $this->assertFalse($psbt->getInputs()[0]->hasWitnessTxOut());
         $txOut = new TransactionOutput(1, new Script());
-        $psbt->updateInput(0, function(UpdatableInput $input) use ($txOut): UpdatableInput {
+        $psbt->updateInput(0, function (UpdatableInput $input) use ($txOut): UpdatableInput {
             $input->addWitnessTxOut($txOut);
             return $input;
         });
         $this->assertTrue($psbt->getInputs()[0]->hasWitnessTxOut());
         $this->assertSame($txOut, $psbt->getInputs()[0]->getWitnessTxOut());
+    }
+
+    /**
+     * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidPSBTException
+     * @expectedExceptionMessage Invalid number of inputs
+     */
+    public function testChecksNumInputsMatchesGreaterThan()
+    {
+        $unsignedTx = new Transaction(0, [
+            new TransactionInput(new OutPoint(Buffer::hex('', 32), 0xffffffff), new Script()),
+        ], []);
+
+        new PSBT($unsignedTx, [], [new PSBTInput(), new PSBTInput()], []);
+    }
+
+    /**
+     * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidPSBTException
+     * @expectedExceptionMessage Invalid number of inputs
+     */
+    public function testChecksNumInputsMatchesLessThan()
+    {
+        $unsignedTx = new Transaction(0, [
+            new TransactionInput(new OutPoint(Buffer::hex('', 32), 0xffffffff), new Script()),
+        ], []);
+
+        new PSBT($unsignedTx, [], [], []);
+    }
+
+    /**
+     * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidPSBTException
+     * @expectedExceptionMessage Invalid number of outputs
+     */
+    public function testChecksNumOutputsMatchesGreaterThan()
+    {
+        $unsignedTx = new Transaction(0, [
+            new TransactionInput(new OutPoint(Buffer::hex('', 32), 0xffffffff), new Script()),
+        ], [new TransactionOutput(1, new Script()), new TransactionOutput(2, new Script())]);
+
+        new PSBT($unsignedTx, [], [new PSBTInput()], [new PSBTOutput()]);
+    }
+
+    /**
+     * @expectedException \BitWasp\Bitcoin\Exceptions\InvalidPSBTException
+     * @expectedExceptionMessage Invalid number of outputs
+     */
+    public function testChecksNumOutputsMatchesLessThan()
+    {
+        $unsignedTx = new Transaction(0, [
+            new TransactionInput(new OutPoint(Buffer::hex('', 32), 0xffffffff), new Script()),
+        ], [new TransactionOutput(1, new Script()), new TransactionOutput(2, new Script())]);
+
+        new PSBT($unsignedTx, [], [new PSBTInput()], [new PSBTOutput(), new PSBTOutput(), new PSBTOutput()]);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage No input at this index
+     */
+    public function testUpdateInputChecksInputNum()
+    {
+        $unsignedTx = new Transaction(0, [
+            new TransactionInput(new OutPoint(Buffer::hex('', 32), 0xffffffff), new Script()),
+        ], [new TransactionOutput(1, new Script()), new TransactionOutput(2, new Script())]);
+
+        $psbt = new PSBT($unsignedTx, [], [new PSBTInput()], [new PSBTOutput(), new PSBTOutput()]);
+        $psbt->updateInput(10, function () {
+        });
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unknowns must be a map of string keys to Buffer values
+     */
+    public function testChecksUnknownsFormat()
+    {
+        $unsignedTx = new Transaction(0, [
+            new TransactionInput(new OutPoint(Buffer::hex('', 32), 0xffffffff), new Script()),
+        ], [new TransactionOutput(1, new Script()), new TransactionOutput(2, new Script())]);
+
+        new PSBT($unsignedTx, [1 => $unsignedTx], [new PSBTInput()], [new PSBTOutput(), new PSBTOutput()]);
     }
 }

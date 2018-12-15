@@ -67,7 +67,7 @@ class UpdatorTest extends AbstractTestCase
 
         $fpr = 0xd90c6a4f;
         $derivs = [];
-        $createDeriv = function(string $hexKey, int $fpr, string $path) use (&$derivs) {
+        $createDeriv = function (string $hexKey, int $fpr, string $path) use (&$derivs) {
             $sequence = new HierarchicalKeySequence();
             $keyFactory = new PublicKeyFactory();
             $key = $keyFactory->fromHex($hexKey);
@@ -119,8 +119,8 @@ class UpdatorTest extends AbstractTestCase
                 $this->assertInstanceOf(TransactionInterface::class, $tx);
                 /** @var TransactionInterface $tx */
                 if ($tx->hasWitness() && !$input->input()->hasWitnessTxOut()) {
-                    $input->addWitnessTx($tx);
-                } else if (!$input->input()->hasNonWitnessTx()){
+                    $input->addWitnessTxOut($tx->getOutput($outPoint->getVout()));
+                } else if (!$input->input()->hasNonWitnessTx()) {
                     $input->addNonWitnessTx($tx);
                 }
 

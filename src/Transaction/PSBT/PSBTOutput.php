@@ -72,7 +72,7 @@ class PSBTOutput
      * @throws \BitWasp\Bitcoin\Exceptions\WitnessScriptException
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public static function fromKeyValues(Parser $parser, VarString $vs): PSBTOutput
+    public static function fromParser(Parser $parser, VarString $vs): PSBTOutput
     {
         $redeemScript = null;
         $witnessScript = null;
@@ -198,5 +198,4 @@ class PSBTOutput
         $parser->appendBinary($vs->write(new Buffer()));
         return $map;
     }
-
 }

@@ -11,7 +11,6 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\Types\VarString;
 
 class PSBT
 {
@@ -65,7 +64,7 @@ class PSBT
         }
         foreach ($unknowns as $key => $unknown) {
             if (!is_string($key) || !($unknown instanceof BufferInterface)) {
-                throw new InvalidPSBTException("Unknowns must be a map of string keys to Buffer values");
+                throw new \InvalidArgumentException("Unknowns must be a map of string keys to Buffer values");
             }
         }
         $this->tx = $tx;
@@ -96,7 +95,6 @@ class PSBT
 
         $tx = null;
         $unknown = [];
-
         try {
             do {
                 $key = $vs->read($parser);
@@ -148,12 +146,13 @@ class PSBT
         $outputs = [];
         for ($i = 0; $parser->getPosition() < $parser->getSize() && $i < $numOutputs; $i++) {
             try {
-                $output = PSBTOutput::fromKeyValues($parser, $vs);
+                $output = PSBTOutput::fromParser($parser, $vs);
                 $outputs[] = $output;
             } catch (\Exception $e) {
                 throw new InvalidPSBTException("Failed to parse outputs section", 0, $e);
             }
         }
+
         if ($numOutputs !== count($outputs)) {
             throw new InvalidPSBTException("Missing outputs");
         }
@@ -198,23 +197,9 @@ class PSBT
             throw new \RuntimeException("No input at this index");
         }
 
-        $result = $modifyPsbtIn(new UpdatableInput($this, $input, $this->inputs[$input]));
-        if (!($result instanceof UpdatableInput)) {
-            throw new \RuntimeException("Invalid result for update");
-        }
-        $this->inputs[$input] = $result->input();
-    }
-
-    public function writeToParser(Parser $parser, VarString $vs)
-    {
-        $parser->appendBinary($vs->write(new Buffer(chr(self::PSBT_GLOBAL_UNSIGNED_TX))));
-        $parser->appendBinary($vs->write($this->tx->getBuffer()));
-
-        foreach ($this->unknown as $key => $value) {
-            $parser->appendBinary($vs->write(new Buffer($key)));
-            $parser->appendBinary($vs->write($value));
-        }
-        $parser->appendBinary($vs->write(new Buffer()));
+        $updatable = new UpdatableInput($this, $input, $this->inputs[$input]);
+        $modifyPsbtIn($updatable);
+        $this->inputs[$input] = $updatable->input();
     }
 
     /**
@@ -225,7 +210,14 @@ class PSBT
         $vs = Types::varstring();
         $parser = new Parser();
         $parser->appendBinary("psbt\xff");
-        $this->writeToParser($parser, $vs);
+        $parser->appendBinary($vs->write(new Buffer(chr(self::PSBT_GLOBAL_UNSIGNED_TX))));
+        $parser->appendBinary($vs->write($this->tx->getBuffer()));
+        foreach ($this->unknown as $key => $value) {
+            $parser->appendBinary($vs->write(new Buffer($key)));
+            $parser->appendBinary($vs->write($value));
+        }
+        $parser->appendBinary($vs->write(new Buffer()));
+
         $numInputs = count($this->tx->getInputs());
         for ($i = 0; $i < $numInputs; $i++) {
             $this->inputs[$i]->writeToParser($parser, $vs);
