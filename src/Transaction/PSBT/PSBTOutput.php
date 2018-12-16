@@ -161,7 +161,7 @@ class PSBTOutput
     }
 
     /**
-     * @return string[]
+     * @return BufferInterface[]
      */
     public function getUnknownFields(): array
     {

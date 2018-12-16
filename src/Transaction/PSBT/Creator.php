@@ -10,15 +10,16 @@ class Creator
 {
     public function createPsbt(TransactionInterface $tx, array $unknowns = []): PSBT
     {
+        $nIn = count($tx->getInputs());
         $inputs = [];
-        for ($i = 0; $i < count($tx->getInputs()); $i++) {
+        for ($i = 0; $i < $nIn; $i++) {
             $inputs[] = new PSBTInput();
         }
+        $nOut = count($tx->getOutputs());
         $outputs = [];
-        for ($i = 0; $i < count($tx->getOutputs()); $i++) {
+        for ($i = 0; $i < $nOut; $i++) {
             $outputs[] = new PSBTOutput();
         }
-
         return new PSBT($tx, $unknowns, $inputs, $outputs);
     }
 }

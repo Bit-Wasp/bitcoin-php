@@ -373,6 +373,9 @@ class PSBTInput
         return $this->finalScriptWitness;
     }
 
+    /**
+     * @return BufferInterface[]
+     */
     public function getUnknownFields(): array
     {
         return $this->unknown;

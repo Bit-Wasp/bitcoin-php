@@ -167,8 +167,9 @@ class PSBT
     {
         return $this->tx;
     }
+
     /**
-     * @return string[]
+     * @return BufferInterface[]
      */
     public function getUnknowns(): array
     {
