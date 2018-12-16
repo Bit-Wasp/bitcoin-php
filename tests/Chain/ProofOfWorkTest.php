@@ -42,20 +42,16 @@ class ProofOfWorkTest extends AbstractTestCase
         $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
         $bits = 1;
-        $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
+        $pow->checkPow(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Hash doesn't match nBits
-     */
     public function testWhereHashTooLow()
     {
         $math = new Math();
         $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
         $bits = 0x181287ba;
-        $pow->check(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
+        $this->assertFalse($pow->checkPow(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits));
     }
 
     /**

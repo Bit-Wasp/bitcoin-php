@@ -38,7 +38,7 @@ class ProofOfWork
      * @param int $bits
      * @return \GMP
      */
-    public function getTarget($bits): \GMP
+    public function getTarget(int $bits): \GMP
     {
         $negative = false;
         $overflow = false;
@@ -85,7 +85,7 @@ class ProofOfWork
      * @param int $nBits
      * @return bool
      */
-    public function check(BufferInterface $hash, int $nBits): bool
+    public function checkPow(BufferInterface $hash, int $nBits): bool
     {
         $negative = false;
         $overflow = false;
@@ -96,7 +96,7 @@ class ProofOfWork
         }
 
         if ($this->math->cmp($hash->getGmp(), $target) > 0) {
-            throw new \RuntimeException("Hash doesn't match nBits");
+            return false;
         }
 
         return true;
@@ -109,7 +109,7 @@ class ProofOfWork
      */
     public function checkHeader(BlockHeaderInterface $header): bool
     {
-        return $this->check($header->getHash(), $header->getBits());
+        return $this->checkPow($header->getHash(), $header->getBits());
     }
 
     /**
