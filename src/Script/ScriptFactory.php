@@ -22,9 +22,13 @@ class ScriptFactory
      * @var OutputScriptFactory
      */
     private static $outputScriptFactory = null;
-    private static $opcodes = null;
 
-    private static function getOpCodes(): Opcodes
+    /**
+     * @var Opcodes|null
+     */
+    protected static $opcodes = null;
+
+    public static function getOpCodes(): Opcodes
     {
         if (null === static::$opcodes) {
             static::$opcodes = new Opcodes();
