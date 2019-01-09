@@ -16,14 +16,6 @@ class NetworkFactoryTest extends AbstractTestCase
             ['bitcoin', Networks\Bitcoin::class],
             ['bitcoinTestnet', Networks\BitcoinTestnet::class],
             ['bitcoinRegtest', Networks\BitcoinRegtest::class],
-            ['dash', Networks\Dash::class],
-            ['dashTestnet', Networks\DashTestnet::class],
-            ['dogecoin', Networks\Dogecoin::class],
-            ['dogecoinTestnet', Networks\DogecoinTestnet::class],
-            ['litecoin', Networks\Litecoin::class],
-            ['litecoinTestnet', Networks\LitecoinTestnet::class],
-            ['viacoin', Networks\Viacoin::class],
-            ['viacoinTestnet', Networks\ViacoinTestnet::class],
         ];
     }
 

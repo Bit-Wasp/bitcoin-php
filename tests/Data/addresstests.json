@@ -131,12 +131,6 @@
             "hash": "33b5ea4cee854383bb1ef23223af8544351dc148",
             "network": "btc",
             "address": "15iRPUaoGPkxAdsR9Pg7amifytRj7h1nJf"
-        },
-        {
-            "publickey": "03005d784682e7ae5933d39a8ebf2758f610aefe238b2f0ea06a26c20fa9d4733e",
-            "hash": "e1c34e05292274d459949e910b758b8d104ede1b",
-            "network": "zec",
-            "address": "t1eTL1WZWMFj5DTsingVqcPsfFzUSzPEEiM"
         }
     ]
 }
