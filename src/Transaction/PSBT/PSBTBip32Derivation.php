@@ -62,7 +62,7 @@ class PSBTBip32Derivation
     public function getPublicKey(EcAdapterInterface $ecAdapter = null): PublicKeyInterface
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
-        $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, $ecAdapter);
+        $pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
         return $pubKeySerializer->parse($this->rawKey);
     }
 }
