@@ -110,7 +110,7 @@ class EcSerializer
      * @param EcAdapterInterface $adapter
      * @return mixed
      */
-    public static function getSerializer(string $interface, $useCache = true, EcAdapterInterface $adapter = null)
+    public static function getSerializer(string $interface, bool $useCache = true, EcAdapterInterface $adapter = null)
     {
         if (null === $adapter) {
             $adapter = Bitcoin::getEcAdapter();
