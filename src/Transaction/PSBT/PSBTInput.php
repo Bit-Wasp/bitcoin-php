@@ -7,7 +7,7 @@ namespace BitWasp\Bitcoin\Transaction\PSBT;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPSBTException;
 use BitWasp\Bitcoin\Script\P2shScript;
-use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Script\WitnessScript;
@@ -210,7 +210,7 @@ class PSBTInput
                         } else if ($key->getSize() !== 1) {
                             throw new InvalidPSBTException("Invalid key length");
                         }
-                        $redeemScript = new P2shScript(ScriptFactory::fromBuffer($value));
+                        $redeemScript = new P2shScript(new Script($value));
                         break;
                     case self::WITNESS_SCRIPT:
                         if ($witnessScript !== null) {
@@ -218,7 +218,7 @@ class PSBTInput
                         } else if ($key->getSize() !== 1) {
                             throw new InvalidPSBTException("Invalid key length");
                         }
-                        $witnessScript = new WitnessScript(ScriptFactory::fromBuffer($value));
+                        $witnessScript = new WitnessScript(new Script($value));
                         break;
                     case self::BIP32_DERIVATION:
                         $pubKey = self::parsePublicKeyKey($key);
@@ -234,7 +234,7 @@ class PSBTInput
                         } else if ($key->getSize() !== 1) {
                             throw new InvalidPSBTException("Invalid key length");
                         }
-                        $finalScriptSig = ScriptFactory::fromBuffer($value);
+                        $finalScriptSig = new Script($value);
                         break;
                     case self::FINAL_WITNESS:
                         if ($finalScriptWitness !== null) {
