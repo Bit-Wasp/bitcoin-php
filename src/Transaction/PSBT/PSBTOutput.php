@@ -49,18 +49,24 @@ class PSBTOutput
      * @param ScriptInterface|null $redeemScript
      * @param ScriptInterface|null $witnessScript
      * @param PSBTBip32Derivation[] $bip32Derivations
-     * @param BufferInterface[] $unknown
+     * @param BufferInterface[] $unknowns
      */
     public function __construct(
         ScriptInterface $redeemScript = null,
         ScriptInterface $witnessScript = null,
         array $bip32Derivations = [],
-        array $unknown = []
+        array $unknowns = []
     ) {
+        foreach ($unknowns as $key => $unknown) {
+            if (!is_string($key) || !($unknown instanceof BufferInterface)) {
+                throw new \RuntimeException("Unknowns must be a map of string keys to Buffer values");
+            }
+        }
+
         $this->redeemScript = $redeemScript;
         $this->witnessScript = $witnessScript;
         $this->bip32Derivations = $bip32Derivations;
-        $this->unknown = $unknown;
+        $this->unknown = $unknowns;
     }
 
     /**
