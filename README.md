@@ -1,6 +1,5 @@
   
 ## Bitcoin
-=======
 
 [![Build Status](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/build-status/master)
 [![Code Coverage](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/?branch=master)
@@ -40,6 +39,14 @@ You can install this library via Composer: `composer require bitwasp/bitcoin`
  - [ext-bitcoinconsensus](https://github.com/Bit-Wasp/bitcoinconsensus-php) - PHP bindings to libbitcoinconsensus
  - [bitcoin-p2p-php](https://github.com/Bit-Wasp/bitcoin-p2p-php) - PHP implementation of bitcoin P2P messaging using reactphp
  - [stratum-php](https://github.com/Bit-Wasp/stratum-php) - PHP implementation of the stratum protocol using reactphp
- - [electrum-discovery-php](https://github.com/Bit-Wasp/electrum-discovery-php)- Electrum server discovery (over IRC) using reactphp
+ - [electrum-discovery-php](https://github.com/Bit-Wasp/electrum-discovery-php) - Electrum server discovery (over IRC) using reactphp
  - [node-php](https://github.com/Bit-Wasp/node-php) - A toy project (really just for fun) a full node using bitcoin-p2p-php
  - [bip70-php](https://github.com/bip70/bip70-php) - A BIP70 (payment requests) implementation for PHP
+
+## Supporters
+
+This library is a 100% open source project. We do not receive any funding from the industry, nor provide paid support or development of features. That said, we are grateful for our supporters who provide free access for open source projects:
+
+[![JetBrains](https://avatars0.githubusercontent.com/u/878437?s=200&v=4)](https://www.jetbrains.com/)
+
+Thanks to [JetBrains](https://www.jetbrains.com/) for supporting the project through sponsoring some [All Products Packs](https://www.jetbrains.com/products.html) within their [Free Open Source License](https://www.jetbrains.com/buy/opensource/) program.
