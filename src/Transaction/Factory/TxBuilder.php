@@ -30,6 +30,11 @@ class TxBuilder
     private $nVersion;
 
     /**
+     * @var int
+     */
+    private $nType;
+
+    /**
      * @var array
      */
     private $inputs;
@@ -64,6 +69,7 @@ class TxBuilder
         $this->outputs = [];
         $this->witness = [];
         $this->nLockTime = 0;
+        $this->nType = 0;
         return $this;
     }
 
@@ -72,7 +78,7 @@ class TxBuilder
      */
     private function makeTransaction(): TransactionInterface
     {
-        return new Transaction($this->nVersion, $this->inputs, $this->outputs, $this->witness, $this->nLockTime);
+        return new Transaction($this->nVersion, $this->inputs, $this->outputs, $this->witness, $this->nLockTime, $this->nType);
     }
 
     /**

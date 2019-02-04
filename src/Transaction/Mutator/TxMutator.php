@@ -86,7 +86,8 @@ class TxMutator
             array_key_exists('inputs', $array) ? $array['inputs'] : $this->transaction->getInputs(),
             array_key_exists('outputs', $array) ? $array['outputs'] : $this->transaction->getOutputs(),
             array_key_exists('witness', $array) ? $array['witness'] : $this->transaction->getWitnesses(),
-            array_key_exists('nLockTime', $array) ? $array['nLockTime'] : $this->transaction->getLockTime()
+            array_key_exists('nLockTime', $array) ? $array['nLockTime'] : $this->transaction->getLockTime(),
+            array_key_exists('type', $array) ? $array['type'] : $this->transaction->getType()
         );
 
         return $this;
@@ -99,6 +100,15 @@ class TxMutator
     public function version(int $nVersion)
     {
         return $this->replace(array('version' => $nVersion));
+    }
+
+    /**
+     * @param int $nType
+     * @return $this
+     */
+    public function type(int $nType)
+    {
+        return $this->replace(array('type' => $nType));
     }
 
     /**

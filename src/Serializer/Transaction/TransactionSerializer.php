@@ -17,6 +17,16 @@ class TransactionSerializer implements TransactionSerializerInterface
     const NO_WITNESS = 1;
 
     /**
+     * @var \BitWasp\Buffertools\Types\Int16
+     */
+    protected $int16le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint16
+     */
+    protected $uint16le;
+
+    /**
      * @var \BitWasp\Buffertools\Types\Int32
      */
     protected $int32le;
@@ -48,6 +58,8 @@ class TransactionSerializer implements TransactionSerializerInterface
 
     public function __construct(TransactionInputSerializer $inputSerializer = null, TransactionOutputSerializer $outputSerializer = null, ScriptWitnessSerializer $witnessSerializer = null)
     {
+        $this->int16le = Types::int16le();
+        $this->uint16le = Types::uint16le();
         $this->int32le = Types::int32le();
         $this->uint32le = Types::uint32le();
         $this->varint = Types::varint();
@@ -77,7 +89,8 @@ class TransactionSerializer implements TransactionSerializerInterface
      */
     public function fromParser(Parser $parser): TransactionInterface
     {
-        $version = (int) $this->int32le->read($parser);
+        $version = (int) $this->uint16le->read($parser);
+        $type = (int) $this->uint16le->read($parser);
 
         $vin = [];
         $vinCount = $this->varint->read($parser);
@@ -122,7 +135,7 @@ class TransactionSerializer implements TransactionSerializerInterface
 
         $lockTime = (int) $this->uint32le->read($parser);
 
-        return new Transaction($version, $vin, $vout, $vwit, $lockTime);
+        return new Transaction($version, $vin, $vout, $vwit, $lockTime, $type);
     }
 
     /**
@@ -142,7 +155,8 @@ class TransactionSerializer implements TransactionSerializerInterface
     public function serialize(TransactionInterface $transaction, int $opt = 0): BufferInterface
     {
         $parser = new Parser();
-        $parser->appendBinary($this->int32le->write($transaction->getVersion()));
+        $parser->appendBinary($this->int16le->write($transaction->getVersion()));
+        $parser->appendBinary($this->int16le->write($transaction->getType()));
 
         $flags = 0;
         $allowWitness = !($opt & self::NO_WITNESS);
