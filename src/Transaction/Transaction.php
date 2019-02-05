@@ -7,6 +7,7 @@ namespace BitWasp\Bitcoin\Transaction;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
+use BitWasp\Bitcoin\ExtraPayload\ExtraPayloadInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Util\IntRange;
@@ -46,6 +47,11 @@ class Transaction extends Serializable implements TransactionInterface
     private $type;
 
     /**
+     * @var ExtraPayloadInterface
+     */
+    private $extra_payload;
+
+    /**
      * @var BufferInterface
      */
     private $wtxid;
@@ -64,6 +70,7 @@ class Transaction extends Serializable implements TransactionInterface
      * @param ScriptWitnessInterface[] $vwit
      * @param int $nLockTime
      * @param int $nType
+     * @param ExtraPayloadInterface $nExtraPayload
      */
     public function __construct(
         int $nVersion = TransactionInterface::DEFAULT_VERSION,
@@ -71,7 +78,8 @@ class Transaction extends Serializable implements TransactionInterface
         array $vout = [],
         array $vwit = [],
         int $nLockTime = 0,
-        int $nType = TransactionInterface::DEFAULT_TYPE
+        int $nType = TransactionInterface::DEFAULT_TYPE,
+        ExtraPayloadInterface $nExtraPayload = null
     ) {
         if ($nVersion < IntRange::I32_MIN || $nVersion > IntRange::I32_MAX) {
             throw new \InvalidArgumentException('Transaction version is outside valid range');
@@ -84,6 +92,10 @@ class Transaction extends Serializable implements TransactionInterface
         $this->version = $nVersion;
         $this->lockTime = $nLockTime;
         $this->type = $nType;
+
+        if ($nVersion >= 3 && $nType > 0) {
+            $this->extra_payload = $nExtraPayload;
+        }
 
         $this->inputs = array_map(function (TransactionInputInterface $input) {
             return $input;
@@ -141,6 +153,14 @@ class Transaction extends Serializable implements TransactionInterface
     public function getType(): int
     {
         return $this->type;
+    }
+
+    /**
+     * @return ExtraPayloadInterface
+     */
+    public function getExtraPayload(): ExtraPayloadInterface
+    {
+        return $this->extra_payload;
     }
 
     /**
