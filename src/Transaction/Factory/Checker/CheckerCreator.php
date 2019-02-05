@@ -29,7 +29,7 @@ class CheckerCreator extends CheckerCreatorBase
      * @param TransactionOutputInterface $txOut
      * @return CheckerBase
      */
-    public function create(TransactionInterface $tx, int $nInput, TransactionOutputInterface $txOut): CheckerBase
+    public function create(TransactionInterface $tx, int $nInput, TransactionOutputInterface $txOut)
     {
         return new Checker($this->ecAdapter, $tx, $nInput, $txOut->getValue(), $this->txSigSerializer, $this->pubKeySerializer);
     }
