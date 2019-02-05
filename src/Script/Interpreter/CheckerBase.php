@@ -88,7 +88,7 @@ abstract class CheckerBase
      * @param int $sigVersion
      * @return BufferInterface
      */
-    abstract public function getSigHash(ScriptInterface $script, int $hashType, int $sigVersion): BufferInterface;
+    abstract public function getSigHash(ScriptInterface $script, int $hashType, int $sigVersion);
 
     /**
      * @param BufferInterface $signature
