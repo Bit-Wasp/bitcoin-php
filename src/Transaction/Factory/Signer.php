@@ -71,7 +71,7 @@ class Signer
      * @param TransactionInterface $tx
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(TransactionInterface $tx, EcAdapterInterface $ecAdapter = null, $signatureChecker)
+    public function __construct(TransactionInterface $tx, EcAdapterInterface $ecAdapter = null, $signatureChecker = null)
     {
         $this->tx = $tx;
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
