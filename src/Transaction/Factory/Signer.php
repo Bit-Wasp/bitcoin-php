@@ -71,13 +71,13 @@ class Signer
      * @param TransactionInterface $tx
      * @param EcAdapterInterface $ecAdapter
      */
-    public function __construct(TransactionInterface $tx, EcAdapterInterface $ecAdapter = null)
+    public function __construct(TransactionInterface $tx, EcAdapterInterface $ecAdapter = null, $signatureChecker)
     {
         $this->tx = $tx;
         $this->ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->sigSerializer = new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $this->ecAdapter));
         $this->pubKeySerializer = EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $this->ecAdapter);
-        $this->checkerCreator = new CheckerCreator($this->ecAdapter, $this->sigSerializer, $this->pubKeySerializer);
+        $this->checkerCreator = $signatureChecker ?: new CheckerCreator($this->ecAdapter, $this->sigSerializer, $this->pubKeySerializer);
     }
 
     /**
