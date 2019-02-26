@@ -55,7 +55,7 @@ class EcAdapterFactory
             return self::$adapter;
         }
 
-        if (extension_loaded('secp256k1') && Semver::satisfies(phpversion('secp256k1'), "~0.1.0")) {
+        if (extension_loaded('secp256k1') && Semver::satisfies(phpversion('secp256k1'), "^0.2.0")) {
             self::$adapter = self::getSecp256k1($math, $generator);
         } else {
             self::$adapter = self::getPhpEcc($math, $generator);
