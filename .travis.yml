@@ -6,7 +6,6 @@ php:
   - 7.1
   - 7.2
   - 7.3
-  - nightly
 
 env:
   - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
