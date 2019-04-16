@@ -1,5 +1,5 @@
 {
-  "name": "bitwasp/bitcoin",
+  "name": "koltsov/bitcoin",
   "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
   "type": "library",
   "homepage": "https://github.com/bit-wasp/bitcoin-php",
