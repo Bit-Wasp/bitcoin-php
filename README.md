@@ -8,6 +8,8 @@
 
 This repository contains an implementation of Bitcoin using mostly pure PHP.
 
+*Warning*: This library does not support 32-bit installs of PHP. Please also note that composer is the only supported installation method.
+
 ## Installation
 
 You can install this library via Composer: `composer require bitwasp/bitcoin`
