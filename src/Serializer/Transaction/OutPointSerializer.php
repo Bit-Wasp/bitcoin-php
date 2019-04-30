@@ -50,8 +50,8 @@ class OutPointSerializer implements OutPointSerializerInterface
     public function fromParser(Parser $parser): OutPointInterface
     {
         return new OutPoint(
-            $this->txid->read($parser),
-            (int) $this->vout->read($parser)
+            new Buffer(strrev($parser->readBytes(32)->getBinary()), 32),
+            unpack("V", $parser->readBytes(4)->getBinary())[1]
         );
     }
 
