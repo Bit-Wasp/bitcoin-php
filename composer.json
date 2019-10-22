@@ -24,6 +24,7 @@
   },
   "require": {
     "php-64bit": ">=7.0",
+    "ext-gmp": "*",
     "pleonasm/merkle-tree": "1.0.0",
     "composer/semver": "^1.4.0",
     "lastguest/murmurhash": "v2.0.0",
