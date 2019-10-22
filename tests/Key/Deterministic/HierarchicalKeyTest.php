@@ -483,8 +483,10 @@ class HierarchicalKeyTest extends AbstractTestCase
             ->setMethods([
                 'getSecret',
                 'getPublicKey',
+                'getXOnlyPublicKey',
                 'sign',
                 'signCompact',
+                'signSchnorr',
                 'toWif',
 
                 // Key Interface

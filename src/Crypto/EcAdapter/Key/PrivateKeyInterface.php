@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SchnorrSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Network\NetworkInterface;
@@ -19,6 +20,13 @@ interface PrivateKeyInterface extends KeyInterface
      * @return \GMP
      */
     public function getSecret();
+
+    /**
+     * @param BufferInterface $msg32
+     * @param RbgInterface $rbg
+     * @return SchnorrSignatureInterface
+     */
+    public function signSchnorr(BufferInterface $msg32): SchnorrSignatureInterface;
 
     /**
      * @param BufferInterface $msg32
@@ -40,6 +48,13 @@ interface PrivateKeyInterface extends KeyInterface
      * @return PublicKeyInterface
      */
     public function getPublicKey();
+
+    /**
+     * Return the public key.
+     *
+     * @return XOnlyPublicKeyInterface
+     */
+    public function getXOnlyPublicKey(): XOnlyPublicKeyInterface;
 
     /**
      * Convert the private key to wallet import format. This function

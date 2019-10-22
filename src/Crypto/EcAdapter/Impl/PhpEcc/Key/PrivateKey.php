@@ -8,12 +8,14 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PrivateKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SchnorrSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Crypto\Random\Rfc6979;
@@ -116,6 +118,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
         );
     }
 
+    public function signSchnorr(BufferInterface $msg32): SchnorrSignatureInterface
+    {
+        throw new \RuntimeException("not implemented");
+    }
+
     /**
      * @param \GMP $tweak
      * @return KeyInterface
@@ -159,6 +166,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
         }
 
         return $this->publicKey;
+    }
+
+    public function getXOnlyPublicKey(): XOnlyPublicKeyInterface
+    {
+        throw new \RuntimeException("not implemented");
     }
 
     /**
