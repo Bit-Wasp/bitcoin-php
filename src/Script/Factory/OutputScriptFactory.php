@@ -193,4 +193,12 @@ class OutputScriptFactory
             new Buffer("\xaa\x21\xa9\xed" . $commitment->getBinary())
         ]);
     }
+
+    public function taproot(BufferInterface $key32): ScriptInterface
+    {
+        if ($key32->getSize() !== 32) {
+            throw new \RuntimeException('Taproot key should be 32 bytes');
+        }
+        return ScriptFactory::sequence([Opcodes::OP_1, $key32]);
+    }
 }
