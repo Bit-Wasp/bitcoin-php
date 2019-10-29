@@ -141,6 +141,9 @@ class TaprootHasher extends SigHash
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
      * SIGHASH_ALL
      *
+     * Note: this function doesn't use txOutScript, as we have access to it via
+     * spentOutputs.
+     *
      * @param ScriptInterface $txOutScript
      * @param int $inputToSign
      * @param int $sighashType
