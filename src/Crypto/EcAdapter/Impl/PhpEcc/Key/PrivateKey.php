@@ -168,9 +168,14 @@ class PrivateKey extends Key implements PrivateKeyInterface
         return $this->publicKey;
     }
 
+    /**
+     * Return the public key
+     *
+     * @return XOnlyPublicKeyInterface
+     */
     public function getXOnlyPublicKey(): XOnlyPublicKeyInterface
     {
-        throw new \RuntimeException("not implemented");
+        return $this->getPublicKey()->asXOnlyPublicKey();
     }
 
     /**

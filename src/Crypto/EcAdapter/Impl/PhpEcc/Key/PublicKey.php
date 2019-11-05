@@ -125,7 +125,9 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
 
     public function asXOnlyPublicKey(): XOnlyPublicKeyInterface
     {
-        throw new \RuntimeException("not implemented");
+        // todo: check this, see Secp version
+        $hasSquareY = gmp_jacobi($this->getPoint()->getY(), $this->getCurve()->getPrime()) >= 0;
+        return new XOnlyPublicKey($this->ecAdapter, $this->point, $hasSquareY);
     }
 
     /**
