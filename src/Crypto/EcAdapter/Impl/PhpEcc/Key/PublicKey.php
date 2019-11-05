@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PublicKeySeriali
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Crypto\Signature\Signer;
@@ -120,6 +121,11 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     {
         $point = $this->point->mul($tweak);
         return new PublicKey($this->ecAdapter, $point, $this->compressed);
+    }
+
+    public function asXOnlyPublicKey(): XOnlyPublicKeyInterface
+    {
+        throw new \RuntimeException("not implemented");
     }
 
     /**

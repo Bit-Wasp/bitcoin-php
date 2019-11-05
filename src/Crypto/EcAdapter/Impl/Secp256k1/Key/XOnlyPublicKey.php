@@ -24,13 +24,14 @@ class XOnlyPublicKey implements XOnlyPublicKeyInterface
     /**
      * @var bool
      */
-    private $isPositive;
+    private $hasSquareY;
 
     /**
      * @param resource $context
      * @param resource $xonlyKey
+     * @param bool $hasSquareY
      */
-    public function __construct($context, $xonlyKey)
+    public function __construct($context, $xonlyKey, bool $hasSquareY)
     {
         if (!is_resource($context) ||
             !get_resource_type($context) === SECP256K1_TYPE_CONTEXT) {
@@ -43,19 +44,12 @@ class XOnlyPublicKey implements XOnlyPublicKeyInterface
 
         $this->context = $context;
         $this->xonlyKey = $xonlyKey;
+        $this->hasSquareY = $hasSquareY;
     }
 
-    public function isPositive(): bool
+    public function hasSquareY(): bool
     {
-        if (null === $this->isPositive) {
-            $x = gmp_init(unpack("H*", $this->getBuffer()->getBinary())[1], 16);
-            $p = gmp_init("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F", 16);
-            // todo: is this === 1 or >= 0
-            // https://github.com/bitcoin-core/secp256k1/blob/1c131affd3c3402f269b56685bca63c631cfcf26/src/field_impl.h#L311
-            // https://github.com/sipa/bitcoin/commit/348b0e0e00c0ebe57c180e49b08edcecde5f9158#diff-607598e1a39100b1883191275b789557R278
-            $this->isPositive = gmp_jacobi($x, $p) === 1;
-        }
-        return $this->isPositive;
+        return $this->hasSquareY;
     }
 
     private function doVerifySchnorr(BufferInterface $msg32, SchnorrSignature $schnorrSig): bool
@@ -93,10 +87,11 @@ class XOnlyPublicKey implements XOnlyPublicKeyInterface
     {
         $pubkey = $this->clonePubkey();
         $tweaked = null;
-        if (!secp256k1_xonly_pubkey_tweak_add($this->context, $tweaked, $pubkey, $tweak32->getBinary())) {
+        $hasSquareY = null;
+        if (!secp256k1_xonly_pubkey_tweak_add($this->context, $tweaked, $hasSquareY, $pubkey, $tweak32->getBinary())) {
             throw new \RuntimeException("failed to tweak pubkey");
         }
-        return new XOnlyPublicKey($this->context, $pubkey);
+        return new XOnlyPublicKey($this->context, $pubkey, (bool) $hasSquareY);
     }
 
     public function getBuffer(): BufferInterface

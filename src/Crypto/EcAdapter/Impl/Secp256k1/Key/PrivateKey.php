@@ -188,13 +188,7 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     public function getXOnlyPublicKey(): XOnlyPublicKeyInterface
     {
-        $context = $this->ecAdapter->getContext();
-        $xonlyPubKey = null;
-        if (1 !== secp256k1_xonly_pubkey_create($context, $xonlyPubKey, $this->getBinary())) {
-            throw new \RuntimeException('Failed to create public key');
-        }
-        /** @var resource $xonlyPubKey */
-        return new XOnlyPublicKey($context, $xonlyPubKey);
+        return $this->getPublicKey()->asXOnlyPublicKey();
     }
 
     /**

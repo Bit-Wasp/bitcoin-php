@@ -7,7 +7,7 @@ use BitWasp\Buffertools\BufferInterface;
 
 interface XOnlyPublicKeyInterface
 {
-    public function isPositive(): bool;
+    public function hasSquareY(): bool;
     public function verifySchnorr(BufferInterface $msg32, SchnorrSignatureInterface $schnorrSig): bool;
     public function tweakAdd(BufferInterface $tweak32): XOnlyPublicKeyInterface;
     public function getBuffer(): BufferInterface;

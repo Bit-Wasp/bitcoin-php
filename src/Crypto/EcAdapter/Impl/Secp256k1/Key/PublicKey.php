@@ -10,6 +10,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -166,6 +167,19 @@ class PublicKey extends Key implements PublicKeyInterface
         }
 
         return new PublicKey($this->ecAdapter, $clone, $this->compressed);
+    }
+
+    public function asXOnlyPublicKey(): XOnlyPublicKeyInterface
+    {
+        $context = $this->ecAdapter->getContext();
+        $xonlyPubKey = null;
+        $hasSquareY = null;
+        if (1 !== secp256k1_xonly_pubkey_from_pubkey($context, $xonlyPubKey, $hasSquareY, $this->pubkey_t)) {
+            throw new \RuntimeException("Failed to convert pubkey to xonly pubkey");
+        }
+
+        /** @var resource $xonlyPubKey */
+        return new XOnlyPublicKey($context, $xonlyPubKey, (bool) $hasSquareY);
     }
 
     /**
