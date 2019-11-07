@@ -2,14 +2,14 @@
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Key;
 
-
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\SchnorrSignature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SchnorrSignatureInterface;
+use BitWasp\Bitcoin\Serializable;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
-class XOnlyPublicKey implements XOnlyPublicKeyInterface
+class XOnlyPublicKey extends Serializable implements XOnlyPublicKeyInterface
 {
     /**
      * @var resource
@@ -91,7 +91,7 @@ class XOnlyPublicKey implements XOnlyPublicKeyInterface
         if (!secp256k1_xonly_pubkey_tweak_add($this->context, $tweaked, $hasSquareY, $pubkey, $tweak32->getBinary())) {
             throw new \RuntimeException("failed to tweak pubkey");
         }
-        return new XOnlyPublicKey($this->context, $pubkey, (bool) $hasSquareY);
+        return new XOnlyPublicKey($this->context, $tweaked, (bool) $hasSquareY);
     }
 
     public function getBuffer(): BufferInterface

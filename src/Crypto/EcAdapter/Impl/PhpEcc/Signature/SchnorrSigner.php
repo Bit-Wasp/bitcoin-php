@@ -1,12 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PrivateKey;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\XOnlyPublicKey;
+use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class SchnorrSigner
@@ -24,22 +24,30 @@ class SchnorrSigner
     /**
      * @param PrivateKey $privateKey
      * @param BufferInterface $message32
-     * @return Signature
+     * @return SchnorrSignature
+     * @throws \Exception
      */
-    public function sign(PrivateKey $privateKey, BufferInterface $message32): Signature
+    public function sign(PrivateKey $privateKey, BufferInterface $message32): SchnorrSignature
     {
         $G = $this->adapter->getGenerator();
         $n = $G->getOrder();
-        $k = $this->hashPrivateData($privateKey, $message32, $n);
+        $d = $privateKey->getSecret();
+        $P = $privateKey->getXOnlyPublicKey();
+        if (!$P->hasSquareY()) {
+            $d = gmp_sub($n, $d);
+        }
+        $k = $this->hashPrivateData($d, $message32, $n);
+        if (gmp_cmp($k, 0) === 0) {
+            throw new \RuntimeException("unable to produce signature");
+        }
         $R = $G->mul($k);
-
-        if (gmp_cmp(gmp_jacobi($R->getY(), $G->getCurve()->getPrime()), 1) !== 0) {
-            $k = gmp_sub($G->getOrder(), $k);
+        if (gmp_jacobi($R->getY(), $G->getCurve()->getPrime()) !== 1) {
+            $k = gmp_sub($n, $k);
         }
 
-        $e = $this->hashPublicData($R->getX(), $privateKey->getPublicKey(), $message32, $n);
-        $s = gmp_mod(gmp_add($k, gmp_mod(gmp_mul($e, $privateKey->getSecret()), $n)), $n);
-        return new Signature($this->adapter, $R->getX(), $s);
+        $e = $this->hashPublicData($R->getX(), $privateKey->getXOnlyPublicKey(), $message32, $n);
+        $s = gmp_mod(gmp_add($k, gmp_mod(gmp_mul($e, $d), $n)), $n);
+        return new SchnorrSignature($R->getX(), $s);
     }
 
     /**
@@ -52,52 +60,54 @@ class SchnorrSigner
     }
 
     /**
-     * @param PrivateKey $privateKey
+     * @param \GMP $secret
      * @param BufferInterface $message32
      * @param \GMP $n
      * @return \GMP
+     * @throws \Exception
      */
-    private function hashPrivateData(PrivateKey $privateKey, BufferInterface $message32, \GMP $n): \GMP
+    private function hashPrivateData(\GMP $secret, BufferInterface $message32, \GMP $n): \GMP
     {
-        $hasher = hash_init('sha256');
-        hash_update($hasher, $this->tob32($privateKey->getSecret()));
-        hash_update($hasher, $message32->getBinary());
-        return gmp_mod(gmp_init(hash_final($hasher, false), 16), $n);
+        $hash = Hash::taggedSha256("BIPSchnorrDerive", new Buffer($this->tob32($secret) . $message32->getBinary()));
+        return gmp_mod($hash->getGmp(), $n);
     }
 
     /**
      * @param \GMP $Rx
-     * @param PublicKey $publicKey
+     * @param XOnlyPublicKey $publicKey
      * @param BufferInterface $message32
      * @param \GMP $n
      * @param string|null $rxBytes
      * @return \GMP
+     * @throws \Exception
      */
-    private function hashPublicData(\GMP $Rx, PublicKey $publicKey, BufferInterface $message32, \GMP $n, string &$rxBytes = null): \GMP
+    private function hashPublicData(\GMP $Rx, XOnlyPublicKey $publicKey, BufferInterface $message32, \GMP $n, string &$rxBytes = null): \GMP
     {
-        $hasher = hash_init('sha256');
         $rxBytes = $this->tob32($Rx);
-        hash_update($hasher, $rxBytes);
-        hash_update($hasher, $publicKey->getBinary());
-        hash_update($hasher, $message32->getBinary());
-        return gmp_mod(gmp_init(hash_final($hasher, false), 16), $n);
+        $hash = Hash::taggedSha256("BIPSchnorr", new Buffer($rxBytes . $publicKey->getBinary() . $message32->getBinary()));
+        return gmp_mod(gmp_init($hash->getHex(), 16), $n);
     }
 
-    public function verify(BufferInterface $message32, PublicKey $publicKey, Signature $signature): bool
+    public function verify(BufferInterface $msg32, XOnlyPublicKey $publicKey, SchnorrSignature $signature): bool
     {
         $G = $this->adapter->getGenerator();
         $n = $G->getOrder();
         $p = $G->getCurve()->getPrime();
 
-        if (gmp_cmp($signature->getR(), $p) >= 0 || gmp_cmp($signature->getR(), $n) >= 0) {
+        $r = $signature->getR();
+        $s = $signature->getS();
+        if (gmp_cmp($r, $p) >= 0 || gmp_cmp($s, $n) >= 0) {
             return false;
         }
 
-        $RxBytes = null;
-        $e = $this->hashPublicData($signature->getR(), $publicKey, $message32, $n, $RxBytes);
-        $R = $G->mul($signature->getS())->add($publicKey->tweakMul(gmp_sub($G->getOrder(), $e))->getPoint());
+        if (gmp_jacobi($publicKey->getPoint()->getY(), $p) !== 1) {
+            throw new \RuntimeException("public key wrong has_square_y");
+        }
 
-        $jacobiNotOne = gmp_cmp(gmp_jacobi($R->getY(), $p), 1) !== 0;
+        $RxBytes = null;
+        $e = $this->hashPublicData($r, $publicKey, $msg32, $n, $RxBytes);
+        $R = $G->mul($s)->add($publicKey->getPoint()->mul(gmp_sub($n, $e)));
+        $jacobiNotOne = gmp_jacobi($R->getY(), $p) !== 1;
         $rxNotEquals = !hash_equals($RxBytes, $this->tob32($R->getX()));
         if ($jacobiNotOne || $rxNotEquals) {
             return false;

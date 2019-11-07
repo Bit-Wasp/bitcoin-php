@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key\PrivateKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\SchnorrSigner;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\Signature;
@@ -120,7 +121,8 @@ class PrivateKey extends Key implements PrivateKeyInterface
 
     public function signSchnorr(BufferInterface $msg32): SchnorrSignatureInterface
     {
-        throw new \RuntimeException("not implemented");
+        $schnorr = new SchnorrSigner($this->ecAdapter);
+        return $schnorr->sign($this, $msg32);
     }
 
     /**

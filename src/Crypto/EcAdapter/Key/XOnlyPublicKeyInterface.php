@@ -3,9 +3,10 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SchnorrSignatureInterface;
+use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Buffertools\BufferInterface;
 
-interface XOnlyPublicKeyInterface
+interface XOnlyPublicKeyInterface extends SerializableInterface
 {
     public function hasSquareY(): bool;
     public function verifySchnorr(BufferInterface $msg32, SchnorrSignatureInterface $schnorrSig): bool;

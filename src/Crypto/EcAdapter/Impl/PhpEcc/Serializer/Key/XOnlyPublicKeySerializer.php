@@ -3,8 +3,10 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\XOnlyPublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\XOnlyPublicKeySerializerInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
@@ -22,13 +24,19 @@ class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
         $this->ecAdapter = $ecAdapter;
     }
 
+    private function doSerialize(XOnlyPublicKey $publicKey): BufferInterface
+    {
+        $x = $publicKey->getPoint()->getX();
+        return Buffer::int(gmp_strval($x), 32);
+    }
+
     /**
      * @param XOnlyPublicKeyInterface $publicKey
      * @return BufferInterface
      */
     public function serialize(XOnlyPublicKeyInterface $publicKey): BufferInterface
     {
-        throw new \RuntimeException("not implemented");
+        return $this->doSerialize($publicKey);
     }
 
     /**
@@ -37,6 +45,9 @@ class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
      */
     public function parse(BufferInterface $buffer): XOnlyPublicKeyInterface
     {
-        throw new \RuntimeException("not implemented");
+        if ($buffer->getSize() !== 32) {
+            throw new \RuntimeException("incorrect size");
+        }
+        $x = $buffer->getGmp();
     }
 }

@@ -13,8 +13,11 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Crypto\Signature\Signer;
+use Mdanter\Ecc\Exception\SquareRootException;
+use Mdanter\Ecc\Math\NumberTheory;
 use Mdanter\Ecc\Primitives\CurveFpInterface;
 use Mdanter\Ecc\Primitives\GeneratorPoint;
+use Mdanter\Ecc\Primitives\Point;
 use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\Key\PublicKeyInterface
@@ -123,11 +126,34 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
         return new PublicKey($this->ecAdapter, $point, $this->compressed);
     }
 
+    private function liftX(\GMP $x, PointInterface &$point = null): bool
+    {
+        $curve = $this->getCurve();
+        $xCubed = gmp_powm($x, 3, $curve->getPrime());
+        $v = gmp_add($xCubed, gmp_add(
+            gmp_mul($curve->getA(), $x),
+            $curve->getB()
+        ));
+        $math = $this->ecAdapter->getMath();
+        $nt = new NumberTheory($math);
+        try {
+            $y = $nt->squareRootModP($v, $curve->getPrime());
+            $point = new Point($math, $curve, $x, $y, $this->getGenerator()->getOrder());
+            return true;
+        } catch (SquareRootException $e) {
+            return false;
+        }
+    }
+
     public function asXOnlyPublicKey(): XOnlyPublicKeyInterface
     {
         // todo: check this, see Secp version
-        $hasSquareY = gmp_jacobi($this->getPoint()->getY(), $this->getCurve()->getPrime()) >= 0;
-        return new XOnlyPublicKey($this->ecAdapter, $this->point, $hasSquareY);
+        $hasSquareY = gmp_jacobi($this->point->getY(), $this->getCurve()->getPrime()) >= 0;
+        $point = null;
+        if (!$this->liftX($this->point->getX(), $point)) {
+            throw new \RuntimeException("point has no square root");
+        }
+        return new XOnlyPublicKey($this->ecAdapter, $point, $hasSquareY);
     }
 
     /**
