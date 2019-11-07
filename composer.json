@@ -15,7 +15,10 @@
     "psr-4": {
       "BitWasp\\Bitcoin\\": "src/"
     },
-    "files": ["src/Script/functions.php"]
+    "files": [
+      "src/Script/functions.php",
+      "src/Script/sighash_functions.php"
+    ]
   },
   "autoload-dev": {
     "psr-4": {

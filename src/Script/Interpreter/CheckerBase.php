@@ -14,6 +14,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SchnorrSignatureSerial
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Locktime;
+use BitWasp\Bitcoin\Script\PrecomputedData;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
@@ -89,6 +90,11 @@ abstract class CheckerBase
     protected $sigHashOptionalBits = SigHash::ANYONECANPAY;
 
     /**
+     * @var PrecomputedData
+     */
+    protected $precomputedData;
+
+    /**
      * CheckerBase constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
@@ -119,12 +125,9 @@ abstract class CheckerBase
         $this->amount = $amount;
     }
 
-    public function setSpentOutputs(array $txOuts)
+    public function setPrecomputedData(PrecomputedData $precomputedData)
     {
-        if (count($txOuts) !== count($this->transaction->getInputs())) {
-            throw new \RuntimeException("number of spent txouts should equal number of inputs");
-        }
-        $this->spentOutputs = $txOuts;
+        $this->precomputedData = $precomputedData;
     }
 
     /**
@@ -274,9 +277,8 @@ abstract class CheckerBase
     {
         $cacheCheck = $sigVersion . $sigHashType;
         if (!isset($this->schnorrSigHashCache[$cacheCheck])) {
-            $hasher = new TaprootHasher($this->transaction, $this->amount, $this->spentOutputs);
-
-            $hash = $hasher->calculate($this->spentOutputs[$this->nInput]->getScript(), $this->nInput, $sigHashType);
+            $hasher = new TaprootHasher($this->transaction, $this->amount, $this->precomputedData);
+            $hash = $hasher->calculate($this->precomputedData->getSpentOutputs()[$this->nInput]->getScript(), $this->nInput, $sigHashType);
             $this->schnorrSigHashCache[$cacheCheck] = $hash->getBinary();
         } else {
             $hash = new Buffer($this->schnorrSigHashCache[$cacheCheck], 32);
