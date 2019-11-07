@@ -182,7 +182,8 @@ class Interpreter implements InterpreterInterface
         } elseif ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
             return false;
         } else {
-            return false;
+            // Unknown versions are always 'valid' to permit future soft forks
+            return true;
         }
 
         $mainStack = new Stack();
