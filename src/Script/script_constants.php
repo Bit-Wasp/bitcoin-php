@@ -1,0 +1,4 @@
+<?php
+
+
+const VALIDATION_WEIGHT_OFFSET = 50;

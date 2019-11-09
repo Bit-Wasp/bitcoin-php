@@ -223,6 +223,9 @@ class Interpreter implements InterpreterInterface
 
         $mainStack = new Stack();
         foreach ($witness as $value) {
+            if ($value->getSize() > self::MAX_SCRIPT_ELEMENT_SIZE) {
+                return false;
+            }
             $mainStack->push($value);
         }
 
