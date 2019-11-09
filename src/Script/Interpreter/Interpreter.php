@@ -194,10 +194,41 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
+     * @param ScriptWitnessInterface $witness
+     * @param ScriptInterface $script
+     * @param int $sigVersion
+     * @param int $flags
+     * @param CheckerBase $checker
+     * @return bool
+     */
+    private function executeWitnessProgram(ScriptWitnessInterface $witness, ScriptInterface $script, int $sigVersion, int $flags, CheckerBase $checker): bool
+    {
+        $mainStack = new Stack();
+        foreach ($witness as $value) {
+            $mainStack->push($value);
+        }
+
+        if (!$this->evaluate($script, $mainStack, $sigVersion, $flags, $checker)) {
+            return false;
+        }
+
+        if ($mainStack->count() !== 1) {
+            return false;
+        }
+
+        if (!$this->castToBool($mainStack->bottom())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param WitnessProgram $witnessProgram
      * @param ScriptWitnessInterface $scriptWitness
      * @param int $flags
      * @param CheckerBase $checker
+     * @param bool $isP2sh
      * @return bool
      */
     private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, CheckerBase $checker, bool $isP2sh): bool
@@ -205,34 +236,36 @@ class Interpreter implements InterpreterInterface
         $witnessCount = count($scriptWitness);
 
         if ($witnessProgram->getVersion() === 0) {
-            $buffer = $witnessProgram->getProgram();
-            if ($buffer->getSize() === 32) {
+            $program = $witnessProgram->getProgram();
+            if ($program->getSize() === 32) {
                 // Version 0 segregated witness program: SHA256(Script) in program, Script + inputs in witness
                 if ($witnessCount === 0) {
                     // Must contain script at least
                     return false;
                 }
 
-                $sigVersion = SigHash::V1;
                 $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
-                $stackValues = $scriptWitness->slice(0, -1);
-                if (!$buffer->equals($scriptPubKey->getWitnessScriptHash())) {
+                /** @var ScriptWitnessInterface $stack */
+                $stack = $scriptWitness->slice(0, -1);
+                if (!$program->equals($scriptPubKey->getWitnessScriptHash())) {
                     return false;
                 }
-            } elseif ($buffer->getSize() === 20) {
+                return $this->executeWitnessProgram($stack, $scriptPubKey, SigHash::V1, $flags, $checker);
+            } elseif ($program->getSize() === 20) {
                 // Version 0 special case for pay-to-pubkeyhash
                 if ($witnessCount !== 2) {
                     // 2 items in witness - <signature> <pubkey>
                     return false;
                 }
 
-                $sigVersion = SigHash::V1;
-                $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($buffer);
-                $stackValues = $scriptWitness;
+                $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($program);
+                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::V1, $flags, $checker);
             } else {
                 return false;
             }
-        } else if ($witnessProgram->getVersion() === 1 && $witnessProgram->getProgram()->getSize() === 32 && !$isP2sh) {
+        }
+
+        if ($witnessProgram->getVersion() === 1 && $witnessProgram->getProgram()->getSize() === 32 && !$isP2sh) {
             if (!($flags & self::VERIFY_TAPROOT)) {
                 return true;
             }
@@ -280,36 +313,17 @@ class Interpreter implements InterpreterInterface
                 if (!$this->verifyTaprootCommitment($control, $witnessProgram->getProgram(), $scriptPubKey, $leafHash)) {
                     return false;
                 }
-                $sigVersion = SigHash::TAPSCRIPT;
-                $stackValues = $scriptWitness->all();
 
                 // return true at this stage, need further work to proceed
-                return true;
+                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::TAPSCRIPT, $flags, $checker);
             }
-        } elseif ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
-            return false;
-        } else {
-            // Unknown versions are always 'valid' to permit future soft forks
-            return true;
         }
 
-        $mainStack = new Stack();
-        foreach ($stackValues as $value) {
-            $mainStack->push($value);
-        }
-
-        if (!$this->evaluate($scriptPubKey, $mainStack, $sigVersion, $flags, $checker)) {
+        if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
             return false;
         }
 
-        if ($mainStack->count() !== 1) {
-            return false;
-        }
-
-        if (!$this->castToBool($mainStack->bottom())) {
-            return false;
-        }
-
+        // Return true to allow future softforks
         return true;
     }
 
