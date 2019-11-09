@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Crypto\Hash;
+use BitWasp\Bitcoin\Script\ExecutionContext;
 use BitWasp\Bitcoin\Script\PrecomputedData;
 use BitWasp\Bitcoin\Script\ScriptInterface;
-use BitWasp\Bitcoin\Script\ScriptWitness;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializerInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
@@ -27,7 +26,7 @@ class TaprootHasher extends SigHash
     /**
      * @var int
      */
-    protected $amount;
+    protected $sigVersion;
 
     /**
      * @var TransactionOutputSerializer
@@ -40,6 +39,11 @@ class TaprootHasher extends SigHash
     protected $outpointSerializer;
 
     /**
+     * @var ExecutionContext
+     */
+    protected $execContext;
+
+    /**
      * @var PrecomputedData
      */
     protected $precomputedData;
@@ -49,24 +53,30 @@ class TaprootHasher extends SigHash
     /**
      * V1Hasher constructor.
      * @param TransactionInterface $transaction
-     * @param int $amount
+     * @param int $sigVersion
      * @param PrecomputedData $precomputedData
+     * @param ExecutionContext $execContext
      * @param OutPointSerializerInterface $outpointSerializer
      * @param TransactionOutputSerializer|null $outputSerializer
      */
     public function __construct(
         TransactionInterface $transaction,
-        int $amount,
+        int $sigVersion,
         PrecomputedData $precomputedData,
+        ExecutionContext $execContext,
         OutPointSerializerInterface $outpointSerializer = null,
         TransactionOutputSerializer $outputSerializer = null
     ) {
-        $this->amount = $amount;
+        $this->sigVersion = $sigVersion;
+        $this->execContext = $execContext;
         $this->precomputedData = $precomputedData;
         $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer();
         $this->outpointSerializer = $outpointSerializer ?: new OutPointSerializer();
         if (!($precomputedData->isReady() && $precomputedData->haveSpentOutputs())) {
             throw new \RuntimeException("precomputed data not ready");
+        }
+        if (!$execContext->isAnnexCheckDone()) {
+            throw new \RuntimeException("annex check must be already complete");
         }
         parent::__construct($transaction);
     }
@@ -114,15 +124,11 @@ class TaprootHasher extends SigHash
 
         $scriptPubKey = $this->precomputedData->getSpentOutputs()[$inputToSign]->getScript()->getBuffer();
         $spendType = 0;
-        $witnesses = $this->tx->getWitnesses();
-
-        // todo: does back() == bottom()?
-        $witness = new ScriptWitness();
-        if (array_key_exists($inputToSign, $witnesses)) {
-            $witness = $witnesses[$inputToSign];
-            if ($witness->count() > 1 && $witness->bottom()->getSize() > 0 && ord($witness->bottom()->getBinary()[0]) === self::TAPROOT_ANNEX_BYTE) {
-                $spendType |= 1;
-            }
+        if ($this->execContext->hasAnnex()) {
+            $spendType |= 1;
+        }
+        if ($this->sigVersion === SigHash::TAPSCRIPT) {
+            $spendType |= 2;
         }
 
         $ss .= pack('C', $spendType);
@@ -135,8 +141,8 @@ class TaprootHasher extends SigHash
         } else {
             $ss .= pack('V', $inputToSign);
         }
-        if (($spendType & 2) != 0) {
-            $ss .= Hash::sha256($witness->bottom())->getBinary();
+        if ($this->execContext->hasAnnex()) {
+            $ss .= $this->execContext->getAnnexHash()->getBinary();
         }
 
         if ($outputType == SigHash::SINGLE) {
@@ -145,6 +151,13 @@ class TaprootHasher extends SigHash
                 throw new \RuntimeException("sighash single input > #outputs");
             }
             $ss .= Hash::sha256($this->outputSerializer->serialize($outputs[$inputToSign]))->getBinary();
+        }
+
+        if ($this->sigVersion == SigHash::TAPSCRIPT) {
+            assert($this->execContext->hasTapLeaf());
+            $ss .= $this->execContext->getTapLeafHash()->getBinary();
+            $ss .= "\x00"; // key version
+            $ss .= pack("V", $this->execContext->getCodeSeparatorPosition());
         }
 
         return Hash::taggedSha256('TapSighash', new Buffer($ss));

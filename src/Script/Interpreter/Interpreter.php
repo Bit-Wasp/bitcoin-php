@@ -12,6 +12,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
+use BitWasp\Bitcoin\Script\ExecutionContext;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -60,6 +61,8 @@ class Interpreter implements InterpreterInterface
         Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
 
+    const TAPROOT_LEAF_MASK = 0xfe;
+    const TAPROOT_LEAF_TAPSCRIPT = 0xc0;
     const TAPROOT_CONTROL_BASE_SIZE = 33;
     const TAPROOT_CONTROL_BRANCH_SIZE = 32;
     const TAPROOT_CONTROL_MAX_DEPTH = 128;
@@ -199,16 +202,17 @@ class Interpreter implements InterpreterInterface
      * @param int $sigVersion
      * @param int $flags
      * @param CheckerBase $checker
+     * @param ExecutionContext $execContext
      * @return bool
      */
-    private function executeWitnessProgram(ScriptWitnessInterface $witness, ScriptInterface $script, int $sigVersion, int $flags, CheckerBase $checker): bool
+    private function executeWitnessProgram(ScriptWitnessInterface $witness, ScriptInterface $script, int $sigVersion, int $flags, CheckerBase $checker, ExecutionContext $execContext): bool
     {
         $mainStack = new Stack();
         foreach ($witness as $value) {
             $mainStack->push($value);
         }
 
-        if (!$this->evaluate($script, $mainStack, $sigVersion, $flags, $checker)) {
+        if (!$this->evaluate($script, $mainStack, $sigVersion, $flags, $checker, $execContext)) {
             return false;
         }
 
@@ -234,6 +238,7 @@ class Interpreter implements InterpreterInterface
     private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, CheckerBase $checker, bool $isP2sh): bool
     {
         $witnessCount = count($scriptWitness);
+        $execContext = new ExecutionContext();
 
         if ($witnessProgram->getVersion() === 0) {
             $program = $witnessProgram->getProgram();
@@ -250,7 +255,7 @@ class Interpreter implements InterpreterInterface
                 if (!$program->equals($scriptPubKey->getWitnessScriptHash())) {
                     return false;
                 }
-                return $this->executeWitnessProgram($stack, $scriptPubKey, SigHash::V1, $flags, $checker);
+                return $this->executeWitnessProgram($stack, $scriptPubKey, SigHash::V1, $flags, $checker, $execContext);
             } elseif ($program->getSize() === 20) {
                 // Version 0 special case for pay-to-pubkeyhash
                 if ($witnessCount !== 2) {
@@ -259,7 +264,7 @@ class Interpreter implements InterpreterInterface
                 }
 
                 $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($program);
-                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::V1, $flags, $checker);
+                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::V1, $flags, $checker, $execContext);
             } else {
                 return false;
             }
@@ -277,17 +282,17 @@ class Interpreter implements InterpreterInterface
                 if (($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_ANNEX)) {
                     return false;
                 }
+                $execContext->setAnnexHash(Hash::sha256($annex));
                 // remove annex from witness
                 $scriptWitness = $scriptWitness->slice(0, -1);
                 $witnessCount--;
             }
+            $execContext->setAnnexCheckDone();
 
             if ($witnessCount === 1) {
                 // key spend path - doesn't use the interpreter, directly checks signature
                 $signature = $scriptWitness[count($scriptWitness) - 1];
-                $key = $witnessProgram->getProgram();
-
-                if (!$checker->checkSigSchnorr($signature, $key, SigHash::TAPROOT)) {
+                if (!$checker->checkSigSchnorr($signature, $witnessProgram->getProgram(), SigHash::TAPROOT, $execContext)) {
                     return false;
                 }
                 return true;
@@ -313,9 +318,15 @@ class Interpreter implements InterpreterInterface
                 if (!$this->verifyTaprootCommitment($control, $witnessProgram->getProgram(), $scriptPubKey, $leafHash)) {
                     return false;
                 }
+                $execContext->setTapLeafHash($leafHash);
+
+                if ((ord($control->getBinary()[0]) & self::TAPROOT_LEAF_MASK) == self::TAPROOT_LEAF_TAPSCRIPT) {
+                    // #Elements + [len(element) || element] for n
+                    $execContext->setValidationWeightLeft($scriptWitness->getBuffer()->getSize());
+                }
 
                 // return true at this stage, need further work to proceed
-                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::TAPSCRIPT, $flags, $checker);
+                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::TAPSCRIPT, $flags, $checker, $execContext);
             }
         }
 
@@ -482,7 +493,7 @@ class Interpreter implements InterpreterInterface
      * @param CheckerBase $checker
      * @return bool
      */
-    public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, CheckerBase $checker): bool
+    public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, CheckerBase $checker, ExecutionContext $execContext = null): bool
     {
         $hashStartPos = 0;
         $opCount = 0;
@@ -997,7 +1008,7 @@ class Interpreter implements InterpreterInterface
 
                             $scriptCode = new Script($script->getBuffer()->slice($hashStartPos));
 
-                            $success = $checker->checkSig($scriptCode, $vchSig, $vchPubKey, $sigVersion, $flags);
+                            $success = $checker->checkSig($scriptCode, $vchSig, $vchPubKey, $sigVersion, $flags, $execContext);
 
                             $mainStack->pop();
                             $mainStack->pop();

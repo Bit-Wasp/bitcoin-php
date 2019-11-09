@@ -14,6 +14,7 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SchnorrSignatureSerial
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Locktime;
+use BitWasp\Bitcoin\Script\ExecutionContext;
 use BitWasp\Bitcoin\Script\PrecomputedData;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
@@ -273,11 +274,11 @@ abstract class CheckerBase
         }
     }
 
-    public function getTaprootSigHash(int $sigHashType, int $sigVersion): BufferInterface
+    public function getTaprootSigHash(int $sigHashType, int $sigVersion, ExecutionContext $execContext): BufferInterface
     {
         $cacheCheck = $sigVersion . $sigHashType;
         if (!isset($this->schnorrSigHashCache[$cacheCheck])) {
-            $hasher = new TaprootHasher($this->transaction, $this->amount, $this->precomputedData);
+            $hasher = new TaprootHasher($this->transaction, $sigVersion, $this->precomputedData, $execContext);
             $hash = $hasher->calculate($this->precomputedData->getSpentOutputs()[$this->nInput]->getScript(), $this->nInput, $sigHashType);
             $this->schnorrSigHashCache[$cacheCheck] = $hash->getBinary();
         } else {
@@ -287,7 +288,7 @@ abstract class CheckerBase
         return $hash;
     }
 
-    public function checkSigSchnorr(BufferInterface $sig64, BufferInterface $key32, int $sigVersion): bool
+    public function checkSigSchnorr(BufferInterface $sig64, BufferInterface $key32, int $sigVersion, ExecutionContext $execContext): bool
     {
         if ($sig64->getSize() === 0) {
             return false;
@@ -312,7 +313,7 @@ abstract class CheckerBase
         try {
             $sig = $this->schnorrSigSerializer->parse($sig64);
             $pubKey = $this->xonlyKeySerializer->parse($key32);
-            $sigHash = $this->getTaprootSigHash($hashType, $sigVersion);
+            $sigHash = $this->getTaprootSigHash($hashType, $sigVersion, $execContext);
             return $pubKey->verifySchnorr($sigHash, $sig);
         } catch (\Exception $e) {
             return false;
