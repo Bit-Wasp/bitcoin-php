@@ -62,6 +62,7 @@ class Interpreter implements InterpreterInterface
         Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
 
+    const MAX_SCRIPT_SIZE = 10000;
     const MAX_STACK_SIZE = 1000;
     const TAPROOT_LEAF_MASK = 0xfe;
     const TAPROOT_LEAF_TAPSCRIPT = 0xc0;
@@ -517,7 +518,8 @@ class Interpreter implements InterpreterInterface
         $minimal = ($flags & self::VERIFY_MINIMALDATA) !== 0;
         $parser = $script->getScriptParser();
 
-        if ($script->getBuffer()->getSize() > 10000) {
+        // script limit applies to base, and v0 segwit, but not tapscript
+        if (($sigVersion === SigHash::V0 || $sigVersion === SigHash::V1) && $script->getBuffer()->getSize() > self::MAX_SCRIPT_SIZE) {
             return false;
         }
 
