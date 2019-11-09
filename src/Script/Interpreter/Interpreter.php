@@ -539,9 +539,12 @@ class Interpreter implements InterpreterInterface
                     throw new \RuntimeException('Error - push size');
                 }
 
-                // OP_RESERVED should not count towards opCount
-                if ($opCode > Opcodes::OP_16 && ++$opCount) {
-                    $this->checkOpcodeCount($opCount);
+                // non-push opcode limit applies to base & v0 segwit, but not tapscript
+                if ($sigVersion === SigHash::V0 || $sigVersion === SigHash::V1) {
+                    // OP_RESERVED should not count towards opCount
+                    if ($opCode > Opcodes::OP_16 && ++$opCount) {
+                        $this->checkOpcodeCount($opCount);
+                    }
                 }
 
                 if (in_array($opCode, $this->disabledOps, true)) {
