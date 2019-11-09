@@ -523,6 +523,11 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
+        // stack limit applies to initial stack under tapscript
+        if ($sigVersion === SigHash::TAPSCRIPT && $mainStack->count() > self::MAX_STACK_SIZE) {
+            return false;
+        }
+
         try {
             foreach ($parser as $operation) {
                 $opCode = $operation->getOp();
