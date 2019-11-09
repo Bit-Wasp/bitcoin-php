@@ -80,6 +80,8 @@ interface InterpreterInterface
 
     const VERIFY_DISCOURAGE_UPGRADABLE_ANNEX = 1 << 19;
 
+    const VERIFY_DISCOURAGE_OP_SUCCESS = 1 << 20;
+
     // Verify CHECKSEQUENCEVERIFY
     //
     // See BIP112 for details.

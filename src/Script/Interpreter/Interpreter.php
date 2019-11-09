@@ -27,6 +27,7 @@ use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
+use function BitWasp\Bitcoin\Script\isOPSuccess;
 
 class Interpreter implements InterpreterInterface
 {
@@ -61,6 +62,7 @@ class Interpreter implements InterpreterInterface
         Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
 
+    const MAX_STACK_SIZE = 1000;
     const TAPROOT_LEAF_MASK = 0xfe;
     const TAPROOT_LEAF_TAPSCRIPT = 0xc0;
     const TAPROOT_CONTROL_BASE_SIZE = 33;
@@ -207,6 +209,17 @@ class Interpreter implements InterpreterInterface
      */
     private function executeWitnessProgram(ScriptWitnessInterface $witness, ScriptInterface $script, int $sigVersion, int $flags, CheckerBase $checker, ExecutionContext $execContext): bool
     {
+        if ($sigVersion === SigHash::TAPSCRIPT) {
+            foreach ($script->getScriptParser() as $operation) {
+                if (isOPSuccess($operation->getOp())) {
+                    if (($flags & self::VERIFY_DISCOURAGE_OP_SUCCESS)) {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+        }
+
         $mainStack = new Stack();
         foreach ($witness as $value) {
             $mainStack->push($value);
@@ -491,6 +504,7 @@ class Interpreter implements InterpreterInterface
      * @param int $sigVersion
      * @param int $flags
      * @param CheckerBase $checker
+     * @param ExecutionContext|null $execContext
      * @return bool
      */
     public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, CheckerBase $checker, ExecutionContext $execContext = null): bool
@@ -1126,7 +1140,7 @@ class Interpreter implements InterpreterInterface
                             throw new \RuntimeException('Opcode not found');
                     }
 
-                    if (count($mainStack) + count($altStack) > 1000) {
+                    if (count($mainStack) + count($altStack) > self::MAX_STACK_SIZE) {
                         throw new \RuntimeException('Invalid stack size, exceeds 1000');
                     }
                 }
