@@ -76,6 +76,10 @@ interface InterpreterInterface
 
     const VERIFY_NULLFAIL = 1 << 14;
 
+    const VERIFY_TAPROOT = 1 << 17;
+
+    const VERIFY_DISCOURAGE_UPGRADABLE_ANNEX = 1 << 19;
+
     // Verify CHECKSEQUENCEVERIFY
     //
     // See BIP112 for details.

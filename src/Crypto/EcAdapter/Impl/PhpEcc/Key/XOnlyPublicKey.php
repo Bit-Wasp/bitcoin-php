@@ -58,6 +58,14 @@ class XOnlyPublicKey extends Serializable implements XOnlyPublicKeyInterface
         return new XOnlyPublicKey($this->adapter, $newPoint, $hasSquareY);
     }
 
+    public function checkPayToContract(XOnlyPublicKeyInterface $base, BufferInterface $hash, bool $hasSquareY): bool
+    {
+        $pkExpected = $base->tweakAdd($hash);
+        /** @var XOnlyPublicKey $pkExpected */
+        return gmp_cmp($pkExpected->getPoint()->getX(), $this->point->getX()) === 0 &&
+            $pkExpected->hasSquareY() === $hasSquareY;
+    }
+
     public function getBuffer(): BufferInterface
     {
         return Buffer::int(gmp_strval($this->point->getX(), 10), 32);

@@ -6,6 +6,8 @@ namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\XOnlyPublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
@@ -19,9 +21,11 @@ use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
+use BitWasp\Bitcoin\Transaction\SignatureHash\TaprootHasher;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Buffertools;
 
 class Interpreter implements InterpreterInterface
 {
@@ -42,6 +46,11 @@ class Interpreter implements InterpreterInterface
     private $vchTrue;
 
     /**
+     * @var EcAdapterInterface
+     */
+    private $adapter;
+
+    /**
      * @var array
      */
     private $disabledOps = [
@@ -51,6 +60,11 @@ class Interpreter implements InterpreterInterface
         Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
 
+    const TAPROOT_CONTROL_BASE_SIZE = 33;
+    const TAPROOT_CONTROL_BRANCH_SIZE = 32;
+    const TAPROOT_CONTROL_MAX_DEPTH = 128;
+    const TAPROOT_CONTROL_MAX_SIZE = self::TAPROOT_CONTROL_BASE_SIZE + (self::TAPROOT_CONTROL_BRANCH_SIZE * self::TAPROOT_CONTROL_MAX_DEPTH);
+
     /**
      * @param EcAdapterInterface $ecAdapter
      */
@@ -58,6 +72,7 @@ class Interpreter implements InterpreterInterface
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->math = $ecAdapter->getMath();
+        $this->adapter = $ecAdapter;
         $this->vchFalse = new Buffer("", 0);
         $this->vchTrue = new Buffer("\x01", 1);
     }
@@ -145,13 +160,47 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
+     * Size of control must be validated before calling.
+     * @param BufferInterface $control
+     * @param BufferInterface $program
+     * @param BufferInterface $scriptPubKey
+     * @return bool
+     * @throws \Exception
+     */
+    private function verifyTaprootCommitment(BufferInterface $control, BufferInterface $program, BufferInterface $scriptPubKey, BufferInterface &$leafHash = null): bool
+    {
+        $m = ($control->getSize() - 33) / 32;
+        $p = $control->slice(1, 32);
+        /** @var XOnlyPublicKeySerializerInterface $xonlySer */
+        $xonlySer = EcSerializer::getSerializer(XOnlyPublicKeySerializerInterface::class, true, $this->adapter);
+        $P = $xonlySer->parse($p);
+        $Q = $xonlySer->parse($program);
+        $leafVersion = $control->slice(0, 1)->getInt() & 0xfe;
+
+        $leafData = new Buffer(pack("C", $leafVersion&0xfe) . Buffertools::numToVarIntBin($scriptPubKey->getSize()) . $scriptPubKey->getBinary());
+        $k = Hash::taggedSha256("TapLeaf", $leafData);
+        $leafHash = $k;
+        for ($i = 0; $i < $m; $i++) {
+            $begin = self::TAPROOT_CONTROL_BASE_SIZE+self::TAPROOT_CONTROL_BRANCH_SIZE*$i;
+            $ej = $control->slice($begin, $begin + self::TAPROOT_CONTROL_BRANCH_SIZE);
+            if (strcmp($k->getBinary(), $ej->getBinary()) >= 0) {
+                $k = Hash::taggedSha256("TapBranch", Buffertools::concat($ej, $k));
+            } else {
+                $k = Hash::taggedSha256("TapBranch", Buffertools::concat($k, $ej));
+            }
+        }
+        $t = Hash::taggedSha256("TapTweak", Buffertools::concat($p, $k));
+        return $Q->checkPayToContract($P, $t, ($control->getBinary()[0] & 1) == 1);
+    }
+
+    /**
      * @param WitnessProgram $witnessProgram
      * @param ScriptWitnessInterface $scriptWitness
      * @param int $flags
      * @param CheckerBase $checker
      * @return bool
      */
-    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, CheckerBase $checker): bool
+    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, CheckerBase $checker, bool $isP2sh): bool
     {
         $witnessCount = count($scriptWitness);
 
@@ -164,6 +213,7 @@ class Interpreter implements InterpreterInterface
                     return false;
                 }
 
+                $sigVersion = SigHash::V1;
                 $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
                 $stackValues = $scriptWitness->slice(0, -1);
                 if (!$buffer->equals($scriptPubKey->getWitnessScriptHash())) {
@@ -176,10 +226,65 @@ class Interpreter implements InterpreterInterface
                     return false;
                 }
 
+                $sigVersion = SigHash::V1;
                 $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($buffer);
                 $stackValues = $scriptWitness;
             } else {
                 return false;
+            }
+        } else if ($witnessProgram->getVersion() === 1 && $witnessProgram->getProgram()->getSize() === 32 && !$isP2sh) {
+            if (!($flags & self::VERIFY_TAPROOT)) {
+                return true;
+            }
+
+            if ($witnessCount === 0) {
+                return false;
+            } else if ($witnessCount >= 2 && $scriptWitness->bottom()->getSize() > 0 && ord($scriptWitness->bottom()->getBinary()[0]) === TaprootHasher::TAPROOT_ANNEX_BYTE) {
+                $annex = $scriptWitness->bottom();
+                if (($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_ANNEX)) {
+                    return false;
+                }
+                // remove annex from witness
+                $scriptWitness = $scriptWitness->slice(0, -1);
+                $witnessCount--;
+            }
+
+            if ($witnessCount === 1) {
+                // key spend path - doesn't use the interpreter, directly checks signature
+                $signature = $scriptWitness[count($scriptWitness) - 1];
+                $key = $witnessProgram->getProgram();
+
+                if (!$checker->checkSigSchnorr($signature, $key, SigHash::TAPROOT)) {
+                    return false;
+                }
+                return true;
+            } else {
+                // script spend path
+                // load control, and drop from end of witness
+                /** @var BufferInterface $control */
+                $control = $scriptWitness->bottom();
+                $scriptWitness = $scriptWitness->slice(0, -1);
+
+                // load scriptPubKey, and drop from end of witness
+                /** @var BufferInterface $control */
+                $scriptPubKey = $scriptWitness->bottom();
+                $scriptWitness = $scriptWitness->slice(0, -1);
+
+                if ($control->getSize() < self::TAPROOT_CONTROL_BASE_SIZE ||
+                    $control->getSize() > self::TAPROOT_CONTROL_MAX_SIZE ||
+                    (($control->getSize() - self::TAPROOT_CONTROL_BASE_SIZE) % self::TAPROOT_CONTROL_BRANCH_SIZE !== 0)) {
+                    return false;
+                }
+
+                $leafHash = null;
+                if (!$this->verifyTaprootCommitment($control, $witnessProgram->getProgram(), $scriptPubKey, $leafHash)) {
+                    return false;
+                }
+                $sigVersion = SigHash::TAPSCRIPT;
+                $stackValues = $scriptWitness->all();
+
+                // return true at this stage, need further work to proceed
+                return true;
             }
         } elseif ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
             return false;
@@ -193,7 +298,7 @@ class Interpreter implements InterpreterInterface
             $mainStack->push($value);
         }
 
-        if (!$this->evaluate($scriptPubKey, $mainStack, SigHash::V1, $flags, $checker)) {
+        if (!$this->evaluate($scriptPubKey, $mainStack, $sigVersion, $flags, $checker)) {
             return false;
         }
 
@@ -261,10 +366,9 @@ class Interpreter implements InterpreterInterface
                     return false;
                 }
 
-                if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
+                if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker, false)) {
                     return false;
                 }
-
                 $stack->resize(1);
             }
         }
@@ -307,7 +411,7 @@ class Interpreter implements InterpreterInterface
                         return false; // SCRIPT_ERR_WITNESS_MALLEATED_P2SH
                     }
 
-                    if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
+                    if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker, true)) {
                         return false;
                     }
 

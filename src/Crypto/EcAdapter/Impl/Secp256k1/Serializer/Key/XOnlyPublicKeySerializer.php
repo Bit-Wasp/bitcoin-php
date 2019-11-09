@@ -67,7 +67,8 @@ class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
         /** @var resource $xonlyPubkey */
         return new XOnlyPublicKey(
             $this->ecAdapter->getContext(),
-            $xonlyPubkey
+            $xonlyPubkey,
+            true
         );
     }
 }

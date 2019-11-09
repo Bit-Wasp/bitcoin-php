@@ -63,8 +63,8 @@ function SighashGetSpentAmountsHash(TransactionOutputSerializer $txOutSerializer
 {
     $amounts = [];
     $count = count($spentTxOuts);
-    for ($i = 0; $i < $count - 1; $i++) {
+    for ($i = 0; $i < $count; $i++) {
         $amounts[] = $spentTxOuts[$i]->getValue();
     }
-    return Hash::sha256(pack(str_repeat("P", $count), ...$amounts));
+    return Hash::sha256(new Buffer(pack(str_repeat("P", $count), ...$amounts)));
 }

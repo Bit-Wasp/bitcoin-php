@@ -8,6 +8,10 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\XOnlyPublicKeySerializerInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use Mdanter\Ecc\Exception\SquareRootException;
+use Mdanter\Ecc\Math\NumberTheory;
+use Mdanter\Ecc\Primitives\Point;
+use Mdanter\Ecc\Primitives\PointInterface;
 
 class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
 {
@@ -39,6 +43,26 @@ class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
         return $this->doSerialize($publicKey);
     }
 
+    private function liftX(\GMP $x, PointInterface &$point = null): bool
+    {
+        $generator = $this->ecAdapter->getGenerator();
+        $curve = $generator->getCurve();
+        $xCubed = gmp_powm($x, 3, $curve->getPrime());
+        $v = gmp_add($xCubed, gmp_add(
+            gmp_mul($curve->getA(), $x),
+            $curve->getB()
+        ));
+        $math = $this->ecAdapter->getMath();
+        $nt = new NumberTheory($math);
+        try {
+            $y = $nt->squareRootModP($v, $curve->getPrime());
+            $point = new Point($math, $curve, $x, $y, $generator->getOrder());
+            return true;
+        } catch (SquareRootException $e) {
+            return false;
+        }
+    }
+
     /**
      * @param BufferInterface $buffer
      * @return XOnlyPublicKeyInterface
@@ -49,5 +73,11 @@ class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
             throw new \RuntimeException("incorrect size");
         }
         $x = $buffer->getGmp();
+        $point = null;
+        // todo: review, might not need this
+        if (!$this->liftX($x, $point)) {
+            throw new \RuntimeException("No square root for this point");
+        }
+        return new XOnlyPublicKey($this->ecAdapter, $point, true);
     }
 }

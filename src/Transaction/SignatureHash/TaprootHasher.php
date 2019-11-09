@@ -44,6 +44,8 @@ class TaprootHasher extends SigHash
      */
     protected $precomputedData;
 
+    const TAPROOT_ANNEX_BYTE = 0x50;
+
     /**
      * V1Hasher constructor.
      * @param TransactionInterface $transaction
@@ -64,7 +66,7 @@ class TaprootHasher extends SigHash
         $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer();
         $this->outpointSerializer = $outpointSerializer ?: new OutPointSerializer();
         if (!($precomputedData->isReady() && $precomputedData->haveSpentOutputs())) {
-            throw new \RuntimeException("");
+            throw new \RuntimeException("precomputed data not ready");
         }
         parent::__construct($transaction);
     }
@@ -118,7 +120,7 @@ class TaprootHasher extends SigHash
         $witness = new ScriptWitness();
         if (array_key_exists($inputToSign, $witnesses)) {
             $witness = $witnesses[$inputToSign];
-            if ($witness->count() > 1 && $witness->bottom()->getSize() > 0 && ord($witness->bottom()->getBinary()[0]) === 0xff) {
+            if ($witness->count() > 1 && $witness->bottom()->getSize() > 0 && ord($witness->bottom()->getBinary()[0]) === self::TAPROOT_ANNEX_BYTE) {
                 $spendType |= 1;
             }
         }
