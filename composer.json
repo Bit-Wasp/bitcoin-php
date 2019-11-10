@@ -18,7 +18,7 @@
     "files": [
       "src/Script/functions.php",
       "src/Script/sighash_functions.php",
-      "src/Script/script_constants.php"
+      "src/Script/Interpreter/interpreter_constants.php"
     ]
   },
   "autoload-dev": {

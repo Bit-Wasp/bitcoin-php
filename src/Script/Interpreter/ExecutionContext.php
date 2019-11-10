@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace BitWasp\Bitcoin\Script;
+namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Buffertools\BufferInterface;
 
@@ -98,6 +98,14 @@ class ExecutionContext
     public function hasValidationWeightSet(): bool
     {
         return null !== $this->validationWeightLeft;
+    }
+
+    /**
+     * @return null|int
+     */
+    public function getValidationWeightLeft()
+    {
+        return $this->validationWeightLeft;
     }
 
     public function setValidationWeightLeft(int $weight)

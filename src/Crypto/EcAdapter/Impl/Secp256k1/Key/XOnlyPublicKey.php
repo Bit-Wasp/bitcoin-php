@@ -96,7 +96,10 @@ class XOnlyPublicKey extends Serializable implements XOnlyPublicKeyInterface
 
     private function doCheckPayToContract(XOnlyPublicKey $base, BufferInterface $hash, bool $negated): bool
     {
-        return secp256k1_xonly_pubkey_tweak_verify($this->context, $this->xonlyKey, (int) !$negated, $base->xonlyKey, $hash->getBinary());
+        if (1 !== secp256k1_xonly_pubkey_tweak_verify($this->context, $this->xonlyKey, (int) !$negated, $base->xonlyKey, $hash->getBinary())) {
+            return false;
+        }
+        return true;
     }
 
     public function checkPayToContract(XOnlyPublicKeyInterface $base, BufferInterface $hash, bool $hasSquareY): bool

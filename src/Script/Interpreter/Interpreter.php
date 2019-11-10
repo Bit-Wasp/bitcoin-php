@@ -12,7 +12,7 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\ExecutionContext;
+use BitWasp\Bitcoin\Script\Interpreter\ExecutionContext;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -196,7 +196,7 @@ class Interpreter implements InterpreterInterface
             }
         }
         $t = Hash::taggedSha256("TapTweak", Buffertools::concat($p, $k));
-        return $Q->checkPayToContract($P, $t, ($control->getBinary()[0] & 1) == 1);
+        return $Q->checkPayToContract($P, $t, (ord($control->getBinary()[0]) & 1) == 1);
     }
 
     /**
@@ -305,7 +305,6 @@ class Interpreter implements InterpreterInterface
                 $witnessCount--;
             }
             $execContext->setAnnexCheckDone();
-
             if ($witnessCount === 1) {
                 // key spend path - doesn't use the interpreter, directly checks signature
                 $signature = $scriptWitness[count($scriptWitness) - 1];
@@ -343,7 +342,7 @@ class Interpreter implements InterpreterInterface
                 }
 
                 // return true at this stage, need further work to proceed
-                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::TAPSCRIPT, $flags, $checker, $execContext);
+                return $this->executeWitnessProgram($scriptWitness, new Script($scriptPubKey), SigHash::TAPSCRIPT, $flags, $checker, $execContext);
             }
         }
 
@@ -502,6 +501,54 @@ class Interpreter implements InterpreterInterface
         return (bool) $ret;
     }
 
+    private function evalChecksigPreTapscript(BufferInterface $sig, BufferInterface $key, ScriptInterface $scriptPubKey, int $hashStartPos, int $flags, CheckerBase $checker, int $sigVersion, bool &$success): bool
+    {
+        assert($sigVersion === SigHash::V0 || $sigVersion === SigHash::V1);
+        $scriptCode = new Script($scriptPubKey->getBuffer()->slice($hashStartPos));
+        // encoding is checked in checker
+        $success = $checker->checkSig($scriptCode, $sig, $key, $sigVersion, $flags);
+        return true;
+    }
+
+    private function evalChecksigTapscript(BufferInterface $sig, BufferInterface $key, int $flags, CheckerBase $checker, int $sigVersion, ExecutionContext $execContext, bool &$success): bool
+    {
+        assert($sigVersion === SigHash::TAPSCRIPT);
+        $success = $sig->getSize() > 0;
+        if ($success) {
+            assert($execContext->hasValidationWeightSet());
+            $execContext->setValidationWeightLeft($execContext->getValidationWeightLeft() - VALIDATION_WEIGHT_OFFSET);
+            if ($execContext->getValidationWeightLeft() < 0) {
+                return false;
+            }
+        }
+        if ($key->getSize() === 0) {
+            return false;
+        } else if ($key->getSize() === 32) {
+            if ($success && !$checker->checkSigSchnorr($sig, $key, $sigVersion, $execContext)) {
+                return false;
+            }
+        } else {
+            if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_PUBKEYTYPE) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function evalChecksig(BufferInterface $sig, BufferInterface $key, ScriptInterface $scriptPubKey, int $hashStartPos, int $flags, CheckerBase $checker, int $sigVersion, ExecutionContext $execContext, bool &$success): bool
+    {
+        switch ($sigVersion) {
+            case SigHash::V0:
+            case SigHash::V1:
+                return $this->evalChecksigPreTapscript($sig, $key, $scriptPubKey, $hashStartPos, $flags, $checker, $sigVersion, $success);
+            case SigHash::TAPSCRIPT:
+                return $this->evalChecksigTapscript($sig, $key, $flags, $checker, $sigVersion, $execContext, $success);
+            case SigHash::TAPROOT:
+                break;
+        };
+        assert(false);
+    }
+
     /**
      * @param ScriptInterface $script
      * @param Stack $mainStack
@@ -513,6 +560,9 @@ class Interpreter implements InterpreterInterface
      */
     public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, CheckerBase $checker, ExecutionContext $execContext = null): bool
     {
+        if ($execContext === null) {
+            $execContext = new ExecutionContext();
+        }
         $hashStartPos = 0;
         $opCount = 0;
         $zero = gmp_init(0, 10);
@@ -1033,9 +1083,10 @@ class Interpreter implements InterpreterInterface
                             $vchPubKey = $mainStack[-1];
                             $vchSig = $mainStack[-2];
 
-                            $scriptCode = new Script($script->getBuffer()->slice($hashStartPos));
-
-                            $success = $checker->checkSig($scriptCode, $vchSig, $vchPubKey, $sigVersion, $flags, $execContext);
+                            $success = false;
+                            if (!$this->evalChecksig($vchSig, $vchPubKey, $script, $hashStartPos, $flags, $checker, $sigVersion, $execContext, $success)) {
+                                return false;
+                            }
 
                             $mainStack->pop();
                             $mainStack->pop();

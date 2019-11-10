@@ -64,6 +64,6 @@ class SchnorrSignatureSerializer implements SchnorrSignatureSerializerInterface
             throw new \RuntimeException('Unable to parse compact signature');
         }
         /** @var resource $sig_t */
-        return new SchnorrSignature($this->ecAdapter, $sig_t);
+        return new SchnorrSignature($this->ecAdapter->getContext(), $sig_t);
     }
 }

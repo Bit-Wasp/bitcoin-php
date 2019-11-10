@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Script\ExecutionContext;
+use BitWasp\Bitcoin\Script\Interpreter\ExecutionContext;
 use BitWasp\Bitcoin\Script\PrecomputedData;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
