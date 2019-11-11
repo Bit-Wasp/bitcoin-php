@@ -1074,6 +1074,27 @@ class Interpreter implements InterpreterInterface
                             $hashStartPos = $parser->getPosition();
                             break;
 
+                        case Opcodes::OP_CHECKSIGADD:
+                            if ($sigVersion !== SigHash::TAPSCRIPT) {
+                                throw new \RuntimeException('Opcode not found');
+                            }
+                            if ($mainStack->count() < 3) {
+                                return false;
+                            }
+                            $pubkey = $mainStack[-1];
+                            $n = Number::buffer($mainStack[-2], $minimal, Number::MAX_NUM_SIZE, $this->math);
+                            $sig = $mainStack[-3];
+
+                            $success = false;
+                            if (!$this->evalChecksig($sig, $pubkey, $script, $hashStartPos, $flags, $checker, $sigVersion, $execContext, $success)) {
+                                return false;
+                            }
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push(Number::gmp($this->math->add($n->getGmp(), gmp_init($success ? 1 : 0, 10)), $this->math));
+                            break;
+
                         case Opcodes::OP_CHECKSIG:
                         case Opcodes::OP_CHECKSIGVERIFY:
                             if (count($mainStack) < 2) {

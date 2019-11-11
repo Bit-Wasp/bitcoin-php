@@ -136,6 +136,7 @@ class Opcodes implements \ArrayAccess
     const OP_NOP8 = 183;
     const OP_NOP9 = 184;
     const OP_NOP10 = 185;
+    const OP_CHECKSIGADD = 186;
 
     /**
      * @var array
@@ -270,6 +271,7 @@ class Opcodes implements \ArrayAccess
         self::OP_NOP8 => 'OP_NOP8',
         self::OP_NOP9 => 'OP_NOP9',
         self::OP_NOP10 => 'OP_NOP10',
+        self::OP_CHECKSIGADD => 'OP_CHECKSIGADD',
     ];
 
     /**
