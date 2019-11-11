@@ -12,7 +12,6 @@ use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Script\Classifier\OutputClassifier;
-use BitWasp\Bitcoin\Script\Interpreter\ExecutionContext;
 use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptFactory;
@@ -708,7 +707,8 @@ class Interpreter implements InterpreterInterface
                                 }
                                 $vch = $mainStack[-1];
 
-                                if ($sigVersion === SigHash::V1 && ($flags & self::VERIFY_MINIMALIF)) {
+                                // minimalif is a standardness rule in v0 segwit, but required in tapscript
+                                if ($sigVersion === SigHash::TAPSCRIPT || ($sigVersion === SigHash::V1 && ($flags & self::VERIFY_MINIMALIF))) {
                                     if ($vch->getSize() > 1) {
                                         throw new ScriptRuntimeException(self::VERIFY_MINIMALIF, 'Input to OP_IF/NOTIF should be minimally encoded');
                                     }
