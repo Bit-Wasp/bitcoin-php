@@ -18,6 +18,7 @@
     "files": [
       "src/Script/functions.php",
       "src/Script/sighash_functions.php",
+      "src/Script/Taproot/taproot_functions.php",
       "src/Script/Interpreter/interpreter_constants.php"
     ]
   },

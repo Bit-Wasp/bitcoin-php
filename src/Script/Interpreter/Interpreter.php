@@ -63,12 +63,6 @@ class Interpreter implements InterpreterInterface
 
     const MAX_SCRIPT_SIZE = 10000;
     const MAX_STACK_SIZE = 1000;
-    const TAPROOT_LEAF_MASK = 0xfe;
-    const TAPROOT_LEAF_TAPSCRIPT = 0xc0;
-    const TAPROOT_CONTROL_BASE_SIZE = 33;
-    const TAPROOT_CONTROL_BRANCH_SIZE = 32;
-    const TAPROOT_CONTROL_MAX_DEPTH = 128;
-    const TAPROOT_CONTROL_MAX_SIZE = self::TAPROOT_CONTROL_BASE_SIZE + (self::TAPROOT_CONTROL_BRANCH_SIZE * self::TAPROOT_CONTROL_MAX_DEPTH);
 
     /**
      * @param EcAdapterInterface $ecAdapter
@@ -186,8 +180,8 @@ class Interpreter implements InterpreterInterface
         $k = Hash::taggedSha256("TapLeaf", $leafData);
         $leafHash = $k;
         for ($i = 0; $i < $m; $i++) {
-            $begin = self::TAPROOT_CONTROL_BASE_SIZE+self::TAPROOT_CONTROL_BRANCH_SIZE*$i;
-            $ej = $control->slice($begin, $begin + self::TAPROOT_CONTROL_BRANCH_SIZE);
+            $begin = TAPROOT_CONTROL_BASE_SIZE+TAPROOT_CONTROL_BRANCH_SIZE*$i;
+            $ej = $control->slice($begin, $begin + TAPROOT_CONTROL_BRANCH_SIZE);
             if (strcmp($k->getBinary(), $ej->getBinary()) >= 0) {
                 $k = Hash::taggedSha256("TapBranch", Buffertools::concat($ej, $k));
             } else {
@@ -323,9 +317,9 @@ class Interpreter implements InterpreterInterface
                 $scriptPubKey = $scriptWitness->bottom();
                 $scriptWitness = $scriptWitness->slice(0, -1);
 
-                if ($control->getSize() < self::TAPROOT_CONTROL_BASE_SIZE ||
-                    $control->getSize() > self::TAPROOT_CONTROL_MAX_SIZE ||
-                    (($control->getSize() - self::TAPROOT_CONTROL_BASE_SIZE) % self::TAPROOT_CONTROL_BRANCH_SIZE !== 0)) {
+                if ($control->getSize() < TAPROOT_CONTROL_BASE_SIZE ||
+                    $control->getSize() > TAPROOT_CONTROL_MAX_SIZE ||
+                    (($control->getSize() - TAPROOT_CONTROL_BASE_SIZE) % TAPROOT_CONTROL_BRANCH_SIZE !== 0)) {
                     return false;
                 }
 
@@ -335,7 +329,7 @@ class Interpreter implements InterpreterInterface
                 }
                 $execContext->setTapLeafHash($leafHash);
 
-                if ((ord($control->getBinary()[0]) & self::TAPROOT_LEAF_MASK) == self::TAPROOT_LEAF_TAPSCRIPT) {
+                if ((ord($control->getBinary()[0]) & TAPROOT_LEAF_MASK) == TAPROOT_LEAF_TAPSCRIPT) {
                     // #Elements + [len(element) || element] for n
                     $execContext->setValidationWeightLeft($scriptWitness->getBuffer()->getSize() + VALIDATION_WEIGHT_OFFSET);
                 }
