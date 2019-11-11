@@ -338,7 +338,7 @@ class Interpreter implements InterpreterInterface
 
                 if ((ord($control->getBinary()[0]) & self::TAPROOT_LEAF_MASK) == self::TAPROOT_LEAF_TAPSCRIPT) {
                     // #Elements + [len(element) || element] for n
-                    $execContext->setValidationWeightLeft($scriptWitness->getBuffer()->getSize());
+                    $execContext->setValidationWeightLeft($scriptWitness->getBuffer()->getSize() + VALIDATION_WEIGHT_OFFSET);
                 }
 
                 // return true at this stage, need further work to proceed
