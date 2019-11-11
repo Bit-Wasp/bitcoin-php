@@ -2,12 +2,28 @@
 
 namespace BitWasp\Bitcoin\Script\Taproot;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Script\ScriptFactory;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
 use const BitWasp\Bitcoin\Script\Interpreter\TAPROOT_LEAF_MASK;
+
+function hashTapLeaf(int $leafVersion, BufferInterface $scriptBytes): BufferInterface
+{
+    return Hash::taggedSha256("TapLeaf", new Buffer(
+        pack("C", $leafVersion&TAPROOT_LEAF_MASK) .
+        Buffertools::numToVarIntBin($scriptBytes->getSize()) .
+        $scriptBytes->getBinary()
+    ));
+}
+
+function hashTapBranch(BufferInterface $left, BufferInterface $right): BufferInterface
+{
+    $hash = Hash::taggedSha256("TapBranch", Buffertools::concat(...Buffertools::sort([$left, $right])));
+    return $hash;
+}
 
 function taprootTreeHelper(array $scripts): array
 {
@@ -17,13 +33,13 @@ function taprootTreeHelper(array $scripts): array
             if (!($script instanceof \BitWasp\Bitcoin\Script\ScriptInterface)) {
                 throw new \RuntimeException("leaf[1] not a script");
             }
-            $scriptBytes = $script->getBuffer();
-            $preimg = new Buffer(pack("C", $leafVersion&TAPROOT_LEAF_MASK) . Buffertools::numToVarIntBin($scriptBytes->getSize()) . $scriptBytes->getBinary());
+
+            $leafHash = hashTapLeaf($leafVersion, $script->getBuffer());
             return [
                 [
                     [$leafVersion, $script, new Buffer() /*leafcontrol*/]
                 ],
-                Hash::taggedSha256("TapLeaf", $preimg),
+                $leafHash,
             ];
         } else {
             return taprootTreeHelper($scripts[0]);
@@ -46,29 +62,29 @@ function taprootTreeHelper(array $scripts): array
     foreach ($right as list($version, $script, $control)) {
         $right2[] = [$version, $script, Buffertools::concat($control, $left_hash)];
     }
-    $hash = Hash::taggedSha256("TapBranch", Buffertools::concat(...Buffertools::sort([$left_hash, $right_hash])));
 
+    $hash = hashTapBranch($left_hash, $right_hash);
     return [array_merge($left2, $right2), $hash];
 }
 
-function taprootConstruct(\BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface $xonlyPubKey, array $scripts): array
+function taprootConstruct(XOnlyPublicKeyInterface $xonlyPubKey, array $scripts): array
 {
     $xonlyKeyBytes = $xonlyPubKey->getBuffer();
     if (count($scripts) == 0) {
-        return [ScriptFactory::scriptPubKey()->taproot($xonlyKeyBytes), [], []];
+        return [ScriptFactory::scriptPubKey()->taproot($xonlyKeyBytes), null, [], []];
     }
-    list ($ret, $hash) = taprootTreeHelper($scripts);
 
+    list ($ret, $hash) = taprootTreeHelper($scripts);
     $tweak = Hash::taggedSha256("TapTweak", new Buffer($xonlyKeyBytes->getBinary() . $hash->getBinary()));
     $tweaked = $xonlyPubKey->tweakAdd($tweak);
+
     $controlList = [];
     $scriptList = [];
     foreach ($ret as list ($version, $script, $control)) {
         $scriptList[] = $script;
-        $controlList[] = pack("C", ($version & 0xfe) + ($tweaked->hasSquareY() ? 0 : 1)) .
+        $controlList[] = chr(($version & TAPROOT_LEAF_MASK) + ($tweaked->hasSquareY() ? 0 : 1)) .
             $xonlyKeyBytes->getBinary() .
             $control->getBinary();
     }
     return [ScriptFactory::scriptPubKey()->taproot($tweaked->getBuffer()), $tweak, $scriptList, $controlList];
 }
-
