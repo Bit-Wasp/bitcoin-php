@@ -564,6 +564,7 @@ class Interpreter implements InterpreterInterface
         }
         $hashStartPos = 0;
         $opCount = 0;
+        $opCodePos = 0;
         $zero = gmp_init(0, 10);
         $altStack = new Stack();
         $vfStack = new Stack();
@@ -1072,6 +1073,7 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_CODESEPARATOR:
                             $hashStartPos = $parser->getPosition();
+                            $execContext->setCodeSeparatorPosition($opCodePos);
                             break;
 
                         case Opcodes::OP_CHECKSIGADD:
@@ -1231,6 +1233,8 @@ class Interpreter implements InterpreterInterface
                     if (count($mainStack) + count($altStack) > self::MAX_STACK_SIZE) {
                         throw new \RuntimeException('Invalid stack size, exceeds 1000');
                     }
+
+                    $opCodePos++;
                 }
             }
 
