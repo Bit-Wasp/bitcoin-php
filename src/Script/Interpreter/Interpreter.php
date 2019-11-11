@@ -1107,6 +1107,9 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_CHECKMULTISIG:
                         case Opcodes::OP_CHECKMULTISIGVERIFY:
+                            if ($sigVersion === SigHash::TAPSCRIPT) {
+                                throw new \RuntimeException('Disabled Opcode');
+                            }
                             $i = 1;
                             if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
