@@ -12,11 +12,12 @@ use const BitWasp\Bitcoin\Script\Interpreter\TAPROOT_LEAF_MASK;
 
 function hashTapLeaf(int $leafVersion, BufferInterface $scriptBytes): BufferInterface
 {
-    return Hash::taggedSha256("TapLeaf", new Buffer(
+    $ret = Hash::taggedSha256("TapLeaf", new Buffer(
         pack("C", $leafVersion&TAPROOT_LEAF_MASK) .
         Buffertools::numToVarIntBin($scriptBytes->getSize()) .
         $scriptBytes->getBinary()
     ));
+    return $ret;
 }
 
 function hashTapBranch(BufferInterface $left, BufferInterface $right): BufferInterface
@@ -67,24 +68,23 @@ function taprootTreeHelper(array $scripts): array
     return [array_merge($left2, $right2), $hash];
 }
 
-function taprootConstruct(XOnlyPublicKeyInterface $xonlyPubKey, array $scripts): array
+function taprootConstruct(XOnlyPublicKeyInterface $internalKey, array $scripts): array
 {
-    $xonlyKeyBytes = $xonlyPubKey->getBuffer();
+    $keyBytes = $internalKey->getBuffer();
     if (count($scripts) == 0) {
-        return [ScriptFactory::scriptPubKey()->taproot($xonlyKeyBytes), null, [], []];
+        return [ScriptFactory::scriptPubKey()->taproot($keyBytes), null, [], []];
     }
 
     list ($ret, $hash) = taprootTreeHelper($scripts);
-    $tweak = Hash::taggedSha256("TapTweak", new Buffer($xonlyKeyBytes->getBinary() . $hash->getBinary()));
-    $tweaked = $xonlyPubKey->tweakAdd($tweak);
-
+    $tweak = Hash::taggedSha256("TapTweak", new Buffer($keyBytes->getBinary() . $hash->getBinary()));
+    $outputKey = $internalKey->tweakAdd($tweak);
     $controlList = [];
     $scriptList = [];
     foreach ($ret as list ($version, $script, $control)) {
         $scriptList[] = $script;
-        $controlList[] = chr(($version & TAPROOT_LEAF_MASK) + ($tweaked->hasSquareY() ? 0 : 1)) .
-            $xonlyKeyBytes->getBinary() .
+        $controlList[] = chr(($version & TAPROOT_LEAF_MASK) + ($outputKey->hasSquareY() ? 0 : 1)) .
+            $keyBytes->getBinary() .
             $control->getBinary();
     }
-    return [ScriptFactory::scriptPubKey()->taproot($tweaked->getBuffer()), $tweak, $scriptList, $controlList];
+    return [ScriptFactory::scriptPubKey()->taproot($outputKey->getBuffer()), $tweak, $scriptList, $controlList];
 }

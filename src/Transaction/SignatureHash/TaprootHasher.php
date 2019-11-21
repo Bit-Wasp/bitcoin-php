@@ -160,6 +160,7 @@ class TaprootHasher extends SigHash
             $ss .= pack("V", $this->execContext->getCodeSeparatorPosition());
         }
 
-        return Hash::taggedSha256('TapSighash', new Buffer($ss));
+        $ret = Hash::taggedSha256('TapSighash', new Buffer($ss));
+        return $ret;
     }
 }

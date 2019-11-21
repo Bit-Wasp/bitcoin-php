@@ -14,7 +14,6 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SchnorrSignatureSerial
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Locktime;
-use BitWasp\Bitcoin\Script\Interpreter\ExecutionContext;
 use BitWasp\Bitcoin\Script\PrecomputedData;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
@@ -24,7 +23,6 @@ use BitWasp\Bitcoin\Transaction\SignatureHash\TaprootHasher;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
-use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
@@ -59,11 +57,6 @@ abstract class CheckerBase
      * @var array
      */
     protected $schnorrSigHashCache = [];
-
-    /**
-     * @var TransactionOutputInterface[]
-     */
-    protected $spentOutputs = [];
 
     /**
      * @var TransactionSignatureSerializer
@@ -299,8 +292,8 @@ abstract class CheckerBase
 
         $hashType = SigHash::TAPDEFAULT;
         if ($sig64->getSize() === 65) {
-            $hashType = $sig64->slice(64, 1);
-            if ($hashType == SigHash::TAPDEFAULT) {
+            $hashType = (int) $sig64->slice(64, 1)->getInt();
+            if ($hashType === SigHash::TAPDEFAULT) {
                 return false;
             }
             $sig64 = $sig64->slice(0, 64);

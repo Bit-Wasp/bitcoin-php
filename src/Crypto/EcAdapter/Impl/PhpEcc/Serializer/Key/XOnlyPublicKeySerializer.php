@@ -78,6 +78,7 @@ class XOnlyPublicKeySerializer implements XOnlyPublicKeySerializerInterface
         if (!$this->liftX($x, $point)) {
             throw new \RuntimeException("No square root for this point");
         }
+        // todo: why pass hasSquareY again?
         return new XOnlyPublicKey($this->ecAdapter, $point, true);
     }
 }

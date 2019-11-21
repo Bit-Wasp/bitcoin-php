@@ -163,20 +163,25 @@ class Interpreter implements InterpreterInterface
      * @param BufferInterface $control
      * @param BufferInterface $program
      * @param BufferInterface $scriptPubKey
+     * @param BufferInterface|null $leafHash
      * @return bool
      * @throws \Exception
      */
     private function verifyTaprootCommitment(BufferInterface $control, BufferInterface $program, BufferInterface $scriptPubKey, BufferInterface &$leafHash = null): bool
     {
-        $m = ($control->getSize() - 33) / 32;
+        $m = ($control->getSize() - TAPROOT_CONTROL_BASE_SIZE) / TAPROOT_CONTROL_BRANCH_SIZE;
         $p = $control->slice(1, 32);
         /** @var XOnlyPublicKeySerializerInterface $xonlySer */
         $xonlySer = EcSerializer::getSerializer(XOnlyPublicKeySerializerInterface::class, true, $this->adapter);
-        $P = $xonlySer->parse($p);
-        $Q = $xonlySer->parse($program);
-        $leafVersion = $control->slice(0, 1)->getInt() & 0xfe;
+        try {
+            $P = $xonlySer->parse($p);
+            $Q = $xonlySer->parse($program);
+        } catch (\Exception $e) {
+            return false;
+        }
+        $leafVersion = $control->slice(0, 1)->getInt() & TAPROOT_LEAF_MASK;
 
-        $leafData = new Buffer(pack("C", $leafVersion&0xfe) . Buffertools::numToVarIntBin($scriptPubKey->getSize()) . $scriptPubKey->getBinary());
+        $leafData = new Buffer(chr($leafVersion&TAPROOT_LEAF_MASK) . Buffertools::numToVarIntBin($scriptPubKey->getSize()) . $scriptPubKey->getBinary());
         $k = Hash::taggedSha256("TapLeaf", $leafData);
         $leafHash = $k;
         for ($i = 0; $i < $m; $i++) {
@@ -188,8 +193,12 @@ class Interpreter implements InterpreterInterface
                 $k = Hash::taggedSha256("TapBranch", Buffertools::concat($k, $ej));
             }
         }
+
         $t = Hash::taggedSha256("TapTweak", Buffertools::concat($p, $k));
-        return $Q->checkPayToContract($P, $t, (ord($control->getBinary()[0]) & 1) == 1);
+
+        $negated = (bool) (ord($control->getBinary()[0]) & 1);
+
+        return $Q->checkPayToContract($P, $t, $negated);
     }
 
     /**
@@ -1085,10 +1094,11 @@ class Interpreter implements InterpreterInterface
                             if (!$this->evalChecksig($sig, $pubkey, $script, $hashStartPos, $flags, $checker, $sigVersion, $execContext, $success)) {
                                 return false;
                             }
+                            $push = Number::gmp($this->math->add($n->getGmp(), gmp_init($success ? 1 : 0, 10)), $this->math)->getBuffer();
                             $mainStack->pop();
                             $mainStack->pop();
                             $mainStack->pop();
-                            $mainStack->push(Number::gmp($this->math->add($n->getGmp(), gmp_init($success ? 1 : 0, 10)), $this->math));
+                            $mainStack->push($push);
                             break;
 
                         case Opcodes::OP_CHECKSIG:

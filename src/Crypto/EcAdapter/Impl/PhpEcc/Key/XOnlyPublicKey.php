@@ -51,20 +51,24 @@ class XOnlyPublicKey extends Serializable implements XOnlyPublicKeyInterface
         }
         $offset = $this->adapter->getGenerator()->mul($gmpTweak);
         $newPoint = $this->point->add($offset);
-        $hasSquareY = gmp_jacobi($this->point->getY(), $curve->getPrime()) >= 0;
-        if (!$hasSquareY) {
-            throw new \RuntimeException("point without square y");
-        }
+        // todo: check this out
+        $hasSquareY = gmp_cmp(gmp_jacobi($newPoint->getY(), $curve->getPrime()), gmp_init(1)) === 0;
+
         return new XOnlyPublicKey($this->adapter, $newPoint, $hasSquareY);
     }
 
-    public function checkPayToContract(XOnlyPublicKeyInterface $base, BufferInterface $hash, bool $hasSquareY): bool
+    private function tweakTest(XOnlyPublicKeyInterface $base, BufferInterface $hash, bool $hasSquareY): bool
     {
         $pkExpected = $base->tweakAdd($hash);
         $xEquals = gmp_cmp($pkExpected->getPoint()->getX(), $this->point->getX()) === 0;
-        $squareEquals = $pkExpected->hasSquareY() === !$hasSquareY;
+        $squareEquals = $pkExpected->hasSquareY() === $hasSquareY;
         /** @var XOnlyPublicKey $pkExpected */
         return $xEquals && $squareEquals;
+    }
+
+    public function checkPayToContract(XOnlyPublicKeyInterface $base, BufferInterface $hash, bool $negated): bool
+    {
+        return $this->tweakTest($base, $hash, !$negated);
     }
 
     public function getBuffer(): BufferInterface

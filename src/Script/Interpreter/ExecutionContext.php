@@ -74,7 +74,7 @@ class ExecutionContext
 
     public function hasTapLeaf(): bool
     {
-        return null === $this->tapLeafHash;
+        return null !== $this->tapLeafHash;
     }
 
     /**

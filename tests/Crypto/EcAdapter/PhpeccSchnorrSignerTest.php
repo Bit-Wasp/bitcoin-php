@@ -133,6 +133,7 @@ class PhpeccSchnorrSignerTest extends AbstractTestCase
         $msg = Buffer::hex($msg32);
         $signature = $priv->signSchnorr($msg);
         $xonlyPub = $pub->asXOnlyPublicKey();
+
         $this->assertEquals(strtolower($sig64), $signature->getHex());
         $this->assertTrue($xonlyPub->verifySchnorr($msg, $signature));
     }

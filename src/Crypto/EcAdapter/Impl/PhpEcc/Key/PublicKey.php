@@ -148,7 +148,7 @@ class PublicKey extends Key implements PublicKeyInterface, \Mdanter\Ecc\Crypto\K
     public function asXOnlyPublicKey(): XOnlyPublicKeyInterface
     {
         // todo: check this, see Secp version
-        $hasSquareY = gmp_jacobi($this->point->getY(), $this->getCurve()->getPrime()) >= 0;
+        $hasSquareY = gmp_cmp(gmp_jacobi($this->point->getY(), $this->getCurve()->getPrime()), gmp_init(1)) === 0;
         $point = null;
         if (!$this->liftX($this->point->getX(), $point)) {
             throw new \RuntimeException("point has no square root");

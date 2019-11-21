@@ -46,6 +46,10 @@ class ConsensusTest extends ScriptCheckTestBase
         $vectors = [];
         foreach ($this->prepareTestData() as $fixture) {
             list ($flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest) = $fixture;
+            $spentOutputs = [];
+            if (count($fixture) > 7) {
+                $spentOutputs = $fixture[7];
+            }
             foreach ($adapters as $consensusFixture) {
                 list ($consensus) = $consensusFixture;
 
@@ -59,7 +63,7 @@ class ConsensusTest extends ScriptCheckTestBase
                     }
                 }
 
-                $vectors[] = [$consensus, $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest];
+                $vectors[] = [$consensus, $flags, $returns, $scriptWitness, $scriptSig, $scriptPubKey, $amount, $strTest, $spentOutputs];
             }
         }
 
@@ -85,11 +89,12 @@ class ConsensusTest extends ScriptCheckTestBase
         ScriptInterface $scriptSig,
         ScriptInterface $scriptPubKey,
         int $amount,
-        string $strTest
+        string $strTest,
+        array $spentOutputs = []
     ) {
         $create = $this->buildCreditingTransaction($scriptPubKey, $amount);
         $tx = $this->buildSpendTransaction($create, $scriptSig, $scriptWitness);
-        $check = $consensus->verify($tx, $scriptPubKey, $flags, 0, $amount);
+        $check = $consensus->verify($tx, $scriptPubKey, $flags, 0, $amount, $spentOutputs);
 
         $this->assertEquals($expectedResult, $check, $strTest);
     }

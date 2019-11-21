@@ -100,10 +100,6 @@ class SchnorrSigner
             return false;
         }
 
-        if (gmp_jacobi($publicKey->getPoint()->getY(), $p) !== 1) {
-            throw new \RuntimeException("public key wrong has_square_y");
-        }
-
         $RxBytes = null;
         $e = $this->hashPublicData($r, $publicKey, $msg32, $n, $RxBytes);
         $R = $G->mul($s)->add($publicKey->getPoint()->mul(gmp_sub($n, $e)));
