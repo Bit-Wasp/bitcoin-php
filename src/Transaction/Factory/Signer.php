@@ -87,7 +87,7 @@ class Signer
      */
     public function setCheckerCreator(CheckerCreatorBase $checker)
     {
-        if (null === $this->signatureCreator) {
+        if (count($this->signatureCreator) === 0) {
             $this->checkerCreator = $checker;
             return $this;
         } else {
