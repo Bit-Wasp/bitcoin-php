@@ -331,6 +331,33 @@ class SignerTest extends AbstractTestCase
         $input->getSigHash(20);
     }
 
+    public function testSetCheckerCreatorNoInputs()
+    {
+        $signer = new Signer((new TxBuilder())
+            ->get(), Bitcoin::getEcAdapter());
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $checkerCreator = \BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreator::fromEcAdapter($ecAdapter);
+        $signer->setCheckerCreator($checkerCreator);
+    }
+
+    public function testSetCheckerCreator()
+    {
+        $outpoint = new OutPoint(new Buffer('', 32), 0xffffffff);
+        $txOut = new TransactionOutput(5000000000, ScriptFactory::scriptPubKey()->p2pkh((new Random())->bytes(20)));
+        $signer = new Signer((new TxBuilder())
+            ->inputs([new TransactionInput($outpoint, new Script())])
+            ->outputs([new TransactionOutput(4900000000, new Script)])
+            ->get(), Bitcoin::getEcAdapter());
+        $input = $signer->input(0, $txOut);
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $checkerCreator = \BitWasp\Bitcoin\Transaction\Factory\Checker\CheckerCreator::fromEcAdapter($ecAdapter);
+
+        $this->expectException(SignerException::class);
+        $this->expectExceptionMessage("Cannot change CheckerCreator after inputs have been parsed");
+
+        $signer->setCheckerCreator($checkerCreator);
+    }
+
     public function testDiscouragesInvalidKeysInScripts()
     {
         $caught = false;
