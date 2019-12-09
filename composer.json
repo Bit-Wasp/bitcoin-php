@@ -1,8 +1,8 @@
 {
-  "name": "bitwasp/bitcoin",
+  "name": "olegabr/bitcoin",
   "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
   "type": "library",
-  "homepage": "https://github.com/bit-wasp/bitcoin-php",
+  "homepage": "https://github.com/olegabr/bitcoin-php",
   "license": "Unlicense",
   "authors": [
     {
