@@ -1,5 +1,5 @@
 {
-  "name": "olegabr/bitcoin",
+  "name": "olegabr/bitcoin-php",
   "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
   "type": "library",
   "homepage": "https://github.com/olegabr/bitcoin-php",
