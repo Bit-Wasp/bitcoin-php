@@ -43,9 +43,9 @@ class CheckLocktimeVerify
     /**
      * @param Operation[] $chunks
      * @param bool $fMinimal
-     * @return static
+     * @return CheckLocktimeVerify
      */
-    public static function fromDecodedScript(array $chunks, bool $fMinimal = false): self
+    public static function fromDecodedScript(array $chunks, bool $fMinimal = false): CheckLocktimeVerify
     {
         if (count($chunks) !== 3) {
             throw new \RuntimeException("Invalid number of items for CLTV");
@@ -65,7 +65,7 @@ class CheckLocktimeVerify
 
         $numLockTime = Number::buffer($chunks[0]->getData(), $fMinimal, 5);
 
-        return new static($numLockTime->getInt());
+        return new CheckLocktimeVerify($numLockTime->getInt());
     }
 
     /**

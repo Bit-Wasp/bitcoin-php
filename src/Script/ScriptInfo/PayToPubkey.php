@@ -60,7 +60,7 @@ class PayToPubkey
             throw new \InvalidArgumentException('Malformed pay-to-pubkey script');
         }
 
-        return new static($chunks[1]->getOp(), $chunks[0]->getData(), $allowVerify);
+        return new PayToPubkey($chunks[1]->getOp(), $chunks[0]->getData(), $allowVerify);
     }
 
     /**
