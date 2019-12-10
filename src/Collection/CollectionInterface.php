@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Collection;
 
+/**
+ * @deprecated v2.0.0
+ */
 interface CollectionInterface extends \Iterator, \ArrayAccess, \Countable
 {
     /**
