@@ -40,7 +40,7 @@ class CheckSequenceVerify
      * @param bool $fMinimal
      * @return static
      */
-    public static function fromDecodedScript(array $chunks, $fMinimal = false): self
+    public static function fromDecodedScript(array $chunks, $fMinimal = false): CheckSequenceVerify
     {
         if (count($chunks) !== 3) {
             throw new \RuntimeException("Invalid number of items for CSV");
@@ -60,7 +60,7 @@ class CheckSequenceVerify
 
         $numLockTime = Number::buffer($chunks[0]->getData(), $fMinimal, 5);
 
-        return new static($numLockTime->getInt());
+        return new CheckSequenceVerify($numLockTime->getInt());
     }
 
     /**

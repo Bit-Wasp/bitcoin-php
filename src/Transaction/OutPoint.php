@@ -44,11 +44,11 @@ class OutPoint extends Serializable implements OutPointInterface
     }
 
     /**
-     * @return static
+     * @return OutPointInterface
      */
-    public static function makeCoinbase(): self
+    public static function makeCoinbase(): OutPointInterface
     {
-        return new static(new Buffer("", 32), 0xffffffff);
+        return new OutPoint(new Buffer("", 32), 0xffffffff);
     }
 
     /**
