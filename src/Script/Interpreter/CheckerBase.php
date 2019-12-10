@@ -284,9 +284,11 @@ abstract class CheckerBase
     public function checkSigSchnorr(BufferInterface $sig64, BufferInterface $key32, int $sigVersion, ExecutionContext $execContext): bool
     {
         if ($sig64->getSize() === 0) {
+            echo "sig64 = 0\n";
             return false;
         }
         if ($key32->getSize() !== 32) {
+            echo "key != 32\n";
             return false;
         }
 
@@ -294,12 +296,14 @@ abstract class CheckerBase
         if ($sig64->getSize() === 65) {
             $hashType = (int) $sig64->slice(64, 1)->getInt();
             if ($hashType === SigHash::TAPDEFAULT) {
+                echo "badsighash1\n";
                 return false;
             }
             $sig64 = $sig64->slice(0, 64);
         }
 
         if ($sig64->getSize() !== 64) {
+            echo "sig.size!=64\n";
             return false;
         }
 
@@ -309,6 +313,7 @@ abstract class CheckerBase
             $sigHash = $this->getTaprootSigHash($hashType, $sigVersion, $execContext);
             return $pubKey->verifySchnorr($sigHash, $sig);
         } catch (\Exception $e) {
+            echo "checksigSchnorr exception: ". $e->getMessage().PHP_EOL;
             return false;
         }
     }

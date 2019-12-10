@@ -295,10 +295,12 @@ class Interpreter implements InterpreterInterface
             }
 
             if ($witnessCount === 0) {
+                echo "empty witness\n";
                 return false;
             } else if ($witnessCount >= 2 && $scriptWitness->bottom()->getSize() > 0 && ord($scriptWitness->bottom()->getBinary()[0]) === TaprootHasher::TAPROOT_ANNEX_BYTE) {
                 $annex = $scriptWitness->bottom();
                 if (($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_ANNEX)) {
+                    echo "uigradable annex\n";
                     return false;
                 }
                 $execContext->setAnnexHash(Hash::sha256($annex));
@@ -311,6 +313,7 @@ class Interpreter implements InterpreterInterface
                 // key spend path - doesn't use the interpreter, directly checks signature
                 $signature = $scriptWitness[count($scriptWitness) - 1];
                 if (!$checker->checkSigSchnorr($signature, $witnessProgram->getProgram(), SigHash::TAPROOT, $execContext)) {
+                    echo "invalid signature\n";
                     return false;
                 }
                 return true;
@@ -329,11 +332,13 @@ class Interpreter implements InterpreterInterface
                 if ($control->getSize() < TAPROOT_CONTROL_BASE_SIZE ||
                     $control->getSize() > TAPROOT_CONTROL_MAX_SIZE ||
                     (($control->getSize() - TAPROOT_CONTROL_BASE_SIZE) % TAPROOT_CONTROL_BRANCH_SIZE !== 0)) {
+                    echo "invalid control size\n";
                     return false;
                 }
 
                 $leafHash = null;
                 if (!$this->verifyTaprootCommitment($control, $witnessProgram->getProgram(), $scriptPubKey, $leafHash)) {
+                    echo "invalid taproot commitment\n";
                     return false;
                 }
                 $execContext->setTapLeafHash($leafHash);
@@ -344,11 +349,15 @@ class Interpreter implements InterpreterInterface
                 }
 
                 // return true at this stage, need further work to proceed
-                return $this->executeWitnessProgram($scriptWitness, new Script($scriptPubKey), SigHash::TAPSCRIPT, $flags, $checker, $execContext);
+                $ret = $this->executeWitnessProgram($scriptWitness, new Script($scriptPubKey), SigHash::TAPSCRIPT, $flags, $checker, $execContext);
+                var_dump("witnessExec");
+                var_dump($ret);
+                return $ret;
             }
         }
 
         if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
+            echo "upgradable witness program\n";
             return false;
         }
 
@@ -520,17 +529,21 @@ class Interpreter implements InterpreterInterface
             assert($execContext->hasValidationWeightSet());
             $execContext->setValidationWeightLeft($execContext->getValidationWeightLeft() - VALIDATION_WEIGHT_OFFSET);
             if ($execContext->getValidationWeightLeft() < 0) {
+                echo "validation weight failure\n";
                 return false;
             }
         }
         if ($key->getSize() === 0) {
+            echo "keysize=0\n";
             return false;
         } else if ($key->getSize() === 32) {
             if ($success && !$checker->checkSigSchnorr($sig, $key, $sigVersion, $execContext)) {
+                echo "keysize = 32 and checksig failed\n";
                 return false;
             }
         } else {
             if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_PUBKEYTYPE) {
+                echo "upgradable keytype\n";
                 return false;
             }
         }
@@ -614,9 +627,9 @@ class Interpreter implements InterpreterInterface
                     }
 
                     $mainStack->push($pushData);
-                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
+                     echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || (Opcodes::OP_IF <= $opCode && $opCode <= Opcodes::OP_ENDIF)) {
-                    // echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
+                     echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1NEGATE:
                         case Opcodes::OP_1:
@@ -1081,9 +1094,11 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_CHECKSIGADD:
                             if ($sigVersion !== SigHash::TAPSCRIPT) {
+                                echo "sigVersion != tapscript\n";
                                 throw new \RuntimeException('Opcode not found');
                             }
                             if ($mainStack->count() < 3) {
+                                echo "mainStack count != 3\n";
                                 return false;
                             }
                             $pubkey = $mainStack[-1];
@@ -1092,6 +1107,7 @@ class Interpreter implements InterpreterInterface
 
                             $success = false;
                             if (!$this->evalChecksig($sig, $pubkey, $script, $hashStartPos, $flags, $checker, $sigVersion, $execContext, $success)) {
+                                echo "checksig add - evalChecksig false\n";
                                 return false;
                             }
                             $push = Number::gmp($this->math->add($n->getGmp(), gmp_init($success ? 1 : 0, 10)), $this->math)->getBuffer();
@@ -1248,11 +1264,11 @@ class Interpreter implements InterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            // echo "\n Runtime: " . $e->getMessage() . "\n" . $e->getTraceAsString() . PHP_EOL;
+             echo "\n Runtime: " . $e->getMessage() . "\n" . $e->getTraceAsString() . PHP_EOL;
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            // echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
+             echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
             return false;
         }
     }
