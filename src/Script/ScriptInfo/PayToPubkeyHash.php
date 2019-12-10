@@ -57,9 +57,9 @@ class PayToPubkeyHash
     /**
      * @param Operation[] $chunks
      * @param bool $allowVerify
-     * @return static
+     * @return PayToPubKeyHash
      */
-    public static function fromDecodedScript(array $chunks, bool $allowVerify = false)
+    public static function fromDecodedScript(array $chunks, bool $allowVerify = false): PayToPubKeyHash
     {
         if (count($chunks) !== 5) {
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
@@ -72,7 +72,7 @@ class PayToPubkeyHash
             throw new \RuntimeException('Malformed pay-to-pubkey-hash script');
         }
 
-        return new static($chunks[4]->getOp(), $chunks[2]->getData(), $allowVerify);
+        return new PayToPubkeyHash($chunks[4]->getOp(), $chunks[2]->getData(), $allowVerify);
     }
 
     /**
