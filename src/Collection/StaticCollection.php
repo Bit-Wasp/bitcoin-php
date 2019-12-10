@@ -6,6 +6,9 @@ namespace BitWasp\Bitcoin\Collection;
 
 use BitWasp\Buffertools\BufferInterface;
 
+/**
+ * @deprecated v2.0.0
+ */
 abstract class StaticCollection implements CollectionInterface
 {
     /**
