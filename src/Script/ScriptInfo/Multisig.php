@@ -90,7 +90,7 @@ class Multisig
      * @param Operation[] $decoded
      * @param PublicKeySerializerInterface|null $pubKeySerializer
      * @param bool $allowVerify
-     * @return static
+     * @return Multisig
      */
     public static function fromDecodedScript(array $decoded, PublicKeySerializerInterface $pubKeySerializer = null, $allowVerify = false)
     {
@@ -119,7 +119,7 @@ class Multisig
             throw new \LogicException('No public keys found in script');
         }
 
-        return new static($requiredSigs, $publicKeyBuffers, $opCode, $allowVerify, $pubKeySerializer);
+        return new Multisig($requiredSigs, $publicKeyBuffers, $opCode, $allowVerify, $pubKeySerializer);
     }
 
     /**
