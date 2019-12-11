@@ -39,9 +39,7 @@ class CompactSignature extends Signature implements CompactSignatureInterface
      */
     public function __construct(EcAdapter $ecAdapter, $secp256k1_ecdsa_signature_t, int $recid, bool $compressed)
     {
-        if (!is_resource($secp256k1_ecdsa_signature_t)
-            || SECP256K1_TYPE_RECOVERABLE_SIG !== get_resource_type($secp256k1_ecdsa_signature_t)
-        ) {
+        if (!is_resource($secp256k1_ecdsa_signature_t) || SECP256K1_TYPE_RECOVERABLE_SIG !== get_resource_type($secp256k1_ecdsa_signature_t)) {
             throw new \RuntimeException('CompactSignature: must pass recoverable signature resource');
         }
 

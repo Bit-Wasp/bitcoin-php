@@ -38,8 +38,7 @@ class PublicKey extends Key implements PublicKeyInterface
      */
     public function __construct(EcAdapter $ecAdapter, $secp256k1_pubkey_t, bool $compressed = false)
     {
-        if (!is_resource($secp256k1_pubkey_t) ||
-            !get_resource_type($secp256k1_pubkey_t) === SECP256K1_TYPE_PUBKEY) {
+        if (!is_resource($secp256k1_pubkey_t) || get_resource_type($secp256k1_pubkey_t) !== SECP256K1_TYPE_PUBKEY) {
             throw new \InvalidArgumentException('Secp256k1\Key\PublicKey expects ' . SECP256K1_TYPE_PUBKEY . ' resource');
         }
 
