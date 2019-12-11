@@ -33,19 +33,19 @@ class CompactSignature extends Signature implements CompactSignatureInterface
 
     /**
      * @param EcAdapter $ecAdapter
-     * @param resource $secp256k1_ecdsa_signature_t
+     * @param resource $secp256k1_recoverable_signature_t
      * @param int $recid
      * @param bool $compressed
      */
-    public function __construct(EcAdapter $ecAdapter, $secp256k1_ecdsa_signature_t, int $recid, bool $compressed)
+    public function __construct(EcAdapter $ecAdapter, $secp256k1_recoverable_signature_t, int $recid, bool $compressed)
     {
-        if (!is_resource($secp256k1_ecdsa_signature_t) || SECP256K1_TYPE_RECOVERABLE_SIG !== get_resource_type($secp256k1_ecdsa_signature_t)) {
-            throw new \RuntimeException('CompactSignature: must pass recoverable signature resource');
+        if (!is_resource($secp256k1_recoverable_signature_t) || SECP256K1_TYPE_RECOVERABLE_SIG !== get_resource_type($secp256k1_recoverable_signature_t)) {
+            throw new \RuntimeException('CompactSignature: must pass recoverable signature resource, not ' . $secp256k1_recoverable_signature_t);
         }
 
         $ser = '';
         $recidout = 0;
-        secp256k1_ecdsa_recoverable_signature_serialize_compact($ecAdapter->getContext(), $ser, $recidout, $secp256k1_ecdsa_signature_t);
+        secp256k1_ecdsa_recoverable_signature_serialize_compact($ecAdapter->getContext(), $ser, $recidout, $secp256k1_recoverable_signature_t);
         list ($r, $s) = array_map(
             function ($val) {
                 return (new Buffer($val))->getGmp();
@@ -53,11 +53,14 @@ class CompactSignature extends Signature implements CompactSignatureInterface
             str_split($ser, 32)
         );
 
-        $this->resource = $secp256k1_ecdsa_signature_t;
+        $this->resource = $secp256k1_recoverable_signature_t;
         $this->recid = $recid;
         $this->compressed = $compressed;
         $this->ecAdapter = $ecAdapter;
-        parent::__construct($ecAdapter, $r, $s, $secp256k1_ecdsa_signature_t);
+
+        $sig_t = null;
+        secp256k1_ecdsa_recoverable_signature_convert($this->ecAdapter->getContext(), $sig_t, $this->resource);
+        parent::__construct($ecAdapter, $r, $s, $sig_t);
     }
 
     /**

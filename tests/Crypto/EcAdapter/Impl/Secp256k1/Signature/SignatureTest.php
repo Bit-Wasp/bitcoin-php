@@ -20,7 +20,7 @@ class SignatureTest extends AbstractTestCase
             $this->markTestSkipped("secp256k1 not installed");
         }
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('CompactSignature: must pass recoverable signature resource');
+        $this->expectExceptionMessage('Secp256k1\Signature\Signature expects ' . SECP256K1_TYPE_SIG . ' resource');
         $this->callConstructor("");
     }
     public function testWrongResourceType()
@@ -29,7 +29,7 @@ class SignatureTest extends AbstractTestCase
             $this->markTestSkipped("secp256k1 not installed");
         }
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('CompactSignature: must pass recoverable signature resource');
+        $this->expectExceptionMessage('Secp256k1\Signature\Signature expects ' . SECP256K1_TYPE_SIG . ' resource');
         $this->callConstructor(gmp_init(1));
     }
 }

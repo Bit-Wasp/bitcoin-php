@@ -20,7 +20,7 @@ class CompactSignatureTest extends AbstractTestCase
         if (!function_exists('secp256k1_context_create')) {
             $this->markTestSkipped("secp256k1 not installed");
         }
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('CompactSignature: must pass recoverable signature resource');
         $this->callConstructor("");
     }
@@ -29,7 +29,7 @@ class CompactSignatureTest extends AbstractTestCase
         if (!function_exists('secp256k1_context_create')) {
             $this->markTestSkipped("secp256k1 not installed");
         }
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('CompactSignature: must pass recoverable signature resource');
         $this->callConstructor(gmp_init(1));
     }
