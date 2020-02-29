@@ -14,7 +14,6 @@ use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Script\ScriptType;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Script\WitnessScript;
-use BitWasp\Bitcoin\SegwitBech32;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
