@@ -136,6 +136,12 @@ class Opcodes implements \ArrayAccess
     const OP_NOP8 = 183;
     const OP_NOP9 = 184;
     const OP_NOP10 = 185;
+    
+    // Qtum opcodes
+    const OP_CREATE = 193;
+    const OP_CALL = 194;
+    const OP_SPEND = 195;
+    const OP_SENDER = 196;
 
     /**
      * @var array
@@ -270,6 +276,12 @@ class Opcodes implements \ArrayAccess
         self::OP_NOP8 => 'OP_NOP8',
         self::OP_NOP9 => 'OP_NOP9',
         self::OP_NOP10 => 'OP_NOP10',
+    	
+        // Qtum opcodes
+    	self::OP_CREATE => 'OP_CREATE',
+    	self::OP_CALL => 'OP_CALL',
+    	self::OP_SPEND => 'OP_SPEND',
+    	self::OP_SENDER => 'OP_SENDER',
     ];
 
     /**

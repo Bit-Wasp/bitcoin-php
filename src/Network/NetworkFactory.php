@@ -104,4 +104,28 @@ class NetworkFactory
     {
         return new Networks\Zcash();
     }
+    
+    /**
+     * @return NetworkInterface
+     */
+    public static function qtum()
+    {
+    	return new Networks\Qtum();
+    }
+    
+    /**
+     * @return NetworkInterface
+     */
+    public static function qtumtestnet()
+    {
+    	return new Networks\QtumTestnet();
+    }
+    
+    /**
+     * @return NetworkInterface
+     */
+    public static function qtumregtest()
+    {
+    	return new Networks\QtumRegtest();
+    }
 }
