@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Block;
 
-use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
@@ -92,25 +91,6 @@ class Block extends Serializable implements BlockInterface
         }
 
         return $this->transactions[$i];
-    }
-
-    /**
-     * @param BloomFilter $filter
-     * @return FilteredBlock
-     */
-    public function filter(BloomFilter $filter): FilteredBlock
-    {
-        $vMatch = [];
-        $vHashes = [];
-        foreach ($this->getTransactions() as $tx) {
-            $vMatch[] = $filter->isRelevantAndUpdate($tx);
-            $vHashes[] = $tx->getTxHash();
-        }
-
-        return new FilteredBlock(
-            $this->getHeader(),
-            PartialMerkleTree::create(count($this->getTransactions()), $vHashes, $vMatch)
-        );
     }
 
     /**

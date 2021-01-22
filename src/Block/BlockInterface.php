@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\Block;
 
-use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\SerializableInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\BufferInterface;
@@ -39,10 +38,4 @@ interface BlockInterface extends SerializableInterface
      * @return TransactionInterface
      */
     public function getTransaction(int $i): TransactionInterface;
-
-    /**
-     * @param BloomFilter $filter
-     * @return FilteredBlock
-     */
-    public function filter(BloomFilter $filter): FilteredBlock;
 }
