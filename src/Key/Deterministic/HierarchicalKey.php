@@ -320,8 +320,17 @@ class HierarchicalKey
      */
     public function derivePath(string $path): HierarchicalKey
     {
+        if ($path == "") {
+            throw new \InvalidArgumentException("Path cannot be empty!");
+        }
+
         $sequences = new HierarchicalKeySequence();
-        $parts = $sequences->decodeRelative($path);
+        if ($this->depth == 0 && ($path[0] == 'm' || $path[0] == 'M')) {
+            list($retainPrivate, $parts) = $sequences->decodeAbsolute($path);
+        } else {
+            $retainPrivate = true;
+            $parts = $sequences->decodeRelative($path);
+        }
         $numParts = count($parts);
 
         $key = $this;
@@ -336,7 +345,9 @@ class HierarchicalKey
                 }
             }
         }
-
+        if (!$retainPrivate) {
+            $key = $key->withoutPrivateKey();
+        }
         return $key;
     }
 
