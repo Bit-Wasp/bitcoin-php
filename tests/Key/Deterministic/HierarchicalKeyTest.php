@@ -193,6 +193,52 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
      */
+    public function testMasterKeyCanDeriveAbsolutePaths(EcAdapterInterface $ecAdapter)
+    {
+        $xPrv = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPrv, $this->network);
+        $derivPriv = $key->derivePath("m/0'");
+        $this->assertTrue($derivPriv->isPrivate());
+        $this->assertEquals("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7", $derivPriv->toExtendedPrivateKey($this->network));
+        $this->assertEquals("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", $derivPriv->toExtendedPublicKey($this->network));
+
+        $derivPriv = $key->derivePath("0'");
+        $this->assertTrue($derivPriv->isPrivate());
+        $this->assertEquals("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7", $derivPriv->toExtendedPrivateKey($this->network));
+        $this->assertEquals("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", $derivPriv->toExtendedPublicKey($this->network));
+
+        $derivPub = $key->derivePath("M/0'");
+        $this->assertFalse($derivPub->isPrivate());
+        $this->assertEquals("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", $derivPub->toExtendedPublicKey($this->network));
+    }
+
+    public function testChildCannotDeriveAbsolutePaths()
+    {
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $xPrv = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPrv, $this->network);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Only relative paths accepted");
+        $key->derivePath("m/0'");
+    }
+
+    public function testChildCannotDeriveAbsolutePathsPublic()
+    {
+        $ecAdapter = Bitcoin::getEcAdapter();
+        $xPrv = 'xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7';
+        $hdFactory = new HierarchicalKeyFactory($ecAdapter);
+        $key = $hdFactory->fromExtended($xPrv, $this->network);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Only relative paths accepted");
+        $key->derivePath("M/0'");
+    }
+
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
     public function testCreateHeirarchicalPrivateKey(EcAdapterInterface $ecAdapter)
     {
         $xPrv = 'xprv9s21ZrQH143K24zyWeuwtaWrpNjzYRX9VNSFgT6TwC8aBK46j95aWJM7rW9uek4M9BNosaoN8fLFMi3UVMAynimfuf164nXoZpaQJa2FXpU';
