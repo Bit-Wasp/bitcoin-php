@@ -40,9 +40,7 @@ class Signature extends Serializable implements SignatureInterface
      */
     public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, $secp256k1_ecdsa_signature_t)
     {
-        if (!is_resource($secp256k1_ecdsa_signature_t) ||
-            !get_resource_type($secp256k1_ecdsa_signature_t) === SECP256K1_TYPE_SIG
-        ) {
+        if (!is_resource($secp256k1_ecdsa_signature_t) || get_resource_type($secp256k1_ecdsa_signature_t) !== SECP256K1_TYPE_SIG) {
             throw new \InvalidArgumentException('Secp256k1\Signature\Signature expects ' . SECP256K1_TYPE_SIG . ' resource');
         }
 
