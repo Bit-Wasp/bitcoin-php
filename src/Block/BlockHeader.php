@@ -16,32 +16,32 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     /**
      * @var int
      */
-    private $version;
+    protected $version;
 
     /**
      * @var BufferInterface
      */
-    private $prevBlock;
+    protected $prevBlock;
 
     /**
      * @var BufferInterface
      */
-    private $merkleRoot;
+    protected $merkleRoot;
 
     /**
      * @var int
      */
-    private $timestamp;
+    protected $timestamp;
 
     /**
      * @var int
      */
-    private $bits;
+    protected $bits;
 
     /**
      * @var int
      */
-    private $nonce;
+    protected $nonce;
 
     const BIP9_PREFIX = 1 << 29;
 
@@ -52,23 +52,18 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
      * @param int $timestamp
      * @param int $bits
      * @param int $nonce
+     * @throws InvalidHashLengthException
      */
     public function __construct(int $version, BufferInterface $prevBlock, BufferInterface $merkleRoot, int $timestamp, int $bits, int $nonce)
     {
-        if ($prevBlock->getSize() !== 32) {
-            throw new InvalidHashLengthException('BlockHeader prevBlock must be a 32-byte Buffer');
-        }
-
-        if ($merkleRoot->getSize() !== 32) {
-            throw new InvalidHashLengthException('BlockHeader merkleRoot must be a 32-byte Buffer');
-        }
-
         $this->version = $version;
         $this->prevBlock = $prevBlock;
         $this->merkleRoot = $merkleRoot;
         $this->timestamp = $timestamp;
         $this->bits = $bits;
         $this->nonce = $nonce;
+
+        $this->validate();
     }
 
     /**
@@ -152,11 +147,11 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     public function equals(BlockHeaderInterface $other): bool
     {
         return $this->version === $other->getVersion()
-            && $this->prevBlock->equals($other->getPrevBlock())
-            && $this->merkleRoot->equals($other->getMerkleRoot())
-            && $this->timestamp === $other->getTimestamp()
-            && $this->bits === $other->getBits()
-            && $this->nonce === $other->getNonce();
+               && $this->prevBlock->equals($other->getPrevBlock())
+               && $this->merkleRoot->equals($other->getMerkleRoot())
+               && $this->timestamp === $other->getTimestamp()
+               && $this->bits === $other->getBits()
+               && $this->nonce === $other->getNonce();
     }
 
     /**
@@ -166,5 +161,19 @@ class BlockHeader extends Serializable implements BlockHeaderInterface
     public function getBuffer(): BufferInterface
     {
         return (new BlockHeaderSerializer())->serialize($this);
+    }
+
+    /**
+     * @throws InvalidHashLengthException
+     */
+    protected function validate()
+    {
+        if ($this->prevBlock->getSize() !== 32) {
+            throw new InvalidHashLengthException('BlockHeader prevBlock must be a 32-byte Buffer');
+        }
+
+        if ($this->merkleRoot->getSize() !== 32) {
+            throw new InvalidHashLengthException('BlockHeader merkleRoot must be a 32-byte Buffer');
+        }
     }
 }
