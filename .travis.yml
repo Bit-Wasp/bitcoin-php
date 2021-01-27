@@ -8,7 +8,7 @@ php:
   - 7.3
 
 env:
-  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
+  - PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_REMOTE="jonasnick/secp256k1" SECP256K1_COMMIT="1901f3bf9c6197f0bd3cc62e9f6c69296566a23a"
 
 dist: trusty
 sudo: required
@@ -20,14 +20,14 @@ cache:
 matrix:
   exclude:
     - php: 7.2
-      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
+      env: PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_REMOTE="jonasnick/secp256k1" SECP256K1_COMMIT="1901f3bf9c6197f0bd3cc62e9f6c69296566a23a"
 
   include:
     # add extra test runs for php7: coverage, codestyle, examples, rpc tests
     - php: 7.2
-      env: COVERAGE=true CODE_STYLE=true EXAMPLES=true PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
+      env: COVERAGE=true CODE_STYLE=true EXAMPLES=true PHPUNIT=true PHPUNIT_EXT=true BITCOIN_VERSION="0.16.3" SECP256K1_REMOTE="jonasnick/secp256k1" SECP256K1_COMMIT="1901f3bf9c6197f0bd3cc62e9f6c69296566a23a"
     - php: 7.0
-      env: RPC_TEST=true BITCOIN_VERSION="0.16.3" SECP256K1_COMMIT="cd329dbc3eaf096ae007e807b86b6f5947621ee3"
+      env: RPC_TEST=true BITCOIN_VERSION="0.16.3" SECP256K1_REMOTE="jonasnick/secp256k1" SECP256K1_COMMIT="1901f3bf9c6197f0bd3cc62e9f6c69296566a23a"
 
 install:
     - |
@@ -47,16 +47,17 @@ install:
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ]; then
-            git clone https://github.com/bitcoin/secp256k1.git &&
+            git clone https://github.com/${SECP256K1_REMOTE}.git &&
             cd secp256k1 && git checkout ${SECP256K1_COMMIT} &&
-            ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-experimental &&
+            ./autogen.sh && ./configure --disable-jni --enable-module-recovery --enable-module-ecdh --enable-module-schnorrsig --enable-experimental &&
             make && sudo make install && cd ..;
         fi
     - |
         if [ "$PHPUNIT_EXT" = "true" ]; then
-            git clone -b v0.2.0 https://github.com/Bit-Wasp/secp256k1-php &&
+            git clone https://github.com/afk11/secp256k1-php &&
             cd secp256k1-php/secp256k1 &&
-            phpize && ./configure &&
+            git fetch origin schnorr2 && git checkout schnorr2 &&
+            phpize && ./configure --with-secp256k1 --with-secp256k1-config --with-module-ecdh --with-module-recovery --with-module-schnorrsig &&
             make && sudo make install && echo "extension=secp256k1.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini && cd ../..;
         fi
     - |
@@ -77,6 +78,8 @@ before_script:
   - if [ "${COVERAGE}" != "true" ] && [ "$TRAVIS_PHP_VERSION" != "hhvm" ] && [ "$TRAVIS_PHP_VERSION" != "nightly" ]; then phpenv config-rm xdebug.ini && echo "xdebug disabled"; fi
 
 script:
+  - vendor/bin/phpunit --filter 'TaprootTest::testScript#20'
+  - vendor/bin/phpunit --filter 'TaprootTest::testScript#21'
   - travis/run_secp256k1_tests.sh || exit 1
   - if [ "$COVERAGE" = "true" ]; then pwd && vendor/bin/phpstan analyse src tests -l 1; fi
   - make phpunit-ci || exit 1

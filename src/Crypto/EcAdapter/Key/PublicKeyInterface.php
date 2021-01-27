@@ -46,4 +46,9 @@ interface PublicKeyInterface extends KeyInterface
      * @return bool
      */
     public function verify(BufferInterface $msg32, SignatureInterface $signature): bool;
+
+    /**
+     * @return XOnlyPublicKeyInterface
+     */
+    public function asXOnlyPublicKey(): XOnlyPublicKeyInterface;
 }

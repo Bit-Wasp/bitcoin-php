@@ -128,4 +128,22 @@ class Hash
     {
         return new Buffer(hash_hmac($algo, $data->getBinary(), $salt->getBinary(), true));
     }
+
+    /**
+     * Creates a tagged sha256 hash per bip-schnorr
+     *
+     * @param string $tag
+     * @param BufferInterface $data
+     * @return BufferInterface
+     * @throws \Exception
+     */
+    public static function taggedSha256(string $tag, BufferInterface $data): BufferInterface
+    {
+        $taghash = hash('sha256', $tag, true);
+        $ctx = hash_init('sha256');
+        hash_update($ctx, $taghash);
+        hash_update($ctx, $taghash);
+        hash_update($ctx, $data->getBinary());
+        return new Buffer(hash_final($ctx, true));
+    }
 }

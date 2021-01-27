@@ -12,6 +12,8 @@ abstract class SigHash implements SigHashInterface
 {
     const V0 = 0;
     const V1 = 1;
+    const TAPROOT = 2;
+    const TAPSCRIPT = 3;
     
     /**
      * @var TransactionInterface

@@ -30,6 +30,10 @@ interface SigHashInterface
      */
     const ANYONECANPAY = 128;
 
+    const TAPDEFAULT = 0x00;
+    const TAPOUTPUTMASK = 0x03;
+    const TAPINPUTMASK = 0x80;
+
     /**
      * Calculate the hash of the current transaction, when you are looking to
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
