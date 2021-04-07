@@ -33,6 +33,21 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
             ];
     }
 
+    public function sampleSegwitMessage()
+    {
+        return
+            [
+                'hi',
+                'tb1q9p35ug38k0tvuj542452f3275t3uc3py5pwt82',
+                '-----BEGIN BITCOIN SIGNED MESSAGE-----
+hi
+-----BEGIN SIGNATURE-----
+H6KhveLOgDCpIt13HbUxGtEGgtgVInY/bDiW9UR8TF36KgO1TZOnZ66pR1vyTS+ylvuoiwdaIGT/c3aminfCa/8=
+-----END BITCOIN SIGNED MESSAGE-----',
+                NetworkFactory::bitcoinTestnet()
+            ];
+    }
+
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
@@ -48,7 +63,7 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
             EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
         );
 
-        $signed = $serializer->parse($content);
+        $signed = $serializer->parse(str_replace("\r\n", "\n", $content));
         $signer = new MessageSigner($ecAdapter);
 
         $this->assertSame($message, $signed->getMessage());
@@ -142,5 +157,32 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $signer = new MessageSigner();
         $result = $signer->verify($signedMessage, $address, $network);
         $this->assertTrue($result);
+    }
+
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testParsesSegwitMessage(EcAdapterInterface $ecAdapter)
+    {
+        list ($message, $addressString, $content, $network) = $this->sampleSegwitMessage();
+        
+        $addrCreator = new AddressCreator();
+        /** @var SegwitAddress $address */
+        $address = $addrCreator->fromString($addressString, $network);
+        $serializer = new SignedMessageSerializer(
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
+            );
+        
+        $signed = $serializer->parse(str_replace("\r\n", "\n", $content));
+        $signer = new MessageSigner($ecAdapter);
+        
+        $this->assertSame($message, $signed->getMessage());
+        $this->assertSame('73560454392673031410410110112528757574906118603913228462684770364360586190330', gmp_strval($signed->getCompactSignature()->getR(), 10));
+        $this->assertSame('19003691489245959228844184723526227573581591575474947180245750135893235231743', gmp_strval($signed->getCompactSignature()->getS(), 10));
+        $this->assertEquals(0, $signed->getCompactSignature()->getRecoveryId());
+        $this->assertSame(true, $signed->getCompactSignature()->isCompressed());
+        $this->assertTrue($signer->verify($signed, $address));
+        $this->assertSame($content, $signed->getBuffer()->getBinary());
     }
 }

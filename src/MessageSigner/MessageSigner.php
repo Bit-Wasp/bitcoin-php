@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\MessageSigner;
 
-use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Address\Address;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -60,11 +60,11 @@ class MessageSigner
 
     /**
      * @param SignedMessage $signedMessage
-     * @param PayToPubKeyHashAddress $address
+     * @param Address $address
      * @param NetworkInterface|null $network
      * @return bool
      */
-    public function verify(SignedMessage $signedMessage, PayToPubKeyHashAddress $address, NetworkInterface $network = null): bool
+    public function verify(SignedMessage $signedMessage, Address $address, NetworkInterface $network = null): bool
     {
         $network = $network ?: Bitcoin::getNetwork();
         $hash = $this->calculateMessageHash($network, $signedMessage->getMessage());
