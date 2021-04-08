@@ -172,11 +172,11 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $address = $addrCreator->fromString($addressString, $network);
         $serializer = new SignedMessageSerializer(
             EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
-            );
-        
+        );
+
         $signed = $serializer->parse(str_replace("\r\n", "\n", $content));
         $signer = new MessageSigner($ecAdapter);
-        
+
         $this->assertSame($message, $signed->getMessage());
         $this->assertSame('73560454392673031410410110112528757574906118603913228462684770364360586190330', gmp_strval($signed->getCompactSignature()->getR(), 10));
         $this->assertSame('19003691489245959228844184723526227573581591575474947180245750135893235231743', gmp_strval($signed->getCompactSignature()->getS(), 10));
@@ -184,5 +184,31 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
         $this->assertSame(true, $signed->getCompactSignature()->isCompressed());
         $this->assertTrue($signer->verify($signed, $address));
         $this->assertSame($content, $signed->getBuffer()->getBinary());
+    }
+
+    /**
+     * @dataProvider getEcAdapters
+     * @param EcAdapterInterface $ecAdapter
+     */
+    public function testParsesScriptHashMessage(EcAdapterInterface $ecAdapter)
+    {
+        $this->expectException(\BitWasp\Bitcoin\Exceptions\SignerException::class);
+        $this->expectExceptionMessage('Wrong address format');
+        $sample = $this->sampleMessage();
+        $content = $sample[2];
+        $network = $sample[3];
+        $addressString = '2MzQwSSnBHWHqSAqtTVQ6v47XtaisrJa1Vc';
+
+        $addrCreator = new AddressCreator();
+        /** @var ScriptHashAddress $address */
+        $address = $addrCreator->fromString($addressString, $network);
+        $serializer = new SignedMessageSerializer(
+            EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter)
+        );
+
+        $signed = $serializer->parse(str_replace("\r\n", "\n", $content));
+        $signer = new MessageSigner($ecAdapter);
+
+        $signer->verify($signed, $address);
     }
 }
