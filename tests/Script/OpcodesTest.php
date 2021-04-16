@@ -20,13 +20,11 @@ class OpcodesTest extends AbstractTestCase
         $this->assertSame($lookupOpName, $op[Opcodes::OP_0]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Opcode by that name not found
-     */
     public function testGetOpByNameFail()
     {
         $op = new Opcodes();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Opcode by that name not found");
         $op->getOpByName('OP_DEADBEEF');
     }
 
@@ -40,31 +38,25 @@ class OpcodesTest extends AbstractTestCase
         $this->assertSame($expected, $val);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Opcode not found
-     */
     public function testGetOpCodeException()
     {
         $op = new Opcodes;
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Opcode not found");
         $op->getOp(3);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testNoWriteSet()
     {
         $op = new Opcodes();
+        $this->expectException(\RuntimeException::class);
         $op[1] = 2;
     }
-    
-    /**
-     * @expectedException \RuntimeException
-     */
+
     public function testNoWriteUnSet()
     {
         $op = new Opcodes();
+        $this->expectException(\RuntimeException::class);
         unset($op[Opcodes::OP_1]);
     }
 
