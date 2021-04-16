@@ -8,11 +8,4 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
-            <directory>src</directory>
-            <exclude>src/PaymentProtocol/Protobufs</exclude>
-        </whitelist>
-    </filter>
-
 </phpunit>
