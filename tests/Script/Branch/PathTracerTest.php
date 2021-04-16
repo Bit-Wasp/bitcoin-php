@@ -17,7 +17,7 @@ class PathTracerTest extends AbstractTestCase
         $tracer = new PathTracer();
         $result = $tracer->done();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals(0, count($result));
 
         $resultAgain = $tracer->done();
@@ -33,7 +33,7 @@ class PathTracerTest extends AbstractTestCase
 
         $result = $tracer->done();
 
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertEquals(1, count($result));
 
         $resultAgain = $tracer->done();
