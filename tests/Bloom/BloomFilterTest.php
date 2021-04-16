@@ -25,7 +25,7 @@ class BloomFilterTest extends AbstractTestCase
      */
     private $pubKeyFactory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->pubKeyFactory = new PublicKeyFactory();
         parent::setUp();
