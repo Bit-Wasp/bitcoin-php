@@ -33,8 +33,7 @@ class ProofOfWorkTest extends AbstractTestCase
     }
 
     /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage nBits below minimum work
+
      */
     public function testWhereBitsBelowMinimum()
     {
@@ -42,6 +41,8 @@ class ProofOfWorkTest extends AbstractTestCase
         $params = new Params($math);
         $pow = new ProofOfWork(new Math(), $params);
         $bits = 1;
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("nBits below minimum work");
         $pow->checkPow(Buffer::hex('00000000a3bbe4fd1da16a29dbdaba01cc35d6fc74ee17f794cf3aab94f7aaa0'), $bits);
     }
 
