@@ -46,6 +46,7 @@ class InputCollectionMutatorTest extends AbstractTestCase
         ];
         
         $mutator = new InputCollectionMutator($collection);
+        $this->expectException(\RuntimeException::class);
         $mutator->slice(0, 1);
     }
 
