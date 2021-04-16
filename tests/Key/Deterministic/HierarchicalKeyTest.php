@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Exceptions\InvalidDerivationException;
 use BitWasp\Bitcoin\Key\Deterministic\HierarchicalKey;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shP2wshScriptDecorator;
 use BitWasp\Bitcoin\Key\KeyToScript\Decorator\P2shScriptDecorator;
@@ -78,13 +79,11 @@ class HierarchicalKeyTest extends AbstractTestCase
         $this->assertInstanceOf(HierarchicalKey::class, $key);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage A HierarchicalKey must always be compressed
-     */
     public function testFailsWithUncompressed()
     {
         $privFactory = new PrivateKeyFactory();
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("A HierarchicalKey must always be compressed");
         new HierarchicalKey(
             Bitcoin::getEcAdapter(),
             new P2pkhScriptDataFactory(),
@@ -149,7 +148,6 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
-     * @throws \Exception
      */
     public function testDerivePath(EcAdapterInterface $ecAdapter)
     {
@@ -215,24 +213,25 @@ class HierarchicalKeyTest extends AbstractTestCase
 
     /**
      * This tests if the key being decoded has bytes which match the network.
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage  HD key magic bytes do not match network magic bytes
      */
     public function testCreateWithInvalidNetwork()
     {
         $network = new BitcoinTestnet();
         $hdFactory = new HierarchicalKeyFactory();
         $key = 'xpub661MyMwAqRbcEZ5ScgSxFiTbNQaUwtEzrbMrUqW5VXfZ47PFGgPq46fbhkpYCkxZQRDxhFy53Nip1VJCofd7auHCrPCmP72NV4YWu2HB7ir';
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("HD key magic bytes do not match network magic bytes");
         $hdFactory->fromExtended($key, $network);
     }
 
     /**
-     * @expectedException \Exception
+     * @
      */
     public function testCreateWithInvalidLength()
     {
         $key = 'KyQZJyRyxqNBc31iWzZjUf1vDMXpbcUzwND6AANq44M3v38smDkA';
         $hdFactory = new HierarchicalKeyFactory();
+        $this->expectException(\Exception::class);
         $hdFactory->fromExtended($key, $this->network);
     }
 
@@ -257,13 +256,15 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
-     * @expectedException \Exception
+
      */
     public function testGetExtendedPrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $hdFactory = new HierarchicalKeyFactory();
         $key = $hdFactory->fromExtended($xPub, $this->network);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Cannot create extended private key from public");
         $key->toExtendedPrivateKey($this->network);
     }
 
@@ -347,14 +348,15 @@ class HierarchicalKeyTest extends AbstractTestCase
      * @dataProvider getEcAdapters
      * @depends testGetPrivateKey
      * @param EcAdapterInterface $ecAdapter
-     * @expectedException \Exception
      */
     public function testGetPrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
         $xPub = 'xpub6AV8iVdKGa79ExyueSBjnCNKkmwLQsTvaN2N8iWCT5PNX6Xrh3gPgz3gVrxtLiYyCdC9FjwsuTTXmJiuWkxpLoqo8gj7rPWdkDsUCWfQHJB';
         $hdFactory = new HierarchicalKeyFactory($ecAdapter);
         $key = $hdFactory->fromExtended($xPub, $this->network);
-        $this->assertSame('edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea', $key->getPrivateKey());
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Unable to get private key, not known");
+        $key->getPrivateKey();
     }/**/
 
     /**
@@ -372,13 +374,14 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
-     * @expectedException \Exception
      */
     public function testDeriveFailure(EcAdapterInterface $ecAdapter)
     {
         $k = 'xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8';
         $factory = new HierarchicalKeyFactory($ecAdapter);
         $key = $factory->fromExtended($k, $this->network);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Can't derive a hardened key without the private key");
         $key->deriveChild(2147483648);
     }
 
@@ -394,27 +397,28 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      * @dataProvider getInvalidSequences
      * @param int $sequence
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Sequence is outside valid range
      */
     public function testInvalidSequenceGetHmac($sequence)
     {
         $xPrv = 'xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi';
         $hdFactory = new HierarchicalKeyFactory();
         $key = $hdFactory->fromExtended($xPrv, $this->network);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Sequence is outside valid range");
+
         $key->getHmacSeed($sequence);
     }
 
     /**
      * @dataProvider getInvalidSequences
      * @param int $sequence
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Sequence is outside valid range, must be >= 0 && <= (2^31)-1
      */
     public function testInvalidSequenceDeriveChild($sequence)
     {
         $factory = new HierarchicalKeyFactory(Bitcoin::getEcAdapter());
         $key = $factory->fromExtended('xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi', $this->network);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Sequence is outside valid range, must be >= 0 && <= (2^31)-1");
         $key->deriveChild($sequence);
     }
 
@@ -547,6 +551,10 @@ class HierarchicalKeyTest extends AbstractTestCase
         );
 
         $this->assertEquals(0, $this->HK_run_count);
+
+        $this->expectException(InvalidDerivationException::class);
+        $this->expectExceptionMessage("Derived invalid key for index 1, use next index");
+
         $key->deriveChild(1);
     }
 
