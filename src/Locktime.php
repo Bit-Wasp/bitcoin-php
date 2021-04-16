@@ -12,7 +12,7 @@ class Locktime
      * Maximum block height that can be used in locktime, as beyond
      * this is reserved for timestamp locktimes
      */
-    const BLOCK_MAX = 500000000;
+    const BLOCK_MAX = 500000000-1;
 
     /**
      * Maximum timestamp that can be encoded in locktime
@@ -98,8 +98,8 @@ class Locktime
      */
     public function toBlockHeight(int $lockTime): int
     {
-        if ($lockTime >= self::BLOCK_MAX) {
-            throw new \Exception('This locktime is out of range for a block height');
+        if ($lockTime > self::BLOCK_MAX) {
+            throw new \Exception("This locktime $lockTime is out of range for a block height " . self::BLOCK_MAX);
         }
 
         return $lockTime;
