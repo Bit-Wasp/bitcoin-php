@@ -44,7 +44,7 @@ class HierarchicalKeyTest extends AbstractTestCase
     /**
      *
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->network = NetworkFactory::bitcoin();
     }
