@@ -99,7 +99,7 @@ class Locktime
     public function toBlockHeight(int $lockTime): int
     {
         if ($lockTime > self::BLOCK_MAX) {
-            throw new \Exception("This locktime $lockTime is out of range for a block height " . self::BLOCK_MAX);
+            throw new \Exception("This locktime is out of range for a block height");
         }
 
         return $lockTime;
