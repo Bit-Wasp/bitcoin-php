@@ -16,25 +16,20 @@ class EnglishWordListTest extends AbstractTestCase
         $this->assertEquals(2048, count($wl->getWords()));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testUnknownWord()
     {
         $wl = new EnglishWordList();
+        $this->expectException(\InvalidArgumentException::class);
         $wl->getWord(101010101);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOutOfRange()
     {
         $wl = new EnglishWordList();
 
         $word = $wl->getIndex('able');
-        $this->assertInternalType('integer', $word);
-
+        $this->assertIsInt($word);
+        $this->expectException(\InvalidArgumentException::class);
         $wl->getIndex('unknownword');
     }
 }
