@@ -6,6 +6,7 @@ namespace BitWasp\Bitcoin\Tests\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\Random\Random;
+use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
 use BitWasp\Bitcoin\Key\Factory\PrivateKeyFactory;
 use BitWasp\Bitcoin\Network\NetworkFactory;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
@@ -54,13 +55,13 @@ class PrivateKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @expectedException \Exception
      * @param EcAdapterInterface $ecAdapter
      */
     public function testCreatePrivateKeyFailure(EcAdapterInterface $ecAdapter)
     {
         $hex = 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141';
         $factory = new PrivateKeyFactory($ecAdapter);
+        $this->expectException(\Exception::class);
         $factory->fromHexCompressed($hex);
     }
 
@@ -182,11 +183,11 @@ class PrivateKeyTest extends AbstractTestCase
 
     /**
      * @dataProvider getEcAdapters
-     * @expectedException \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
      */
     public function testInvalidWif(EcAdapterInterface $ecAdapter)
     {
         $factory = new PrivateKeyFactory($ecAdapter);
+        $this->expectException(Base58ChecksumFailure::class);
         $factory->fromWif('5akdgashdgkjads');
     }
 }
