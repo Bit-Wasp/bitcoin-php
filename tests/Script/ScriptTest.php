@@ -113,10 +113,11 @@ class ScriptTest extends AbstractTestCase
 
     /**
      * @depends testOp
-     * @expectedException \RuntimeException
      */
     public function testOpFailure()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Opcode by that name not found");
         ScriptFactory::create()->op('OP_HASH666');
     }
 
@@ -251,7 +252,7 @@ class ScriptTest extends AbstractTestCase
 
     public function testDebugInfo()
     {
-        $this->assertInternalType('array', (new Script)->__debugInfo());
+        $this->assertIsArray((new Script)->__debugInfo());
     }
 
     public function testBadScriptZeroSigOps()
