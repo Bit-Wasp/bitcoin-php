@@ -40,7 +40,7 @@ class BlockTest extends AbstractTestCase
         $header = $this->getBlockHeader();
         $block = new Block(new Math(), $header);
 
-        $this->assertInternalType('array', $block->getTransactions());
+        $this->assertIsArray($block->getTransactions());
         $this->assertEmpty($block->getTransactions());
     }
 
@@ -112,7 +112,7 @@ class BlockTest extends AbstractTestCase
 
         $this->assertInstanceOf(Block::class, $newBlock);
 
-        $this->assertInternalType('array', $newBlock->getTransactions());
+        $this->assertIsArray($newBlock->getTransactions());
         $this->assertEquals(1, count($newBlock->getTransactions()));
         $this->assertInstanceOf(TransactionInterface::class, $newBlock->getTransaction(0));
         $this->assertEquals($newBlock->getHeader()->getMerkleRoot(), $newBlock->getMerkleRoot());
