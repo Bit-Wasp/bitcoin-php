@@ -57,7 +57,7 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertInstanceOf(Buffer::class, $result->getMerkleRoot());
         $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->getHex());
 
-        $this->assertInternalType('int', $result->getBits());
+        $this->assertIsInt($result->getBits());
         $this->assertEquals(0x1d00ffff, $result->getBits());
 
         $this->assertEquals(1231006505, $result->getTimestamp());
