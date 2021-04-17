@@ -77,12 +77,10 @@ class UriTest extends AbstractTestCase
         $this->assertEquals('bitcoin:'.$string.'?r=https%3A%2F%2Fexample.com%2Frequest', $uri->uri());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testBip21MustProvideAddress()
     {
         $address = null;
+        $this->expectException(\InvalidArgumentException::class);
         new Uri($address);
     }
 
