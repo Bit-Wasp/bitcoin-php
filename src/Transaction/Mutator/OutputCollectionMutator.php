@@ -72,10 +72,6 @@ class OutputCollectionMutator extends AbstractCollectionMutator
         return $this;
     }
 
-    /**
-     * @param TransactionOutputInterface $output
-     * @return $this
-     */
     public function add(TransactionOutputInterface $output): OutputCollectionMutator
     {
         $size = $this->count();

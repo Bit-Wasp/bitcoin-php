@@ -88,7 +88,7 @@ class InputCollectionMutator extends AbstractCollectionMutator
         if ($i > count($this->set)) {
             throw new \InvalidArgumentException();
         }
-        $this->set[$i] = $input;
+        $this->set[$i] = new InputMutator($input);
         return $this;
     }
 }
