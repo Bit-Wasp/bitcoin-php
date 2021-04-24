@@ -11,7 +11,7 @@ build:
         redis: false
         postgresql: false
         php:
-           version: 7.2
+           version: 7.3
            ini:
                'zend.assertions': '1'
                'assert.exception': '1'

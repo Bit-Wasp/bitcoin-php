@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Tests\Block;
 
 use BitWasp\Bitcoin\Block\MerkleRoot;
+use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
@@ -13,35 +14,27 @@ use BitWasp\Buffertools\BufferInterface;
 
 class MerkleRootTest extends AbstractTestCase
 {
-
-    /**
-     * @expectedException \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
-     */
     public function testCannotUseEmptyCollection()
     {
         $math = $this->safeMath();
         $root = new MerkleRoot($math, []);
+        $this->expectException(MerkleTreeEmpty::class);
         $root->calculateHash();
     }
 
     /**
-     * @param array $hexes
+     * @param string[] $hexes
      * @return array
      */
-    private function getTransactionCollection(array $hexes)
+    private function getTransactionCollection(array $hexes): array
     {
         return array_map(
-            function ($value) {
-                return TransactionFactory::fromHex($value);
-            },
+            [TransactionFactory::class, 'fromHex'],
             $hexes
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getMerkleVectors()
+    public function getMerkleVectors(): array
     {
         $math = new Math();
         $vectors = [];

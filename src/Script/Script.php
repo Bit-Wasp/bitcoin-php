@@ -288,10 +288,24 @@ class Script extends Serializable implements ScriptInterface
      */
     public function isP2SH(& $scriptHash): bool
     {
+        //
+//        if (strlen($this->script) == 23) {
+//            var_dump("{$this->script[0]} | ".ord($this->script[0])." ".Opcodes::OP_HASH160);
+//            var_dump(ord($this->script[0]) == Opcodes::OP_HASH160);
+//            var_dump("{$this->script[1]} | ".ord($this->script[1])." 20");
+//            var_dump(ord($this->script[1]) == 20);
+//            var_dump("{$this->script[22]} | ".ord($this->script[22])." ".Opcodes::OP_EQUAL);
+//            var_dump(ord($this->script[22]) == Opcodes::OP_EQUAL);
+//        }
+//        echo "isP2SH?\n";
+//        echo "script: ".bin2hex($this->script).PHP_EOL;
         if (strlen($this->script) === 23
-            && $this->script[0] = Opcodes::OP_HASH160
-            && $this->script[1] = 20
-            && $this->script[22] = Opcodes::OP_EQUAL
+            && ord($this->script[0]) == Opcodes::OP_HASH160
+            && ord($this->script[1]) == 20
+            && ord($this->script[22]) == Opcodes::OP_EQUAL
+//            && $this->script[0] == Opcodes::OP_HASH160
+//            && $this->script[1] == 20
+//            && $this->script[22] == Opcodes::OP_EQUAL
         ) {
             $scriptHash = new Buffer(substr($this->script, 2, 20));
             return true;

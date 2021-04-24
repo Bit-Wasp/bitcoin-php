@@ -42,7 +42,7 @@ class JapaneseWordList extends WordList implements Bip39WordListInterface
         }
 
         if (!isset($this->wordsFlipped[$word])) {
-            throw new \InvalidArgumentException(__CLASS__ . ' does not contain word ' . $word);
+            throw new \InvalidArgumentException('Wordlist does not contain word ' . $word);
         }
 
         return $this->wordsFlipped[$word];

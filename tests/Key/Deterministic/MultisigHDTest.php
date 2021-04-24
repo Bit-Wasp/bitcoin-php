@@ -28,12 +28,10 @@ use BitWasp\Buffertools\Buffer;
 
 class MultisigHDTest extends AbstractTestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Must have at least one HierarchicalKey for Multisig HD Script
-     */
     public function testAlwaysProvidesKeys()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Must have at least one HierarchicalKey for Multisig HD Script");
         new MultisigHD(new MultisigScriptDataFactory(2, 2, true));
     }
 

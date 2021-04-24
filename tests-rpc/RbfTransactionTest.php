@@ -35,7 +35,7 @@ class RbfTransactionTest extends AbstractTestCase
 
     private function assertSendRawTransaction($result)
     {
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey('error', $result);
         $this->assertEquals(null, $result['error']);
 
@@ -45,9 +45,9 @@ class RbfTransactionTest extends AbstractTestCase
 
     private function assertBitcoindError($errorCode, $result)
     {
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey('error', $result);
-        $this->assertInternalType('array', $result['error']);
+        $this->assertIsArray($result['error']);
         $this->assertEquals($errorCode, $result['error']['code']);
 
         $this->assertArrayHasKey('error', $result);

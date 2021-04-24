@@ -9,7 +9,7 @@ use BitWasp\Bitcoin\Tests\AbstractTestCase;
 
 class HierarchicalKeySequenceTest extends AbstractTestCase
 {
-    public function getSequenceVectors()
+    public function getSequenceVectors(): array
     {
         return [
             ['0', 0],
@@ -22,21 +22,19 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
 
     /**
      * @dataProvider getSequenceVectors
-     * @param $node
-     * @param $eSeq
+     * @param string $node
+     * @param int $eSeq
      */
-    public function testGetSequence($node, $eSeq)
+    public function testGetSequence(string $node, int $eSeq)
     {
         $sequence = new HierarchicalKeySequence();
         $this->assertEquals([$eSeq], $sequence->decodeRelative($node));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testDecodePathFailure()
     {
         $sequence = new HierarchicalKeySequence();
+        $this->expectException(\InvalidArgumentException::class);
         $sequence->decodeRelative('');
     }
 
@@ -44,16 +42,20 @@ class HierarchicalKeySequenceTest extends AbstractTestCase
     {
         $sequence = new HierarchicalKeySequence();
 
-        $expected = ['2147483648','2147483649','444','2147526030'];
-        $this->assertEquals($expected, $sequence->decodeRelative("0'/1'/444/42382'"));
+        $decodedPath = $sequence->decodeRelative("0'/1'/444/42382'");
+        $expected = [2147483648, 2147483649, 444, 2147526030];
+        foreach ($decodedPath as $i => $item) {
+            $this->assertIsInt($item);
+            $this->assertEquals($expected[$i], $item);
+        }
     }
 
     /**
      * @dataProvider getSequenceVectors
-     * @param $node
-     * @param $integer
+     * @param string $node
+     * @param int $integer
      */
-    public function testDecodePathVectors($node, $integer)
+    public function testDecodePathVectors(string $node, int $integer)
     {
         $sequence = new HierarchicalKeySequence();
 

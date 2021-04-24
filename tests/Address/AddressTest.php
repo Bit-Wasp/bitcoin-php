@@ -178,14 +178,12 @@ class AddressTest extends AbstractTestCase
         $this->assertInstanceOf(ScriptHashAddress::class, $scriptAddress);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Script type is not associated with an address
-     */
     public function testFromOutputScript()
     {
         $unknownScript = ScriptFactory::create()->opcode(Opcodes::OP_0, Opcodes::OP_1)->getScript();
         $addressCreator = new AddressCreator();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Script type is not associated with an address");
         $addressCreator->fromOutputScript($unknownScript);
     }
 

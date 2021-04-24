@@ -128,7 +128,7 @@ abstract class ScriptCheckTestBase extends AbstractTestCase
                 $item = 'OP_CHECKSEQUENCEVERIFY';
             }
 
-            if (strlen($item) == '') {
+            if (strlen($item) == 0) {
             } else if (preg_match("/^[0-9]*$/", $item) || substr($item, 0, 1) === "-" && preg_match("/^[0-9]*$/", substr($item, 1))) {
                 $builder->int((int) $item);
             } else if (substr($item, 0, 2) === "0x") {

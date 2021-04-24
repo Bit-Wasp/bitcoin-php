@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace BitWasp\Bitcoin\Tests;
 
 use BitWasp\Bitcoin\Base58;
+use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Exceptions\Base58InvalidCharacter;
 use BitWasp\Buffertools\Buffer;
 
 class Base58Test extends AbstractTestCase
@@ -64,28 +66,22 @@ class Base58Test extends AbstractTestCase
         $this->assertTrue($bs->equals(Base58::decodeCheck($encoded)));
     }
 
-    /**
-     * @expectedException \BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure
-     */
     public function testDecodeCheckChecksumFailure()
     {
         // Base58Check encoded data has a checksum at the end.
         // 12D2adLM3UKy4bH891ZFDkWmXmotrMoF <-- valid
         // 12D2adLM3UKy4cH891ZFDkWmXmotrMoF <-- has typo, b replaced with c.
         //              ^
-
+        $this->expectException(Base58ChecksumFailure::class);
         Base58::decodeCheck('12D2adLM3UKy4cH891ZFDkWmXmotrMoF');
     }
 
-    /**
-     * @expectedException \BitWasp\Bitcoin\Exceptions\Base58InvalidCharacter
-     */
     public function testDecodeBadCharacter()
     {
         // 12D2adLM3UKy4bH891ZFDkWmXmotrMoF <-- valid
         // 12D2adLM3UKy4bH891ZFDkWmXmotrM0F <-- 0 is not allowed in base58 strings
         //                               ^
-
+        $this->expectException(Base58InvalidCharacter::class);
         Base58::decode('12D2adLM3UKy4cH891ZFDkWmXmotrM0F');
     }
 }

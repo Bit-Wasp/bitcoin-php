@@ -10,12 +10,10 @@ use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 
 class BlockSerializerTest extends AbstractTestCase
 {
-    /**
-     * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
-     */
     public function testInvalidParse()
     {
         $serializer = new BlockSerializer(
@@ -23,6 +21,7 @@ class BlockSerializerTest extends AbstractTestCase
             new BlockHeaderSerializer,
             new TransactionSerializer()
         );
+        $this->expectException(ParserOutOfRange::class);
         $serializer->parse(new Buffer());
     }
 }

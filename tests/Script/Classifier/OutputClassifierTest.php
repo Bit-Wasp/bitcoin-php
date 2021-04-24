@@ -156,7 +156,7 @@ class OutputClassifierTest extends AbstractTestCase
         $this->assertEquals($type, $decoded->getType());
         $this->assertEquals($script, $decoded->getScript());
         if (is_array($eSolution)) {
-            $this->assertInternalType('array', $solution);
+            $this->assertIsArray($solution);
 
             /** @var BufferInterface[] $solution */
             /** @var BufferInterface[] $eSolution */

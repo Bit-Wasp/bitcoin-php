@@ -81,10 +81,6 @@ class ElectrumKeyTest extends AbstractTestCase
         }
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Electrum keys are not compressed
-     */
     public function testFromKey()
     {
         $random = new Random();
@@ -96,6 +92,8 @@ class ElectrumKeyTest extends AbstractTestCase
         $this->assertInstanceOf(ElectrumKey::class, $e);
 
         $key = $privKeyFactory->generateCompressed($random);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Electrum keys are not compressed");
         $electrumFactory->fromKey($key);
     }
 
@@ -108,16 +106,14 @@ class ElectrumKeyTest extends AbstractTestCase
         $this->assertInstanceOf(ElectrumKey::class, $key);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Cannot produce master private key from master public key
-     */
     public function testFailsWithoutMasterPrivateKey()
     {
         $pubKeyFactory = new PublicKeyFactory();
         $key = $pubKeyFactory->fromHex('045b81f0017e2091e2edcd5eecf10d5bdd120a5514cb3ee65b8447ec18bfc4575c6d5bf415e54e03b1067934a0f0ba76b01c6b9ab227142ee1d543764b69d901e0');
         $electrumFactory = new ElectrumKeyFactory();
         $e = $electrumFactory->fromKey($key);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Cannot produce master private key from master public key");
         $e->getMasterPrivateKey();
     }
 }
