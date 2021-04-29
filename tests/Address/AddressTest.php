@@ -31,8 +31,6 @@ class AddressTest extends AbstractTestCase
                 return NetworkFactory::bitcoin();
             case 'tbtc':
                 return NetworkFactory::bitcoinTestnet();
-            case 'zec':
-                return NetworkFactory::zcash();
             default:
                 throw new \RuntimeException("Invalid test fixture, unknown network");
         }

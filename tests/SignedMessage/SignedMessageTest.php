@@ -125,22 +125,4 @@ IBpGR29vEbbl4kmpK0fcDsT75GPeH2dg5O199D3iIkS3VcDoQahJMGJEDozXot8JGULWjN9Llq79aF+F
 
         $serializer->parse($invalid);
     }
-
-    public function testLitecoinFixture()
-    {
-        $network = NetworkFactory::litecoin();
-        $addressCreator = new AddressCreator();
-        $address = $addressCreator->fromString("LKueBopPJdhhniURL373SCQ3vx9evQbVSt", $network);
-        $message = "hey there";
-
-        $cpctSig = new Buffer(base64_decode("H7tlmAm+BRVYmFaNClCN096E+29GOVzy0sH0ev/AbPu4cIDD31G8BIfDghPP+G4tI3Nd0n3VWBB2t1dGtxhoGCQ="));
-        /** @var CompactSignatureSerializerInterface $compactSigSerializer */
-        $compactSigSerializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class);
-        $parsed = $compactSigSerializer->parse($cpctSig);
-        $signedMessage = new SignedMessage($message, $parsed);
-
-        $signer = new MessageSigner();
-        $result = $signer->verify($signedMessage, $address, $network);
-        $this->assertTrue($result);
-    }
 }
