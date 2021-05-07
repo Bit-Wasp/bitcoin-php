@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BitWasp\Bitcoin\MessageSigner;
 
-use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Address\Address;
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
@@ -14,6 +14,9 @@ use BitWasp\Bitcoin\Network\NetworkInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
+use BitWasp\Bitcoin\Address\SegwitAddress;
+use BitWasp\Bitcoin\Address\PayToPubKeyHashAddress;
+use BitWasp\Bitcoin\Exceptions\SignerException;
 
 class MessageSigner
 {
@@ -60,12 +63,21 @@ class MessageSigner
 
     /**
      * @param SignedMessage $signedMessage
-     * @param PayToPubKeyHashAddress $address
+     * @param Address $address
      * @param NetworkInterface|null $network
      * @return bool
+     * @throws SignerException
      */
-    public function verify(SignedMessage $signedMessage, PayToPubKeyHashAddress $address, NetworkInterface $network = null): bool
+    public function verify(SignedMessage $signedMessage, Address $address, NetworkInterface $network = null): bool
     {
+        if ($address instanceof SegwitAddress) {
+            $version = $address->getWitnessProgram()->getVersion();
+            if ($version > 0) {
+                throw new SignerException('Wrong segwit address version');
+            }
+        } elseif (!$address instanceof PayToPubKeyHashAddress) {
+            throw new SignerException('Wrong address format');
+        }
         $network = $network ?: Bitcoin::getNetwork();
         $hash = $this->calculateMessageHash($network, $signedMessage->getMessage());
 
