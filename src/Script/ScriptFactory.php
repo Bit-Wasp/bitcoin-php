@@ -24,6 +24,19 @@ class ScriptFactory
     private static $outputScriptFactory = null;
 
     /**
+     * @var Opcodes|null
+     */
+    protected static $opcodes = null;
+
+    public static function getOpCodes(): Opcodes
+    {
+        if (null === static::$opcodes) {
+            static::$opcodes = new Opcodes();
+        }
+        return static::$opcodes;
+    }
+
+    /**
      * @param string $string
      * @return ScriptInterface
      * @throws \Exception
@@ -52,7 +65,8 @@ class ScriptFactory
      */
     public static function create(BufferInterface $buffer = null, Opcodes $opcodes = null, Math $math = null): ScriptCreator
     {
-        return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes ?: new Opcodes(), $buffer);
+        $opcodes = $opcodes ?: self::getOpCodes();
+        return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes, $buffer);
     }
 
     /**
