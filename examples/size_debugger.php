@@ -30,7 +30,7 @@ foreach ($tx->getInputs() as $input) {
     $fields[] = [4*$scriptSize, "\tscript\t".$input->getScript()->getHex()];
     $fields[] = [4*4, "\tseq\t".$input->getSequence()];
 }
-$fields[] = [Buffertools::numToVarInt(count($tx->getOutputs()))->getSize(), 'nOut'];
+$fields[] = [4*Buffertools::numToVarInt(count($tx->getOutputs()))->getSize(), 'nOut'];
 foreach ($tx->getOutputs() as $output) {
     $script = $output->getScript();
     $scriptSize = $script->getBuffer()->getSize();
