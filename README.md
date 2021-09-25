@@ -37,6 +37,7 @@ All contributions are welcome. Please see [[this page](https://github.com/Bit-Wa
 
 # Other projects
 
+ - [bitcoin-php-bloom-filter](https://github.com/Bit-Wasp/bitcoin-php-bloom-filter) - Package providing bloom filter support.
  - [buffertools-php](https://github.com/Bit-Wasp/buffertools-php) - Toolkit for working with binary data in PHP
  - [ext-secp256k1](https://github.com/Bit-Wasp/secp256k1-php) - PHP bindings to libsecp256k1
  - [ext-bitcoinconsensus](https://github.com/Bit-Wasp/bitcoinconsensus-php) - PHP bindings to libbitcoinconsensus
