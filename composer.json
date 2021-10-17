@@ -23,7 +23,7 @@
     }
   },
   "require": {
-    "php-64bit": "^7.3|^8.0",
+    "php-64bit": "^7.0|^8.0",
     "pleonasm/merkle-tree": "1.0.0",
     "composer/semver": "^1.4.0|^3.2.0",
     "lastguest/murmurhash": "v2.0.0",
