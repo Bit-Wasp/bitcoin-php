@@ -14,7 +14,7 @@ abstract class WordList implements WordListInterface
     {
         $words = $this->getWords();
         if (!isset($words[$index])) {
-            throw new \InvalidArgumentException(__CLASS__ . " does not contain a word for index [{$index}]");
+            throw new \InvalidArgumentException("Wordlist does not contain a word for index [{$index}]");
         }
 
         return $words[$index];

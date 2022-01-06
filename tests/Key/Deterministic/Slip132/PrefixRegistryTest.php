@@ -21,7 +21,7 @@ class PrefixRegistryTest extends AbstractTestCase
         ]);
 
         $res = $registry->getPrefixes($key);
-        $this->assertInternalType('array', $res);
+        $this->assertIsArray($res);
         $this->assertCount(2, $res);
         $this->assertEquals($priv, $res[0]);
         $this->assertEquals($pub, $res[1]);

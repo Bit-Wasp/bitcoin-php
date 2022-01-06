@@ -278,7 +278,7 @@ class SignerTest extends AbstractTestCase
     /**
      * @return array
      */
-    public function getSimpleSpendVectors()
+    public function getSimpleSpendVectors(): array
     {
         $vectors = [];
         foreach ($this->getEcAdapters() as $adapterFixture) {
@@ -295,8 +295,6 @@ class SignerTest extends AbstractTestCase
      * @param EcAdapterInterface $ecAdapter
      * @param ScriptInterface $script
      * @dataProvider getSimpleSpendVectors
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Signing with the wrong private key
      */
     public function testRejectsWrongKey(EcAdapterInterface $ecAdapter, ScriptInterface $script)
     {
@@ -312,6 +310,8 @@ class SignerTest extends AbstractTestCase
 
         $txOut = new TransactionOutput(5000000000, $script);
         $signer = new Signer($tx, $ecAdapter);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Signing with the wrong private key");
         $signer->input(0, $txOut)->sign($privateKey, SigHash::ALL);
     }
 

@@ -50,10 +50,6 @@ class EcTest extends AbstractTestCase
         return $math->mod($math->mul($key, $add), $ec->getOrder());
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Failed to find valid recovery factor
-     */
     public function testCalcPubkeyRecidFail()
     {
         $math = new Math();
@@ -61,6 +57,8 @@ class EcTest extends AbstractTestCase
 
         $phpecc = new PhpEcc($math, $g);
         $private = $this->getFirstPrivateKey($phpecc);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Failed to find valid recovery factor");
         $phpecc->calcPubKeyRecoveryParam(gmp_init(1), gmp_init(1), Buffer::hex('4141414141414141414141414141414141414141414141414141414141414141'), $private->getPublicKey());
     }
 

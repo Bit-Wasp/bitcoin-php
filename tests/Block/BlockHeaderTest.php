@@ -9,6 +9,7 @@ use BitWasp\Bitcoin\Block\BlockHeaderFactory;
 use BitWasp\Bitcoin\Exceptions\InvalidHashLengthException;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 
 class BlockHeaderTest extends AbstractTestCase
 {
@@ -57,7 +58,7 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertInstanceOf(Buffer::class, $result->getMerkleRoot());
         $this->assertSame('4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b', $result->getMerkleRoot()->getHex());
 
-        $this->assertInternalType('int', $result->getBits());
+        $this->assertIsInt($result->getBits());
         $this->assertEquals(0x1d00ffff, $result->getBits());
 
         $this->assertEquals(1231006505, $result->getTimestamp());
@@ -77,13 +78,11 @@ class BlockHeaderTest extends AbstractTestCase
         $this->assertSame('000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f', $result->getHash()->getHex());
     }
 
-    /**
-     * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
-     * @expectedExceptionMessage Failed to extract full block header from parser
-     */
     public function testFromParserFailure()
     {
         $genesisHeader = '0100000000000000000000003BA3EDFD7A7B12B27AC72C3E67768F617FC81BC3888A51323A9FB8AA4B1E5E4A29AB5F49FFFF001D1DAC2B7C';
+        $this->expectException(ParserOutOfRange::class);
+        $this->expectExceptionMessage("Failed to extract full block header from parser");
         BlockHeaderFactory::fromHex($genesisHeader);
     }
 

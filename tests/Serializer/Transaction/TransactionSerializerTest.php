@@ -8,6 +8,7 @@ use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
 use BitWasp\Bitcoin\Tests\AbstractTestCase;
 use BitWasp\Bitcoin\Transaction\TransactionFactory;
 use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
 
 class TransactionSerializerTest extends AbstractTestCase
 {
@@ -53,14 +54,12 @@ class TransactionSerializerTest extends AbstractTestCase
         $this->assertEquals($hex, $serialized);
     }
 
-    /**
-     * @expectedException \BitWasp\Buffertools\Exceptions\ParserOutOfRange
-     * @expectedExceptionMessage Insufficient data remaining for VarString
-     */
     public function testInvalidTxinVarint()
     {
         // not perfect, but gotta explode somewhere
         $hex = $this->dataFile('biginputtx.invalid.txt');
+        $this->expectException(ParserOutOfRange::class);
+        $this->expectExceptionMessage("Insufficient data remaining for VarString");
         TransactionFactory::fromHex($hex);
     }
 }

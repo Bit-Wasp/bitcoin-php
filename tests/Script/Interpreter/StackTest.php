@@ -11,12 +11,11 @@ use BitWasp\Buffertools\BufferInterface;
 
 class StackTest extends AbstractTestCase
 {
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testPopException()
     {
         $stack = new Stack;
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Cannot pop from empty stack");
         $stack->pop();
     }
 
@@ -63,12 +62,11 @@ class StackTest extends AbstractTestCase
         $this->assertTrue(count($stack) == 0);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testEraseException()
     {
         $stack = new Stack;
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("Nothing at this position");
         unset($stack[0]);
     }
 

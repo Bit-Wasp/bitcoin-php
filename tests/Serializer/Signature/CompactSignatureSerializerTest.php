@@ -16,12 +16,12 @@ class CompactSignatureSerializerTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $ecAdapter
-     * @expectedException \Exception
      */
     public function testFromParserFailure(EcAdapterInterface $ecAdapter)
     {
         /** @var CompactSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(CompactSignatureSerializerInterface::class, true, $ecAdapter);
+        $this->expectException(\Exception::class);
         $serializer->parse(new Buffer());
     }
 

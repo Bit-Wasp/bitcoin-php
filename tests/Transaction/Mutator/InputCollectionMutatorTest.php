@@ -46,6 +46,7 @@ class InputCollectionMutatorTest extends AbstractTestCase
         ];
         
         $mutator = new InputCollectionMutator($collection);
+        $this->expectException(\RuntimeException::class);
         $mutator->slice(0, 1);
     }
 
@@ -61,5 +62,26 @@ class InputCollectionMutatorTest extends AbstractTestCase
         $outputs = $mutator->done();
 
         $this->assertEquals(0, count($outputs));
+    }
+
+    public function testSet()
+    {
+        $collection = [
+            new TransactionInput(new OutPoint(Buffer::hex('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 5), new Script()),
+            new TransactionInput(new OutPoint(Buffer::hex('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 10), new Script()),
+        ];
+
+        $mutator = new InputCollectionMutator($collection);
+        $new = new TransactionInput(new OutPoint(Buffer::hex('baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'), 11), new Script());
+        $mutator->set(1, $new);
+        $newCollection = $mutator->done();
+        $this->assertTrue($newCollection[1]->equals($new));
+    }
+
+    public function testInvalidIndex()
+    {
+        $mutator = new InputCollectionMutator([]);
+        $this->expectException(\OutOfRangeException::class);
+        $mutator->offsetGet(10);
     }
 }

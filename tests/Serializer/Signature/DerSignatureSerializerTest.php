@@ -19,12 +19,12 @@ class DerSignatureSerializerTest extends AbstractTestCase
     /**
      * @dataProvider getEcAdapters
      * @param EcAdapterInterface $adapter
-     * @expectedException \Exception
      */
     public function testFromParserFailure(EcAdapterInterface $adapter)
     {
         /** @var DerSignatureSerializerInterface $serializer */
         $serializer = EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $adapter);
+        $this->expectException(\Exception::class);
         $serializer->parse(new Buffer());
     }
 

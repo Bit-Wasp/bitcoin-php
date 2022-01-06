@@ -62,11 +62,11 @@ class BloomFilter extends Serializable
     private $flags;
 
     /**
-     * @param Math $math
+     * @param Math  $math
      * @param array $vFilter
-     * @param int $numHashFuncs
-     * @param int $nTweak
-     * @param int $flags
+     * @param int   $numHashFuncs
+     * @param int   $nTweak
+     * @param int   $flags
      */
     public function __construct(Math $math, array $vFilter, int $numHashFuncs, int $nTweak, int $flags)
     {
@@ -91,11 +91,11 @@ class BloomFilter extends Serializable
      * Create the Bloom Filter given the number of elements, a false positive rate,
      * and the flags governing how the filter should be updated.
      *
-     * @param Math $math
-     * @param int $nElements
-     * @param float $nFpRate
-     * @param int $nTweak
-     * @param int $flags
+     * @param  Math  $math
+     * @param  int   $nElements
+     * @param  float $nFpRate
+     * @param  int   $nTweak
+     * @param  int   $flags
      * @return BloomFilter
      */
     public static function create(Math $math, int $nElements, float $nFpRate, int $nTweak, int $flags): BloomFilter
@@ -184,33 +184,15 @@ class BloomFilter extends Serializable
     }
 
     /**
-     * @param int $nElements
+     * @param int   $nElements
      * @param float $fpRate
      * @return int
      */
     public static function idealSize(int $nElements, float $fpRate): int
     {
-        return (int) floor(
-            bcdiv(
-                min(
-                    bcmul(
-                        bcmul(
-                            bcdiv(
-                                '-1',
-                                (string) self::LN2SQUARED
-                            ),
-                            (string) $nElements
-                        ),
-                        (string) log($fpRate)
-                    ),
-                    bcmul(
-                        (string) self::MAX_FILTER_SIZE,
-                        '8'
-                    )
-                ),
-                '8'
-            )
-        );
+        $a = (-1/self::LN2SQUARED)*$nElements*log($fpRate);
+        $b = self::MAX_FILTER_SIZE*8;
+        return (int) floor(min($a, $b) / 8);
     }
 
     /**
@@ -220,28 +202,13 @@ class BloomFilter extends Serializable
      */
     public static function idealNumHashFuncs(int $filterSize, int $nElements)
     {
-        return (int) floor(
-            min(
-                bcmul(
-                    bcdiv(
-                        bcmul(
-                            (string) $filterSize,
-                            '8'
-                        ),
-                        (string) $nElements
-                    ),
-                    (string) self::LN2
-                ),
-                bcmul(
-                    (string) self::MAX_FILTER_SIZE,
-                    '8'
-                )
-            )
-        );
+        $a = (($filterSize*8)/$nElements)*self::LN2;
+        $b = self::MAX_FILTER_SIZE * 8;
+        return (int) floor(min($a, $b));
     }
 
     /**
-     * @param int $nHashNum
+     * @param int             $nHashNum
      * @param BufferInterface $data
      * @return string
      */

@@ -30,7 +30,7 @@ class ServerTest extends AbstractTestCase
         $server = $this->rpcFactory->startBitcoind();
 
         $result = $server->makeRpcRequest("getblockchaininfo");
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertArrayHasKey('result', $result);
         $this->assertArrayHasKey('chain', $result['result']);
         $this->assertEquals('regtest', $result['result']['chain']);
@@ -44,12 +44,12 @@ class ServerTest extends AbstractTestCase
 
         // First bitcoind, generate block
         $result = $bitcoind->request("generate", [1]);
-        $this->assertInternalType("array", $result['result']);
+        $this->assertIsArray($result['result']);
         $this->assertEquals(64, strlen($result['result'][0]));
 
         // First bitcoind, get block height - 1
         $info = $bitcoind->request("getblockchaininfo");
-        $this->assertInternalType("array", $info['result']);
+        $this->assertIsArray($info['result']);
         $this->assertEquals(1, $info['result']['blocks']);
 
         // Destroy that instance
@@ -60,7 +60,7 @@ class ServerTest extends AbstractTestCase
         $bitcoind = $this->rpcFactory->startBitcoind();
 
         $info = $bitcoind->request("getblockchaininfo");
-        $this->assertInternalType("array", $info['result']);
+        $this->assertIsArray($info['result']);
         $this->assertEquals(0, $info['result']['blocks']);
 
         $bitcoind->destroy();

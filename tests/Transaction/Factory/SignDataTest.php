@@ -57,33 +57,28 @@ class SignDataTest extends AbstractTestCase
         }
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Witness script requested but not set
-     */
     public function testThrowsIfUnknownWSRequested()
     {
         $signData = new SignData();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Witness script requested but not set");
         $signData->getWitnessScript();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Redeem script requested but not set
-     */
     public function testThrowsIfUnknownRSRequested()
     {
         $signData = new SignData();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Redeem script requested but not set");
         $signData->getRedeemScript();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Signature policy requested but not set
-     */
     public function testThrowsIfUnknownSignaturePolicyRequested()
     {
         $signData = new SignData();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Signature policy requested but not set");
+
         $signData->getSignaturePolicy();
     }
 }
