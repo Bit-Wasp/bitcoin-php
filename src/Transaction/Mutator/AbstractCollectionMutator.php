@@ -21,12 +21,12 @@ abstract class AbstractCollectionMutator implements Iterator, ArrayAccess, Count
 
     public function all(): array
     {
-        return $this->set->toArray();
+        return $this->array->toArray();
     }
 
     public function isNull(): bool
     {
-        return count($this->set) === 0;
+        return count($this->array) === 0;
     }
 
     public function rewind()
@@ -66,7 +66,7 @@ abstract class AbstractCollectionMutator implements Iterator, ArrayAccess, Count
 
     public function offsetSet($offset, $value)
     {
-        if (!$this->set->offsetExists($offset)) {
+        if (!$this->array->offsetExists($offset)) {
             throw new \OutOfRangeException('Nothing found at this offset');
         }
 
