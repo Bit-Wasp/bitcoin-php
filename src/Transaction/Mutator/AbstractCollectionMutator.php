@@ -10,23 +10,23 @@ use SplFixedArray;
 
 abstract class AbstractCollectionMutator implements Iterator, ArrayAccess, Countable
 {
-    private $array;
+    protected $set;
     private $position;
 
     public function __construct(int $size)
     {
-        $this->array = new SplFixedArray($size);
+        $this->set = new SplFixedArray($size);
         $this->position = 0;
     }
 
     public function all(): array
     {
-        return $this->array->toArray();
+        return $this->set->toArray();
     }
 
     public function isNull(): bool
     {
-        return count($this->array) === 0;
+        return count($this->set) === 0;
     }
 
     public function rewind()
@@ -36,7 +36,7 @@ abstract class AbstractCollectionMutator implements Iterator, ArrayAccess, Count
 
     public function current()
     {
-        return $this->array[$this->position];
+        return $this->set[$this->position];
     }
 
     public function key()
@@ -51,26 +51,26 @@ abstract class AbstractCollectionMutator implements Iterator, ArrayAccess, Count
 
     public function valid()
     {
-        return isset($this->array[$this->position]);
+        return isset($this->set[$this->position]);
     }
 
     public function offsetExists($offset)
     {
-        return isset($this->array[$offset]);
+        return isset($this->set[$offset]);
     }
 
     public function offsetGet($offset)
     {
-        return $this->array[$offset];
+        return $this->set[$offset];
     }
 
     public function offsetSet($offset, $value)
     {
-        if (!$this->array->offsetExists($offset)) {
+        if (!$this->set->offsetExists($offset)) {
             throw new \OutOfRangeException('Nothing found at this offset');
         }
 
-        $this->array[$offset] = $value;
+        $this->set[$offset] = $value;
     }
 
     public function offsetUnset($offset)
@@ -79,11 +79,11 @@ abstract class AbstractCollectionMutator implements Iterator, ArrayAccess, Count
             throw new \InvalidArgumentException('Offset does not exist');
         }
 
-        unset($this->array[$offset]);
+        unset($this->set[$offset]);
     }
 
     public function count()
     {
-        return $this->array->count();
+        return $this->set->count();
     }
 }
