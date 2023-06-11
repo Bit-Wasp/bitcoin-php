@@ -24,14 +24,6 @@ class InputCollectionMutator extends AbstractCollectionMutator
     }
 
     /**
-     * @return InputMutator
-     */
-    public function current(): InputMutator
-    {
-        return $this->set->current();
-    }
-
-    /**
      * @param int $offset
      * @return InputMutator
      */
