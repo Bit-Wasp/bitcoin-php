@@ -78,6 +78,11 @@ class Signature extends Serializable implements SignatureInterface, \Mdanter\Ecc
         return $this->doEquals($signature);
     }
 
+    public function getSignatureType(): string
+    {
+        return "ecdsa";
+    }
+
     /**
      * @return \BitWasp\Buffertools\BufferInterface
      */
