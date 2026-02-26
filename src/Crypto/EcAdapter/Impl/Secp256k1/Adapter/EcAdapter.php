@@ -44,7 +44,7 @@ class EcAdapter implements EcAdapterInterface
      */
     public function __construct(Math $math, GeneratorPoint $generator, $secp256k1_context_t)
     {
-        if (!is_resource($secp256k1_context_t) || !get_resource_type($secp256k1_context_t) === SECP256K1_TYPE_CONTEXT) {
+        if (!is_resource($secp256k1_context_t) || get_resource_type($secp256k1_context_t) !== SECP256K1_TYPE_CONTEXT) {
             throw new \InvalidArgumentException('Secp256k1: Must pass a secp256k1_context_t resource');
         }
 
