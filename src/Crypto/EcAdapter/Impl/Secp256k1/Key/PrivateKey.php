@@ -8,10 +8,13 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key\PrivateKeySerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\CompactSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\SchnorrSignature;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\SchnorrSignatureInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature\Signature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\Key;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\KeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Key\XOnlyPublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Bitcoin\Crypto\Random\RbgInterface;
 use BitWasp\Bitcoin\Exceptions\InvalidPrivateKey;
@@ -68,6 +71,18 @@ class PrivateKey extends Key implements PrivateKeyInterface
         $this->secret = $secret;
         $this->secretBin = $buffer->getBinary();
         $this->compressed = $compressed;
+    }
+
+    public function signSchnorr(BufferInterface $msg32): \BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SchnorrSignatureInterface
+    {
+        $context = $this->ecAdapter->getContext();
+
+        $schnorrSig = null;
+        if (1 !== secp256k1_schnorrsig_sign($context, $schnorrSig, $msg32->getBinary(), $this->secretBin)) {
+            throw new \RuntimeException("failed to sign transaction");
+        }
+
+        return new SchnorrSignature($context, $schnorrSig);
     }
 
     /**
@@ -169,6 +184,11 @@ class PrivateKey extends Key implements PrivateKeyInterface
         }
 
         return $this->publicKey;
+    }
+
+    public function getXOnlyPublicKey(): XOnlyPublicKeyInterface
+    {
+        return $this->getPublicKey()->asXOnlyPublicKey();
     }
 
     /**

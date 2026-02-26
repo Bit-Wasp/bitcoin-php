@@ -8,8 +8,10 @@ use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\XOnlyPublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SchnorrSignatureSerializerInterface;
 
 class EcSerializer
 {
@@ -22,8 +24,10 @@ class EcSerializer
     private static $serializerInterface = [
         PrivateKeySerializerInterface::class,
         PublicKeySerializerInterface::class,
+        XOnlyPublicKeySerializerInterface::class,
         CompactSignatureSerializerInterface::class,
         DerSignatureSerializerInterface::class,
+        SchnorrSignatureSerializerInterface::class,
     ];
 
     /**
@@ -32,8 +36,10 @@ class EcSerializer
     private static $serializerImpl = [
         'Serializer\Key\PrivateKeySerializer',
         'Serializer\Key\PublicKeySerializer',
+        'Serializer\Key\XOnlyPublicKeySerializer',
         'Serializer\Signature\CompactSignatureSerializer',
-        'Serializer\Signature\DerSignatureSerializer'
+        'Serializer\Signature\DerSignatureSerializer',
+        'Serializer\Signature\SchnorrSignatureSerializer',
     ];
 
     /**

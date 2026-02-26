@@ -13,6 +13,9 @@ use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
+use function BitWasp\Bitcoin\Script\SighashGetOutputsSha256;
+use function BitWasp\Bitcoin\Script\SighashGetPrevoutsSha256;
+use function BitWasp\Bitcoin\Script\SighashGetSequencesSha256;
 
 class V1Hasher extends SigHash
 {
@@ -62,11 +65,7 @@ class V1Hasher extends SigHash
     public function hashPrevOuts(int $sighashType): BufferInterface
     {
         if (!($sighashType & SigHash::ANYONECANPAY)) {
-            $binary = '';
-            foreach ($this->tx->getInputs() as $input) {
-                $binary .= $this->outpointSerializer->serialize($input->getOutPoint())->getBinary();
-            }
-            return Hash::sha256d(new Buffer($binary));
+            return Hash::sha256(SighashGetPrevoutsSha256($this->outpointSerializer, $this->tx));
         }
 
         return new Buffer('', 32);
@@ -79,12 +78,7 @@ class V1Hasher extends SigHash
     public function hashSequences(int $sighashType): BufferInterface
     {
         if (!($sighashType & SigHash::ANYONECANPAY) && ($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
-            $binary = '';
-            foreach ($this->tx->getInputs() as $input) {
-                $binary .= pack('V', $input->getSequence());
-            }
-
-            return Hash::sha256d(new Buffer($binary));
+            return Hash::sha256(SighashGetSequencesSha256($this->tx));
         }
 
         return new Buffer('', 32);
@@ -98,11 +92,7 @@ class V1Hasher extends SigHash
     public function hashOutputs(int $sighashType, int $inputToSign): BufferInterface
     {
         if (($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
-            $binary = '';
-            foreach ($this->tx->getOutputs() as $output) {
-                $binary .= $this->outputSerializer->serialize($output)->getBinary();
-            }
-            return Hash::sha256d(new Buffer($binary));
+            return Hash::sha256(SighashGetOutputsSha256($this->outputSerializer, $this->tx));
         } elseif (($sighashType & 0x1f) === SigHash::SINGLE && $inputToSign < count($this->tx->getOutputs())) {
             return Hash::sha256d($this->outputSerializer->serialize($this->tx->getOutput($inputToSign)));
         }

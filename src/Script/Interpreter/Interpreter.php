@@ -6,6 +6,8 @@ namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\XOnlyPublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
@@ -19,9 +21,12 @@ use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\Script\WitnessProgram;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
+use BitWasp\Bitcoin\Transaction\SignatureHash\TaprootHasher;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Buffertools;
+use function BitWasp\Bitcoin\Script\isOPSuccess;
 
 class Interpreter implements InterpreterInterface
 {
@@ -42,6 +47,11 @@ class Interpreter implements InterpreterInterface
     private $vchTrue;
 
     /**
+     * @var EcAdapterInterface
+     */
+    private $adapter;
+
+    /**
      * @var array
      */
     private $disabledOps = [
@@ -51,6 +61,9 @@ class Interpreter implements InterpreterInterface
         Opcodes::OP_MOD,    Opcodes::OP_LSHIFT, Opcodes::OP_RSHIFT
     ];
 
+    const MAX_SCRIPT_SIZE = 10000;
+    const MAX_STACK_SIZE = 1000;
+
     /**
      * @param EcAdapterInterface $ecAdapter
      */
@@ -58,6 +71,7 @@ class Interpreter implements InterpreterInterface
     {
         $ecAdapter = $ecAdapter ?: Bitcoin::getEcAdapter();
         $this->math = $ecAdapter->getMath();
+        $this->adapter = $ecAdapter;
         $this->vchFalse = new Buffer("", 0);
         $this->vchTrue = new Buffer("\x01", 1);
     }
@@ -145,55 +159,79 @@ class Interpreter implements InterpreterInterface
     }
 
     /**
-     * @param WitnessProgram $witnessProgram
-     * @param ScriptWitnessInterface $scriptWitness
+     * Size of control must be validated before calling.
+     * @param BufferInterface $control
+     * @param BufferInterface $program
+     * @param BufferInterface $scriptPubKey
+     * @param BufferInterface|null $leafHash
+     * @return bool
+     * @throws \Exception
+     */
+    private function verifyTaprootCommitment(BufferInterface $control, BufferInterface $program, BufferInterface $scriptPubKey, BufferInterface &$leafHash = null): bool
+    {
+        $m = ($control->getSize() - TAPROOT_CONTROL_BASE_SIZE) / TAPROOT_CONTROL_BRANCH_SIZE;
+        $p = $control->slice(1, 32);
+        /** @var XOnlyPublicKeySerializerInterface $xonlySer */
+        $xonlySer = EcSerializer::getSerializer(XOnlyPublicKeySerializerInterface::class, true, $this->adapter);
+        try {
+            $P = $xonlySer->parse($p);
+            $Q = $xonlySer->parse($program);
+        } catch (\Exception $e) {
+            return false;
+        }
+        $leafVersion = $control->slice(0, 1)->getInt() & TAPROOT_LEAF_MASK;
+
+        $leafData = new Buffer(chr($leafVersion&TAPROOT_LEAF_MASK) . Buffertools::numToVarIntBin($scriptPubKey->getSize()) . $scriptPubKey->getBinary());
+        $k = Hash::taggedSha256("TapLeaf", $leafData);
+        $leafHash = $k;
+        for ($i = 0; $i < $m; $i++) {
+            $begin = TAPROOT_CONTROL_BASE_SIZE+TAPROOT_CONTROL_BRANCH_SIZE*$i;
+            $ej = $control->slice($begin, $begin + TAPROOT_CONTROL_BRANCH_SIZE);
+            if (strcmp($k->getBinary(), $ej->getBinary()) >= 0) {
+                $k = Hash::taggedSha256("TapBranch", Buffertools::concat($ej, $k));
+            } else {
+                $k = Hash::taggedSha256("TapBranch", Buffertools::concat($k, $ej));
+            }
+        }
+
+        $t = Hash::taggedSha256("TapTweak", Buffertools::concat($p, $k));
+
+        $negated = (bool) (ord($control->getBinary()[0]) & 1);
+
+        return $Q->checkPayToContract($P, $t, $negated);
+    }
+
+    /**
+     * @param ScriptWitnessInterface $witness
+     * @param ScriptInterface $script
+     * @param int $sigVersion
      * @param int $flags
      * @param CheckerBase $checker
+     * @param ExecutionContext $execContext
      * @return bool
      */
-    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, CheckerBase $checker): bool
+    private function executeWitnessProgram(ScriptWitnessInterface $witness, ScriptInterface $script, int $sigVersion, int $flags, CheckerBase $checker, ExecutionContext $execContext): bool
     {
-        $witnessCount = count($scriptWitness);
-
-        if ($witnessProgram->getVersion() === 0) {
-            $buffer = $witnessProgram->getProgram();
-            if ($buffer->getSize() === 32) {
-                // Version 0 segregated witness program: SHA256(Script) in program, Script + inputs in witness
-                if ($witnessCount === 0) {
-                    // Must contain script at least
-                    return false;
+        if ($sigVersion === SigHash::TAPSCRIPT) {
+            foreach ($script->getScriptParser() as $operation) {
+                if (isOPSuccess($operation->getOp())) {
+                    if (($flags & self::VERIFY_DISCOURAGE_OP_SUCCESS)) {
+                        return false;
+                    }
+                    return true;
                 }
-
-                $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
-                $stackValues = $scriptWitness->slice(0, -1);
-                if (!$buffer->equals($scriptPubKey->getWitnessScriptHash())) {
-                    return false;
-                }
-            } elseif ($buffer->getSize() === 20) {
-                // Version 0 special case for pay-to-pubkeyhash
-                if ($witnessCount !== 2) {
-                    // 2 items in witness - <signature> <pubkey>
-                    return false;
-                }
-
-                $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($buffer);
-                $stackValues = $scriptWitness;
-            } else {
-                return false;
             }
-        } elseif ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
-            return false;
-        } else {
-            // Unknown versions are always 'valid' to permit future soft forks
-            return true;
         }
 
         $mainStack = new Stack();
-        foreach ($stackValues as $value) {
+        foreach ($witness as $value) {
+            if ($value->getSize() > self::MAX_SCRIPT_ELEMENT_SIZE) {
+                return false;
+            }
             $mainStack->push($value);
         }
 
-        if (!$this->evaluate($scriptPubKey, $mainStack, SigHash::V1, $flags, $checker)) {
+        if (!$this->evaluate($script, $mainStack, $sigVersion, $flags, $checker, $execContext)) {
             return false;
         }
 
@@ -205,6 +243,125 @@ class Interpreter implements InterpreterInterface
             return false;
         }
 
+        return true;
+    }
+
+    /**
+     * @param WitnessProgram $witnessProgram
+     * @param ScriptWitnessInterface $scriptWitness
+     * @param int $flags
+     * @param CheckerBase $checker
+     * @param bool $isP2sh
+     * @return bool
+     */
+    private function verifyWitnessProgram(WitnessProgram $witnessProgram, ScriptWitnessInterface $scriptWitness, int $flags, CheckerBase $checker, bool $isP2sh): bool
+    {
+        $witnessCount = count($scriptWitness);
+        $execContext = new ExecutionContext();
+
+        if ($witnessProgram->getVersion() === 0) {
+            $program = $witnessProgram->getProgram();
+            if ($program->getSize() === 32) {
+                // Version 0 segregated witness program: SHA256(Script) in program, Script + inputs in witness
+                if ($witnessCount === 0) {
+                    // Must contain script at least
+                    return false;
+                }
+
+                $scriptPubKey = new Script($scriptWitness[$witnessCount - 1]);
+                /** @var ScriptWitnessInterface $stack */
+                $stack = $scriptWitness->slice(0, -1);
+                if (!$program->equals($scriptPubKey->getWitnessScriptHash())) {
+                    return false;
+                }
+                return $this->executeWitnessProgram($stack, $scriptPubKey, SigHash::V1, $flags, $checker, $execContext);
+            } elseif ($program->getSize() === 20) {
+                // Version 0 special case for pay-to-pubkeyhash
+                if ($witnessCount !== 2) {
+                    // 2 items in witness - <signature> <pubkey>
+                    return false;
+                }
+
+                $scriptPubKey = ScriptFactory::scriptPubKey()->payToPubKeyHash($program);
+                return $this->executeWitnessProgram($scriptWitness, $scriptPubKey, SigHash::V1, $flags, $checker, $execContext);
+            } else {
+                return false;
+            }
+        }
+
+        if ($witnessProgram->getVersion() === 1 && $witnessProgram->getProgram()->getSize() === 32 && !$isP2sh) {
+            if (!($flags & self::VERIFY_TAPROOT)) {
+                return true;
+            }
+
+            if ($witnessCount === 0) {
+                echo "empty witness\n";
+                return false;
+            } else if ($witnessCount >= 2 && $scriptWitness->bottom()->getSize() > 0 && ord($scriptWitness->bottom()->getBinary()[0]) === TaprootHasher::TAPROOT_ANNEX_BYTE) {
+                $annex = $scriptWitness->bottom();
+                if (($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_ANNEX)) {
+                    echo "uigradable annex\n";
+                    return false;
+                }
+                $execContext->setAnnexHash(Hash::sha256($annex));
+                // remove annex from witness
+                $scriptWitness = $scriptWitness->slice(0, -1);
+                $witnessCount--;
+            }
+            $execContext->setAnnexCheckDone();
+            if ($witnessCount === 1) {
+                // key spend path - doesn't use the interpreter, directly checks signature
+                $signature = $scriptWitness[count($scriptWitness) - 1];
+                if (!$checker->checkSigSchnorr($signature, $witnessProgram->getProgram(), SigHash::TAPROOT, $execContext)) {
+                    echo "invalid signature\n";
+                    return false;
+                }
+                return true;
+            } else {
+                // script spend path
+                // load control, and drop from end of witness
+                /** @var BufferInterface $control */
+                $control = $scriptWitness->bottom();
+                $scriptWitness = $scriptWitness->slice(0, -1);
+
+                // load scriptPubKey, and drop from end of witness
+                /** @var BufferInterface $control */
+                $scriptPubKey = $scriptWitness->bottom();
+                $scriptWitness = $scriptWitness->slice(0, -1);
+
+                if ($control->getSize() < TAPROOT_CONTROL_BASE_SIZE ||
+                    $control->getSize() > TAPROOT_CONTROL_MAX_SIZE ||
+                    (($control->getSize() - TAPROOT_CONTROL_BASE_SIZE) % TAPROOT_CONTROL_BRANCH_SIZE !== 0)) {
+                    echo "invalid control size\n";
+                    return false;
+                }
+
+                $leafHash = null;
+                if (!$this->verifyTaprootCommitment($control, $witnessProgram->getProgram(), $scriptPubKey, $leafHash)) {
+                    echo "invalid taproot commitment\n";
+                    return false;
+                }
+                $execContext->setTapLeafHash($leafHash);
+
+                if ((ord($control->getBinary()[0]) & TAPROOT_LEAF_MASK) == TAPROOT_LEAF_TAPSCRIPT) {
+                    // #Elements + [len(element) || element] for n
+                    $execContext->setValidationWeightLeft($scriptWitness->getBuffer()->getSize() + VALIDATION_WEIGHT_OFFSET);
+                }
+
+                // return true at this stage, need further work to proceed
+                $ret = $this->executeWitnessProgram($scriptWitness, new Script($scriptPubKey), SigHash::TAPSCRIPT, $flags, $checker, $execContext);
+                var_dump("witnessExec");
+                var_dump($ret);
+                return $ret;
+            }
+        }
+
+        if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM) {
+            echo "upgradable witness program\n";
+            return false;
+        }
+
+        // Return true to allow future softforks
         return true;
     }
 
@@ -261,10 +418,9 @@ class Interpreter implements InterpreterInterface
                     return false;
                 }
 
-                if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
+                if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker, false)) {
                     return false;
                 }
-
                 $stack->resize(1);
             }
         }
@@ -307,7 +463,7 @@ class Interpreter implements InterpreterInterface
                         return false; // SCRIPT_ERR_WITNESS_MALLEATED_P2SH
                     }
 
-                    if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker)) {
+                    if (!$this->verifyWitnessProgram($program, $witness, $flags, $checker, true)) {
                         return false;
                     }
 
@@ -356,25 +512,88 @@ class Interpreter implements InterpreterInterface
         return (bool) $ret;
     }
 
+    private function evalChecksigPreTapscript(BufferInterface $sig, BufferInterface $key, ScriptInterface $scriptPubKey, int $hashStartPos, int $flags, CheckerBase $checker, int $sigVersion, bool &$success): bool
+    {
+        assert($sigVersion === SigHash::V0 || $sigVersion === SigHash::V1);
+        $scriptCode = new Script($scriptPubKey->getBuffer()->slice($hashStartPos));
+        // encoding is checked in checker
+        $success = $checker->checkSig($scriptCode, $sig, $key, $sigVersion, $flags);
+        return true;
+    }
+
+    private function evalChecksigTapscript(BufferInterface $sig, BufferInterface $key, int $flags, CheckerBase $checker, int $sigVersion, ExecutionContext $execContext, bool &$success): bool
+    {
+        assert($sigVersion === SigHash::TAPSCRIPT);
+        $success = $sig->getSize() > 0;
+        if ($success) {
+            assert($execContext->hasValidationWeightSet());
+            $execContext->setValidationWeightLeft($execContext->getValidationWeightLeft() - VALIDATION_WEIGHT_OFFSET);
+            if ($execContext->getValidationWeightLeft() < 0) {
+                echo "validation weight failure\n";
+                return false;
+            }
+        }
+        if ($key->getSize() === 0) {
+            echo "keysize=0\n";
+            return false;
+        } else if ($key->getSize() === 32) {
+            if ($success && !$checker->checkSigSchnorr($sig, $key, $sigVersion, $execContext)) {
+                echo "keysize = 32 and checksig failed\n";
+                return false;
+            }
+        } else {
+            if ($flags & self::VERIFY_DISCOURAGE_UPGRADABLE_PUBKEYTYPE) {
+                echo "upgradable keytype\n";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private function evalChecksig(BufferInterface $sig, BufferInterface $key, ScriptInterface $scriptPubKey, int $hashStartPos, int $flags, CheckerBase $checker, int $sigVersion, ExecutionContext $execContext, bool &$success): bool
+    {
+        switch ($sigVersion) {
+            case SigHash::V0:
+            case SigHash::V1:
+                return $this->evalChecksigPreTapscript($sig, $key, $scriptPubKey, $hashStartPos, $flags, $checker, $sigVersion, $success);
+            case SigHash::TAPSCRIPT:
+                return $this->evalChecksigTapscript($sig, $key, $flags, $checker, $sigVersion, $execContext, $success);
+            case SigHash::TAPROOT:
+                break;
+        };
+        assert(false);
+    }
+
     /**
      * @param ScriptInterface $script
      * @param Stack $mainStack
      * @param int $sigVersion
      * @param int $flags
      * @param CheckerBase $checker
+     * @param ExecutionContext|null $execContext
      * @return bool
      */
-    public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, CheckerBase $checker): bool
+    public function evaluate(ScriptInterface $script, Stack $mainStack, int $sigVersion, int $flags, CheckerBase $checker, ExecutionContext $execContext = null): bool
     {
+        if ($execContext === null) {
+            $execContext = new ExecutionContext();
+        }
         $hashStartPos = 0;
         $opCount = 0;
+        $opCodePos = 0;
         $zero = gmp_init(0, 10);
         $altStack = new Stack();
         $vfStack = new Stack();
         $minimal = ($flags & self::VERIFY_MINIMALDATA) !== 0;
         $parser = $script->getScriptParser();
 
-        if ($script->getBuffer()->getSize() > 10000) {
+        // script limit applies to base, and v0 segwit, but not tapscript
+        if (($sigVersion === SigHash::V0 || $sigVersion === SigHash::V1) && $script->getBuffer()->getSize() > self::MAX_SCRIPT_SIZE) {
+            return false;
+        }
+
+        // stack limit applies to initial stack under tapscript
+        if ($sigVersion === SigHash::TAPSCRIPT && $mainStack->count() > self::MAX_STACK_SIZE) {
             return false;
         }
 
@@ -389,9 +608,12 @@ class Interpreter implements InterpreterInterface
                     throw new \RuntimeException('Error - push size');
                 }
 
-                // OP_RESERVED should not count towards opCount
-                if ($opCode > Opcodes::OP_16 && ++$opCount) {
-                    $this->checkOpcodeCount($opCount);
+                // non-push opcode limit applies to base & v0 segwit, but not tapscript
+                if ($sigVersion === SigHash::V0 || $sigVersion === SigHash::V1) {
+                    // OP_RESERVED should not count towards opCount
+                    if ($opCode > Opcodes::OP_16 && ++$opCount) {
+                        $this->checkOpcodeCount($opCount);
+                    }
                 }
 
                 if (in_array($opCode, $this->disabledOps, true)) {
@@ -405,9 +627,9 @@ class Interpreter implements InterpreterInterface
                     }
 
                     $mainStack->push($pushData);
-                    // echo " - [pushed '" . $pushData->getHex() . "']\n";
+                     echo " - [pushed '" . $pushData->getHex() . "']\n";
                 } elseif ($fExec || (Opcodes::OP_IF <= $opCode && $opCode <= Opcodes::OP_ENDIF)) {
-                    // echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
+                     echo "OPCODE - " . $script->getOpcodes()->getOp($opCode) . "\n";
                     switch ($opCode) {
                         case Opcodes::OP_1NEGATE:
                         case Opcodes::OP_1:
@@ -502,7 +724,8 @@ class Interpreter implements InterpreterInterface
                                 }
                                 $vch = $mainStack[-1];
 
-                                if ($sigVersion === SigHash::V1 && ($flags & self::VERIFY_MINIMALIF)) {
+                                // minimalif is a standardness rule in v0 segwit, but required in tapscript
+                                if ($sigVersion === SigHash::TAPSCRIPT || ($sigVersion === SigHash::V1 && ($flags & self::VERIFY_MINIMALIF))) {
                                     if ($vch->getSize() > 1) {
                                         throw new ScriptRuntimeException(self::VERIFY_MINIMALIF, 'Input to OP_IF/NOTIF should be minimally encoded');
                                     }
@@ -866,6 +1089,32 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_CODESEPARATOR:
                             $hashStartPos = $parser->getPosition();
+                            $execContext->setCodeSeparatorPosition($opCodePos);
+                            break;
+
+                        case Opcodes::OP_CHECKSIGADD:
+                            if ($sigVersion !== SigHash::TAPSCRIPT) {
+                                echo "sigVersion != tapscript\n";
+                                throw new \RuntimeException('Opcode not found');
+                            }
+                            if ($mainStack->count() < 3) {
+                                echo "mainStack count != 3\n";
+                                return false;
+                            }
+                            $pubkey = $mainStack[-1];
+                            $n = Number::buffer($mainStack[-2], $minimal, Number::MAX_NUM_SIZE, $this->math);
+                            $sig = $mainStack[-3];
+
+                            $success = false;
+                            if (!$this->evalChecksig($sig, $pubkey, $script, $hashStartPos, $flags, $checker, $sigVersion, $execContext, $success)) {
+                                echo "checksig add - evalChecksig false\n";
+                                return false;
+                            }
+                            $push = Number::gmp($this->math->add($n->getGmp(), gmp_init($success ? 1 : 0, 10)), $this->math)->getBuffer();
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->pop();
+                            $mainStack->push($push);
                             break;
 
                         case Opcodes::OP_CHECKSIG:
@@ -877,9 +1126,10 @@ class Interpreter implements InterpreterInterface
                             $vchPubKey = $mainStack[-1];
                             $vchSig = $mainStack[-2];
 
-                            $scriptCode = new Script($script->getBuffer()->slice($hashStartPos));
-
-                            $success = $checker->checkSig($scriptCode, $vchSig, $vchPubKey, $sigVersion, $flags);
+                            $success = false;
+                            if (!$this->evalChecksig($vchSig, $vchPubKey, $script, $hashStartPos, $flags, $checker, $sigVersion, $execContext, $success)) {
+                                return false;
+                            }
 
                             $mainStack->pop();
                             $mainStack->pop();
@@ -900,6 +1150,9 @@ class Interpreter implements InterpreterInterface
 
                         case Opcodes::OP_CHECKMULTISIG:
                         case Opcodes::OP_CHECKMULTISIGVERIFY:
+                            if ($sigVersion === SigHash::TAPSCRIPT) {
+                                throw new \RuntimeException('Disabled Opcode');
+                            }
                             $i = 1;
                             if (count($mainStack) < $i) {
                                 throw new \RuntimeException('Invalid stack operation');
@@ -997,9 +1250,11 @@ class Interpreter implements InterpreterInterface
                             throw new \RuntimeException('Opcode not found');
                     }
 
-                    if (count($mainStack) + count($altStack) > 1000) {
+                    if (count($mainStack) + count($altStack) > self::MAX_STACK_SIZE) {
                         throw new \RuntimeException('Invalid stack size, exceeds 1000');
                     }
+
+                    $opCodePos++;
                 }
             }
 
@@ -1009,11 +1264,11 @@ class Interpreter implements InterpreterInterface
 
             return true;
         } catch (ScriptRuntimeException $e) {
-            // echo "\n Runtime: " . $e->getMessage() . "\n" . $e->getTraceAsString() . PHP_EOL;
+             echo "\n Runtime: " . $e->getMessage() . "\n" . $e->getTraceAsString() . PHP_EOL;
             // Failure due to script tags, can access flag: $e->getFailureFlag()
             return false;
         } catch (\Exception $e) {
-            // echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
+             echo "\n General: " . $e->getMessage()  . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
             return false;
         }
     }

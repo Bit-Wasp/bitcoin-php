@@ -8,17 +8,22 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\EcSerializer;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\XOnlyPublicKeySerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\SchnorrSignatureSerializerInterface;
 use BitWasp\Bitcoin\Exceptions\ScriptRuntimeException;
 use BitWasp\Bitcoin\Exceptions\SignatureNotCanonical;
 use BitWasp\Bitcoin\Locktime;
+use BitWasp\Bitcoin\Script\PrecomputedData;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializer\Signature\TransactionSignatureSerializer;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
 use BitWasp\Bitcoin\Transaction\SignatureHash\SigHash;
+use BitWasp\Bitcoin\Transaction\SignatureHash\TaprootHasher;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 abstract class CheckerBase
@@ -49,6 +54,11 @@ abstract class CheckerBase
     protected $sigCache = [];
 
     /**
+     * @var array
+     */
+    protected $schnorrSigHashCache = [];
+
+    /**
      * @var TransactionSignatureSerializer
      */
     private $sigSerializer;
@@ -59,27 +69,59 @@ abstract class CheckerBase
     private $pubKeySerializer;
 
     /**
+     * @var XOnlyPublicKeySerializerInterface
+     */
+    private $xonlyKeySerializer;
+
+    /**
+     * @var SchnorrSignatureSerializerInterface
+     */
+    private $schnorrSigSerializer;
+
+    /**
      * @var int
      */
     protected $sigHashOptionalBits = SigHash::ANYONECANPAY;
 
     /**
-     * Checker constructor.
+     * @var PrecomputedData
+     */
+    protected $precomputedData;
+
+    /**
+     * CheckerBase constructor.
      * @param EcAdapterInterface $ecAdapter
      * @param TransactionInterface $transaction
      * @param int $nInput
      * @param int $amount
      * @param TransactionSignatureSerializer|null $sigSerializer
      * @param PublicKeySerializerInterface|null $pubKeySerializer
+     * @param XOnlyPublicKeySerializerInterface|null $xonlyKeySerializer
+     * @param SchnorrSignatureSerializerInterface|null $schnorrSigSerializer
      */
-    public function __construct(EcAdapterInterface $ecAdapter, TransactionInterface $transaction, int $nInput, int $amount, TransactionSignatureSerializer $sigSerializer = null, PublicKeySerializerInterface $pubKeySerializer = null)
-    {
+    public function __construct(
+        EcAdapterInterface $ecAdapter,
+        TransactionInterface $transaction,
+        int $nInput,
+        int $amount,
+        TransactionSignatureSerializer $sigSerializer = null,
+        PublicKeySerializerInterface $pubKeySerializer = null,
+        XOnlyPublicKeySerializerInterface $xonlyKeySerializer = null,
+        SchnorrSignatureSerializerInterface $schnorrSigSerializer = null
+    ) {
         $this->sigSerializer = $sigSerializer ?: new TransactionSignatureSerializer(EcSerializer::getSerializer(DerSignatureSerializerInterface::class, true, $ecAdapter));
         $this->pubKeySerializer = $pubKeySerializer ?: EcSerializer::getSerializer(PublicKeySerializerInterface::class, true, $ecAdapter);
+        $this->xonlyKeySerializer = $xonlyKeySerializer ?: EcSerializer::getSerializer(XOnlyPublicKeySerializerInterface::class, true, $ecAdapter);
+        $this->schnorrSigSerializer = $schnorrSigSerializer ?: EcSerializer::getSerializer(SchnorrSignatureSerializerInterface::class, true, $ecAdapter);
         $this->adapter = $ecAdapter;
         $this->transaction = $transaction;
         $this->nInput = $nInput;
         $this->amount = $amount;
+    }
+
+    public function setPrecomputedData(PrecomputedData $precomputedData)
+    {
+        $this->precomputedData = $precomputedData;
     }
 
     /**
@@ -221,6 +263,57 @@ abstract class CheckerBase
 
             return $result;
         } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function getTaprootSigHash(int $sigHashType, int $sigVersion, ExecutionContext $execContext): BufferInterface
+    {
+        $cacheCheck = $sigVersion . $sigHashType;
+        if (!isset($this->schnorrSigHashCache[$cacheCheck])) {
+            $hasher = new TaprootHasher($this->transaction, $sigVersion, $this->precomputedData, $execContext);
+            $hash = $hasher->calculate($this->precomputedData->getSpentOutputs()[$this->nInput]->getScript(), $this->nInput, $sigHashType);
+            $this->schnorrSigHashCache[$cacheCheck] = $hash->getBinary();
+        } else {
+            $hash = new Buffer($this->schnorrSigHashCache[$cacheCheck], 32);
+        }
+
+        return $hash;
+    }
+
+    public function checkSigSchnorr(BufferInterface $sig64, BufferInterface $key32, int $sigVersion, ExecutionContext $execContext): bool
+    {
+        if ($sig64->getSize() === 0) {
+            echo "sig64 = 0\n";
+            return false;
+        }
+        if ($key32->getSize() !== 32) {
+            echo "key != 32\n";
+            return false;
+        }
+
+        $hashType = SigHash::TAPDEFAULT;
+        if ($sig64->getSize() === 65) {
+            $hashType = (int) $sig64->slice(64, 1)->getInt();
+            if ($hashType === SigHash::TAPDEFAULT) {
+                echo "badsighash1\n";
+                return false;
+            }
+            $sig64 = $sig64->slice(0, 64);
+        }
+
+        if ($sig64->getSize() !== 64) {
+            echo "sig.size!=64\n";
+            return false;
+        }
+
+        try {
+            $sig = $this->schnorrSigSerializer->parse($sig64);
+            $pubKey = $this->xonlyKeySerializer->parse($key32);
+            $sigHash = $this->getTaprootSigHash($hashType, $sigVersion, $execContext);
+            return $pubKey->verifySchnorr($sigHash, $sig);
+        } catch (\Exception $e) {
+            echo "checksigSchnorr exception: ". $e->getMessage().PHP_EOL;
             return false;
         }
     }
