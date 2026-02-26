@@ -45,7 +45,7 @@ $transaction = new Transaction(
     $txIns,
     $txOuts,
     $witnesses,
-    0 /* locktime */
+    $locktime
 );
 
 echo $transaction->getTxId()->getHex().PHP_EOL;
