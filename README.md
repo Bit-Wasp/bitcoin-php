@@ -1,4 +1,4 @@
-  
+0xc256a6869dcc04af795c0f040b30f4a3fa9d3007  
 ## Bitcoin
 
 [![Build Status](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bit-wasp/bitcoin-php/build-status/master)
